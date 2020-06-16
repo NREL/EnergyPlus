@@ -115,8 +115,6 @@ namespace WeatherManager {
     // and internal Evolutionary Engineering documentation.
 
     // USE STATEMENTS:
-    // Use statements for data only modules
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataEnvironment;
@@ -129,7 +127,6 @@ namespace WeatherManager {
     using namespace Psychrometrics;
 
     // Data
-    // MODULE PARAMETER DEFINITIONS:
     // Following are Date Types read in from EPW file or IDF
     int const InvalidDate(-1);
     int const MonthDay(1);
@@ -191,13 +188,6 @@ namespace WeatherManager {
 
     bool Debugout(false);
 
-    // Real64 CalcWaterMainsTempCurrent( 0 );
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
     // MODULE VARIABLE DECLARATIONS:
 
     int YearOfSim(1); // The Present year of Simulation.
@@ -209,8 +199,7 @@ namespace WeatherManager {
     int WeatherDataReport(0);         // Report number for the weather data
     bool WeatherFileExists(false);    // Set to true if a weather file exists
     std::string LocationTitle;        // Location Title from input File
-    bool LocationGathered(false);     // flag to show if Location exists on Input File (we assume one is there and
-    // correct on weather file)
+    bool LocationGathered(false);     // flag to show if Location exists on Input File (we assume one is there and correct on weather file)
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
         // to facilitate easier unit testing of those functions.
@@ -225,16 +214,16 @@ namespace WeatherManager {
     Real64 WeatherFileLongitude(0.0);
     Real64 WeatherFileTimeZone(0.0);
     Real64 WeatherFileElevation(0.0);
-    int WeatherFileUnitNumber;                           // File unit number for the weather file
+    int WeatherFileUnitNumber;                                // File unit number for the weather file
     Array1D<Real64> GroundTempsFCFromEPWHeader(12, 0.0); // F or C factor method
     Array1D<Real64> GroundReflectances(12, 0.2);         // User Specified Ground Reflectances !EPTeam: Using DP causes big diffs
-    Real64 SnowGndRefModifier(1.0);                      // Modifier to ground reflectance during snow
-    Real64 SnowGndRefModifierForDayltg(1.0);             // Modifier to ground reflectance during snow for daylighting
-    int WaterMainsTempsMethod(0);                        // Water mains temperature calculation method
-    int WaterMainsTempsSchedule(0);                      // Water mains temperature schedule
-    Real64 WaterMainsTempsAnnualAvgAirTemp(0.0);         // Annual average outdoor air temperature (C)
-    Real64 WaterMainsTempsMaxDiffAirTemp(0.0);           // Maximum difference in monthly average outdoor air temperatures (deltaC)
-    std::string WaterMainsTempsScheduleName;             // water mains tempeature schedule name
+    Real64 SnowGndRefModifier(1.0);                           // Modifier to ground reflectance during snow
+    Real64 SnowGndRefModifierForDayltg(1.0);                  // Modifier to ground reflectance during snow for daylighting
+    int WaterMainsTempsMethod(0);                             // Water mains temperature calculation method
+    int WaterMainsTempsSchedule(0);                           // Water mains temperature schedule
+    Real64 WaterMainsTempsAnnualAvgAirTemp(0.0);              // Annual average outdoor air temperature (C)
+    Real64 WaterMainsTempsMaxDiffAirTemp(0.0);                // Maximum difference in monthly average outdoor air temperatures (deltaC)
+    std::string WaterMainsTempsScheduleName;                  // water mains tempeature schedule name
     bool wthFCGroundTemps(false);
     Real64 RainAmount(0.0);
     Real64 SnowAmount(0.0);
@@ -303,8 +292,7 @@ namespace WeatherManager {
     Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth
 
     Array3D<Real64> DDDBRngModifier;  // Design Day Dry-bulb Temperature Range Modifier
-    Array3D<Real64> DDHumIndModifier; // Design Day relative humidity values
-    //   or wet-bulb modifiers (per HumIndType)
+    Array3D<Real64> DDHumIndModifier; // Design Day relative humidity values or wet-bulb modifiers (per HumIndType)
     Array3D<Real64> DDBeamSolarValues;    // Design Day Beam Solar Values
     Array3D<Real64> DDDiffuseSolarValues; // Design Day Relative Humidity Values
 
@@ -329,8 +317,7 @@ namespace WeatherManager {
     int NumSPSiteScheduleNamePtrs(0);                     // Number of SP Site Schedules (DesignDay only)
     int NumMissing(0);                                    // Number of hours of missing data
     Array1D<Real64> Interpolation;                        // Interpolation values based on Number of Time Steps in Hour
-    Array1D<Real64> SolarInterpolation;                   // Solar Interpolation values based on
-    //      Number of Time Steps in Hour
+    Array1D<Real64> SolarInterpolation;                   // Solar Interpolation values based on Number of Time Steps in Hour
     Array1D_int EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31});
     bool ErrorInWeatherFile(false);           // Set to TRUE when there is a problem with dates
     int LeapYearAdd(0);                       // Set during environment if leap year is active (adds 1 to number days in Feb)
@@ -338,10 +325,6 @@ namespace WeatherManager {
     bool StartDatesCycleShouldBeReset(false); // True when start dates on repeat should be reset
     bool Jan1DatesShouldBeReset(false);       // True if Jan 1 should signal reset of dates
     bool RPReadAllWeatherData(false);         // True if need to read all weather data prior to simulation
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE WeatherManager
-    // PUBLIC  ProcessDateString
-    // Get Input from Input File
 
     // Object Data
     DayWeatherVariables TodayVariables; // Today's daily weather variables | Derived Type for Storing Weather "Header" Data | Day of year for weather
@@ -578,27 +561,6 @@ namespace WeatherManager {
         // METHODOLOGY EMPLOYED:
         // Standard EnergyPlus "manager" methodology.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         static bool PrintEnvrnStamp(false); // Set to true when the environment header should be printed
 
         // FLOW:
@@ -612,18 +574,6 @@ namespace WeatherManager {
 
     void ResetEnvironmentCounter()
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   August 2010
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This routine provides an easy method to assure that the environment
-        // counter (used by GetNextEnvironment) is reset before SetupSimulation or
-        // Simulating.  May not be necessary, but just in case.
-
         Envrn = 0;
     }
 
@@ -838,12 +788,6 @@ namespace WeatherManager {
                                                        "Brunt",
                                                        "Idso",
                                                        "Berdahl and Martin"});
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //////////// hoisted into namespace changed to GetBranchInputOneTimeFlag////////////
-        //	static bool GetInputFlag( true ); // Set to true before execution starts changed to GetEnvironmentInputOneTimeFlag
-        //	static bool FirstCall( true ); // changed to GetEnvironmentFirstCall
-        // static bool PrntEnvHeaders( true );
-        ////////////////////////////////////////////////
         int Loop;
         std::string StDate;
         std::string EnDate;
@@ -1434,8 +1378,6 @@ namespace WeatherManager {
 
     void AddDesignSetToEnvironmentStruct(int const HVACSizingIterCount)
     {
-        // SUBROUTINE INFORMATION:
-
         using DataGlobals::ksDesignDay;
         using DataGlobals::ksHVACSizeDesignDay;
         using DataGlobals::ksHVACSizeRunPeriodDesign;
@@ -1476,31 +1418,9 @@ namespace WeatherManager {
         // This subroutine calculates the weekday for each month based on the start date and
         // weekday specified for that date.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         EP_SIZE_CHECK(WeekDays, 12);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int CurWeekDay;
 
@@ -1600,31 +1520,8 @@ namespace WeatherManager {
         // This subroutine resets the weekday for each month based on the current weekday
         // and previous weekdays per month.
 
-        // METHODOLOGY EMPLOYED:
-        // NA
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
         EP_SIZE_CHECK(WeekDays, 12);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_int WeekDaysCopy(12);
         int Loop;
         int CurWeekDay;
@@ -1844,29 +1741,8 @@ namespace WeatherManager {
         // need to set DST (Daylight Saving Time) dates at start of environment or year.
         // DST is only projected for one year.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SetDSTDateRanges: ");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActStartMonth; // Actual Start Month
         int ActStartDay;   // Actual Start Day of Month
         int ActEndMonth;   // Actual End Month
@@ -1968,29 +1844,8 @@ namespace WeatherManager {
         // need to set Special Day dates at start of environment or year.
         // Special Days are only projected for one year.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SetSpecialDayDates: ");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int ThisDay;
         int JDay;
@@ -2080,35 +1935,11 @@ namespace WeatherManager {
         // Most of the weather handling can be described as "initializations"
         // so most of the work is done via this subroutine.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int FirstSimDayofYear; // Variable which tells when to skip the day in a multi year simulation.
 
         static bool FirstCall(true);                 // Some things should only be done once
         static bool WaterMainsParameterReport(true); // should only be done once
-        //  LOGICAL, SAVE :: SetYear=.TRUE.
         int JDay5Start;
         int JDay5End;
         int TWeekDay;
@@ -2184,7 +2015,6 @@ namespace WeatherManager {
                 PrintEnvrnStamp = true; // Set this to true so that on first non-warmup day (only) the environment header will print out
             }
 
-            //    WeekDayCount=0  ! Reset weekday count (weather periods only)
             for (Loop = 1; Loop <= NumSpecialDays; ++Loop) {
                 SpecialDays(Loop).Used = false;
             }
@@ -2344,13 +2174,11 @@ namespace WeatherManager {
                         SetSpecialDayDates(Environment(Envrn).MonWeekDay);
                     }
                 }
-                //      SetYear=.FALSE.
             }
         } // ... end of BeginDayFlag IF-THEN block.
 
         if (!BeginDayFlag && !WarmupFlag && (Month != Environment(Envrn).StartMonth || DayOfMonth != Environment(Envrn).StartDay) &&
             !DatesShouldBeReset && Environment(Envrn).KindOfEnvrn == ksRunPeriodWeather) {
-            //    SetYear=.TRUE.
             DatesShouldBeReset = true;
         }
 
@@ -2362,7 +2190,6 @@ namespace WeatherManager {
 
         // set the EndDesignDayEnvrnsFlag (dataGlobals)
         // True at the end of the last design day environment (last time step of last hour of last day of environ which is a design day)
-        // added to address CR7562
         EndDesignDayEnvrnsFlag = false;
         if (EndEnvrnFlag) {
             if (Envrn < NumOfEnvrn) {
@@ -2405,33 +2232,6 @@ namespace WeatherManager {
         // enough reengineering has taken place to eliminate the need for this
         // include.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // FLOW:
-        // unused          integer :: myhr
-
         TodayVariables = TomorrowVariables; // Transfer Tomorrow's Daily Weather Variables to Today
 
         if (BeginEnvrnFlag) {
@@ -2459,7 +2259,6 @@ namespace WeatherManager {
         Month = TodayVariables.Month;
         DayOfMonth = TodayVariables.DayOfMonth;
         DayOfWeek = TodayVariables.DayOfWeek;
-        //  WeekDayCount(DayOfWeek)=WeekDayCount(DayOfWeek)+1
         HolidayIndex = TodayVariables.HolidayIndex;
         if (HolidayIndex > 0) {
             RptDayType = 7 + HolidayIndex;
@@ -2503,25 +2302,17 @@ namespace WeatherManager {
         // day boundary (current hour = 24), the next hour is hour 1 of next
         // weather data day (Tomorrow%).
 
-        // REFERENCES:
-        // INTERPOL(IBLAST) legacy code.
-
-        // Using/Aliasing
         using ScheduleManager::UpdateScheduleValues;
         using namespace GroundTemperatureManager;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static char time_stamp[10];
         static char day_stamp[6];
         static char day_year_stamp[11];
         static std::string const RoutineName("SetCurrentWeather");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int NextHour;
         Real64 TempVal;
         Real64 TempDPVal;
-
-        // FLOW:
 
         NextHour = HourOfDay + 1;
 
@@ -2660,18 +2451,11 @@ namespace WeatherManager {
             GndSolarRad = 0.0;
         }
 
-        // Calc some values
         OutEnthalpy = PsyHFnTdbW(OutDryBulbTemp, OutHumRat);
         OutAirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, OutDryBulbTemp, OutHumRat);
 
-        // Make sure outwetbulbtemp is valid.  And that no error occurs here.
         if (OutDryBulbTemp < OutWetBulbTemp) OutWetBulbTemp = OutDryBulbTemp;
-
-        //                                      VALIDITY TEST.
-        if (OutDewPointTemp > OutWetBulbTemp) {
-            OutDewPointTemp = OutWetBulbTemp;
-        }
-        // Get exterior daylight illuminance for daylighting calculation
+        if (OutDewPointTemp > OutWetBulbTemp) OutDewPointTemp = OutWetBulbTemp;
 
         DayltgCurrentExtHorizIllum();
 
@@ -2705,30 +2489,6 @@ namespace WeatherManager {
         // Theoretically, several kinds of weather files could be read here.  As
         // distributed only EPW files are allowed.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         ReadEPlusWeatherForDay(OutputFiles::getSingleton(), DayToRead, Environ, BackSpaceAfterRead);
     }
 
@@ -2748,18 +2508,14 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reads the appropriate day of EPW weather data.
 
-        // Using/Aliasing
         using General::RoundSigDigits;
         using ScheduleManager::GetScheduleValuesForDay;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
         static ObjexxFCL::gio::Fmt fmtLD("*");
         static ObjexxFCL::gio::Fmt YMDHFmt("(I4.4,2('/',I2.2),1X,I2.2,':',I2.2)");
         static ObjexxFCL::gio::Fmt YMDHFmt1("(I4.4,2('/',I2.2),1X,'hour=',I2.2,' - expected hour=',I2.2)");
 
-        // DERIVED TYPE DEFINITIONS:
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Hour;
         int TS;
         int WYear;
@@ -2868,7 +2624,6 @@ namespace WeatherManager {
             }
         };
 
-        // Object Data
         HourlyWeatherData Wthr;
 
         if (DayToRead == 1) {
@@ -2896,7 +2651,6 @@ namespace WeatherManager {
                     ReadStatus = flags.ios();
                 }
                 if (ReadStatus == 0) {
-                    // Reduce ugly code
                     InterpretWeatherDataLine(WeatherDataLine,
                                              ErrorFound,
                                              WYear,
@@ -3442,28 +3196,6 @@ namespace WeatherManager {
                         ++Missed.OpaqSkyCvr;
                     }
 
-                    // Some values are not used within EnergyPlus, don't keep stats on their missing data points.
-
-                    //        IF (Visibility >= 9999.0d0) THEN
-                    //          Visibility=Missing%Visibility
-                    //          Missed%Visibility=Missed%Visibility+1
-                    //        ENDIF
-
-                    //        IF (CeilHeight >= 99999.0d0) THEN
-                    //          CeilHeight=Missing%Ceiling
-                    //         Missed%Ceiling=Missed%Ceiling+1
-                    //        ENDIF
-
-                    //        IF (PrecipWater >= 999.0d0) THEN
-                    //          PrecipWater=Missing%PrecipWater
-                    //          Missed%PrecipWater=Missed%PrecipWater+1
-                    //        ENDIF
-
-                    //        IF (AerosolOptDepth >= 0.999d0) THEN
-                    //          AerosolOptDepth=Missing%AerOptDepth
-                    //         Missed%AerOptDepth=Missed%AerOptDepth+1
-                    //        ENDIF
-
                     if (SnowDepth >= 999.0) {
                         SnowDepth = Missing.SnowDepth;
                         ++Missed.SnowDepth;
@@ -3478,11 +3210,6 @@ namespace WeatherManager {
                         LiquidPrecip = Missing.LiquidPrecip;
                         ++Missed.LiquidPrecip;
                     }
-
-                    //        IF (DaysSinceLastSnow >= 99) THEN
-                    //          DaysSinceLastSnow=Missing%DaysLastSnow
-                    //          Missed%DaysLastSnow=Missed%DaysLastSnow+1
-                    //        ENDIF
 
                     TomorrowOutDryBulbTemp(CurTimeStep, Hour) = DryBulb;
                     TomorrowOutDewPointTemp(CurTimeStep, Hour) = DewPoint;
@@ -3789,30 +3516,6 @@ namespace WeatherManager {
         // conditions.  Improve code readability by having three routine calls instead of three
         // IF blocks.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (EnvironDayOfWeek != 0) {
             if (EnvironDayOfWeek <= 7) {
                 CurDayOfWeek = EnvironDayOfWeek - 1;
@@ -3879,35 +3582,12 @@ namespace WeatherManager {
         // likely to contain blanks.  Note that the "Weatherconditions" must be a 9 character
         // alpha field with no intervening blanks.
 
-        // REFERENCES:
-        // CALL InterpretWeatherDataLine(WeatherDataLine,ErrorFound,WYear,WMonth,WDay,WHour,WMinute,  &
-        //       DryBulb,DewPoint,RelHum,AtmPress,ETHoriz,ETDirect,IRHoriz,GLBHoriz,            &
-        //       DirectRad,DiffuseRad,GLBHorizIllum,DirectNrmIllum,DiffuseHorizIllum,ZenLum,    &
-        //       WindDir,WindSpeed,TotalSkyCover,OpaqueSkyCover,Visibility,CeilHeight,          &
-        //       PresWeathObs,PresWeathConds,PrecipWater,AerosolOptDepth,SnowDepth,DaysSinceLastSnow,
-        //       Albedo,LiquidPrecipDepth)
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
         EP_SIZE_CHECK(WCodesArr, 9);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const ValidDigits("0123456789");
         static ObjexxFCL::gio::Fmt fmtLD("*");
         static ObjexxFCL::gio::Fmt fmt9I1("(9I1)");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string::size_type Pos;
         std::string PresWeathCodes;
         Real64 RYear;
@@ -4114,7 +3794,6 @@ namespace WeatherManager {
             RField26 = 999.0;
             RField27 = 999.0;
         }
-        //  READ(Line,*,err=903,end=903) RField22,RField23,RField24,RField25
 
         WObs = nint(RField21);
         if (WObs == 0) { // Obs Indicator indicates Weather Codes valid
@@ -4162,12 +3841,6 @@ namespace WeatherManager {
         ShowContinueError("Remainder of line=" + Line);
         ShowFatalError("Error in Reading Weather Data");
 
-        // Label903: ;
-        //		gio::write( DateError, "(I4,'/',I2,'/',I2,' Hour#=',I2,' Min#=',I2)" ) << WYear << WMonth << WDay << WHour << WMinute;
-        //		ShowSevereError( "Invalid Weather Line at date=" + DateError );
-        //		ShowContinueError( "Full Data Line=" + SaveLine );
-        //		ShowContinueError( "Partial line read; Remainder of line=" + Line );
-        //		ShowFatalError( "Error in Reading Weather Data" );
     }
 
     void SetUpDesignDay(OutputFiles &outputFiles, int const EnvrnNum) // Environment number passed into the routine
@@ -4186,21 +3859,11 @@ namespace WeatherManager {
         // weather day record information in the local module level derived type
         // called DesignDay.
 
-        // METHODOLOGY EMPLOYED:
-        // Methodology incorporates the design day setup from Tarp as appropriate.
-
-        // REFERENCES:
-        // ASHRAE Handbook of Fundamentals?
-
-        // Using/Aliasing
         using General::RoundSigDigits;
         using ScheduleManager::GetSingleDayScheduleValues;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr Real64 GlobalSolarConstant(1367.0);
         constexpr Real64 ZHGlobalSolarConstant(1355.0);
-
-
 
         Real64 const ZhangHuangModCoeff_C0(0.5598);   // 37.6865d0
         Real64 const ZhangHuangModCoeff_C1(0.4982);   // 13.9263d0
@@ -4216,7 +3879,6 @@ namespace WeatherManager {
         static std::string const WeatherManager("WeatherManager");
         static std::string const RoutineNameLong("WeatherManager.cc subroutine SetUpDesignDay");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Hour;
         int TS;
         Real64 A;                  // Apparent solar irradiation at air mass = 0
@@ -4550,30 +4212,6 @@ namespace WeatherManager {
                     TomorrowOutDewPointTemp(TS, Hour) = PsyTdpFnWPb(HumidityRatio, DesDayInput(EnvrnNum).PressBarom);
                 }
 
-                // Determine Sky Temp ==>
-                // Function of DryBulb, DewPoint, OpaqueSkyCover
-                // Calculate Sky IR
-                // HIR = ESKY * SIGMA * (TOUT**4)
-                // where
-                // HIR = horizontal IR intensity (W/m2)
-                // ESKY = sky emissivity
-                // SIGMA = Stefan-Boltzmann constant = 5.6697e-8 W/m2-K4
-                // TOUT = drybulb temperature (K)
-                // The sky emissivity is given by
-                // ESKY = [0.787 + 0.764*ln(TDEW/273)]*[1 + 0.0224*N - 0.0035*(N**2) + 0.00028*(N**3)]
-                // where
-                // TDEW = dewpoint temperature (K)
-                // N = opaque sky cover (tenths)
-                // Example: Clear sky (N=0), TOUT = 273+20=293K, TDEW = 273+10=283K:
-                // ESKY = 0.787 + 0.764*0.036 = 0.815
-                // HIR = 0.815*5.6697e-8*(293**4) = 340.6 W/m2
-
-                // References:
-                // George N. Walton, "Thermal Analysis Research Program Reference Manual,"
-                // NBSIR 83-2655, March 1983, p. 21.
-                // G. Clark and C. Allen, "The Estimation of Atmospheric Radiation for Clear and
-                // Cloudy Skies," Proc. 2nd National Passive Solar Conference (AS/ISES), 1978, pp. 675-678.
-
                 double DryBulb = TomorrowOutDryBulbTemp(TS, Hour);
                 double RelHum = TomorrowOutRelHum(TS, Hour) * 0.01;
                 ESky = CalcSkyEmissivity(Environment(EnvrnNum).SkyTempModel, OSky, DryBulb, TomorrowOutDewPointTemp(TS, Hour), RelHum);
@@ -4734,8 +4372,6 @@ namespace WeatherManager {
         WarmupFlag = SaveWarmupFlag;
     }
 
-    //------------------------------------------------------------------------------
-
     Real64 AirMass(Real64 const CosZen) // COS( solar zenith), 0 - 1
     {
 
@@ -4756,25 +4392,7 @@ namespace WeatherManager {
         // Kasten, F and T. Young.  1989.  Revised optical air mass tables
         //   and approximating formula.  Applied Optics 28:4735-4738.
 
-        // USE STATEMENTS:
-        // na
-
-        // Return value
         Real64 AirMass;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SunAltD;
 
         if (CosZen <= 0.001) {
@@ -4819,23 +4437,6 @@ namespace WeatherManager {
         // REFERENCES:
         // ASHRAE HOF 2009 Chapter 14
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Real64 AB; // air mass exponents
         Real64 AD;
         Real64 M; // air mass
@@ -4874,30 +4475,6 @@ namespace WeatherManager {
         // Design Day) to the proper number of "time steps in hour" requested by the user.
         // Interpolation of data is done later after either setting up the design day (hourly
         // data) or reading in hourly weather data.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         TodayIsRain.allocate(NumOfTimeStepInHour, 24);
         TodayIsRain = false;
@@ -4996,51 +4573,19 @@ namespace WeatherManager {
         // coefficients a, b, and c.
         // See SUN3 in SolarShading. See SUN2 in BLAST.  See SUN3 in Tarp.
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const DayCorrection(Pi * 2.0 / 366.0);
 
-        static Array1D<Real64> const SineSolDeclCoef(
-            9, {0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951, -0.00011691, 0.00002096}); // Fitted coefficients
-                                                                                                                                // of Fourier series |
-                                                                                                                                // Sine of declination
-                                                                                                                                // coefficients
-        static Array1D<Real64> const EqOfTimeCoef(
-            9, {0.00021971, -0.122649, 0.00762856, -0.156308, -0.0530028, -0.00388702, -0.00123978, -0.00270502, -0.00167992}); // Fitted coefficients
-                                                                                                                                // of Fourier Series |
-                                                                                                                                // Equation of Time
-                                                                                                                                // coefficients
-        static Array1D<Real64> const ASHRAE_A_Coef(
-            9, {1161.6685, 1.1554, 77.3575, -0.5359, -3.7622, 0.9875, -3.3924, -1.7445, 1.1198}); // Fitted coefficients of Fourier Series | ASHRAE A
-                                                                                                  // Factor coefficients
-        // English (original) units:
-        //              368.49341,.366502,24.538624,-.169983,-1.193417,            &
-        //              .313261,-1.076093,-.543376,.355197 ,                       &
+        // Fitted coefficients of Fourier series | Sine of declination coefficients
+        static Array1D<Real64> const SineSolDeclCoef(9, {0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951, -0.00011691, 0.00002096});
+        // Fitted coefficients of Fourier Series | Equation of Time coefficients
+        static Array1D<Real64> const EqOfTimeCoef(9, {0.00021971, -0.122649, 0.00762856, -0.156308, -0.0530028, -0.00388702, -0.00123978, -0.00270502, -0.00167992});
+        // Fitted coefficients of Fourier Series | ASHRAE A Factor coefficients
+        static Array1D<Real64> const ASHRAE_A_Coef(9, {1161.6685, 1.1554, 77.3575, -0.5359, -3.7622, 0.9875, -3.3924, -1.7445, 1.1198});
+        // Fitted coefficients of Fourier Series | ASHRAE B Factor coefficients
+        static Array1D<Real64> const ASHRAE_B_Coef(9, {0.171631, -0.00400448, -0.0344923, 0.00000209, 0.00325428, -0.00085429, 0.00229562, 0.0009034, -0.0011867});
+        // Fitted coefficients of Fourier Series | ASHRAE C Factor coefficients
+        static Array1D<Real64> const ASHRAE_C_Coef(9, {0.0905151, -0.00322522, -0.0407966, 0.000104164, 0.00745899, -0.00086461, 0.0013111, 0.000808275, -0.00170515});
 
-        static Array1D<Real64> const ASHRAE_B_Coef(
-            9, {0.171631, -0.00400448, -0.0344923, 0.00000209, 0.00325428, -0.00085429, 0.00229562, 0.0009034, -0.0011867}); // Fitted coefficients of
-                                                                                                                             // Fourier Series |
-                                                                                                                             // ASHRAE B Factor
-                                                                                                                             // coefficients
-        static Array1D<Real64> const ASHRAE_C_Coef(
-            9, {0.0905151, -0.00322522, -0.0407966, 0.000104164, 0.00745899, -0.00086461, 0.0013111, 0.000808275, -0.00170515}); // Fitted
-                                                                                                                                 // coefficients of
-                                                                                                                                 // Fourier Series |
-                                                                                                                                 // ASHRAE C Factor
-                                                                                                                                 // coefficients
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 X;    // Day of Year in Radians (Computed from Input DayOfYear)
         Real64 CosX; // COS(X)
         Real64 SinX; // SIN(X)
@@ -5074,10 +4619,10 @@ namespace WeatherManager {
             ASHRAE_A_Coef(8) * (2.0 * (SinX * CosX * 2.0) * (pow_2(CosX) - pow_2(SinX))) +
             ASHRAE_A_Coef(9) * (pow_2(pow_2(CosX) - pow_2(SinX)) - pow_2(SinX * CosX * 2.0));
 
-        //                        Compute B and C coefficients
+        // Compute B and C coefficients
 
         if (Latitude < 0.0) {
-            //                            If in southern hemisphere, compute B and C with a six month time shift.
+            // If in southern hemisphere, compute B and C with a six month time shift.
             X -= Pi;
             SinX = std::sin(X);
             CosX = std::cos(X);
@@ -5113,40 +4658,19 @@ namespace WeatherManager {
         // This routine computes the solar direction cosines for hourly
         // radiation calculations.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
         // REFERENCES:
         // "NECAP Engineering Manual", 1974, p.3-117
 
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
         EP_SIZE_CHECK(SUNCOS, 3);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 COSH; // Cosine of hour angle
         Real64 H;    // Hour angle (before noon = +)
 
-        //                                      COMPUTE THE HOUR ANGLE
+        // COMPUTE THE HOUR ANGLE
         H = (15.0 * (12.0 - (TimeValue + EqOfTime)) + (TimeZoneMeridian - Longitude)) * DegToRadians;
         COSH = std::cos(H);
-        //                                      COMPUTE THE COSINE OF THE
-        //                                      SOLAR ZENITH ANGLE.
-        //                                      This is also the Sine of the Solar Altitude Angle
+        // COMPUTE THE COSINE OF THE SOLAR ZENITH ANGLE.
+        // This is also the Sine of the Solar Altitude Angle
 
         SUNCOS(3) = SinSolDeclin * SinLatitude + CosSolDeclin * CosLatitude * COSH;
 
@@ -5172,31 +4696,11 @@ namespace WeatherManager {
         // This subroutine determines if the sun is up or down for the current
         // hour/timestep.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
         // REFERENCES:
         // Sun routines from IBLAST, authored by Walton.
 
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
         EP_SIZE_CHECK(SunDirectionCosines, 3);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 H; // Hour angle (before noon = +)
         Real64 SinAltitude;
         Real64 SolarAltitude;
@@ -5204,10 +4708,8 @@ namespace WeatherManager {
         Real64 SolarZenith;
         Real64 CosAzimuth;
         Real64 CosZenith;
-        //  REAL(r64) HAngle
 
         // COMPUTE THE HOUR ANGLE
-
         if (NumOfTimeStepInHour != 1) {
             HrAngle = (15.0 * (12.0 - (CurrentTime + TodayVariables.EquationOfTime)) + (TimeZoneMeridian - Longitude));
         } else {
@@ -5259,32 +4761,6 @@ namespace WeatherManager {
         // exists in the working directory and calls appropriate routines to
         // open the files and set up for use.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // FLOW:
-
         {
             IOFlags flags;
             ObjexxFCL::gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
@@ -5317,7 +4793,6 @@ namespace WeatherManager {
 
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const Header(8,
                                            {"LOCATION",
                                             "DESIGN CONDITIONS",
@@ -5328,7 +4803,6 @@ namespace WeatherManager {
                                             "COMMENTS 2",
                                             "DATA PERIODS"});
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string Line;
         int HdLine;
         bool StillLooking;
@@ -5373,7 +4847,6 @@ namespace WeatherManager {
                 std::string::size_type const Pos = FindNonSpace(Line);
                 std::string::size_type const HdPos = index(Line, Header(HdLine));
                 if (Pos != HdPos) continue;
-                //      line=UtilityRoutines::MakeUPPERCase(line)
                 ProcessEPWHeader(Header(HdLine), Line, ErrorsFound);
                 ++HdLine;
                 if (HdLine == 9) StillLooking = false;
@@ -5400,39 +4873,6 @@ namespace WeatherManager {
 
     void CloseWeatherFile()
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   February 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine closes the open weather file.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool EPWOpen;
         int unitnumber;
 
@@ -5462,30 +4902,7 @@ namespace WeatherManager {
         // in this module.  At some point, this subroutine will be converted
         // to read information directly from the new input file.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using General::RoundSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // FLOW:
 
         if (Environment(NumOfEnvrn).KindOfEnvrn == ksRunPeriodWeather && WeatherFileExists) {
             if (LocationGathered) {
@@ -5544,35 +4961,11 @@ namespace WeatherManager {
         // time meridian is also calculated and compared to the user supplied
         // or weather file time zone number.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // Legacy subroutine CKBLDE.
-
-        // Using/Aliasing
         using General::RoundSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         bool LocationError;  // Set to true if there is a problem detected
         Real64 StdTimeMerid; // Standard time meridian
         Real64 DiffCalc;     // Difference between Standard Time Meridian and TimeZone
-
-        // FLOW:
 
         LocationError = false;
 
@@ -5597,13 +4990,6 @@ namespace WeatherManager {
         }
 
         StdTimeMerid = GetSTM(Longitude); // Obtain the standard time meridian.
-
-        // Bias at +/- 12 for StdTimeMerid
-        //  IF (StdTimeMerid == -12.0 .and. TimeZoneNumber > 0) THEN
-        //    StdTimeMerid=12.0
-        //  ELSEIF (StdTimeMerid == 12.0 .and. TimeZoneNumber < 0) THEN
-        //    StdTimeMerid=-12.0
-        //  ENDIF
 
         // Compare the standard time meridian with the time zone number.  If
         // different, notify the user.  If StdTimeMerid couldn't be calculated,
@@ -5670,31 +5056,6 @@ namespace WeatherManager {
         // routine also sends the weather file header information at the
         // Environment derived type.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // Legacy subroutine CKBLDE.
-
-        // Using/Aliasing
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // FLOW:
-
         ErrorInWeatherFile = false;
         if (!WeatherFileExists) { // No weather file exists but the user requested one--print error message
 
@@ -5727,29 +5088,9 @@ namespace WeatherManager {
         // incremented.  Finally, the header information for the report must
         // be sent to the output file.
 
-        // REFERENCES:
-        // EnergyPlus Output Description document.
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // Format descriptor for the environment title
         static ObjexxFCL::gio::Fmt A("(a)");
         static std::string EnvironmentString(",5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]");
-        static std::string TimeStepString(
-            ",8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType");
+        static std::string TimeStepString(",8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType");
         static std::string DailyString(",5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily ");
         static std::string MonthlyString(",2,Cumulative Days of Simulation[],Month[]  ! When Monthly ");
         static std::string RunPeriodString(",1,Cumulative Days of Simulation[] ! When Run Period ");
@@ -5815,28 +5156,6 @@ namespace WeatherManager {
         // warmup days (to allow all modules to print the report headers to the
         // output file.  This is controlled by the PrintEnvrnStamp variable
         // which is passed in and reset if necessary.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // unused0909  USE DataSystemVariables, ONLY: ReportDuringWarmup
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        //  CHARACTER(len=*), PARAMETER :: TimeStampFormat = "(i3,',',i4,',',i2,',',i2,',',i2)" ! Format descriptor for the date/time stamp
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // FLOW:
 
         // Report the time stamp and the current weather to the output file
 
@@ -6027,12 +5346,10 @@ namespace WeatherManager {
         // This subroutine gets the run period info from User input and the
         //  simulation dates
 
-        // Using/Aliasing
         using General::TrimSigDigits;
         using namespace DataSystemVariables;
         using namespace DataIPShortCuts;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlpha;   // Number of alphas being input
         int NumNumeric; // Number of numbers being input
         int IOStat;     // IO Status when calling get input subroutine
@@ -6045,11 +5362,6 @@ namespace WeatherManager {
 
         cCurrentModuleObject = "RunPeriod";
         Count = 0;
-        // if ( ! WFAllowsLeapYears ) {
-        //   LocalLeapYearAdd = 0;
-        // } else {
-        //  LocalLeapYearAdd = 1;
-        // }
         for (Loop = 1; Loop <= TotRunPers; ++Loop) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           Loop,
@@ -6384,12 +5696,10 @@ namespace WeatherManager {
         // This subroutine gets the run period design info from User input and the
         //  simulation dates
 
-        // Using/Aliasing
         using General::TrimSigDigits;
         using namespace DataSystemVariables;
         using namespace DataIPShortCuts;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const ValidNames(12,
                                                {"SUNDAY",
                                                 "MONDAY",
@@ -6404,7 +5714,6 @@ namespace WeatherManager {
                                                 "CUSTOMDAY1",
                                                 "CUSTOMDAY2"});
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;   // Number of alphas being input
         int NumNumerics; // Number of Numerics being input
         int IOStat;      // IO Status when calling get input subroutine
@@ -6413,9 +5722,7 @@ namespace WeatherManager {
         int RPD2;
         int Count;
         int WhichPeriod;
-        // unused1208  CHARACTER(len=MaxNameLength) :: ThisObject
 
-        // FLOW:
         // Call Input Get routine to retrieve annual run data
         RPD1 = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays");
         RPD2 = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileConditionType");
@@ -6441,7 +5748,6 @@ namespace WeatherManager {
             GlobalNames::VerifyUniqueInterObjectName(
                 RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
-            // Increment Count
             ++Count;
             RunPeriodDesignInput(Count).title = cAlphaArgs(1);
             RunPeriodDesignInput(Count).periodType = "User Selected WeatherFile RunPeriod (Design)";
@@ -6553,7 +5859,6 @@ namespace WeatherManager {
             GlobalNames::VerifyUniqueInterObjectName(
                 RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
-            // Increment count
             ++Count;
             RunPeriodDesignInput(Count).title = cAlphaArgs(1);
             RunPeriodDesignInput(Count).periodType = "User Selected WeatherFile Typical/Extreme Period (Design)=" + cAlphaArgs(2);
@@ -6690,14 +5995,11 @@ namespace WeatherManager {
         //        \key CustomDay1
         //        \key CustomDay2
 
-        // Using/Aliasing
         using namespace DataIPShortCuts;
         using General::TrimSigDigits;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const ValidDayTypes(5, {"HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2"});
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string AlphArray(3);
         int NumAlphas;
         Array1D<Real64> Duration(1);
@@ -6765,8 +6067,6 @@ namespace WeatherManager {
             }
             ++Count;
         }
-
-        // CALL CalcSpecialDayTypes
     }
 
     void CalcSpecialDayTypes()
@@ -6786,25 +6086,6 @@ namespace WeatherManager {
         // Sets up the SpecialDayTypes array that then is used during simulation.
         // Uses WFLeapYearInd to indicate Leap Year simulation runs.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int Loop1;
         int JDay;
@@ -6869,10 +6150,8 @@ namespace WeatherManager {
         //      \memo <Weekday> can be Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
         //      \memo <Nth> can be 1 or 1st, 2 or 2nd, etc. up to 5(?)
 
-        // Using/Aliasing
         using namespace DataIPShortCuts;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumFound;
         int NumAlphas;
         int IOStat;
@@ -6929,8 +6208,6 @@ namespace WeatherManager {
         // This subroutine retrieves the design day info from user input file
         //  which is later to be used in the Setup Design Day Routine.
 
-        // METHODOLOGY EMPLOYED:
-
         // REFERENCES:
         // SizingPeriod:DesignDay,
         //   A1, \field Name
@@ -6960,7 +6237,6 @@ namespace WeatherManager {
         //   N13, \field ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
         //   N14; \field Sky Clearness
 
-        // Using/Aliasing
         using namespace DataIPShortCuts;
         using General::FindNumberInList;
         using General::RoundSigDigits;
@@ -6970,7 +6246,6 @@ namespace WeatherManager {
         using namespace DataSystemVariables;
         using namespace OutputReportPredefined;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const ValidNames(12,
                                                {"SUNDAY",
                                                 "MONDAY",
@@ -6994,8 +6269,6 @@ namespace WeatherManager {
                                                             "WetBulbProfileDifferenceSchedule []",
                                                             "WetBulbProfileMultiplierSchedule []"});
 
-        //  REAL(r64), PARAMETER, DIMENSION(24) :: DefaultTempRangeMult=(/ .87d0,.92d0,.96d0,.99d0,1.0d0,.98d0,.93d0,  &
-        //                   .84d0,.71d0,.56d0,.39d0,.23d0, .11d0,.03d0,.00d0,.03d0,.10d0,.21d0,.34d0,.47d0,.58d0,.68d0,.76d0,.82d0 /)
         // Below are the 2009 fractions, HOF, Chap 14, Table 6
         static Array1D<Real64> const DefaultTempRangeMult(24, {0.88, 0.92, 0.95, 0.98, 1.0,  0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13,
                                                                0.05, 0.00, 0.00, 0.06, 0.14, 0.24, 0.39, 0.50, 0.59, 0.68, 0.75, 0.82});
@@ -7019,8 +6292,6 @@ namespace WeatherManager {
         int schPtr;
         bool MaxDryBulbEntered;
         bool PressureEntered;
-
-        // FLOW:
 
         DesDayInput.allocate(TotDesDays); // Allocate the array to the # of DD's
         DDDBRngModifier.allocate(NumOfTimeStepInHour, 24, TotDesDays);
@@ -7546,7 +6817,6 @@ namespace WeatherManager {
                     }
                     LastHrValue = DefaultTempRangeMult(HrLoop);
                 }
-                // ELSE missing case?
             }
 
             // verify that design WB or DP <= design DB
@@ -7791,10 +7061,8 @@ namespace WeatherManager {
         // This subroutine gets the location info from the IDF file; latitude,
         //  longitude and time zone number.
 
-        // Using/Aliasing
         using namespace DataIPShortCuts;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int LocNumAlpha;             // Number of alpha names being passed
         int LocNumProp;              // Number of properties being passed
         int IOStat;                  // IO Status when calling get input subroutine
@@ -7802,7 +7070,6 @@ namespace WeatherManager {
         Array1D<Real64> LocProps(4); // Temporary array to transfer location info
         int NumLocations;
 
-        // FLOW:
         cCurrentModuleObject = "Site:Location";
         NumLocations = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
@@ -7839,9 +7106,6 @@ namespace WeatherManager {
         // used in the test suite runs that have specific requirements for certain properties (such as
         // sky temperature).
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
         // REFERENCES:
         // WeatherProperty:SkyTemperature,
         //        \memo This object is used to override internal sky temperature calculations.
@@ -7860,16 +7124,13 @@ namespace WeatherManager {
         //        \object-list DayScheduleNames
         //        \object-list ScheduleNames
 
-        // Using/Aliasing
         using ScheduleManager::GetDayScheduleIndex;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataIPShortCuts;
         using General::FindNumberInList;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetWeatherProperties:");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;
         int IOStat;
         int NumAlpha;
@@ -8080,14 +7341,11 @@ namespace WeatherManager {
         // This file reads the Ground Temps from the input file and puts them
         //  in a new variable.
 
-        // Using/Aliasing
         using namespace DataIPShortCuts;
         using namespace GroundTemperatureManager;
 
-        // Formats
         static ObjexxFCL::gio::Fmt Format_720("(' ',A,12(', ',F6.2))");
 
-        // FLOW:
         // Initialize Site:GroundTemperature:BuildingSurface object
         siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
         if (siteBuildingSurfaceGroundTempsPtr) {
@@ -8126,10 +7384,7 @@ namespace WeatherManager {
         // This file reads the Ground Reflectances from the input file (optional) and
         // places them in the monthly array.
 
-        // Using/Aliasing
         using namespace DataIPShortCuts;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int GndNumAlpha;          // Number of construction alpha names being passed
         int GndNumProp;           // dummy variable for properties being passed
@@ -8138,10 +7393,8 @@ namespace WeatherManager {
         Array1D_string GndAlphas; // Construction Alpha names defined
         Array1D<Real64> GndProps; // Temporary array to transfer ground reflectances
 
-        // Formats
         static ObjexxFCL::gio::Fmt Format_720("(' Site:GroundReflectance',12(', ',F5.2))");
 
-        // FLOW:
         cCurrentModuleObject = "Site:GroundReflectance";
         I = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (I != 0) {
@@ -8194,10 +7447,7 @@ namespace WeatherManager {
         // This file reads the Snow Ground Reflectance Modifiers from the input file (optional) and
         // places them in the variables.
 
-        // Using/Aliasing
         using namespace DataIPShortCuts;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int GndNumAlpha;          // Number of construction alpha names being passed
         int GndNumProp;           // dummy variable for properties being passed
@@ -8206,10 +7456,8 @@ namespace WeatherManager {
         Array1D_string GndAlphas; // Construction Alpha names defined
         Array1D<Real64> GndProps; // Temporary array to transfer ground reflectances
 
-        // Formats
-       static ObjexxFCL::gio::Fmt Format_721("(A,12(', ',F5.2))");
+        static ObjexxFCL::gio::Fmt Format_721("(A,12(', ',F5.2))");
 
-        // FLOW:
         cCurrentModuleObject = "Site:GroundReflectance:SnowModifier";
         I = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (I != 0) {
@@ -8270,11 +7518,9 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Reads the input data for the WATER MAINS TEMPERATURES object.
 
-        // Using/Aliasing
         using namespace DataIPShortCuts;
         using ScheduleManager::GetScheduleIndex;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumObjects;
         int NumAlphas;               // Number of elements in the alpha array
         int NumNums;                 // Number of elements in the numeric array
@@ -8282,7 +7528,6 @@ namespace WeatherManager {
         Array1D_string AlphArray(2); // Character string data
         Array1D<Real64> NumArray(2); // Numeric data
 
-        // FLOW:
         cCurrentModuleObject = "Site:WaterMainsTemperature";
         NumObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
@@ -8351,15 +7596,8 @@ namespace WeatherManager {
         // is fit to Fahrenheit units, so the air temperature values are first convert to F, then mains temperature
         // is calculated and converted back to C.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // FLOW:
         {
             auto const SELECT_CASE_var(WaterMainsTempsMethod);
 
@@ -8403,10 +7641,6 @@ namespace WeatherManager {
         // Savings Benchmark for All Residential End-Uses", Proceedings of SimBuild 2004, IBPSA-USA National Conference,
         // Boulder, CO, August 4 - 6, 2004.
 
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Tavg;                          // Annual Average Outdoor Air Temperature (F)
         Real64 Tdiff;                         // Maximum difference in monthly average outdoor air temperatures (deltaF)
         Real64 Ratio;                         // Value used in correlation
@@ -8414,7 +7648,6 @@ namespace WeatherManager {
         Real64 Offset;                        // Value used in correlation
         Real64 CurrentWaterMainsTemp;         // calculated water main temp (F)
 
-        // FLOW:
         Tavg = AnnualOAAvgDryBulbTemp * (9.0 / 5.0) + 32.0;
         Tdiff = MonthlyOAAvgDryBulbTempMaxDiff * (9.0 / 5.0);
 
@@ -8447,11 +7680,9 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Reads the input data for the WEATHER STATION object.
 
-        // Using/Aliasing
         using namespace DataIPShortCuts;
         using General::RoundSigDigits;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumObjects;
         int NumAlphas;                      // Number of elements in the alpha array
         int NumNums;                        // Number of elements in the numeric array
@@ -8463,11 +7694,6 @@ namespace WeatherManager {
         Real64 WeatherFileWindBLHeight;     // Boundary layer height for the wind velocity profile at the weather station (m)
         Real64 WeatherFileTempSensorHeight; // Height of the air temperature sensor at the weather station (m)
 
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // FLOW:
         cCurrentModuleObject = "Site:WeatherStation";
         NumObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
@@ -8532,39 +7758,17 @@ namespace WeatherManager {
         // REFERENCES:
         // Based on DOE-2.1E subroutine DEXTIL.
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Real64 SDIRH; // Exterior horizontal beam irradiance (W/m2)
         Real64 SDIFH; // Exterior horizontal sky diffuse irradiance (W/m2)
-        // REAL(r64)   :: PDIRLW                  ! Luminous efficacy (lum/W) of beam solar radiation
-        // REAL(r64)   :: PDIFLW                  ! Luminous efficacy (lum/W) of sky diffuse solar radiation
-
-        //              DIRECT AND DIFFUSE HORIZONTAL SOLAR IRRADIANCE (W/M2).
-        //              SOLCOS(3), below, is the cosine of the solar zenith angle.
+        // SOLCOS(3), below, is the cosine of the solar zenith angle.
         if (SunIsUp) {
             SDIRH = BeamSolarRad * SOLCOS(3);
             SDIFH = DifSolarRad;
-            //              Fraction of sky covered by clouds
+            // Fraction of sky covered by clouds
             CloudFraction = pow_2(SDIFH / (SDIRH + SDIFH + 0.0001));
-            //              Luminous efficacy of sky diffuse solar and beam solar (lumens/W);
-            //              Horizontal illuminance from sky and horizontal beam illuminance (lux)
-            //              obtained from solar quantities on weather file and luminous efficacy.
+            // Luminous efficacy of sky diffuse solar and beam solar (lumens/W);
+            // Horizontal illuminance from sky and horizontal beam illuminance (lux)
+            // obtained from solar quantities on weather file and luminous efficacy.
 
             DayltgLuminousEfficacy(PDIFLW, PDIRLW);
             HISKF = SDIFH * PDIFLW;
@@ -8605,16 +7809,6 @@ namespace WeatherManager {
         // global irradiance components from direct and global irradiance,"
         // Solar Energy 44 (1990) 271-289.
 
-        // Called by DayltgCurrentExtHorizIllum.
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D<Real64> const ADiffLumEff(
             8, {97.24, 107.22, 104.97, 102.39, 100.71, 106.42, 141.88, 152.23}); // Diffuse luminous efficacy coefficients
         static Array1D<Real64> const BDiffLumEff(8, {-0.46, 1.15, 2.96, 5.59, 5.94, 3.83, 1.90, 0.35});
@@ -8639,13 +7833,6 @@ namespace WeatherManager {
                                                       128814.0,
                                                       130471.0}); // Monthly exterrestrial direct normal illuminance (lum/m2)
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SunZenith;      // Solar zenith angle (radians)
         Real64 SunAltitude;    // Solar altitude angle (radians)
         Real64 SinSunAltitude; // Sine of the solar altitude angle
@@ -8654,19 +7841,17 @@ namespace WeatherManager {
         Real64 AirMass;       // Relative optical air mass
         Real64 AtmosMoisture; // Atmospheric moisture (cm of precipitable water)
 
-        // FLOW:
-
         SunZenith = std::acos(SOLCOS(3));
         SunAltitude = PiOvr2 - SunZenith;
         SinSunAltitude = std::sin(SunAltitude);
-        //              Clearness of sky. SkyClearness close to 1.0 corresponds to an overcast sky.
-        //              SkyClearness > 6 is a clear sky.
-        //              DifSolarRad is the diffuse horizontal irradiance.
-        //              BeamSolarRad is the direct normal irradiance.
+        // Clearness of sky. SkyClearness close to 1.0 corresponds to an overcast sky.
+        // SkyClearness > 6 is a clear sky.
+        // DifSolarRad is the diffuse horizontal irradiance.
+        // BeamSolarRad is the direct normal irradiance.
         Zeta = 1.041 * pow_3(SunZenith);
         SkyClearness = ((DifSolarRad + BeamSolarRad) / (DifSolarRad + 0.0001) + Zeta) / (1.0 + Zeta);
         AirMass = (1.0 - 0.1 * Elevation / 1000.0) / (SinSunAltitude + 0.15 / std::pow(SunAltitude / DegToRadians + 3.885, 1.253));
-        //              In the following, 93.73 is the extraterrestrial luminous efficacy
+        // In the following, 93.73 is the extraterrestrial luminous efficacy
         SkyBrightness = (DifSolarRad * 93.73) * AirMass / ExtraDirNormIll(Month);
         if (SkyClearness <= 1.065) {
             ISkyClearness = 1;
@@ -8686,14 +7871,14 @@ namespace WeatherManager {
             ISkyClearness = 8;
         }
         AtmosMoisture = std::exp(0.07 * OutDewPointTemp - 0.075);
-        //              Sky diffuse luminous efficacy
+        // Sky diffuse luminous efficacy
         if (SkyBrightness <= 0.0) {
             DiffLumEff = 0.0;
         } else {
             DiffLumEff = ADiffLumEff(ISkyClearness) + BDiffLumEff(ISkyClearness) * AtmosMoisture + CDiffLumEff(ISkyClearness) * SOLCOS(3) +
                          DDiffLumEff(ISkyClearness) * std::log(SkyBrightness);
         }
-        //              Direct normal luminous efficacy
+        // Direct normal luminous efficacy
         if (SkyBrightness <= 0.0) {
             DirLumEff = 0.0;
         } else {
@@ -8717,31 +7902,8 @@ namespace WeatherManager {
         // value is needed for weather calculations so that the sun comes
         // up and goes down at the right times.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
         Real64 GetSTM;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Array1D<Real64> longl({-12, 12}); // Lower Longitude value for a Time Zone
         Array1D<Real64> longh({-12, 12}); // Upper Longitude value for a Time Zone
         int i;                            // Loop variable
@@ -8792,13 +7954,9 @@ namespace WeatherManager {
         // File is positioned to the correct line, then backspaced.  This routine
         // reads in the line and processes as appropriate.
 
-        // Using/Aliasing
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string Title;
         int Count;
         std::string WMO;
@@ -9373,11 +8531,6 @@ namespace WeatherManager {
 
                         } else if (SELECT_CASE_var1 == 2) {
                             NumIntervalsPerHour = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
-                            //          IF (NumIntervalsPerHour /= 1) THEN
-                            //            CALL ShowSevereError('Process EPW: Not ready for more than one interval per hour')
-                            //            ErrorsFound=.TRUE.
-                            //          ENDIF
-
                         } else if ((SELECT_CASE_var1 >= 3)) {
                             CurOne = mod(Count - 3, 4);
 
@@ -9501,14 +8654,8 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine skips the initial header records on the EnergyPlus Weather File (in.epw).
 
-        // METHODOLOGY EMPLOYED:
-        // List directed reads, as possible.
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
         static std::string const Header("DATA PERIODS");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string::size_type Pos;
         std::string Line;
         bool StillLooking;
@@ -9616,20 +8763,6 @@ namespace WeatherManager {
         // This subroutine reports the counts of missing/out of range data
         // for weather file environments.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const MissString("Missing Data Found on Weather Data File");
         static constexpr auto msFmt("Missing {}, Number of items={:5}");
         static std::string const InvString("Invalid Data Found on Weather Data File");
@@ -9637,13 +8770,6 @@ namespace WeatherManager {
         static std::string const RangeString("Out of Range Data Found on Weather Data File");
         static constexpr auto rgFmt("Out of Range {} [{},{}], Number of items={:5}");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool MissedHeader;
         bool OutOfRangeHeader;
 
@@ -9706,22 +8832,6 @@ namespace WeatherManager {
             }
             ShowMessage(format(msFmt, "\"Diffuse Radiation\"", Missed.DiffuseRad));
         }
-        //  IF (Missed%Visibility>0) THEN
-        //    IF (.not. MissedHeader) THEN
-        //      CALL ShowWarningError(MissString)
-        //      MissedHeader=.TRUE.
-        //    ENDIF
-        //    WRITE(ErrString,msFMT) 'Visibility',Missed%Visibility
-        //    CALL ShowMessage(ErrString)
-        //  ENDIF
-        //  IF (Missed%AerOptDepth>0) THEN
-        //    IF (.not. MissedHeader) THEN
-        //      CALL ShowWarningError(MissString)
-        //      MissedHeader=.TRUE.
-        //    ENDIF
-        //    WRITE(ErrString,msFMT) 'Aerosol Optical Depth',Missed%AerOptDepth
-        //    CALL ShowMessage(ErrString)
-        //  ENDIF
         if (Missed.TotSkyCvr > 0) {
             if (!MissedHeader) {
                 ShowWarningError(MissString);
@@ -9736,22 +8846,6 @@ namespace WeatherManager {
             }
             ShowMessage(format(msFmt, "\"Opaque Sky Cover\"", Missed.OpaqSkyCvr));
         }
-        //  IF (Missed%Ceiling>0) THEN
-        //    IF (.not. MissedHeader) THEN
-        //      CALL ShowWarningError(MissString)
-        //      MissedHeader=.TRUE.
-        //    ENDIF
-        //    WRITE(ErrString,msFMT) 'Ceiling Height',Missed%Ceiling
-        //    CALL ShowMessage(ErrString)
-        //  ENDIF
-        //  IF (Missed%PrecipWater>0) THEN
-        //    IF (.not. MissedHeader) THEN
-        //      CALL ShowWarningError(MissString)
-        //      MissedHeader=.TRUE.
-        //    ENDIF
-        //    WRITE(ErrString,msFMT) 'Water Precipitation',Missed%PrecipWater
-        //    CALL ShowMessage(ErrString)
-        //  ENDIF
         if (Missed.SnowDepth > 0) {
             if (!MissedHeader) {
                 ShowWarningError(MissString);
@@ -9763,14 +8857,6 @@ namespace WeatherManager {
             ShowWarningError(InvString);
             ShowMessage(format(ivFmt, "\"Weather Codes\" (not equal 9 digits)", Missed.WeathCodes));
         }
-        //  IF (Missed%Albedo>0) THEN
-        //    IF (.not. MissedHeader) THEN
-        //      CALL ShowWarningError(MissString)
-        //      MissedHeader=.TRUE.
-        //    ENDIF
-        //    WRITE(ErrString,msFMT) '"Albedo"',Missed%Albedo
-        //    CALL ShowMessage(ErrString)
-        //  ENDIF
         if (Missed.LiquidPrecip > 0) {
             if (!MissedHeader) {
                 ShowWarningError(MissString);
@@ -9778,14 +8864,6 @@ namespace WeatherManager {
             }
             ShowMessage(format(msFmt, "\"Liquid Precipitation Depth\"", Missed.LiquidPrecip));
         }
-        //  IF (Missed%DaysLastSnow>0) THEN
-        //    IF (.not. MissedHeader) THEN
-        //      CALL ShowWarningError(MissString)
-        //      MissedHeader=.TRUE.
-        //    ENDIF
-        //    WRITE(ErrString,msFMT) 'Days Since Last Snow',Missed%DaysLastSnow
-        //    CALL ShowMessage(ErrString)
-        //  ENDIF
 
         OutOfRangeHeader = false;
         if (OutOfRange.DryBulb > 0) {
@@ -9864,26 +8942,6 @@ namespace WeatherManager {
         // Create arrays (InterpolationValues, SolarInterpolationValues) dependent on
         // Number of Time Steps in Hour.  This will be used in the "SetCurrentWeather" procedure.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int halfpoint;
         int hpoint;
         int tloop;
@@ -9962,29 +9020,8 @@ namespace WeatherManager {
         // Make sure Environment derived type is set prior to getting
         // Weather Properties
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using General::BetweenDates;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int LocalLeapYearAdd;
 
@@ -10116,39 +9153,7 @@ namespace WeatherManager {
 
     bool isLeapYear(int const Year)
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   March 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // From entered year returns true (Yes) if it's a leap year, false (no) if not.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
+        // true if it's a leap year, false if not.
 
         if (mod(Year, 4) == 0) { // Potential Leap Year
             if (!(mod(Year, 100) == 0 && mod(Year, 400) != 0)) {
@@ -10178,31 +9183,10 @@ namespace WeatherManager {
         // number of days can be add or subtracted to jdate and
         // that result is a proper julian date.
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
         // REFERENCES:
         // for discussion of this algorithm,
         // see cacm, vol 11, no 10, oct 1968, page 657
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // 1 --> gregorian (dd/mm/yyyy) to julian
-        // 2 --> julian to gregorian.
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int tdate; // integer*4 variable needed for double precision arithmetic
         int tyyyy; // integer*4 variable needed for double precision arithmetic
         int tmm;   // integer*4 variable needed for double precision arithmetic
@@ -10257,30 +9241,10 @@ namespace WeatherManager {
         // number of days can be add or subtracted to jdate and
         // that result is a proper julian date.
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
         // REFERENCES:
         // for discussion of this algorithm,
         // see cacm, vol 11, no 10, oct 1968, page 657
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int tyyyy; // integer*4 variable needed for double precision arithmetic
         int tmm;   // integer*4 variable needed for double precision arithmetic
         int tdd;   // integer*4 variable needed for double precision arithmetic
@@ -10312,25 +9276,7 @@ namespace WeatherManager {
         // http://en.wikipedia.org/wiki/Zeller%27s_congruence
         // and other references around the web.
 
-        // USE STATEMENTS:
-        // na
-
-        // Return value
         int DayOfWeek; // EnergyPlus convention (1=Sunday, 2=Monday, etc)
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int JulDate; // Julian date copy
         int Gyyyy;   // Gregorian yyyy
         int Gmm;     // Gregorian mm
@@ -10370,15 +9316,6 @@ namespace WeatherManager {
         // http://en.wikipedia.org/wiki/Zeller%27s_congruence
         // and other references around the web.
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Gyyyy(year); // Gregorian yyyy
         int Gmm(month);  // Gregorian mm
 
@@ -10406,16 +9343,6 @@ namespace WeatherManager {
         // PURPOSE OF THIS FUNCTION:
         // Compute the day of the year for non-leap years.
 
-        // METHODOLOGY EMPLOYED:
-        // Lookup table.
-
-        // REFERENCES:
-        // NA
-
-        // USE STATEMENTS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         static std::array<int, 12> daysbefore{{0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334}};
 
         // Could probably do some bounds checking here, but for now assume the month is in [1, 12]
@@ -10434,16 +9361,6 @@ namespace WeatherManager {
         // PURPOSE OF THIS FUNCTION:
         // Compute the day of the year for leap and non-leap years.
 
-        // METHODOLOGY EMPLOYED:
-        // Lookup table.
-
-        // REFERENCES:
-        // NA
-
-        // USE STATEMENTS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         static std::array<int, 12> daysbefore{{0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334}};
         static std::array<int, 12> daysbeforeleap{{0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335}};
 
@@ -10466,18 +9383,6 @@ namespace WeatherManager {
 
         // PURPOSE OF THIS FUNCTION:
         // Determine if a month/day+leapyear combination is valid.
-
-        // METHODOLOGY EMPLOYED:
-        // Lookup table.
-
-        // REFERENCES:
-        // NA
-
-        // USE STATEMENTS:
-        // NA
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // NA
 
         switch (month) {
         case 1:
@@ -10519,26 +9424,10 @@ namespace WeatherManager {
         // drybulb temperature from STAT (*.stat) for use to autosize main water
         // temperature.
 
-        // METHODOLOGY EMPLOYED:
-        // Opens and processes the weather or stat file only once
-
-        // Using/Aliasing
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 HourlyDryBulbTemp;                                  // hourly outside air dry-bulb temperature read from weather file
         Real64 MonthlyDailyDryBulbMin(200.0);                      // monthly-daily minimum outside air dry-bulb temperature
@@ -10716,13 +9605,10 @@ namespace WeatherManager {
         // report site water mains temperature object user inputs and/or parameters calculated
         // from weather or stat file
 
-        // USE STATEMENTS:
         using General::RoundSigDigits;
         using WeatherManager::OADryBulbAverage;
         using namespace ObjexxFCL::gio;
 
-        // Locals
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string const cCalculationMethod({1, 3}, {"Schedule", "Correlation", "CorrelationFromWeatherFile"});
 
         if (!OutputFiles::getSingleton().eio.good()) {

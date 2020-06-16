@@ -65,10 +65,6 @@ namespace EnergyPlus {
     class OutputFiles;
 namespace WeatherManager {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     // Following are Date Types read in from EPW file or IDF
     extern int const InvalidDate;
     extern int const MonthDay;
@@ -122,13 +118,6 @@ namespace WeatherManager {
 
     extern bool Debugout;
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
     extern int const NumDaysInYear;
     extern int EnvironmentReportNbr;         // Report number for the environment stamp
     extern std::string EnvironmentReportChr; // Report number for the environment stamp (character -- for printing)
@@ -137,8 +126,7 @@ namespace WeatherManager {
     extern int WeatherDataReport;            // Report number for the weather data
     extern bool WeatherFileExists;           // Set to true if a weather file exists
     extern std::string LocationTitle;        // Location Title from input File
-    extern bool LocationGathered;            // flag to show if Location exists on Input File (we assume one is there and
-    // correct on weather file)
+    extern bool LocationGathered;            // flag to show if Location exists on Input File (we assume one is there and correct on weather file)
 
     extern Real64 WeatherFileLatitude;
     extern Real64 WeatherFileLongitude;
@@ -248,8 +236,7 @@ namespace WeatherManager {
     extern int NumSPSiteScheduleNamePtrs;                        // Number of SP Site Schedules (DesignDay only)
     extern int NumMissing;                                       // Number of hours of missing data
     extern Array1D<Real64> Interpolation;                        // Interpolation values based on Number of Time Steps in Hour
-    extern Array1D<Real64> SolarInterpolation;                   // Solar Interpolation values based on
-    //      Number of Time Steps in Hour
+    extern Array1D<Real64> SolarInterpolation;                   // Solar Interpolation values based on Number of Time Steps in Hour
     extern Array1D_int EndDayOfMonth;
     extern bool ErrorInWeatherFile;           // Set to TRUE when there is a problem with dates
     extern int LeapYearAdd;                   // Set during environment if leap year is active (adds 1 to number days in Feb)
@@ -257,12 +244,6 @@ namespace WeatherManager {
     extern bool StartDatesCycleShouldBeReset; // True when start dates on repeat should be reset
     extern bool Jan1DatesShouldBeReset;       // True if Jan 1 should signal reset of dates
     extern bool RPReadAllWeatherData;         // True if need to read all weather data prior to simulation
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE WeatherManager
-    // PUBLIC  ProcessDateString
-    // Get Input from Input File
-
-    // Types
 
     enum class WeekDay
     {
@@ -510,11 +491,10 @@ namespace WeatherManager {
         }
     };
 
-    struct MissingData // This Derived type carries the default missing data
+    // This struct carries the default missing data for those data elements that would be best replaced with the previous hour's data for missing data.
+    struct MissingData
     {
         // Members
-        // for those data elements that would be best replaced
-        // with the previous hour's data for missing data.
         Real64 DryBulb;      // Dry Bulb Temperature (C)
         Real64 DewPoint;     // Dew Point Temperature (C)
         int RelHumid;        // Relative Humidity (%)
@@ -540,12 +520,10 @@ namespace WeatherManager {
         }
     };
 
-    struct MissingDataCounts // This Derived type carries the counts of missing data
+    // This Derived type carries the counts of missing data items in the weather reading process. It will count only items that are on the source file -- not those that are derived from data on the source file.
+    struct MissingDataCounts
     {
         // Members
-        // items in the weather reading process.  It will count
-        // only items that are on the source file -- not those that
-        // are derived from data on the source file.
         // Comments below illustrate the data that is being counted:
         int DryBulb;      // Dry Bulb Temperature (C)
         int DewPoint;     // Dew Point Temperature (C)
@@ -575,12 +553,10 @@ namespace WeatherManager {
         }
     };
 
-    struct RangeDataCounts // This Derived type carries the counts of out of range
+    // This Derived type carries the counts of out of range items in the weather reading process. It will count only items that are on the source file -- not those that are derived from data on the source file.
+    struct RangeDataCounts
     {
         // Members
-        // items in the weather reading process.  It will count
-        // only items that are on the source file -- not those that
-        // are derived from data on the source file.
         // Comments below illustrate the data that is being counted:
         int DryBulb;    // Dry Bulb Temperature (C)
         int DewPoint;   // Dew Point Temperature (C)
@@ -651,21 +627,24 @@ namespace WeatherManager {
     extern std::vector<UnderwaterBoundary> underwaterBoundaries;
 
     // Object Data
-    extern DayWeatherVariables TodayVariables; // Today's daily weather variables | Derived Type for Storing Weather "Header" Data | Day of year for
-                                               // weather data | Year of weather data | Month of weather data | Day of month for weather data | Day of
-                                               // week for weather data | Daylight Saving Time Period indicator (0=no,1=yes) | Holiday indicator (0=no
-                                               // holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of the solar
-                                               // declination angle | Value of the equation of time formula
-    extern DayWeatherVariables TomorrowVariables; // Tomorrow's daily weather variables | Derived Type for Storing Weather "Header" Data | Day of year
-                                                  // for weather data | Year of weather data | Month of weather data | Day of month for weather data |
-                                                  // Day of week for weather data | Daylight Saving Time Period indicator (0=no,1=yes) | Holiday
-                                                  // indicator (0=no holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of
-                                                  // the solar declination angle | Value of the equation of time formula
+    // Today's daily weather variables | Derived Type for Storing Weather "Header" Data | Day of year for
+    // weather data | Year of weather data | Month of weather data | Day of month for weather data | Day of
+    // week for weather data | Daylight Saving Time Period indicator (0=no,1=yes) | Holiday indicator (0=no
+    // holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of the solar
+    // declination angle | Value of the equation of time formula
+    extern DayWeatherVariables TodayVariables;
+    // Tomorrow's daily weather variables | Derived Type for Storing Weather "Header" Data | Day of year
+    // for weather data | Year of weather data | Month of weather data | Day of month for weather data |
+    // Day of week for weather data | Daylight Saving Time Period indicator (0=no,1=yes) | Holiday
+    // indicator (0=no holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of
+    // the solar declination angle | Value of the equation of time formula
+    extern DayWeatherVariables TomorrowVariables;
     extern Array1D<DayWeatherVariables> DesignDay; // Design day environments
-    extern MissingData Missing; // Dry Bulb Temperature (C) | Dew Point Temperature (C) | Relative Humidity (%) | Atmospheric Pressure (Pa) | Wind
-                                // Direction (deg) | Wind Speed/Velocity (m/s) | Total Sky Cover (tenths) | Opaque Sky Cover (tenths) | Visibility
-                                // (km) | Ceiling Height (m) | Precipitable Water (mm) | Aerosol Optical Depth | Snow Depth (cm) | Number of Days
-                                // since last snow | Albedo | Rain/Liquid Precipitation (mm)
+    // Dry Bulb Temperature (C) | Dew Point Temperature (C) | Relative Humidity (%) | Atmospheric Pressure (Pa) | Wind
+    // Direction (deg) | Wind Speed/Velocity (m/s) | Total Sky Cover (tenths) | Opaque Sky Cover (tenths) | Visibility
+    // (km) | Ceiling Height (m) | Precipitable Water (mm) | Aerosol Optical Depth | Snow Depth (cm) | Number of Days
+    // since last snow | Albedo | Rain/Liquid Precipitation (mm)
+    extern MissingData Missing;
     extern MissingDataCounts Missed;
     extern RangeDataCounts OutOfRange;
     extern Array1D<DesignDayData> DesDayInput;   // Design day Input Data
@@ -787,13 +766,10 @@ namespace WeatherManager {
 
     void SetUpDesignDay(OutputFiles &outputFiles, int const EnvrnNum); // Environment number passed into the routine
 
-    //------------------------------------------------------------------------------
-
     Real64 AirMass(Real64 const CosZen); // COS( solar zenith), 0 - 1
 
-    //------------------------------------------------------------------------------
-
-    Real64 CalcSkyEmissivity(int Envrn, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum); // Calculate sky temperature from weather data
+    // Calculate sky temperature from weather data
+    Real64 CalcSkyEmissivity(int Envrn, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
 
     void ASHRAETauModel(int const TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
                         Real64 const ETR,       // extraterrestrial normal irradiance, W/m2
@@ -924,7 +900,8 @@ namespace WeatherManager {
 
     bool validMonthDay(int const month, int const day, int const leapYearAdd = 0);
 
-    struct AnnualMonthlyDryBulbWeatherData // derived type for processing and storing Dry-bulb weather or stat file
+    // derived type for processing and storing Dry-bulb weather or stat file
+    struct AnnualMonthlyDryBulbWeatherData
     {
         // Members
         bool OADryBulbWeatherDataProcessed;             // if false stat or weather file OA Dry-bulb temp is not processed yet
