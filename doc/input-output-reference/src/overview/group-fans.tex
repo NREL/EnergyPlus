@@ -74,7 +74,7 @@ This numeric field is the fraction of the motor heat that is added to the air st
 
 This numeric field is the electric power consumption at the full Design Maximum Air Flow Rate and Design Pressure Rise, in Watts.  The value entered in this field is used to determine the fan efficiency. This field is autosizable and defaults to autosize.  When autosized there are three different options available for the method used to size the design power and can be selected in the following field.
 
-\paragraph{Field: Design Power Sizing Method}\label{field-design-power-sizing-method}
+\paragraph{Field: Design Power Sizing Method}
 
 This field is used to select how the fan's Design Electric Power Consumption is sized when the previous field is set to autosize.  There are three choices: PowerPerFlow, PowerPerFlowPerPressure, or TotalEfficiencyAndPressure.  The default is PowerPerFlowPerPressure.
 When PowerPerFlow is selected, the value entered in the input field called Electric Power Per Unit Flow Rate is used to size the Design Electric Power Consumption. This method is useful during early-phase design modeling when little information is available for determining the Design Pressure Rise.  Although the pressure rise is not used to size the Design Electric Power Consumption it is still used to determine the heat added to the air stream as a result of the work done by the fan.
@@ -378,7 +378,7 @@ Enter the name of an exponent performance curve. This optional alpha field must 
 
 Enter the name of a quadratic or cubic performance curve. This optional alpha field is used to simulate multi-speed fan motors. This curve represents the ratio of actual fan total efficiency to rated fan total efficiency when a change in fan speed occurs. Leave this field blank when simulating constant-speed fan motors.
 
-\paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-1-000}
+\paragraph{Field: End-Use Subcategory}
 
 Allows you to specify a user-defined end-use subcategory, e.g., ``Main Fans'', etc. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the fan will be assigned to the ``General'' end-use subcategory.
 
@@ -531,7 +531,7 @@ The name of the HVAC system node which supplies the inlet air conditions to the 
 
 The name of the HVAC system node to which the fan sends its outlet air.
 
-\paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-2-000}
+\paragraph{Field: End-Use Subcategory}
 
 Allows you to specify a user-defined end-use subcategory, e.g., ``Central System'', etc. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the fan will be assigned to the ``General'' end-use subcategory.
 

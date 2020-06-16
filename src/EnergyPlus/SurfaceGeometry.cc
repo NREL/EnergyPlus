@@ -391,9 +391,7 @@ namespace SurfaceGeometry {
             } else { // For Windows
 
                 if ((Surface(SurfNum).ExtBoundCond > 0) && (Surface(SurfNum).BaseSurf != SurfNum)) { // Interzone window present
-                    if (!IgnoreInteriorWindowTransmission) {
-                        Zone(Surface(SurfNum).Zone).HasInterZoneWindow = true;
-                    }
+                    Zone(Surface(SurfNum).Zone).HasInterZoneWindow = true;
                 } else {
                     if (((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) &&
                         (Surface(SurfNum).Class != SurfaceClass_TDD_Dome)) {
