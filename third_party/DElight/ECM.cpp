@@ -19,24 +19,24 @@
  * under contract with Lawrence Berkeley National Laboratory.
  **************************************************************/
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 #pragma warning(disable:4786)
@@ -95,7 +95,6 @@ namespace BGL = BldgGeomLib;
 int	dillum(
 	double cloud_fraction,	/* fraction of sky covered by clouds (0.0=clear 1.0=overcast) */
 	BLDG *bldg_ptr,			/* building data structure pointer */
-	LIB *lib_ptr,			/* library data structure pointer */
 	SUN_DATA *sun_ptr,		/* pointer to sun data structure */
 	RUN_DATA *run_ptr,		/* pointer to runtime data structure */
 	int wx_flag,			/* weather availability flag */
@@ -197,7 +196,7 @@ int	dillum(
 	calc_sched_days(bldg_ptr,run_ptr);
 
 	/* Output power reduction factor headings. */
-	*pofdmpfile << "\n"; 
+	*pofdmpfile << "\n";
 
 	/* Init number of hours in year for annual average hourly electric lighting reduction. */
 	anndays = 0;
@@ -205,7 +204,7 @@ int	dillum(
 	/* Month Loop */
 	for (imon=(run_ptr->mon_begin-1); imon<run_ptr->mon_end; imon++) {
 		/* Output month corrected so that Jan=1 to Dec=12. */
-		*pofdmpfile << "Month: " << imon+1 << "\n"; 
+		*pofdmpfile << "Month: " << imon+1 << "\n";
 
 		/* Init number of days in month for monthly average hourly electric lighting reduction. */
 		mondays = 0;
@@ -234,7 +233,7 @@ int	dillum(
 			if ((wx_flag == 0) && (iday > iday1)) continue;
 
 			/* Output day. */
-			*pofdmpfile << "Day: " << iday << " DayofWeek " << dayofweek << "\n"; 
+			*pofdmpfile << "Day: " << iday << " DayofWeek " << dayofweek << "\n";
 
 			/* Count number of days simulated in month for monthly average */
 			/* hourly electric lighting reduction. */
@@ -245,7 +244,7 @@ int	dillum(
 			if ((iGetSchedRetVal = get_sched(bldg_ptr,dayofyr,dayofweek)) < 0) {
                 // If errors were detected then return now, else register warnings and continue processing
                 if (iGetSchedRetVal != -10) {
-					*pofdmpfile << "ERROR: DElight Zone Lighting Schedule not found for at least one Zone\n"; 
+					*pofdmpfile << "ERROR: DElight Zone Lighting Schedule not found for at least one Zone\n";
 					return(-1);
                 }
                 else {
@@ -259,14 +258,14 @@ int	dillum(
 			/* Hour Loop */
 			for (ihr=0; ihr<HOURS; ihr++) {
 				/* Output dmpfile hour. */
-				*pofdmpfile << "Hour: " << ihr+1 << "\n"; 
+				*pofdmpfile << "Hour: " << ihr+1 << "\n";
 
 				/* Get hourly solar quantities */
                 int iSun2RetVal;
 				if ((iSun2RetVal = sun2(imon,iday,ihr,&sun1_data,&sun2_data,bldg_ptr,wx_flag,wxfile_ptr)) < 0) {
                     // If errors were detected then return now, else register warnings and continue processing
                     if (iSun2RetVal != -10) {
-					    *pofdmpfile << "ERROR: DElight Bad return from sun2(), return from dillum()\n"; 
+					    *pofdmpfile << "ERROR: DElight Bad return from sun2(), return from dillum()\n";
 					    return(-1);
                     }
                     else {
@@ -280,7 +279,7 @@ int	dillum(
 					/* For each zone */
 					for (izone=0; izone<bldg_ptr->nzones; izone++) {
 						/* Output to dump file */
-						*pofdmpfile << "Zone [" << bldg_ptr->zone[izone]->name << " PRF = " << 1.0 << " Percent Savings = " << 0.0 << "\n"; 
+						*pofdmpfile << "Zone [" << bldg_ptr->zone[izone]->name << " PRF = " << 1.0 << " Percent Savings = " << 0.0 << "\n";
 					}
 					continue;
 				}
@@ -290,7 +289,7 @@ int	dillum(
 				calc_sun(&phsun,&thsun,&phratio,&thratio,&iphs,&iths,&sun2_data,phsmin,phsmax,phsdel,thsmin,thsmax,thsdel,bldg_ptr);
 
 				/* Output sun position. */
-				*pofdmpfile << "Sun Altitude: " << phsun/DTOR << " Sun Azimuth: " << thsun/DTOR << "\n"; 
+				*pofdmpfile << "Sun Altitude: " << phsun/DTOR << " Sun Azimuth: " << thsun/DTOR << "\n";
 
 				/* NOTE: If weather data is not available, set cloudiness fraction equal to */
 				/* value passed into dillum(); */
@@ -303,7 +302,7 @@ int	dillum(
 					if ((iDavailRetVal = davail(&chilsk[ihr],&chilsu[ihr],&ohilsk[ihr],&cdirlw[ihr],&cdiflw[ihr],&odiflw[ihr],imon,phsun,thsun,solic,bldg_ptr,pofdmpfile)) < 0) {
                         // If errors were detected then return now, else register warnings and continue processing
                         if (iDavailRetVal != -10) {
-					        *pofdmpfile << "ERROR: DElight Bad return from davail(), return from dillum()\n"; 
+					        *pofdmpfile << "ERROR: DElight Bad return from davail(), return from dillum()\n";
 					        return(-1);
                         }
                         else {
@@ -314,11 +313,11 @@ int	dillum(
 
 				/* Calc current hour illum on an unobstructed exterior horizontal surface */
                 int iDextilRetVal;
-				if ((iDextilRetVal = dextil(&hisunf,&chiskf,&ohiskf,wx_flag,chilsu[ihr],chilsk[ihr],ohilsk[ihr],cdirlw[ihr],cdiflw[ihr],odiflw[ihr],phsun,solic,imon,bldg_ptr,&sun2_data,pofdmpfile)) < 0) {
+				if ((iDextilRetVal = dextil(&hisunf,&chiskf,&ohiskf,wx_flag,chilsu[ihr],chilsk[ihr],ohilsk[ihr],phsun,solic,imon,bldg_ptr,&sun2_data,pofdmpfile)) < 0) {
                     // If errors were detected then return now, else register warnings and continue processing
                     if (iDextilRetVal != -10) {
                         *pofdmpfile << "\n";
-					    *pofdmpfile << "ERROR: DElight Bad return from dextil(), return from dillum()\n"; 
+					    *pofdmpfile << "ERROR: DElight Bad return from dextil(), return from dillum()\n";
 					    return(-1);
                     }
                     else {
@@ -330,7 +329,7 @@ int	dillum(
 				for (izone=0; izone<bldg_ptr->nzones; izone++) {
 					/* Find daylight illuminance level */
 					/* at each ref pt in current zone. */
-					dintil(bldg_ptr->zone[izone],lib_ptr,imon,ihr,hisunf,chiskf,ohiskf,iphs,iths,phratio,thratio,pofdmpfile);
+					dintil(bldg_ptr->zone[izone],imon,ihr,hisunf,chiskf,ohiskf,iphs,iths,phratio,thratio);
 
 					/* Calculate lighting power reduction factor due to daylighting. */
 					/* 	PRF = 1.0 => full power required */
@@ -339,7 +338,7 @@ int	dillum(
 				    if ((iDltsysRetVal = dltsys(bldg_ptr->zone[izone],&sun2_data,pofdmpfile)) < 0) {
                         // If errors were detected then return now, else register warnings and continue processing
                         if (iDltsysRetVal != -10) {
-					        *pofdmpfile << "ERROR: DElight Bad return from dltsys(), return from dillum()\n"; 
+					        *pofdmpfile << "ERROR: DElight Bad return from dltsys(), return from dillum()\n";
 					        return(-1);
                         }
                         else {
@@ -355,7 +354,7 @@ int	dillum(
 					lt_reduc = 1.0 - lt_frac;
 
 					/* Output power reduction factor and electric lighting savings for this zone. */
-					*pofdmpfile << "Zone [" << bldg_ptr->zone[izone]->name << " PRF = " << bldg_ptr->zone[izone]->frac_power << " Percent Savings = " << (lt_reduc*100.0) << "\n"; 
+					*pofdmpfile << "Zone [" << bldg_ptr->zone[izone]->name << " PRF = " << bldg_ptr->zone[izone]->frac_power << " Percent Savings = " << (lt_reduc*100.0) << "\n";
 
 					/* Accumulate monthly hourly fractional electric lighting energy reduction. */
 					bldg_ptr->zone[izone]->lt_reduc[imon][ihr] += lt_reduc;
@@ -434,7 +433,7 @@ int	davail(
 	if ((iDhillRetVal = dhill(chilsk_ptr,chilsu_ptr,ohilsk_ptr,bldg_ptr,imon,phsun,thsun,zenl,tfac,solic,pofdmpfile)) < 0) {
         // If errors were detected then return now, else register warnings and continue processing
         if (iDhillRetVal != -10) {
-			*pofdmpfile << "ERROR: DElight Bad return from dhill(), return from davail()\n"; 
+			*pofdmpfile << "ERROR: DElight Bad return from dhill(), return from davail()\n";
 			return(-1);
         }
         else {
@@ -565,7 +564,6 @@ int	dplumef(
 
 	// Atmospheric moisture (cm).
 	double wch = exp(0.0389 * (sun2_ptr->dewpt - 32.0) - 0.075);
-	double atm_moi = wch / 2.54;
 
 	// Sky diffuse luminous efficacy (lumens/watt).
 	if (del <= 0.0) *pdiflw_ptr = 0.0;
@@ -614,7 +612,7 @@ int init_avail(
 /* from a weather file. */
 /* Otherwise, illuminances are taken from davail(). */
 /* 12/17/98 mods to incorporate Perez model for determining luminous efficacies */
-/* when hourly solar data (irradiances) and dewpoint temp are available.
+/* when hourly solar data (irradiances) and dewpoint temp are available. */
 // Previous method is retained for use when no wx data is available.
 /****************************************************************************/
 /* C Language Implementation of DOE2 Daylighting Algorithms */
@@ -629,9 +627,9 @@ int	dextil(
 	double chilsu,	/* current hour clear sky horiz illum sun component from davail() */
 	double chilsk,	/* current hour clear sky horiz illum sky component from davail() */
 	double ohilsk,	/* current hour overcast sky horiz illum sky component from davail() */
-	double cdirlw,	/* CIE luminous efficacy for direct solar radiation from clear sky */
-	double cdiflw,	/* CIE luminous efficacy for diffuse radiation from clear sky */
-	double odiflw,	/* CIE luminous efficacy for diffuse radiation from overcast sky */
+	//double cdirlw,	/* CIE luminous efficacy for direct solar radiation from clear sky */
+	//double cdiflw,	/* CIE luminous efficacy for diffuse radiation from clear sky */
+	//double odiflw,	/* CIE luminous efficacy for diffuse radiation from overcast sky */
 	double phsun,		/* sun altitude (radians) */
 	double solic[MONTHS],/* extraterrestrial illum for first day of each month */
 	int imon,			/* current month */
@@ -653,7 +651,7 @@ int	dextil(
 	if (cr > 0.2) etacld = 1.0 - (cr - 0.2) * 1.25;
 	else etacld = 1.;
 
-	/* Calculate illums when no wx data is available. */ 
+	/* Calculate illums when no wx data is available. */
 	if (wx_flag == 0) {
 		/* Direct horizontal illuminance */
 		*hisunf_ptr = (1.0 - cr) * chilsu;
@@ -679,7 +677,7 @@ int	dextil(
 	    if ((iDplumefRetVal = dplumef(&pdiflw, &pdirlw, bscc, rdncc, phsun, solic, imon, sun2_ptr, bldg_ptr, pofdmpfile)) < 0) {
             // If errors were detected then return now, else register warnings and continue processing
             if (iDplumefRetVal != -10) {
-			    *pofdmpfile << "ERROR: DElight Bad return from dplumef(), return from dextil()\n"; 
+			    *pofdmpfile << "ERROR: DElight Bad return from dplumef(), return from dextil()\n";
 			    return(-1);
             }
             else {
@@ -711,7 +709,6 @@ int	dextil(
 /******************************** subroutine dintil *******************************/
 int	dintil(
 	ZONE *zone_ptr,	/* bldg->zone data structure pointer */
-	LIB *lib_ptr,	/* library data structure pointer */
 	int imon,		/* current month */
 	int ihr,		/* current hour */
 	double hisunf,	/* current hour clear sky horiz illum sun component */
@@ -720,8 +717,7 @@ int	dintil(
 	int iphs,		/* sun altitude interpolation lower bound index */
 	int iths,		/* sun azimuth interpolation lower bound index */
 	double phratio,	/* sun altitude interpolation displacement ratio */
-	double thratio,	/* sun azimuth interpolation displacement ratio */
-	ofstream* pofdmpfile)	/* ptr to dump file */
+	double thratio)	/* sun azimuth interpolation displacement ratio */
 {
 	int irp;				/* ref pt loop index */
 	int ip_lo, ip_hi;		/* sun altitude low and high interpolation indexes */
@@ -856,8 +852,8 @@ int dltsys(
 	/* Loop over reference points */
 	for (irp=0; irp<zone_ptr->nrefpts; irp++) {
 		/* Output reference point daylight illuminance (lux). */
-//		*pofdmpfile << zone_ptr->name << "," << zone_ptr->ref_pt[irp]->name << "," << zone_ptr->ref_pt[irp]->daylight*10.763915 << "\n"; 
-		*pofdmpfile << zone_ptr->ref_pt[irp]->daylight*10.763915 << "\n"; 
+//		*pofdmpfile << zone_ptr->name << "," << zone_ptr->ref_pt[irp]->name << "," << zone_ptr->ref_pt[irp]->daylight*10.763915 << "\n";
+		*pofdmpfile << zone_ptr->ref_pt[irp]->daylight*10.763915 << "\n";
 
 		/* If this reference point does not control a lighting system then skip it */
 		if (zone_ptr->ref_pt[irp]->lt_ctrl_type == 0) continue;
@@ -916,7 +912,7 @@ int dltsys(
 		}
 		/* Unknown system */
 		else {
-			*pofdmpfile << "WARNING: DElight Unknown light dimming system type specified for reference point " << zone_ptr->ref_pt[irp]->name << "\n"; 
+			*pofdmpfile << "WARNING: DElight Unknown light dimming system type specified for reference point " << zone_ptr->ref_pt[irp]->name << "\n";
 			*pofdmpfile << "WARNING: Dimming will be ignored at this reference point.\n";
             iReturnVal = -10;
 			fp = 1.;

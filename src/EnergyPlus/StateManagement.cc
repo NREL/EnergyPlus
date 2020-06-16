@@ -98,6 +98,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -220,6 +221,7 @@
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
@@ -284,6 +286,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     DataSystemVariables::clear_state();
     DataUCSDSharedData::clear_state();
     DataViewFactorInformation::clear_state();
+    DataWater::clear_state();
     DataZoneControls::clear_state();
     DataZoneEnergyDemands::clear_state();
     DataZoneEquipment::clear_state();
@@ -401,6 +404,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     VariableSpeedCoils::clear_state();
     VentilatedSlab::clear_state();
     WaterCoils::clear_state();
+    WaterManager::clear_state();
     WaterThermalTanks::clear_state();
     WaterToAirHeatPumpSimple::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
