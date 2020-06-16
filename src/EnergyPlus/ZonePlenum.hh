@@ -158,8 +158,6 @@ namespace ZonePlenum {
 
     // Functions
 
-    void clear_state();
-
     void SimAirZonePlenum(EnergyPlusData &state, std::string const &CompName,
                           int const iCompType,
                           int &CompIndex,
