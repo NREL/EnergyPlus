@@ -390,7 +390,7 @@ namespace HybridEvapCoolingModel {
             sol.MassFlowRatio.push_back(Max_Msa);
         } else {
             Real64 ResolutionMsa = (Max_Msa-Min_Msa)/5;
-            for (Real64 Msa_val = Min_Msa; Msa_val <= Max_Msa; Msa_val += ResolutionMsa) {
+            for (Real64 Msa_val = Max_Msa; Msa_val >= Min_Msa; Msa_val -= ResolutionMsa) {
                 sol.MassFlowRatio.push_back(Msa_val);
             }
         }
@@ -399,7 +399,7 @@ namespace HybridEvapCoolingModel {
             sol.OutdoorAirFraction.push_back(Max_OAF);
         } else {
             Real64 ResolutionOSA = (Max_OAF-Min_OAF)/5;
-            for (Real64 OAF_val = Min_OAF; OAF_val <= Max_OAF; OAF_val += ResolutionOSA) {
+            for (Real64 OAF_val = Max_OAF; OAF_val >= Min_OAF; OAF_val -= ResolutionOSA) {
                 sol.OutdoorAirFraction.push_back(OAF_val);
             }
         }
