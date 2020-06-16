@@ -902,7 +902,6 @@ namespace HeatBalanceSurfaceManager {
         Real64 mult;
         Real64 curAzimuth;
         Real64 curTilt;
-        int iSurf;
         Real64 windowArea;
         Real64 frameWidth;
         Real64 frameArea;
