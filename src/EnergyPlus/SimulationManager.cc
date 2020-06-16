@@ -1288,7 +1288,7 @@ namespace SimulationManager {
                         // DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
                         // DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
                         // To do: Add code here for linking the Convergency Limit min system timestep
-                        DataConvergParams::MinTimeStepSys = 2.0/60.0; // Perform override using 1hr.
+                        DataConvergParams::MinTimeStepSys = 5.0/60.0; // Perform override using 1hr.
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(
