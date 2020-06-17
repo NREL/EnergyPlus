@@ -195,9 +195,9 @@ namespace ZonePlenum {
         bool InitAirZoneReturnPlenumEnvrnFlag = true;
         bool InitAirZoneReturnPlenumOneTimeFlag = true;
 
-        int NumZonePlenums;       // The Number of ZonePlenums found in the Input
-        int NumZoneReturnPlenums; // The Number of ZoneReturnPlenums found in the Input
-        int NumZoneSupplyPlenums; // The Number of ZoneSupplyPlenums found in the Input
+        int NumZonePlenums = 0;       // The Number of ZonePlenums found in the Input
+        int NumZoneReturnPlenums = 0; // The Number of ZoneReturnPlenums found in the Input
+        int NumZoneSupplyPlenums = 0; // The Number of ZoneSupplyPlenums found in the Input
         Array1D_bool CheckRetEquipName;
         Array1D_bool CheckSupEquipName;
 
