@@ -78,6 +78,7 @@ using namespace EnergyPlus::DaylightingDevices;
 using namespace EnergyPlus::DaylightingManager;
 using namespace EnergyPlus::DataDaylighting;
 using namespace EnergyPlus::DataSurfaces;
+using namespace EnergyPlus::HeatBalanceManager;
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
 {
@@ -2854,30 +2855,14 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
-    ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::PreviousHour = 1;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
-    InternalHeatGains::GetInternalHeatGainsInput(state);
-    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
-
-    HeatBalanceManager::InitHeatBalance(state.outputFiles);
-    DaylightingDevices::InitDaylightingDevices(state.outputFiles);
+    DataHeatBalance::Construct(Surface(7).Construction).TransDiff = 0.001;  // required for GetTDDInput function to work.
+    DaylightingDevices::GetTDDInput();
     CalcDayltgCoefficients(state.outputFiles);
 
     std::string const error_string = delimited_string({
-        ""});
-
+      "   ** Warning ** DaylightingDevice:Tubular = PIPE1:  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.  ",
+      "   ** Warning ** DaylightingDevice:Tubular = PIPE2:  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.  ",
+    });
     EXPECT_TRUE(compare_err_stream(error_string, true));
+
 }
