@@ -367,7 +367,6 @@ namespace SimAirServingZones {
         //        \required-field
 
         // Using/Aliasing
-        using AirLoopHVACDOAS::numAirLoopDOAS;
         using BranchInputManager::GetBranchData;
         using BranchInputManager::GetBranchList;
         using BranchInputManager::GetLoopMixer;
@@ -1452,11 +1451,11 @@ namespace SimAirServingZones {
                                 PrimaryAirSystem(AirSysNum).Name);
         }
 
-        numAirLoopDOAS = inputProcessor->getNumObjectsFound("AirLoopHVAC:DedicatedOutdoorAirSystem");
-        if (numAirLoopDOAS > 0) {
-            if (AirLoopHVACDOAS::GetInputOnceFlag) {
+        state.dataAirLoopHVACDOAS.numAirLoopDOAS = inputProcessor->getNumObjectsFound("AirLoopHVAC:DedicatedOutdoorAirSystem");
+        if (state.dataAirLoopHVACDOAS.numAirLoopDOAS > 0) {
+            if (state.dataAirLoopHVACDOAS.GetInputOnceFlag) {
                 AirLoopHVACDOAS::getAirLoopHVACDOASInput(state);
-                AirLoopHVACDOAS::GetInputOnceFlag = false;
+                state.dataAirLoopHVACDOAS.GetInputOnceFlag = false;
             }
         }
     }
@@ -2497,8 +2496,6 @@ namespace SimAirServingZones {
         // REFERENCES: None
 
         // Using/Aliasing
-        using AirLoopHVACDOAS::airloopDOAS;
-        using AirLoopHVACDOAS::numAirLoopDOAS;
         using DataConvergParams::CalledFromAirSystemSupplySideDeck1;
         using DataConvergParams::CalledFromAirSystemSupplySideDeck2;
         using General::GetPreviousHVACTime;
@@ -2635,11 +2632,11 @@ namespace SimAirServingZones {
 
         } // End of Air Loop iteration
 
-        if (numAirLoopDOAS > 0) {
+        if (state.dataAirLoopHVACDOAS.numAirLoopDOAS > 0) {
             int index;
             Real64 OAMassFLowrate = 0.0;
-            for (std::size_t loop = 0; loop < airloopDOAS.size(); ++loop) {
-                auto &thisAirLoopDOASObjec = airloopDOAS[loop]; // <- regular reference variable, not a pointer
+            for (std::size_t loop = 0; loop < state.dataAirLoopHVACDOAS.airloopDOAS.size(); ++loop) {
+                auto &thisAirLoopDOASObjec = state.dataAirLoopHVACDOAS.airloopDOAS[loop]; // <- regular reference variable, not a pointer
                 if (thisAirLoopDOASObjec.m_AirLoopDOASNum > -1) {
                     index = thisAirLoopDOASObjec.m_AirLoopDOASNum;
                 } else {
@@ -2708,7 +2705,7 @@ namespace SimAirServingZones {
 
                 } // End of Air Loop iteration
                 // check convergence at the mixer outlet or at the AirLoopDOAS outlet
-                AirLoopHVACDOAS::CheckConvergence();
+                AirLoopHVACDOAS::CheckConvergence(state);
             }
         }
         // Reset current system number for sizing routines
