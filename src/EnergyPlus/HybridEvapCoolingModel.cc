@@ -389,7 +389,7 @@ namespace HybridEvapCoolingModel {
         if (Min_Msa == Max_Msa){
             sol.MassFlowRatio.push_back(Max_Msa);
         } else {
-            Real64 ResolutionMsa = (Max_Msa-Min_Msa)/5;
+            Real64 ResolutionMsa = (Max_Msa-Min_Msa)*0.2;
             for (Real64 Msa_val = Max_Msa; Msa_val >= Min_Msa; Msa_val -= ResolutionMsa) {
                 sol.MassFlowRatio.push_back(Msa_val);
             }
@@ -398,7 +398,7 @@ namespace HybridEvapCoolingModel {
         if (Min_OAF == Max_OAF){
             sol.OutdoorAirFraction.push_back(Max_OAF);
         } else {
-            Real64 ResolutionOSA = (Max_OAF-Min_OAF)/5;
+            Real64 ResolutionOSA = (Max_OAF-Min_OAF)*0.2;
             for (Real64 OAF_val = Max_OAF; OAF_val >= Min_OAF; OAF_val -= ResolutionOSA) {
                 sol.OutdoorAirFraction.push_back(OAF_val);
             }
@@ -1306,7 +1306,6 @@ namespace HybridEvapCoolingModel {
         bool DidWeMeetLoad = false;
         bool DidWeMeetHumidificaiton = false;
         bool DidWePartlyMeetLoad = false;
-        int modenumber = 0;
         Real64 OptimalSetting_RunFractionTotalFuel = IMPLAUSIBLE_POWER;
         Real64 Tma;
         Real64 Wma;
@@ -1438,7 +1437,6 @@ namespace HybridEvapCoolingModel {
                     SAHR_OC_MetinMode_v[Mode.ModeID] = SAHR_OC_MetinMode_v[Mode.ModeID] + 1;
                 }
             }
-            modenumber++;
         }
 
         for (auto &thisSetting : Settings) {
