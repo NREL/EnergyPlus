@@ -831,7 +831,7 @@ The PerformancePrecisionTradeoffs object can be used to control tradeoffs betwee
 
 \paragraph{Tuning using the \_perflog.csv file}\label{tuning-using-perlog-csv-file}
 
-Every time a simulation includes the PerformancePrecisionTradeoffs object, a file is generated with the same name as the input but ending with \erflog.csv file (the performance log file). This file can be opened using a spreadsheet program and may be helpful in adjusting the input field values for the PerformancePrecisionTradeoffs object. Unlike most EnergyPlus output files, a new line of results is appended (added to the end of the file) every time the input file is simulated. The \_perflog.csv file contains a log of results from each run and allows the examination of the impacts of the changes to the PerformancePrecisionTradeoffs object and any other simulation inputs. You are encouraged to not make changes to any other portions of your input file other than the PerformancePrecisionTradeoffs object when you are tuning that object. Also, if you are looking at the \_perflog.csv in a spreadsheet program, make sure you close the file before each simulation. A spreadsheet program will often lock a CSV file and prevent it from being modified by another program like EnergyPlus.
+Every time a simulation includes the PerformancePrecisionTradeoffs object, a file is generated with the same name as the input but ending with \_perflog.csv file (the performance log file). This file can be opened using a spreadsheet program and may be helpful in adjusting the input field values for the PerformancePrecisionTradeoffs object. Unlike most EnergyPlus output files, a new line of results is appended (added to the end of the file) every time the input file is simulated. The \_perflog.csv file contains a log of results from each run and allows the examination of the impacts of the changes to the PerformancePrecisionTradeoffs object and any other simulation inputs. You are encouraged to not make changes to any other portions of your input file other than the PerformancePrecisionTradeoffs object when you are tuning that object. Also, if you are looking at the \_perflog.csv in a spreadsheet program, make sure you close the file before each simulation. A spreadsheet program will often lock a CSV file and prevent it from being modified by another program like EnergyPlus.
 
 To illustrate how to use the PerformancePrecisionTradeoffs object and the \_perflog.csv file together, here is an example using an IDF file with 100 zones, one window per zone, and is served by fan coil units and a central boiler and chiller. Thirteen simulations were made, and the results in the <filename>\_perflog.csv for various options in the PerformancePrecisionTradeoffs object are shown below in the following tables.
 
@@ -840,7 +840,7 @@ To illustrate how to use the PerformancePrecisionTradeoffs object and the \_perf
 {\scriptsize
 \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.6in}p{0.5in}p{0.5in}p{0.6in}p{0.6in}p{0.65in}}
 % \begin{longtable}[c]{cccccccrr}
-\caption{PerfLog Mode Columns\label{table:perflog_mode_columns}} \tabularnewline
+\caption{PerfLog Mode Columns} \tabularnewline
 \toprule
 Run &
 Direct Coil &
@@ -879,7 +879,7 @@ These example simulations each took three minutes or less to try. If your buildi
 % table X
 {\scriptsize
 \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.7in}p{0.65in}}
-\caption{PerfLog Energy Columns\label{table:perflog_mode_columns}} \tabularnewline
+\caption{PerfLog Energy Columns} \tabularnewline
 \toprule
 Run &
 Direct Coil &
@@ -916,7 +916,7 @@ The CarrollMRT options seemed to have a much more significant impact on the natu
 % table X
 {\scriptsize
 \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.6in}p{0.65in}}
-\caption{PerfLog Oscillation Columns\label{table:perflog_mode_columns}} \tabularnewline
+\caption{PerfLog Oscillation Columns} \tabularnewline
 \toprule
 Run &
 Direct Coil &
@@ -963,7 +963,7 @@ Although this input field may eventually affect all coils, the current implement
 The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below
 
 \begin{equation}
-{\left {PLR}\right} = \frac{SystemLoad-OutputOff}{OutputFull - OutputOff}
+PLR = \frac{SystemLoad-OutputOff}{OutputFull - OutputOff}
 \end{equation}
 
 where

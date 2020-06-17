@@ -102,7 +102,7 @@ namespace WaterManager {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    // na
+    bool MyOneTimeFlag(true);
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -115,6 +115,11 @@ namespace WaterManager {
     // pointers for water storage tanks and their demand arrays
 
     // Functions
+
+    void clear_state()
+    {
+        MyOneTimeFlag = true;
+    }
 
     void ManageWater()
     {
@@ -244,8 +249,7 @@ namespace WaterManager {
         static int NumAlphas(0);        // Number of Alphas for each GetObjectItem call
         static int NumNumbers(0);       // Number of Numbers for each GetObjectItem call
         static int IOStatus(0);         // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        static bool MyOneTimeFlag(true);
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         static int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
         static int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
         static int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs

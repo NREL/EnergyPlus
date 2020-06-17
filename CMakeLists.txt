@@ -13,6 +13,8 @@ if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
   CMAKE_POLICY(SET CMP0054 NEW) # CMake 3.1 added this policy
 endif()
 
+cmake_policy(SET CMP0012 NEW)  # if() recognizes boolean constants
+
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
 set( CMAKE_POSITION_INDEPENDENT_CODE ON )
@@ -103,8 +105,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     "MinSizeRel" "RelWithDebInfo")
 endif()
 
-# we are making *a Python 3 Interpreter* a required dependency, so find it here
-find_package(PythonInterp 3 REQUIRED)
+# we are making *a Python 3.6 Interpreter* a required dependency, so find it here
+find_package(PythonInterp 3.6 REQUIRED)
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
@@ -337,6 +339,7 @@ if( BUILD_PACKAGE )
 endif()
 
 if (BUILD_DOCS)
+  set(DOCS_TESTING ${BUILD_TESTING} CACHE INTERNAL "" FORCE)
   add_subdirectory(doc)
 endif()
 
