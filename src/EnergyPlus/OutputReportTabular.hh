@@ -799,7 +799,7 @@ namespace OutputReportTabular {
 
     void WriteTimeBinTables();
 
-    void WriteBEPSTable();
+    void WriteBEPSTable(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
 
     std::string ResourceWarningMessage(std::string resource);
 

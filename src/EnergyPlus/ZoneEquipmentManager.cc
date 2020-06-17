@@ -265,7 +265,7 @@ namespace ZoneEquipmentManager {
         InitZoneEquipment(FirstHVACIteration);
 
         if (ZoneSizingCalc) {
-            SizeZoneEquipment(state.outputFiles);
+            SizeZoneEquipment(state.dataZoneTempPredictorCorrector, state.outputFiles);
         } else {
             SimZoneEquipment(state, FirstHVACIteration, SimAir);
             ZoneEquipSimulatedOnce = true;
@@ -548,7 +548,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void SizeZoneEquipment(OutputFiles &outputFiles)
+    void SizeZoneEquipment(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -626,7 +626,7 @@ namespace ZoneEquipmentManager {
         Real64 HR90L;                         // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 
         if (SizeZoneEquipmentOneTimeFlag) {
-            SetUpZoneSizingArrays(outputFiles);
+            SetUpZoneSizingArrays(dataZoneTempPredictorCorrector, outputFiles);
             SizeZoneEquipmentOneTimeFlag = false;
         }
 
@@ -907,7 +907,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void SetUpZoneSizingArrays(OutputFiles &outputFiles)
+    void SetUpZoneSizingArrays(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -987,7 +987,7 @@ namespace ZoneEquipmentManager {
                     ZoneSizingInput(ZoneSizIndex).ZoneNum = ZoneIndex;
                 }
                 if (ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod == FromDDCalc || ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod == FromDDCalc) {
-                    if (!VerifyThermostatInZone(ZoneSizingInput(ZoneSizIndex).ZoneName)) {
+                    if (!VerifyThermostatInZone(dataZoneTempPredictorCorrector, ZoneSizingInput(ZoneSizIndex).ZoneName)) {
                         if (!isPulseZoneSizing) {
                             ShowWarningError("SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput(ZoneSizIndex).ZoneName +
                                              "\", Zone has no thermostat (ref: ZoneControl:Thermostat, et al)");

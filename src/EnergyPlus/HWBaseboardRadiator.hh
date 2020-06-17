@@ -190,7 +190,7 @@ namespace HWBaseboardRadiator {
 
     void SizeHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    void CalcHWBaseboard(int &BaseboardNum, Real64 &LoadMet);
+    void CalcHWBaseboard(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int &BaseboardNum, Real64 &LoadMet);
 
     void UpdateHWBaseboard(int const BaseboardNum);
 

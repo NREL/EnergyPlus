@@ -78,7 +78,7 @@ namespace SimulationManager {
 
     void ManageSimulation(EnergyPlusData &state);
 
-    void GetProjectData(OutputFiles &outputFiles);
+    void GetProjectData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles);
 
     void writeIntialPerfLogValues(std::string const &currentOverrideModeValue);
 

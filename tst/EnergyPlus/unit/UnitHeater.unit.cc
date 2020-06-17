@@ -1117,7 +1117,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData(state.outputFiles);
+    GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
 

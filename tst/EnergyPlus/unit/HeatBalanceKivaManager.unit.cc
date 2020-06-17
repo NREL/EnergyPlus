@@ -192,7 +192,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     DataGlobals::MinutesPerTimeStep = 60;       // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state.outputFiles);    // read schedules
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.outputFiles);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     ScheduleManager::Schedule(DataZoneControls::TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand;
 
@@ -204,7 +204,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     kv1.zoneControlNum = 1;
     kv1.zoneControlType = 1; // Temperature
 
-    kv1.setInitialBoundaryConditions(kivaweather, 1, 1, 1);
+    kv1.setInitialBoundaryConditions(state.dataZoneTempPredictorCorrector, kivaweather, 1, 1, 1);
 
     Real64 expectedResult1 = kv1.instance.bcs->slabConvectiveTemp;
 
@@ -219,7 +219,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     kv2.zoneControlNum = 1;
     kv2.zoneControlType = 1; // Temperature
 
-    kv2.setInitialBoundaryConditions(kivaweather, 1, 1, 1);
+    kv2.setInitialBoundaryConditions(state.dataZoneTempPredictorCorrector, kivaweather, 1, 1, 1);
 
     Real64 expectedResult2 = kv2.instance.bcs->slabConvectiveTemp;
 
@@ -227,8 +227,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 100C/-100C
 
-    dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
-    dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
+    state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
+    state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
 
     Real64 coolingSetpoint3 = 100.0;
     Real64 zoneAssumedTemperature3 = -9999;
@@ -237,7 +237,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     kv3.zoneControlNum = 1;
     kv3.zoneControlType = 1; // Temperature
 
-    kv3.setInitialBoundaryConditions(kivaweather, 1, 1, 1);
+    kv3.setInitialBoundaryConditions(state.dataZoneTempPredictorCorrector, kivaweather, 1, 1, 1);
 
     Real64 expectedResult3 = kv3.instance.bcs->slabConvectiveTemp;
 
@@ -245,8 +245,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 100C/-100C
 
-    dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
-    dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
+    state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
+    state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
 
     Real64 zoneAssumedTemperature4 = 15.0;
     HeatBalanceKivaManager::KivaInstanceMap kv4(fnd, 0, {}, 0, zoneAssumedTemperature4, 1.0, 0, &km);
@@ -254,7 +254,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     kv4.zoneControlNum = 1;
     kv4.zoneControlType = 1; // Temperature
 
-    kv4.setInitialBoundaryConditions(kivaweather, 1, 1, 1);
+    kv4.setInitialBoundaryConditions(state.dataZoneTempPredictorCorrector, kivaweather, 1, 1, 1);
 
     Real64 expectedResult4 = kv4.instance.bcs->slabConvectiveTemp;
 

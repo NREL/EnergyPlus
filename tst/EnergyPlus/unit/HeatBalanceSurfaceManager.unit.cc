@@ -694,7 +694,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
@@ -771,7 +771,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     AllocateSurfaceHeatBalArrays();
     createFacilityElectricPowerServiceObject();
     // with supply air
-    CalcHeatBalanceInsideSurf();
+    CalcHeatBalanceInsideSurf(state.dataZoneTempPredictorCorrector);
     EXPECT_EQ(24.0, DataHeatBalance::TempEffBulkAir(1));
     EXPECT_EQ(23.0, DataHeatBalance::TempEffBulkAir(2));
     EXPECT_EQ(20.0, DataHeatBalance::TempEffBulkAir(3));
@@ -781,7 +781,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     DataLoopNode::Node(2).MassFlowRate = 0.0;
     DataLoopNode::Node(3).MassFlowRate = 0.0;
     DataLoopNode::Node(4).MassFlowRate = 0.0;
-    CalcHeatBalanceInsideSurf();
+    CalcHeatBalanceInsideSurf(state.dataZoneTempPredictorCorrector);
     EXPECT_EQ(24.0, DataHeatBalance::TempEffBulkAir(1));
     EXPECT_EQ(23.0, DataHeatBalance::TempEffBulkAir(2));
     EXPECT_EQ(24.0, DataHeatBalance::TempEffBulkAir(3));
@@ -2466,7 +2466,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     CalcHeatBalanceOutsideSurf();
     EXPECT_EQ(-0.1, DataHeatBalSurface::QAdditionalHeatSourceOutside(1));
 
-    CalcHeatBalanceInsideSurf();
+    CalcHeatBalanceInsideSurf(state.dataZoneTempPredictorCorrector);
     EXPECT_EQ(0.1, DataHeatBalSurface::QAdditionalHeatSourceInside(6));
 
     DataZoneEquipment::ZoneEquipConfig.deallocate();

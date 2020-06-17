@@ -110,9 +110,9 @@ namespace ZoneEquipmentManager {
 
     void InitZoneEquipment(bool const FirstHVACIteration); // unused 1208
 
-    void SizeZoneEquipment(OutputFiles &outputFiles);
+    void SizeZoneEquipment(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles);
 
-    void SetUpZoneSizingArrays(OutputFiles &outputFiles);
+    void SetUpZoneSizingArrays(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles);
 
     void RezeroZoneSizingArrays();
 

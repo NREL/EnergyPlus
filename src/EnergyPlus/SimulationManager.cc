@@ -334,7 +334,7 @@ namespace SimulationManager {
         AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state.outputFiles);
-        GetProjectData(state.outputFiles);
+        GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
         CheckForMisMatchedEnvironmentSpecifications();
         CheckForRequestedReporting();
         SetPredefinedTables();
@@ -712,7 +712,7 @@ namespace SimulationManager {
         }
     }
 
-    void GetProjectData(OutputFiles &outputFiles)
+    void GetProjectData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3119,7 +3119,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
         // Surface simulation
         InitSurfaceHeatBalance(state);
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
-        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
+        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state.dataZoneTempPredictorCorrector);
 
         // Air simulation
         InitAirHeatBalance();

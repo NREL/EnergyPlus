@@ -1721,7 +1721,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -3295,7 +3295,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early

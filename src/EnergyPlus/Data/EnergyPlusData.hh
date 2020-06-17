@@ -71,6 +71,7 @@
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 #include <unordered_map>
 #include <string>
 
@@ -100,6 +101,8 @@ namespace EnergyPlus {
         // after we have eliminated all calls to getSingleton
         // after we've plumbed enough of the functions to allow
         OutputFiles outputFiles;
+
+        ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
 
         EnergyPlusData() {
             OutputFiles::setSingleton(&outputFiles);

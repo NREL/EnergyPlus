@@ -125,7 +125,7 @@ namespace SurfaceGeometry {
 
     void AllocateModuleArrays();
 
-    void GetSurfaceData(OutputFiles &outputFiles, bool &ErrorsFound); // If errors found in input
+    void GetSurfaceData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles, bool &ErrorsFound); // If errors found in input
 
     void checkSubSurfAzTiltNorm(SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
@@ -258,7 +258,7 @@ namespace SurfaceGeometry {
 
     void GetHTSurfExtVentedCavityData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
-    void GetSurfaceHeatTransferAlgorithmOverrides(OutputFiles &outputFiles, bool &ErrorsFound);
+    void GetSurfaceHeatTransferAlgorithmOverrides(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles, bool &ErrorsFound);
 
     class ExposedFoundationPerimeter
     {

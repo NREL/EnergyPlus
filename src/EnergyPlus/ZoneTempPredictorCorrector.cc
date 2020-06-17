@@ -96,8 +96,6 @@
 
 namespace EnergyPlus {
 
-ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
-
 namespace ZoneTempPredictorCorrector {
 
     // MODULE INFORMATION:
@@ -188,8 +186,6 @@ namespace ZoneTempPredictorCorrector {
                                                     "AdaptiveCEN15251CategoryIIUpperLine",
                                                     "AdaptiveCEN15251CategoryIIIUpperLine"});
 
-    Array1D<Real64> dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(7, -1);
-
     // Functions
     void ManageZoneAirUpdates(EnergyPlusData &state, int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
                               Real64 &ZoneTempChange, // Temp change in zone air btw previous and current timestep
@@ -211,20 +207,20 @@ namespace ZoneTempPredictorCorrector {
         // temperature setpoint for each zone from the schedule manager.
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints(state.outputFiles);
+            GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.outputFiles);
             GetZoneAirStatsInputFlag = false;
         }
 
-        InitZoneAirSetPoints();
+        InitZoneAirSetPoints(state.dataZoneTempPredictorCorrector);
 
         {
             auto const SELECT_CASE_var(UpdateType);
 
             if (SELECT_CASE_var == iGetZoneSetPoints) {
-                CalcZoneAirTempSetPoints();
+                CalcZoneAirTempSetPoints(state.dataZoneTempPredictorCorrector);
 
             } else if (SELECT_CASE_var == iPredictStep) {
-                PredictSystemLoads(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                PredictSystemLoads(state, state.dataZoneTempPredictorCorrector, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
             } else if (SELECT_CASE_var == iCorrectStep) {
                 CorrectZoneAirTemp(state, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
@@ -233,7 +229,7 @@ namespace ZoneTempPredictorCorrector {
                 RevertZoneTimestepHistories();
 
             } else if (SELECT_CASE_var == iPushZoneTimestepHistories) {
-                PushZoneTimestepHistories();
+                PushZoneTimestepHistories(state.dataZoneTempPredictorCorrector);
 
             } else if (SELECT_CASE_var == iPushSystemTimestepHistories) {
                 PushSystemTimestepHistories();
@@ -241,7 +237,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void GetZoneAirSetPoints(OutputFiles &outputFiles)
+    void GetZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1837,7 +1833,7 @@ namespace ZoneTempPredictorCorrector {
                                         Array1D<Real64> runningAverageASH(NumDaysInYear, 0.0);
                                         Array1D<Real64> runningAverageCEN(NumDaysInYear, 0.0);
                                         CalculateMonthlyRunningAverageDryBulb(runningAverageASH, runningAverageCEN);
-                                        CalculateAdaptiveComfortSetPointSchl(runningAverageASH, runningAverageCEN);
+                                        CalculateAdaptiveComfortSetPointSchl(dataZoneTempPredictorCorrector, runningAverageASH, runningAverageCEN);
                                     }
                                 }
                             }
@@ -1929,7 +1925,7 @@ namespace ZoneTempPredictorCorrector {
                                         Array1D<Real64> runningAverageASH(NumDaysInYear, 0.0);
                                         Array1D<Real64> runningAverageCEN(NumDaysInYear, 0.0);
                                         CalculateMonthlyRunningAverageDryBulb(runningAverageASH, runningAverageCEN);
-                                        CalculateAdaptiveComfortSetPointSchl(runningAverageASH, runningAverageCEN);
+                                        CalculateAdaptiveComfortSetPointSchl(dataZoneTempPredictorCorrector, runningAverageASH, runningAverageCEN);
                                     }
                                 }
                             }
@@ -2492,7 +2488,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalculateAdaptiveComfortSetPointSchl(Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN)
+    void CalculateAdaptiveComfortSetPointSchl(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xuan Luo
@@ -2565,7 +2561,7 @@ namespace ZoneTempPredictorCorrector {
         dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.initialized = true;
     }
 
-    void InitZoneAirSetPoints()
+    void InitZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3152,7 +3148,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void PredictSystemLoads(EnergyPlusData &state, bool const ShortenTimeStepSys,
+    void PredictSystemLoads(EnergyPlusData &state, ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, bool const ShortenTimeStepSys,
                             bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     )
@@ -3691,7 +3687,7 @@ namespace ZoneTempPredictorCorrector {
             }
 
             // Calculate the predicted zone load to be provided by the system with the given desired zone air temperature
-            CalcPredictedSystemLoad(ZoneNum, RAFNFrac);
+            CalcPredictedSystemLoad(dataZoneTempPredictorCorrector, ZoneNum, RAFNFrac);
 
             // Calculate the predicted zone load to be provided by the system with the given desired humidity ratio
             CalcPredictedHumidityRatio(ZoneNum, RAFNFrac);
@@ -3716,7 +3712,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalcZoneAirTempSetPoints()
+    void CalcZoneAirTempSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3805,7 +3801,7 @@ namespace ZoneTempPredictorCorrector {
                     // Added Jan 17 (X. Luo)
                     // Adjust operative temperature based on adaptive comfort model
                     if ((TempControlledZone(RelativeZoneNum).AdaptiveComfortTempControl)) {
-                        AdjustOperativeSetPointsforAdapComfort(RelativeZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
+                        AdjustOperativeSetPointsforAdapComfort(dataZoneTempPredictorCorrector, RelativeZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
                         AdapComfortCoolingSetPoint(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
                     }
 
@@ -3813,7 +3809,7 @@ namespace ZoneTempPredictorCorrector {
                     ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
                     //        ZoneThermostatSetPointLo(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum)
 
-                    AdjustCoolingSetPointforTempAndHumidityControl(RelativeZoneNum, ActualZoneNum);
+                    AdjustCoolingSetPointforTempAndHumidityControl(dataZoneTempPredictorCorrector, RelativeZoneNum, ActualZoneNum);
 
                 } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
 
@@ -3827,7 +3823,7 @@ namespace ZoneTempPredictorCorrector {
                     // Added Jan 17 (X. Luo)
                     // Adjust operative temperature based on adaptive comfort model
                     if ((TempControlledZone(RelativeZoneNum).AdaptiveComfortTempControl)) {
-                        AdjustOperativeSetPointsforAdapComfort(RelativeZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
+                        AdjustOperativeSetPointsforAdapComfort(dataZoneTempPredictorCorrector, RelativeZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
                         AdapComfortCoolingSetPoint(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
                     }
 
@@ -3869,7 +3865,7 @@ namespace ZoneTempPredictorCorrector {
                     // Added Jan 17 (X. Luo)
                     // Adjust operative temperature based on adaptive comfort model
                     if ((TempControlledZone(RelativeZoneNum).AdaptiveComfortTempControl)) {
-                        AdjustOperativeSetPointsforAdapComfort(RelativeZoneNum, ZoneThermostatSetPointHi(ActualZoneNum));
+                        AdjustOperativeSetPointsforAdapComfort(dataZoneTempPredictorCorrector, RelativeZoneNum, ZoneThermostatSetPointHi(ActualZoneNum));
                         AdapComfortCoolingSetPoint(ActualZoneNum) = ZoneThermostatSetPointHi(ActualZoneNum);
                     }
 
@@ -3900,7 +3896,7 @@ namespace ZoneTempPredictorCorrector {
                     }
                     //--------------------------------------------------------------------------------------------
 
-                    AdjustCoolingSetPointforTempAndHumidityControl(RelativeZoneNum, ActualZoneNum);
+                    AdjustCoolingSetPointforTempAndHumidityControl(dataZoneTempPredictorCorrector, RelativeZoneNum, ActualZoneNum);
 
                 } else {
                     ShowSevereError("CalcZoneAirTempSetpoints: Illegal control type for Zone=" + Zone(ActualZoneNum).Name +
@@ -3941,11 +3937,11 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        if (NumComfortControlledZones > 0) CalcZoneAirComfortSetPoints();
+        if (NumComfortControlledZones > 0) CalcZoneAirComfortSetPoints(dataZoneTempPredictorCorrector);
         OverrideAirSetPointsforEMSCntrl();
     }
 
-    void CalcPredictedSystemLoad(int const ZoneNum, Real64 RAFNFrac)
+    void CalcPredictedSystemLoad(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const ZoneNum, Real64 RAFNFrac)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5075,7 +5071,7 @@ namespace ZoneTempPredictorCorrector {
             CorrectZoneHumRat(ZoneNum);
 
             ZoneAirHumRat(ZoneNum) = ZoneAirHumRatTemp(ZoneNum);
-            dataZoneTempPredictorCorrector.ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(ZT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress, RoutineName);
+            state.dataZoneTempPredictorCorrector.ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(ZT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress, RoutineName);
 
             // ZoneTempChange is used by HVACManager to determine if the timestep needs to be shortened.
             {
@@ -5136,7 +5132,7 @@ namespace ZoneTempPredictorCorrector {
         } // ZoneNum
     }
 
-    void PushZoneTimestepHistories()
+    void PushZoneTimestepHistories(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6729,7 +6725,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    bool VerifyThermostatInZone(std::string const &ZoneName) // Zone to verify
+    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, std::string const &ZoneName) // Zone to verify
     {
 
         // FUNCTION INFORMATION:
@@ -6746,7 +6742,7 @@ namespace ZoneTempPredictorCorrector {
         bool HasThermostat; // True if does, false if not.
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints(OutputFiles::getSingleton());
+            GetZoneAirSetPoints(dataZoneTempPredictorCorrector, OutputFiles::getSingleton());
             GetZoneAirStatsInputFlag = false;
         }
         if (NumTempControlledZones > 0) {
@@ -6781,7 +6777,7 @@ namespace ZoneTempPredictorCorrector {
         return (UtilityRoutines::FindItemInList(ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName) > 0);
     }
 
-    void DetectOscillatingZoneTemp()
+    void DetectOscillatingZoneTemp(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -6966,7 +6962,7 @@ namespace ZoneTempPredictorCorrector {
         ZoneAirSetPoint = (ZoneAirSetPoint - thisMRTFraction * thisMRT) / (1.0 - thisMRTFraction);
     }
 
-    void AdjustOperativeSetPointsforAdapComfort(int const TempControlledZoneID, Real64 &ZoneAirSetPoint)
+    void AdjustOperativeSetPointsforAdapComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const TempControlledZoneID, Real64 &ZoneAirSetPoint)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xuan Luo
@@ -7034,7 +7030,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalcZoneAirComfortSetPoints()
+    void CalcZoneAirComfortSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7074,7 +7070,7 @@ namespace ZoneTempPredictorCorrector {
         // FLOW:
         // Call thermal comfort module to read zone control comfort object
         if (FirstTimeFlag) {
-            ManageThermalComfort(true);
+            ManageThermalComfort(dataZoneTempPredictorCorrector, true);
             FirstTimeFlag = false;
         }
 
@@ -7509,7 +7505,7 @@ namespace ZoneTempPredictorCorrector {
         return PMVResidual;
     }
 
-    void AdjustCoolingSetPointforTempAndHumidityControl(int const TempControlledZoneID,
+    void AdjustCoolingSetPointforTempAndHumidityControl(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const TempControlledZoneID,
                                                         int const ActualZoneNum // controlled zone actual zone number
     )
     {
@@ -7676,7 +7672,7 @@ namespace ZoneTempPredictorCorrector {
     }
 
     // add values to the LEED tabular report related to schedules used by the thermostat objects
-    void FillPredefinedTableOnThermostatSetpoints()
+    void FillPredefinedTableOnThermostatSetpoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
         // J.Glazer - Aug 2017
         using namespace OutputReportPredefined;

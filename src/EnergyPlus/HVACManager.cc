@@ -495,13 +495,13 @@ namespace HVACManager {
                 ZoneAirHumRatAvg(ZoneNum) += ZoneAirHumRat(ZoneNum) * FracTimeStepZone;
                 if (Contaminant.CO2Simulation) ZoneAirCO2Avg(ZoneNum) += ZoneAirCO2(ZoneNum) * FracTimeStepZone;
                 if (Contaminant.GenericContamSimulation) ZoneAirGCAvg(ZoneNum) += ZoneAirGC(ZoneNum) * FracTimeStepZone;
-                if (dataZoneTempPredictorCorrector.NumOnOffCtrZone > 0) {
+                if (state.dataZoneTempPredictorCorrector.NumOnOffCtrZone > 0) {
                     ZoneThermostatSetPointHiAver(ZoneNum) += ZoneThermostatSetPointHi(ZoneNum) * FracTimeStepZone;
                     ZoneThermostatSetPointLoAver(ZoneNum) += ZoneThermostatSetPointLo(ZoneNum) * FracTimeStepZone;
                 }
             }
 
-            DetectOscillatingZoneTemp();
+            DetectOscillatingZoneTemp(state.dataZoneTempPredictorCorrector);
             UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
             UpdateIceFractions();          // Update fraction of ice stored in TES
             ManageWater();

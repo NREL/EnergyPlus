@@ -158,7 +158,7 @@ namespace LowTempRadiantSystem {
         
         Real64 setRadiantSystemControlTemperature();
         
-        virtual void calculateLowTemperatureRadiantSystem(Real64 &LoadMet) = 0;
+        virtual void calculateLowTemperatureRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet) = 0;
         
         void updateLowTemperatureRadiantSystemSurfaces();
         
@@ -260,9 +260,9 @@ namespace LowTempRadiantSystem {
             {
             }
         
-        void calculateLowTemperatureRadiantSystem(Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet);
         
-        void calculateLowTemperatureRadiantSystemComponents(Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystemComponents(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet);
         
         void updateLowTemperatureRadiantSystem();
         
@@ -330,9 +330,9 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        void calculateLowTemperatureRadiantSystem(Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet);
         
-        void calculateLowTemperatureRadiantSystemComponents(int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
+        void calculateLowTemperatureRadiantSystemComponents(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
                                                             bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
                                                             Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
         );
@@ -366,7 +366,7 @@ namespace LowTempRadiantSystem {
         {
         }
         
-        void calculateLowTemperatureRadiantSystem(Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet);
 
         void updateLowTemperatureRadiantSystem();
         

@@ -130,7 +130,7 @@ namespace HeatBalanceKivaManager {
         }
     }
 
-    void KivaInstanceMap::initGround(const KivaWeatherData &kivaWeather)
+    void KivaInstanceMap::initGround(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather)
     {
 
 #ifdef GROUND_PLOT
@@ -168,7 +168,7 @@ namespace HeatBalanceKivaManager {
 
         // Initialize with steady state before accelerated timestepping
         instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_STEADY_STATE;
-        setInitialBoundaryConditions(kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
+        setInitialBoundaryConditions(dataZoneTempPredictorCorrector, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
         instance.calculate();
         accDate += acceleratedTimestep;
         while (accDate > 365 + WeatherManager::LeapYearAdd) {
@@ -178,7 +178,7 @@ namespace HeatBalanceKivaManager {
         // Accelerated timestepping
         instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_IMPLICIT;
         for (int i = 0; i < numAccelaratedTimesteps; ++i) {
-            setInitialBoundaryConditions(kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
+            setInitialBoundaryConditions(dataZoneTempPredictorCorrector, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
             instance.calculate(acceleratedTimestep * 24 * 60 * 60);
             accDate += acceleratedTimestep;
             while (accDate > 365 + WeatherManager::LeapYearAdd) {
@@ -190,7 +190,7 @@ namespace HeatBalanceKivaManager {
         instance.foundation->numericalScheme = Kiva::Foundation::NS_ADI;
     }
 
-    void KivaInstanceMap::setInitialBoundaryConditions(const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep)
+    void KivaInstanceMap::setInitialBoundaryConditions(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep)
     {
 
         unsigned index, indexPrev;
@@ -647,13 +647,13 @@ namespace HeatBalanceKivaManager {
         ObjexxFCL::gio::close(kivaWeatherFileUnitNumber);
     }
 
-    bool KivaManager::setupKivaInstances(OutputFiles &outputFiles)
+    bool KivaManager::setupKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles)
     {
         Kiva::setMessageCallback(kivaErrorCallback, nullptr);
         bool ErrorsFound = false;
 
         if (DataZoneControls::GetZoneAirStatsInputFlag) {
-            ZoneTempPredictorCorrector::GetZoneAirSetPoints(outputFiles);
+            ZoneTempPredictorCorrector::GetZoneAirSetPoints(dataZoneTempPredictorCorrector, outputFiles);
             DataZoneControls::GetZoneAirStatsInputFlag = false;
         }
 
@@ -1101,12 +1101,12 @@ namespace HeatBalanceKivaManager {
         return ErrorsFound;
     }
 
-    void KivaManager::initKivaInstances()
+    void KivaManager::initKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
         // initialize temperatures at the beginning of run environment
         for (auto &kv : kivaInstances) {
             // Start with steady-state solution
-            kv.initGround(kivaWeather);
+            kv.initGround(dataZoneTempPredictorCorrector, kivaWeather);
         }
         calcKivaSurfaceResults();
     }

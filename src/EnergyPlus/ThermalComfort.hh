@@ -283,7 +283,7 @@ namespace ThermalComfort {
 
     void clear_state();
 
-    void ManageThermalComfort(bool const InitializeOnly); // when called from ZTPC and calculations aren't needed
+    void ManageThermalComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, bool const InitializeOnly); // when called from ZTPC and calculations aren't needed
 
     void InitThermalComfort();
 
@@ -317,7 +317,7 @@ namespace ThermalComfort {
 
     void ResetThermalComfortSimpleASH55();
 
-    void CalcIfSetPointMet();
+    void CalcIfSetPointMet(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
 
     void ResetSetPointMet();
 

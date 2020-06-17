@@ -3972,7 +3972,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     SurfaceGeometry::SinZoneRelNorth = 0.0;
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ZoneEquipmentManager::GetZoneEquipment(state);

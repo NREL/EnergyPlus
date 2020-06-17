@@ -149,7 +149,7 @@ namespace SwimmingPool {
             thisPool.simulate(state, A, FirstHVACIteration, CurLoad, RunFlag);
         }
 
-        if (NumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
+        if (NumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state.dataZoneTempPredictorCorrector);
 
         ReportSwimmingPool();
     }

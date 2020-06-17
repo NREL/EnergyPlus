@@ -5675,7 +5675,7 @@ namespace OutputReportTabular {
 
         if (WriteTabularFiles) {
             // call each type of report in turn
-            WriteBEPSTable();
+            WriteBEPSTable(state.dataZoneTempPredictorCorrector);
             WriteTableOfContents();
             WriteVeriSumTable(state.outputFiles);
             WriteDemandEndUseSummary();
@@ -6837,7 +6837,7 @@ namespace OutputReportTabular {
             }
         }
         // fill the LEED setpoint table
-        ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints();
+        ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints(state.dataZoneTempPredictorCorrector);
     }
 
     void WriteMonthlyTables()
@@ -7475,7 +7475,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteBEPSTable()
+    void WriteBEPSTable(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer

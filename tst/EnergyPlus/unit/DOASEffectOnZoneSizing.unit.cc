@@ -290,7 +290,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     Zone(2).ListMultiplier = 1;
 
     SizeZoneEquipmentOneTimeFlag = false;
-    SizeZoneEquipment(state.outputFiles);
+    SizeZoneEquipment(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     EXPECT_DOUBLE_EQ(12.2, CalcZoneSizing(1, 1).DOASSupTemp);
     EXPECT_NEAR(.00795195, CalcZoneSizing(1, 1).DOASSupHumRat, .00000001);

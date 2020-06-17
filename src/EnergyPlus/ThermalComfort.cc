@@ -350,7 +350,7 @@ namespace ThermalComfort {
         AngleFactorList.deallocate();
     }
 
-    void ManageThermalComfort(bool const InitializeOnly) // when called from ZTPC and calculations aren't needed
+    void ManageThermalComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, bool const InitializeOnly) // when called from ZTPC and calculations aren't needed
     {
 
         // SUBROUTINE INFORMATION:
@@ -397,7 +397,7 @@ namespace ThermalComfort {
             CalcThermalComfortPierce();
             CalcThermalComfortKSU();
             CalcThermalComfortSimpleASH55();
-            CalcIfSetPointMet();
+            CalcIfSetPointMet(dataZoneTempPredictorCorrector);
             if (ASH55Flag) CalcThermalComfortAdaptiveASH55(false);
             if (CEN15251Flag) CalcThermalComfortAdaptiveCEN15251(false);
         }
@@ -2391,7 +2391,7 @@ namespace ThermalComfort {
         TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
     }
 
-    void CalcIfSetPointMet()
+    void CalcIfSetPointMet(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer

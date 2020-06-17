@@ -1273,7 +1273,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     SimAirServingZones::GetAirPathData(state);
     SimAirServingZones::InitAirLoops(state, FirstHVACIteration);
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.outputFiles);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     CurDeadBandOrSetback.allocate(2);
     CurDeadBandOrSetback(1) = false;
