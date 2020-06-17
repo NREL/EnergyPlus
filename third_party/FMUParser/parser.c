@@ -23,6 +23,10 @@
 #include "string.h"
 #include "util.h"
 
+#ifndef _MSC_VER
+#include <libgen.h>
+#endif
+
 #define XML_FILE  "modelDescription.xml"
 
 FMU fmu;        // FMU to parse
@@ -35,7 +39,7 @@ FMU fmu;        // FMU to parse
 ///\return 0 if no error occurred
 ///////////////////////////////////////////////////////////////////////////
 int callparser(const char* fmuFilNam, const char* tmpPat){
-  int length;
+  size_t length;
   char* xmlPat;
   char* filNam, *tmp, *ext;
 
@@ -142,7 +146,8 @@ int main(int argc, char* argv[]){
   char *tmpPat=NULL;
   char *objNam=NULL;
   option opt;
-  int length = 0, nam = 0;
+  size_t length = 0;
+  int nam = 0;
   int optNum = 0;
 
   printDebug("New Line:\n");
@@ -190,7 +195,7 @@ int main(int argc, char* argv[]){
   }
 
   if (optNum == 0) {
-    if (WINDOWS) {
+    if (IS_WINDOWS) {
 	    printError("Missing option: parser.exe option [argument]");
       printf("For help, use: parser.exe -h \n");
     }
@@ -203,7 +208,7 @@ int main(int argc, char* argv[]){
 
   if (optNum > 1) {
     printError("Can not use more than 1 option at the same time except \"-u\".");
-    if (WINDOWS) {
+    if (IS_WINDOWS) {
       printf("For help, use: parser.exe -h \n");
     }
     else {
@@ -222,7 +227,7 @@ int main(int argc, char* argv[]){
         printError("No FMU folder is given.\n"); break;
      }
 
-    if (WINDOWS) {
+    if (IS_WINDOWS) {
 	    printf("Correct usage: parser.exe option [argument] \n");
       printf("For help information, use: parser.exe -h \n");
     }

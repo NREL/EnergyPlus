@@ -223,17 +223,17 @@ AirLoopHVAC:SupplyPath,
 
 The AirLoopHVAC:ZoneSplitter is a component that splits airflow from a single inlet to multiple outlets. This component must be referenced in an \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath} object. The input contains only node connection information.
 
-\subsubsection{Inputs}\label{inputs-4-002}
+\subsubsection{Inputs}
 
-\paragraph{Field: Name}\label{field-name-4-002}
+\paragraph{Field: Name}
 
 Unique name for this zone splitter.
 
-\paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-2}
+\paragraph{Field: Inlet Node Name}
 
 The name of the single inlet node going into the splitter.
 
-\paragraph{Field: Outlet \textless{}\#\textgreater{} Node Name}\label{field-outlet-node-name-2}
+\paragraph{Field: Outlet \textless{}\#\textgreater{} Node Name}
 
 The name of a splitter outlet node. There is no limit to the number of outlet nodes, and there may be no duplicate outlet node names. (Note that some EnergyPlus editing tools may allow only 500 outlet node names, but this may be increased by extending the object in the Energy+.idd file.)
 
@@ -253,17 +253,17 @@ AirLoopHVAC:ZoneSplitter,
 
 The AirLoopHVAC:ZoneMixer takes the air from multiple inlets and mixes the streams together to be sent out of a single outlet node. This is a simple process of summing flows and averaging the air properties. This compoment may be part of an air loop return path or part of an induction terminal unit. When used as a return air mixer, this component must be listed in an \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath} object, and the inlets may be zone return air nodes or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} outlet nodes. When used in an induction terminal unit (ref. \hyperref[airterminalsingleductseriespiureheat]{AirTerminal:SingleDuct:SeriesPIU:Reheat}, \hyperref[airterminalsingleductparallelpiureheat]{AirTerminal:SingleDuct:ParallelPIU:Reheat}, and \hyperref[airterminalsingleductconstantvolumefourpipeinduction]{AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction}), one inlet node is the supply (primary) air inlet from the central air handler, and the second inlet node is the induced (secondary) air inlet. These node names should match equivalent node names in the terminal unit.
 
-\subsubsection{Inputs}\label{inputs-5-002}
+\subsubsection{Inputs}
 
-\paragraph{Field: Name}\label{field-name-5-002}
+\paragraph{Field: Name}
 
 Unique name for this zone mixer.
 
-\paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-3}
+\paragraph{Field: Outlet Node Name}
 
 The name of the single outlet node leaving the mixer.
 
-\paragraph{Field: Inlet \textless{}\#\textgreater{} Node Name}\label{field-inlet-node-name-3}
+\paragraph{Field: Inlet \textless{}\#\textgreater{} Node Name}
 
 The name of a mixer inlet node. There is no limit to the number of inlet nodes, and there may be no duplicate inlet node names. (Note that some EnergyPlus editing tools may allow only 500 inlet node names, but this may be increased by extending the object in the Energy+.idd file.)
 
@@ -281,7 +281,7 @@ AirLoopHVAC:ZoneMixer,
 
 \subsection{AirLoopHVAC:DedicatedOutdoorAirSystem}\label{airloophvacdedicatedoutdoorairsystem}
 
-The AirLoopHVAC:DedicatedOutdoorAirSystem is a central dedicated outdoor air system (DOAS) and deliveres outdoor air to multiple \hyperref[airloophvac]{AirLoopHVAC} systems. The amount of delivered outdoor air is based on a sum of outdoor air flow rates from outdoor air stream nodes defined in the \hyperref[outdoorairmixe]{OutdoorAir:Mixer}. These OutdoorAir:Mixer objects are a component of served multiple AirLoopHVAC systems. The central DOAS system also pretreates outdoor air before outdoor air distribution into multiple AirLoopHVAC, with given precool and preheat air conditions.
+The AirLoopHVAC:DedicatedOutdoorAirSystem is a central dedicated outdoor air system (DOAS) and deliveres outdoor air to multiple \hyperref[airloophvac]{AirLoopHVAC} systems. The amount of delivered outdoor air is based on a sum of outdoor air flow rates from outdoor air stream nodes defined in the \hyperref[outdoorairmixer]{OutdoorAir:Mixer}. These OutdoorAir:Mixer objects are a component of served multiple AirLoopHVAC systems. The central DOAS system also pretreates outdoor air before outdoor air distribution into multiple AirLoopHVAC, with given precool and preheat air conditions.
 
 After the object name, the object has four fields to provide the name of AirLoopHVAC:OutdoorAirSystem, system availability, and names of AirLoopHVAC:Mixer and AirLoopHVAC:Splitter. The AirLoopHVAC:OutdoorAirSystem lists a controller to perform controls, and coils and fans to pretreat outdoor air before delivery to served AirLoopHVAC. The Availability Schedule determines times when a system is operationa or shutdownl. The AirLoopHVAC:Mixer and AirLoopHVAC:Splitter provide connection into distribution and relief nodes, respectively.
 
@@ -289,9 +289,9 @@ The next four fields requires inputs for pretreat air conditions, including prec
 
 The last section lists the number of AirLoopHVAC to be served and names of served AirLoopHVAC objects.
 
-\subsubsection{Inputs}\label{inputs-002}
+\subsubsection{Inputs}
 
-\paragraph{Field: Name}\label{field-name-002}
+\paragraph{Field: Name}
 
 This field is a unique, user assigned name for a single instance of an AirLoopHVAC:DedicatedOutdoorAirSystem object. Any other object referencing this AirLoopHVAC:DedicatedOutdoorAirSystem will use this name.
 
@@ -303,19 +303,19 @@ This field is the name of a AirLoopHVAC:OutdoorAirSystem object. It handles outd
 
 The name of a schedule that specifies when the system is available.
 
-\paragraph{Field: Preheat Design Temperature}\label{field-preheat-design-temperature}
+\paragraph{Field: Preheat Design Temperature}
 
 The design air temperature exiting the preheat coil (if any) in degrees Celsius.
 
-\paragraph{Field: Preheat Design Humidity Ratio}\label{field-preheat-design-humidity-ratio}
+\paragraph{Field: Preheat Design Humidity Ratio}
 
 The design humidity ratio exiting the preheat coil (if any) in kilograms of water per kilogram of dry air. (kgWater/kgDryAir)
 
-\paragraph{Field: Precool Design Temperature}\label{field-precool-design-temperature}
+\paragraph{Field: Precool Design Temperature}
 
 The design air temperature exiting the precooling coil (if any) in degrees Celsius.
 
-\paragraph{Field: Precool Design Humidity Ratio}\label{field-precool-design-humidity-ratio}
+\paragraph{Field: Precool Design Humidity Ratio}
 
 The design humidity ratio exiting the precooling coil (if any) in kilograms of water per kilogram of dry air. (kgWater/kgDryAir)
 
@@ -351,7 +351,7 @@ An example of this statement in an IDF is:
 
 \subsection{AirLoopHVAC:Mixer}\label{airloophvacmixer}
 
-The AirLoopHVAC:Mixer takes the air from multiple inlets and mixes the streams together to be sent out of a single outlet node. This is a simple process of summing flows and averaging the air properties. This component must be referenced in an \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem} object. The multiple inlet nodes are relief nodes of \hyperref[outdoorairmixe]{OutdoorAir:Mixer}, whihc is a component of AirLoopHVAC, served by the AirLoopHVAC:DedicatedOutdoorAirSystem object. The single outlet node is connected into either outdoor or a heat exchanger. The heat exchanger must be listed as a component in AirLoopHVAC:OutdoorAirSystem, referenced in the AirLoopHVAC:DedicatedOutdoorAirSystem object. 
+The AirLoopHVAC:Mixer takes the air from multiple inlets and mixes the streams together to be sent out of a single outlet node. This is a simple process of summing flows and averaging the air properties. This component must be referenced in an \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem} object. The multiple inlet nodes are relief nodes of \hyperref[outdoorairmixer]{OutdoorAir:Mixer}, whihc is a component of AirLoopHVAC, served by the AirLoopHVAC:DedicatedOutdoorAirSystem object. The single outlet node is connected into either outdoor or a heat exchanger. The heat exchanger must be listed as a component in AirLoopHVAC:OutdoorAirSystem, referenced in the AirLoopHVAC:DedicatedOutdoorAirSystem object. 
 
 \subsubsection{Inputs}\label{inputs-5-002}
 
@@ -383,7 +383,7 @@ An input example is shown below.
 
 \subsection{AirLoopHVAC:Splitter}\label{airloophvacsplitter}
 
-The AirLoopHVAC:Splitter is a component that splits airflow from a single inlet to multiple outlets. This component must be referenced in an \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem} object. The input contains only node connection information. The multiple outlet nodes must be outdoor air stream nodes of \hyperref[outdoorairmixe]{OutdoorAir:Mixer}, whihc is a component of AirLoopHVAC, served by the AirLoopHVAC:DedicatedOutdoorAirSystem object.
+The AirLoopHVAC:Splitter is a component that splits airflow from a single inlet to multiple outlets. This component must be referenced in an \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem} object. The input contains only node connection information. The multiple outlet nodes must be outdoor air stream nodes of \hyperref[outdoorairmixer]{OutdoorAir:Mixer}, whihc is a component of AirLoopHVAC, served by the AirLoopHVAC:DedicatedOutdoorAirSystem object.
 
 \subsubsection{Inputs}\label{inputs-4-002}
 

@@ -2239,13 +2239,13 @@ namespace HVACControllers {
                     // For temperature and humidity control, after temperature control is converged, check if humidity setpoint is met
                     if (!thisController.HumRatCtrlOverride) {
                         // For humidity control tolerance, always use 0.0001 which is roughly equivalent to a 0.015C change in dewpoint
-                        if (Node(thisController.SensedNode).HumRat > (Node(thisController.SensedNode).HumRatMax + 1.0e-4)) {
+                        if (Node(thisController.SensedNode).HumRat > (Node(thisController.SensedNode).HumRatMax + 1.0e-5)) {
                             // Turn on humdity control and restart controller
                             IsConvergedFlag = false;
                             thisController.HumRatCtrlOverride = true;
                             if (thisController.Action == iReverseAction) {
                                 // Cooling coil controller should always be ReverseAction, but skip this if not
-                                RootFinder::SetupRootFinder(RootFinders(ControlNum), iSlopeDecreasing, iMethodBrent, constant_zero, 1.0e-6, 1.0e-4);
+                                RootFinder::SetupRootFinder(RootFinders(ControlNum), iSlopeDecreasing, iMethodFalsePosition, constant_zero, 1.0e-6, 1.0e-5);
                             }
                             // Do a cold start reset, same as iControllerOpColdStart
                             ResetController(ControlNum, false, IsConvergedFlag);
