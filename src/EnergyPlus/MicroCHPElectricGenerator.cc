@@ -591,7 +591,7 @@ namespace MicroCHPElectricGenerator {
         GeneratorDynamicsManager::SetupGeneratorControlStateManager(this->DynamicsControlID);
     }
 
-    void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators()
+    void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(BranchInputManagerData &data)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith
@@ -610,7 +610,8 @@ namespace MicroCHPElectricGenerator {
 
         if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(data,
+                                                    this->Name,
                                                     DataPlant::TypeOf_Generator_MicroCHP,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,

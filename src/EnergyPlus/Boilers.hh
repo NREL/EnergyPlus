@@ -63,6 +63,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 struct BoilersData;
+struct BranchInputManagerData;
 
 namespace Boilers {
 
@@ -159,7 +160,7 @@ namespace Boilers {
 
         void SetupOutputVars();
 
-        void InitBoiler(); // number of the current boiler being simulated
+        void InitBoiler(BranchInputManagerData &data); // number of the current boiler being simulated
 
         void SizeBoiler();
 

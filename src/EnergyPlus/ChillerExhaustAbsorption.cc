@@ -132,7 +132,7 @@ namespace ChillerExhaustAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void ExhaustAbsorberSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ExhaustAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
 
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
@@ -142,12 +142,12 @@ namespace ChillerExhaustAbsorption {
         // Match inlet node name of calling branch to determine if this call is for heating or cooling
         if (BranchInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
             this->InCoolingMode = RunFlag != 0;
-            this->initialize();
+            this->initialize(state.dataBranchInputManager);
             this->calcChiller(CurLoad);
             this->updateCoolRecords(CurLoad, RunFlag);
         } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
             this->InHeatingMode = RunFlag != 0;
-            this->initialize();
+            this->initialize(state.dataBranchInputManager);
             this->calcHeater(CurLoad, RunFlag);
             this->updateHeatRecords(CurLoad, RunFlag);
         } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
@@ -204,9 +204,9 @@ namespace ChillerExhaustAbsorption {
         _SizFac = this->SizFac;
     }
 
-    void ExhaustAbsorberSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
+    void ExhaustAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
 
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
@@ -616,7 +616,7 @@ namespace ChillerExhaustAbsorption {
                             ChillerName);
     }
 
-    void ExhaustAbsorberSpecs::initialize()
+    void ExhaustAbsorberSpecs::initialize(BranchInputManagerData &data)
     {
 
         // SUBROUTINE INFORMATION:
@@ -653,7 +653,8 @@ namespace ChillerExhaustAbsorption {
         if (this->plantScanInit) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(data,
+                                                    this->Name,
                                                     DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
@@ -669,7 +670,8 @@ namespace ChillerExhaustAbsorption {
                 ShowFatalError("InitExhaustAbsorber: Program terminated due to previous condition(s).");
             }
 
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(data,
+                                                    this->Name,
                                                     DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
                                                     this->HWLoopNum,
                                                     this->HWLoopSideNum,
@@ -686,7 +688,8 @@ namespace ChillerExhaustAbsorption {
             }
 
             if (this->isWaterCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(data,
+                                                        this->Name,
                                                         DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,

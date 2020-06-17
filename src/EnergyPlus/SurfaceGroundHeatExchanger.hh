@@ -54,10 +54,13 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
 
 namespace SurfaceGroundHeatExchanger {
 
@@ -179,7 +182,7 @@ namespace SurfaceGroundHeatExchanger {
 
         static PlantComponent *factory(int objectType, std::string objectName);
 
-        void InitSurfaceGroundHeatExchanger();
+        void InitSurfaceGroundHeatExchanger(BranchInputManagerData &data);
 
         //==============================================================================
 

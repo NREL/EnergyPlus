@@ -52,7 +52,6 @@
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
-#include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
@@ -259,7 +258,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     DataAirLoop::clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
-    dataBranchInputManager.clear_state();
     DataBranchNodeConnections::clear_state();
     DataContaminantBalance::clear_state();
     DataConvergParams::clear_state();

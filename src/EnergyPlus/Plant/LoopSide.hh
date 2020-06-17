@@ -58,7 +58,9 @@
 
 namespace EnergyPlus {
 
+    // Forward declarations
     struct EnergyPlusData;
+    struct BranchInputManagerData;
 
 namespace DataPlant {
 
@@ -162,7 +164,7 @@ namespace DataPlant {
 
         void ValidateFlowControlPaths();
 
-        Real64 DetermineLoopSideFlowRate(int ThisSideInletNode, Real64 ThisSideLoopFlowRequest);
+        Real64 DetermineLoopSideFlowRate(BranchInputManagerData &data, int ThisSideInletNode, Real64 ThisSideLoopFlowRequest);
 
         void SimulateAllLoopSideBranches(EnergyPlusData &state, Real64 ThisLoopSideFlow, bool FirstHVACIteration, bool &LoopShutDownFlag);
 
@@ -192,11 +194,12 @@ namespace DataPlant {
 
         void ResolveParallelFlows(Real64 ThisLoopSideFlow, bool FirstHVACIteration);
 
-        void SimulateSinglePump(PlantLocation SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
+        void SimulateSinglePump(BranchInputManagerData &data, PlantLocation SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
 
         void UpdateAnyLoopDemandAlterations(int BranchNum, int CompNum);
 
-        void SimulateAllLoopSidePumps(Optional<PlantLocation const> SpecificPumpLocation = _,
+        void SimulateAllLoopSidePumps(BranchInputManagerData &data,
+                                      Optional<PlantLocation const> SpecificPumpLocation = _,
                                       Optional<Real64 const> SpecificPumpFlowRate = _);
 
         void AdjustPumpFlowRequestByEMSControls(int BranchNum, int CompNum, Real64 &FlowToRequest);

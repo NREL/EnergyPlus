@@ -881,7 +881,8 @@ namespace MicroturbineElectricGenerator {
         OptLoad = 0.0;
     }
 
-    void MTGeneratorSpecs::InitMTGenerators(bool const RunFlag,
+    void MTGeneratorSpecs::InitMTGenerators(BranchInputManagerData &data,
+                                            bool const RunFlag,
                                             Real64 const MyLoad, // electrical load in W
                                             bool const FirstHVACIteration)
     {
@@ -908,7 +909,8 @@ namespace MicroturbineElectricGenerator {
 
         if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(data,
+                                                    this->Name,
                                                     DataPlant::TypeOf_Generator_MicroTurbine,
                                                     this->HRLoopNum,
                                                     this->HRLoopSideNum,

@@ -3285,7 +3285,8 @@ namespace VariableSpeedCoils {
                     plantTypeOfNum = DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
                 }
                 errFlag = false;
-                ScanPlantLoopsForObject(VarSpeedCoil(DXCoilNum).Name,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        VarSpeedCoil(DXCoilNum).Name,
                                         plantTypeOfNum,
                                         VarSpeedCoil(DXCoilNum).LoopNum,
                                         VarSpeedCoil(DXCoilNum).LoopSide,

@@ -755,12 +755,12 @@ namespace SolarCollectors {
         }
     }
 
-    void CollectorData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+    void CollectorData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                  bool const EP_UNUSED(FirstHVACIteration),
                                  Real64 &EP_UNUSED(CurLoad),
                                  bool const EP_UNUSED(RunFlag))
     {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
 
         {
             auto const SELECT_CASE_var(this->TypeNum);
@@ -779,7 +779,7 @@ namespace SolarCollectors {
         this->report();
     }
 
-    void CollectorData::initialize()
+    void CollectorData::initialize(BranchInputManagerData &data)
     {
 
         // SUBROUTINE INFORMATION:
@@ -806,7 +806,7 @@ namespace SolarCollectors {
         if (this->SetLoopIndexFlag) {
             if (allocated(DataPlant::PlantLoop)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(
+                PlantUtilities::ScanPlantLoopsForObject(data,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError("InitSolarCollector: Program terminated due to previous condition(s).");

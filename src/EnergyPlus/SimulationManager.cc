@@ -350,7 +350,7 @@ namespace SimulationManager {
         createFacilityElectricPowerServiceObject();
         createCoilSelectionReportObj();
 
-        ManageBranchInput(); // just gets input and returns.
+        ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
 
         // Create a new plugin manager which starts up the Python interpreter
         // Note this cannot be done if we are running within the library environment, nor would you really to do so
@@ -383,7 +383,7 @@ namespace SimulationManager {
         }
         Available = true;
 
-        if (dataBranchInputManager.InvalidBranchDefinitions) {
+        if (state.dataBranchInputManager.InvalidBranchDefinitions) {
             ShowFatalError("Preceding error(s) in Branch Input cause termination.");
         }
 
@@ -427,7 +427,7 @@ namespace SimulationManager {
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations();
             InitDemandManagers(state);
-            TestBranchIntegrity(state.outputFiles, ErrFound);
+            TestBranchIntegrity(state.dataBranchInputManager, state.outputFiles, ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(state, state.outputFiles, ErrFound);
             if (ErrFound) TerminalError = true;

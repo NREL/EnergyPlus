@@ -122,12 +122,12 @@ namespace PondGroundHeatExchanger {
     bool GetInputFlag(true);
     Array1D<PondGroundHeatExchangerData> PondGHE;
 
-    void PondGroundHeatExchangerData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PondGroundHeatExchangerData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                                bool const FirstHVACIteration,
                                                Real64 &EP_UNUSED(CurLoad),
                                                bool const EP_UNUSED(RunFlag))
     {
-        this->InitPondGroundHeatExchanger(FirstHVACIteration);
+        this->InitPondGroundHeatExchanger(state.dataBranchInputManager, FirstHVACIteration);
         this->CalcPondGroundHeatExchanger();
         this->UpdatePondGroundHeatExchanger();
     }
@@ -149,12 +149,16 @@ namespace PondGroundHeatExchanger {
         return nullptr;
     }
 
+    void PondGroundHeatExchangerData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
+        this->InitPondGroundHeatExchanger(state.dataBranchInputManager, true);
+    }
+
     void PondGroundHeatExchangerData::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
                                                           Real64 &MaxLoad,
                                                           Real64 &MinLoad,
                                                           Real64 &OptLoad)
     {
-        this->InitPondGroundHeatExchanger(true);
         MaxLoad = this->DesignCapacity;
         MinLoad = 0.0;
         OptLoad = this->DesignCapacity;
@@ -355,7 +359,7 @@ namespace PondGroundHeatExchanger {
         SetupOutputVariable("Pond Heat Exchanger Bulk Temperature", OutputProcessor::Unit::C, this->PondTemp, "Plant", "Average", this->Name);
     }
 
-    void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+    void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(BranchInputManagerData &data, bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
 
@@ -400,7 +404,8 @@ namespace PondGroundHeatExchanger {
         if (this->MyFlag) {
             // Locate the hx on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(data,
+                                                    this->Name,
                                                     DataPlant::TypeOf_GrndHtExchgPond,
                                                     this->LoopNum,
                                                     this->LoopSideNum,

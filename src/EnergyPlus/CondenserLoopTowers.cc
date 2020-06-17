@@ -168,12 +168,12 @@ namespace CondenserLoopTowers {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void CoolingTower::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+    void CoolingTower::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                 bool const EP_UNUSED(FirstHVACIteration),
                                 Real64 &CurLoad,
                                 bool const RunFlag)
     {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
             this->calculateSingleSpeedTower();
         } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
@@ -200,9 +200,9 @@ namespace CondenserLoopTowers {
         SizFactor = this->SizFac;
     }
 
-    void CoolingTower::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
+    void CoolingTower::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
             this->SizeVSMerkelTower();
         } else {
@@ -1858,7 +1858,7 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void CoolingTower::initialize()
+    void CoolingTower::initialize(BranchInputManagerData &data)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1886,7 +1886,7 @@ namespace CondenserLoopTowers {
 
             // Locate the tower on the plant loops for later usage
             bool ErrorsFound = false;
-            PlantUtilities::ScanPlantLoopsForObject(
+            PlantUtilities::ScanPlantLoopsForObject(data,
                 this->Name, this->TowerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
             if (ErrorsFound) {
                 ShowFatalError("initialize: Program terminated due to previous condition(s).");
@@ -5274,7 +5274,7 @@ namespace CondenserLoopTowers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla;             // Flag of solver
         Array1D<Real64> Par(4); // Parameter array for regula falsi solver
-        Real64 const VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver 
+        Real64 const VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver
 
         //   determine tower outlet water temperature
         Par(1) = this->thisTowerNum; // Index to cooling tower

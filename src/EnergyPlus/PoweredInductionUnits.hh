@@ -54,9 +54,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
 
 namespace PoweredInductionUnits {
 
@@ -180,7 +183,8 @@ namespace PoweredInductionUnits {
 
     void GetPIUs(EnergyPlusData &state);
 
-    void InitPIU(int const PIUNum,             // number of the current fan coil unit being simulated
+    void InitPIU(BranchInputManagerData &data,
+                 int const PIUNum,             // number of the current fan coil unit being simulated
                  bool const FirstHVACIteration // TRUE if first zone equip this HVAC step
     );
 
