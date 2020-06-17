@@ -2432,12 +2432,12 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
 
     EXPECT_EQ(ZoneEquipList(1).NumOfEquipTypes, 2);
     // first priority zone equipment is zone ADU
-    EXPECT_EQ(dataZoneEquipmentManager.PrioritySimOrder(1).EquipType, "ZONEHVAC:AIRDISTRIBUTIONUNIT");
-    EXPECT_EQ(dataZoneEquipmentManager.PrioritySimOrder(1).EquipName, "MAIN ZONE ATU");
+    EXPECT_EQ(state.dataZoneEquipmentManager.PrioritySimOrder(1).EquipType, "ZONEHVAC:AIRDISTRIBUTIONUNIT");
+    EXPECT_EQ(state.dataZoneEquipmentManager.PrioritySimOrder(1).EquipName, "MAIN ZONE ATU");
     EXPECT_EQ(HeatingCoils::HeatingCoil(1).Name, "MAIN ZONE REHEAT COIL");
     // second priority zone equipment is unit heater
-    EXPECT_EQ(dataZoneEquipmentManager.PrioritySimOrder(2).EquipType, "ZONEHVAC:UNITHEATER");
-    EXPECT_EQ(dataZoneEquipmentManager.PrioritySimOrder(2).EquipName, "UNITHEATER");
+    EXPECT_EQ(state.dataZoneEquipmentManager.PrioritySimOrder(2).EquipType, "ZONEHVAC:UNITHEATER");
+    EXPECT_EQ(state.dataZoneEquipmentManager.PrioritySimOrder(2).EquipName, "UNITHEATER");
     EXPECT_EQ(HeatingCoils::HeatingCoil(2).Name, "UNITHEATER_ELECTRICHEATER");
     // check the reheat coil output
     EXPECT_NEAR(HeatingCoils::HeatingCoil(1).HeatingCoilRate, 7028.9, 1.0);
@@ -2462,7 +2462,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     bool SimAirLoops = true;
     bool FirstHVACIteration = false;
     // re-simulate the zone HVAC equipment per the priority order
-    ZoneEquipmentManager::ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+    ZoneEquipmentManager::ManageZoneEquipment(state, state.dataZoneEquipmentManager, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
     // check the reheat coil nominal capacity
     EXPECT_NEAR(HeatingCoils::HeatingCoil(1).NominalCapacity, 17542.3, 1.0);
     // check the reheat coil outputis the full capacity

@@ -125,8 +125,6 @@
 
 namespace EnergyPlus {
 
-ZoneEquipmentManagerData dataZoneEquipmentManager;
-
 namespace ZoneEquipmentManager {
 
     // Module containing the routines dealing with the Zone Equipment Manager.
@@ -166,7 +164,7 @@ namespace ZoneEquipmentManager {
     using Psychrometrics::PsyWFnTdbRhPb;
     using Psychrometrics::PsyWFnTdpPb;
 
-    void ManageZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration,
+    void ManageZoneEquipment(EnergyPlusData &state, ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration,
                              bool &SimZone, // Set to false at the end of the routine
                              bool &SimAir   // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
     )
@@ -184,17 +182,17 @@ namespace ZoneEquipmentManager {
         // water-water, etc)
 
         if (dataZoneEquipmentManager.GetZoneEquipmentInputFlag) {
-            GetZoneEquipment(state);
+            GetZoneEquipment(state, state.dataZoneEquipmentManager);
             dataZoneEquipmentManager.GetZoneEquipmentInputFlag = false;
             ZoneEquipInputsFilled = true;
         }
 
-        InitZoneEquipment(FirstHVACIteration);
+        InitZoneEquipment(dataZoneEquipmentManager, FirstHVACIteration);
 
         if (ZoneSizingCalc) {
-            SizeZoneEquipment(state.outputFiles);
+            SizeZoneEquipment(dataZoneEquipmentManager, state.outputFiles);
         } else {
-            SimZoneEquipment(state, FirstHVACIteration, SimAir);
+            SimZoneEquipment(state, state.dataZoneEquipmentManager, FirstHVACIteration, SimAir);
             ZoneEquipSimulatedOnce = true;
         }
 
@@ -203,7 +201,7 @@ namespace ZoneEquipmentManager {
         SimZone = false;
     }
 
-    void GetZoneEquipment(EnergyPlusData &state)
+    void GetZoneEquipment(EnergyPlusData &state, ZoneEquipmentManagerData &dataZoneEquipmentManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -235,7 +233,7 @@ namespace ZoneEquipmentManager {
         dataZoneEquipmentManager.PrioritySimOrder.allocate(MaxNumOfEquipTypes);
     }
 
-    void InitZoneEquipment(bool const FirstHVACIteration) // unused 1208
+    void InitZoneEquipment(ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration) // unused 1208
     {
 
         // SUBROUTINE INFORMATION:
@@ -429,7 +427,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void SizeZoneEquipment(OutputFiles &outputFiles)
+    void SizeZoneEquipment(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -491,7 +489,7 @@ namespace ZoneEquipmentManager {
         Real64 HR90L;                         // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 
         if (dataZoneEquipmentManager.SizeZoneEquipmentOneTimeFlag) {
-            SetUpZoneSizingArrays(outputFiles);
+            SetUpZoneSizingArrays(dataZoneEquipmentManager, outputFiles);
             dataZoneEquipmentManager.SizeZoneEquipmentOneTimeFlag = false;
         }
 
@@ -503,7 +501,7 @@ namespace ZoneEquipmentManager {
             SysDepZoneLoads(ActualZoneNum) = 0.0;
             SysOutputProvided = 0.0;
             LatOutputProvided = 0.0;
-            InitSystemOutputRequired(ActualZoneNum, true);
+            InitSystemOutputRequired(dataZoneEquipmentManager, ActualZoneNum, true);
             ZoneNode = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
             SupplyAirNode = 0;
             SupplyAirNode1 = 0;
@@ -539,7 +537,7 @@ namespace ZoneEquipmentManager {
                 DOASSysOutputProvided = DOASMassFlowRate * DOASCpAir * (DOASSupplyTemp - Node(ZoneNode).Temp);
                 TotDOASSysOutputProvided =
                     DOASMassFlowRate * (PsyHFnTdbW(DOASSupplyTemp, DOASSupplyHumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
-                UpdateSystemOutputRequired(ActualZoneNum, DOASSysOutputProvided, LatOutputProvided);
+                UpdateSystemOutputRequired(dataZoneEquipmentManager, ActualZoneNum, DOASSysOutputProvided, LatOutputProvided);
                 Node(SupplyAirNode1).Temp = DOASSupplyTemp;
                 Node(SupplyAirNode1).HumRat = DOASSupplyHumRat;
                 Node(SupplyAirNode1).MassFlowRate = DOASMassFlowRate;
@@ -625,7 +623,7 @@ namespace ZoneEquipmentManager {
                 MassFlowRate = 0.0;
             }
 
-            UpdateSystemOutputRequired(ActualZoneNum, SysOutputProvided, LatOutputProvided);
+            UpdateSystemOutputRequired(dataZoneEquipmentManager, ActualZoneNum, SysOutputProvided, LatOutputProvided);
 
             if (SysOutputProvided > 0.0) {
                 CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatLoad = SysOutputProvided;
@@ -663,7 +661,7 @@ namespace ZoneEquipmentManager {
 
         CalcZoneMassBalance(true);
 
-        CalcZoneLeavingConditions(true);
+        CalcZoneLeavingConditions(dataZoneEquipmentManager, true);
 
         for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
             if (!ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
@@ -772,7 +770,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void SetUpZoneSizingArrays(OutputFiles &outputFiles)
+    void SetUpZoneSizingArrays(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -854,7 +852,7 @@ namespace ZoneEquipmentManager {
         }
 
         // Put Auto Sizing of Sizing:Zone inputs here!
-        AutoCalcDOASControlStrategy(outputFiles);
+        AutoCalcDOASControlStrategy(dataZoneEquipmentManager, outputFiles);
 
         ZoneSizing.allocate(TotDesDays + TotRunDesPersDays, NumOfZones);
         FinalZoneSizing.allocate(NumOfZones);
@@ -1410,7 +1408,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void UpdateZoneSizing(EnergyPlusData &state, int const CallIndicator)
+    void UpdateZoneSizing(EnergyPlusData &state, ZoneEquipmentManagerData &dataZoneEquipmentManager, int const CallIndicator)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2582,7 +2580,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool &SimAir)
+    void SimZoneEquipment(EnergyPlusData &state, ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration, bool &SimAir)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2737,7 +2735,7 @@ namespace ZoneEquipmentManager {
             ZoneEquipConfig(ControlledZoneNum).PlenumMassFlow = 0.0;
             CurZoneEqNum = ControlledZoneNum;
 
-            InitSystemOutputRequired(ActualZoneNum, FirstHVACIteration, true);
+            InitSystemOutputRequired(dataZoneEquipmentManager, ActualZoneNum, FirstHVACIteration, true);
 
             // Air loop system availability manager status only applies to PIU and exhaust fans
             // Reset fan SAM operation flags for zone fans.
@@ -3143,7 +3141,7 @@ namespace ZoneEquipmentManager {
                     }
                 }
 
-                UpdateSystemOutputRequired(ActualZoneNum, SysOutputProvided, LatOutputProvided, EquipTypeNum);
+                UpdateSystemOutputRequired(state.dataZoneEquipmentManager, ActualZoneNum, SysOutputProvided, LatOutputProvided, EquipTypeNum);
                 CurTermUnitSizingNum = 0;
             } // zone loop
         }     // End of controlled zone loop
@@ -3199,12 +3197,12 @@ namespace ZoneEquipmentManager {
 
         CalcZoneMassBalance(FirstHVACIteration);
 
-        CalcZoneLeavingConditions(FirstHVACIteration);
+        CalcZoneLeavingConditions(state.dataZoneEquipmentManager, FirstHVACIteration);
 
         SimReturnAirPath(state);
     }
 
-    void SetZoneEquipSimOrder(int const ControlledZoneNum, int const ActualZoneNum)
+    void SetZoneEquipSimOrder(ZoneEquipmentManagerData &dataZoneEquipmentManager, int const ControlledZoneNum, int const ActualZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3271,7 +3269,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void InitSystemOutputRequired(int const ZoneNum, bool const FirstHVACIteration, bool const ResetSimOrder)
+    void InitSystemOutputRequired(ZoneEquipmentManagerData &dataZoneEquipmentManager, int const ZoneNum, bool const FirstHVACIteration, bool const ResetSimOrder)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3309,7 +3307,7 @@ namespace ZoneEquipmentManager {
                 }
                 return 0;
             }();
-            SetZoneEquipSimOrder(ControlledZoneNum, ZoneNum);
+            SetZoneEquipSimOrder(dataZoneEquipmentManager, ControlledZoneNum, ZoneNum);
         }
 
         // If one sequenced load is allocated, then all have been allocated in InitZoneEquipment
@@ -3373,10 +3371,10 @@ namespace ZoneEquipmentManager {
 
         DataZoneEnergyDemands::CurDeadBandOrSetback(ZoneNum) = DataZoneEnergyDemands::DeadBandOrSetback(ZoneNum);
 
-        DistributeSystemOutputRequired(ZoneNum, FirstHVACIteration);
+        DistributeSystemOutputRequired(dataZoneEquipmentManager, ZoneNum, FirstHVACIteration);
     }
 
-    void DistributeSystemOutputRequired(int const ActualZoneNum, bool const FirstHVACIteration)
+    void DistributeSystemOutputRequired(ZoneEquipmentManagerData &dataZoneEquipmentManager, int const ActualZoneNum, bool const FirstHVACIteration)
     {
         // Distribute zone equipment loads according to load distribution scheme
 
@@ -3664,7 +3662,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void UpdateSystemOutputRequired(int const ZoneNum,
+    void UpdateSystemOutputRequired(ZoneEquipmentManagerData &dataZoneEquipmentManager, int const ZoneNum,
                                     Real64 const SysOutputProvided,     // sensible output provided by zone equipment (W)
                                     Real64 const LatOutputProvided,     // latent output provided by zone equipment (kg/s)
                                     Optional_int_const EquipPriorityNum // index in PrioritySimOrder for this update
@@ -4356,7 +4354,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void CalcZoneLeavingConditions(bool const FirstHVACIteration)
+    void CalcZoneLeavingConditions(ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4541,7 +4539,7 @@ namespace ZoneEquipmentManager {
             } // End of check for a return air node, which implies a return air system.
 
             // Reset current deadband flags, remaining output required, so no impact beyond zone equipment
-            InitSystemOutputRequired(ActualZoneNum, FirstHVACIteration, true);
+            InitSystemOutputRequired(dataZoneEquipmentManager, ActualZoneNum, FirstHVACIteration, true);
         }
     }
 
@@ -5710,7 +5708,7 @@ namespace ZoneEquipmentManager {
         MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
     }
 
-    void AutoCalcDOASControlStrategy(OutputFiles &outputFiles)
+    void AutoCalcDOASControlStrategy(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -5740,7 +5738,7 @@ namespace ZoneEquipmentManager {
                     } else if (ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint > 0.0 && ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint == AutoSize) {
                         ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint + 2.8;
                     }
-                    ReportZoneSizingDOASInputs(outputFiles,
+                    ReportZoneSizingDOASInputs(dataZoneEquipmentManager, outputFiles,
                                                ZoneSizingInput(ZoneSizIndex).ZoneName,
                                                "NeutralSupplyAir",
                                                ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
@@ -5754,7 +5752,7 @@ namespace ZoneEquipmentManager {
                     } else if (ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint > 0.0 && ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint == AutoSize) {
                         ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = 22.2;
                     }
-                    ReportZoneSizingDOASInputs(outputFiles,
+                    ReportZoneSizingDOASInputs(dataZoneEquipmentManager, outputFiles,
                                                ZoneSizingInput(ZoneSizIndex).ZoneName,
                                                "NeutralDehumidifiedSupplyAir",
                                                ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
@@ -5768,7 +5766,7 @@ namespace ZoneEquipmentManager {
                     } else if (ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint > 0.0 && ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint == AutoSize) {
                         ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint + 2.2;
                     }
-                    ReportZoneSizingDOASInputs(outputFiles,
+                    ReportZoneSizingDOASInputs(dataZoneEquipmentManager, outputFiles,
                                                ZoneSizingInput(ZoneSizIndex).ZoneName,
                                                "ColdSupplyAir",
                                                ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
@@ -5786,7 +5784,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void ReportZoneSizingDOASInputs(OutputFiles &outputFiles,
+    void ReportZoneSizingDOASInputs(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles,
                                     std::string const &ZoneName,         // the name of the zone
                                     std::string const &DOASCtrlStrategy, // DOAS control strategy
                                     Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]

@@ -59,8 +59,9 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct EnergyPlusData;
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZoneEquipmentManagerData;
 
 namespace ZoneEquipmentManager {
 
@@ -82,32 +83,32 @@ namespace ZoneEquipmentManager {
 
     // Functions
 
-    void ManageZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration,
+    void ManageZoneEquipment(EnergyPlusData &state, ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration,
                              bool &SimZone,                     // Set to false at the end of the routine
                              bool &SimAir                       // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
     );
 
-    void GetZoneEquipment(EnergyPlusData &state);
+    void GetZoneEquipment(EnergyPlusData &state, ZoneEquipmentManagerData &dataZoneEquipmentManager);
 
-    void InitZoneEquipment(bool const FirstHVACIteration); // unused 1208
+    void InitZoneEquipment(ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration); // unused 1208
 
-    void SizeZoneEquipment(OutputFiles &outputFiles);
+    void SizeZoneEquipment(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles);
 
-    void SetUpZoneSizingArrays(OutputFiles &outputFiles);
+    void SetUpZoneSizingArrays(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles);
 
     void RezeroZoneSizingArrays();
 
-    void UpdateZoneSizing(EnergyPlusData &state, int const CallIndicator);
+    void UpdateZoneSizing(EnergyPlusData &state, ZoneEquipmentManagerData &dataZoneEquipmentManager, int const CallIndicator);
 
-    void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool &SimAir);
+    void SimZoneEquipment(EnergyPlusData &state, ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration, bool &SimAir);
 
-    void SetZoneEquipSimOrder(int const ControlledZoneNum, int const ActualZoneNum);
+    void SetZoneEquipSimOrder(ZoneEquipmentManagerData &dataZoneEquipmentManager, int const ControlledZoneNum, int const ActualZoneNum);
 
-    void InitSystemOutputRequired(int const ZoneNum, bool const FirstHVACIteration, bool const ResetSimOrder = false);
+    void InitSystemOutputRequired(ZoneEquipmentManagerData &dataZoneEquipmentManager, int const ZoneNum, bool const FirstHVACIteration, bool const ResetSimOrder = false);
 
-    void DistributeSystemOutputRequired(int const ActualZoneNum, bool const FirstHVACIteration);
+    void DistributeSystemOutputRequired(ZoneEquipmentManagerData &dataZoneEquipmentManager, int const ActualZoneNum, bool const FirstHVACIteration);
 
-    void UpdateSystemOutputRequired(int const ZoneNum,
+    void UpdateSystemOutputRequired(ZoneEquipmentManagerData &dataZoneEquipmentManager, int const ZoneNum,
                                     Real64 const SysOutputProvided,         // sensible output provided by zone equipment (W)
                                     Real64 const LatOutputProvided,         // latent output provided by zone equipment (kg/s)
                                     Optional_int_const EquipPriorityNum = _ // index in PrioritySimOrder for this update
@@ -130,7 +131,7 @@ namespace ZoneEquipmentManager {
 
     void CalcZoneMixingFlowRateOfSourceZone(int const ZoneNum);
 
-    void CalcZoneLeavingConditions(bool const FirstHVACIteration);
+    void CalcZoneLeavingConditions(ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration);
 
     void UpdateZoneEquipment(bool &SimAir);
 
@@ -145,9 +146,9 @@ namespace ZoneEquipmentManager {
                                    Real64 &DOASSupHR    // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
     );
 
-    void AutoCalcDOASControlStrategy(OutputFiles &outputFiles);
+    void AutoCalcDOASControlStrategy(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles);
 
-    void ReportZoneSizingDOASInputs(OutputFiles &outputFiles,
+    void ReportZoneSizingDOASInputs(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles,
                                     std::string const &ZoneName,         // the name of the zone
                                     std::string const &DOASCtrlStrategy, // DOAS control strategy
                                     Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]
@@ -156,35 +157,33 @@ namespace ZoneEquipmentManager {
 
 } // namespace ZoneEquipmentManager
 
-struct ZoneEquipmentManagerData : BaseGlobalStruct {
+    struct ZoneEquipmentManagerData : BaseGlobalStruct {
 
-    Array1D<Real64> AvgData; // scratch array for storing averaged data
-    int NumOfTimeStepInDay; // number of zone time steps in a day
-    bool GetZoneEquipmentInputFlag = true;
-    bool SizeZoneEquipmentOneTimeFlag = true;
+        Array1D<Real64> AvgData; // scratch array for storing averaged data
+        int NumOfTimeStepInDay; // number of zone time steps in a day
+        bool GetZoneEquipmentInputFlag = true;
+        bool SizeZoneEquipmentOneTimeFlag = true;
 
-    Array1D<ZoneEquipmentManager::SimulationOrder> PrioritySimOrder;
+        Array1D<ZoneEquipmentManager::SimulationOrder> PrioritySimOrder;
 
-    bool reportDOASZoneSizingHeader = true;
-    bool InitZoneEquipmentOneTimeFlag = true;
-    bool InitZoneEquipmentEnvrnFlag = true;
-    bool FirstPassZoneEquipFlag = true; // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
+        bool reportDOASZoneSizingHeader = true;
+        bool InitZoneEquipmentOneTimeFlag = true;
+        bool InitZoneEquipmentEnvrnFlag = true;
+        bool FirstPassZoneEquipFlag = true; // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
 
-    void clear_state() override
-    {
-        SizeZoneEquipmentOneTimeFlag = true;
-        InitZoneEquipmentOneTimeFlag = true;
-        InitZoneEquipmentEnvrnFlag = true;
-        AvgData.deallocate();   // scratch array for storing averaged data
-        NumOfTimeStepInDay = 0; // number of zone time steps in a day
-        GetZoneEquipmentInputFlag = true;
-        PrioritySimOrder.deallocate();
-        FirstPassZoneEquipFlag = true;
-        reportDOASZoneSizingHeader = true;
-    }
-};
-
-extern ZoneEquipmentManagerData dataZoneEquipmentManager;
+        void clear_state() override
+        {
+            SizeZoneEquipmentOneTimeFlag = true;
+            InitZoneEquipmentOneTimeFlag = true;
+            InitZoneEquipmentEnvrnFlag = true;
+            AvgData.deallocate();   // scratch array for storing averaged data
+            NumOfTimeStepInDay = 0; // number of zone time steps in a day
+            GetZoneEquipmentInputFlag = true;
+            PrioritySimOrder.deallocate();
+            FirstPassZoneEquipFlag = true;
+            reportDOASZoneSizingHeader = true;
+        }
+    };
 
 } // namespace EnergyPlus
 
