@@ -3766,7 +3766,7 @@ namespace ZoneTempPredictorCorrector {
             // Calculate the various heat balance sums
 
             // NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
-            CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
+            CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
 
             // Sum all convective internal gains except for people: SumIntGainExceptPeople
             if (HybridModel::FlagHybridModel_PC) {
@@ -5090,7 +5090,7 @@ namespace ZoneTempPredictorCorrector {
             ManageAirModel(state, ZoneNum);
 
             // Calculate the various heat balance sums
-            CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
+            CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
 
             // Sum all convective internal gains except for people: SumIntGainExceptPeople
             if (HybridModel::FlagHybridModel_PC) {
@@ -5252,7 +5252,7 @@ namespace ZoneTempPredictorCorrector {
             SNLoadCoolEnergy(ZoneNum) = std::abs(min(SNLoad, 0.0) * TimeStepSys * SecInHour);
 
             // Final humidity calcs
-            CorrectZoneHumRat(ZoneNum);
+            CorrectZoneHumRat(state.dataZonePlenum, ZoneNum);
 
             ZoneAirHumRat(ZoneNum) = ZoneAirHumRatTemp(ZoneNum);
             ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(ZT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress, RoutineName);
@@ -5299,7 +5299,7 @@ namespace ZoneTempPredictorCorrector {
                 }
             }
 
-            CalcZoneComponentLoadSums(ZoneNum,
+            CalcZoneComponentLoadSums(state.dataZonePlenum, ZoneNum,
                                       TempDepCoef,
                                       TempIndCoef,
                                       ZnAirRpt(ZoneNum).SumIntGains,
@@ -5582,7 +5582,7 @@ namespace ZoneTempPredictorCorrector {
         } // zone loop
     }
 
-    void CorrectZoneHumRat(int const ZoneNum)
+    void CorrectZoneHumRat(ZonePlenumData &dataZonePlenum, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6295,7 +6295,7 @@ namespace ZoneTempPredictorCorrector {
         PreviousMeasuredHumRat1(ZoneNum) = Zone(ZoneNum).ZoneMeasuredHumidityRatio;
     }
 
-    void CalcZoneSums(int const ZoneNum,  // Zone number
+    void CalcZoneSums(ZonePlenumData &dataZonePlenum, int const ZoneNum,  // Zone number
                       Real64 &SumIntGain, // Zone sum of convective internal gains
                       Real64 &SumHA,      // Zone sum of Hc*Area
                       Real64 &SumHATsurf, // Zone sum of Hc*Area*Tsurf
@@ -6581,7 +6581,7 @@ namespace ZoneTempPredictorCorrector {
         } // SurfNum
     }
 
-    void CalcZoneComponentLoadSums(int const ZoneNum,        // Zone number
+    void CalcZoneComponentLoadSums(ZonePlenumData &dataZonePlenum, int const ZoneNum,        // Zone number
                                    Real64 const TempDepCoef, // Dependent coefficient
                                    Real64 const TempIndCoef, // Independent coefficient
                                    Real64 &SumIntGains,      // Zone sum of convective internal gains

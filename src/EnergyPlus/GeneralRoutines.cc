@@ -1480,9 +1480,9 @@ void TestAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles, bool 
     ValRetAPaths = 0;
     ValSupAPaths = 0;
 
-    TestSupplyAirPathIntegrity(state, outputFiles, errFlag);
+    TestSupplyAirPathIntegrity(state, state.dataZonePlenum, outputFiles, errFlag);
     if (errFlag) ErrFound = true;
-    TestReturnAirPathIntegrity(state, outputFiles, errFlag, ValRetAPaths);
+    TestReturnAirPathIntegrity(state, state.dataZonePlenum, outputFiles, errFlag, ValRetAPaths);
     if (errFlag) ErrFound = true;
 
     // Final tests, look for duplicate nodes
@@ -1518,7 +1518,7 @@ void TestAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles, bool 
     ValSupAPaths.deallocate();
 }
 
-void TestSupplyAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrFound)
+void TestSupplyAirPathIntegrity(EnergyPlusData &state, ZonePlenumData &dataZonePlenum, OutputFiles &outputFiles, bool &ErrFound)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1698,7 +1698,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles,
     }
     if (dataZonePlenum.NumZoneSupplyPlenums == 0 && dataZonePlenum.NumZoneReturnPlenums == 0) {
         if (inputProcessor->getNumObjectsFound("AirLoopHVAC:SupplyPlenum") > 0) {
-            ZonePlenum::GetZonePlenumInput(state);
+            ZonePlenum::GetZonePlenumInput(state, dataZonePlenum);
         }
     }
 
@@ -1772,7 +1772,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles,
     }
 }
 
-void TestReturnAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrFound, Array2S_int ValRetAPaths)
+void TestReturnAirPathIntegrity(EnergyPlusData &state, ZonePlenumData &dataZonePlenum, OutputFiles &outputFiles, bool &ErrFound, Array2S_int ValRetAPaths)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1782,9 +1782,6 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles,
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine tests return air path integrity and displays the loop for each branch.
     // Also, input and output nodes.
-
-    // METHODOLOGY EMPLOYED:
-    // na
 
     // REFERENCES:
     // Return Air Path Validity Rules:
@@ -2051,7 +2048,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles,
     }
     if (dataZonePlenum.NumZoneSupplyPlenums == 0 && dataZonePlenum.NumZoneReturnPlenums == 0) {
         if (inputProcessor->getNumObjectsFound("AirLoopHVAC:ReturnPlenum") > 0) {
-            GetZonePlenumInput(state);
+            GetZonePlenumInput(state, dataZonePlenum);
         }
     }
 

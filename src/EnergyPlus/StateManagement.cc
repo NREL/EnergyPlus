@@ -257,7 +257,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     CurveManager::clear_state();
     AirflowNetwork::clear_state();
     dataAirflowNetworkBalanceManager.clear_state();
-    dataZonePlenum.clear_state();
     DataAirLoop::clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();

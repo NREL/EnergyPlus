@@ -177,7 +177,7 @@ namespace InternalHeatGains {
             if (InitOnly) return;
         }
 
-        InitInternalHeatGains(state);
+        InitInternalHeatGains(state, state.dataZonePlenum);
 
         ReportInternalHeatGains();
 
@@ -5123,7 +5123,7 @@ namespace InternalHeatGains {
         }
     }
 
-    void InitInternalHeatGains(EnergyPlusData &state)
+    void InitInternalHeatGains(EnergyPlusData &state, ZonePlenumData &dataZonePlenum)
     {
 
         // SUBROUTINE INFORMATION:
