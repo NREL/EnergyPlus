@@ -2696,7 +2696,7 @@ namespace ZoneEquipmentManager {
 
                     } else if (SELECT_CASE_var == ZoneSupplyPlenum_Type) { // 'AirLoopHVAC:SupplyPlenum'
 
-                        SimAirZonePlenum(state, SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
+                        SimAirZonePlenum(state, state.dataZonePlenum, SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                          ZoneSupplyPlenum_Type,
                                          SupplyAirPath(SupplyAirPathNum).ComponentIndex(CompNum),
                                          FirstHVACIteration,
@@ -3175,7 +3175,7 @@ namespace ZoneEquipmentManager {
 
                     } else if (SELECT_CASE_var == ZoneSupplyPlenum_Type) { // 'AirLoopHVAC:SupplyPlenum'
 
-                        SimAirZonePlenum(state, SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
+                        SimAirZonePlenum(state, state.dataZonePlenum, SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                          ZoneSupplyPlenum_Type,
                                          SupplyAirPath(SupplyAirPathNum).ComponentIndex(CompNum),
                                          FirstHVACIteration,

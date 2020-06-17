@@ -5671,7 +5671,7 @@ namespace OutputReportTabular {
 
 
         FillWeatherPredefinedEntries();
-        FillRemainingPredefinedEntries(state);
+        FillRemainingPredefinedEntries(state, state.dataZonePlenum);
 
         if (WriteTabularFiles) {
             // call each type of report in turn
@@ -6408,7 +6408,7 @@ namespace OutputReportTabular {
         return inString.substr(startPos, endPos - startPos);
     }
 
-    void FillRemainingPredefinedEntries(EnergyPlusData &state)
+    void FillRemainingPredefinedEntries(EnergyPlusData &state, ZonePlenumData &dataZonePlenum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer

@@ -291,7 +291,7 @@ namespace SimAirServingZones {
         }
 
         // Initialize air loop related parameters
-        InitAirLoops(state, FirstHVACIteration);
+        InitAirLoops(state, state.dataZonePlenum, FirstHVACIteration);
 
         // Call the AirLoop Simulation
         if (SysSizingCalc) {
@@ -1465,7 +1465,7 @@ namespace SimAirServingZones {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE if first full HVAC iteration in an HVAC timestep
+    void InitAirLoops(EnergyPlusData &state, ZonePlenumData &dataZonePlenum, bool const FirstHVACIteration) // TRUE if first full HVAC iteration in an HVAC timestep
     {
 
         // SUBROUTINE INFORMATION:
@@ -2023,7 +2023,7 @@ namespace SimAirServingZones {
             }
 
             // now connect return nodes with airloops and corresponding inlet nodes
-            ConnectReturnNodes();
+            ConnectReturnNodes(dataZonePlenum);
 
             InitAirLoopsOneTimeFlag = false;
 
@@ -2364,7 +2364,7 @@ namespace SimAirServingZones {
         } // end loop over primary air systems
     }
 
-    void ConnectReturnNodes()
+    void ConnectReturnNodes(ZonePlenumData &dataZonePlenum)
     {
         // This initializes ZoneEquipConfig.ReturnNodeInletNum and ReturnNodeAirLoopNum
         // Search all return paths to match return nodes with the airloop they are connected to and find the corresponding zone inlet node (same zone,

@@ -137,9 +137,9 @@ namespace SimAirServingZones {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration); // TRUE if first full HVAC iteration in an HVAC timestep
+    void InitAirLoops(EnergyPlusData &state, ZonePlenumData &dataZonePlenum, bool const FirstHVACIteration); // TRUE if first full HVAC iteration in an HVAC timestep
 
-    void ConnectReturnNodes();
+    void ConnectReturnNodes(ZonePlenumData &dataZonePlenum);
 
     // Begin Algorithm Section of the Module
     //******************************************************************************

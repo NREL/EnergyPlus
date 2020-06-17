@@ -574,7 +574,7 @@ namespace RoomAirModelAirflowNetwork {
         }
 
         // reuse code in ZoneTempPredictorCorrector for sensible components.
-        CalcNodeSums(RoomAirNode);
+        CalcNodeSums(state.dataZonePlenum, RoomAirNode);
 
         SumNonAirSystemResponseForNode(state, RoomAirNode);
 
@@ -829,7 +829,7 @@ namespace RoomAirModelAirflowNetwork {
         }
     } // UpdateRoomAirModelAirflowNetwork
 
-    void RAFNData::CalcNodeSums(int const RoomAirNodeNum)
+    void RAFNData::CalcNodeSums(ZonePlenumData &dataZonePlenum, int const RoomAirNodeNum)
     {
 
         // SUBROUTINE INFORMATION:

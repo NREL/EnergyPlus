@@ -74,8 +74,6 @@
 
 namespace EnergyPlus {
 
-ZonePlenumData dataZonePlenum;
-
 namespace ZonePlenum {
     // Module containing simulation routines for both zone return and zone supply plenums
 
@@ -106,7 +104,7 @@ namespace ZonePlenum {
 
     // Functions
 
-    void SimAirZonePlenum(EnergyPlusData &state, std::string const &CompName,
+    void SimAirZonePlenum(EnergyPlusData &state, ZonePlenumData &dataZonePlenum, std::string const &CompName,
                           int const iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration, // Autodesk:OPTIONAL Used without PRESENT check
@@ -136,7 +134,7 @@ namespace ZonePlenum {
 
         // Obtains and Allocates ZonePlenum related parameters from input file
         if (dataZonePlenum.GetInputFlag) { // First time subroutine has been entered
-            GetZonePlenumInput(state);
+            GetZonePlenumInput(state, dataZonePlenum);
             dataZonePlenum.GetInputFlag = false;
         }
 
@@ -165,11 +163,11 @@ namespace ZonePlenum {
                 }
             }
 
-            InitAirZoneReturnPlenum(ZonePlenumNum); // Initialize all ZonePlenum related parameters
+            InitAirZoneReturnPlenum(dataZonePlenum, ZonePlenumNum); // Initialize all ZonePlenum related parameters
 
-            CalcAirZoneReturnPlenum(ZonePlenumNum);
+            CalcAirZoneReturnPlenum(dataZonePlenum, ZonePlenumNum);
 
-            UpdateAirZoneReturnPlenum(ZonePlenumNum); // Update the current ZonePlenum to the outlet nodes
+            UpdateAirZoneReturnPlenum(dataZonePlenum, ZonePlenumNum); // Update the current ZonePlenum to the outlet nodes
 
         } else if (iCompType == ZoneSupplyPlenum_Type) { // 'AirLoopHVAC:SupplyPlenum'
             // Find the correct ZonePlenumNumber
@@ -196,11 +194,11 @@ namespace ZonePlenum {
                 }
             }
 
-            InitAirZoneSupplyPlenum(ZonePlenumNum, FirstHVACIteration, FirstCall); // Initialize all ZonePlenum related parameters
+            InitAirZoneSupplyPlenum(dataZonePlenum, ZonePlenumNum, FirstHVACIteration, FirstCall); // Initialize all ZonePlenum related parameters
 
-            CalcAirZoneSupplyPlenum(ZonePlenumNum, FirstCall);
+            CalcAirZoneSupplyPlenum(dataZonePlenum, ZonePlenumNum, FirstCall);
             // Update the current ZonePlenum to the outlet nodes
-            UpdateAirZoneSupplyPlenum(ZonePlenumNum, PlenumInletChanged, FirstCall);
+            UpdateAirZoneSupplyPlenum(dataZonePlenum, ZonePlenumNum, PlenumInletChanged, FirstCall);
 
         } else {
             ShowSevereError("SimAirZonePlenum: Errors in Plenum=" + CompName);
@@ -209,7 +207,7 @@ namespace ZonePlenum {
         }
     }
 
-    void GetZonePlenumInput(EnergyPlusData &state)
+    void GetZonePlenumInput(EnergyPlusData &state, ZonePlenumData &dataZonePlenum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -595,7 +593,7 @@ namespace ZonePlenum {
         }
     }
 
-    void InitAirZoneReturnPlenum(int const ZonePlenumNum)
+    void InitAirZoneReturnPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -766,7 +764,7 @@ namespace ZonePlenum {
         dataZonePlenum.ZoneRetPlenCond(ZonePlenumNum).ZoneEnthalpy = Node(ZoneNodeNum).Enthalpy;
     }
 
-    void InitAirZoneSupplyPlenum(int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall)
+    void InitAirZoneSupplyPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall)
     {
 
         // SUBROUTINE INFORMATION:
@@ -890,7 +888,7 @@ namespace ZonePlenum {
         } // For FirstCall
     }
 
-    void CalcAirZoneReturnPlenum(int const ZonePlenumNum)
+    void CalcAirZoneReturnPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -968,7 +966,7 @@ namespace ZonePlenum {
             max(dataZonePlenum.ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRateMaxAvail, dataZonePlenum.ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRate);
     }
 
-    void CalcAirZoneSupplyPlenum(int const ZonePlenumNum, bool const FirstCall)
+    void CalcAirZoneSupplyPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum, bool const FirstCall)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1020,7 +1018,7 @@ namespace ZonePlenum {
     // Beginning of Update subroutines for the ZonePlenum Module
     // *****************************************************************************
 
-    void UpdateAirZoneReturnPlenum(int const ZonePlenumNum)
+    void UpdateAirZoneReturnPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1108,7 +1106,7 @@ namespace ZonePlenum {
         }
     }
 
-    void UpdateAirZoneSupplyPlenum(int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall)
+    void UpdateAirZoneSupplyPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1178,7 +1176,7 @@ namespace ZonePlenum {
         } // For FirstCall
     }
 
-    int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum)
+    int GetReturnPlenumIndex(EnergyPlusData &state, ZonePlenumData &dataZonePlenum, int const &ExNodeNum)
     {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1188,7 +1186,7 @@ namespace ZonePlenum {
 
         // Obtains and Allocates ZonePlenum related parameters from input file
         if (dataZonePlenum.GetInputFlag) { // First time subroutine has been entered
-            GetZonePlenumInput(state);
+            GetZonePlenumInput(state, dataZonePlenum);
             dataZonePlenum.GetInputFlag = false;
         }
 
@@ -1214,12 +1212,12 @@ namespace ZonePlenum {
         return WhichPlenum;
     }
 
-    void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, std::string &ReturnPlenumName)
+    void GetReturnPlenumName(EnergyPlusData &state, ZonePlenumData &dataZonePlenum, int const &ReturnPlenumIndex, std::string &ReturnPlenumName)
     {
 
         // Obtains and Allocates ZonePlenum related parameters from input file
         if (dataZonePlenum.GetInputFlag) { // First time subroutine has been entered
-            GetZonePlenumInput(state);
+            GetZonePlenumInput(state, dataZonePlenum);
             dataZonePlenum.GetInputFlag = false;
         }
 
@@ -1229,7 +1227,7 @@ namespace ZonePlenum {
         }
     }
 
-    int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum)
+    int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, ZonePlenumData &dataZonePlenum, int const &InNodeNum)
     {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1239,7 +1237,7 @@ namespace ZonePlenum {
 
         // Obtains and Allocates ZonePlenum related parameters from input file
         if (dataZonePlenum.GetInputFlag) { // First time subroutine has been entered
-            GetZonePlenumInput(state);
+            GetZonePlenumInput(state, dataZonePlenum);
             dataZonePlenum.GetInputFlag = false;
         }
 

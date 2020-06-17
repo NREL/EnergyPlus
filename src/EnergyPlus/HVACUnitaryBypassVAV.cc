@@ -556,7 +556,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                               DataLoopNode::ObjectIsParent);
             }
 
-            CBVAV(CBVAVNum).plenumIndex = ZonePlenum::getReturnPlenumIndexFromInletNode(state, CBVAV(CBVAVNum).PlenumMixerInletAirNode);
+            CBVAV(CBVAVNum).plenumIndex = ZonePlenum::getReturnPlenumIndexFromInletNode(state, state.dataZonePlenum, CBVAV(CBVAVNum).PlenumMixerInletAirNode);
             CBVAV(CBVAVNum).mixerIndex = MixerComponent::getZoneMixerIndexFromInletNode(CBVAV(CBVAVNum).PlenumMixerInletAirNode);
             if (CBVAV(CBVAVNum).plenumIndex > 0 && CBVAV(CBVAVNum).mixerIndex > 0) {
                 ShowSevereError(CurrentModuleObject + ": " + CBVAV(CBVAVNum).Name);
