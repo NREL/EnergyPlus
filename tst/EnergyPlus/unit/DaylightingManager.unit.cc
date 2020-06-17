@@ -2864,5 +2864,4 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
       "   ** Warning ** DaylightingDevice:Tubular = PIPE2:  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.  ",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
-
 }
