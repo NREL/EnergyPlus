@@ -499,6 +499,7 @@ namespace DataHeatBalance {
     bool AnyKiva(false);                    // Kiva used
     bool AnyAirBoundary(false);             // Construction:AirBoundary used
     bool AnyAirBoundaryGroupedSolar(false); // Construction:AirBoundary with GroupedZones for solar used somewhere
+    bool AnyBSDF(false);                    // True if any WindowModelType == WindowBSDFModel
 
     int MaxNumberOfWarmupDays(25);      // Maximum number of warmup days allowed
     int MinNumberOfWarmupDays(1);       // Minimum number of warmup days allowed
@@ -875,6 +876,7 @@ namespace DataHeatBalance {
         AnyKiva = false;
         AnyAirBoundary = false;
         AnyAirBoundaryGroupedSolar = false;
+        AnyBSDF = false;
         MaxNumberOfWarmupDays = 25;
         MinNumberOfWarmupDays = 1;
         CondFDRelaxFactor = 1.0;

@@ -6829,7 +6829,7 @@ namespace SolarShading {
             // Loop over exterior surfaces in this zone
             auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             // delete values from previous timestep
-            AWinCFOverlap = 0.0;
+            if (AnyBSDF) AWinCFOverlap = 0.0;
 
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (((Surface(SurfNum).ExtBoundCond != ExternalEnvironment) && (Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&

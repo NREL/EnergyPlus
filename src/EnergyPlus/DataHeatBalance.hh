@@ -353,6 +353,7 @@ namespace DataHeatBalance {
     extern bool AnyKiva;                    // Kiva used
     extern bool AnyAirBoundary;             // Construction:AirBoundary used
     extern bool AnyAirBoundaryGroupedSolar; // Construction:AirBoundary with GroupedZones for solar used somewhere
+    extern bool AnyBSDF;                    // True if any WindowModelType == WindowBSDFModel
 
     extern int MaxNumberOfWarmupDays;     // Maximum number of warmup days allowed
     extern int MinNumberOfWarmupDays;     // Minimum number of warmup days allowed
