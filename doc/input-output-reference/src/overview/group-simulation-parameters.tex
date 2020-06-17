@@ -1079,7 +1079,7 @@ Mode & Description \tabularnewline
 
 Normal & no overrides\tabularnewline
 Mode01 & Zone Time step (TimeStep object) will be set to one timestep per hour\tabularnewline
-Mode02 & Mode01 plus minimum system timestep will be set to 12 timesteps per hour\tabularnewline
+Mode02 & Mode01 plus minimum system timestep length will be 1 hour\tabularnewline
 Mode03 & Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler\tabularnewline
 Mode04 & Mode03 plus Minimum Number of Warmup Days will be set to 1\tabularnewline
 Mode05 & Mode04 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets\tabularnewline
@@ -1109,7 +1109,7 @@ PerformancePrecisionTradeoffs,
 
 \paragraph{Field: MaxAllowedDelTemp}\label{max-allowed-del-temp}
 
-This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxAllowedDelTemp variable within EnergyPlus. This variable sets the maximum surface temperature change before the HVAC timestep is shortened. Similar to the \textbf{MaxZoneTempDiff} parameter, larger \textbf{MaxAllowedDelTemp} values result in fewer iterations. To understand this input completely, please review the use of the \textbf{MaxAllowedDetTemp} variable in the CalcHeatBalanceInsideSurf2() routine located in the HeatBalanceSurfaceManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.002 ($^\circ$C), which is also the default value. Testing has been done with a value of 0.1, which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 0.1 have not been tested.
+This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxAllowedDelTemp variable within EnergyPlus. This variable sets the maximum surface temperature change before the HVAC timestep is shortened. Similar to the MaxZoneTempDiff parameter, larger MaxAllowedDelTemp values result in fewer iterations. To understand this input completely, please review the use of the MaxAllowedDetTemp variable in the CalcHeatBalanceInsideSurf2() routine located in the HeatBalanceSurfaceManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.002 ($^\circ$C), which is also the default value. Testing has been done with a value of 0.1, which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 0.1 have not been tested.
 
 
 \subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}
