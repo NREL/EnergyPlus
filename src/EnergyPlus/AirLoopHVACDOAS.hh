@@ -60,12 +60,12 @@ struct EnergyPlusData;
 
 namespace AirLoopHVACDOAS {
 
-    void CheckConvergence();
+    void CheckConvergence(EnergyPlusData &state);
 
     struct AirLoopMixer
     {
         std::string name;
-        static AirLoopMixer *factory(int object_type_of_num, std::string const &objectName);
+        static AirLoopMixer *factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName);
         int numOfInletNodes;
         int m_AirLoopMixer_Num;
         int OutletNodeNum;
@@ -81,14 +81,14 @@ namespace AirLoopHVACDOAS {
 
         ~AirLoopMixer() = default; // destructor
 
-        static void getAirLoopMixer();
+        static void getAirLoopMixer(EnergyPlusData &state);
         void CalcAirLoopMixer();
     };
 
     struct AirLoopSplitter
     {
         std::string name;
-        static AirLoopSplitter *factory(int object_type_of_num, std::string const &objectName);
+        static AirLoopSplitter *factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName);
         int numOfOutletNodes;
         int m_AirLoopSplitter_Num;
         std::string InletNodeName;
@@ -103,7 +103,7 @@ namespace AirLoopHVACDOAS {
 
         ~AirLoopSplitter() = default; // destructor
 
-        static void getAirLoopSplitter();
+        static void getAirLoopSplitter(EnergyPlusData &state);
         void CalcAirLoopSplitter(Real64 Temp, Real64 Humrat);
     };
 
@@ -197,8 +197,8 @@ namespace AirLoopHVACDOAS {
         void GetDesignDayConditions();
     };
 
-    int getAirLoopMixerIndex(std::string const &objectName);
-    int getAirLoopSplitterIndex(std::string const &objectName);
+    int getAirLoopMixerIndex(EnergyPlusData &state, std::string const &objectName);
+    int getAirLoopSplitterIndex(EnergyPlusData &state, std::string const &objectName);
     void getAirLoopHVACDOASInput(EnergyPlusData &state);
 
 } // namespace AirLoopHVACDOAS
@@ -226,8 +226,6 @@ namespace AirLoopHVACDOAS {
             airloopSplitter.clear();
         }
     };
-
-    extern AirLoopHVACDOASData dataAirLoopHVACDOAS;
 
 } // namespace EnergyPlus
 #endif // ENERGYPLUS_AIRLOOPHVACDOAS_HH

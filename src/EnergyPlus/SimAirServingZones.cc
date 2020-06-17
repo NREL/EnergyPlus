@@ -1449,11 +1449,11 @@ namespace SimAirServingZones {
                                 PrimaryAirSystem(AirSysNum).Name);
         }
 
-        dataAirLoopHVACDOAS.numAirLoopDOAS = inputProcessor->getNumObjectsFound("AirLoopHVAC:DedicatedOutdoorAirSystem");
-        if (dataAirLoopHVACDOAS.numAirLoopDOAS > 0) {
-            if (dataAirLoopHVACDOAS.GetInputOnceFlag) {
+        state.dataAirLoopHVACDOAS.numAirLoopDOAS = inputProcessor->getNumObjectsFound("AirLoopHVAC:DedicatedOutdoorAirSystem");
+        if (state.dataAirLoopHVACDOAS.numAirLoopDOAS > 0) {
+            if (state.dataAirLoopHVACDOAS.GetInputOnceFlag) {
                 AirLoopHVACDOAS::getAirLoopHVACDOASInput(state);
-                dataAirLoopHVACDOAS.GetInputOnceFlag = false;
+                state.dataAirLoopHVACDOAS.GetInputOnceFlag = false;
             }
         }
     }
@@ -2630,11 +2630,11 @@ namespace SimAirServingZones {
 
         } // End of Air Loop iteration
 
-        if (dataAirLoopHVACDOAS.numAirLoopDOAS > 0) {
+        if (state.dataAirLoopHVACDOAS.numAirLoopDOAS > 0) {
             int index;
             Real64 OAMassFLowrate = 0.0;
-            for (std::size_t loop = 0; loop < dataAirLoopHVACDOAS.airloopDOAS.size(); ++loop) {
-                auto &thisAirLoopDOASObjec = dataAirLoopHVACDOAS.airloopDOAS[loop]; // <- regular reference variable, not a pointer
+            for (std::size_t loop = 0; loop < state.dataAirLoopHVACDOAS.airloopDOAS.size(); ++loop) {
+                auto &thisAirLoopDOASObjec = state.dataAirLoopHVACDOAS.airloopDOAS[loop]; // <- regular reference variable, not a pointer
                 if (thisAirLoopDOASObjec.m_AirLoopDOASNum > -1) {
                     index = thisAirLoopDOASObjec.m_AirLoopDOASNum;
                 } else {
@@ -2703,7 +2703,7 @@ namespace SimAirServingZones {
 
                 } // End of Air Loop iteration
                 // check convergence at the mixer outlet or at the AirLoopDOAS outlet
-                AirLoopHVACDOAS::CheckConvergence();
+                AirLoopHVACDOAS::CheckConvergence(state);
             }
         }
         // Reset current system number for sizing routines
