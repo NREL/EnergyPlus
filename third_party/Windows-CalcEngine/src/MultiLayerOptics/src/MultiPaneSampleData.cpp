@@ -1,6 +1,7 @@
 #include <vector>
 #include <iterator>
 #include <cassert>
+#include <stdexcept>
 
 #include "MultiPaneSampleData.hpp"
 #include "EquivalentLayerSingleComponentMW.hpp"
