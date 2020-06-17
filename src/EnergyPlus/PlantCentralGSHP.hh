@@ -379,6 +379,7 @@ namespace PlantCentralGSHP {
         bool SimulHtgDominant;
         WrapperReportVars Report;
         bool setupOutputVarsFlag;
+        bool mySizesReported;
 
         WrapperSpecs()
             : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(0), CHWInletNodeNum(0), CHWOutletNodeNum(0), HWInletNodeNum(0),
@@ -389,7 +390,7 @@ namespace PlantCentralGSHP {
               HWLoopSideNum(0), HWBranchNum(0), HWCompNum(0), GLHELoopNum(0), GLHELoopSideNum(0), GLHEBranchNum(0), GLHECompNum(0),
               CHWMassFlowIndex(0), HWMassFlowIndex(0), GLHEMassFlowIndex(0), SizingFactor(1.0), CHWVolFlowRate(0.0), HWVolFlowRate(0.0),
               GLHEVolFlowRate(0.0), MyWrapperFlag(true), MyWrapperEnvrnFlag(true), SimulClgDominant(false), SimulHtgDominant(false),
-              setupOutputVarsFlag(true)
+              setupOutputVarsFlag(true), mySizesReported(false)
         {
         }
 

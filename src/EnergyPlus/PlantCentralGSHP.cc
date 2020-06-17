@@ -284,7 +284,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRateWasAutoSized) {
                             this->ChillerHeater(NumChillerHeater).EvapVolFlowRate = tmpEvapVolFlowRate;
-                            if (DataPlant::PlantFinalSizesOkayToReport) {
+                            if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
                                 ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
                                                                         this->ChillerHeater(NumChillerHeater).Name,
                                                                         "Design Size Reference Chilled Water Flow Rate [m3/s]",
@@ -298,7 +298,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             }
                         } else {
                             if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0 &&
-                                DataPlant::PlantFinalSizesOkayToReport) {
+                                DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
 
                                 // Hardsized evaporator design volume flow rate for reporting
                                 Real64 EvapVolFlowRateUser = this->ChillerHeater(NumChillerHeater).EvapVolFlowRate;
@@ -333,7 +333,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             ErrorsFound = true;
                         }
                     } else {
-                        if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport) {
+                        if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
                             ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
                                                                     this->ChillerHeater(NumChillerHeater).Name,
                                                                     "User-Specified Reference Chilled Water Flow Rate [m3/s]",
@@ -377,7 +377,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             this->ChillerHeater(NumChillerHeater).RefCOPClgHtg =
                                 this->ChillerHeater(NumChillerHeater).RefCapClgHtg / this->ChillerHeater(NumChillerHeater).RefPowerClgHtg;
 
-                            if (DataPlant::PlantFinalSizesOkayToReport) {
+                            if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
                                 ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
                                                                         this->ChillerHeater(NumChillerHeater).Name,
                                                                         "Design Size Reference Capacity [W]",
@@ -391,7 +391,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             }
                         } else {
                             if (this->ChillerHeater(NumChillerHeater).RefCapCooling > 0.0 && tmpNomCap > 0.0 &&
-                                DataPlant::PlantFinalSizesOkayToReport) {
+                                DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
 
                                 // Hardsized nominal capacity cooling power for reporting
                                 Real64 NomCapUser = this->ChillerHeater(NumChillerHeater).RefCapCooling;
@@ -426,7 +426,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             ErrorsFound = true;
                         }
                     } else {
-                        if (this->ChillerHeater(NumChillerHeater).RefCapCooling > 0.0 && DataPlant::PlantFinalSizesOkayToReport) {
+                        if (this->ChillerHeater(NumChillerHeater).RefCapCooling > 0.0 && DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
                             ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
                                                                     this->ChillerHeater(NumChillerHeater).Name,
                                                                     "User-Specified Reference Capacity [W]",
@@ -463,7 +463,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         if (this->ChillerHeater(NumChillerHeater).CondVolFlowRateWasAutoSized) {
                             this->ChillerHeater(NumChillerHeater).CondVolFlowRate = tmpCondVolFlowRate;
-                            if (DataPlant::PlantFinalSizesOkayToReport) {
+                            if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
                                 ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
                                                                         this->ChillerHeater(NumChillerHeater).Name,
                                                                         "Design Size Reference Condenser Water Flow Rate [m3/s]",
@@ -477,7 +477,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             }
                         } else {
                             if (this->ChillerHeater(NumChillerHeater).CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0 &&
-                                DataPlant::PlantFinalSizesOkayToReport) {
+                                DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
 
                                 // Hardsized condenser design volume flow rate for reporting
                                 Real64 CondVolFlowRateUser = this->ChillerHeater(NumChillerHeater).CondVolFlowRate;
@@ -513,7 +513,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             ErrorsFound = true;
                         }
                     } else {
-                        if (this->ChillerHeater(NumChillerHeater).CondVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport) {
+                        if (this->ChillerHeater(NumChillerHeater).CondVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
                             ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
                                                                     this->ChillerHeater(NumChillerHeater).Name,
                                                                     "User-Specified Reference Condenser Water Flow Rate [m3/s]",
@@ -522,7 +522,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                     }
                 }
 
-                if (DataPlant::PlantFinalSizesOkayToReport) {
+                if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
                     // create predefined report
                     std::string equipName = this->ChillerHeater(NumChillerHeater).Name;
                     OutputReportPredefined::PreDefTableEntry(
@@ -552,6 +552,10 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             PlantUtilities::RegisterPlantCompDesignFlow(this->HWInletNodeNum, TotalHotWaterVolFlowRate);
             // save the reference condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
             PlantUtilities::RegisterPlantCompDesignFlow(this->GLHEInletNodeNum, TotalCondVolFlowRate);
+
+            if (DataPlant::PlantFinalSizesOkayToReport) {
+                this->mySizesReported = true;
+            }
 
             return;
         }
