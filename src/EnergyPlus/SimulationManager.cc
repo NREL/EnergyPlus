@@ -420,7 +420,7 @@ namespace SimulationManager {
             SetupPollutionMeterReporting();
             SystemReports::AllocateAndSetUpVentReports();
             if (EnergyPlus::PluginManagement::pluginManager) {
-                EnergyPlus::PluginManagement::pluginManager->setupOutputVariables();
+                EnergyPlus::PluginManagement::PluginManager::setupOutputVariables();
             }
             UpdateMeterReporting(state.outputFiles);
             CheckPollutionMeterReporting();
@@ -1067,8 +1067,6 @@ namespace SimulationManager {
                     MakeMirroredDetachedShading = false;
                 } else if (UtilityRoutines::SameString(Alphas(NumA), "DoNotMirrorAttachedShading")) {
                     MakeMirroredAttachedShading = false;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "IgnoreInteriorWindowTransmission")) {
-                    IgnoreInteriorWindowTransmission = true;
                 } else if (UtilityRoutines::SameString(Alphas(NumA), "ReportDuringWarmup")) {
                     ReportDuringWarmup = true;
                 } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayWeatherMissingDataWarnings")) {

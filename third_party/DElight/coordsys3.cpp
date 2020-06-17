@@ -28,7 +28,7 @@
 // =================================================================================
 
 #include <iostream>
-#include <strstream>
+#include <sstream>
 #include <iomanip>
 #include <vector>
 using namespace std;
@@ -289,7 +289,7 @@ istream &operator >> (istream &s, RHCoordSys3 &cs)
 {
     RHCoordSys3	result;
     Char	c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 	
 	// Expected format: [[1 2 3] [4 5 6] [7 8 9]]
 	// Each vector is a column[??? ROW!!!] of the matrix.
