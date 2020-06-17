@@ -6828,6 +6828,8 @@ namespace SolarShading {
 
             // Loop over exterior surfaces in this zone
             auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+            // delete values from previous timestep
+            AWinCFOverlap = 0.0;
 
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (((Surface(SurfNum).ExtBoundCond != ExternalEnvironment) && (Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
@@ -8325,7 +8327,7 @@ namespace SolarShading {
 
                                 CFBoverlap = 0.0;
                                 // delete values from previous timestep
-                                AWinCFOverlap = 0.0;
+                                //AWinCFOverlap = 0.0;
 
                                 // Calculate effects on all back surfaces for each of basis directions.  Each of basis directions from the back of the
                                 // window has to be considered as beam and therefore calcualte CFBoverlap for each of them
@@ -8392,9 +8394,22 @@ namespace SolarShading {
                                                         // CFDirBoverlap is energy transmitted for current basis beam.  It is important to note that
                                                         // AWinOverlap array needs to contain flux and not absorbed energy because later in the code
                                                         // this will be multiplied with window area
+                                                        //if (Surface(BackSurfaceNumber).Name == "ROOM 102 WEST WINDOW" && !WarmupFlag) {
+                                                        //    ShowContinueErrorTimeStamp("CalcInteriorSolarDistribution: Surface=" + Surface(BackSurfaceNumber).Name + ", Lay=" + General::RoundSigDigits(Lay)
+                                                        //        + ", bestBackTrn=" + General::RoundSigDigits(bestBackTrn)
+                                                        //        + ", BkAbs=" + General::RoundSigDigits(Construct(ConstrNumBack).BSDFInput.Layer(Lay).BkAbs(bestBackTrn, 1), 4)
+                                                        //        + ", BaseSurf=" + General::RoundSigDigits(BaseSurf)
+                                                        //        + ", BackSurfaceNumber=" + General::RoundSigDigits(BackSurfaceNumber)
+                                                        //        + ", IBack=" + General::RoundSigDigits(IBack)
+                                                        //        + ", CurTrnDir=" + General::RoundSigDigits(CurTrnDir)
+                                                        //        + ", CFDirBoverlap=" + General::RoundSigDigits(CFDirBoverlap(IBack, CurTrnDir), 4));
+                                                        //}
                                                         AWinCFOverlap(Lay, BackSurfaceNumber) +=
                                                             Construct(ConstrNumBack).BSDFInput.Layer(Lay).BkAbs(bestBackTrn, 1) *
                                                             CFDirBoverlap(IBack, CurTrnDir) / Surface(BackSurfaceNumber).Area;
+                                                        //if (Surface(BackSurfaceNumber).Name == "ROOM 102 WEST WINDOW" && !WarmupFlag) {
+                                                        //    ShowContinueError("    AWinCFOverlap(Lay, BackSurfaceNumber)=" + General::RoundSigDigits(AWinCFOverlap(Lay, BackSurfaceNumber),6));
+                                                        //}
                                                         // END IF
                                                     }
 
