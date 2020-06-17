@@ -80,15 +80,7 @@ class Runtime:
         program name is not passed in as an argument, rather only the command line options.
 
         An example call:
-        run_energyplus(
-            [
-                '-d',
-                '/path/to/output/directory',
-                '-w',
-                '/path/to/weather.epw',
-                '/path/to/input.idf'
-            ]
-        )
+        run_energyplus(['-d', '/path/to/output/directory', '-w', '/path/to/weather.epw', '/path/to/input.idf'])
 
         :param command_line_args: The command line arguments that would be passed into EnergyPlus if executing directly
                                   from the EnergyPlus executable.

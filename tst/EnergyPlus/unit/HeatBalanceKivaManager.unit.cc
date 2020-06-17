@@ -122,8 +122,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     HeatBalanceKivaManager::KivaManager km;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
-        " ",
         "Zone,",
         "  Core_bottom,             !- Name",
         "  0.0000,                  !- Direction of Relative North {deg}",
@@ -192,11 +190,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     DataGlobals::TimeStep = 1;                  // must initialize this to get schedules initialized
     DataGlobals::NumOfTimeStepInHour = 1;       // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;       // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());    // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles);    // read schedules
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(OutputFiles::getSingleton());
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.outputFiles);
 
-    ScheduleManager::Schedule(DataZoneControls::TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand; 
+    ScheduleManager::Schedule(DataZoneControls::TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand;
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 24C/20C
 

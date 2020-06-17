@@ -49,6 +49,7 @@
 #define CommandLineInterface_hh_INCLUDED
 
 #include <EnergyPlus/api/EnergyPlusAPI.h>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <string>
 
 namespace EnergyPlus {
@@ -56,7 +57,7 @@ namespace EnergyPlus {
 namespace CommandLineInterface {
 
     // Process command line arguments
-    int ENERGYPLUSLIB_API ProcessArgs(int argc, const char *argv[]);
+    int ENERGYPLUSLIB_API ProcessArgs(EnergyPlusData &state, int argc, const char *argv[]);
 
     void ReadINIFile(int const UnitNumber,               // Unit number of the opened INI file
                      std::string const &Heading,         // Heading for the parameters ('[heading]')
@@ -64,7 +65,7 @@ namespace CommandLineInterface {
                      std::string &DataOut                // Output from the retrieval
     );
 
-    int runReadVarsESO();
+    int runReadVarsESO(OutputFiles &outputFiles);
 
 } // namespace CommandLineInterface
 

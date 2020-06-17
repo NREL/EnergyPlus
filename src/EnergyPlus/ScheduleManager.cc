@@ -57,8 +57,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -99,7 +97,6 @@ namespace ScheduleManager {
     // OTHER NOTES:
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataEnvironment::DayOfMonthTomorrow;
     using DataEnvironment::DayOfWeek;
     using DataEnvironment::DayOfWeekTomorrow;
@@ -110,7 +107,6 @@ namespace ScheduleManager {
     using DataGlobals::HourOfDay;
     using DataGlobals::MinutesPerTimeStep;
     using DataGlobals::NumOfTimeStepInHour;
-    using DataGlobals::OutputFileDebug;
     using DataGlobals::TimeStep;
 
     // Data
@@ -238,7 +234,6 @@ namespace ScheduleManager {
         using General::ProcessDateString;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
-        using namespace DataIPShortCuts;
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSemicolon;
@@ -255,7 +250,6 @@ namespace ScheduleManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Array1D_int DaysInYear(366);
-        int UnitNumber;
         int LoopIndex;
         int InLoopIndex;
         int DayIndex;
@@ -544,7 +538,7 @@ namespace ScheduleManager {
             inputProcessor->getObjectItem(
                 CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
             std::string ShadingSunlitFracFileName = Alphas(1);
-            CheckForActualFileName(ShadingSunlitFracFileName, FileExists, TempFullFileName);
+            CheckForActualFileName(outputFiles, ShadingSunlitFracFileName, FileExists, TempFullFileName);
             if (!FileExists) {
                 ShowSevereError(RoutineName + ":\"" + ShadingSunlitFracFileName +
                                 "\" not found when External Shading Calculation Method = ImportedShading.");
@@ -731,8 +725,7 @@ namespace ScheduleManager {
         Schedule(0).ScheduleTypePtr = 0;
         Schedule(0).WeekSchedulePointer = 0;
 
-        UnitNumber = FindUnitNumber(DataStringGlobals::outputAuditFileName);
-        ObjexxFCL::gio::write(UnitNumber, fmtLD) << " Processing Schedule Input -- Start";
+        print(outputFiles.audit.ensure_open("ProcessScheduleInput"), "{}\n", "  Processing Schedule Input -- Start");
 
         //!! Get Schedule Types
 
@@ -1142,7 +1135,7 @@ namespace ScheduleManager {
                 if (DayIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex + 1) + " \"" +
                                         Alphas(InLoopIndex + 1) + "\" not Found",
-                                    UnitNumber);
+                                    OptionalOutputFileRef{outputFiles.audit});
                     ErrorsFound = true;
                 } else {
                     WeekSchedule(LoopIndex).DaySchedulePointer(InLoopIndex) = DayIndex;
@@ -1177,7 +1170,7 @@ namespace ScheduleManager {
                 if (DayIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex + 1) + " \"" +
                                         Alphas(InLoopIndex + 1) + "\" not Found",
-                                    UnitNumber);
+                                    OptionalOutputFileRef{outputFiles.audit});
                     ShowContinueError("ref: " + cAlphaFields(InLoopIndex) + " \"" + Alphas(InLoopIndex) + "\"");
                     ErrorsFound = true;
                 } else {
@@ -1247,7 +1240,7 @@ namespace ScheduleManager {
                 if (WeekIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex) + "=\"" +
                                         Alphas(InLoopIndex) + "\" not found.",
-                                    UnitNumber);
+                                    OptionalOutputFileRef{outputFiles.audit});
                     ErrorsFound = true;
                 } else {
                     // Process for month, day
@@ -1283,13 +1276,13 @@ namespace ScheduleManager {
             }
             if (any_eq(DaysInYear, 0)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(LoopIndex).Name + "\" has missing days in its schedule pointers",
-                                UnitNumber);
+                                OptionalOutputFileRef{outputFiles.audit});
                 ErrorsFound = true;
             }
             if (any_gt(DaysInYear, 1)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(LoopIndex).Name +
                                     "\" has overlapping days in its schedule pointers",
-                                UnitNumber);
+                                OptionalOutputFileRef{outputFiles.audit});
                 ErrorsFound = true;
             }
 
@@ -1408,9 +1401,7 @@ namespace ScheduleManager {
                 }
                 ++WkCount;
                 ++AddWeekSch;
-                ObjexxFCL::gio::write(ExtraField, fmtLD) << WkCount;
-                strip(ExtraField);
-                WeekSchedule(AddWeekSch).Name = Alphas(1) + "_wk_" + ExtraField;
+                WeekSchedule(AddWeekSch).Name = Alphas(1) + "_wk_" + fmt::to_string(WkCount);
                 WeekSchedule(AddWeekSch).Used = true;
                 for (Hr = StartPointer; Hr <= EndPointer; ++Hr) {
                     Schedule(SchNum).WeekSchedulePointer(Hr) = AddWeekSch;
@@ -1426,9 +1417,7 @@ namespace ScheduleManager {
                     if (has_prefix(Alphas(NumField), "FOR")) {
                         ++DyCount;
                         ++AddDaySch;
-                        ObjexxFCL::gio::write(ExtraField, fmtLD) << DyCount;
-                        strip(ExtraField);
-                        DaySchedule(AddDaySch).Name = Alphas(1) + "_dy_" + ExtraField;
+                        DaySchedule(AddDaySch).Name = Alphas(1) + "_dy_" + fmt::to_string(DyCount);
                         DaySchedule(AddDaySch).ScheduleTypePtr = Schedule(SchNum).ScheduleTypePtr;
                         DaySchedule(AddDaySch).Used = true;
                         TheseDays = false;
@@ -1578,13 +1567,13 @@ namespace ScheduleManager {
             }
             if (any_eq(DaysInYear, 0)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + "\" has missing days in its schedule pointers",
-                                UnitNumber);
+                                OptionalOutputFileRef{outputFiles.audit});
                 ErrorsFound = true;
             }
             if (any_gt(DaysInYear, 1)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name +
                                     "\" has overlapping days in its schedule pointers",
-                                UnitNumber);
+                                OptionalOutputFileRef{outputFiles.audit});
                 ErrorsFound = true;
             }
 
@@ -1777,7 +1766,7 @@ namespace ScheduleManager {
             //      ENDDO
             //    ENDIF
 
-            CheckForActualFileName(Alphas(3), FileExists, TempFullFileName);
+            CheckForActualFileName(outputFiles, Alphas(3), FileExists, TempFullFileName);
 
             //    INQUIRE(file=Alphas(3),EXIST=FileExists)
             // Setup file reading parameters
@@ -2350,7 +2339,7 @@ namespace ScheduleManager {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        ObjexxFCL::gio::write(UnitNumber, fmtLD) << " Processing Schedule Input -- Complete";
+        print(outputFiles.audit, "{}\n", "  Processing Schedule Input -- Complete");
     }
 
     void ReportScheduleDetails(OutputFiles &outputFiles, int const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt
@@ -2372,7 +2361,6 @@ namespace ScheduleManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::OutputFileDebug;
         using General::RoundSigDigits;
 
         // Locals
@@ -2383,7 +2371,6 @@ namespace ScheduleManager {
         static Array1D_string const HrField({0, 24}, {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
                                                       "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"});
 
-        static ObjexxFCL::gio::Fmt CMinFmt("(I2.2)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2420,7 +2407,7 @@ namespace ScheduleManager {
 
         CurMinute = MinutesPerTimeStep;
         for (Count = 1; Count <= NumOfTimeStepInHour - 1; ++Count) {
-            ObjexxFCL::gio::write(ShowMinute(Count), CMinFmt) << CurMinute;
+            ShowMinute(Count) = format("{:02}", CurMinute);
             CurMinute += MinutesPerTimeStep;
         }
         ShowMinute(NumOfTimeStepInHour) = "00";
@@ -2486,10 +2473,8 @@ namespace ScheduleManager {
                             YesNo2 = "Yes";
                         } else {
                             YesNo2 = "No";
-                            ObjexxFCL::gio::write(Num1, fmtLD) << int(ScheduleType(Count).Minimum);
-                            strip(Num1);
-                            ObjexxFCL::gio::write(Num2, fmtLD) << int(ScheduleType(Count).Maximum);
-                            strip(Num2);
+                            Num1 = fmt::to_string(static_cast<int>(ScheduleType(Count).Minimum));
+                            Num2 = fmt::to_string(static_cast<int>(ScheduleType(Count).Maximum));
                         }
                     } else {
                         NoAverageLinear = "No";
@@ -2582,60 +2567,53 @@ namespace ScheduleManager {
 
             } else if (SELECT_CASE_var == 3) {
                 for (Count = 1; Count <= NumSchedules; ++Count) {
-                    ObjexxFCL::gio::write(OutputFileDebug);
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  Schedule:Compact,";
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    " + Schedule(Count).Name + ",           !- Name";
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA)
-                        << "    " + ScheduleType(Schedule(Count).ScheduleTypePtr).Name + ",          !- ScheduleTypeLimits";
+                    print(outputFiles.debug, "\n");
+                    print(outputFiles.debug, "  Schedule:Compact,\n");
+                    print(outputFiles.debug, "    {},           !- Name\n", Schedule(Count).Name);
+                    print(outputFiles.debug, "    {},          !- ScheduleTypeLimits\n", ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
                     NumF = 1;
                     while (NumF <= 366) {
                         TS = Schedule(Count).WeekSchedulePointer(NumF);
                         while (Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
                             if (NumF == 366) {
                                 General::InvOrdinalDay(NumF, PMon, PDay, 1);
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Through: " + RoundSigDigits(PMon) + '/' + RoundSigDigits(PDay) + ',';
+                                print(outputFiles.debug, "    Through: {}/{},\n", PMon, PDay);
                                 iDayP = 0;
                                 for (DT = 2; DT <= 6; ++DT) {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
+                                    print(outputFiles.debug, "    For: {},\n", ValidDayTypes(DT));
                                     iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                     iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                     if (iDay != iDayP) {
                                         for (Hr = 1; Hr <= 24; ++Hr) {
-                                            ObjexxFCL::gio::write(OutputFileDebug, fmtA)
-                                                << "    Until: " + RoundSigDigits(Hr) + ':' + ShowMinute(NumOfTimeStepInHour) + ',' +
-                                                       RoundSigDigits(DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr), 2) + ',';
+                                            print(outputFiles.debug, "    Until: {}:{},{:.2R},\n", Hr, ShowMinute(NumOfTimeStepInHour), DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
                                         }
                                     } else {
-                                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Same as previous";
+                                        print(outputFiles.debug, "    Same as previous\n");
                                     }
                                     iDayP = iDay;
                                 }
                                 DT = 1;
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
+                                print(outputFiles.debug, "    For: {},\n", ValidDayTypes(DT));
                                 iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                 iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                 if (iDay != iDayP) {
                                     for (Hr = 1; Hr <= 24; ++Hr) {
-                                        ObjexxFCL::gio::write(OutputFileDebug, fmtA)
-                                            << "    Until: " + RoundSigDigits(Hr) + ':' + ShowMinute(NumOfTimeStepInHour) + ',' +
-                                                   RoundSigDigits(DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr), 2) + ',';
+                                        print(outputFiles.debug, "    Until: {}:{},{:.2R},\n", Hr, ShowMinute(NumOfTimeStepInHour), DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
                                     }
                                 } else {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Same as previous";
+                                    print(outputFiles.debug, "    Same as previous\n");
                                 }
                                 iDayP = iDay;
                                 for (DT = 7; DT <= MaxDayTypes; ++DT) {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
+                                    print(outputFiles.debug, "    For: {},\n", ValidDayTypes(DT));
                                     iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                     iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                     if (iDay != iDayP) {
                                         for (Hr = 1; Hr <= 24; ++Hr) {
-                                            ObjexxFCL::gio::write(OutputFileDebug, fmtA)
-                                                << "    Until: " + RoundSigDigits(Hr) + ':' + ShowMinute(NumOfTimeStepInHour) + ',' +
-                                                       RoundSigDigits(DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr), 2) + ',';
+                                            print(outputFiles.debug, "    Until: {}:{},{:.2R},\n", Hr, ShowMinute(NumOfTimeStepInHour), DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
                                         }
                                     } else {
-                                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Same as previous";
+                                        print(outputFiles.debug, "    Same as previous\n");
                                     }
                                     iDayP = iDay;
                                 }
@@ -2645,49 +2623,55 @@ namespace ScheduleManager {
                         }
                         if (NumF <= 366) {
                             General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
-                            ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Through: " + RoundSigDigits(PMon) + '/' + RoundSigDigits(PDay) + ',';
+                            print(outputFiles.debug, "    Through: {}/{},\n", PMon, PDay);
                             iDayP = 0;
                             for (DT = 2; DT <= 6; ++DT) {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
+                                print(outputFiles.debug, "    For: {},\n", ValidDayTypes(DT));
                                 iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                 iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                 if (iDay != iDayP) {
                                     for (Hr = 1; Hr <= 24; ++Hr) {
-                                        ObjexxFCL::gio::write(OutputFileDebug, fmtA)
-                                            << "    Until: " + RoundSigDigits(Hr) + ':' + ShowMinute(NumOfTimeStepInHour) + ',' +
-                                                   RoundSigDigits(DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr), 2) + ',';
+                                        print(outputFiles.debug,
+                                              "    Until: {}:{},{:.2R},\n",
+                                              Hr,
+                                              ShowMinute(NumOfTimeStepInHour),
+                                              DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
                                     }
                                 } else {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Same as previous";
+                                    print(outputFiles.debug, "    Same as previous\n");
                                 }
                                 iDayP = iDay;
                             }
                             DT = 1;
-                            ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
+                            print(outputFiles.debug, "    For: {},\n", ValidDayTypes(DT));
                             iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                             iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                             if (iDay != iDayP) {
                                 for (Hr = 1; Hr <= 24; ++Hr) {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA)
-                                        << "    Until: " + RoundSigDigits(Hr) + ':' + ShowMinute(NumOfTimeStepInHour) + ',' +
-                                               RoundSigDigits(DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr), 2) + ',';
+                                    print(outputFiles.debug,
+                                          "    Until: {}:{},{:.2R},\n",
+                                          Hr,
+                                          ShowMinute(NumOfTimeStepInHour),
+                                          DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
                                 }
                             } else {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Same as previous";
+                                print(outputFiles.debug, "    Same as previous\n");
                             }
                             iDayP = iDay;
                             for (DT = 7; DT <= MaxDayTypes; ++DT) {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    For: " + ValidDayTypes(DT) + ',';
+                                print(outputFiles.debug, "    For: {},\n", ValidDayTypes(DT));
                                 iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                 iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                 if (iDay != iDayP) {
                                     for (Hr = 1; Hr <= 24; ++Hr) {
-                                        ObjexxFCL::gio::write(OutputFileDebug, fmtA)
-                                            << "    Until: " + RoundSigDigits(Hr) + ':' + ShowMinute(NumOfTimeStepInHour) + ',' +
-                                                   RoundSigDigits(DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr), 2) + ',';
+                                        print(outputFiles.debug,
+                                              "    Until: {}:{},{:.2R},\n",
+                                              Hr,
+                                              ShowMinute(NumOfTimeStepInHour),
+                                              DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
                                     }
                                 } else {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "    Same as previous";
+                                    print(outputFiles.debug, "    Same as previous\n");
                                 }
                                 iDayP = iDay;
                             }
@@ -3550,7 +3534,6 @@ namespace ScheduleManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt hhmmFormat("(I2.2)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -3623,9 +3606,7 @@ namespace ScheduleManager {
         }
 
         if (nonIntegral) {
-            ObjexxFCL::gio::write(hHour, hhmmFormat) << RetHH;
-            ObjexxFCL::gio::write(mMinute, hhmmFormat) << RetMM;
-            ShowContinueError("Until value to be used will be: " + hHour + ':' + mMinute);
+            ShowContinueError(format("Until value to be used will be: {:2.2F}:{:2.2F}", hHour, mMinute));
         }
         if (interpolationKind == ScheduleInterpolation::No) {
             if (!isMinuteMultipleOfTimestep(RetMM, MinutesPerTimeStep)) {

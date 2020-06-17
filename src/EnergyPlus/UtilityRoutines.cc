@@ -66,11 +66,14 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
@@ -86,10 +89,10 @@ extern "C" {
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SystemReports.hh>
-#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/Timer.h>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -417,37 +420,18 @@ namespace UtilityRoutines {
         return false;
     }
 
-    std::string IPTrimSigDigits(int const IntegerValue)
+    size_t case_insensitive_hasher::operator()(const std::string &key) const noexcept
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function accepts a number as parameter as well as the number of
-        // significant digits after the decimal point to report and returns a string
-        // that is appropriate.
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::string String; // Working string
-
-        ObjexxFCL::gio::write(String, fmtLD) << IntegerValue;
-        return stripped(String);
+        std::string keyCopy = MakeUPPERCase(key);
+        return std::hash<std::string>()(keyCopy);
     }
 
-    size_t case_insensitive_hasher::operator()(const std::string& key) const noexcept {
-            std::string keyCopy = MakeUPPERCase(key);
-            return std::hash<std::string>()(keyCopy);
-    }
-
-    bool case_insensitive_comparator::operator()(const std::string& a, const std::string& b) const noexcept {
+    bool case_insensitive_comparator::operator()(const std::string &a, const std::string &b) const noexcept
+    {
         return SameString(a, b);
     }
 
-    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn) 
+    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn)
     // Add column to the performance log file (comma separated) which is appended to existing log.
     // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
     // J.Glazer February 2020
@@ -459,20 +443,20 @@ namespace UtilityRoutines {
             return;
         }
 
-        //accumuate the row until ready to be written to the file.
+        // accumuate the row until ready to be written to the file.
         appendPerfLog_headerRow = appendPerfLog_headerRow + colHeader + ",";
         appendPerfLog_valuesRow = appendPerfLog_valuesRow + colValue + ",";
 
         if (finalColumn) {
             std::fstream fsPerfLog;
             if (!exists(DataStringGlobals::outputPerfLogFileName)) {
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
+                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); // open file normally
                 if (!fsPerfLog.fail()) {
                     fsPerfLog << appendPerfLog_headerRow << std::endl;
                     fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             } else {
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
+                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); // append to already existing file
                 if (!fsPerfLog.fail()) {
                     fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
@@ -481,1686 +465,1811 @@ namespace UtilityRoutines {
         }
     }
 
-    inline bool exists (const std::string& filename) {
-    // https://stackoverflow.com/questions/25225948/how-to-check-if-a-file-exists-in-c-with-fstreamopen/51300933
-      struct stat buffer;   
-      return (stat (filename.c_str(), &buffer) == 0); 
-    }
-
-} // namespace UtilityRoutines
-
-int AbortEnergyPlus()
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   December 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine causes the program to halt due to a fatal error.
-
-    // METHODOLOGY EMPLOYED:
-    // Puts a message on output files.
-    // Closes files.
-    // Stops the program.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using namespace DataSystemVariables;
-    using namespace DataTimings;
-    using namespace DataErrorTracking;
-    using BranchInputManager::TestBranchIntegrity;
-    using BranchNodeConnections::CheckNodeConnections;
-    using BranchNodeConnections::TestCompSetInletOutletNodes;
-    using ExternalInterface::CloseSocket;
-    using ExternalInterface::NumExternalInterfaces;
-    using General::RoundSigDigits;
-    using NodeInputManager::CheckMarkedNodes;
-    using NodeInputManager::SetupNodeVarsForReporting;
-    using PlantManager::CheckPlantOnAbort;
-    using SimulationManager::ReportLoopConnections;
-    using SolarShading::ReportSurfaceErrors;
-    using SystemReports::ReportAirLoopConnections;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static ObjexxFCL::gio::Fmt fmtLD("*");
-    static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
-    static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int tempfl;
-    std::string NumWarnings;
-    std::string NumSevere;
-    std::string NumWarningsDuringWarmup;
-    std::string NumSevereDuringWarmup;
-    std::string NumWarningsDuringSizing;
-    std::string NumSevereDuringSizing;
-    std::string Elapsed;
-    int Hours;      // Elapsed Time Hour Reporting
-    int Minutes;    // Elapsed Time Minute Reporting
-    Real64 Seconds; // Elapsed Time Second Reporting
-    bool ErrFound;
-    bool TerminalError;
-    int write_stat;
-
-    if (sqlite) {
-        sqlite->updateSQLiteSimulationRecord(true, false);
-    }
-
-    AbortProcessing = true;
-    if (AskForConnectionsReport) {
-        AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
-
-        ShowMessage("Fatal error -- final processing.  More error messages may appear.");
-        SetupNodeVarsForReporting();
-
-        ErrFound = false;
-        TerminalError = false;
-        TestBranchIntegrity(ErrFound);
-        if (ErrFound) TerminalError = true;
-        TestAirPathIntegrity(ErrFound);
-        if (ErrFound) TerminalError = true;
-        CheckMarkedNodes(ErrFound);
-        if (ErrFound) TerminalError = true;
-        CheckNodeConnections(ErrFound);
-        if (ErrFound) TerminalError = true;
-        TestCompSetInletOutletNodes(ErrFound);
-        if (ErrFound) TerminalError = true;
-
-        if (!TerminalError) {
-            ReportAirLoopConnections();
-            ReportLoopConnections();
-        }
-
-    } else if (!ExitDuringSimulations) {
-        ShowMessage("Warning:  Node connection errors not checked - most system input has not been read (see previous warning).");
-        ShowMessage("Fatal error -- final processing.  Program exited before simulations began.  See previous error messages.");
-    }
-
-    if (AskForSurfacesReport) {
-        ReportSurfaces();
-    }
-
-    ReportSurfaceErrors();
-    CheckPlantOnAbort();
-    ShowRecurringErrors();
-    SummarizeErrors();
-    CloseMiscOpenFiles();
-    NumWarnings = RoundSigDigits(TotalWarningErrors);
-    strip(NumWarnings);
-    NumSevere = RoundSigDigits(TotalSevereErrors);
-    strip(NumSevere);
-    NumWarningsDuringWarmup = RoundSigDigits(TotalWarningErrorsDuringWarmup);
-    strip(NumWarningsDuringWarmup);
-    NumSevereDuringWarmup = RoundSigDigits(TotalSevereErrorsDuringWarmup);
-    strip(NumSevereDuringWarmup);
-    NumWarningsDuringSizing = RoundSigDigits(TotalWarningErrorsDuringSizing);
-    strip(NumWarningsDuringSizing);
-    NumSevereDuringSizing = RoundSigDigits(TotalSevereErrorsDuringSizing);
-    strip(NumSevereDuringSizing);
-
-    // catch up with timings if in middle
-    Time_Finish = epElapsedTime();
-    if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
-    Elapsed_Time = Time_Finish - Time_Start;
-#ifdef EP_Detailed_Timings
-    epStopTime("EntireRun=");
-#endif
-    if (Elapsed_Time < 0.0) Elapsed_Time = 0.0;
-    Hours = Elapsed_Time / 3600.0;
-    Elapsed_Time -= Hours * 3600.0;
-    Minutes = Elapsed_Time / 60.0;
-    Elapsed_Time -= Minutes * 60.0;
-    Seconds = Elapsed_Time;
-    if (Seconds < 0.0) Seconds = 0.0;
-    ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
-
-    ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
-
-    ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
-                " Severe Errors.");
-    ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
-                " Severe Errors.");
-    ShowMessage("EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
-    DisplayString("EnergyPlus Run Time=" + Elapsed);
-    tempfl = GetNewUnitNumber();
+    inline bool exists(const std::string &filename)
     {
-        IOFlags flags;
-        flags.ACTION("write");
-        ObjexxFCL::gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
-        write_stat = flags.ios();
-    }
-    if (write_stat != 0) {
-        DisplayString("AbortEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write).");
-    }
-    ObjexxFCL::gio::write(tempfl, fmtLD) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
-                                     " Severe Errors; Elapsed Time=" + Elapsed;
-
-    ObjexxFCL::gio::close(tempfl);
-
-    // Output detailed ZONE time series data
-    SimulationManager::OpenOutputJsonFiles();
-
-    if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-        ResultsFramework::OutputSchema->writeTimeSeriesReports();
+        // https://stackoverflow.com/questions/25225948/how-to-check-if-a-file-exists-in-c-with-fstreamopen/51300933
+        struct stat buffer;
+        return (stat(filename.c_str(), &buffer) == 0);
     }
 
-    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-        ResultsFramework::OutputSchema->WriteReport();
-    }
-
-#ifdef EP_Detailed_Timings
-    epSummaryTimes(Time_Finish - Time_Start);
-#endif
-    std::cerr << "Program terminated: "
-              << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
-    CloseOutOpenFiles();
-    // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
-    // indicating that E+ terminated with an error.
-    if (NumExternalInterfaces > 0) CloseSocket(-1);
-    return EXIT_FAILURE;
-}
-
-void CloseMiscOpenFiles()
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   December 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine scans potential unit numbers and closes
-    // any that are still open.
-
-    // METHODOLOGY EMPLOYED:
-    // Use INQUIRE to determine if file is open.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using DataGlobals::OutputFileDebug;
-    using DataReportingFlags::DebugOutput;
-    using DaylightingManager::CloseDFSFile;
-    using DaylightingManager::CloseReportIllumMaps;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string DebugPosition;
-
-    //      LOGICAL :: exists, opened
-    //      INTEGER :: UnitNumber
-    //      INTEGER :: ios
-
-    CloseReportIllumMaps();
-    CloseDFSFile();
-
-    //  In case some debug output was produced, it appears that the
-    //  position on the INQUIRE will not be 'ASIS' (3 compilers tested)
-    //  So, will want to keep....
-
+    bool ValidateFuelType(std::string const &FuelTypeInput,
+                          std::string &FuelTypeOutput,
+                          bool &FuelTypeErrorsFound)
     {
-        IOFlags flags;
-        ObjexxFCL::gio::inquire(OutputFileDebug, flags);
-        DebugPosition = flags.POSITION();
-    }
-    if (DebugPosition != "ASIS") {
-        DebugOutput = true;
-    }
-    if (DebugOutput) {
-        ObjexxFCL::gio::close(OutputFileDebug);
-    } else {
-        {
-            IOFlags flags;
-            flags.DISPOSE("DELETE");
-            ObjexxFCL::gio::close(OutputFileDebug, flags);
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Dareum Nam
+        //       DATE WRITTEN   May 2020
+
+        // PURPOSE OF THIS FUNCTION:
+        // Validates fuel types and sets output strings
+
+        auto const SELECT_CASE_var(FuelTypeInput);
+
+        if (SELECT_CASE_var == "ELECTRICITY") {
+            FuelTypeOutput = "Electric";
+
+        } else if (SELECT_CASE_var == "NATURALGAS") {
+            FuelTypeOutput = "Gas";
+
+        } else if (SELECT_CASE_var == "DIESEL") {
+            FuelTypeOutput = "Diesel";
+
+        } else if (SELECT_CASE_var == "GASOLINE") {
+            FuelTypeOutput = "Gasoline";
+
+        } else if (SELECT_CASE_var == "COAL") {
+            FuelTypeOutput = "Coal";
+
+        } else if (SELECT_CASE_var == "FUELOILNO1") {
+            FuelTypeOutput = "FuelOil#1";
+
+        } else if (SELECT_CASE_var == "FUELOILNO2") {
+            FuelTypeOutput = "FuelOil#2";
+
+        } else if (SELECT_CASE_var == "PROPANE") {
+            FuelTypeOutput = "Propane";
+
+        } else if (SELECT_CASE_var == "OTHERFUEL1") {
+            FuelTypeOutput = "OtherFuel1";
+
+        } else if (SELECT_CASE_var == "OTHERFUEL2") {
+            FuelTypeOutput = "OtherFuel2";
+
+        } else {
+            FuelTypeErrorsFound = true;
         }
-    }
-}
 
-void CloseOutOpenFiles()
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   April 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine scans potential unit numbers and closes
-    // any that are still open.
-
-    // METHODOLOGY EMPLOYED:
-    // Use INQUIRE to determine if file is open.
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxUnitNumber(1000);
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    bool exists;
-    bool opened;
-    std::string name;
-    const std::string stdin_name("stdin");
-    const std::string stdout_name("stdout");
-    const std::string stderr_name("stderr");
-    bool not_special(false);
-    int UnitNumber;
-    int ios;
-
-    for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(UnitNumber, flags);
-            exists = flags.exists();
-            opened = flags.open();
-            ios = flags.ios();
-            name = flags.name();
-        }
-        if (exists && opened && ios == 0) {
-            not_special = name.compare(stdin_name) != 0;
-            not_special = not_special && (name.compare(stdout_name) != 0);
-            not_special = not_special && (name.compare(stderr_name) != 0);
-            if (not_special) ObjexxFCL::gio::close(UnitNumber);
-        }
-    }
-}
-
-int EndEnergyPlus()
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   December 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine causes the program to terminate when complete (no errors).
-
-    // METHODOLOGY EMPLOYED:
-    // Puts a message on output files.
-    // Closes files.
-    // Stops the program.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using namespace DataSystemVariables;
-    using namespace DataTimings;
-    using namespace DataErrorTracking;
-    using ExternalInterface::CloseSocket;
-    using ExternalInterface::haveExternalInterfaceBCVTB;
-    using ExternalInterface::NumExternalInterfaces;
-    using General::RoundSigDigits;
-    using SolarShading::ReportSurfaceErrors;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
-    static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int tempfl;
-    std::string NumWarnings;
-    std::string NumSevere;
-    std::string NumWarningsDuringWarmup;
-    std::string NumSevereDuringWarmup;
-    std::string NumWarningsDuringSizing;
-    std::string NumSevereDuringSizing;
-    std::string Elapsed;
-    int Hours;      // Elapsed Time Hour Reporting
-    int Minutes;    // Elapsed Time Minute Reporting
-    Real64 Seconds; // Elapsed Time Second Reporting
-    int write_stat;
-
-    if (sqlite) {
-        sqlite->updateSQLiteSimulationRecord(true, true);
+        return FuelTypeErrorsFound;
     }
 
-    ReportSurfaceErrors();
-    ShowRecurringErrors();
-    SummarizeErrors();
-    CloseMiscOpenFiles();
-    NumWarnings = RoundSigDigits(TotalWarningErrors);
-    strip(NumWarnings);
-    NumSevere = RoundSigDigits(TotalSevereErrors);
-    strip(NumSevere);
-    NumWarningsDuringWarmup = RoundSigDigits(TotalWarningErrorsDuringWarmup);
-    strip(NumWarningsDuringWarmup);
-    NumSevereDuringWarmup = RoundSigDigits(TotalSevereErrorsDuringWarmup);
-    strip(NumSevereDuringWarmup);
-    NumWarningsDuringSizing = RoundSigDigits(TotalWarningErrorsDuringSizing);
-    strip(NumWarningsDuringSizing);
-    NumSevereDuringSizing = RoundSigDigits(TotalSevereErrorsDuringSizing);
-    strip(NumSevereDuringSizing);
-
-    Time_Finish = epElapsedTime();
-    if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
-    Elapsed_Time = Time_Finish - Time_Start;
-    if (DataGlobals::createPerfLog) {
-        UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
-    }
-#ifdef EP_Detailed_Timings
-    epStopTime("EntireRun=");
-#endif
-    Hours = Elapsed_Time / 3600.0;
-    Elapsed_Time -= Hours * 3600.0;
-    Minutes = Elapsed_Time / 60.0;
-    Elapsed_Time -= Minutes * 60.0;
-    Seconds = Elapsed_Time;
-    if (Seconds < 0.0) Seconds = 0.0;
-    ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
-
-    ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
-
-    if (DataGlobals::createPerfLog) {
-        UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
-        UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
-        UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); //last item so write the perfLog file
-    }
-    ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
-                " Severe Errors.");
-    ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
-                " Severe Errors.");
-    ShowMessage("EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
-    DisplayString("EnergyPlus Run Time=" + Elapsed);
-    tempfl = GetNewUnitNumber();
+    bool ValidateFuelTypeWithFuelTypeNum(std::string const &FuelTypeInput,
+                                         int &FuelTypeNum,
+                                         bool &FuelTypeErrorsFound)
     {
-        IOFlags flags;
-        flags.ACTION("write");
-        ObjexxFCL::gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
-        write_stat = flags.ios();
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Dareum Nam
+        //       DATE WRITTEN   May 2020
+
+        // PURPOSE OF THIS FUNCTION:
+        // Validates fuel types and sets output strings with fuel type number (DXCoils.cc and HVACVariableRefrigerantFlow.cc)
+
+        if (SameString(FuelTypeInput, "Electricity")) {
+            FuelTypeNum = 1; // FuelTypeElectricity
+        } else if (SameString(FuelTypeInput, "NaturalGas")) {
+            FuelTypeNum = 2; // FuelTypeNaturalGas
+        } else if (SameString(FuelTypeInput, "Propane")) {
+            FuelTypeNum = 3; // FuelTypePropaneGas
+        } else if (SameString(FuelTypeInput, "Diesel")) {
+            FuelTypeNum = 4; // FuelTypeDiesel
+        } else if (SameString(FuelTypeInput, "Gasoline")) {
+            FuelTypeNum = 5; // FuelTypeGasoline
+        } else if (SameString(FuelTypeInput, "FuelOilNo1")) {
+            FuelTypeNum = 6; // FuelTypeFuelOil1
+        } else if (SameString(FuelTypeInput, "FuelOilNo2")) {
+            FuelTypeNum = 7; // FuelTypeFuelOil2
+        } else if (SameString(FuelTypeInput, "OtherFuel1")) {
+            FuelTypeNum = 8; // FuelTypeOtherFuel1
+        } else if (SameString(FuelTypeInput, "OtherFuel2")) {
+            FuelTypeNum = 9; // FuelTypeOtherFuel2
+        } else {
+            FuelTypeErrorsFound = true;
+        }
+
+        return FuelTypeErrorsFound;
     }
-    if (write_stat != 0) {
-        DisplayString("EndEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write).");
-    }
-    ObjexxFCL::gio::write(tempfl, fmtA) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere +
-                                    " Severe Errors; Elapsed Time=" + Elapsed;
-    ObjexxFCL::gio::close(tempfl);
 
-    // Output detailed ZONE time series data
-    SimulationManager::OpenOutputJsonFiles();
-
-    if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-        ResultsFramework::OutputSchema->writeTimeSeriesReports();
-    }
-
-    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-        ResultsFramework::OutputSchema->WriteReport();
-    }
-
-#ifdef EP_Detailed_Timings
-    epSummaryTimes(Time_Finish - Time_Start);
-#endif
-    std::cerr << "EnergyPlus Completed Successfully." << std::endl;
-    CloseOutOpenFiles();
-    // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
-    // indicating that E+ finished its simulation
-    if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
-    return EXIT_SUCCESS;
-}
-
-int GetNewUnitNumber()
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda K. Lawrie, adapted from reference
-    //       DATE WRITTEN   September 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Returns a unit number of a unit that can exist and is not connected.  Note
-    // this routine does not magically mark that unit number in use.  In order to
-    // have the unit "used", the source code must OPEN the file.
-
-    // METHODOLOGY EMPLOYED:
-    // Use Inquire function to find out if proposed unit: exists or is opened.
-    // If not, can be used for a new unit number.
-
-    // REFERENCES:
-    // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
-    // Developed at Unicomp, Inc.
-    // Permission to use, copy, modify, and distribute this
-    // software is freely granted, provided that this notice
-    // is preserved.
-
-    // USE STATEMENTS:
-    // na
-
-    //	// Return value
-    //	int UnitNumber; // Result from scanning currently open files
-    //
-    //	// Locals
-    //	// FUNCTION ARGUMENT DEFINITIONS:
-    //
-    //	// FUNCTION PARAMETER DEFINITIONS:
-    //	//  IO Status Values:
-    //
-    //	int const END_OF_RECORD( -2 );
-    //	int const END_OF_FILE( -1 );
-    //
-    //	//  Indicate default input and output units:
-    //
-    //	int const DEFAULT_INPUT_UNIT( 5 );
-    //	int const DEFAULT_OUTPUT_UNIT( 6 );
-    //
-    //	//  Indicate number and value of preconnected units
-    //
-    //	int const NUMBER_OF_PRECONNECTED_UNITS( 2 );
-    //	static Array1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
-    //
-    //	//  Largest allowed unit number (or a large number, if none)
-    //	int const MaxUnitNumber( 1000 );
-    //
-    //	// INTERFACE BLOCK SPECIFICATIONS
-    //	// na
-    //
-    //	// DERIVED TYPE DEFINITIONS
-    //	// na
-    //
-    //	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-    //	bool exists; // File exists
-    //	bool opened; // Unit is open
-    //	int ios; // return value from Inquire intrinsic
-    //
-    //	for ( UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber ) {
-    //		if ( UnitNumber == DEFAULT_INPUT_UNIT || UnitNumber == DEFAULT_OUTPUT_UNIT ) continue;
-    //		if ( any_eq( UnitNumber, PRECONNECTED_UNITS ) ) continue;
-    //		{ IOFlags flags; ObjexxFCL::gio::inquire( UnitNumber, flags ); exists = flags.exists(); opened = flags.open(); ios = flags.ios(); }
-    //		if ( exists && ! opened && ios == 0 ) return UnitNumber; // result is set in UnitNumber
-    //	}
-    //
-    //	UnitNumber = -1;
-    //
-    //	return UnitNumber;
-
-    return ObjexxFCL::gio::get_unit(); // Autodesk:Note ObjexxFCL::gio system provides this (and protects the F90+ preconnected units {100,101,102})
-}
-
-int FindUnitNumber(std::string const &FileName) // File name to be searched.
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 1997, adapted from reference
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Returns a unit number for the file name that is either opened or exists.
-
-    // METHODOLOGY EMPLOYED:
-    // Use Inquire function to find out if proposed unit: exists or is opened.
-    // If not, can be used for a new unit number.
-
-    // REFERENCES:
-    // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
-    // Developed at Unicomp, Inc.
-    // Permission to use, copy, modify, and distribute this
-    // software is freely granted, provided that this notice
-    // is preserved.
-
-    // USE STATEMENTS:
-    // na
-
-    // Return value
-    int UnitNumber; // Unit number that should be used
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    //  Largest allowed unit number (or a large number, if none)
-    int const MaxUnitNumber(1000);
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    std::string TestFileName; // File name returned from opened file
-    bool exists;              // True if file already exists
-    bool opened;              // True if file is open
-    int ios;                  // Status indicator from INQUIRE intrinsic
-
+    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
+                                                   std::string &FuelTypeOutput,
+                                                   int &FuelTypeNum,
+                                                   bool &FuelTypeErrorsFound)
     {
-        IOFlags flags;
-        ObjexxFCL::gio::inquire(FileName, flags);
-        exists = flags.exists();
-        opened = flags.open();
-        ios = flags.ios();
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Dareum Nam
+        //       DATE WRITTEN   May 2020
+
+        // PURPOSE OF THIS FUNCTION:
+        // Validates fuel types and sets output strings with DataGlobalConstants::AssignResourceTypeNum() (Boilers.cc and boilerSteam.cc)
+
+        auto const SELECT_CASE_var(FuelTypeInput);
+
+        if (SELECT_CASE_var == "ELECTRICITY") {
+            FuelTypeOutput = "Electric";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
+
+        } else if (SELECT_CASE_var == "NATURALGAS") {
+            FuelTypeOutput = "Gas";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
+
+        } else if (SELECT_CASE_var == "DIESEL") {
+            FuelTypeOutput = "Diesel";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("DIESEL");
+
+        } else if (SELECT_CASE_var == "GASOLINE") {
+            FuelTypeOutput = "Gasoline";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("GASOLINE");
+
+        } else if (SELECT_CASE_var == "COAL") {
+            FuelTypeOutput = "Coal";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("COAL");
+
+        } else if (SELECT_CASE_var == "FUELOILNO1") {
+            FuelTypeOutput = "FuelOil#1";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
+
+        } else if (SELECT_CASE_var == "FUELOILNO2") {
+            FuelTypeOutput = "FuelOil#2";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
+
+        } else if (SELECT_CASE_var == "PROPANE") {
+            FuelTypeOutput = "Propane";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
+
+        } else if (SELECT_CASE_var == "OTHERFUEL1") {
+            FuelTypeOutput = "OtherFuel1";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL1");
+
+        } else if (SELECT_CASE_var == "OTHERFUEL2") {
+            FuelTypeOutput = "OtherFuel2";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
+
+        } else {
+            FuelTypeErrorsFound = true;
+        }
+
+        return FuelTypeErrorsFound;
     }
-    if (!opened) {
-        UnitNumber = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.POSITION("APPEND");
-            ObjexxFCL::gio::open(UnitNumber, FileName, flags);
-            ios = flags.ios();
+
+    } // namespace UtilityRoutines
+
+    int AbortEnergyPlus(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   December 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine causes the program to halt due to a fatal error.
+
+        // METHODOLOGY EMPLOYED:
+        // Puts a message on output files.
+        // Closes files.
+        // Stops the program.
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using namespace DataPrecisionGlobals;
+        using namespace DataSystemVariables;
+        using namespace DataTimings;
+        using namespace DataErrorTracking;
+        using BranchInputManager::TestBranchIntegrity;
+        using BranchNodeConnections::CheckNodeConnections;
+        using BranchNodeConnections::TestCompSetInletOutletNodes;
+        using ExternalInterface::CloseSocket;
+        using ExternalInterface::NumExternalInterfaces;
+        using General::RoundSigDigits;
+        using NodeInputManager::CheckMarkedNodes;
+        using NodeInputManager::SetupNodeVarsForReporting;
+        using PlantManager::CheckPlantOnAbort;
+        using SimulationManager::ReportLoopConnections;
+        using SolarShading::ReportSurfaceErrors;
+        using SystemReports::ReportAirLoopConnections;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static ObjexxFCL::gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
+
+        // INTERFACE BLOCK SPECIFICATIONS
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int tempfl;
+        std::string NumWarnings;
+        std::string NumSevere;
+        std::string NumWarningsDuringWarmup;
+        std::string NumSevereDuringWarmup;
+        std::string NumWarningsDuringSizing;
+        std::string NumSevereDuringSizing;
+        int Hours;      // Elapsed Time Hour Reporting
+        int Minutes;    // Elapsed Time Minute Reporting
+        Real64 Seconds; // Elapsed Time Second Reporting
+        bool ErrFound;
+        bool TerminalError;
+        int write_stat;
+
+        if (sqlite) {
+            sqlite->updateSQLiteSimulationRecord(true, false);
         }
-        if (ios != 0) {
-            DisplayString("FindUnitNumber: Could not open file \"" + FileName + "\" for append.");
-        }
-    } else {
-        std::string::size_type const FileNameLength = len(FileName);
-        std::string::size_type TestFileLength;
-        std::string::size_type Pos; // Position pointer
-        for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-            // Skip preassigned units - ObjexxFCL::gio::inquire breaks std::cout on Windows - these units are assigned in objexx\GlobalStreams constructor
-            if ((UnitNumber == 0) || (UnitNumber == 5) || (UnitNumber == 6) || (UnitNumber == 100) || (UnitNumber == 101) || (UnitNumber == 102)) {
-                continue;
+
+        AbortProcessing = true;
+        if (AskForConnectionsReport) {
+            AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
+
+            ShowMessage("Fatal error -- final processing.  More error messages may appear.");
+            SetupNodeVarsForReporting(state.outputFiles);
+
+            ErrFound = false;
+            TerminalError = false;
+            TestBranchIntegrity(state.outputFiles, ErrFound);
+            if (ErrFound) TerminalError = true;
+            TestAirPathIntegrity(state, state.outputFiles, ErrFound);
+            if (ErrFound) TerminalError = true;
+            CheckMarkedNodes(ErrFound);
+            if (ErrFound) TerminalError = true;
+            CheckNodeConnections(ErrFound);
+            if (ErrFound) TerminalError = true;
+            TestCompSetInletOutletNodes(ErrFound);
+            if (ErrFound) TerminalError = true;
+
+            if (!TerminalError) {
+                ReportAirLoopConnections(state.outputFiles);
+                ReportLoopConnections(state.outputFiles);
             }
+
+        } else if (!ExitDuringSimulations) {
+            ShowMessage("Warning:  Node connection errors not checked - most system input has not been read (see previous warning).");
+            ShowMessage("Fatal error -- final processing.  Program exited before simulations began.  See previous error messages.");
+        }
+
+        if (AskForSurfacesReport) {
+            ReportSurfaces(state.outputFiles);
+        }
+
+        ReportSurfaceErrors();
+        CheckPlantOnAbort();
+        ShowRecurringErrors();
+        SummarizeErrors();
+        CloseMiscOpenFiles(state.outputFiles);
+        NumWarnings = fmt::to_string(TotalWarningErrors);
+        NumSevere = fmt::to_string(TotalSevereErrors);
+        NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
+        NumSevereDuringWarmup = fmt::to_string(TotalSevereErrorsDuringWarmup);
+        NumWarningsDuringSizing = fmt::to_string(TotalWarningErrorsDuringSizing);
+        NumSevereDuringSizing = fmt::to_string(TotalSevereErrorsDuringSizing);
+
+        // catch up with timings if in middle
+        Time_Finish = epElapsedTime();
+        if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
+        Elapsed_Time = Time_Finish - Time_Start;
+#ifdef EP_Detailed_Timings
+        epStopTime("EntireRun=");
+#endif
+        if (Elapsed_Time < 0.0) Elapsed_Time = 0.0;
+        Hours = Elapsed_Time / 3600.0;
+        Elapsed_Time -= Hours * 3600.0;
+        Minutes = Elapsed_Time / 60.0;
+        Elapsed_Time -= Minutes * 60.0;
+        Seconds = Elapsed_Time;
+        if (Seconds < 0.0) Seconds = 0.0;
+        static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
+        const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
+
+        ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
+        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+
+        ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
+                    " Severe Errors.");
+        ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
+                    " Severe Errors.");
+        ShowMessage("EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
+                    " Severe Errors; Elapsed Time=" + Elapsed);
+        DisplayString("EnergyPlus Run Time=" + Elapsed);
+        tempfl = GetNewUnitNumber();
+        {
+            IOFlags flags;
+            flags.ACTION("write");
+            ObjexxFCL::gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
+            write_stat = flags.ios();
+        }
+        if (write_stat != 0) {
+            DisplayString("AbortEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write).");
+        }
+        ObjexxFCL::gio::write(tempfl, fmtLD) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
+                                                    " Severe Errors; Elapsed Time=" + Elapsed;
+
+        ObjexxFCL::gio::close(tempfl);
+
+        // Output detailed ZONE time series data
+        SimulationManager::OpenOutputJsonFiles();
+
+        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
+            ResultsFramework::OutputSchema->writeTimeSeriesReports();
+        }
+
+        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::OutputSchema->WriteReport();
+        }
+
+#ifdef EP_Detailed_Timings
+        epSummaryTimes(Time_Finish - Time_Start);
+#endif
+        std::cerr << "Program terminated: "
+                  << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
+        CloseOutOpenFiles();
+        // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
+        // indicating that E+ terminated with an error.
+        if (NumExternalInterfaces > 0) CloseSocket(-1);
+        return EXIT_FAILURE;
+    }
+
+    void CloseMiscOpenFiles(OutputFiles &outputFiles)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   December 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine scans potential unit numbers and closes
+        // any that are still open.
+
+        // METHODOLOGY EMPLOYED:
+        // Use INQUIRE to determine if file is open.
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using DataReportingFlags::DebugOutput;
+        using DaylightingManager::CloseDFSFile;
+        using DaylightingManager::CloseReportIllumMaps;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // na
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        //      LOGICAL :: exists, opened
+        //      INTEGER :: UnitNumber
+        //      INTEGER :: ios
+
+        CloseReportIllumMaps(outputFiles);
+        CloseDFSFile(outputFiles);
+
+        if (DebugOutput || outputFiles.debug.position() > 0) {
+            outputFiles.debug.close();
+        } else {
+            outputFiles.debug.del();
+        }
+    }
+
+    void CloseOutOpenFiles()
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   April 2012
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine scans potential unit numbers and closes
+        // any that are still open.
+
+        // METHODOLOGY EMPLOYED:
+        // Use INQUIRE to determine if file is open.
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+        // na
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // na
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        int const MaxUnitNumber(1000);
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+        bool exists;
+        bool opened;
+        std::string name;
+        const std::string stdin_name("stdin");
+        const std::string stdout_name("stdout");
+        const std::string stderr_name("stderr");
+        bool not_special(false);
+        int UnitNumber;
+        int ios;
+
+        for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
             {
                 IOFlags flags;
                 ObjexxFCL::gio::inquire(UnitNumber, flags);
-                TestFileName = flags.name();
+                exists = flags.exists();
                 opened = flags.open();
+                ios = flags.ios();
+                name = flags.name();
             }
-            //  Powerstation returns just file name
-            //  DVF (Digital Fortran) returns whole path
-            TestFileLength = len(TestFileName);
-            Pos = index(TestFileName, FileName);
-            if (Pos != std::string::npos) {
-                //  Must be the last part of the file
-                if (Pos + FileNameLength == TestFileLength) break;
+            if (exists && opened && ios == 0) {
+                not_special = name.compare(stdin_name) != 0;
+                not_special = not_special && (name.compare(stdout_name) != 0);
+                not_special = not_special && (name.compare(stderr_name) != 0);
+                if (not_special) ObjexxFCL::gio::close(UnitNumber);
             }
         }
     }
 
-    return UnitNumber;
-}
+    int EndEnergyPlus(OutputFiles &outputFiles)
+    {
 
-void ConvertCaseToUpper(std::string const &InputString, // Input string
-                        std::string &OutputString       // Output string (in UpperCase)
-)
-{
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   December 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine causes the program to terminate when complete (no errors).
 
-    // PURPOSE OF THIS SUBROUTINE:
-    // Convert a string to upper case
+        // METHODOLOGY EMPLOYED:
+        // Puts a message on output files.
+        // Closes files.
+        // Stops the program.
 
-    // METHODOLOGY EMPLOYED:
-    // This routine is not dependant upon the ASCII
-    // code.  It works by storing the upper and lower case alphabet.  It
-    // scans the whole input string.  If it finds a character in the lower
-    // case alphabet, it makes an appropriate substitution.
+        // REFERENCES:
+        // na
 
-    // REFERENCES:
-    // na
+        // Using/Aliasing
+        using namespace DataPrecisionGlobals;
+        using namespace DataSystemVariables;
+        using namespace DataTimings;
+        using namespace DataErrorTracking;
+        using ExternalInterface::CloseSocket;
+        using ExternalInterface::haveExternalInterfaceBCVTB;
+        using ExternalInterface::NumExternalInterfaces;
+        using General::RoundSigDigits;
+        using SolarShading::ReportSurfaceErrors;
 
-    // Using/Aliasing
-    using namespace DataStringGlobals;
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // na
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
+        // INTERFACE BLOCK SPECIFICATIONS
 
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
+        // DERIVED TYPE DEFINITIONS
+        // na
 
-    // DERIVED TYPE DEFINITIONS
-    // na
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int tempfl;
+        std::string NumWarnings;
+        std::string NumSevere;
+        std::string NumWarningsDuringWarmup;
+        std::string NumSevereDuringWarmup;
+        std::string NumWarningsDuringSizing;
+        std::string NumSevereDuringSizing;
+        std::string Elapsed;
+        int Hours;      // Elapsed Time Hour Reporting
+        int Minutes;    // Elapsed Time Minute Reporting
+        Real64 Seconds; // Elapsed Time Second Reporting
+        int write_stat;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    OutputString = InputString;
-
-    for (std::string::size_type A = 0; A < len(InputString); ++A) {
-        std::string::size_type const B = index(LowerCase, InputString[A]);
-        if (B != std::string::npos) {
-            OutputString[A] = UpperCase[B];
+        if (sqlite) {
+            sqlite->updateSQLiteSimulationRecord(true, true);
         }
-    }
-}
 
-void ConvertCaseToLower(std::string const &InputString, // Input string
-                        std::string &OutputString       // Output string (in LowerCase)
-)
-{
+        ReportSurfaceErrors();
+        ShowRecurringErrors();
+        SummarizeErrors();
+        CloseMiscOpenFiles(outputFiles);
+        NumWarnings = RoundSigDigits(TotalWarningErrors);
+        strip(NumWarnings);
+        NumSevere = RoundSigDigits(TotalSevereErrors);
+        strip(NumSevere);
+        NumWarningsDuringWarmup = RoundSigDigits(TotalWarningErrorsDuringWarmup);
+        strip(NumWarningsDuringWarmup);
+        NumSevereDuringWarmup = RoundSigDigits(TotalSevereErrorsDuringWarmup);
+        strip(NumSevereDuringWarmup);
+        NumWarningsDuringSizing = RoundSigDigits(TotalWarningErrorsDuringSizing);
+        strip(NumWarningsDuringSizing);
+        NumSevereDuringSizing = RoundSigDigits(TotalSevereErrorsDuringSizing);
+        strip(NumSevereDuringSizing);
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Convert a string to lower case
-
-    // METHODOLOGY EMPLOYED:
-    // This routine is not dependant upon the ASCII
-    // code.  It works by storing the upper and lower case alphabet.  It
-    // scans the whole input string.  If it finds a character in the lower
-    // case alphabet, it makes an appropriate substitution.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataStringGlobals;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    OutputString = InputString;
-
-    for (std::string::size_type A = 0; A < len(InputString); ++A) {
-        std::string::size_type const B = index(UpperCase, InputString[A]);
-        if (B != std::string::npos) {
-            OutputString[A] = LowerCase[B];
+        Time_Finish = epElapsedTime();
+        if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
+        Elapsed_Time = Time_Finish - Time_Start;
+        if (DataGlobals::createPerfLog) {
+            UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
         }
-    }
-}
+#ifdef EP_Detailed_Timings
+        epStopTime("EntireRun=");
+#endif
+        Hours = Elapsed_Time / 3600.0;
+        Elapsed_Time -= Hours * 3600.0;
+        Minutes = Elapsed_Time / 60.0;
+        Elapsed_Time -= Minutes * 60.0;
+        Seconds = Elapsed_Time;
+        if (Seconds < 0.0) Seconds = 0.0;
+        ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
 
-std::string::size_type FindNonSpace(std::string const &String) // String to be scanned
-{
+        ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
+        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+        if (DataGlobals::createPerfLog) {
+            UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
+            UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
+            UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); // last item so write the perfLog file
+        }
+        ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
+                    " Severe Errors.");
+        ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
+                    " Severe Errors.");
+        ShowMessage("EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
+        DisplayString("EnergyPlus Run Time=" + Elapsed);
+        tempfl = GetNewUnitNumber();
+        {
+            IOFlags flags;
+            flags.ACTION("write");
+            ObjexxFCL::gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
+            write_stat = flags.ios();
+        }
+        if (write_stat != 0) {
+            DisplayString("EndEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write).");
+        }
+        ObjexxFCL::gio::write(tempfl, fmtA) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere +
+                                                   " Severe Errors; Elapsed Time=" + Elapsed;
+        ObjexxFCL::gio::close(tempfl);
 
-    // PURPOSE OF THIS FUNCTION:
-    // This function finds the first non-space character in the passed string
-    // and returns that position as the result to the calling program.
+        // Output detailed ZONE time series data
+        SimulationManager::OpenOutputJsonFiles();
 
-    // METHODOLOGY EMPLOYED:
-    // Scan string for character not equal to blank.
+        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
+            ResultsFramework::OutputSchema->writeTimeSeriesReports();
+        }
 
-    // REFERENCES:
-    // na
+        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::OutputSchema->WriteReport();
+        }
 
-    // USE STATEMENTS:
-    // na
-
-    // Return value
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-    return String.find_first_not_of(' ');
-}
-
-bool env_var_on(std::string const &env_var_str)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Stuart G. Mentzer
-    //       DATE WRITTEN   April 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Test if a boolean environment variable value is "on" (has value starting with Y or T)
-
-    return ((!env_var_str.empty()) && is_any_of(env_var_str[0], "YyTt"));
-}
-
-void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 1997
-    //       MODIFIED       Kyle Benne
-    //                      August 2010
-    //                      Added sqlite output
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine puts ErrorMessage with a Fatal designation on
-    // designated output files.  Then, the program is aborted.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls ShowErrorMessage utility routine.
-    // Calls AbortEnergyPlus
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataErrorTracking;
-    using General::RoundSigDigits;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    ShowErrorMessage(" **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2);
-    DisplayString("**FATAL:" + ErrorMessage);
-
-    ShowErrorMessage(" ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2);
-    ShowErrorMessage(" ..... Reference severe error count=" + RoundSigDigits(TotalSevereErrors), OutUnit1, OutUnit2);
-    ShowErrorMessage(" ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2);
-    if (sqlite) {
-        sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
-        if (sqlite->sqliteWithinTransaction()) sqlite->sqliteCommit();
-    }
-    throw FatalError(ErrorMessage);
-}
-
-void ShowSevereError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine puts ErrorMessage with a Severe designation on
-    // designated output files.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls ShowErrorMessage utility routine.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataStringGlobals;
-    using namespace DataErrorTracking;
-    using DataGlobals::DoingSizing;
-    using DataGlobals::KickOffSimulation;
-    using DataGlobals::WarmupFlag;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Loop;
-
-    for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
+#ifdef EP_Detailed_Timings
+        epSummaryTimes(Time_Finish - Time_Start);
+#endif
+        std::cerr << "EnergyPlus Completed Successfully." << std::endl;
+        CloseOutOpenFiles();
+        // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
+        // indicating that E+ finished its simulation
+        if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
+        return EXIT_SUCCESS;
     }
 
-    ++TotalSevereErrors;
-    if (WarmupFlag && !DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalSevereErrorsDuringWarmup;
-    if (DoingSizing) ++TotalSevereErrorsDuringSizing;
-    ShowErrorMessage(" ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
-    LastSevereError = ErrorMessage;
+    int GetNewUnitNumber()
+    {
 
-    //  Could set a variable here that gets checked at some point?
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Linda K. Lawrie, adapted from reference
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-    if (sqlite) {
-        sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 1);
+        // PURPOSE OF THIS FUNCTION:
+        // Returns a unit number of a unit that can exist and is not connected.  Note
+        // this routine does not magically mark that unit number in use.  In order to
+        // have the unit "used", the source code must OPEN the file.
+
+        // METHODOLOGY EMPLOYED:
+        // Use Inquire function to find out if proposed unit: exists or is opened.
+        // If not, can be used for a new unit number.
+
+        // REFERENCES:
+        // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
+        // Developed at Unicomp, Inc.
+        // Permission to use, copy, modify, and distribute this
+        // software is freely granted, provided that this notice
+        // is preserved.
+
+        // USE STATEMENTS:
+        // na
+
+        //	// Return value
+        //	int UnitNumber; // Result from scanning currently open files
+        //
+        //	// Locals
+        //	// FUNCTION ARGUMENT DEFINITIONS:
+        //
+        //	// FUNCTION PARAMETER DEFINITIONS:
+        //	//  IO Status Values:
+        //
+        //	int const END_OF_RECORD( -2 );
+        //	int const END_OF_FILE( -1 );
+        //
+        //	//  Indicate default input and output units:
+        //
+        //	int const DEFAULT_INPUT_UNIT( 5 );
+        //	int const DEFAULT_OUTPUT_UNIT( 6 );
+        //
+        //	//  Indicate number and value of preconnected units
+        //
+        //	int const NUMBER_OF_PRECONNECTED_UNITS( 2 );
+        //	static Array1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
+        //
+        //	//  Largest allowed unit number (or a large number, if none)
+        //	int const MaxUnitNumber( 1000 );
+        //
+        //	// INTERFACE BLOCK SPECIFICATIONS
+        //	// na
+        //
+        //	// DERIVED TYPE DEFINITIONS
+        //	// na
+        //
+        //	// FUNCTION LOCAL VARIABLE DECLARATIONS:
+        //	bool exists; // File exists
+        //	bool opened; // Unit is open
+        //	int ios; // return value from Inquire intrinsic
+        //
+        //	for ( UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber ) {
+        //		if ( UnitNumber == DEFAULT_INPUT_UNIT || UnitNumber == DEFAULT_OUTPUT_UNIT ) continue;
+        //		if ( any_eq( UnitNumber, PRECONNECTED_UNITS ) ) continue;
+        //		{ IOFlags flags; ObjexxFCL::gio::inquire( UnitNumber, flags ); exists = flags.exists(); opened = flags.open(); ios =
+        //flags.ios(); } 		if ( exists && ! opened && ios == 0 ) return UnitNumber; // result is set in UnitNumber
+        //	}
+        //
+        //	UnitNumber = -1;
+        //
+        //	return UnitNumber;
+
+        return ObjexxFCL::gio::get_unit(); // Autodesk:Note ObjexxFCL::gio system provides this (and protects the F90+ preconnected units
+                                           // {100,101,102})
     }
-}
 
-void ShowSevereMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
-{
+    int FindUnitNumber(std::string const &FileName) // File name to be searched.
+    {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 1997, adapted from reference
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine puts ErrorMessage with a Severe designation on
-    // designated output files.
-    // But does not bump the error count so can be used in conjunction with recurring
-    // error calls.
+        // PURPOSE OF THIS FUNCTION:
+        // Returns a unit number for the file name that is either opened or exists.
 
-    // METHODOLOGY EMPLOYED:
-    // Calls ShowErrorMessage utility routine.
+        // METHODOLOGY EMPLOYED:
+        // Use Inquire function to find out if proposed unit: exists or is opened.
+        // If not, can be used for a new unit number.
 
-    // REFERENCES:
-    // na
+        // REFERENCES:
+        // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
+        // Developed at Unicomp, Inc.
+        // Permission to use, copy, modify, and distribute this
+        // software is freely granted, provided that this notice
+        // is preserved.
 
-    // Using/Aliasing
-    using namespace DataStringGlobals;
-    using namespace DataErrorTracking;
+        // USE STATEMENTS:
+        // na
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
+        // Return value
+        int UnitNumber; // Unit number that should be used
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
+        // Locals
+        // FUNCTION ARGUMENT DEFINITIONS:
 
-    // INTERFACE BLOCK SPECIFICATIONS
+        // FUNCTION PARAMETER DEFINITIONS:
+        //  Largest allowed unit number (or a large number, if none)
+        int const MaxUnitNumber(1000);
 
-    // DERIVED TYPE DEFINITIONS
-    // na
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Loop;
+        // DERIVED TYPE DEFINITIONS
+        // na
 
-    for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
-    }
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        std::string TestFileName; // File name returned from opened file
+        bool exists;              // True if file already exists
+        bool opened;              // True if file is open
+        int ios;                  // Status indicator from INQUIRE intrinsic
 
-    ShowErrorMessage(" ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
-    LastSevereError = ErrorMessage;
-
-    //  Could set a variable here that gets checked at some point?
-
-    if (sqlite) {
-        sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 0);
-    }
-}
-
-void ShowContinueError(std::string const &Message, Optional_int OutUnit1, Optional_int OutUnit2)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   October 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine displays a 'continued error' message on designated output files.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls ShowErrorMessage utility routine.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    // na
-
-    ShowErrorMessage(" **   ~~~   ** " + Message, OutUnit1, OutUnit2);
-    if (sqlite) {
-        sqlite->updateSQLiteErrorRecord(Message);
-    }
-}
-
-void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit1, Optional_int OutUnit2)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   February 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine displays a 'continued error' timestamp message on designated output files.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls ShowErrorMessage utility routine.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using DataEnvironment::CurMnDy;
-    using DataEnvironment::EnvironmentName;
-    using DataGlobals::DoingSizing;
-    using DataGlobals::WarmupFlag;
-    using General::CreateSysTimeIntervalString;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string cEnvHeader;
-
-    if (WarmupFlag) {
-        if (!DoingSizing) {
-            cEnvHeader = " During Warmup, Environment=";
+        {
+            IOFlags flags;
+            ObjexxFCL::gio::inquire(FileName, flags);
+            exists = flags.exists();
+            opened = flags.open();
+            ios = flags.ios();
+        }
+        if (!opened) {
+            UnitNumber = GetNewUnitNumber();
+            {
+                IOFlags flags;
+                flags.POSITION("APPEND");
+                ObjexxFCL::gio::open(UnitNumber, FileName, flags);
+                ios = flags.ios();
+            }
+            if (ios != 0) {
+                DisplayString("FindUnitNumber: Could not open file \"" + FileName + "\" for append.");
+            }
         } else {
-            cEnvHeader = " During Warmup & Sizing, Environment=";
-        }
-    } else {
-        if (!DoingSizing) {
-            cEnvHeader = " Environment=";
-        } else {
-            cEnvHeader = " During Sizing, Environment=";
-        }
-    }
-
-    if (len(Message) < 50) {
-        ShowErrorMessage(" **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                             CreateSysTimeIntervalString(),
-                         OutUnit1,
-                         OutUnit2);
-        if (sqlite) {
-            sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                            CreateSysTimeIntervalString());
-        }
-    } else {
-        ShowErrorMessage(" **   ~~~   ** " + Message);
-        ShowErrorMessage(" **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(),
-                         OutUnit1,
-                         OutUnit2);
-        if (sqlite) {
-            sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                            CreateSysTimeIntervalString());
-        }
-    }
-}
-
-void ShowMessage(std::string const &Message, Optional_int OutUnit1, Optional_int OutUnit2)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine displays a simple message on designated output files.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls ShowErrorMessage utility routine.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    // na
-
-    if (Message.empty()) {
-        ShowErrorMessage(" *************", OutUnit1, OutUnit2);
-    } else {
-        ShowErrorMessage(" ************* " + Message, OutUnit1, OutUnit2);
-        if (sqlite) {
-            sqlite->createSQLiteErrorRecord(1, -1, Message, 0);
-        }
-    }
-}
-
-void ShowWarningError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine puts ErrorMessage with a Warning designation on
-    // designated output files.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls ShowErrorMessage utility routine.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataStringGlobals;
-    using namespace DataErrorTracking;
-    using DataGlobals::DoingSizing;
-    using DataGlobals::KickOffSimulation;
-    using DataGlobals::WarmupFlag;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Loop;
-
-    for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
-    }
-
-    ++TotalWarningErrors;
-    if (WarmupFlag && !DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalWarningErrorsDuringWarmup;
-    if (DoingSizing) ++TotalWarningErrorsDuringSizing;
-    ShowErrorMessage(" ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
-
-    if (sqlite) {
-        sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 1);
-    }
-}
-
-void ShowWarningMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 2009
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine puts ErrorMessage with a Warning designation on
-    // designated output files.
-    // But does not bump the error count so can be used in conjunction with recurring
-    // error calls.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls ShowErrorMessage utility routine.
-
-    // Using/Aliasing
-    using namespace DataStringGlobals;
-    using namespace DataErrorTracking;
-
-    for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
-    }
-
-    ShowErrorMessage(" ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
-    if (sqlite) {
-        sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 0);
-    }
-}
-
-void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
-                                   int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
-                                   Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
-                                   Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
-                                   Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
-                                   std::string const &ReportMaxUnits,  // optional char string (<=15 length) of units for max value
-                                   std::string const &ReportMinUnits,  // optional char string (<=15 length) of units for min value
-                                   std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Michael J. Witte
-    //       DATE WRITTEN   August 2004
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine stores a recurring ErrorMessage with a Severe designation
-    // for output at the end of the simulation with automatic tracking of number
-    // of occurrences and optional tracking of associated min, max, and sum values
-
-    // METHODOLOGY EMPLOYED:
-    // Calls StoreRecurringErrorMessage utility routine.
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using namespace DataStringGlobals;
-    using namespace DataErrorTracking;
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    //  Use for recurring "severe" error messages shown once at end of simulation
-    //  with count of occurrences and optional max, min, sum
-
-    for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(Message, MessageSearch(Loop))) {
-            ++MatchCounts(Loop);
-            break;
-        }
-    }
-    bool bNewMessageFound = true;
-    for (int Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
-        if (UtilityRoutines::SameString(RecurringErrors(Loop).Message, " ** Severe  ** " + Message)) {
-            bNewMessageFound = false;
-            MsgIndex = Loop;
-            break;
-        }
-    }
-    if (bNewMessageFound) {
-        MsgIndex = 0;
-    }
-
-    ++TotalSevereErrors;
-    StoreRecurringErrorMessage(
-        " ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
-}
-
-void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
-                                    int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
-                                    Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
-                                    Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
-                                    Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
-                                    std::string const &ReportMaxUnits,  // optional char string (<=15 length) of units for max value
-                                    std::string const &ReportMinUnits,  // optional char string (<=15 length) of units for min value
-                                    std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Michael J. Witte
-    //       DATE WRITTEN   August 2004
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine stores a recurring ErrorMessage with a Warning designation
-    // for output at the end of the simulation with automatic tracking of number
-    // of occurrences and optional tracking of associated min, max, and sum values
-
-    // METHODOLOGY EMPLOYED:
-    // Calls StoreRecurringErrorMessage utility routine.
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using namespace DataStringGlobals;
-    using namespace DataErrorTracking;
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    //  Use for recurring "warning" error messages shown once at end of simulation
-    //  with count of occurrences and optional max, min, sum
-
-    for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(Message, MessageSearch(Loop))) {
-            ++MatchCounts(Loop);
-            break;
-        }
-    }
-    bool bNewMessageFound = true;
-    for (int Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
-        if (UtilityRoutines::SameString(RecurringErrors(Loop).Message, " ** Warning ** " + Message)) {
-            bNewMessageFound = false;
-            MsgIndex = Loop;
-            break;
-        }
-    }
-    if (bNewMessageFound) {
-        MsgIndex = 0;
-    }
-
-    ++TotalWarningErrors;
-    StoreRecurringErrorMessage(
-        " ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
-}
-
-void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
-                                     int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
-                                     Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
-                                     Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
-                                     Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
-                                     std::string const &ReportMaxUnits,  // optional char string (<=15 length) of units for max value
-                                     std::string const &ReportMinUnits,  // optional char string (<=15 length) of units for min value
-                                     std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Michael J. Witte
-    //       DATE WRITTEN   August 2004
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine stores a recurring ErrorMessage with a continue designation
-    // for output at the end of the simulation with automatic tracking of number
-    // of occurrences and optional tracking of associated min, max, and sum values
-
-    // METHODOLOGY EMPLOYED:
-    // Calls StoreRecurringErrorMessage utility routine.
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using namespace DataStringGlobals;
-    using namespace DataErrorTracking;
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    //  Use for recurring "continue" error messages shown once at end of simulation
-    //  with count of occurrences and optional max, min, sum
-
-    for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(Message, MessageSearch(Loop))) {
-            ++MatchCounts(Loop);
-            break;
-        }
-    }
-    bool bNewMessageFound = true;
-    for (int Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
-        if (UtilityRoutines::SameString(RecurringErrors(Loop).Message, " **   ~~~   ** " + Message)) {
-            bNewMessageFound = false;
-            MsgIndex = Loop;
-            break;
-        }
-    }
-    if (bNewMessageFound) {
-        MsgIndex = 0;
-    }
-
-    StoreRecurringErrorMessage(
-        " **   ~~~   ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
-}
-
-void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Message automatically written to "error file" at end of simulation
-                                int &ErrorMsgIndex,                      // Recurring message index, if zero, next available index is assigned
-                                Optional<Real64 const> ErrorReportMaxOf, // Track and report the max of the values passed to this argument
-                                Optional<Real64 const> ErrorReportMinOf, // Track and report the min of the values passed to this argument
-                                Optional<Real64 const> ErrorReportSumOf, // Track and report the sum of the values passed to this argument
-                                std::string const &ErrorReportMaxUnits,  // Units for "max" reporting
-                                std::string const &ErrorReportMinUnits,  // Units for "min" reporting
-                                std::string const &ErrorReportSumUnits   // Units for "sum" reporting
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Michael J. Witte
-    //       DATE WRITTEN   August 2004
-    //       MODIFIED       September 2005;LKL;Added Units
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine stores a recurring ErrorMessage with
-    // for output at the end of the simulation with automatic tracking of number
-    // of occurrences and optional tracking of associated min, max, and sum values
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using namespace DataStringGlobals;
-    using namespace DataErrorTracking;
-    using DataGlobals::DoingSizing;
-    using DataGlobals::WarmupFlag;
-
-    // If Index is zero, then assign next available index and reallocate array
-    if (ErrorMsgIndex == 0) {
-        RecurringErrors.redimension(++NumRecurringErrors);
-        ErrorMsgIndex = NumRecurringErrors;
-        // The message string only needs to be stored once when a new recurring message is created
-        RecurringErrors(ErrorMsgIndex).Message = ErrorMessage;
-        RecurringErrors(ErrorMsgIndex).Count = 1;
-        if (WarmupFlag) RecurringErrors(ErrorMsgIndex).WarmupCount = 1;
-        if (DoingSizing) RecurringErrors(ErrorMsgIndex).SizingCount = 1;
-
-        // For max, min, and sum values, store the current value when a new recurring message is created
-        if (present(ErrorReportMaxOf)) {
-            RecurringErrors(ErrorMsgIndex).MaxValue = ErrorReportMaxOf;
-            RecurringErrors(ErrorMsgIndex).ReportMax = true;
-            if (!ErrorReportMaxUnits.empty()) {
-                RecurringErrors(ErrorMsgIndex).MaxUnits = ErrorReportMaxUnits;
-            }
-        }
-        if (present(ErrorReportMinOf)) {
-            RecurringErrors(ErrorMsgIndex).MinValue = ErrorReportMinOf;
-            RecurringErrors(ErrorMsgIndex).ReportMin = true;
-            if (!ErrorReportMinUnits.empty()) {
-                RecurringErrors(ErrorMsgIndex).MinUnits = ErrorReportMinUnits;
-            }
-        }
-        if (present(ErrorReportSumOf)) {
-            RecurringErrors(ErrorMsgIndex).SumValue = ErrorReportSumOf;
-            RecurringErrors(ErrorMsgIndex).ReportSum = true;
-            if (!ErrorReportSumUnits.empty()) {
-                RecurringErrors(ErrorMsgIndex).SumUnits = ErrorReportSumUnits;
-            }
-        }
-
-    } else if (ErrorMsgIndex > 0) {
-        // Do stats and store
-        ++RecurringErrors(ErrorMsgIndex).Count;
-        if (WarmupFlag) ++RecurringErrors(ErrorMsgIndex).WarmupCount;
-        if (DoingSizing) ++RecurringErrors(ErrorMsgIndex).SizingCount;
-
-        if (present(ErrorReportMaxOf)) {
-            RecurringErrors(ErrorMsgIndex).MaxValue = max(ErrorReportMaxOf, RecurringErrors(ErrorMsgIndex).MaxValue);
-            RecurringErrors(ErrorMsgIndex).ReportMax = true;
-        }
-        if (present(ErrorReportMinOf)) {
-            RecurringErrors(ErrorMsgIndex).MinValue = min(ErrorReportMinOf, RecurringErrors(ErrorMsgIndex).MinValue);
-            RecurringErrors(ErrorMsgIndex).ReportMin = true;
-        }
-        if (present(ErrorReportSumOf)) {
-            RecurringErrors(ErrorMsgIndex).SumValue += ErrorReportSumOf;
-            RecurringErrors(ErrorMsgIndex).ReportSum = true;
-        }
-    } else {
-        // If ErrorMsgIndex < 0, then do nothing
-    }
-}
-
-void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   December 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine displays the error messages on the indicated
-    // file unit numbers, in addition to the "standard error output"
-    // unit.
-
-    // METHODOLOGY EMPLOYED:
-    // If arguments OutUnit1 and/or OutUnit2 are present the
-    // error message is written to these as well and the standard one.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using DataGlobals::CacheIPErrorFile;
-    using DataGlobals::DoingInputProcessing;
-    using DataGlobals::err_stream;
-    using DataStringGlobals::IDDVerString;
-    using DataStringGlobals::VerString;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static ObjexxFCL::gio::Fmt ErrorFormat("(2X,A)");
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    if (UtilityRoutines::outputErrorHeader && err_stream) {
-        *err_stream << "Program Version," + VerString + ',' + IDDVerString + DataStringGlobals::NL;
-        UtilityRoutines::outputErrorHeader = false;
-    }
-
-    if (!DoingInputProcessing) {
-        if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
-    } else {
-        ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
-    }
-    if (present(OutUnit1)) {
-        ObjexxFCL::gio::write(OutUnit1, ErrorFormat) << ErrorMessage;
-    }
-    if (present(OutUnit2)) {
-        ObjexxFCL::gio::write(OutUnit2, ErrorFormat) << ErrorMessage;
-    }
-    std::string tmp = "  " + ErrorMessage + DataStringGlobals::NL;
-    if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
-}
-
-void SummarizeErrors()
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   March 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine provides a summary of certain errors that might
-    // otherwise get lost in the shuffle of many similar messages.
-
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataErrorTracking;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string::size_type StartC;
-    std::string::size_type EndC;
-
-    if (any_gt(MatchCounts, 0)) {
-        ShowMessage("");
-        ShowMessage("===== Final Error Summary =====");
-        ShowMessage("The following error categories occurred.  Consider correcting or noting.");
-        for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (MatchCounts(Loop) > 0) {
-                ShowMessage(Summaries(Loop));
-                if (MoreDetails(Loop) != "") {
-                    StartC = 0;
-                    EndC = len(MoreDetails(Loop)) - 1;
-                    while (EndC != std::string::npos) {
-                        EndC = index(MoreDetails(Loop).substr(StartC), "<CR");
-                        ShowMessage(".." + MoreDetails(Loop).substr(StartC, EndC));
-                        if (MoreDetails(Loop).substr(StartC + EndC, 5) == "<CRE>") break;
-                        StartC += EndC + 4;
-                        EndC = len(MoreDetails(Loop).substr(StartC)) - 1;
-                    }
+            std::string::size_type const FileNameLength = len(FileName);
+            std::string::size_type TestFileLength;
+            std::string::size_type Pos; // Position pointer
+            for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
+                // Skip preassigned units - ObjexxFCL::gio::inquire breaks std::cout on Windows - these units are assigned in objexx\GlobalStreams
+                // constructor
+                if ((UnitNumber == 0) || (UnitNumber == 5) || (UnitNumber == 6) || (UnitNumber == 100) || (UnitNumber == 101) ||
+                    (UnitNumber == 102)) {
+                    continue;
+                }
+                {
+                    IOFlags flags;
+                    ObjexxFCL::gio::inquire(UnitNumber, flags);
+                    TestFileName = flags.name();
+                    opened = flags.open();
+                }
+                //  Powerstation returns just file name
+                //  DVF (Digital Fortran) returns whole path
+                TestFileLength = len(TestFileName);
+                Pos = index(TestFileName, FileName);
+                if (Pos != std::string::npos) {
+                    //  Must be the last part of the file
+                    if (Pos + FileNameLength == TestFileLength) break;
                 }
             }
         }
-        ShowMessage("");
+
+        return UnitNumber;
     }
-}
 
-void ShowRecurringErrors()
-{
+    void ConvertCaseToUpper(std::string const &InputString, // Input string
+                            std::string &OutputString       // Output string (in UpperCase)
+    )
+    {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   March 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine provides a summary of certain errors that might
-    // otherwise get lost in the shuffle of many similar messages.
+        // PURPOSE OF THIS SUBROUTINE:
+        // Convert a string to upper case
 
-    // METHODOLOGY EMPLOYED:
-    // na
+        // METHODOLOGY EMPLOYED:
+        // This routine is not dependant upon the ASCII
+        // code.  It works by storing the upper and lower case alphabet.  It
+        // scans the whole input string.  If it finds a character in the lower
+        // case alphabet, it makes an appropriate substitution.
 
-    // REFERENCES:
-    // na
+        // REFERENCES:
+        // na
 
-    // Using/Aliasing
-    using namespace DataErrorTracking;
-    using General::RoundSigDigits;
-    using General::strip_trailing_zeros;
+        // Using/Aliasing
+        using namespace DataStringGlobals;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const StatMessageStart(" **   ~~~   ** ");
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
 
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
 
-    // DERIVED TYPE DEFINITIONS
-    // na
+        // DERIVED TYPE DEFINITIONS
+        // na
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Loop;
-    std::string StatMessage;
-    std::string MaxOut;
-    std::string MinOut;
-    std::string SumOut;
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    if (NumRecurringErrors > 0) {
-        ShowMessage("");
-        ShowMessage("===== Recurring Error Summary =====");
-        ShowMessage("The following recurring error messages occurred.");
-        for (Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
-            auto const &error(RecurringErrors(Loop));
-            // Suppress reporting the count if it is a continue error
-            if (has_prefix(error.Message, " **   ~~~   ** ")) {
-                ShowMessage(error.Message);
-                if (sqlite) {
-                    sqlite->updateSQLiteErrorRecord(error.Message);
-                }
+        OutputString = InputString;
+
+        for (std::string::size_type A = 0; A < len(InputString); ++A) {
+            std::string::size_type const B = index(LowerCase, InputString[A]);
+            if (B != std::string::npos) {
+                OutputString[A] = UpperCase[B];
+            }
+        }
+    }
+
+    void ConvertCaseToLower(std::string const &InputString, // Input string
+                            std::string &OutputString       // Output string (in LowerCase)
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Convert a string to lower case
+
+        // METHODOLOGY EMPLOYED:
+        // This routine is not dependant upon the ASCII
+        // code.  It works by storing the upper and lower case alphabet.  It
+        // scans the whole input string.  If it finds a character in the lower
+        // case alphabet, it makes an appropriate substitution.
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using namespace DataStringGlobals;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        OutputString = InputString;
+
+        for (std::string::size_type A = 0; A < len(InputString); ++A) {
+            std::string::size_type const B = index(UpperCase, InputString[A]);
+            if (B != std::string::npos) {
+                OutputString[A] = LowerCase[B];
+            }
+        }
+    }
+
+    std::string::size_type FindNonSpace(std::string const &String) // String to be scanned
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function finds the first non-space character in the passed string
+        // and returns that position as the result to the calling program.
+
+        // METHODOLOGY EMPLOYED:
+        // Scan string for character not equal to blank.
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+        // na
+
+        // Return value
+
+        // Locals
+        // FUNCTION ARGUMENT DEFINITIONS:
+
+        // FUNCTION PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+        return String.find_first_not_of(' ');
+    }
+
+    bool env_var_on(std::string const &env_var_str)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Stuart G. Mentzer
+        //       DATE WRITTEN   April 2014
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Test if a boolean environment variable value is "on" (has value starting with Y or T)
+
+        return ((!env_var_str.empty()) && is_any_of(env_var_str[0], "YyTt"));
+    }
+
+    void ShowFatalError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       Kyle Benne
+        //                      August 2010
+        //                      Added sqlite output
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine puts ErrorMessage with a Fatal designation on
+        // designated output files.  Then, the program is aborted.
+
+        // METHODOLOGY EMPLOYED:
+        // Calls ShowErrorMessage utility routine.
+        // Calls AbortEnergyPlus
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using namespace DataErrorTracking;
+        using General::RoundSigDigits;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+        ShowErrorMessage(" **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2);
+        DisplayString("**FATAL:" + ErrorMessage);
+
+        ShowErrorMessage(" ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2);
+        ShowErrorMessage(" ..... Reference severe error count=" + RoundSigDigits(TotalSevereErrors), OutUnit1, OutUnit2);
+        ShowErrorMessage(" ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2);
+        if (sqlite) {
+            sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
+            if (sqlite->sqliteWithinTransaction()) sqlite->sqliteCommit();
+        }
+        throw FatalError(ErrorMessage);
+    }
+
+    void ShowSevereError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine puts ErrorMessage with a Severe designation on
+        // designated output files.
+
+        // METHODOLOGY EMPLOYED:
+        // Calls ShowErrorMessage utility routine.
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using namespace DataStringGlobals;
+        using namespace DataErrorTracking;
+        using DataGlobals::DoingSizing;
+        using DataGlobals::KickOffSimulation;
+        using DataGlobals::WarmupFlag;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int Loop;
+
+        for (Loop = 1; Loop <= SearchCounts; ++Loop) {
+            if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
+        }
+
+        ++TotalSevereErrors;
+        if (WarmupFlag && !DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalSevereErrorsDuringWarmup;
+        if (DoingSizing) ++TotalSevereErrorsDuringSizing;
+        ShowErrorMessage(" ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
+        LastSevereError = ErrorMessage;
+
+        //  Could set a variable here that gets checked at some point?
+
+        if (sqlite) {
+            sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 1);
+        }
+    }
+
+    void ShowSevereMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 2009
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine puts ErrorMessage with a Severe designation on
+        // designated output files.
+        // But does not bump the error count so can be used in conjunction with recurring
+        // error calls.
+
+        // METHODOLOGY EMPLOYED:
+        // Calls ShowErrorMessage utility routine.
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using namespace DataStringGlobals;
+        using namespace DataErrorTracking;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int Loop;
+
+        for (Loop = 1; Loop <= SearchCounts; ++Loop) {
+            if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
+        }
+
+        ShowErrorMessage(" ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
+        LastSevereError = ErrorMessage;
+
+        //  Could set a variable here that gets checked at some point?
+
+        if (sqlite) {
+            sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 0);
+        }
+    }
+
+    void ShowContinueError(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   October 2001
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine displays a 'continued error' message on designated output files.
+
+        // METHODOLOGY EMPLOYED:
+        // Calls ShowErrorMessage utility routine.
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        // na
+
+        ShowErrorMessage(" **   ~~~   ** " + Message, OutUnit1, OutUnit2);
+        if (sqlite) {
+            sqlite->updateSQLiteErrorRecord(Message);
+        }
+    }
+
+    void ShowContinueErrorTimeStamp(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   February 2004
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine displays a 'continued error' timestamp message on designated output files.
+
+        // METHODOLOGY EMPLOYED:
+        // Calls ShowErrorMessage utility routine.
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using DataEnvironment::CurMnDy;
+        using DataEnvironment::EnvironmentName;
+        using DataGlobals::DoingSizing;
+        using DataGlobals::WarmupFlag;
+        using General::CreateSysTimeIntervalString;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        std::string cEnvHeader;
+
+        if (WarmupFlag) {
+            if (!DoingSizing) {
+                cEnvHeader = " During Warmup, Environment=";
             } else {
-                ShowMessage("");
-                ShowMessage(error.Message);
-                ShowMessage(StatMessageStart + "  This error occurred " + RoundSigDigits(error.Count) + " total times;");
-                ShowMessage(StatMessageStart + "  during Warmup " + RoundSigDigits(error.WarmupCount) + " times;");
-                ShowMessage(StatMessageStart + "  during Sizing " + RoundSigDigits(error.SizingCount) + " times.");
-                if (sqlite) {
-                    if (has_prefix(error.Message, " ** Warning ** ")) {
-                        sqlite->createSQLiteErrorRecord(1, 0, error.Message.substr(15), error.Count);
-                    } else if (has_prefix(error.Message, " ** Severe  ** ")) {
-                        sqlite->createSQLiteErrorRecord(1, 1, error.Message.substr(15), error.Count);
+                cEnvHeader = " During Warmup & Sizing, Environment=";
+            }
+        } else {
+            if (!DoingSizing) {
+                cEnvHeader = " Environment=";
+            } else {
+                cEnvHeader = " During Sizing, Environment=";
+            }
+        }
+
+        if (len(Message) < 50) {
+            ShowErrorMessage(" **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+                                 CreateSysTimeIntervalString(),
+                             OutUnit1,
+                             OutUnit2);
+            if (sqlite) {
+                sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+                                                CreateSysTimeIntervalString());
+            }
+        } else {
+            ShowErrorMessage(" **   ~~~   ** " + Message);
+            ShowErrorMessage(" **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+                                 CreateSysTimeIntervalString(),
+                             OutUnit1,
+                             OutUnit2);
+            if (sqlite) {
+                sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+                                                CreateSysTimeIntervalString());
+            }
+        }
+    }
+
+    void ShowMessage(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine displays a simple message on designated output files.
+
+        // METHODOLOGY EMPLOYED:
+        // Calls ShowErrorMessage utility routine.
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        // na
+
+        if (Message.empty()) {
+            ShowErrorMessage(" *************", OutUnit1, OutUnit2);
+        } else {
+            ShowErrorMessage(" ************* " + Message, OutUnit1, OutUnit2);
+            if (sqlite) {
+                sqlite->createSQLiteErrorRecord(1, -1, Message, 0);
+            }
+        }
+    }
+
+    void ShowWarningError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine puts ErrorMessage with a Warning designation on
+        // designated output files.
+
+        // METHODOLOGY EMPLOYED:
+        // Calls ShowErrorMessage utility routine.
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using namespace DataStringGlobals;
+        using namespace DataErrorTracking;
+        using DataGlobals::DoingSizing;
+        using DataGlobals::KickOffSimulation;
+        using DataGlobals::WarmupFlag;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int Loop;
+
+        for (Loop = 1; Loop <= SearchCounts; ++Loop) {
+            if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
+        }
+
+        ++TotalWarningErrors;
+        if (WarmupFlag && !DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalWarningErrorsDuringWarmup;
+        if (DoingSizing) ++TotalWarningErrorsDuringSizing;
+        ShowErrorMessage(" ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
+
+        if (sqlite) {
+            sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 1);
+        }
+    }
+
+    void ShowWarningMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 2009
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine puts ErrorMessage with a Warning designation on
+        // designated output files.
+        // But does not bump the error count so can be used in conjunction with recurring
+        // error calls.
+
+        // METHODOLOGY EMPLOYED:
+        // Calls ShowErrorMessage utility routine.
+
+        // Using/Aliasing
+        using namespace DataStringGlobals;
+        using namespace DataErrorTracking;
+
+        for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
+            if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
+        }
+
+        ShowErrorMessage(" ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
+        if (sqlite) {
+            sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 0);
+        }
+    }
+
+    void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
+                                       int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
+                                       Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
+                                       Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
+                                       Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
+                                       std::string const &ReportMaxUnits,  // optional char string (<=15 length) of units for max value
+                                       std::string const &ReportMinUnits,  // optional char string (<=15 length) of units for min value
+                                       std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Michael J. Witte
+        //       DATE WRITTEN   August 2004
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine stores a recurring ErrorMessage with a Severe designation
+        // for output at the end of the simulation with automatic tracking of number
+        // of occurrences and optional tracking of associated min, max, and sum values
+
+        // METHODOLOGY EMPLOYED:
+        // Calls StoreRecurringErrorMessage utility routine.
+
+        // Using/Aliasing
+        using namespace DataPrecisionGlobals;
+        using namespace DataStringGlobals;
+        using namespace DataErrorTracking;
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        //  Use for recurring "severe" error messages shown once at end of simulation
+        //  with count of occurrences and optional max, min, sum
+
+        for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
+            if (has(Message, MessageSearch(Loop))) {
+                ++MatchCounts(Loop);
+                break;
+            }
+        }
+        bool bNewMessageFound = true;
+        for (int Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
+            if (UtilityRoutines::SameString(RecurringErrors(Loop).Message, " ** Severe  ** " + Message)) {
+                bNewMessageFound = false;
+                MsgIndex = Loop;
+                break;
+            }
+        }
+        if (bNewMessageFound) {
+            MsgIndex = 0;
+        }
+
+        ++TotalSevereErrors;
+        StoreRecurringErrorMessage(
+            " ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
+    }
+
+    void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
+                                        int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
+                                        Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
+                                        Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
+                                        Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
+                                        std::string const &ReportMaxUnits,  // optional char string (<=15 length) of units for max value
+                                        std::string const &ReportMinUnits,  // optional char string (<=15 length) of units for min value
+                                        std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Michael J. Witte
+        //       DATE WRITTEN   August 2004
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine stores a recurring ErrorMessage with a Warning designation
+        // for output at the end of the simulation with automatic tracking of number
+        // of occurrences and optional tracking of associated min, max, and sum values
+
+        // METHODOLOGY EMPLOYED:
+        // Calls StoreRecurringErrorMessage utility routine.
+
+        // Using/Aliasing
+        using namespace DataPrecisionGlobals;
+        using namespace DataStringGlobals;
+        using namespace DataErrorTracking;
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        //  Use for recurring "warning" error messages shown once at end of simulation
+        //  with count of occurrences and optional max, min, sum
+
+        for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
+            if (has(Message, MessageSearch(Loop))) {
+                ++MatchCounts(Loop);
+                break;
+            }
+        }
+        bool bNewMessageFound = true;
+        for (int Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
+            if (UtilityRoutines::SameString(RecurringErrors(Loop).Message, " ** Warning ** " + Message)) {
+                bNewMessageFound = false;
+                MsgIndex = Loop;
+                break;
+            }
+        }
+        if (bNewMessageFound) {
+            MsgIndex = 0;
+        }
+
+        ++TotalWarningErrors;
+        StoreRecurringErrorMessage(
+            " ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
+    }
+
+    void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
+                                         int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
+                                         Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
+                                         Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
+                                         Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
+                                         std::string const &ReportMaxUnits,  // optional char string (<=15 length) of units for max value
+                                         std::string const &ReportMinUnits,  // optional char string (<=15 length) of units for min value
+                                         std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Michael J. Witte
+        //       DATE WRITTEN   August 2004
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine stores a recurring ErrorMessage with a continue designation
+        // for output at the end of the simulation with automatic tracking of number
+        // of occurrences and optional tracking of associated min, max, and sum values
+
+        // METHODOLOGY EMPLOYED:
+        // Calls StoreRecurringErrorMessage utility routine.
+
+        // Using/Aliasing
+        using namespace DataPrecisionGlobals;
+        using namespace DataStringGlobals;
+        using namespace DataErrorTracking;
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        //  Use for recurring "continue" error messages shown once at end of simulation
+        //  with count of occurrences and optional max, min, sum
+
+        for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
+            if (has(Message, MessageSearch(Loop))) {
+                ++MatchCounts(Loop);
+                break;
+            }
+        }
+        bool bNewMessageFound = true;
+        for (int Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
+            if (UtilityRoutines::SameString(RecurringErrors(Loop).Message, " **   ~~~   ** " + Message)) {
+                bNewMessageFound = false;
+                MsgIndex = Loop;
+                break;
+            }
+        }
+        if (bNewMessageFound) {
+            MsgIndex = 0;
+        }
+
+        StoreRecurringErrorMessage(
+            " **   ~~~   ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
+    }
+
+    void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Message automatically written to "error file" at end of simulation
+                                    int &ErrorMsgIndex,                      // Recurring message index, if zero, next available index is assigned
+                                    Optional<Real64 const> ErrorReportMaxOf, // Track and report the max of the values passed to this argument
+                                    Optional<Real64 const> ErrorReportMinOf, // Track and report the min of the values passed to this argument
+                                    Optional<Real64 const> ErrorReportSumOf, // Track and report the sum of the values passed to this argument
+                                    std::string const &ErrorReportMaxUnits,  // Units for "max" reporting
+                                    std::string const &ErrorReportMinUnits,  // Units for "min" reporting
+                                    std::string const &ErrorReportSumUnits   // Units for "sum" reporting
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Michael J. Witte
+        //       DATE WRITTEN   August 2004
+        //       MODIFIED       September 2005;LKL;Added Units
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine stores a recurring ErrorMessage with
+        // for output at the end of the simulation with automatic tracking of number
+        // of occurrences and optional tracking of associated min, max, and sum values
+
+        // Using/Aliasing
+        using namespace DataPrecisionGlobals;
+        using namespace DataStringGlobals;
+        using namespace DataErrorTracking;
+        using DataGlobals::DoingSizing;
+        using DataGlobals::WarmupFlag;
+
+        // If Index is zero, then assign next available index and reallocate array
+        if (ErrorMsgIndex == 0) {
+            RecurringErrors.redimension(++NumRecurringErrors);
+            ErrorMsgIndex = NumRecurringErrors;
+            // The message string only needs to be stored once when a new recurring message is created
+            RecurringErrors(ErrorMsgIndex).Message = ErrorMessage;
+            RecurringErrors(ErrorMsgIndex).Count = 1;
+            if (WarmupFlag) RecurringErrors(ErrorMsgIndex).WarmupCount = 1;
+            if (DoingSizing) RecurringErrors(ErrorMsgIndex).SizingCount = 1;
+
+            // For max, min, and sum values, store the current value when a new recurring message is created
+            if (present(ErrorReportMaxOf)) {
+                RecurringErrors(ErrorMsgIndex).MaxValue = ErrorReportMaxOf;
+                RecurringErrors(ErrorMsgIndex).ReportMax = true;
+                if (!ErrorReportMaxUnits.empty()) {
+                    RecurringErrors(ErrorMsgIndex).MaxUnits = ErrorReportMaxUnits;
+                }
+            }
+            if (present(ErrorReportMinOf)) {
+                RecurringErrors(ErrorMsgIndex).MinValue = ErrorReportMinOf;
+                RecurringErrors(ErrorMsgIndex).ReportMin = true;
+                if (!ErrorReportMinUnits.empty()) {
+                    RecurringErrors(ErrorMsgIndex).MinUnits = ErrorReportMinUnits;
+                }
+            }
+            if (present(ErrorReportSumOf)) {
+                RecurringErrors(ErrorMsgIndex).SumValue = ErrorReportSumOf;
+                RecurringErrors(ErrorMsgIndex).ReportSum = true;
+                if (!ErrorReportSumUnits.empty()) {
+                    RecurringErrors(ErrorMsgIndex).SumUnits = ErrorReportSumUnits;
+                }
+            }
+
+        } else if (ErrorMsgIndex > 0) {
+            // Do stats and store
+            ++RecurringErrors(ErrorMsgIndex).Count;
+            if (WarmupFlag) ++RecurringErrors(ErrorMsgIndex).WarmupCount;
+            if (DoingSizing) ++RecurringErrors(ErrorMsgIndex).SizingCount;
+
+            if (present(ErrorReportMaxOf)) {
+                RecurringErrors(ErrorMsgIndex).MaxValue = max(ErrorReportMaxOf, RecurringErrors(ErrorMsgIndex).MaxValue);
+                RecurringErrors(ErrorMsgIndex).ReportMax = true;
+            }
+            if (present(ErrorReportMinOf)) {
+                RecurringErrors(ErrorMsgIndex).MinValue = min(ErrorReportMinOf, RecurringErrors(ErrorMsgIndex).MinValue);
+                RecurringErrors(ErrorMsgIndex).ReportMin = true;
+            }
+            if (present(ErrorReportSumOf)) {
+                RecurringErrors(ErrorMsgIndex).SumValue += ErrorReportSumOf;
+                RecurringErrors(ErrorMsgIndex).ReportSum = true;
+            }
+        } else {
+            // If ErrorMsgIndex < 0, then do nothing
+        }
+    }
+
+    void ShowErrorMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   December 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine displays the error messages on the indicated
+        // file unit numbers, in addition to the "standard error output"
+        // unit.
+
+        // METHODOLOGY EMPLOYED:
+        // If arguments OutUnit1 and/or OutUnit2 are present the
+        // error message is written to these as well and the standard one.
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using DataGlobals::CacheIPErrorFile;
+        using DataGlobals::DoingInputProcessing;
+        using DataGlobals::err_stream;
+        using DataStringGlobals::IDDVerString;
+        using DataStringGlobals::VerString;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+        if (UtilityRoutines::outputErrorHeader && err_stream) {
+            *err_stream << "Program Version," + VerString + ',' + IDDVerString + DataStringGlobals::NL;
+            UtilityRoutines::outputErrorHeader = false;
+        }
+
+        if (!DoingInputProcessing) {
+            if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
+        } else {
+            ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
+        }
+        if (present(OutUnit1)) {
+            print(OutUnit1(), "  {}", ErrorMessage);
+        }
+        if (present(OutUnit2)) {
+            print(OutUnit2(), "  {}", ErrorMessage);
+        }
+        std::string tmp = "  " + ErrorMessage + DataStringGlobals::NL;
+        if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
+    }
+
+    void SummarizeErrors()
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   March 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine provides a summary of certain errors that might
+        // otherwise get lost in the shuffle of many similar messages.
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using namespace DataErrorTracking;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // na
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        std::string::size_type StartC;
+        std::string::size_type EndC;
+
+        if (any_gt(MatchCounts, 0)) {
+            ShowMessage("");
+            ShowMessage("===== Final Error Summary =====");
+            ShowMessage("The following error categories occurred.  Consider correcting or noting.");
+            for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
+                if (MatchCounts(Loop) > 0) {
+                    ShowMessage(Summaries(Loop));
+                    if (MoreDetails(Loop) != "") {
+                        StartC = 0;
+                        EndC = len(MoreDetails(Loop)) - 1;
+                        while (EndC != std::string::npos) {
+                            EndC = index(MoreDetails(Loop).substr(StartC), "<CR");
+                            ShowMessage(".." + MoreDetails(Loop).substr(StartC, EndC));
+                            if (MoreDetails(Loop).substr(StartC + EndC, 5) == "<CRE>") break;
+                            StartC += EndC + 4;
+                            EndC = len(MoreDetails(Loop).substr(StartC)) - 1;
+                        }
                     }
                 }
             }
-            StatMessage = "";
-            if (error.ReportMax) {
-                MaxOut = RoundSigDigits(error.MaxValue, 6);
-                strip_trailing_zeros(MaxOut);
-                StatMessage += "  Max=" + MaxOut;
-                if (!error.MaxUnits.empty()) StatMessage += ' ' + error.MaxUnits;
-            }
-            if (error.ReportMin) {
-                MinOut = RoundSigDigits(error.MinValue, 6);
-                strip_trailing_zeros(MinOut);
-                StatMessage += "  Min=" + MinOut;
-                if (!error.MinUnits.empty()) StatMessage += ' ' + error.MinUnits;
-            }
-            if (error.ReportSum) {
-                SumOut = RoundSigDigits(error.SumValue, 6);
-                strip_trailing_zeros(SumOut);
-                StatMessage += "  Sum=" + SumOut;
-                if (!error.SumUnits.empty()) StatMessage += ' ' + error.SumUnits;
-            }
-            if (error.ReportMax || error.ReportMin || error.ReportSum) {
-                ShowMessage(StatMessageStart + StatMessage);
-            }
+            ShowMessage("");
         }
-        ShowMessage("");
     }
-}
 
-} // namespace EnergyPlus
+    void ShowRecurringErrors()
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   March 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine provides a summary of certain errors that might
+        // otherwise get lost in the shuffle of many similar messages.
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using namespace DataErrorTracking;
+        using General::RoundSigDigits;
+        using General::strip_trailing_zeros;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // na
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static std::string const StatMessageStart(" **   ~~~   ** ");
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int Loop;
+        std::string StatMessage;
+        std::string MaxOut;
+        std::string MinOut;
+        std::string SumOut;
+
+        if (NumRecurringErrors > 0) {
+            ShowMessage("");
+            ShowMessage("===== Recurring Error Summary =====");
+            ShowMessage("The following recurring error messages occurred.");
+            for (Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
+                auto const &error(RecurringErrors(Loop));
+                // Suppress reporting the count if it is a continue error
+                if (has_prefix(error.Message, " **   ~~~   ** ")) {
+                    ShowMessage(error.Message);
+                    if (sqlite) {
+                        sqlite->updateSQLiteErrorRecord(error.Message);
+                    }
+                } else {
+                    ShowMessage("");
+                    ShowMessage(error.Message);
+                    ShowMessage(StatMessageStart + "  This error occurred " + RoundSigDigits(error.Count) + " total times;");
+                    ShowMessage(StatMessageStart + "  during Warmup " + RoundSigDigits(error.WarmupCount) + " times;");
+                    ShowMessage(StatMessageStart + "  during Sizing " + RoundSigDigits(error.SizingCount) + " times.");
+                    if (sqlite) {
+                        if (has_prefix(error.Message, " ** Warning ** ")) {
+                            sqlite->createSQLiteErrorRecord(1, 0, error.Message.substr(15), error.Count);
+                        } else if (has_prefix(error.Message, " ** Severe  ** ")) {
+                            sqlite->createSQLiteErrorRecord(1, 1, error.Message.substr(15), error.Count);
+                        }
+                    }
+                }
+                StatMessage = "";
+                if (error.ReportMax) {
+                    MaxOut = RoundSigDigits(error.MaxValue, 6);
+                    strip_trailing_zeros(MaxOut);
+                    StatMessage += "  Max=" + MaxOut;
+                    if (!error.MaxUnits.empty()) StatMessage += ' ' + error.MaxUnits;
+                }
+                if (error.ReportMin) {
+                    MinOut = RoundSigDigits(error.MinValue, 6);
+                    strip_trailing_zeros(MinOut);
+                    StatMessage += "  Min=" + MinOut;
+                    if (!error.MinUnits.empty()) StatMessage += ' ' + error.MinUnits;
+                }
+                if (error.ReportSum) {
+                    SumOut = RoundSigDigits(error.SumValue, 6);
+                    strip_trailing_zeros(SumOut);
+                    StatMessage += "  Sum=" + SumOut;
+                    if (!error.SumUnits.empty()) StatMessage += ' ' + error.SumUnits;
+                }
+                if (error.ReportMax || error.ReportMin || error.ReportSum) {
+                    ShowMessage(StatMessageStart + StatMessage);
+                }
+            }
+            ShowMessage("");
+        }
+    }
+
+} // namespace UtilityRoutines

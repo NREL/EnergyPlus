@@ -119,12 +119,8 @@ namespace DataStringGlobals {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    std::string outputAuditFileName("eplusout.audit");
-    std::string outputBndFileName("eplusout.bnd");
-    std::string outputDxfFileName("eplusout.dxf");
     std::string outputEndFileName("eplusout.end");
     std::string outputErrFileName("eplusout.err");
-    std::string outputEsoFileName("eplusout.eso");
     std::string outputJsonFileName("eplusout.json");
     std::string outputTSHvacJsonFileName("eplusout_detailed_HVAC.json");
     std::string outputTSZoneJsonFileName("eplusout_detailed_zone.json");
@@ -152,7 +148,6 @@ namespace DataStringGlobals {
     std::string outputDYMsgPackFileName("eplusout_daily.msgpack");
     std::string outputHRMsgPackFileName("eplusout_hourly.msgpack");
     std::string outputSMMsgPackFileName("eplusout_runperiod.msgpack");
-    std::string outputMtdFileName("eplusout.mtd");
     std::string outputMddFileName("eplusout.mdd");
     std::string outputRddFileName("eplusout.rdd");
     std::string outputShdFileName("eplusout.shd");
@@ -162,30 +157,18 @@ namespace DataStringGlobals {
     std::string outputTblTxtFileName("eplustbl.txt");
     std::string outputTblXmlFileName("eplustbl.xml");
     std::string outputAdsFileName("eplusADS.out");
-    std::string outputDfsFileName("eplusout.dfs");
     std::string outputGLHEFileName("eplusout.glhe");
-    std::string outputDelightInFileName("eplusout.delightin");
     std::string outputDelightOutFileName("eplusout.delightout");
     std::string outputDelightEldmpFileName("eplusout.delighteldmp");
     std::string outputDelightDfdmpFileName("eplusout.delightdfdmp");
-    std::string outputMapTabFileName("eplusmap.tab");
-    std::string outputMapCsvFileName("eplusmap.csv");
-    std::string outputMapTxtFileName("eplusmap.txt");
-    std::string outputEddFileName("eplusout.edd");
     std::string outputIperrFileName("eplusout.iperr");
-    std::string outputDbgFileName("eplusout.dbg");
     std::string outputPerfLogFileName("eplusout_perflog.csv");
-    std::string outputSlnFileName("eplusout.sln");
-    std::string outputSciFileName("eplusout.sci");
-    std::string outputWrlFileName("eplusout.wrl");
-    std::string outputScreenCsvFileName("eplusscreen.csv");
     std::string outputSqlFileName("eplusout.sql");
     std::string outputSqliteErrFileName("eplussqlite.err");
     std::string TarcogIterationsFileName("TarcogIterations.dbg");
     std::string outputCsvFileName("eplusout.csv");
     std::string outputMtrCsvFileName("eplusmtr.csv");
     std::string outputRvauditFileName("eplusout.rvaudit");
-    std::string outputExtShdFracFileName("eplusshading.csv");
 
     std::string EnergyPlusIniFileName;
     std::string inStatFileName;

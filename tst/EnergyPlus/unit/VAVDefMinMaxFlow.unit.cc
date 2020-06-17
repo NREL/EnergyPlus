@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -246,11 +247,11 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     GetOARequirements();      // get the OA requirements object
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
-    GetZoneEquipmentData1();
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
-    GetSysInput();
+    GetSysInput(state);
     ZoneSizingRunDone = true;
     CurZoneEqNum = 1;
     CurTermUnitSizingNum = 1;
@@ -426,11 +427,11 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     GetOARequirements();      // get the OA requirements object
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
-    GetZoneEquipmentData1();
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
-    GetSysInput();
+    GetSysInput(state);
     ZoneSizingRunDone = true;
     CurZoneEqNum = 1;
     CurTermUnitSizingNum = 1;
@@ -605,11 +606,11 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     GetOARequirements();      // get the OA requirements object
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
-    GetZoneEquipmentData1();
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
-    GetSysInput();
+    GetSysInput(state);
     ZoneSizingRunDone = true;
     CurZoneEqNum = 1;
     CurTermUnitSizingNum = 1;
@@ -786,11 +787,11 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     // GetOARequirements(); // get the OA requirements object
     // GetZoneAirDistribution(); // get zone air distribution objects
     // GetZoneSizingInput();
-    GetZoneEquipmentData1();
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
-    GetSysInput();
+    GetSysInput(state);
     ZoneSizingRunDone = false;
     CurZoneEqNum = 1;
     Zone(1).FloorArea = 96.48;
@@ -936,11 +937,11 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     GetOARequirements();      // get the OA requirements object
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
-    GetZoneEquipmentData1();
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
-    GetSysInput();
+    GetSysInput(state);
     ZoneSizingRunDone = true;
     CurZoneEqNum = 1;
     CurTermUnitSizingNum = 1;

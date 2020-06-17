@@ -52,11 +52,8 @@
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
-#include <EnergyPlus/BoilerSteam.hh>
-#include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
@@ -102,6 +99,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -126,6 +124,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
@@ -214,6 +213,7 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitVentilator.hh>
@@ -222,6 +222,7 @@
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
@@ -238,23 +239,16 @@
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-void EnergyPlus::clearAllStates()
+void EnergyPlus::clearThisState(EnergyPlusData &state)
+{
+    state.clear_state();
+}
+void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
 {
     using namespace EnergyPlus;
     // A to Z order
-    AirflowNetworkBalanceManager::clear_state();
-    BaseboardElectric::clear_state();
-    BaseboardRadiator::clear_state();
-    Boilers::clear_state();
-    BoilerSteam::clear_state();
     BranchInputManager::clear_state();
     CoolingPanelSimple::clear_state();
-    ChillerAbsorption::clear_state();
-    ChillerElectricEIR::clear_state();
-    ChillerExhaustAbsorption::clear_state();
-    ChillerGasAbsorption::clear_state();
-    ChillerIndirectAbsorption::clear_state();
-    ChillerReformulatedEIR::clear_state();
     CoilCoolingDX::clear_state();
     CondenserLoopTowers::clear_state();
     CoolTower::clear_state();
@@ -262,6 +256,7 @@ void EnergyPlus::clearAllStates()
     CTElectricGenerator::clear_state();
     CurveManager::clear_state();
     AirflowNetwork::clear_state();
+    dataAirflowNetworkBalanceManager.clear_state();
     DataAirLoop::clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
@@ -272,7 +267,7 @@ void EnergyPlus::clearAllStates()
     DataEnvironment::clear_state();
     DataErrorTracking::clear_state();
     DataGenerators::clear_state();
-    DataGlobals::clear_state();
+    DataGlobals::clear_state(outputFiles);
     DataHeatBalance::clear_state();
     DataHeatBalFanSys::clear_state();
     DataHeatBalSurface::clear_state();
@@ -293,6 +288,7 @@ void EnergyPlus::clearAllStates()
     DataSystemVariables::clear_state();
     DataUCSDSharedData::clear_state();
     DataViewFactorInformation::clear_state();
+    DataWater::clear_state();
     DataZoneControls::clear_state();
     DataZoneEnergyDemands::clear_state();
     DataZoneEquipment::clear_state();
@@ -308,7 +304,7 @@ void EnergyPlus::clearAllStates()
     EMSManager::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
-    ExteriorEnergyUse::clear_state();
+    //ExteriorEnergyUse::clear_state();
     FanCoilUnits::clear_state();
     Fans::clear_state();
     FaultsManager::clear_state();
@@ -365,7 +361,6 @@ void EnergyPlus::clearAllStates()
     Pipes::clear_state();
     PipeHeatTransfer::clear_state();
     PlantCentralGSHP::clear_state();
-    PlantChillers::clear_state();
     PlantCondLoopOperation::clear_state();
     PlantHeatExchangerFluidToFluid::clear_state();
     PlantLoadProfile::clear_state();
@@ -401,6 +396,7 @@ void EnergyPlus::clearAllStates()
     SurfaceGeometry::clear_state();
     SystemAvailabilityManager::clear_state();
     SwimmingPool::clear_state();
+    ThermalChimney::clear_state();
     ThermalComfort::clear_state();
     UnitarySystems::clear_state();
     UnitHeater::clear_state();
@@ -410,6 +406,7 @@ void EnergyPlus::clearAllStates()
     VariableSpeedCoils::clear_state();
     VentilatedSlab::clear_state();
     WaterCoils::clear_state();
+    WaterManager::clear_state();
     WaterThermalTanks::clear_state();
     WaterToAirHeatPumpSimple::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();

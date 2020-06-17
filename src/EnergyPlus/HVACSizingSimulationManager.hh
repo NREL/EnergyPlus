@@ -67,6 +67,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
@@ -89,7 +90,7 @@ public:
     void DetermineSizingAnalysesNeeded();
     void SetupSizingAnalyses();
 
-    void RedoKickOffAndResize();
+    void RedoKickOffAndResize(EnergyPlusData &state);
     void PostProcessLogs();
     void ProcessCoincidentPlantSizeAdjustments(int const HVACSizingIterCount);
 
@@ -102,7 +103,7 @@ private:
 
 extern std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
-void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound);
+void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound);
 
 } // namespace EnergyPlus
 

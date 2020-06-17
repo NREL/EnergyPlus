@@ -52,8 +52,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
@@ -83,6 +81,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
@@ -152,8 +151,6 @@ namespace HVACManager {
     using DataGlobals::KickOffSimulation;
     using DataGlobals::MetersHaveBeenInitialized;
     using DataGlobals::NumOfZones;
-    using DataGlobals::OutputFileDebug;
-    using DataGlobals::OutputFileStandard;
     using DataGlobals::RunOptCondEntTemp;
     using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
@@ -218,7 +215,7 @@ namespace HVACManager {
         ReportAirHeatBalanceFirstTimeFlag = true;
     }
 
-    void ManageHVAC(OutputFiles &outputFiles)
+    void ManageHVAC(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -301,11 +298,9 @@ namespace HVACManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
         static constexpr auto EndOfHeaderString("End of Data Dictionary");          // End of data dictionary marker
-        static ObjexxFCL::gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
         static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
-        static ObjexxFCL::gio::Fmt fmtLD("*");
+
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -332,18 +327,12 @@ namespace HVACManager {
         bool DummyLogical;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_10(
-            "('node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       ','MassMax        MassSP    Press "
-            "       Enthal     HumRat Fluid Type')");
-        static ObjexxFCL::gio::Fmt Format_11("('node #   Name')");
-        static ObjexxFCL::gio::Fmt Format_20("(1x,I3,1x,F8.2,2(2x,F8.3),2x,F8.2,4(1x,F13.2),2x,F8.0,2x,F11.2,2x,F9.5,2x,A)");
-        static ObjexxFCL::gio::Fmt Format_30("(1x,I3,5x,A)");
 
         // SYSTEM INITIALIZATION
         if (TriggerGetAFN) {
             TriggerGetAFN = false;
             DisplayString("Initializing HVAC");
-            ManageAirflowNetworkBalance(); // first call only gets input and returns.
+            ManageAirflowNetworkBalance(state); // first call only gets input and returns.
         }
 
         ZT = MAT;
@@ -390,19 +379,19 @@ namespace HVACManager {
 
         SetOutAirNodes();
 
-        ManageRefrigeratedCaseRacks();
+        ManageRefrigeratedCaseRacks(state);
 
         // ZONE INITIALIZATION  'Get Zone Setpoints'
-        ManageZoneAirUpdates(iGetZoneSetPoints, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
         if (Contaminant.SimulateContaminants)
             ManageZoneContaminanUpdates(iGetZoneSetPoints, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        ManageHybridVentilation();
+        ManageHybridVentilation(state);
 
-        CalcAirFlowSimple();
+        CalcAirFlowSimple(state);
         if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
             AirflowNetwork::RollBackFlag = false;
-            ManageAirflowNetworkBalance(false);
+            ManageAirflowNetworkBalance(state, false);
         }
 
         SetHeatToReturnAirFlag();
@@ -411,16 +400,16 @@ namespace HVACManager {
 
         UpdateInternalGainValues(true, true);
 
-        ManageZoneAirUpdates(iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        SimHVAC();
+        SimHVAC(state);
 
         if (AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && !WarmupFlag) {
             RunOptCondEntTemp = true;
             while (RunOptCondEntTemp) {
-                SimHVAC();
+                SimHVAC(state);
             }
         }
 
@@ -428,12 +417,12 @@ namespace HVACManager {
 
         // Only simulate once per zone timestep; must be after SimHVAC
         if (FirstTimeStepSysFlag && MetersHaveBeenInitialized) {
-            ManageDemand();
+            ManageDemand(state);
         }
 
         BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
 
-        ManageZoneAirUpdates(iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        ManageZoneAirUpdates(state, iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
         if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         if (ZoneTempChange > MaxZoneTempDiff && !KickOffSimulation) {
@@ -457,25 +446,27 @@ namespace HVACManager {
 
             if (TimeStepSys < TimeStepZone) {
 
-                ManageHybridVentilation();
-                CalcAirFlowSimple(SysTimestepLoop);
+                ManageHybridVentilation(state);
+                CalcAirFlowSimple(state, SysTimestepLoop);
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     AirflowNetwork::RollBackFlag = false;
-                    ManageAirflowNetworkBalance(false);
+                    ManageAirflowNetworkBalance(state, false);
                 }
 
                 UpdateInternalGainValues(true, true);
 
-                ManageZoneAirUpdates(iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                                     PriorTimeStep);
 
                 if (Contaminant.SimulateContaminants)
-                    ManageZoneContaminanUpdates(iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-                SimHVAC();
+                    ManageZoneContaminanUpdates(iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                                                PriorTimeStep);
+                SimHVAC(state);
 
                 if (AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && !WarmupFlag) {
                     RunOptCondEntTemp = true;
                     while (RunOptCondEntTemp) {
-                        SimHVAC();
+                        SimHVAC(state);
                     }
                 }
 
@@ -484,13 +475,17 @@ namespace HVACManager {
                 // Need to set the flag back since we do not need to shift the temps back again in the correct step.
                 ShortenTimeStepSys = false;
 
-                ManageZoneAirUpdates(iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                ManageZoneAirUpdates(state, iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                                     PriorTimeStep);
                 if (Contaminant.SimulateContaminants)
-                    ManageZoneContaminanUpdates(iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                    ManageZoneContaminanUpdates(iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                                                PriorTimeStep);
 
-                ManageZoneAirUpdates(iPushSystemTimestepHistories, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                ManageZoneAirUpdates(state, iPushSystemTimestepHistories, ZoneTempChange, ShortenTimeStepSys,
+                                     UseZoneTimeStepHistory, PriorTimeStep);
                 if (Contaminant.SimulateContaminants)
-                    ManageZoneContaminanUpdates(iPushSystemTimestepHistories, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                    ManageZoneContaminanUpdates(iPushSystemTimestepHistories, ShortenTimeStepSys,
+                                                UseZoneTimeStepHistory, PriorTimeStep);
                 PreviousTimeStep = TimeStepSys;
             }
 
@@ -513,10 +508,14 @@ namespace HVACManager {
             ManageWater();
             // update electricity data for net, purchased, sold etc.
             DummyLogical = false;
-            facilityElectricServiceObj->manageElectricPowerService(false, DummyLogical, true);
+            facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);
 
             // Update the plant and condenser loop capacitance model temperature history.
             UpdateNodeThermalHistory();
+
+            if (OutputReportTabular::displayHeatEmissionsSummary) {
+                OutputReportTabular::CalcHeatEmissionReport(state);
+            }
 
             ManageEMS(emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan); // EMS calling point
 
@@ -525,24 +524,24 @@ namespace HVACManager {
                 if (DoOutputReporting) {
                     CalcMoreNodeInfo();
                     CalculatePollution();
-                    InitEnergyReports();
+                    InitEnergyReports(outputFiles);
                     ReportSystemEnergyUse();
                 }
                 if (DoOutputReporting || (ZoneSizingCalc && CompLoadReportIsReq)) {
-                    ReportAirHeatBalance();
+                    ReportAirHeatBalance(state);
                     if (ZoneSizingCalc) GatherComponentLoadsHVAC();
                 }
                 if (DoOutputReporting) {
-                    ReportMaxVentilationLoads();
-                    UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+                    ReportMaxVentilationLoads(state);
+                    UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                     if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                         if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
                     }
-                    UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepSystem);
+                    UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 }
                 if (ZoneSizingCalc) {
-                    UpdateZoneSizing(OutputFiles::getSingleton(), DuringDay);
-                    UpdateFacilitySizing(DuringDay);
+                    UpdateZoneSizing(state, DuringDay);
+                    UpdateFacilitySizing(state.dataGlobals, DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
@@ -553,14 +552,20 @@ namespace HVACManager {
                 if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
-                        ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
+                        print(outputFiles.eso, "{}\n", EndOfHeaderString);
                         print(outputFiles.mtr, "{}\n", EndOfHeaderString);
                         PrintEndDataDictionary = false;
                     }
                     if (DoOutputReporting && !PrintedWarmup) {
-                        ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
-                            << "1"
-                            << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
+
+                        print(outputFiles.eso,
+                              EnvironmentStampFormatStr,
+                              "1",
+                              "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                              Latitude,
+                              Longitude,
+                              TimeZoneNumber,
+                              Elevation);
                         print(outputFiles.mtr,
                               EnvironmentStampFormatStr,
                               "1",
@@ -574,7 +579,7 @@ namespace HVACManager {
                     PrintedWarmup = true;
                 }
                 CalcMoreNodeInfo();
-                UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+                UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                     if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
                 }
@@ -586,14 +591,19 @@ namespace HVACManager {
                 if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
-                        ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
+                        print(outputFiles.eso, "{}\n", EndOfHeaderString);
                         print(outputFiles.mtr, "{}\n", EndOfHeaderString);
                         PrintEndDataDictionary = false;
                     }
                     if (DoOutputReporting && !PrintedWarmup) {
-                        ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
-                            << "1"
-                            << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
+                        print(outputFiles.eso,
+                              EnvironmentStampFormatStr,
+                              "1",
+                              "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                              Latitude,
+                              Longitude,
+                              TimeZoneNumber,
+                              Elevation);
                         print(outputFiles.mtr,
                               EnvironmentStampFormatStr,
                               "1",
@@ -606,7 +616,7 @@ namespace HVACManager {
                     }
                     PrintedWarmup = true;
                 }
-                UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+                UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
             }
             ManageEMS(emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan); // EMS calling point
             // UPDATE SYSTEM CLOCKS
@@ -615,13 +625,13 @@ namespace HVACManager {
             FirstTimeStepSysFlag = false;
         } // system time step  loop (loops once if no downstepping)
 
-        ManageZoneAirUpdates(iPushZoneTimestepHistories, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        ManageZoneAirUpdates(state, iPushZoneTimestepHistories, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
         if (Contaminant.SimulateContaminants)
             ManageZoneContaminanUpdates(iPushZoneTimestepHistories, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         NumOfSysTimeStepsLastZoneTimeStep = NumOfSysTimeSteps;
 
-        UpdateDemandManagers();
+        UpdateDemandManagers(state);
 
         // DO FINAL UPDATE OF RECORD KEEPING VARIABLES
         // Report the Node Data to Aid in Debugging
@@ -633,31 +643,45 @@ namespace HVACManager {
             }
             if ((ReportDebug) && (DayOfSim > 0)) { // Report the node data
                 if (size(Node) > 0 && !DebugNamesReported) {
-                    ObjexxFCL::gio::write(OutputFileDebug, Format_11);
+                    print(outputFiles.debug, "{}\n", "node #   Name");
                     for (NodeNum = 1; NodeNum <= isize(Node); ++NodeNum) {
-                        ObjexxFCL::gio::write(OutputFileDebug, Format_30) << NodeNum << NodeID(NodeNum);
+                        print(outputFiles.debug, " {:3}     {}\n", NodeNum, NodeID(NodeNum));
                     }
                     DebugNamesReported = true;
                 }
                 if (size(Node) > 0) {
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD);
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD);
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "Day of Sim     Hour of Day    Time";
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << DayOfSim << HourOfDay << TimeStep * TimeStepZone;
-                    ObjexxFCL::gio::write(OutputFileDebug, Format_10);
+                    print(outputFiles.debug, "\n\n Day of Sim     Hour of Day    Time\n");
+                    print(outputFiles.debug, "{:12}{:12} {:22.15N} \n", DayOfSim, HourOfDay, TimeStep * TimeStepZone);
+                    print(outputFiles.debug,
+                          "{}\n",
+                          "node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       MassMax        MassSP    Press        "
+                          "Enthal     HumRat Fluid Type");
                 }
                 for (NodeNum = 1; NodeNum <= isize(Node); ++NodeNum) {
-                    ObjexxFCL::gio::write(OutputFileDebug, Format_20)
-                        << NodeNum << Node(NodeNum).Temp << Node(NodeNum).MassFlowRateMinAvail << Node(NodeNum).MassFlowRateMaxAvail
-                        << Node(NodeNum).TempSetPoint << Node(NodeNum).MassFlowRate << Node(NodeNum).MassFlowRateMin << Node(NodeNum).MassFlowRateMax
-                        << Node(NodeNum).MassFlowRateSetPoint << Node(NodeNum).Press << Node(NodeNum).Enthalpy << Node(NodeNum).HumRat
-                        << ValidNodeFluidTypes(Node(NodeNum).FluidType);
+                    static constexpr auto Format_20{
+                        " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#8.0F}  {:11.2F}  {:9.5F}  {}\n"};
+
+                    print(outputFiles.debug,
+                          Format_20,
+                          NodeNum,
+                          Node(NodeNum).Temp,
+                          Node(NodeNum).MassFlowRateMinAvail,
+                          Node(NodeNum).MassFlowRateMaxAvail,
+                          Node(NodeNum).TempSetPoint,
+                          Node(NodeNum).MassFlowRate,
+                          Node(NodeNum).MassFlowRateMin,
+                          Node(NodeNum).MassFlowRateMax,
+                          Node(NodeNum).MassFlowRateSetPoint,
+                          Node(NodeNum).Press,
+                          Node(NodeNum).Enthalpy,
+                          Node(NodeNum).HumRat,
+                          ValidNodeFluidTypes(Node(NodeNum).FluidType));
                 }
             }
         }
     }
 
-    void SimHVAC()
+    void SimHVAC(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -736,7 +760,6 @@ namespace HVACManager {
         /////////////////////////
         static int ErrCount(0); // Number of times that the maximum iterations was exceeded
         static bool MySetPointInit(true);
-        std::string CharErrOut; // a character string equivalent of ErrCount
         static int MaxErrCount(0);
         static std::string ErrEnvironmentName;
         int LoopNum;
@@ -796,9 +819,21 @@ namespace HVACManager {
         if (!SimHVACIterSetup) {
             SetupOutputVariable("HVAC System Solver Iteration Count", OutputProcessor::Unit::None, HVACManageIteration, "HVAC", "Sum", "SimHVAC");
             SetupOutputVariable("Air System Solver Iteration Count", OutputProcessor::Unit::None, RepIterAir, "HVAC", "Sum", "SimHVAC");
-            ManageSetPoints(); // need to call this before getting plant loop data so setpoint checks can complete okay
-            GetPlantLoopData();
-            GetPlantInput();
+            SetupOutputVariable("Air System Relief Air Total Heat Loss Energy",
+                                OutputProcessor::Unit::J,
+                                DataHeatBalance::SysTotalHVACReliefHeatLoss,
+                                "HVAC",
+                                "Sum",
+                                "SimHVAC");
+            SetupOutputVariable("HVAC System Total Heat Rejection Energy",
+                                OutputProcessor::Unit::J,
+                                DataHeatBalance::SysTotalHVACRejectHeatLoss,
+                                "HVAC",
+                                "Sum",
+                                "SimHVAC");
+            ManageSetPoints(state); // need to call this before getting plant loop data so setpoint checks can complete okay
+            GetPlantLoopData(state);
+            GetPlantInput(state);
             SetupInitialPlantCallingOrder();
             SetupBranchControlTypes(); // new routine to do away with input for branch control type
             //    CALL CheckPlantLoopData
@@ -821,10 +856,10 @@ namespace HVACManager {
         }
 
         if (ZoneSizingCalc) {
-            ManageZoneEquipment(FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
+            ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
             // need to call non zone equipment so water use zone gains can be included in sizing calcs
-            ManageNonZoneEquipment(FirstHVACIteration, SimNonZoneEquipmentFlag);
-            facilityElectricServiceObj->manageElectricPowerService(FirstHVACIteration, SimElecCircuitsFlag, false);
+            ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipmentFlag);
+            facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
             return;
         }
 
@@ -839,7 +874,7 @@ namespace HVACManager {
         bool anyEMSRan = false;
         ManageEMS(emsCallFromBeforeHVACManagers, anyEMSRan); // calling point
 
-        ManageSetPoints();
+        ManageSetPoints(state);
 
         // re-initialize plant loop and nodes.
         ReInitPlantLoopsAtFirstHVACIteration();
@@ -854,7 +889,7 @@ namespace HVACManager {
         // first explicitly call each system type with FirstHVACIteration,
 
         // Manages the various component simulations
-        SimSelectedEquipment(SimAirLoopsFlag,
+        SimSelectedEquipment(state, SimAirLoopsFlag,
                              SimZoneEquipmentFlag,
                              SimNonZoneEquipmentFlag,
                              SimPlantLoopsFlag,
@@ -880,7 +915,7 @@ namespace HVACManager {
             ManageEMS(emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
 
             // Manages the various component simulations
-            SimSelectedEquipment(SimAirLoopsFlag,
+            SimSelectedEquipment(state, SimAirLoopsFlag,
                                  SimZoneEquipmentFlag,
                                  SimNonZoneEquipmentFlag,
                                  SimPlantLoopsFlag,
@@ -914,7 +949,7 @@ namespace HVACManager {
                 SimNonZoneEquipmentFlag = false;
                 SimPlantLoopsFlag = true;
                 SimElecCircuitsFlag = false;
-                SimSelectedEquipment(SimAirLoopsFlag,
+                SimSelectedEquipment(state, SimAirLoopsFlag,
                                      SimZoneEquipmentFlag,
                                      SimNonZoneEquipmentFlag,
                                      SimPlantLoopsFlag,
@@ -927,7 +962,7 @@ namespace HVACManager {
                 SimNonZoneEquipmentFlag = true;
                 SimPlantLoopsFlag = false;
                 SimElecCircuitsFlag = true;
-                SimSelectedEquipment(SimAirLoopsFlag,
+                SimSelectedEquipment(state, SimAirLoopsFlag,
                                      SimZoneEquipmentFlag,
                                      SimNonZoneEquipmentFlag,
                                      SimPlantLoopsFlag,
@@ -941,7 +976,7 @@ namespace HVACManager {
                 SimNonZoneEquipmentFlag = false;
                 SimPlantLoopsFlag = true;
                 SimElecCircuitsFlag = false;
-                SimSelectedEquipment(SimAirLoopsFlag,
+                SimSelectedEquipment(state, SimAirLoopsFlag,
                                      SimZoneEquipmentFlag,
                                      SimNonZoneEquipmentFlag,
                                      SimPlantLoopsFlag,
@@ -954,7 +989,7 @@ namespace HVACManager {
                 SimNonZoneEquipmentFlag = true;
                 SimPlantLoopsFlag = false;
                 SimElecCircuitsFlag = true;
-                SimSelectedEquipment(SimAirLoopsFlag,
+                SimSelectedEquipment(state, SimAirLoopsFlag,
                                      SimZoneEquipmentFlag,
                                      SimNonZoneEquipmentFlag,
                                      SimPlantLoopsFlag,
@@ -977,9 +1012,7 @@ namespace HVACManager {
             ++ErrCount;
             if (ErrCount < 15) {
                 ErrEnvironmentName = EnvironmentName;
-                ObjexxFCL::gio::write(CharErrOut, "(I5)") << MaxIter;
-                strip(CharErrOut);
-                ShowWarningError("SimHVAC: Maximum iterations (" + CharErrOut + ") exceeded for all HVAC loops, at " + EnvironmentName + ", " +
+                ShowWarningError("SimHVAC: Maximum iterations (" + fmt::to_string(MaxIter) + ") exceeded for all HVAC loops, at " + EnvironmentName + ", " +
                                  CurMnDy + ' ' + CreateSysTimeIntervalString());
                 if (SimAirLoopsFlag) {
                     ShowContinueError("The solution for one or more of the Air Loop HVAC systems did not appear to converge");
@@ -1729,7 +1762,7 @@ namespace HVACManager {
         }
     }
 
-    void SimSelectedEquipment(bool &SimAirLoops,         // True when the air loops need to be (re)simulated
+    void SimSelectedEquipment(EnergyPlusData &state, bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                               bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                               bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
                               bool &SimPlantLoops,       // True when the main plant loops need to be (re)simulated
@@ -1806,7 +1839,7 @@ namespace HVACManager {
             // determination of which zones are connected to which air loops.
             // This call of ManageZoneEquipment does nothing except force the
             // zone equipment data to be read in.
-            ManageZoneEquipment(FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+            ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
             MyEnvrnFlag = false;
         }
         if (!BeginEnvrnFlag) {
@@ -1817,23 +1850,23 @@ namespace HVACManager {
             RepIterAir = 0;
             // Call AirflowNetwork simulation to calculate air flows and pressures
             if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                ManageAirflowNetworkBalance(FirstHVACIteration);
+                ManageAirflowNetworkBalance(state, FirstHVACIteration);
             }
-            ManageAirLoops(FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+            ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
             AirLoopInputsFilled = true; // all air loop inputs have been read in
             SimAirLoops = true;         // Need to make sure that SimAirLoop is simulated at min twice to calculate PLR in some air loop equipment
             AirLoopsSimOnce = true;     // air loops simulated once for this environment
             ResetTerminalUnitFlowLimits();
             FlowMaxAvailAlreadyReset = true;
-            ManageZoneEquipment(FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+            ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
             SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
-            ManageNonZoneEquipment(FirstHVACIteration, SimNonZoneEquipment);
-            facilityElectricServiceObj->manageElectricPowerService(FirstHVACIteration, SimElecCircuitsFlag, false);
+            ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
+            facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
 
-            ManagePlantLoops(FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
+            ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
 
             AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
-            facilityElectricServiceObj->manageElectricPowerService(FirstHVACIteration, SimElecCircuitsFlag, false);
+            facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
         } else {
             FlowResolutionNeeded = false;
             while ((SimAirLoops || SimZoneEquipment) && (IterAir <= MaxAir)) {
@@ -1841,10 +1874,10 @@ namespace HVACManager {
                 // Call AirflowNetwork simulation to calculate air flows and pressures
                 ResimulateAirZone = false;
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ManageAirflowNetworkBalance(FirstHVACIteration, IterAir, ResimulateAirZone);
+                    ManageAirflowNetworkBalance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
                 }
                 if (SimAirLoops) {
-                    ManageAirLoops(FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+                    ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
                     SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
                 }
 
@@ -1860,7 +1893,7 @@ namespace HVACManager {
                         ResolveAirLoopFlowLimits();
                         FlowResolutionNeeded = false;
                     }
-                    ManageZoneEquipment(FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+                    ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
                     SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
                 }
                 FlowMaxAvailAlreadyReset = false;
@@ -1884,12 +1917,12 @@ namespace HVACManager {
             ResolveLockoutFlags(SimAirLoops);
 
             if (SimNonZoneEquipment) {
-                ManageNonZoneEquipment(FirstHVACIteration, SimNonZoneEquipment);
+                ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
                 SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
             }
 
             if (SimElecCircuits) {
-                facilityElectricServiceObj->manageElectricPowerService(FirstHVACIteration, SimElecCircuitsFlag, false);
+                facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
             }
 
             if (!SimPlantLoops) {
@@ -1900,11 +1933,11 @@ namespace HVACManager {
             }
 
             if (SimPlantLoops) {
-                ManagePlantLoops(FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
+                ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
             }
 
             if (SimElecCircuits) {
-                facilityElectricServiceObj->manageElectricPowerService(FirstHVACIteration, SimElecCircuitsFlag, false);
+                facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
             }
         }
     }
@@ -2330,7 +2363,7 @@ namespace HVACManager {
         } // GroupNum
     }
 
-    void ReportAirHeatBalance()
+    void ReportAirHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2389,7 +2422,6 @@ namespace HVACManager {
 
         using DataHVACGlobals::FanType_ZoneExhaust;
         using Fans::Fan;
-        using Fans::NumFans;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2447,7 +2479,7 @@ namespace HVACManager {
             ZnAirRpt(ZoneLoop).ExhTotalLoss = 0;
             ZnAirRpt(ZoneLoop).ExhSensiLoss = 0;
 
-            for (FanNum = 1; FanNum <= NumFans; ++FanNum) {
+            for (FanNum = 1; FanNum <= state.fans.NumFans; ++FanNum) {
                 //  Add reportable vars
                 if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
                     for (int ExhNum = 1; ExhNum <= ZoneEquipConfig(ZoneLoop).NumExhaustNodes; ExhNum++) {

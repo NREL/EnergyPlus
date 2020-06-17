@@ -426,8 +426,7 @@ namespace ResultsFramework {
             cols.push_back({{"Variable", varMap.second.variableName()}, {"Units", unitEnumToString(varMap.second.units())}});
         }
 
-        std::vector<double> vals;
-        vals.reserve(10000);
+        json vals = json::array();
 
         // if DataFrame is enabled and control reaches here, there must be at least one o/p variable
         assert(TS.size() == variableMap.begin()->second.numValues());
@@ -436,7 +435,11 @@ namespace ResultsFramework {
             vals.clear();
 
             for (auto const &varMap : variableMap) {
-                vals.push_back(varMap.second.value(row));
+                if (row < varMap.second.numValues()) {
+                    vals.push_back(varMap.second.value(row));
+                } else {
+                    vals.push_back(nullptr);
+                }
             }
 
             rows.push_back({{TS.at(row), vals}});

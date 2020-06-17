@@ -54,13 +54,11 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/OutputFiles.hh>
-#include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -330,7 +328,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::GetOSCMData(state.outputFiles, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -354,7 +352,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::GetOSCMData(state.outputFiles, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -525,7 +523,6 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
 TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
 
         "  SizingPeriod:DesignDay,",
         "    Atlanta Jan 21 cooling,  !- Name",
@@ -654,7 +651,6 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     // GetNextEnvironment Will call ReadUserWeatherInput which calls inputProcessor, so let's use process_idf to create one Environment (Design Day)
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
 
         "  SizingPeriod:DesignDay,",
         "    Atlanta Jan 21 cooling,  !- Name",
@@ -693,7 +689,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     bool Available{false};
     bool ErrorsFound{false};
-    ASSERT_THROW(WeatherManager::GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound), std::runtime_error);
+    ASSERT_THROW(WeatherManager::GetNextEnvironment(state, Available, ErrorsFound), std::runtime_error);
     ASSERT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({
@@ -721,7 +717,6 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     OutputReportTabular::displayEioSummary = true;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.2;",
 
         "Site:Location,",
         "  Changsha_Hunan_CHN Design_Conditions,   !- Location Name",
@@ -760,9 +755,9 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::OpenOutputFiles();
+    SimulationManager::OpenOutputFiles(state.outputFiles);
     // reset eio stream
-    compare_eio_stream("", true);
+    has_eio_output(true);
 
     bool ErrorsFound(false);
     DataEnvironment::TotDesDays = 1;
@@ -783,7 +778,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     WeatherManager::GetDesignDayData(DataEnvironment::TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    WeatherManager::SetUpDesignDay(OutputFiles::getSingleton(), 1);
+    WeatherManager::SetUpDesignDay(state.outputFiles, 1);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndType, DDHumIndType_Enthalpy);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndValue, 90500.0);
 
@@ -810,11 +805,11 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, false));
 
-    OutputReportTabular::WriteEioTables(OutputFiles::getSingleton());
+    OutputReportTabular::WriteEioTables(state.outputFiles);
 
 
     // Close output files *after* the EIO has been written to
-    SimulationManager::CloseOutputFiles(OutputFiles::getSingleton());
+    SimulationManager::CloseOutputFiles(state.outputFiles);
 
     EnergyPlus::sqlite->sqliteCommit();
 
@@ -843,4 +838,204 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     }
 
 
+}
+
+TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherZeroIRHoriz) {
+
+    std::vector<std::string> Lines{
+            "1980,1,1,1,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,2,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,3,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,4,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,5,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,6,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,7,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,8,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,9,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,10,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,11,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0,-8.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,12,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0,-8.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,13,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0,-8.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,14,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0.6,-7.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,15,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0.6,-7.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,16,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0.6,-7.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,17,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0.6,-7.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,18,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,0,-8.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,19,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,20,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,21,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,22,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,23,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,24,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+    };
+
+    // DERIVED TYPE DEFINITIONS:
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int WYear;
+    int WMonth;
+    int WDay;
+    int WHour;
+    int WMinute;
+    Real64 DryBulb;
+    Real64 DewPoint;
+    Real64 RelHum;
+    Real64 AtmPress;
+    Real64 ETHoriz;
+    Real64 ETDirect;
+    Real64 IRHoriz;
+    Real64 GLBHoriz;
+    Real64 DirectRad;
+    Real64 DiffuseRad;
+    Real64 GLBHorizIllum;
+    Real64 DirectNrmIllum;
+    Real64 DiffuseHorizIllum;
+    Real64 ZenLum;
+    Real64 WindDir;
+    Real64 WindSpeed;
+    Real64 TotalSkyCover;
+    Real64 OpaqueSkyCover;
+    Real64 Visibility;
+    Real64 CeilHeight;
+    Real64 PrecipWater;
+    Real64 AerosolOptDepth;
+    Real64 SnowDepth;
+    Real64 DaysSinceLastSnow;
+    Real64 Albedo;
+    Real64 LiquidPrecip;
+    int PresWeathObs;
+    Array1D_int PresWeathConds(9);
+    std::string WeatherDataLine;
+    bool ErrorFound;
+    std::string ErrOut;
+
+
+    for (auto WeatherDataLine : Lines){
+        WeatherManager::InterpretWeatherDataLine(WeatherDataLine,
+                                                 ErrorFound,
+                                                 WYear,
+                                                 WMonth,
+                                                 WDay,
+                                                 WHour,
+                                                 WMinute,
+                                                 DryBulb,
+                                                 DewPoint,
+                                                 RelHum,
+                                                 AtmPress,
+                                                 ETHoriz,
+                                                 ETDirect,
+                                                 IRHoriz,
+                                                 GLBHoriz,
+                                                 DirectRad,
+                                                 DiffuseRad,
+                                                 GLBHorizIllum,
+                                                 DirectNrmIllum,
+                                                 DiffuseHorizIllum,
+                                                 ZenLum,
+                                                 WindDir,
+                                                 WindSpeed,
+                                                 TotalSkyCover,
+                                                 OpaqueSkyCover,
+                                                 Visibility,
+                                                 CeilHeight,
+                                                 PresWeathObs,
+                                                 PresWeathConds,
+                                                 PrecipWater,
+                                                 AerosolOptDepth,
+                                                 SnowDepth,
+                                                 DaysSinceLastSnow,
+                                                 Albedo,
+                                                 LiquidPrecip);
+
+        EXPECT_EQ(IRHoriz, 0.0);
+    }
+}
+
+
+TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
+
+    DataStringGlobals::inputWeatherFileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/WeatherManagerIROutputTest.epw";
+
+    std::string const idf_objects = delimited_string({
+                                                         "  Version,9.3;",
+
+                                                         "  SizingPeriod:DesignDay,",
+                                                         "    Atlanta Jan 21 cooling,  !- Name",
+                                                         "    1,                       !- Month",
+                                                         "    21,                      !- Day of Month",
+                                                         "    SummerDesignDay,         !- Day Type",
+                                                         "    16.9,                    !- Maximum Dry-Bulb Temperature {C}",
+                                                         "    11.6,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+                                                         "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+                                                         "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+                                                         "    WetBulbProfileDefaultMultipliers,  !- Humidity Condition Type",
+                                                         "    13.2,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+                                                         "    ,                        !- Humidity Condition Day Schedule Name",
+                                                         "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+                                                         "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+                                                         "    8,                       !- Daily Wet-Bulb Temperature Range {deltaC}",
+                                                         "    97620,                   !- Barometric Pressure {Pa}",
+                                                         "    0.0,                     !- Wind Speed {m/s}",
+                                                         "    0.0,                     !- Wind Direction {deg}",
+                                                         "    No,                      !- Rain Indicator",
+                                                         "    No,                      !- Snow Indicator",
+                                                         "    No,                      !- Daylight Saving Time Indicator",
+                                                         "    ASHRAETau2017,           !- Solar Model Indicator",
+                                                         "    ,                        !- Beam Solar Day Schedule Name",
+                                                         "    ,                        !- Diffuse Solar Day Schedule Name",
+                                                         "    0.325,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+                                                         "    2.461;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+
+                                                         "  SizingPeriod:DesignDay,",
+                                                         "    Atlanta Jul 21 cooling,  !- Name",
+                                                         "    7,                       !- Month",
+                                                         "    21,                      !- Day of Month",
+                                                         "    SummerDesignDay,         !- Day Type",
+                                                         "    33.3,                    !- Maximum Dry-Bulb Temperature {C}",
+                                                         "    11.5,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+                                                         "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+                                                         "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+                                                         "    WetBulbProfileDefaultMultipliers,  !- Humidity Condition Type",
+                                                         "    23.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+                                                         "    ,                        !- Humidity Condition Day Schedule Name",
+                                                         "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+                                                         "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+                                                         "    3.5,                     !- Daily Wet-Bulb Temperature Range {deltaC}",
+                                                         "    97620,                   !- Barometric Pressure {Pa}",
+                                                         "    0.0,                     !- Wind Speed {m/s}",
+                                                         "    0.0,                     !- Wind Direction {deg}",
+                                                         "    No,                      !- Rain Indicator",
+                                                         "    No,                      !- Snow Indicator",
+                                                         "    No,                      !- Daylight Saving Time Indicator",
+                                                         "    ASHRAETau2017,           !- Solar Model Indicator",
+                                                         "    ,                        !- Beam Solar Day Schedule Name",
+                                                         "    ,                        !- Diffuse Solar Day Schedule Name",
+                                                         "    .556,                    !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+                                                         "    1.779;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+                                                     });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    DataEnvironment::TotDesDays = 2;
+
+    // setup environment state
+    Environment.allocate(DataEnvironment::TotDesDays);
+    DesignDay.allocate(DataEnvironment::TotDesDays);
+    Environment(1).DesignDayNum = 1;
+    Environment(2).DesignDayNum = 2;
+    GetDesignDayData(DataEnvironment::TotDesDays, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    WeatherManager::Envrn =1;
+
+    DataGlobals::NumOfTimeStepInHour = 1;
+    Environment.allocate(1);
+    Environment(1).SkyTempModel = WP_ClarkAllenModel;
+
+    AllocateWeatherData();
+    OpenWeatherFile(ErrorsFound);
+    ReadWeatherForDay(0, 1, false);
+
+    Real64 expected_IRHorizSky = 345.73838855245953;
+    EXPECT_NEAR(TomorrowHorizIRSky(1, 1), expected_IRHorizSky, 0.001);
 }

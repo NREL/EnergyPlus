@@ -66,6 +66,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -151,7 +152,7 @@ namespace HeatBalanceAirManager {
         UniqueInfiltrationNames.clear();
     }
 
-    void ManageAirHeatBalance()
+    void ManageAirHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -196,7 +197,7 @@ namespace HeatBalanceAirManager {
 
         // Obtains and Allocates heat balance related parameters from input file
         if (ManageAirHeatBalanceGetInputFlag) {
-            GetAirHeatBalanceInput();
+            GetAirHeatBalanceInput(state);
             ManageAirHeatBalanceGetInputFlag = false;
         }
 
@@ -204,7 +205,7 @@ namespace HeatBalanceAirManager {
 
         // Solve the zone heat balance 'Detailed' solution
         // Call the air surface heat balances
-        CalcHeatBalanceAir();
+        CalcHeatBalanceAir(state);
 
         ReportZoneMeanAirTemp();
     }
@@ -212,7 +213,7 @@ namespace HeatBalanceAirManager {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetAirHeatBalanceInput()
+    void GetAirHeatBalanceInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -251,21 +252,19 @@ namespace HeatBalanceAirManager {
 
         // FLOW:
 
-        auto &outputFiles = OutputFiles::getSingleton();
-
-        GetAirFlowFlag(outputFiles, ErrorsFound);
+        GetAirFlowFlag(state, ErrorsFound);
 
         SetZoneMassConservationFlag();
 
         // get input parameters for modeling of room air flow
-        GetRoomAirModelParameters(outputFiles, ErrorsFound);
+        GetRoomAirModelParameters(state.outputFiles, ErrorsFound);
 
         if (ErrorsFound) {
             ShowFatalError("GetAirHeatBalanceInput: Errors found in getting Air inputs");
         }
     }
 
-    void GetAirFlowFlag(OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors found
+    void GetAirFlowFlag(EnergyPlusData &state, bool &ErrorsFound) // Set to true if errors found
     {
 
         // SUBROUTINE INFORMATION:
@@ -290,10 +289,10 @@ namespace HeatBalanceAirManager {
 
         AirFlowFlag = UseSimpleAirFlow;
 
-        GetSimpleAirModelInputs(outputFiles, ErrorsFound);
+        GetSimpleAirModelInputs(state, ErrorsFound);
         if (TotInfiltration + TotVentilation + TotMixing + TotCrossMixing + TotRefDoorMixing > 0) {
             static constexpr auto Format_720("! <AirFlow Model>, Simple\n AirFlow Model, {}\n");
-            print(outputFiles.eio, Format_720, "Simple");
+            print(state.outputFiles.eio, Format_720, "Simple");
         }
     }
 
@@ -330,7 +329,7 @@ namespace HeatBalanceAirManager {
         }
     }
 
-    void GetSimpleAirModelInputs(OutputFiles &outputFiles, bool &ErrorsFound) // IF errors found in input
+    void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -679,7 +678,7 @@ namespace HeatBalanceAirManager {
             }
 
             // Check whether this zone is also controleld by hybrid ventilation object with ventilation control option or not
-            ControlFlag = GetHybridVentilationControlStatus(ZoneAirBalance(Loop).ZonePtr);
+            ControlFlag = GetHybridVentilationControlStatus(state, ZoneAirBalance(Loop).ZonePtr);
             if (ControlFlag && ZoneAirBalance(Loop).BalanceMethod == AirBalanceQuadrature) {
                 ZoneAirBalance(Loop).BalanceMethod = AirBalanceNone;
                 ShowWarningError(cCurrentModuleObject + " = " + ZoneAirBalance(Loop).Name + ": This Zone (" + cAlphaArgs(2) +
@@ -3525,15 +3524,15 @@ namespace HeatBalanceAirManager {
 
         auto divide_and_print_if_greater_than_zero = [&](const Real64 denominator, const Real64 numerator){
             if (denominator > 0.0) {
-                print(outputFiles.eio, "{:.3R},", numerator / denominator);
+                print(state.outputFiles.eio, "{:.3R},", numerator / denominator);
             } else {
-                print(outputFiles.eio, "N/A,");
+                print(state.outputFiles.eio, "N/A,");
             }
         };
 
         for (Loop = 1; Loop <= TotInfiltration; ++Loop) {
             if (Loop == 1)
-                print(outputFiles.eio, Format_721,
+                print(state.outputFiles.eio, Format_721,
                     "ZoneInfiltration",
                      "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/Exterior Surface Area {m3/s-m2},ACH - "
                        "Air Changes per Hour,Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - "
@@ -3541,22 +3540,22 @@ namespace HeatBalanceAirManager {
 
             ZoneNum = Infiltration(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                print(outputFiles.eio, Format_722, "Infiltration-Illegal Zone specified", Infiltration(Loop).Name);
+                print(state.outputFiles.eio, Format_722, "Infiltration-Illegal Zone specified", Infiltration(Loop).Name);
                 continue;
             }
             TotInfilVentFlow(ZoneNum) += Infiltration(Loop).DesignLevel;
-            print(outputFiles.eio, Format_720, "ZoneInfiltration", Infiltration(Loop).Name, GetScheduleName(Infiltration(Loop).SchedPtr),
+            print(state.outputFiles.eio, Format_720, "ZoneInfiltration", Infiltration(Loop).Name, GetScheduleName(Infiltration(Loop).SchedPtr),
                 Zone(ZoneNum).Name, Zone(ZoneNum).FloorArea, Zone(ZoneNum).TotOccupants);
-            print(outputFiles.eio, "{:.3R},", Infiltration(Loop).DesignLevel);
+            print(state.outputFiles.eio, "{:.3R},", Infiltration(Loop).DesignLevel);
 
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).FloorArea, Infiltration(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).ExteriorTotalSurfArea, Infiltration(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Infiltration(Loop).DesignLevel * SecInHour);
 
-            print(outputFiles.eio, "{:.3R},", Infiltration(Loop).ConstantTermCoef);
-            print(outputFiles.eio, "{:.3R},", Infiltration(Loop).TemperatureTermCoef);
-            print(outputFiles.eio, "{:.3R},", Infiltration(Loop).VelocityTermCoef);
-            print(outputFiles.eio, "{:.3R}\n", Infiltration(Loop).VelocitySQTermCoef);
+            print(state.outputFiles.eio, "{:.3R},", Infiltration(Loop).ConstantTermCoef);
+            print(state.outputFiles.eio, "{:.3R},", Infiltration(Loop).TemperatureTermCoef);
+            print(state.outputFiles.eio, "{:.3R},", Infiltration(Loop).VelocityTermCoef);
+            print(state.outputFiles.eio, "{:.3R}\n", Infiltration(Loop).VelocitySQTermCoef);
         }
 
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
@@ -3568,7 +3567,7 @@ namespace HeatBalanceAirManager {
 
         for (Loop = 1; Loop <= TotVentilation; ++Loop) {
             if (Loop == 1) {
-                print(outputFiles.eio, Format_721,
+                print(state.outputFiles.eio, Format_721,
                     "ZoneVentilation",
                     "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
                        "Changes per Hour,Fan Type {Exhaust;Intake;Natural},Fan Pressure Rise {Pa},Fan Efficiency {},Equation A - Constant Term "
@@ -3580,50 +3579,50 @@ namespace HeatBalanceAirManager {
 
             ZoneNum = Ventilation(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                print(outputFiles.eio, Format_722, "Ventilation-Illegal Zone specified", Ventilation(Loop).Name);
+                print(state.outputFiles.eio, Format_722, "Ventilation-Illegal Zone specified", Ventilation(Loop).Name);
                 continue;
             }
             TotInfilVentFlow(ZoneNum) += Ventilation(Loop).DesignLevel;
-            print(outputFiles.eio, Format_720,
+            print(state.outputFiles.eio, Format_720,
                    "ZoneVentilation", Ventilation(Loop).Name, GetScheduleName(Ventilation(Loop).SchedPtr), Zone(ZoneNum).Name
                     , Zone(ZoneNum).FloorArea, Zone(ZoneNum).TotOccupants);
 
-            print(outputFiles.eio, "{:.3R},", Ventilation(Loop).DesignLevel);
+            print(state.outputFiles.eio, "{:.3R},", Ventilation(Loop).DesignLevel);
 
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).FloorArea, Ventilation(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).TotOccupants, Ventilation(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Ventilation(Loop).DesignLevel * SecInHour);
 
             if (Ventilation(Loop).FanType == ExhaustVentilation) {
-                print(outputFiles.eio, "Exhaust,");
+                print(state.outputFiles.eio, "Exhaust,");
             } else if (Ventilation(Loop).FanType == IntakeVentilation) {
-                print(outputFiles.eio, "Intake,");
+                print(state.outputFiles.eio, "Intake,");
             } else if (Ventilation(Loop).FanType == NaturalVentilation) {
-                print(outputFiles.eio, "Natural,");
+                print(state.outputFiles.eio, "Natural,");
             } else if (Ventilation(Loop).FanType == BalancedVentilation) {
-                print(outputFiles.eio, "Balanced,");
+                print(state.outputFiles.eio, "Balanced,");
             } else {
-                print(outputFiles.eio, "UNKNOWN,");
+                print(state.outputFiles.eio, "UNKNOWN,");
             }
-            print(outputFiles.eio, "{:.3R},", Ventilation(Loop).FanPressure);
-            print(outputFiles.eio, "{:.1R},", Ventilation(Loop).FanEfficiency);
-            print(outputFiles.eio, "{:.3R},", Ventilation(Loop).ConstantTermCoef);
-            print(outputFiles.eio, "{:.3R},", Ventilation(Loop).TemperatureTermCoef);
-            print(outputFiles.eio, "{:.3R},", Ventilation(Loop).VelocityTermCoef);
-            print(outputFiles.eio, "{:.3R},", Ventilation(Loop).VelocitySQTermCoef);
+            print(state.outputFiles.eio, "{:.3R},", Ventilation(Loop).FanPressure);
+            print(state.outputFiles.eio, "{:.1R},", Ventilation(Loop).FanEfficiency);
+            print(state.outputFiles.eio, "{:.3R},", Ventilation(Loop).ConstantTermCoef);
+            print(state.outputFiles.eio, "{:.3R},", Ventilation(Loop).TemperatureTermCoef);
+            print(state.outputFiles.eio, "{:.3R},", Ventilation(Loop).VelocityTermCoef);
+            print(state.outputFiles.eio, "{:.3R},", Ventilation(Loop).VelocitySQTermCoef);
 
             // TODO Should this also be prefixed with "Schedule: " like the following ones are?
             if (Ventilation(Loop).MinIndoorTempSchedPtr > 0) {
-                print(outputFiles.eio, "{},", GetScheduleName(Ventilation(Loop).MinIndoorTempSchedPtr));
+                print(state.outputFiles.eio, "{},", GetScheduleName(Ventilation(Loop).MinIndoorTempSchedPtr));
             } else {
-                print(outputFiles.eio, "{:.2R},", Ventilation(Loop).MinIndoorTemperature);
+                print(state.outputFiles.eio, "{:.2R},", Ventilation(Loop).MinIndoorTemperature);
             }
 
             const auto print_temperature = [&](const int ptr, const Real64 value) {
                 if (ptr > 0) {
-                    print(outputFiles.eio, "Schedule: {},", GetScheduleName(ptr));
+                    print(state.outputFiles.eio, "Schedule: {},", GetScheduleName(ptr));
                 } else {
-                    print(outputFiles.eio, "{:.2R},", value);
+                    print(state.outputFiles.eio, "{:.2R},", value);
                 }
             };
 
@@ -3632,23 +3631,23 @@ namespace HeatBalanceAirManager {
             print_temperature(Ventilation(Loop).MinOutdoorTempSchedPtr, Ventilation(Loop).MinOutdoorTemperature);
             print_temperature(Ventilation(Loop).MaxOutdoorTempSchedPtr, Ventilation(Loop).MaxOutdoorTemperature);
 
-            print(outputFiles.eio, "{:.2R}\n", Ventilation(Loop).MaxWindSpeed);
+            print(state.outputFiles.eio, "{:.2R}\n", Ventilation(Loop).MaxWindSpeed);
         }
 
         TotMixingFlow.dimension(NumOfZones, 0.0);
         for (Loop = 1; Loop <= TotMixing; ++Loop) {
             if (Loop == 1)
-                print(outputFiles.eio, Format_721, "Mixing",
+                print(state.outputFiles.eio, Format_721, "Mixing",
                     "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
                        "Changes per Hour,From/Source Zone,Delta Temperature {C}");
 
             ZoneNum = Mixing(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                print(outputFiles.eio, Format_722, "Mixing-Illegal Zone specified", Mixing(Loop).Name);
+                print(state.outputFiles.eio, Format_722, "Mixing-Illegal Zone specified", Mixing(Loop).Name);
                 continue;
             }
             TotMixingFlow(ZoneNum) += Mixing(Loop).DesignLevel;
-            print(outputFiles.eio,
+            print(state.outputFiles.eio,
                   Format_720,
                   "Mixing",
                   Mixing(Loop).Name,
@@ -3656,18 +3655,18 @@ namespace HeatBalanceAirManager {
                   Zone(ZoneNum).Name,
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
-            print(outputFiles.eio, "{:.3R},", Mixing(Loop).DesignLevel);
+            print(state.outputFiles.eio, "{:.3R},", Mixing(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).FloorArea, Mixing(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).TotOccupants, Mixing(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Mixing(Loop).DesignLevel * SecInHour);
 
-            print(outputFiles.eio, "{},", Zone(Mixing(Loop).FromZone).Name);
-            print(outputFiles.eio, "{:.2R}\n", Mixing(Loop).DeltaTemperature);
+            print(state.outputFiles.eio, "{},", Zone(Mixing(Loop).FromZone).Name);
+            print(state.outputFiles.eio, "{:.2R}\n", Mixing(Loop).DeltaTemperature);
         }
 
         for (Loop = 1; Loop <= TotCrossMixing; ++Loop) {
             if (Loop == 1) {
-                print(outputFiles.eio,
+                print(state.outputFiles.eio,
                       Format_721,
                       "CrossMixing",
                       "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
@@ -3676,11 +3675,11 @@ namespace HeatBalanceAirManager {
 
             ZoneNum = CrossMixing(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                print(outputFiles.eio, Format_722, "CrossMixing-Illegal Zone specified", CrossMixing(Loop).Name);
+                print(state.outputFiles.eio, Format_722, "CrossMixing-Illegal Zone specified", CrossMixing(Loop).Name);
                 continue;
             }
             TotMixingFlow(ZoneNum) += CrossMixing(Loop).DesignLevel;
-            print(outputFiles.eio,
+            print(state.outputFiles.eio,
                   Format_720,
                   "CrossMixing",
                   CrossMixing(Loop).Name,
@@ -3689,19 +3688,19 @@ namespace HeatBalanceAirManager {
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
 
-            print(outputFiles.eio,"{:.3R},",CrossMixing(Loop).DesignLevel);
+            print(state.outputFiles.eio,"{:.3R},",CrossMixing(Loop).DesignLevel);
 
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).FloorArea, CrossMixing(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).TotOccupants, CrossMixing(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, CrossMixing(Loop).DesignLevel * SecInHour);
 
-            print(outputFiles.eio, "{},", Zone(CrossMixing(Loop).FromZone).Name);
-            print(outputFiles.eio, "{:.2R}\n", CrossMixing(Loop).DeltaTemperature);
+            print(state.outputFiles.eio, "{},", Zone(CrossMixing(Loop).FromZone).Name);
+            print(state.outputFiles.eio, "{:.2R}\n", CrossMixing(Loop).DeltaTemperature);
         }
 
         if (TotRefDoorMixing > 0) {
             static constexpr auto Format_724("! <{} Airflow Stats Nominal>, {}\n");
-            print(outputFiles.eio, Format_724,
+            print(state.outputFiles.eio, Format_724,
                 "RefrigerationDoorMixing ",
                 "Name, Zone 1 Name,Zone 2 Name,Door Opening Schedule Name,Door Height {m},Door Area {m2},Door Protection Type");
             for (ZoneNumA = 1; ZoneNumA <= (NumOfZones - 1); ++ZoneNumA) {
@@ -3710,7 +3709,7 @@ namespace HeatBalanceAirManager {
                     ZoneNumB = RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber);
                     // TotMixingFlow(ZoneNum)=TotMixingFlow(ZoneNum)+RefDoorMixing(Loop)%!DesignLevel
                     static constexpr auto Format_723(" {} Airflow Stats Nominal, {},{},{},{},{:.3R},{:.3R},{}\n");
-                    print(outputFiles.eio,
+                    print(state.outputFiles.eio,
                           Format_723,
                           "RefrigerationDoorMixing",
                           RefDoorMixing(ZoneNumA).DoorMixingObjectName(ConnectionNumber),
@@ -4182,7 +4181,7 @@ namespace HeatBalanceAirManager {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcHeatBalanceAir()
+    void CalcHeatBalanceAir(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4221,7 +4220,7 @@ namespace HeatBalanceAirManager {
         if(DataGlobals::externalHVACManager) {
           DataGlobals::externalHVACManager();
         } else {
-          ManageHVAC(OutputFiles::getSingleton());
+          ManageHVAC(state, OutputFiles::getSingleton());
         }
 
         // Do Final Temperature Calculations for Heat Balance before next Time step

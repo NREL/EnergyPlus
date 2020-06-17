@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -221,7 +222,7 @@ namespace WaterUse {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WaterConnectionsType::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void WaterConnectionsType::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                         bool FirstHVACIteration,
                                         Real64 &EP_UNUSED(CurLoad),
                                         bool EP_UNUSED(RunFlag))
@@ -991,7 +992,7 @@ namespace WaterUse {
             this->setupMyOutputVars = false;
         }
 
-        if (allocated(DataPlant::PlantLoop) && !this->StandAlone) {
+        if (this->plantScanFlag && allocated(DataPlant::PlantLoop) && !this->StandAlone) {
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                                     DataPlant::TypeOf_WaterUseConnection,
@@ -1008,6 +1009,7 @@ namespace WaterUse {
             if (errFlag) {
                 ShowFatalError("InitConnections: Program terminated due to previous condition(s).");
             }
+            this->plantScanFlag = false;
         }
 
         // Set the cold water temperature

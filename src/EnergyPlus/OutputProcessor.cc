@@ -77,6 +77,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -121,11 +122,9 @@ namespace OutputProcessor {
     using DataEnvironment::Month;
     using DataEnvironment::Year;
     using DataGlobals::DayOfSim;
-    using DataGlobals::DayOfSimChr;
     using DataGlobals::HourOfDay;
     using DataGlobals::MaxNameLength;
     using DataGlobals::MinutesPerTimeStep;
-    using DataGlobals::OutputFileStandard;
     using DataGlobals::StdOutputRecordCount;
     using namespace DataGlobalConstants;
 
@@ -153,12 +152,7 @@ namespace OutputProcessor {
     int const MeterType_CustomDec(2);  // Type value for custom meters that decrement another meter
     int const MeterType_CustomDiff(3); // Type value for custom meters that difference another meter
 
-    static ObjexxFCL::gio::Fmt fmtLD("*");
     static ObjexxFCL::gio::Fmt fmtA("(A)");
-    static ObjexxFCL::gio::Fmt TimeStampFormat("(A,',',A,',',i2,',',i2,',',i2,',',i2,',',f5.2,',',f5.2,',',A)");
-    static ObjexxFCL::gio::Fmt DailyStampFormat("(A,',',A,',',i2,',',i2,',',i2,',',A)");
-    static ObjexxFCL::gio::Fmt MonthlyStampFormat("(A,',',A,',',i2)");
-    static ObjexxFCL::gio::Fmt RunPeriodStampFormat("(A,',',A)");
     Array1D_string const DayTypes(12,
                                   {"Sunday",
                                    "Monday",
@@ -234,7 +228,6 @@ namespace OutputProcessor {
     int MaxIVariable(0);
     bool OutputInitialized(false);
     int ProduceReportVDD(ReportVDD_No);
-    int OutputFileMeterDetails(0); // Unit number for Meter Details file (output)
     int NumHoursInDay(24);
     int NumHoursInMonth(0);
     int NumHoursInSim(0);
@@ -356,7 +349,6 @@ namespace OutputProcessor {
         OutputInitialized = false;
         GetOutputInputFlag = true;
         ProduceReportVDD = ReportVDD_No;
-        OutputFileMeterDetails = 0;
         NumHoursInDay = 24;
         NumHoursInMonth = 0;
         NumHoursInSim = 0;
@@ -404,7 +396,7 @@ namespace OutputProcessor {
         apiVarRequests.clear();
     }
 
-    void InitializeOutput()
+    void InitializeOutput(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -503,7 +495,7 @@ namespace OutputProcessor {
 
         TimeStepZoneSec = double(MinutesPerTimeStep) * 60.0;
 
-        InitializeMeters();
+        InitializeMeters(outputFiles);
     }
 
     void SetupTimePointers(std::string const &TimeStepTypeKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
@@ -526,7 +518,6 @@ namespace OutputProcessor {
         // attributes in the derived types.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string cValue;
         // ValidateTimeStepType will throw a Fatal if not valid
         TimeStepType timeStepType = ValidateTimeStepType(TimeStepTypeKey, "SetupTimePointers");
 
@@ -538,9 +529,7 @@ namespace OutputProcessor {
         }
     }
 
-    void CheckReportVariable(std::string const &KeyedValue, // Associated Key for this variable
-                             std::string const &VarName     // String Name of variable (without units)
-    )
+    void CheckReportVariable(OutputFiles &outputFiles, std::string const &KeyedValue, std::string const &VarName)
     {
 
         // SUBROUTINE INFORMATION:
@@ -577,7 +566,7 @@ namespace OutputProcessor {
         int MaxLook;
 
         // Make sure that input has been read
-        GetReportVariableInput(OutputFiles::getSingleton());
+        GetReportVariableInput(outputFiles);
 
         if (NumOfReqVariables > 0) {
             // Do a quick check
@@ -983,9 +972,9 @@ namespace OutputProcessor {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt DayFormat("(A,',',I2,',',I2)");
-        static ObjexxFCL::gio::Fmt MonthFormat("(A,',',I2,',',I2,',',I2)");
-        static ObjexxFCL::gio::Fmt EnvrnFormat("(A,',',I2,',',I2,',',I2,',',I2)");
+        static constexpr auto DayFormat("{},{:2},{:2}");
+        static constexpr auto MonthFormat("{},{:2},{:2},{:2}");
+        static constexpr auto EnvrnFormat("{},{:2},{:2},{:2},{:2}");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1004,16 +993,16 @@ namespace OutputProcessor {
 
         switch (ReportFreq) {
         case ReportingFrequency::Daily:
-            ObjexxFCL::gio::write(StrOut, DayFormat) << strip(String) << Hour << Minute;
+            StrOut = format(DayFormat, strip(String), Hour, Minute);
             break;
         case ReportingFrequency::Monthly:
-            ObjexxFCL::gio::write(StrOut, MonthFormat) << strip(String) << Day << Hour << Minute;
+            StrOut = format(MonthFormat, strip(String), Day, Hour, Minute);
             break;
         case ReportingFrequency::Yearly:
-            ObjexxFCL::gio::write(StrOut, EnvrnFormat) << strip(String) << Mon << Day << Hour << Minute;
+            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, Minute);
             break;
         case ReportingFrequency::Simulation:
-            ObjexxFCL::gio::write(StrOut, EnvrnFormat) << strip(String) << Mon << Day << Hour << Minute;
+            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, Minute);
             break;
         default: // Each, TimeStep, Hourly dont have this
             StrOut = BlankString;
@@ -1054,10 +1043,10 @@ namespace OutputProcessor {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt HrFormat("(A,',',I2.2,':',I2.2)");
-        static ObjexxFCL::gio::Fmt DayFormat("(A,',',I2,',',I2.2,':',I2.2)");
-        static ObjexxFCL::gio::Fmt MonthFormat("(A,',',I2,',',I2,',',I2.2,':',I2.2)");
-        static ObjexxFCL::gio::Fmt EnvrnFormat("(A,',',I2,',',I2,',',I2,',',I2.2,':',I2.2)");
+        static constexpr auto HrFormat("{},{:02}:{:02}");
+        static constexpr auto DayFormat("{},{:2},{:02}:{:02}");
+        static constexpr auto MonthFormat("{},{:2},{:2},{:02}:{:02}");
+        static constexpr auto EnvrnFormat("{},{:2},{:2},{:2},{:02}:{:02}");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1078,27 +1067,27 @@ namespace OutputProcessor {
         switch (ReportFreq) {
         case ReportingFrequency::Hourly: // Hourly -- used in meters
             StartMinute = Minute - MinutesPerTimeStep + 1;
-            ObjexxFCL::gio::write(StrOut, HrFormat) << strip(String) << StartMinute << Minute;
+            StrOut = format(HrFormat, strip(String), StartMinute, Minute);
             break;
 
         case ReportingFrequency::Daily: // Daily
             StartMinute = Minute - MinutesPerTimeStep + 1;
-            ObjexxFCL::gio::write(StrOut, DayFormat) << strip(String) << Hour << StartMinute << Minute;
+            StrOut = format(DayFormat, strip(String), Hour, StartMinute, Minute);
             break;
 
         case ReportingFrequency::Monthly: // Monthly
             StartMinute = Minute - MinutesPerTimeStep + 1;
-            ObjexxFCL::gio::write(StrOut, MonthFormat) << strip(String) << Day << Hour << StartMinute << Minute;
+            StrOut = format(MonthFormat, strip(String), Day, Hour, StartMinute, Minute);
             break;
 
         case ReportingFrequency::Yearly: // Yearly
             StartMinute = Minute - MinutesPerTimeStep + 1;
-            ObjexxFCL::gio::write(StrOut, EnvrnFormat) << strip(String) << Mon << Day << Hour << StartMinute << Minute;
+            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, StartMinute, Minute);
             break;
 
         case ReportingFrequency::Simulation: // Environment
             StartMinute = Minute - MinutesPerTimeStep + 1;
-            ObjexxFCL::gio::write(StrOut, EnvrnFormat) << strip(String) << Mon << Day << Hour << StartMinute << Minute;
+            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, StartMinute, Minute);
             break;
 
         default: // Each, TimeStep, Hourly dont have this
@@ -1298,7 +1287,7 @@ namespace OutputProcessor {
     // The following routines implement Energy Meters in EnergyPlus.
     // *****************************************************************************
 
-    void InitializeMeters()
+    void InitializeMeters(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1335,18 +1324,8 @@ namespace OutputProcessor {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int write_stat;
 
-        OutputFileMeterDetails = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(OutputFileMeterDetails, DataStringGlobals::outputMtdFileName, flags);
-            write_stat = flags.ios();
-        }
-        if (write_stat != 0) {
-            ShowFatalError("InitializeMeters: Could not open file " + DataStringGlobals::outputMtdFileName + " for output (write).");
-        }
+        outputFiles.mtd.ensure_open("InitializeMeters");
     }
 
     void GetCustomMeterInput(bool &ErrorsFound)
@@ -2116,8 +2095,7 @@ namespace OutputProcessor {
             EnergyMeters(NumEnergyMeters).RptTS = false;
             EnergyMeters(NumEnergyMeters).RptTSFO = false;
             AssignReportNumber(EnergyMeters(NumEnergyMeters).TSRptNum);
-            ObjexxFCL::gio::write(EnergyMeters(NumEnergyMeters).TSRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).TSRptNum;
-            strip(EnergyMeters(NumEnergyMeters).TSRptNumChr);
+            EnergyMeters(NumEnergyMeters).TSRptNumChr = fmt::to_string(EnergyMeters(NumEnergyMeters).TSRptNum);
             EnergyMeters(NumEnergyMeters).HRValue = 0.0;
             EnergyMeters(NumEnergyMeters).HRMaxVal = MaxSetValue;
             EnergyMeters(NumEnergyMeters).HRMaxValDate = 0;
@@ -2126,8 +2104,7 @@ namespace OutputProcessor {
             EnergyMeters(NumEnergyMeters).RptHR = false;
             EnergyMeters(NumEnergyMeters).RptHRFO = false;
             AssignReportNumber(EnergyMeters(NumEnergyMeters).HRRptNum);
-            ObjexxFCL::gio::write(EnergyMeters(NumEnergyMeters).HRRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).HRRptNum;
-            strip(EnergyMeters(NumEnergyMeters).HRRptNumChr);
+            EnergyMeters(NumEnergyMeters).HRRptNumChr = fmt::to_string(EnergyMeters(NumEnergyMeters).HRRptNum);
             EnergyMeters(NumEnergyMeters).DYValue = 0.0;
             EnergyMeters(NumEnergyMeters).DYMaxVal = MaxSetValue;
             EnergyMeters(NumEnergyMeters).DYMaxValDate = 0;
@@ -2136,8 +2113,7 @@ namespace OutputProcessor {
             EnergyMeters(NumEnergyMeters).RptDY = false;
             EnergyMeters(NumEnergyMeters).RptDYFO = false;
             AssignReportNumber(EnergyMeters(NumEnergyMeters).DYRptNum);
-            ObjexxFCL::gio::write(EnergyMeters(NumEnergyMeters).DYRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).DYRptNum;
-            strip(EnergyMeters(NumEnergyMeters).DYRptNumChr);
+            EnergyMeters(NumEnergyMeters).DYRptNumChr = fmt::to_string(EnergyMeters(NumEnergyMeters).DYRptNum);
             EnergyMeters(NumEnergyMeters).MNValue = 0.0;
             EnergyMeters(NumEnergyMeters).MNMaxVal = MaxSetValue;
             EnergyMeters(NumEnergyMeters).MNMaxValDate = 0;
@@ -2146,8 +2122,7 @@ namespace OutputProcessor {
             EnergyMeters(NumEnergyMeters).RptMN = false;
             EnergyMeters(NumEnergyMeters).RptMNFO = false;
             AssignReportNumber(EnergyMeters(NumEnergyMeters).MNRptNum);
-            ObjexxFCL::gio::write(EnergyMeters(NumEnergyMeters).MNRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).MNRptNum;
-            strip(EnergyMeters(NumEnergyMeters).MNRptNumChr);
+            EnergyMeters(NumEnergyMeters).MNRptNumChr = fmt::to_string(EnergyMeters(NumEnergyMeters).MNRptNum);
             EnergyMeters(NumEnergyMeters).YRValue = 0.0;
             EnergyMeters(NumEnergyMeters).YRMaxVal = MaxSetValue;
             EnergyMeters(NumEnergyMeters).YRMaxValDate = 0;
@@ -2156,8 +2131,7 @@ namespace OutputProcessor {
             EnergyMeters(NumEnergyMeters).RptYR = false;
             EnergyMeters(NumEnergyMeters).RptYRFO = false;
             AssignReportNumber(EnergyMeters(NumEnergyMeters).YRRptNum);
-            ObjexxFCL::gio::write(EnergyMeters(NumEnergyMeters).YRRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).YRRptNum;
-            strip(EnergyMeters(NumEnergyMeters).YRRptNumChr);
+            EnergyMeters(NumEnergyMeters).YRRptNumChr = fmt::to_string(EnergyMeters(NumEnergyMeters).YRRptNum);
             EnergyMeters(NumEnergyMeters).SMValue = 0.0;
             EnergyMeters(NumEnergyMeters).SMMaxVal = MaxSetValue;
             EnergyMeters(NumEnergyMeters).SMMaxValDate = 0;
@@ -2166,8 +2140,7 @@ namespace OutputProcessor {
             EnergyMeters(NumEnergyMeters).RptSM = false;
             EnergyMeters(NumEnergyMeters).RptSMFO = false;
             AssignReportNumber(EnergyMeters(NumEnergyMeters).SMRptNum);
-            ObjexxFCL::gio::write(EnergyMeters(NumEnergyMeters).SMRptNumChr, fmtLD) << EnergyMeters(NumEnergyMeters).SMRptNum;
-            strip(EnergyMeters(NumEnergyMeters).SMRptNumChr);
+            EnergyMeters(NumEnergyMeters).SMRptNumChr = fmt::to_string(EnergyMeters(NumEnergyMeters).SMRptNum);
             AssignReportNumber(EnergyMeters(NumEnergyMeters).TSAccRptNum);
             AssignReportNumber(EnergyMeters(NumEnergyMeters).HRAccRptNum);
             AssignReportNumber(EnergyMeters(NumEnergyMeters).DYAccRptNum);
@@ -3051,7 +3024,8 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportTSMeters(Real64 const StartMinute, // Start Minute for TimeStep
+    void ReportTSMeters(EnergyPlusData &state,
+                        Real64 const StartMinute, // Start Minute for TimeStep
                         Real64 const EndMinute,   // End Minute for TimeStep
                         bool &PrintESOTimeStamp,  // True if the ESO Time Stamp also needs to be printed
                         bool PrintTimeStampToSQL  // Print Time Stamp to SQL file
@@ -3074,9 +3048,6 @@ namespace OutputProcessor {
         // REFERENCES:
         // na
 
-        // Using/Aliasing
-        using DataGlobals::eso_stream;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -3097,7 +3068,6 @@ namespace OutputProcessor {
         static Real64 rDummy2(0.0);
         static int iDummy1(0);
         static int iDummy2(0);
-        std::string cReportID;
 
         if (!ResultsFramework::OutputSchema->TSMeters.rDataFrameEnabled()) {
             ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::TimeStep);
@@ -3115,12 +3085,12 @@ namespace OutputProcessor {
                 if (HolidayIndex > 0) {
                     CurDayType = 7 + HolidayIndex;
                 }
-                WriteTimeStampFormatData(OutputFiles::getSingleton().mtr,
+                WriteTimeStampFormatData(state.outputFiles.mtr,
                                          ReportingFrequency::EachCall,
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
                                          DayOfSim,
-                                         DayOfSimChr,
+                                         state.dataGlobals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3138,12 +3108,12 @@ namespace OutputProcessor {
                 if (HolidayIndex > 0) {
                     CurDayType = 7 + HolidayIndex;
                 }
-                WriteTimeStampFormatData(eso_stream,
+                WriteTimeStampFormatData(state.outputFiles.eso,
                                          ReportingFrequency::EachCall,
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
                                          DayOfSim,
-                                         DayOfSimChr,
+                                         state.dataGlobals.DayOfSimChr,
                                          PrintTimeStamp && PrintESOTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3156,7 +3126,7 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptTS) {
-                WriteReportMeterData(OutputFiles::getSingleton(),
+                WriteReportMeterData(state.outputFiles,
                                      EnergyMeters(Loop).TSRptNum,
                                      EnergyMeters(Loop).TSRptNumChr,
                                      EnergyMeters(Loop).TSValue,
@@ -3169,9 +3139,11 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccTS) {
-                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).TSAccRptNum;
-                strip(cReportID);
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).TSAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccTSFO);
+                WriteCumulativeReportMeterData(state.outputFiles,
+                                               EnergyMeters(Loop).TSAccRptNum,
+                                               fmt::to_string(EnergyMeters(Loop).TSAccRptNum),
+                                               EnergyMeters(Loop).SMValue,
+                                               EnergyMeters(Loop).RptAccTSFO);
             }
         }
 
@@ -3181,7 +3153,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportHRMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportHRMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3222,7 +3194,6 @@ namespace OutputProcessor {
         static Real64 rDummy2(0.0);
         static int iDummy1(0);
         static int iDummy2(0);
-        std::string cReportID;
 
         if (!ResultsFramework::OutputSchema->HRMeters.rDataFrameEnabled()) {
             ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::Hourly);
@@ -3239,12 +3210,12 @@ namespace OutputProcessor {
                 if (HolidayIndex > 0) {
                     CurDayType = 7 + HolidayIndex;
                 }
-                WriteTimeStampFormatData(OutputFiles::getSingleton().mtr,
+                WriteTimeStampFormatData(state.outputFiles.mtr,
                                          ReportingFrequency::Hourly,
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
                                          DayOfSim,
-                                         DayOfSimChr,
+                                         state.dataGlobals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3258,7 +3229,7 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptHR) {
-                WriteReportMeterData(OutputFiles::getSingleton(),
+                WriteReportMeterData(state.outputFiles,
                                      EnergyMeters(Loop).HRRptNum,
                                      EnergyMeters(Loop).HRRptNumChr,
                                      EnergyMeters(Loop).HRValue,
@@ -3276,15 +3247,17 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccHR) {
-                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).HRAccRptNum;
-                strip(cReportID);
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).HRAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccHRFO);
+                WriteCumulativeReportMeterData(state.outputFiles,
+                                               EnergyMeters(Loop).HRAccRptNum,
+                                               fmt::to_string(EnergyMeters(Loop).HRAccRptNum),
+                                               EnergyMeters(Loop).SMValue,
+                                               EnergyMeters(Loop).RptAccHRFO);
                 ResultsFramework::OutputSchema->HRMeters.pushVariableValue(EnergyMeters(Loop).HRAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
     }
 
-    void ReportDYMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportDYMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3321,13 +3294,12 @@ namespace OutputProcessor {
         int Loop; // Loop Control
         bool PrintTimeStamp;
         int CurDayType;
-        std::string cReportID;
 
         if (!ResultsFramework::OutputSchema->DYMeters.rVariablesScanned()) {
             ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::Daily);
         }
         if (ResultsFramework::OutputSchema->DYMeters.rDataFrameEnabled()) {
-            ResultsFramework::OutputSchema->DYMeters.newRow(std::to_string(Month) + "/" + std::to_string(DayOfMonth));
+            ResultsFramework::OutputSchema->DYMeters.newRow(fmt::to_string(Month) + "/" + fmt::to_string(DayOfMonth));
         }
 
         PrintTimeStamp = true;
@@ -3338,12 +3310,12 @@ namespace OutputProcessor {
                 if (HolidayIndex > 0) {
                     CurDayType = 7 + HolidayIndex;
                 }
-                WriteTimeStampFormatData(OutputFiles::getSingleton().mtr,
+                WriteTimeStampFormatData(state.outputFiles.mtr,
                                          ReportingFrequency::Daily,
                                          DailyStampReportNbr,
                                          DailyStampReportChr,
                                          DayOfSim,
-                                         DayOfSimChr,
+                                         state.dataGlobals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3357,7 +3329,7 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptDY) {
-                WriteReportMeterData(OutputFiles::getSingleton(),
+                WriteReportMeterData(state.outputFiles,
                                      EnergyMeters(Loop).DYRptNum,
                                      EnergyMeters(Loop).DYRptNumChr,
                                      EnergyMeters(Loop).DYValue,
@@ -3374,15 +3346,17 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccDY) {
-                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).DYAccRptNum;
-                strip(cReportID);
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).DYAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccDYFO);
+                WriteCumulativeReportMeterData(state.outputFiles,
+                                               EnergyMeters(Loop).DYAccRptNum,
+                                               fmt::to_string(EnergyMeters(Loop).DYAccRptNum),
+                                               EnergyMeters(Loop).SMValue,
+                                               EnergyMeters(Loop).RptAccDYFO);
                 ResultsFramework::OutputSchema->DYMeters.pushVariableValue(EnergyMeters(Loop).DYAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
     }
 
-    void ReportMNMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportMNMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3419,25 +3393,24 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // Loop Control
         bool PrintTimeStamp;
-        std::string cReportID;
 
         if (!ResultsFramework::OutputSchema->MNMeters.rVariablesScanned()) {
             ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::Monthly);
         }
         if (ResultsFramework::OutputSchema->MNMeters.rDataFrameEnabled()) {
-            ResultsFramework::OutputSchema->MNMeters.newRow(std::to_string(Month));
+            ResultsFramework::OutputSchema->MNMeters.newRow(fmt::to_string(Month));
         }
 
         PrintTimeStamp = true;
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
             if (!EnergyMeters(Loop).RptMN && !EnergyMeters(Loop).RptAccMN) continue;
             if (PrintTimeStamp) {
-                WriteTimeStampFormatData(OutputFiles::getSingleton().mtr,
+                WriteTimeStampFormatData(state.outputFiles.mtr,
                                          ReportingFrequency::Monthly,
                                          MonthlyStampReportNbr,
                                          MonthlyStampReportChr,
                                          DayOfSim,
-                                         DayOfSimChr,
+                                         state.dataGlobals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month);
                 PrintTimeStamp = false;
@@ -3445,7 +3418,7 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptMN) {
-                WriteReportMeterData(OutputFiles::getSingleton(),
+                WriteReportMeterData(state.outputFiles,
                                      EnergyMeters(Loop).MNRptNum,
                                      EnergyMeters(Loop).MNRptNumChr,
                                      EnergyMeters(Loop).MNValue,
@@ -3462,16 +3435,17 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccMN) {
-                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).MNAccRptNum;
-                strip(cReportID);
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).MNAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccMNFO);
+                WriteCumulativeReportMeterData(state.outputFiles,
+                                               EnergyMeters(Loop).MNAccRptNum,
+                                               fmt::to_string(EnergyMeters(Loop).MNAccRptNum),
+                                               EnergyMeters(Loop).SMValue,
+                                               EnergyMeters(Loop).RptAccMNFO);
                 ResultsFramework::OutputSchema->MNMeters.pushVariableValue(EnergyMeters(Loop).MNAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
     }
 
-    void ReportYRMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
-    )
+    void ReportYRMeters(OutputFiles &outputFiles, bool PrintTimeStampToSQL)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3506,20 +3480,19 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // Loop Control
         bool PrintTimeStamp;
-        std::string cReportID;
 
         PrintTimeStamp = true;
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
             if (!EnergyMeters(Loop).RptYR && !EnergyMeters(Loop).RptAccYR) continue;
             if (PrintTimeStamp) {
                 WriteYearlyTimeStamp(
-                    OutputFiles::getSingleton().mtr, YearlyStampReportChr, DataGlobals::CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL);
+                    outputFiles.mtr, YearlyStampReportChr, DataGlobals::CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL);
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
             }
 
             if (EnergyMeters(Loop).RptYR) {
-                WriteReportMeterData(OutputFiles::getSingleton(),
+                WriteReportMeterData(outputFiles,
                                      EnergyMeters(Loop).YRRptNum,
                                      EnergyMeters(Loop).YRRptNumChr,
                                      EnergyMeters(Loop).YRValue,
@@ -3535,14 +3508,16 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccYR) {
-                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).YRAccRptNum;
-                strip(cReportID);
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).YRAccRptNum, cReportID, EnergyMeters(Loop).YRValue, EnergyMeters(Loop).RptAccYRFO);
+                WriteCumulativeReportMeterData(outputFiles,
+                                               EnergyMeters(Loop).YRAccRptNum,
+                                               fmt::to_string(EnergyMeters(Loop).YRAccRptNum),
+                                               EnergyMeters(Loop).YRValue,
+                                               EnergyMeters(Loop).RptAccYRFO);
             }
         }
     }
 
-    void ReportSMMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportSMMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3580,13 +3555,12 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // Loop Control
         bool PrintTimeStamp;
-        std::string cReportID;
 
         if (!ResultsFramework::OutputSchema->SMMeters.rVariablesScanned()) {
             ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::Simulation);
         }
         if (ResultsFramework::OutputSchema->SMMeters.rDataFrameEnabled()) {
-            ResultsFramework::OutputSchema->SMMeters.newRow(DayOfSimChr);
+            ResultsFramework::OutputSchema->SMMeters.newRow(state.dataGlobals.DayOfSimChr);
         }
 
         PrintTimeStamp = true;
@@ -3598,19 +3572,19 @@ namespace OutputProcessor {
             EnergyMeters(Loop).LastSMMaxValDate = EnergyMeters(Loop).SMMaxValDate;
             if (!EnergyMeters(Loop).RptSM && !EnergyMeters(Loop).RptAccSM) continue;
             if (PrintTimeStamp) {
-                WriteTimeStampFormatData(OutputFiles::getSingleton().mtr,
+                WriteTimeStampFormatData(state.outputFiles.mtr,
                                          ReportingFrequency::Simulation,
                                          RunPeriodStampReportNbr,
                                          RunPeriodStampReportChr,
                                          DayOfSim,
-                                         DayOfSimChr,
+                                         state.dataGlobals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL);
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
             }
 
             if (EnergyMeters(Loop).RptSM) {
-                WriteReportMeterData(OutputFiles::getSingleton(),
+                WriteReportMeterData(state.outputFiles,
                                      EnergyMeters(Loop).SMRptNum,
                                      EnergyMeters(Loop).SMRptNumChr,
                                      EnergyMeters(Loop).SMValue,
@@ -3624,9 +3598,11 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccSM) {
-                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).SMAccRptNum;
-                strip(cReportID);
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).SMAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccSMFO);
+                WriteCumulativeReportMeterData(state.outputFiles,
+                                               EnergyMeters(Loop).SMAccRptNum,
+                                               fmt::to_string(EnergyMeters(Loop).SMAccRptNum),
+                                               EnergyMeters(Loop).SMValue,
+                                               EnergyMeters(Loop).RptAccSMFO);
                 ResultsFramework::OutputSchema->SMMeters.pushVariableValue(EnergyMeters(Loop).SMAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
@@ -3748,7 +3724,7 @@ namespace OutputProcessor {
 
         if (codedDate == 0) return "-";
 
-        static ObjexxFCL::gio::Fmt DateFmt("(I2.2,'-',A3,'-',I2.2,':',I2.2)");
+        static constexpr auto DateFmt("{:02}-{:3}-{:02}:{:02}");
 
         // ((month*100 + day)*100 + hour)*100 + minute
         int Month;  // month in integer format (1-12)
@@ -3809,13 +3785,11 @@ namespace OutputProcessor {
             break;
         }
 
-        std::string StringOut;
-        ObjexxFCL::gio::write(StringOut, DateFmt) << Day << monthName << Hour << Minute;
-
+        const std::string StringOut = format(DateFmt, Day, monthName, Hour, Minute);
         return StringOut;
     }
 
-    void ReportMeterDetails()
+    void ReportMeterDetails(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3851,95 +3825,62 @@ namespace OutputProcessor {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int VarMeter;
-        int VarMeter1;
-        int Meter;
-        int I;
-        std::string String;
-        std::string Multipliers;
-        int ZoneMult;     // Zone Multiplier
-        int ZoneListMult; // Zone List Multiplier
-        bool CustDecWritten;
 
-        for (VarMeter = 1; VarMeter <= NumVarMeterArrays; ++VarMeter) {
+        for (int VarMeter = 1; VarMeter <= NumVarMeterArrays; ++VarMeter) {
 
-            std::string mtrUnitString = unitEnumToStringBrackets(RVariableTypes(VarMeterArrays(VarMeter).RepVariable).units);
+            const std::string mtrUnitString = unitEnumToStringBrackets(RVariableTypes(VarMeterArrays(VarMeter).RepVariable).units);
 
-            Multipliers = "";
-            ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
-            ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
+            std::string Multipliers = "";
+            const auto ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
+            const auto ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
             if (ZoneMult > 1 || ZoneListMult > 1) {
-                ObjexxFCL::gio::write(String, fmtLD) << ZoneMult * ZoneListMult;
-                Multipliers = " * " + stripped(String);
-                ObjexxFCL::gio::write(String, fmtLD) << ZoneMult;
-                Multipliers += "  (Zone Multiplier = " + stripped(String);
-                ObjexxFCL::gio::write(String, fmtLD) << ZoneListMult;
-                Multipliers += ", Zone List Multiplier = " + stripped(String) + ')';
+                Multipliers = format(" * {}  (Zone Multiplier = {}, Zone List Multiplier = {})", ZoneMult * ZoneListMult, ZoneMult, ZoneListMult);
             }
 
-            ObjexxFCL::gio::write(OutputFileMeterDetails, "(/,A)")
-                << " Meters for " + RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ReportIDChr + ',' +
-                       RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName + mtrUnitString + Multipliers;
+            print(outputFiles.mtd, "\n Meters for {},{}{}{}\n", RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ReportIDChr,
+                       RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName, mtrUnitString, Multipliers);
 
-            for (I = 1; I <= VarMeterArrays(VarMeter).NumOnMeters; ++I) {
-                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
-                    << "  OnMeter=" + EnergyMeters(VarMeterArrays(VarMeter).OnMeters(I)).Name + mtrUnitString;
+            for (int I = 1; I <= VarMeterArrays(VarMeter).NumOnMeters; ++I) {
+                print(outputFiles.mtd, "  OnMeter={}{}\n", EnergyMeters(VarMeterArrays(VarMeter).OnMeters(I)).Name, mtrUnitString);
             }
 
-            for (I = 1; I <= VarMeterArrays(VarMeter).NumOnCustomMeters; ++I) {
-                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
-                    << "  OnCustomMeter=" + EnergyMeters(VarMeterArrays(VarMeter).OnCustomMeters(I)).Name + mtrUnitString;
+            for (int I = 1; I <= VarMeterArrays(VarMeter).NumOnCustomMeters; ++I) {
+                print(outputFiles.mtd, "  OnCustomMeter={}{}\n", EnergyMeters(VarMeterArrays(VarMeter).OnCustomMeters(I)).Name, mtrUnitString);
             }
         }
 
-        for (Meter = 1; Meter <= NumEnergyMeters; ++Meter) {
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileMeterDetails, "(/,A)", flags)
-                    << " For Meter=" + EnergyMeters(Meter).Name + unitEnumToStringBrackets(EnergyMeters(Meter).Units);
-            }
+        for (int Meter = 1; Meter <= NumEnergyMeters; ++Meter) {
+            print(outputFiles.mtd, "\n For Meter={}{}", EnergyMeters(Meter).Name, unitEnumToStringBrackets(EnergyMeters(Meter).Units));
             if (EnergyMeters(Meter).ResourceType != "") {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA, flags) << ", ResourceType=" + EnergyMeters(Meter).ResourceType;
-            };
+                print(outputFiles.mtd, ", ResourceType={}", EnergyMeters(Meter).ResourceType);
+            }
             if (EnergyMeters(Meter).EndUse != "") {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA, flags) << ", EndUse=" + EnergyMeters(Meter).EndUse;
-            };
+                print(outputFiles.mtd, ", EndUse={}", EnergyMeters(Meter).EndUse);
+            }
             if (EnergyMeters(Meter).Group != "") {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA, flags) << ", Group=" + EnergyMeters(Meter).Group;
-            };
-            ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA) << ", contents are:";
+                print(outputFiles.mtd, ", Group={}", EnergyMeters(Meter).Group);
+            }
+            print(outputFiles.mtd, ", contents are:\n");
 
-            CustDecWritten = false;
+            bool CustDecWritten = false;
 
-            for (VarMeter = 1; VarMeter <= NumVarMeterArrays; ++VarMeter) {
+            for (int VarMeter = 1; VarMeter <= NumVarMeterArrays; ++VarMeter) {
                 if (EnergyMeters(Meter).TypeOfMeter == MeterType_Normal) {
                     if (any_eq(VarMeterArrays(VarMeter).OnMeters, Meter)) {
-                        for (VarMeter1 = 1; VarMeter1 <= VarMeterArrays(VarMeter).NumOnMeters; ++VarMeter1) {
+                        for (int VarMeter1 = 1; VarMeter1 <= VarMeterArrays(VarMeter).NumOnMeters; ++VarMeter1) {
                             if (VarMeterArrays(VarMeter).OnMeters(VarMeter1) != Meter) continue;
 
-                            Multipliers = "";
-                            ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
-                            ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
+                            std::string Multipliers = "";
+                            const auto ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
+                            const auto ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
                             if (ZoneMult > 1 || ZoneListMult > 1) {
-                                ObjexxFCL::gio::write(String, fmtLD) << ZoneMult * ZoneListMult;
-                                Multipliers = " * " + stripped(String);
-                                ObjexxFCL::gio::write(String, fmtLD) << ZoneMult;
-                                Multipliers += "  (Zone Multiplier = " + stripped(String);
-                                ObjexxFCL::gio::write(String, fmtLD) << ZoneListMult;
-                                Multipliers += ", Zone List Multiplier = " + stripped(String) + ')';
+                                Multipliers = format(
+                                    " * {}  (Zone Multiplier = {}, Zone List Multiplier = {})", ZoneMult * ZoneListMult, ZoneMult, ZoneListMult);
                             }
 
-                            ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
-                                << "  " + RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName + Multipliers;
+                            print(outputFiles.mtd, "  {}{}\n", RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName, Multipliers);
                         }
                     }
                 }
@@ -3947,29 +3888,22 @@ namespace OutputProcessor {
                     if (VarMeterArrays(VarMeter).NumOnCustomMeters > 0) {
                         if (any_eq(VarMeterArrays(VarMeter).OnCustomMeters, Meter)) {
                             if (!CustDecWritten && EnergyMeters(Meter).TypeOfMeter == MeterType_CustomDec) {
-                                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
-                                    << " Values for this meter will be Source Meter=" + EnergyMeters(EnergyMeters(Meter).SourceMeter).Name +
-                                           "; but will be decremented by:";
+                                print(outputFiles.mtd,  " Values for this meter will be Source Meter={}; but will be decremented by:\n", EnergyMeters(EnergyMeters(Meter).SourceMeter).Name);
                                 CustDecWritten = true;
                             }
-                            for (VarMeter1 = 1; VarMeter1 <= VarMeterArrays(VarMeter).NumOnCustomMeters; ++VarMeter1) {
+                            for (int VarMeter1 = 1; VarMeter1 <= VarMeterArrays(VarMeter).NumOnCustomMeters; ++VarMeter1) {
                                 if (VarMeterArrays(VarMeter).OnCustomMeters(VarMeter1) != Meter) continue;
 
-                                Multipliers = "";
-                                ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
-                                ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
+                                std::string Multipliers;
+                                const auto ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
+                                const auto ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
                                 if (ZoneMult > 1 || ZoneListMult > 1) {
-                                    ObjexxFCL::gio::write(String, fmtLD) << ZoneMult * ZoneListMult;
-                                    Multipliers = " * " + stripped(String);
-                                    ObjexxFCL::gio::write(String, fmtLD) << ZoneMult;
-                                    Multipliers += "  (Zone Multiplier = " + stripped(String);
-                                    ObjexxFCL::gio::write(String, fmtLD) << ZoneListMult;
-                                    Multipliers += ", Zone List Multiplier = " + stripped(String) + ')';
+                                    Multipliers = format(
+                                        " * {}  (Zone Multiplier = {}, Zone List Multiplier = {})", ZoneMult * ZoneListMult, ZoneMult, ZoneListMult);
                                 }
 
-                                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
-                                    << "  " + RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName + Multipliers;
+                                print(outputFiles.mtd, "  {}{}\n", RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName, Multipliers);
                             }
                         }
                     }
@@ -4191,173 +4125,7 @@ namespace OutputProcessor {
         default:
             if (sqlite) {
                 std::string str("Illegal reportingInterval passed to WriteTimeStampFormatData: " +
-                                std::to_string(static_cast<int>(reportingInterval)));
-                sqlite->sqliteWriteMessage(str);
-            }
-            break;
-        }
-    }
-
-    void WriteTimeStampFormatData(
-        std::ostream *out_stream_p,                 // Output stream pointer
-        ReportingFrequency const reportingInterval, // See Module Parameter Definitons for ReportEach, ReportTimeStep, ReportHourly, etc.
-        int const reportID,                         // The ID of the time stamp
-        std::string const &reportIDString,          // The ID of the time stamp
-        int const DayOfSim,                         // the number of days simulated so far
-        std::string const &DayOfSimChr,             // the number of days simulated so far
-        bool writeToSQL,
-        Optional_int_const Month,           // the month of the reporting interval
-        Optional_int_const DayOfMonth,      // The day of the reporting interval
-        Optional_int_const Hour,            // The hour of the reporting interval
-        Optional<Real64 const> EndMinute,   // The last minute in the reporting interval
-        Optional<Real64 const> StartMinute, // The starting minute of the reporting interval
-        Optional_int_const DST,             // A flag indicating whether daylight savings time is observed
-        Optional_string_const DayType       // The day tied for the data (e.g., Monday)
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Greg Stark
-        //       DATE WRITTEN   July 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function reports the timestamp data for the output processor
-        // Much of the code in this function was embedded in earlier versions of EnergyPlus
-        // and was moved to this location to simplify maintenance and to allow for data output
-        // to the SQL database
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace DataPrecisionGlobals;
-        using DataStringGlobals::NL;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static int const N(100);
-        static char stamp[N];
-        assert(reportIDString.length() + DayOfSimChr.length() + (DayType.present() ? DayType().length() : 0u) + 26 <
-               N); // Check will fit in stamp size
-
-        if ((!out_stream_p) || (!*out_stream_p)) return; // Stream
-
-        std::ostream &out_stream(*out_stream_p);
-        switch (reportingInterval) {
-        case ReportingFrequency::EachCall:
-        case ReportingFrequency::TimeStep:
-            std::sprintf(stamp,
-                         "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s",
-                         reportIDString.c_str(),
-                         DayOfSimChr.c_str(),
-                         Month(),
-                         DayOfMonth(),
-                         DST(),
-                         Hour(),
-                         StartMinute(),
-                         EndMinute(),
-                         DayType().c_str());
-            out_stream << stamp << NL;
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
-                                                    reportID,
-                                                    DayOfSim,
-                                                    DataEnvironment::CurEnvirNum,
-                                                    DataGlobals::CalendarYear,
-                                                    Month,
-                                                    DayOfMonth,
-                                                    Hour,
-                                                    EndMinute,
-                                                    StartMinute,
-                                                    DST,
-                                                    DayType,
-                                                    DataGlobals::WarmupFlag);
-            }
-            break;
-        case ReportingFrequency::Hourly:
-            std::sprintf(stamp,
-                         "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s",
-                         reportIDString.c_str(),
-                         DayOfSimChr.c_str(),
-                         Month(),
-                         DayOfMonth(),
-                         DST(),
-                         Hour(),
-                         0.0,
-                         60.0,
-                         DayType().c_str());
-            out_stream << stamp << NL;
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
-                                                    reportID,
-                                                    DayOfSim,
-                                                    DataEnvironment::CurEnvirNum,
-                                                    DataGlobals::CalendarYear,
-                                                    Month,
-                                                    DayOfMonth,
-                                                    Hour,
-                                                    _,
-                                                    _,
-                                                    DST,
-                                                    DayType,
-                                                    DataGlobals::WarmupFlag);
-            }
-            break;
-        case ReportingFrequency::Daily:
-            std::sprintf(stamp, "%s,%s,%2d,%2d,%2d,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), DayType().c_str());
-            out_stream << stamp << NL;
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
-                                                    reportID,
-                                                    DayOfSim,
-                                                    DataEnvironment::CurEnvirNum,
-                                                    DataGlobals::CalendarYear,
-                                                    Month,
-                                                    DayOfMonth,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    DST,
-                                                    DayType,
-                                                    DataGlobals::WarmupFlag);
-            }
-            break;
-        case ReportingFrequency::Monthly:
-            std::sprintf(stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month());
-            out_stream << stamp << NL;
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(
-                    static_cast<int>(reportingInterval), reportID, DayOfSim, DataEnvironment::CurEnvirNum, DataGlobals::CalendarYear, Month);
-            }
-            break;
-        case ReportingFrequency::Simulation:
-            std::sprintf(stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str());
-            out_stream << stamp << NL;
-            if (writeToSQL && sqlite) {
-                sqlite->createSQLiteTimeIndexRecord(
-                    static_cast<int>(reportingInterval), reportID, DayOfSim, DataEnvironment::CurEnvirNum, DataGlobals::CalendarYear);
-            }
-            break;
-        default:
-            if (sqlite) {
-                std::string str("Illegal reportingInterval passed to WriteTimeStampFormatData: " +
-                                std::to_string(static_cast<int>(reportingInterval)));
+                                fmt::to_string(static_cast<int>(reportingInterval)));
                 sqlite->sqliteWriteMessage(str);
             }
             break;
@@ -4375,63 +4143,8 @@ namespace OutputProcessor {
         }
     }
 
-
-    void WriteYearlyTimeStamp(std::ostream *out_stream_p,        // Output stream pointer
-                              std::string const &reportIDString, // The ID of the time stamp
-                              std::string const &yearOfSimChr,   // the year of the simulation
-                              bool writeToSQL)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Jason DeGraw
-        //       DATE WRITTEN   December 2017
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function reports the timestamp data for the output processor
-        // Much of the code in this function was embedded in earlier versions of EnergyPlus
-        // and was moved to this location to simplify maintenance and to allow for data output
-        // to the SQL database
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace DataPrecisionGlobals;
-        using DataStringGlobals::NL;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static int const N(100);
-        static char stamp[N];
-        assert(reportIDString.length() + yearOfSimChr.length() + 26 < N); // Check will fit in stamp size
-
-        if ((!out_stream_p) || (!*out_stream_p)) return; // Stream
-        std::ostream &out_stream(*out_stream_p);
-
-        std::sprintf(stamp, "%s,%s", reportIDString.c_str(), yearOfSimChr.c_str());
-        out_stream << stamp << NL;
-        if (writeToSQL && sqlite) {
-            sqlite->createYearlyTimeIndexRecord(DataGlobals::CalendarYear, DataEnvironment::CurEnvirNum);
-        }
-    }
-
-    void WriteReportVariableDictionaryItem(ReportingFrequency const reportingInterval, // The reporting interval (e.g., hourly, daily)
+    void WriteReportVariableDictionaryItem(OutputFiles &outputFiles,
+                                           ReportingFrequency const reportingInterval, // The reporting interval (e.g., hourly, daily)
                                            StoreType const storeType,
                                            int const reportID,                 // The reporting ID for the data
                                            int const EP_UNUSED(indexGroupKey), // The reporting group (e.g., Zone, Plant Loop, etc.)
@@ -4461,7 +4174,6 @@ namespace OutputProcessor {
         // na
 
         // Using/Aliasing
-        using DataGlobals::eso_stream;
         using DataStringGlobals::NL;
 
         // Locals
@@ -4491,42 +4203,36 @@ namespace OutputProcessor {
         } else {
             UnitsString = unitEnumToString(unitsForVar);
         }
+
+        const auto write = [&](OutputFile &file, const int interval) {
+            if (file.good()) {
+                print(file, "{},{},{},{} [{}]{}\n", reportIDChr, interval, keyedValue, variableName, UnitsString, FreqString);
+            }
+        };
         switch (reportingInterval) {
         case ReportingFrequency::EachCall:
         case ReportingFrequency::TimeStep:
-            if (eso_stream) {
-                *eso_stream << reportIDChr << ",1," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
-            }
+            write(outputFiles.eso, 1);
             break;
         case ReportingFrequency::Hourly:
             TrackingHourlyVariables = true;
-            if (eso_stream) {
-                *eso_stream << reportIDChr << ",1," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
-            }
+            write(outputFiles.eso, 1);
             break;
         case ReportingFrequency::Daily:
             TrackingDailyVariables = true;
-            if (eso_stream) {
-                *eso_stream << reportIDChr << ",7," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
-            }
+            write(outputFiles.eso, 7);
             break;
         case ReportingFrequency::Monthly:
             TrackingMonthlyVariables = true;
-            if (eso_stream) {
-                *eso_stream << reportIDChr << ",9," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
-            }
+            write(outputFiles.eso, 9);
             break;
         case ReportingFrequency::Simulation:
             TrackingRunPeriodVariables = true;
-            if (eso_stream) {
-                *eso_stream << reportIDChr << ",11," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
-            }
+            write(outputFiles.eso, 11);
             break;
         case ReportingFrequency::Yearly:
             TrackingYearlyVariables = true;
-            if (eso_stream) {
-                *eso_stream << reportIDChr << ",11," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
-            }
+            write(outputFiles.eso, 11);
             break;
             // No default available?
         }
@@ -4578,7 +4284,6 @@ namespace OutputProcessor {
         // na
 
         // Using/Aliasing
-        using DataGlobals::eso_stream;
         using DataStringGlobals::NL;
 
         // Locals
@@ -4594,120 +4299,47 @@ namespace OutputProcessor {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string::size_type lenString;
-
         std::string UnitsString = unitEnumToString(unit);
 
         std::string const FreqString(frequencyNotice(storeType, reportingInterval));
+
+        const auto print_meter = [&](OutputFiles& ofs, const int frequency) {
+            const auto out = [&](OutputFile &of) {
+                if (of.good()) {
+                    if (cumulativeMeterFlag) {
+                        static constexpr auto fmt{"{},{},Cumulative {} [{}]{}\n"};
+                        const auto lenString = index(FreqString, '[');
+                        print(of, fmt, reportIDChr, 1, meterName, UnitsString, FreqString.substr(0, lenString));
+                    } else {
+                        static constexpr auto fmt{"{},{},{} [{}]{}\n"};
+                        print(of, fmt, reportIDChr, frequency, meterName, UnitsString, FreqString);
+                    }
+                }
+            };
+
+            out(ofs.mtr);
+            if (!meterFileOnlyFlag) {
+                out(ofs.eso);
+            }
+        };
+
         switch (reportingInterval) {
         case ReportingFrequency::EachCall:
         case ReportingFrequency::TimeStep:
         case ReportingFrequency::Hourly: // -1, 0, 1
-            if (!cumulativeMeterFlag) {
-                if (outputFiles.mtr.good()) {
-                    print(outputFiles.mtr, "{},1,{} [{}]{}\n", reportIDChr, meterName, UnitsString, FreqString);
-                }
-            } else if (outputFiles.mtr.good()) {
-                print(outputFiles.mtr, "{},1,Cumulative {} [{}]{}\n", reportIDChr, meterName, UnitsString, FreqString);
-            }
-
-            if (!meterFileOnlyFlag) {
-                if (!cumulativeMeterFlag) {
-                    if (eso_stream) {
-                        *eso_stream << reportIDChr << ",1," << meterName << " [" << UnitsString << ']' << FreqString << NL;
-                    }
-                } else if (eso_stream) {
-                    *eso_stream << reportIDChr << ",1,Cumulative " << meterName << " [" << UnitsString << ']' << FreqString << NL;
-                }
-            }
+            print_meter(outputFiles, 1);
             break;
         case ReportingFrequency::Daily: //  2
-            if (!cumulativeMeterFlag) {
-                if (outputFiles.mtr.good()) {
-                    print(outputFiles.mtr, "{},7,{} [{}]{}\n", reportIDChr, meterName, UnitsString, FreqString);
-                }
-            } else if (outputFiles.mtr.good()) {
-                lenString = index(FreqString, '[');
-                print(outputFiles.mtr, "{},1,Cumulative {} [{}]{}\n", reportIDChr, meterName, UnitsString, FreqString.substr(0, lenString));
-            }
-            if (!meterFileOnlyFlag) {
-                if (!cumulativeMeterFlag) {
-                    if (eso_stream) {
-                        *eso_stream << reportIDChr << ",7," << meterName << " [" << UnitsString << ']' << FreqString << NL;
-                    }
-                } else if (eso_stream) {
-                    lenString = index(FreqString, '[');
-                    *eso_stream << reportIDChr << ",1,Cumulative " << meterName << " [" << UnitsString << ']' << FreqString.substr(0, lenString)
-                                << NL;
-                }
-            }
+            print_meter(outputFiles, 7);
             break;
         case ReportingFrequency::Monthly: //  3
-            if (!cumulativeMeterFlag) {
-                if (outputFiles.mtr.good()) {
-                    print(outputFiles.mtr, "{},9,{} [{}]{}\n", reportIDChr, meterName, UnitsString, FreqString);
-                }
-            } else if (outputFiles.mtr.good()) {
-                lenString = index(FreqString, '[');
-                print(outputFiles.mtr, "{},1,Cumulative {} [{}]{}\n", reportIDChr, meterName, UnitsString, FreqString.substr(0, lenString));
-            }
-            if (!meterFileOnlyFlag) {
-                if (!cumulativeMeterFlag) {
-                    if (eso_stream) {
-                        *eso_stream << reportIDChr << ",9," << meterName << " [" << UnitsString << ']' << FreqString << NL;
-                    }
-                } else if (eso_stream) {
-                    lenString = index(FreqString, '[');
-                    *eso_stream << reportIDChr << ",1,Cumulative " << meterName << " [" << UnitsString << ']' << FreqString.substr(0, lenString)
-                                << NL;
-                }
-            }
+            print_meter(outputFiles, 9);
             break;
         case ReportingFrequency::Yearly: //  5
-            if (!cumulativeMeterFlag) {
-                if (outputFiles.mtr.good()) {
-                    print(outputFiles.mtr, "{},11,{} [{}]{}\n", reportIDChr, meterName, UnitsString, FreqString);
-                }
-            } else if (outputFiles.mtr.good()) {
-                lenString = index(FreqString, '[');
-                print(outputFiles.mtr, "{},1,Cumulative {} [{}]{}\n", reportIDChr, meterName, UnitsString, FreqString.substr(0, lenString));
-            }
-            if (!meterFileOnlyFlag) {
-                if (!cumulativeMeterFlag) {
-                    if (eso_stream) {
-                        *eso_stream << reportIDChr << ",11," << meterName << " [" << UnitsString << ']' << FreqString << NL;
-                    }
-                } else {
-                    lenString = index(FreqString, '[');
-                    if (eso_stream) {
-                        *eso_stream << reportIDChr << ",1,Cumulative " << meterName << " [" << UnitsString << ']' << FreqString.substr(0, lenString)
-                                    << NL;
-                    }
-                }
-            }
+            print_meter(outputFiles, 11);
             break;
         case ReportingFrequency::Simulation: //  4
-            if (!cumulativeMeterFlag) {
-                if (outputFiles.mtr.good()) {
-                    print(outputFiles.mtr, "{},11,{} [{}]{}\n", reportIDChr, meterName, UnitsString, FreqString);
-                }
-            } else if (outputFiles.mtr.good()) {
-                lenString = index(FreqString, '[');
-                print(outputFiles.mtr, "{},1,Cumulative {} [{}]{}\n", reportIDChr, meterName, UnitsString, FreqString.substr(0, lenString));
-            }
-            if (!meterFileOnlyFlag) {
-                if (!cumulativeMeterFlag) {
-                    if (eso_stream) {
-                        *eso_stream << reportIDChr << ",11," << meterName << " [" << UnitsString << ']' << FreqString << NL;
-                    }
-                } else {
-                    lenString = index(FreqString, '[');
-                    if (eso_stream) {
-                        *eso_stream << reportIDChr << ",1,Cumulative " << meterName << " [" << UnitsString << ']' << FreqString.substr(0, lenString)
-                                    << NL;
-                    }
-                }
-            }
+            print_meter(outputFiles, 11);
             break;
         }
 
@@ -4728,7 +4360,8 @@ namespace OutputProcessor {
         }
     }
 
-    void WriteRealVariableOutput(RealVariables &realVar,             // Real variable to write out
+    void WriteRealVariableOutput(OutputFiles &outputFiles,
+                                 RealVariables &realVar,             // Real variable to write out
                                  ReportingFrequency const reportType // The report type or interval (e.g., hourly)
     )
     {
@@ -4770,7 +4403,7 @@ namespace OutputProcessor {
 
         if (realVar.Report && realVar.frequency == reportType && realVar.Stored) {
             if (realVar.NumStored > 0.0) {
-                WriteReportRealData(realVar.ReportID,
+                WriteReportRealData(outputFiles,realVar.ReportID,
                                     realVar.ReportIDChr,
                                     realVar.StoreValue,
                                     realVar.storeType,
@@ -4791,17 +4424,17 @@ namespace OutputProcessor {
         }
     }
 
-    void WriteReportRealData(int const reportID,                         // The variable's report ID
-                             std::string const &creportID,               // variable ID in characters
-                             Real64 const repValue,                      // The variable's value
-                             StoreType const storeType,                  // Averaged or Sum
-                             Real64 const numOfItemsStored,              // The number of items (hours or timesteps) of data stored
-                             ReportingFrequency const reportingInterval, // The variable's reporting interval (e.g., daily)
-                             Real64 const minValue,                      // The variable's minimum value during the reporting interval
-                             int const minValueDate,                     // The date the minimum value occurred
-                             Real64 const MaxValue,                      // The variable's maximum value during the reporting interval
-                             int const maxValueDate                      // The date the maximum value occurred
-    )
+    void WriteReportRealData(OutputFiles &outputFiles,
+                             int const reportID,
+                             std::string const &creportID,
+                             Real64 const repValue,
+                             StoreType const storeType,
+                             Real64 const numOfItemsStored,
+                             ReportingFrequency const reportingInterval,
+                             Real64 const minValue,
+                             int const minValueDate,
+                             Real64 const MaxValue,
+                             int const maxValueDate)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4854,7 +4487,9 @@ namespace OutputProcessor {
 
         if ((reportingInterval == ReportingFrequency::EachCall) || (reportingInterval == ReportingFrequency::TimeStep) ||
             (reportingInterval == ReportingFrequency::Hourly)) { // -1, 0, 1
-            if (DataGlobals::eso_stream) *DataGlobals::eso_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
+            if (outputFiles.eso.good()) {
+                print(outputFiles.eso, "{},{}\n", creportID, NumberOut);
+            }
 
         } else { // if ( ( reportingInterval == ReportingFrequency::Daily ) || ( reportingInterval == ReportingFrequency::Monthly ) || (
                  // reportingInterval == ReportingFrequency::Simulation ) ) { //  2, 3, 4, 5
@@ -4879,13 +4514,14 @@ namespace OutputProcessor {
             ProduceMinMaxString(MinOut, minValueDate, reportingInterval);
             ProduceMinMaxString(MaxOut, maxValueDate, reportingInterval);
 
-            if (DataGlobals::eso_stream) {
-                *DataGlobals::eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << DataStringGlobals::NL;
+            if (outputFiles.eso.good()) {
+                print(outputFiles.eso, "{},{},{},{}\n", creportID, NumberOut, MinOut, MaxOut);
             }
         }
     }
 
-    void WriteCumulativeReportMeterData(int const reportID,           // The variable's report ID
+    void WriteCumulativeReportMeterData(OutputFiles &outputFiles,
+                                        int const reportID,           // The variable's report ID
                                         std::string const &creportID, // variable ID in characters
                                         Real64 const repValue,        // The variable's value
                                         bool const meterOnlyFlag      // A flag that indicates if the data should be written to standard output
@@ -4916,11 +4552,11 @@ namespace OutputProcessor {
             sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
-        if (OutputFiles::getSingleton().mtr.good()) print(OutputFiles::getSingleton().mtr, "{},{}\n", creportID, NumberOut);
+        if (outputFiles.mtr.good()) print(outputFiles.mtr, "{},{}\n", creportID, NumberOut);
         ++DataGlobals::StdMeterRecordCount;
 
         if (!meterOnlyFlag) {
-            if (DataGlobals::eso_stream) *DataGlobals::eso_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
+            if (outputFiles.eso.good()) print(outputFiles.eso, "{},{}\n", creportID, NumberOut);
             ++DataGlobals::StdOutputRecordCount;
         }
     }
@@ -4955,7 +4591,6 @@ namespace OutputProcessor {
         // na
 
         // Using/Aliasing
-        using DataGlobals::eso_stream;
         using DataGlobals::StdMeterRecordCount;
         using DataGlobals::StdOutputRecordCount;
 
@@ -4976,12 +4611,12 @@ namespace OutputProcessor {
 
         if ((reportingInterval == ReportingFrequency::EachCall) || (reportingInterval == ReportingFrequency::TimeStep) ||
             (reportingInterval == ReportingFrequency::Hourly)) { // -1, 0, 1
-            if (OutputFiles::getSingleton().mtr.good()) {
-                print(OutputFiles::getSingleton().mtr, "{},{}\n", creportID, NumberOut);
+            if (outputFiles.mtr.good()) {
+                print(outputFiles.mtr, "{},{}\n", creportID, NumberOut);
             }
             ++StdMeterRecordCount;
-            if (eso_stream && !meterOnlyFlag) {
-                *eso_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
+            if (outputFiles.eso.good() && !meterOnlyFlag) {
+                print(outputFiles.eso, "{},{}\n", creportID, NumberOut);
                 ++StdOutputRecordCount;
             }
         } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //
@@ -5012,54 +4647,15 @@ namespace OutputProcessor {
             }
 
             ++StdMeterRecordCount;
-            if (eso_stream && !meterOnlyFlag) {
-                *eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << DataStringGlobals::NL;
+            if (outputFiles.eso.good() && !meterOnlyFlag) {
+                print(outputFiles.eso, "{},{},{},{}\n", creportID, NumberOut, MinOut, MaxOut);
                 ++StdOutputRecordCount;
             }
         }
     }
 
-    void strip_number(char *str)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Stuart Mentzer
-        //       DATE WRITTEN   Nov 2014
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Remove trailing spaces and fractional zeros from floating point representation C-string in place for fast output
-
-        assert(!std::strpbrk(str, "ed")); // Pre Not using lowercase exponent letter
-
-        std::size_t l(std::strlen(str)); // String length
-        assert(l >= 2);
-        while ((l > 0u) && (str[l - 1] == ' '))
-            --l;                                                     // Strip space from right
-        if ((std::strchr(str, '.')) && (!std::strpbrk(str, "ED"))) { // Remove trailing fractional zeros
-            while ((l > 0u) && (str[l - 1] == '0'))
-                --l; // Strip trailing 0
-            if (l > 0u) {
-                switch (l) {
-                case 1u: // .0* -> 0.
-                    std::strcpy(str, "0.");
-                    return;
-                case 2u:
-                    if (str[1] == '.') {
-                        char const c0(str[0]);
-                        if ((c0 == '+') || (c0 == '-')) {
-                            std::strcpy(str, "0.");
-                            return;
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-        str[l] = '\0'; // Shorten string
-    }
-
-    void WriteNumericData(int const reportID,           // The variable's reporting ID
+    void WriteNumericData(OutputFiles &outputFiles,
+                          int const reportID,           // The variable's reporting ID
                           std::string const &creportID, // variable ID in characters
                           Real64 const repValue         // The variable's value
     )
@@ -5089,10 +4685,13 @@ namespace OutputProcessor {
             sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
-        if (DataGlobals::eso_stream) *DataGlobals::eso_stream << creportID << ',' << s << DataStringGlobals::NL;
+        if (outputFiles.eso.good()) {
+            print(outputFiles.eso, "{},{}\n", creportID, s);
+        }
     }
 
-    void WriteNumericData(int const reportID,           // The variable's reporting ID
+    void WriteNumericData(OutputFiles &outputFiles,
+                          int const reportID,           // The variable's reporting ID
                           std::string const &creportID, // variable ID in characters
                           int32_t const repValue        // The variable's value
     )
@@ -5120,10 +4719,13 @@ namespace OutputProcessor {
             sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
-        if (DataGlobals::eso_stream) *DataGlobals::eso_stream << creportID << ',' << s << DataStringGlobals::NL;
+        if (outputFiles.eso.good()) {
+            print(outputFiles.eso, "{},{}\n", creportID, s);
+        }
     }
 
-    void WriteNumericData(int const reportID,           // The variable's reporting ID
+    void WriteNumericData(OutputFiles &outputFiles,
+                          int const reportID,           // The variable's reporting ID
                           std::string const &creportID, // variable ID in characters
                           int64_t const repValue        // The variable's value
     )
@@ -5151,10 +4753,13 @@ namespace OutputProcessor {
             sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
-        if (DataGlobals::eso_stream) *DataGlobals::eso_stream << creportID << ',' << s << DataStringGlobals::NL;
+        if (outputFiles.eso.good()) {
+            print(outputFiles.eso, "{},{}\n", creportID, s);
+        }
     }
 
-    void WriteIntegerVariableOutput(IntegerVariables &intVar,           // Integer variable to write out
+    void WriteIntegerVariableOutput(OutputFiles &outputFiles,
+                                    IntegerVariables &intVar,           // Integer variable to write out
                                     ReportingFrequency const reportType // The report type (i.e., the reporting interval)
     )
     {
@@ -5200,7 +4805,8 @@ namespace OutputProcessor {
 
         if (intVar.Report && intVar.frequency == reportType && intVar.Stored) {
             if (intVar.NumStored > 0.0) {
-                WriteReportIntegerData(intVar.ReportID,
+                WriteReportIntegerData(outputFiles,
+                                       intVar.ReportID,
                                        intVar.ReportIDChr,
                                        intVar.StoreValue,
                                        intVar.storeType,
@@ -5221,7 +4827,8 @@ namespace OutputProcessor {
         }
     }
 
-    void WriteReportIntegerData(int const reportID,                         // The variable's reporting ID
+    void WriteReportIntegerData(OutputFiles &outputFiles,
+                                int const reportID,                         // The variable's reporting ID
                                 std::string const &reportIDString,          // The variable's reporting ID (character)
                                 Real64 const repValue,                      // The variable's value
                                 StoreType const storeType,                  // Type of item (averaged or summed)
@@ -5255,7 +4862,6 @@ namespace OutputProcessor {
 
         // Using/Aliasing
         using namespace DataPrecisionGlobals;
-        using DataGlobals::eso_stream;
         using DataStringGlobals::NL;
         using General::strip_trailing_zeros;
 
@@ -5286,13 +4892,13 @@ namespace OutputProcessor {
         if (repValue == 0.0) {
             NumberOut = "0.0";
         } else {
-            ObjexxFCL::gio::write(NumberOut, fmtLD) << repVal;
-            strip_trailing_zeros(strip(NumberOut));
+            NumberOut = format("{:N}", repVal);
+            strip_trailing_zeros(trim(NumberOut));
         }
 
         // Append the min and max strings with date information
-        ObjexxFCL::gio::write(MinOut, fmtLD) << minValue;
-        ObjexxFCL::gio::write(MaxOut, fmtLD) << MaxValue;
+        MinOut = fmt::to_string(minValue);
+        MaxOut = fmt::to_string(MaxValue);
         ProduceMinMaxString(MinOut, minValueDate, reportingInterval);
         ProduceMinMaxString(MaxOut, maxValueDate, reportingInterval);
 
@@ -5320,10 +4926,14 @@ namespace OutputProcessor {
 
         if ((reportingInterval == ReportingFrequency::EachCall) || (reportingInterval == ReportingFrequency::TimeStep) ||
             (reportingInterval == ReportingFrequency::Hourly)) { // -1, 0, 1
-            if (eso_stream) *eso_stream << reportIDString << ',' << NumberOut << NL;
+            if (outputFiles.eso.good()) {
+                print(outputFiles.eso, "{},{}\n", reportIDString, NumberOut);
+            }
         } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //
                  // 2, 3, 4
-            if (eso_stream) *eso_stream << reportIDString << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << NL;
+            if (outputFiles.eso.good()) {
+                print(outputFiles.eso, "{},{},{},{}\n", reportIDString, NumberOut, MinOut, MaxOut);
+            }
         }
     }
 
@@ -5829,7 +5439,6 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CV;
-    std::string IDOut;
     TimeStepType TimeStepType; // 1=TimeStepZone, 2=TimeStepSys
     StoreType VariableType;    // 1=Average, 2=Sum, 3=Min/Max
     int Loop;
@@ -5842,13 +5451,13 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     static bool ErrorsFound(false); // True if Errors Found
     int localIndexGroupKey;
 
-    if (!OutputInitialized) InitializeOutput();
+    if (!OutputInitialized) InitializeOutput(OutputFiles::getSingleton());
 
     // Variable name without units
     const std::string& VarName = VariableName;
 
     // Determine whether to Report or not
-    CheckReportVariable(KeyedValue, VarName);
+    CheckReportVariable(OutputFiles::getSingleton(), KeyedValue, VarName);
 
     if (NumExtraVars == 0) {
         NumExtraVars = 1;
@@ -5945,8 +5554,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
             thisRvar.unitNameCustomEMS = customUnitName;
         }
         AssignReportNumber(CurrentReportNumber);
-        ObjexxFCL::gio::write(IDOut, fmtLD) << CurrentReportNumber;
-        strip(IDOut);
+        const auto IDOut = fmt::to_string(CurrentReportNumber);
         thisRvar.ReportID = CurrentReportNumber;
         auto &thisVarPtr = thisRvar.VarPtr;
         thisVarPtr.Value = 0.0;
@@ -6011,7 +5619,8 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
             }
 
             if (thisVarPtr.SchedPtr != 0) {
-                WriteReportVariableDictionaryItem(thisVarPtr.frequency,
+                WriteReportVariableDictionaryItem(OutputFiles::getSingleton(),
+                                                  thisVarPtr.frequency,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
                                                   localIndexGroupKey,
@@ -6024,7 +5633,8 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                                                   thisRvar.unitNameCustomEMS,
                                                   ReqRepVars(ReportList(Loop)).SchedName);
             } else {
-                WriteReportVariableDictionaryItem(thisVarPtr.frequency,
+                WriteReportVariableDictionaryItem(OutputFiles::getSingleton(),
+                                                  thisVarPtr.frequency,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
                                                   localIndexGroupKey,
@@ -6071,20 +5681,19 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CV;
-    std::string IDOut;
     TimeStepType TimeStepType; // 1=TimeStepZone, 2=TimeStepSys
     StoreType VariableType;    // 1=Average, 2=Sum, 3=Min/Max
     int localIndexGroupKey;
     int Loop;
     ReportingFrequency RepFreq(ReportingFrequency::Hourly);
 
-    if (!OutputInitialized) InitializeOutput();
+    if (!OutputInitialized) InitializeOutput(OutputFiles::getSingleton());
 
     // Variable name without units
     const std::string& VarName = VariableName;
 
     // Determine whether to Report or not
-    CheckReportVariable(KeyedValue, VarName);
+    CheckReportVariable(OutputFiles::getSingleton(), KeyedValue, VarName);
 
     if (NumExtraVars == 0) {
         NumExtraVars = 1;
@@ -6132,8 +5741,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         thisIVar.KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase(KeyedValue);
         thisIVar.units = VariableUnit;
         AssignReportNumber(CurrentReportNumber);
-        ObjexxFCL::gio::write(IDOut, fmtLD) << CurrentReportNumber;
-        strip(IDOut);
+        const auto IDOut = fmt::to_string(CurrentReportNumber);
         thisIVar.ReportID = CurrentReportNumber;
         auto &thisVarPtr = thisIVar.VarPtr;
         thisVarPtr.Value = 0.0;
@@ -6174,7 +5782,8 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
             }
 
             if (thisVarPtr.SchedPtr != 0) {
-                WriteReportVariableDictionaryItem(thisVarPtr.frequency,
+                WriteReportVariableDictionaryItem(OutputFiles::getSingleton(),
+                                                  thisVarPtr.frequency,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
                                                   localIndexGroupKey,
@@ -6186,7 +5795,8 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                                                   thisIVar.units,
                                                   ReqRepVars(ReportList(Loop)).SchedName);
             } else {
-                WriteReportVariableDictionaryItem(thisVarPtr.frequency,
+                WriteReportVariableDictionaryItem(OutputFiles::getSingleton(),
+                                                  thisVarPtr.frequency,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
                                                   localIndexGroupKey,
@@ -6242,7 +5852,6 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static ObjexxFCL::gio::Fmt fmtLD("*");
 
     // INTERFACE BLOCK SPECIFICATIONS:
     // na
@@ -6251,19 +5860,15 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string IDOut;
 
     // Not checking for valid number
-
-    ObjexxFCL::gio::write(IDOut, fmtLD) << KeyedValue;
-    strip(IDOut);
 
     SetupOutputVariable(VariableName,
                         VariableUnit,
                         ActualVariable,
                         TimeStepTypeKey,
                         VariableTypeKey,
-                        IDOut,
+                        fmt::to_string(KeyedValue),
                         ReportFreq,
                         ResourceTypeKey,
                         EndUseKey,
@@ -6275,7 +5880,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                         indexGroupKey);
 }
 
-void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) // What kind of data to update (Zone, HVAC)
+void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType const t_TimeStepTypeKey) // What kind of data to update (Zone, HVAC)
 {
 
     // SUBROUTINE INFORMATION:
@@ -6300,11 +5905,9 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
     using namespace OutputProcessor;
     using DataEnvironment::EndMonthFlag;
     using DataEnvironment::EndYearFlag;
-    using DataGlobals::DayOfSimChr;
     using DataGlobals::EndDayFlag;
     using DataGlobals::EndEnvrnFlag;
     using DataGlobals::EndHourFlag;
-    using DataGlobals::eso_stream;
     using DataGlobals::HourOfDay;
     using General::EncodeMonDayHrMin;
     using ScheduleManager::GetCurrentScheduleValue;
@@ -6448,12 +6051,12 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                     if (HolidayIndex > 0) {
                         CurDayType = 7 + HolidayIndex;
                     }
-                    WriteTimeStampFormatData(eso_stream,
+                    WriteTimeStampFormatData(state.outputFiles.eso,
                                              ReportingFrequency::EachCall,
                                              TimeStepStampReportNbr,
                                              TimeStepStampReportChr,
                                              DayOfSim,
-                                             DayOfSimChr,
+                                             state.dataGlobals.DayOfSimChr,
                                              true,
                                              Month,
                                              DayOfMonth,
@@ -6468,7 +6071,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                 }
                 TimePrint = false;
             }
-            WriteNumericData(rVar.ReportID, rVar.ReportIDChr, *rVar.Which);
+            WriteNumericData(state.outputFiles, rVar.ReportID, rVar.ReportIDChr, *rVar.Which);
             ++StdOutputRecordCount;
 
             if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
@@ -6532,12 +6135,12 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                     if (HolidayIndex > 0) {
                         CurDayType = 7 + HolidayIndex;
                     }
-                    WriteTimeStampFormatData(eso_stream,
+                    WriteTimeStampFormatData(state.outputFiles.eso,
                                              ReportingFrequency::EachCall,
                                              TimeStepStampReportNbr,
                                              TimeStepStampReportChr,
                                              DayOfSim,
-                                             DayOfSimChr,
+                                             state.dataGlobals.DayOfSimChr,
                                              true,
                                              Month,
                                              DayOfMonth,
@@ -6553,7 +6156,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                 TimePrint = false;
             }
             // only time integer vars actual report as integer only is "detailed"
-            WriteNumericData(iVar.ReportID, iVar.ReportIDChr, *iVar.Which);
+            WriteNumericData(state.outputFiles, iVar.ReportID, iVar.ReportIDChr, *iVar.Which);
             ++StdOutputRecordCount;
 
             if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
@@ -6621,12 +6224,12 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                             if (HolidayIndex > 0) {
                                 CurDayType = 7 + HolidayIndex;
                             }
-                            WriteTimeStampFormatData(eso_stream,
+                            WriteTimeStampFormatData(state.outputFiles.eso,
                                                      ReportingFrequency::EachCall,
                                                      TimeStepStampReportNbr,
                                                      TimeStepStampReportChr,
                                                      DayOfSim,
-                                                     DayOfSimChr,
+                                                     state.dataGlobals.DayOfSimChr,
                                                      true,
                                                      Month,
                                                      DayOfMonth,
@@ -6642,7 +6245,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                         TimePrint = false;
                     }
 
-                    WriteNumericData(rVar.ReportID, rVar.ReportIDChr, rVar.TSValue);
+                    WriteNumericData(state.outputFiles, rVar.ReportID, rVar.ReportIDChr, rVar.TSValue);
                     ++StdOutputRecordCount;
 
                     if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
@@ -6677,12 +6280,12 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                             if (HolidayIndex > 0) {
                                 CurDayType = 7 + HolidayIndex;
                             }
-                            WriteTimeStampFormatData(eso_stream,
+                            WriteTimeStampFormatData(state.outputFiles.eso,
                                                      ReportingFrequency::EachCall,
                                                      TimeStepStampReportNbr,
                                                      TimeStepStampReportChr,
                                                      DayOfSim,
-                                                     DayOfSimChr,
+                                                     state.dataGlobals.DayOfSimChr,
                                                      true,
                                                      Month,
                                                      DayOfMonth,
@@ -6698,7 +6301,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                         TimePrint = false;
                     }
 
-                    WriteNumericData(iVar.ReportID, iVar.ReportIDChr, iVar.TSValue);
+                    WriteNumericData(state.outputFiles, iVar.ReportID, iVar.ReportIDChr, iVar.TSValue);
                     ++StdOutputRecordCount;
 
                     if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
@@ -6712,7 +6315,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
 
         UpdateMeters(MDHM);
 
-        ReportTSMeters(StartMinute, TimeValue.at(TimeStepType::TimeStepZone).CurMinute, TimePrint, TimePrint);
+        ReportTSMeters(state, StartMinute, TimeValue.at(TimeStepType::TimeStepZone).CurMinute, TimePrint, TimePrint);
 
     } // TimeStep Block
 
@@ -6723,12 +6326,12 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
             if (HolidayIndex > 0) {
                 CurDayType = 7 + HolidayIndex;
             }
-            WriteTimeStampFormatData(eso_stream,
+            WriteTimeStampFormatData(state.outputFiles.eso,
                                      ReportingFrequency::Hourly,
                                      TimeStepStampReportNbr,
                                      TimeStepStampReportChr,
                                      DayOfSim,
-                                     DayOfSimChr,
+                                     state.dataGlobals.DayOfSimChr,
                                      true,
                                      Month,
                                      DayOfMonth,
@@ -6765,7 +6368,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                         rVar.Value /= double(rVar.thisTSCount);
                     }
                     if (rVar.Report && rVar.frequency == ReportingFrequency::Hourly && rVar.Stored) {
-                        WriteNumericData(rVar.ReportID, rVar.ReportIDChr, rVar.Value);
+                        WriteNumericData(state.outputFiles, rVar.ReportID, rVar.ReportIDChr, rVar.Value);
                         ++StdOutputRecordCount;
                         rVar.Stored = false;
                         // add time series value for hourly to data store
@@ -6794,7 +6397,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                         iVar.Value /= double(iVar.thisTSCount);
                     }
                     if (iVar.Report && iVar.frequency == ReportingFrequency::Hourly && iVar.Stored) {
-                        WriteNumericData(iVar.ReportID, iVar.ReportIDChr, iVar.Value);
+                        WriteNumericData(state.outputFiles, iVar.ReportID, iVar.ReportIDChr, iVar.Value);
                         ++StdOutputRecordCount;
                         iVar.Stored = false;
                         if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
@@ -6811,7 +6414,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
             } // Number of I Variables
         }     // thisTimeStepType (Zone or HVAC)
 
-        ReportHRMeters(TimePrint);
+        ReportHRMeters(state, TimePrint);
 
     } // Hour Block
 
@@ -6824,12 +6427,12 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
             if (HolidayIndex > 0) {
                 CurDayType = 7 + HolidayIndex;
             }
-            WriteTimeStampFormatData(eso_stream,
+            WriteTimeStampFormatData(state.outputFiles.eso,
                                      ReportingFrequency::Daily,
                                      DailyStampReportNbr,
                                      DailyStampReportChr,
                                      DayOfSim,
-                                     DayOfSimChr,
+                                     state.dataGlobals.DayOfSimChr,
                                      true,
                                      Month,
                                      DayOfMonth,
@@ -6854,18 +6457,18 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
             for (Loop = 1; Loop <= NumOfRVariable; ++Loop) {
                 if (RVariableTypes(Loop).timeStepType == thisTimeStepType) {
-                    WriteRealVariableOutput(RVariableTypes(Loop).VarPtr, ReportingFrequency::Daily);
+                    WriteRealVariableOutput(state.outputFiles, RVariableTypes(Loop).VarPtr, ReportingFrequency::Daily);
                 }
             } // Number of R Variables
 
             for (Loop = 1; Loop <= NumOfIVariable; ++Loop) {
                 if (IVariableTypes(Loop).timeStepType == thisTimeStepType) {
-                    WriteIntegerVariableOutput(IVariableTypes(Loop).VarPtr, ReportingFrequency::Daily);
+                    WriteIntegerVariableOutput(state.outputFiles, IVariableTypes(Loop).VarPtr, ReportingFrequency::Daily);
                 }
             } // Number of I Variables
         }     // thisTimeStepType (Zone or HVAC)
 
-        ReportDYMeters(TimePrint);
+        ReportDYMeters(state, TimePrint);
 
     } // Day Block
 
@@ -6875,8 +6478,14 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
     // Month Block
     if (EndMonthFlag || EndEnvrnFlag) {
         if (TrackingMonthlyVariables) {
-            WriteTimeStampFormatData(
-                eso_stream, ReportingFrequency::Monthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, true, Month);
+            WriteTimeStampFormatData(state.outputFiles.eso,
+                                     ReportingFrequency::Monthly,
+                                     MonthlyStampReportNbr,
+                                     MonthlyStampReportChr,
+                                     DayOfSim,
+                                     state.dataGlobals.DayOfSimChr,
+                                     true,
+                                     Month);
             TimePrint = false;
         }
 
@@ -6895,18 +6504,18 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
             for (Loop = 1; Loop <= NumOfRVariable; ++Loop) {
                 if (RVariableTypes(Loop).timeStepType == thisTimeStepType) {
-                    WriteRealVariableOutput(RVariableTypes(Loop).VarPtr, ReportingFrequency::Monthly);
+                    WriteRealVariableOutput(state.outputFiles, RVariableTypes(Loop).VarPtr, ReportingFrequency::Monthly);
                 }
             } // Number of R Variables
 
             for (Loop = 1; Loop <= NumOfIVariable; ++Loop) {
                 if (IVariableTypes(Loop).timeStepType == thisTimeStepType) {
-                    WriteIntegerVariableOutput(IVariableTypes(Loop).VarPtr, ReportingFrequency::Monthly);
+                    WriteIntegerVariableOutput(state.outputFiles, IVariableTypes(Loop).VarPtr, ReportingFrequency::Monthly);
                 }
             } // Number of I Variables
         }     // thisTimeStepType (Zone, HVAC)
 
-        ReportMNMeters(TimePrint);
+        ReportMNMeters(state, TimePrint);
 
         NumHoursInMonth = 0;
     } // Month Block
@@ -6914,8 +6523,13 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
     // Sim/Environment Block
     if (EndEnvrnFlag) {
         if (TrackingRunPeriodVariables) {
-            WriteTimeStampFormatData(
-                eso_stream, ReportingFrequency::Simulation, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, true);
+            WriteTimeStampFormatData(state.outputFiles.eso,
+                                     ReportingFrequency::Simulation,
+                                     RunPeriodStampReportNbr,
+                                     RunPeriodStampReportChr,
+                                     DayOfSim,
+                                     state.dataGlobals.DayOfSimChr,
+                                     true);
             TimePrint = false;
         }
 
@@ -6931,18 +6545,18 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
             for (Loop = 1; Loop <= NumOfRVariable; ++Loop) {
                 if (RVariableTypes(Loop).timeStepType == thisTimeStepType) {
-                    WriteRealVariableOutput(RVariableTypes(Loop).VarPtr, ReportingFrequency::Simulation);
+                    WriteRealVariableOutput(state.outputFiles, RVariableTypes(Loop).VarPtr, ReportingFrequency::Simulation);
                 }
             } // Number of R Variables
 
             for (Loop = 1; Loop <= NumOfIVariable; ++Loop) {
                 if (IVariableTypes(Loop).timeStepType == thisTimeStepType) {
-                    WriteIntegerVariableOutput(IVariableTypes(Loop).VarPtr, ReportingFrequency::Simulation);
+                    WriteIntegerVariableOutput(state.outputFiles, IVariableTypes(Loop).VarPtr, ReportingFrequency::Simulation);
                 }
             } // Number of I Variables
         }     // thisTimeStepType (Zone, HVAC)
 
-        ReportSMMeters(TimePrint);
+        ReportSMMeters(state, TimePrint);
 
         NumHoursInSim = 0;
     }
@@ -6950,27 +6564,27 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
     // Yearly Block
     if (EndYearFlag) {
         if (TrackingYearlyVariables) {
-            WriteYearlyTimeStamp(eso_stream, YearlyStampReportChr, DataGlobals::CalendarYearChr, true);
+            WriteYearlyTimeStamp(state.outputFiles.eso, YearlyStampReportChr, DataGlobals::CalendarYearChr, true);
             TimePrint = false;
         }
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
             for (Loop = 1; Loop <= NumOfRVariable; ++Loop) {
                 if (RVariableTypes(Loop).timeStepType == thisTimeStepType) {
-                    WriteRealVariableOutput(RVariableTypes(Loop).VarPtr, ReportingFrequency::Yearly);
+                    WriteRealVariableOutput(state.outputFiles, RVariableTypes(Loop).VarPtr, ReportingFrequency::Yearly);
                 }
             } // Number of R Variables
 
             for (Loop = 1; Loop <= NumOfIVariable; ++Loop) {
                 if (IVariableTypes(Loop).timeStepType == thisTimeStepType) {
-                    WriteIntegerVariableOutput(IVariableTypes(Loop).VarPtr, ReportingFrequency::Yearly);
+                    WriteIntegerVariableOutput(state.outputFiles, IVariableTypes(Loop).VarPtr, ReportingFrequency::Yearly);
                 }
             } // Number of I Variables
         }     // thisTimeStepType (Zone, HVAC)
 
-        ReportYRMeters(TimePrint);
+        ReportYRMeters(state.outputFiles, TimePrint);
 
         DataGlobals::CalendarYear += 1;
-        DataGlobals::CalendarYearChr = std::to_string(DataGlobals::CalendarYear);
+        DataGlobals::CalendarYearChr = fmt::to_string(DataGlobals::CalendarYear);
     }
 }
 
@@ -7366,7 +6980,7 @@ void UpdateMeterReporting(OutputFiles &outputFiles)
         }
     }
 
-    ReportMeterDetails();
+    ReportMeterDetails(outputFiles);
 
     if (ErrorsLogged) {
         ShowFatalError("UpdateMeterReporting: Previous Meter Specification errors cause program termination.");
@@ -7425,8 +7039,8 @@ void SetInitialMeterReportingAndOutputNames(OutputFiles &outputFiles,
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptTS) {
                     ShowWarningError("Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
-                                     "\" (TimeStep), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName +
-                                     " and " + OutputFiles::getSingleton().mtr.fileName);
+                                     "\" (TimeStep), already on \"Output:Meter\". Will report to both " + outputFiles.eso.fileName +
+                                     " and " + outputFiles.mtr.fileName);
                 }
             }
             if (!EnergyMeters(WhichMeter).RptTS) {
@@ -7450,8 +7064,8 @@ void SetInitialMeterReportingAndOutputNames(OutputFiles &outputFiles,
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptAccTS) {
                     ShowWarningError("Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
-                                     "\" (TimeStep), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName +
-                                     " and " + OutputFiles::getSingleton().mtr.fileName);
+                                     "\" (TimeStep), already on \"Output:Meter\". Will report to both " + outputFiles.eso.fileName +
+                                     " and " + outputFiles.mtr.fileName);
                 }
             }
             if (!EnergyMeters(WhichMeter).RptAccTS) {
@@ -7477,8 +7091,8 @@ void SetInitialMeterReportingAndOutputNames(OutputFiles &outputFiles,
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptHR) {
                     ShowWarningError("Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
-                                     "\" (Hourly), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName +
-                                     " and " + OutputFiles::getSingleton().mtr.fileName);
+                                     "\" (Hourly), already on \"Output:Meter\". Will report to both " + outputFiles.eso.fileName +
+                                     " and " + outputFiles.mtr.fileName);
                 }
             }
             if (!EnergyMeters(WhichMeter).RptHR) {
@@ -7503,8 +7117,8 @@ void SetInitialMeterReportingAndOutputNames(OutputFiles &outputFiles,
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptAccHR) {
                     ShowWarningError("Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
-                                     "\" (Hourly), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName +
-                                     " and " + OutputFiles::getSingleton().mtr.fileName);
+                                     "\" (Hourly), already on \"Output:Meter\". Will report to both " + outputFiles.eso.fileName +
+                                     " and " + outputFiles.mtr.fileName);
                 }
             }
             if (!EnergyMeters(WhichMeter).RptAccHR) {
@@ -7531,8 +7145,8 @@ void SetInitialMeterReportingAndOutputNames(OutputFiles &outputFiles,
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptDY) {
                     ShowWarningError("Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
-                                     "\" (Daily), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName +
-                                     " and " + OutputFiles::getSingleton().mtr.fileName);
+                                     "\" (Daily), already on \"Output:Meter\". Will report to both " + outputFiles.eso.fileName +
+                                     " and " + outputFiles.mtr.fileName);
                 }
             }
             if (!EnergyMeters(WhichMeter).RptDY) {
@@ -7557,8 +7171,8 @@ void SetInitialMeterReportingAndOutputNames(OutputFiles &outputFiles,
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptAccDY) {
                     ShowWarningError("Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
-                                     "\" (Hourly), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName +
-                                     " and " + OutputFiles::getSingleton().mtr.fileName);
+                                     "\" (Hourly), already on \"Output:Meter\". Will report to both " + outputFiles.eso.fileName +
+                                     " and " + outputFiles.mtr.fileName);
                 }
             }
             if (!EnergyMeters(WhichMeter).RptAccDY) {
@@ -7585,8 +7199,8 @@ void SetInitialMeterReportingAndOutputNames(OutputFiles &outputFiles,
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptMN) {
                     ShowWarningError("Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
-                                     "\" (Monthly), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName +
-                                     " and " + OutputFiles::getSingleton().mtr.fileName);
+                                     "\" (Monthly), already on \"Output:Meter\". Will report to both " + outputFiles.eso.fileName +
+                                     " and " + outputFiles.mtr.fileName);
                 }
             }
             if (!EnergyMeters(WhichMeter).RptMN) {
@@ -7611,8 +7225,8 @@ void SetInitialMeterReportingAndOutputNames(OutputFiles &outputFiles,
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptAccMN) {
                     ShowWarningError("Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
-                                     "\" (Monthly), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName +
-                                     " and " + OutputFiles::getSingleton().mtr.fileName);
+                                     "\" (Monthly), already on \"Output:Meter\". Will report to both " + outputFiles.eso.fileName +
+                                     " and " + outputFiles.mtr.fileName);
                 }
             }
             if (!EnergyMeters(WhichMeter).RptAccMN) {
@@ -7639,8 +7253,8 @@ void SetInitialMeterReportingAndOutputNames(OutputFiles &outputFiles,
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptYR) {
                     ShowWarningError("Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
-                                     "\" (Annual), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName +
-                                     " and " + OutputFiles::getSingleton().mtr.fileName);
+                                     "\" (Annual), already on \"Output:Meter\". Will report to both " + outputFiles.eso.fileName +
+                                     " and " + outputFiles.mtr.fileName);
                 }
             }
             if (!EnergyMeters(WhichMeter).RptYR) {
@@ -7665,8 +7279,8 @@ void SetInitialMeterReportingAndOutputNames(OutputFiles &outputFiles,
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptAccYR) {
                     ShowWarningError("Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
-                                     "\" (Annual), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName +
-                                     " and " + OutputFiles::getSingleton().mtr.fileName);
+                                     "\" (Annual), already on \"Output:Meter\". Will report to both " + outputFiles.eso.fileName +
+                                     " and " + outputFiles.mtr.fileName);
                 }
             }
             if (!EnergyMeters(WhichMeter).RptAccYR) {
@@ -7693,8 +7307,8 @@ void SetInitialMeterReportingAndOutputNames(OutputFiles &outputFiles,
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptSM) {
                     ShowWarningError("Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
-                                     "\" (RunPeriod), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName +
-                                     " and " + OutputFiles::getSingleton().mtr.fileName);
+                                     "\" (RunPeriod), already on \"Output:Meter\". Will report to both " + outputFiles.eso.fileName +
+                                     " and " + outputFiles.mtr.fileName);
                 }
             }
             if (!EnergyMeters(WhichMeter).RptSM) {
@@ -7719,8 +7333,8 @@ void SetInitialMeterReportingAndOutputNames(OutputFiles &outputFiles,
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptAccSM) {
                     ShowWarningError("Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
-                                     "\" (RunPeriod), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName +
-                                     " and " + OutputFiles::getSingleton().mtr.fileName);
+                                     "\" (RunPeriod), already on \"Output:Meter\". Will report to both " + outputFiles.eso.fileName +
+                                     " and " + outputFiles.mtr.fileName);
                 }
             }
             if (!EnergyMeters(WhichMeter).RptAccSM) {

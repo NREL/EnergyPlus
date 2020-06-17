@@ -159,11 +159,11 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // read project control data
+    GetProjectControlData(state.outputFiles, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound); // read material data
+    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
@@ -183,7 +183,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     SinBldgRelNorth = 0.0;
 
     ErrorsFound = false;
-    GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state.outputFiles, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     SetSurfaceOutBulbTempAt();

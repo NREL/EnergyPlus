@@ -52,34 +52,17 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-// Note: This file contains two modules:
-// Module BaseboardRadiator -- (ref: Object: ZoneHVAC:Baseboard:Convective:Water)
-// Module BaseboardElectric -- (ref: Object: ZoneHVAC:Baseboard:Convective:Electric)
+    // Forward declarations
+    struct EnergyPlusData;
+    struct BaseboardRadiatorData;
 
 namespace BaseboardRadiator {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern Real64 const SimpConvAirFlowSpeed; // m/s
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumBaseboards;
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
-    extern Array1D_bool SetLoopIndexFlag; // get loop number flag
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
-
-    // Types
 
     struct BaseboardParams
     {
@@ -121,13 +104,18 @@ namespace BaseboardRadiator {
         Real64 ScaledHeatingCapacity; // -  water baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC
                                       // equipment, {-}, or {W/m2}
 
+        bool MySizeFlag;
+        bool CheckEquipName;
+        bool SetLoopIndexFlag;
+
         // Default Constructor
         BaseboardParams()
             : SchedPtr(0), EquipType(0), ZonePtr(0), WaterInletNode(0), WaterOutletNode(0), ControlCompTypeNum(0), CompErrIndex(0), UA(0.0),
               WaterMassFlowRate(0.0), WaterVolFlowRateMax(0.0), WaterMassFlowRateMax(0.0), Offset(0.0), AirMassFlowRate(0.0), DesAirMassFlowRate(0.0),
               WaterInletTemp(0.0), WaterOutletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletEnthalpy(0.0), AirInletTemp(0.0), AirInletHumRat(0.0),
               AirOutletTemp(0.0), Power(0.0), Energy(0.0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), BBLoadReSimIndex(0),
-              BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
+              BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0), MySizeFlag(true),
+              CheckEquipName(true), SetLoopIndexFlag(true)
         {
         }
     };
@@ -138,58 +126,45 @@ namespace BaseboardRadiator {
         Array1D_string FieldNames;
 
         // Default Constructor
-        BaseboardParamsNumericFieldData()
-        {
-        }
+        BaseboardParamsNumericFieldData() = default;
     };
-    // Object Data
-    extern Array1D<BaseboardParams> Baseboard;
-    extern Array1D<BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
 
-    // Functions
-
-    void clear_state();
-
-    void SimBaseboard(std::string const &EquipName,
-                      int const ActualZoneNum,
-                      int const ControlledZoneNum,
-                      bool const FirstHVACIteration,
+    void SimBaseboard(EnergyPlusData &state, std::string const &EquipName,
+                      int ActualZoneNum,
+                      int ControlledZoneNum,
+                      bool FirstHVACIteration,
                       Real64 &PowerMet,
                       int &CompIndex);
 
-    void GetBaseboardInput();
+    void GetBaseboardInput(BaseboardRadiatorData &baseboard);
 
-    void InitBaseboard(int const BaseboardNum, int const ControlledZoneNumSub);
+    void InitBaseboard(EnergyPlusData &state, int BaseboardNum, int ControlledZoneNumSub);
 
-    void SizeBaseboard(int const BaseboardNum);
+    void SizeBaseboard(EnergyPlusData &state, int BaseboardNum);
 
-    void SimHWConvective(int &BaseboardNum, Real64 &LoadMet);
+    void SimHWConvective(BaseboardRadiatorData &baseboard, int &BaseboardNum, Real64 &LoadMet);
 
-    void UpdateBaseboard(int &BaseboardNum);
+    void UpdateBaseboard(BaseboardRadiatorData &baseboard, int &BaseboardNum);
 
-    void ReportBaseboard(int const BaseboardNum);
-
-    Real64 HWBaseboardUAResidual(Real64 const UA,           // UA of coil
+    Real64 HWBaseboardUAResidual(EnergyPlusData &state,
+                                 Real64 UA,           // UA of coil
                                  Array1D<Real64> const &Par // par(1) = design coil load [W]
-    );
-
-    void UpdateBaseboardPlantConnection(int const BaseboardTypeNum,       // type index
-                                        std::string const &BaseboardName, // component name
-                                        int const EquipFlowCtrl,          // Flow control mode for the equipment
-                                        int const LoopNum,                // Plant loop index for where called from
-                                        int const LoopSide,               // Plant loop side index for where called from
-                                        int &CompIndex,                   // Chiller number pointer
-                                        bool const FirstHVACIteration,
-                                        bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     );
 
 } // namespace BaseboardRadiator
 
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//******************************************************************************************************
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//******************************************************************************************************
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    struct BaseboardRadiatorData : BaseGlobalStruct {
+
+        int NumBaseboards = 0;
+        Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
+        Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
+        void clear_state() override
+        {
+            NumBaseboards = 0;
+            Baseboard.deallocate();
+            BaseboardParamsNumericFields.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

@@ -122,10 +122,10 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool foundErrors(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(foundErrors); // read construction data
@@ -143,7 +143,7 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     // reset eio stream

@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -100,24 +101,24 @@ namespace ZoneEquipmentManager {
     // Functions
     void clear_state();
 
-    void ManageZoneEquipment(bool const FirstHVACIteration,
+    void ManageZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration,
                              bool &SimZone,                     // Set to false at the end of the routine
                              bool &SimAir                       // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
     );
 
-    void GetZoneEquipment();
+    void GetZoneEquipment(EnergyPlusData &state);
 
     void InitZoneEquipment(bool const FirstHVACIteration); // unused 1208
 
-    void SizeZoneEquipment();
+    void SizeZoneEquipment(OutputFiles &outputFiles);
 
     void SetUpZoneSizingArrays(OutputFiles &outputFiles);
 
     void RezeroZoneSizingArrays();
 
-    void UpdateZoneSizing(OutputFiles &outputFiles, int const CallIndicator);
+    void UpdateZoneSizing(EnergyPlusData &state, int const CallIndicator);
 
-    void SimZoneEquipment(bool const FirstHVACIteration, bool &SimAir);
+    void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool &SimAir);
 
     void SetZoneEquipSimOrder(int const ControlledZoneNum, int const ActualZoneNum);
 
@@ -138,11 +139,11 @@ namespace ZoneEquipmentManager {
                              Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
     );
 
-    void CalcAirFlowSimple(int const SysTimestepLoop = 0,              // System time step index
+    void CalcAirFlowSimple(EnergyPlusData &state, int const SysTimestepLoop = 0,              // System time step index
                            bool const AdjustZoneMixingFlowFlag = false // flags to adjust zone mxing mass flow rate
     );
 
-    void GetStandAloneERVNodes(int const OutdoorNum); // Zone Air Balance Outdoor index
+    void GetStandAloneERVNodes(EnergyPlusData &state, int const OutdoorNum); // Zone Air Balance Outdoor index
 
     void CalcZoneMixingFlowRateOfReceivingZone(int const ZoneNum, Real64 &ZoneMixingAirMassFlowRate);
 

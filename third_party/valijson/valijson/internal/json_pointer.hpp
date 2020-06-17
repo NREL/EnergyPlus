@@ -15,13 +15,13 @@ namespace internal {
 namespace json_pointer {
 
 /**
- * @brief   Replace all occurrences of `search` with `replace`. Modifies `subject` in place
+ * @brief   Replace all occurrences of `search` with `replace`. Modifies `subject` in place.
  *
  * @param   subject  string to operate on
  * @param   search   string to search
  * @param   replace  replacement string
  */
-inline void replace_all_inplace(std::string& subject, const char* search,
+inline void replaceAllInPlace(std::string& subject, const char* search,
                                 const char* replace)
 {
     size_t pos = 0;
@@ -94,8 +94,8 @@ inline std::string extractReferenceToken(std::string::const_iterator begin,
     std::string token(begin, end);
 
     // Replace JSON Pointer-specific escaped character sequences
-    replace_all_inplace(token, "~1", "/");
-    replace_all_inplace(token, "~0", "~");
+    replaceAllInPlace(token, "~1", "/");
+    replaceAllInPlace(token, "~0", "~");
 
     // Replace %-encoded character sequences with their actual characters
     for (size_t n = token.find('%'); n != std::string::npos;
@@ -215,9 +215,11 @@ inline AdapterType resolveJsonPointer(
     } else if (node.maybeObject()) {
         // Fragment must identify a member of the candidate object
         typedef typename AdapterType::Object Object;
-        typename Object::const_iterator itr = node.asObject().find(
+
+        const Object object = node.asObject();
+        typename Object::const_iterator itr = object.find(
                 referenceToken);
-        if (itr == node.asObject().end()) {
+        if (itr == object.end()) {
             throw std::runtime_error("Expected reference token to identify an "
                     "element in the current object; "
                     "actual token: " + referenceToken);

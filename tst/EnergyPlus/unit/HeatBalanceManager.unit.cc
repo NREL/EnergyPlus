@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -128,7 +129,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
     auto numZones = inputProcessor->getNumObjectsFound("Zone");
     ZoneReOrder.allocate(numZones);
     GetZoneData(ErrorsFound);
-    GetAirFlowFlag(OutputFiles::getSingleton(), ErrorsFound);
+    GetAirFlowFlag(state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 }
 
@@ -164,7 +165,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 
     bool ErrorsFound(false);
 
-    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
+    GetMaterialData(state.outputFiles, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -201,7 +202,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_
 
     bool ErrorsFound(false);
 
-    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
+    GetMaterialData(state.outputFiles, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -393,7 +394,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(ZoneAirMassFlow.BalanceMixing);
@@ -405,46 +406,47 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
 {
     // Test get input for ZoneAirMassFlowConservation object
 
-    std::string const idf_objects = delimited_string({"Building,",
-                                                      "My Building, !- Name",
-                                                      "30., !- North Axis{ deg }",
-                                                      "City, !- Terrain",
-                                                      "0.04, !- Loads Convergence Tolerance Value",
-                                                      "0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
-                                                      "FullExterior, !- Solar Distribution",
-                                                      "25, !- Maximum Number of Warmup Days",
-                                                      "6;                       !- Minimum Number of Warmup Days",
-                                                      "ZoneAirMassFlowConservation,",
-                                                      "No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
-                                                      "AdjustInfiltrationFlow, !- Infiltration Balancing Method",
-                                                      "AllZones;                !- Infiltration Balancing Zones",
-                                                      "Zone, Zone 1;",
-                                                      "Zone, Zone 2;",
-                                                      "ZoneMixing,",
-                                                      "Zone 2 Zone Mixing, !- Name",
-                                                      "Zone 2, !- Zone Name",
-                                                      "Always1, !- Schedule Name",
-                                                      "Flow/Zone, !- Design Flow Rate Calculation Method",
-                                                      "0.07, !- Design Flow Rate{ m3 / s }",
-                                                      ", !- Flow Rate per Zone Floor Area{ m3 / s - m2 }",
-                                                      ", !- Flow Rate per Person{ m3 / s - person }",
-                                                      ", !- Air Changes per Hour{ 1 / hr }",
-                                                      "Zone 1, !- Source Zone Name",
-                                                      "0.0;                     !- Delta Temperature{ deltaC }",
-                                                      "ZoneInfiltration:DesignFlowRate,",
-                                                      "Zone 1 Infil 1, !- Name",
-                                                      "Zone 1, !- Zone or ZoneList Name",
-                                                      "Always1, !- Schedule Name",
-                                                      "flow/zone, !- Design Flow Rate Calculation Method",
-                                                      "0.032, !- Design Flow Rate{ m3 / s }",
-                                                      ", !- Flow per Zone Floor Area{ m3 / s - m2 }",
-                                                      ", !- Flow per Exterior Surface Area{ m3 / s - m2 }",
-                                                      ", !- Air Changes per Hour{ 1 / hr }",
-                                                      "1, !- Constant Term Coefficient",
-                                                      "0, !- Temperature Term Coefficient",
-                                                      "0, !- Velocity Term Coefficient",
-                                                      "0; !- Velocity Squared Term Coefficient",
-                                                      "Schedule:Constant,Always1,,1.0;"
+    std::string const idf_objects = delimited_string({
+            "Building,",
+        "My Building, !- Name",
+        "30., !- North Axis{ deg }",
+        "City, !- Terrain",
+        "0.04, !- Loads Convergence Tolerance Value",
+        "0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
+        "FullExterior, !- Solar Distribution",
+        "25, !- Maximum Number of Warmup Days",
+        "6;                       !- Minimum Number of Warmup Days",
+        "ZoneAirMassFlowConservation,",
+        "No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+        "AdjustInfiltrationFlow, !- Infiltration Balancing Method",
+        "AllZones;                !- Infiltration Balancing Zones",
+        "Zone, Zone 1;",
+        "Zone, Zone 2;",
+        "ZoneMixing,",
+        "Zone 2 Zone Mixing, !- Name",
+        "Zone 2, !- Zone Name",
+        "Always1, !- Schedule Name",
+        "Flow/Zone, !- Design Flow Rate Calculation Method",
+        "0.07, !- Design Flow Rate{ m3 / s }",
+        ", !- Flow Rate per Zone Floor Area{ m3 / s - m2 }",
+        ", !- Flow Rate per Person{ m3 / s - person }",
+        ", !- Air Changes per Hour{ 1 / hr }",
+        "Zone 1, !- Source Zone Name",
+        "0.0;                     !- Delta Temperature{ deltaC }",
+        "ZoneInfiltration:DesignFlowRate,",
+        "Zone 1 Infil 1, !- Name",
+        "Zone 1, !- Zone or ZoneList Name",
+        "Always1, !- Schedule Name",
+        "flow/zone, !- Design Flow Rate Calculation Method",
+        "0.032, !- Design Flow Rate{ m3 / s }",
+        ", !- Flow per Zone Floor Area{ m3 / s - m2 }",
+        ", !- Flow per Exterior Surface Area{ m3 / s - m2 }",
+        ", !- Air Changes per Hour{ 1 / hr }",
+        "1, !- Constant Term Coefficient",
+        "0, !- Temperature Term Coefficient",
+        "0, !- Velocity Term Coefficient",
+        "0; !- Velocity Squared Term Coefficient",
+        "Schedule:Constant,Always1,,1.0;"
 
     });
 
@@ -453,9 +455,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     bool ErrorsFound(false); // If errors detected in input
 
     // call to process input
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    ProcessScheduleInput(state.outputFiles);
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -470,7 +472,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_FALSE(ErrorsFound);
     AllocateHeatBalArrays();
     ErrorsFound = false;
-    GetSimpleAirModelInputs(OutputFiles::getSingleton(), ErrorsFound);
+    GetSimpleAirModelInputs(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     SetZoneMassConservationFlag();
     // setup zone equipment configuration
@@ -582,18 +584,19 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
     // Test get input for ZoneAirMassFlowConservation object
 
     std::string const idf_objects = delimited_string({"Building,",
-                                                      "My Building, !- Name",
-                                                      "30., !- North Axis{ deg }",
-                                                      "City, !- Terrain",
-                                                      "0.04, !- Loads Convergence Tolerance Value",
-                                                      "0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
-                                                      "FullExterior, !- Solar Distribution",
-                                                      "25, !- Maximum Number of Warmup Days",
-                                                      "6;                       !- Minimum Number of Warmup Days",
-                                                      "ZoneAirMassFlowConservation,",
-                                                      "No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
-                                                      "None, !- Infiltration Balancing Method",
-                                                      ";                !- Infiltration Balancing Zones"});
+        "My Building, !- Name",
+        "30., !- North Axis{ deg }",
+        "City, !- Terrain",
+        "0.04, !- Loads Convergence Tolerance Value",
+        "0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
+        "FullExterior, !- Solar Distribution",
+        "25, !- Maximum Number of Warmup Days",
+        "6;                       !- Minimum Number of Warmup Days",
+        "ZoneAirMassFlowConservation,",
+        "No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+        "None, !- Infiltration Balancing Method",
+        ";                !- Infiltration Balancing Zones"
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -601,7 +604,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -661,7 +664,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     NumOfZones = 2;
     ZoneReOrder.allocate(NumOfZones);
@@ -669,7 +672,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     ErrorsFound = false;
-    GetSimpleAirModelInputs(OutputFiles::getSingleton(), ErrorsFound);
+    GetSimpleAirModelInputs(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // first 2 have indexes swapped now since they are in lexicigraphical order now according to the new input processor
@@ -707,7 +710,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
+    GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // check the "Material:RoofVegetation" names
@@ -802,416 +805,416 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
 TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 {
 
-    std::string const idf_objects =
-        delimited_string({"  Version,9.3;",
+    std::string const idf_objects = delimited_string({
 
-                          "  Building,",
-                          "    House with Local Air Nodes,  !- Name",
-                          "    0,                       !- North Axis {deg}",
-                          "    Suburbs,                 !- Terrain",
-                          "    0.001,                   !- Loads Convergence Tolerance Value",
-                          "    0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}",
-                          "    FullInteriorAndExterior, !- Solar Distribution",
-                          "    25,                      !- Maximum Number of Warmup Days",
-                          "    6;                       !- Minimum Number of Warmup Days",
+        "  Building,",
+        "    House with Local Air Nodes,  !- Name",
+        "    0,                       !- North Axis {deg}",
+        "    Suburbs,                 !- Terrain",
+        "    0.001,                   !- Loads Convergence Tolerance Value",
+        "    0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}",
+        "    FullInteriorAndExterior, !- Solar Distribution",
+        "    25,                      !- Maximum Number of Warmup Days",
+        "    6;                       !- Minimum Number of Warmup Days",
 
-                          "  Timestep,6;",
+        "  Timestep,6;",
 
-                          "  SurfaceConvectionAlgorithm:Inside,TARP;",
+        "  SurfaceConvectionAlgorithm:Inside,TARP;",
 
-                          "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
+        "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
-                          "  HeatBalanceAlgorithm,ConductionTransferFunction;",
+        "  HeatBalanceAlgorithm,ConductionTransferFunction;",
 
-                          "  Output:DebuggingData,0,0;",
+        "  Output:DebuggingData,0,0;",
 
-                          "  SimulationControl,",
-                          "    No,                      !- Do Zone Sizing Calculation",
-                          "    No,                      !- Do System Sizing Calculation",
-                          "    No,                      !- Do Plant Sizing Calculation",
-                          "    Yes,                     !- Run Simulation for Sizing Periods",
-                          "    Yes;                     !- Run Simulation for Weather File Run Periods",
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
+        "    Yes;                     !- Run Simulation for Weather File Run Periods",
 
-                          "  RunPeriod,",
-                          "    WinterDay,               !- Name",
-                          "    1,                       !- Begin Month",
-                          "    14,                      !- Begin Day of Month",
-                          "    ,                        !- Begin Year",
-                          "    1,                       !- End Month",
-                          "    14,                      !- End Day of Month",
-                          "    ,                        !- End Year",
-                          "    Tuesday,                 !- Day of Week for Start Day",
-                          "    Yes,                     !- Use Weather File Holidays and Special Days",
-                          "    Yes,                     !- Use Weather File Daylight Saving Period",
-                          "    No,                      !- Apply Weekend Holiday Rule",
-                          "    Yes,                     !- Use Weather File Rain Indicators",
-                          "    Yes;                     !- Use Weather File Snow Indicators",
+        "  RunPeriod,",
+        "    WinterDay,               !- Name",
+        "    1,                       !- Begin Month",
+        "    14,                      !- Begin Day of Month",
+        "    ,                        !- Begin Year",
+        "    1,                       !- End Month",
+        "    14,                      !- End Day of Month",
+        "    ,                        !- End Year",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
 
-                          "  RunPeriod,",
-                          "    SummerDay,               !- Name",
-                          "    7,                       !- Begin Month",
-                          "    7,                       !- Begin Day of Month",
-                          "    ,                        !- Begin Year",
-                          "    7,                       !- End Month",
-                          "    7,                       !- End Day of Month",
-                          "    ,                        !- End Year",
-                          "    Tuesday,                 !- Day of Week for Start Day",
-                          "    Yes,                     !- Use Weather File Holidays and Special Days",
-                          "    Yes,                     !- Use Weather File Daylight Saving Period",
-                          "    No,                      !- Apply Weekend Holiday Rule",
-                          "    Yes,                     !- Use Weather File Rain Indicators",
-                          "    No;                      !- Use Weather File Snow Indicators",
+        "  RunPeriod,",
+        "    SummerDay,               !- Name",
+        "    7,                       !- Begin Month",
+        "    7,                       !- Begin Day of Month",
+        "    ,                        !- Begin Year",
+        "    7,                       !- End Month",
+        "    7,                       !- End Day of Month",
+        "    ,                        !- End Year",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    No;                      !- Use Weather File Snow Indicators",
 
-                          "  Site:Location,",
-                          "    CHICAGO_IL_USA TMY2-94846,  !- Name",
-                          "    41.78,                   !- Latitude {deg}",
-                          "    -87.75,                  !- Longitude {deg}",
-                          "    -6.00,                   !- Time Zone {hr}",
-                          "    190.00;                  !- Elevation {m}",
+        "  Site:Location,",
+        "    CHICAGO_IL_USA TMY2-94846,  !- Name",
+        "    41.78,                   !- Latitude {deg}",
+        "    -87.75,                  !- Longitude {deg}",
+        "    -6.00,                   !- Time Zone {hr}",
+        "    190.00;                  !- Elevation {m}",
 
-                          "  SizingPeriod:DesignDay,",
-                          "    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
-                          "    1,                       !- Month",
-                          "    21,                      !- Day of Month",
-                          "    WinterDesignDay,         !- Day Type",
-                          "    -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
-                          "    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
-                          "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
-                          "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
-                          "    Wetbulb,                 !- Humidity Condition Type",
-                          "    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
-                          "    ,                        !- Humidity Condition Day Schedule Name",
-                          "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
-                          "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
-                          "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
-                          "    99063.,                  !- Barometric Pressure {Pa}",
-                          "    4.9,                     !- Wind Speed {m/s}",
-                          "    270,                     !- Wind Direction {deg}",
-                          "    No,                      !- Rain Indicator",
-                          "    No,                      !- Snow Indicator",
-                          "    No,                      !- Daylight Saving Time Indicator",
-                          "    ASHRAEClearSky,          !- Solar Model Indicator",
-                          "    ,                        !- Beam Solar Day Schedule Name",
-                          "    ,                        !- Diffuse Solar Day Schedule Name",
-                          "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
-                          "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
-                          "    0.0;                     !- Sky Clearness",
+        "  SizingPeriod:DesignDay,",
+        "    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
+        "    1,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    WinterDesignDay,         !- Day Type",
+        "    -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
+        "    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    99063.,                  !- Barometric Pressure {Pa}",
+        "    4.9,                     !- Wind Speed {m/s}",
+        "    270,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    0.0;                     !- Sky Clearness",
 
-                          "  SizingPeriod:DesignDay,",
-                          "    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
-                          "    7,                       !- Month",
-                          "    21,                      !- Day of Month",
-                          "    SummerDesignDay,         !- Day Type",
-                          "    31.5,                    !- Maximum Dry-Bulb Temperature {C}",
-                          "    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
-                          "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
-                          "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
-                          "    Wetbulb,                 !- Humidity Condition Type",
-                          "    23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
-                          "    ,                        !- Humidity Condition Day Schedule Name",
-                          "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
-                          "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
-                          "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
-                          "    99063.,                  !- Barometric Pressure {Pa}",
-                          "    5.3,                     !- Wind Speed {m/s}",
-                          "    230,                     !- Wind Direction {deg}",
-                          "    No,                      !- Rain Indicator",
-                          "    No,                      !- Snow Indicator",
-                          "    No,                      !- Daylight Saving Time Indicator",
-                          "    ASHRAEClearSky,          !- Solar Model Indicator",
-                          "    ,                        !- Beam Solar Day Schedule Name",
-                          "    ,                        !- Diffuse Solar Day Schedule Name",
-                          "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
-                          "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
-                          "    1.0;                     !- Sky Clearness",
+        "  SizingPeriod:DesignDay,",
+        "    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
+        "    7,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    31.5,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    99063.,                  !- Barometric Pressure {Pa}",
+        "    5.3,                     !- Wind Speed {m/s}",
+        "    230,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    1.0;                     !- Sky Clearness",
 
-                          "  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;",
+        "  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;",
 
-                          "  Material,",
-                          "    A1 - 1 IN STUCCO,        !- Name",
-                          "    Smooth,                  !- Roughness",
-                          "    2.5389841E-02,           !- Thickness {m}",
-                          "    0.6918309,               !- Conductivity {W/m-K}",
-                          "    1858.142,                !- Density {kg/m3}",
-                          "    836.8000,                !- Specific Heat {J/kg-K}",
-                          "    0.9000000,               !- Thermal Absorptance",
-                          "    0.9200000,               !- Solar Absorptance",
-                          "    0.9200000;               !- Visible Absorptance",
+        "  Material,",
+        "    A1 - 1 IN STUCCO,        !- Name",
+        "    Smooth,                  !- Roughness",
+        "    2.5389841E-02,           !- Thickness {m}",
+        "    0.6918309,               !- Conductivity {W/m-K}",
+        "    1858.142,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
 
-                          "  Material,",
-                          "    CB11,                    !- Name",
-                          "    MediumRough,             !- Roughness",
-                          "    0.2032000,               !- Thickness {m}",
-                          "    1.048000,                !- Conductivity {W/m-K}",
-                          "    1105.000,                !- Density {kg/m3}",
-                          "    837.0000,                !- Specific Heat {J/kg-K}",
-                          "    0.9000000,               !- Thermal Absorptance",
-                          "    0.2000000,               !- Solar Absorptance",
-                          "    0.2000000;               !- Visible Absorptance",
+        "  Material,",
+        "    CB11,                    !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.2032000,               !- Thickness {m}",
+        "    1.048000,                !- Conductivity {W/m-K}",
+        "    1105.000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.2000000,               !- Solar Absorptance",
+        "    0.2000000;               !- Visible Absorptance",
 
-                          "  Material,",
-                          "    GP01,                    !- Name",
-                          "    MediumSmooth,            !- Roughness",
-                          "    1.2700000E-02,           !- Thickness {m}",
-                          "    0.1600000,               !- Conductivity {W/m-K}",
-                          "    801.0000,                !- Density {kg/m3}",
-                          "    837.0000,                !- Specific Heat {J/kg-K}",
-                          "    0.9000000,               !- Thermal Absorptance",
-                          "    0.7500000,               !- Solar Absorptance",
-                          "    0.7500000;               !- Visible Absorptance",
+        "  Material,",
+        "    GP01,                    !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    1.2700000E-02,           !- Thickness {m}",
+        "    0.1600000,               !- Conductivity {W/m-K}",
+        "    801.0000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
 
-                          "  Material,",
-                          "    IN02,                    !- Name",
-                          "    Rough,                   !- Roughness",
-                          "    9.0099998E-02,           !- Thickness {m}",
-                          "    4.3000001E-02,           !- Conductivity {W/m-K}",
-                          "    10.00000,                !- Density {kg/m3}",
-                          "    837.0000,                !- Specific Heat {J/kg-K}",
-                          "    0.9000000,               !- Thermal Absorptance",
-                          "    0.7500000,               !- Solar Absorptance",
-                          "    0.7500000;               !- Visible Absorptance",
+        "  Material,",
+        "    IN02,                    !- Name",
+        "    Rough,                   !- Roughness",
+        "    9.0099998E-02,           !- Thickness {m}",
+        "    4.3000001E-02,           !- Conductivity {W/m-K}",
+        "    10.00000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
 
-                          "  Material,",
-                          "    IN05,                    !- Name",
-                          "    Rough,                   !- Roughness",
-                          "    0.2458000,               !- Thickness {m}",
-                          "    4.3000001E-02,           !- Conductivity {W/m-K}",
-                          "    10.00000,                !- Density {kg/m3}",
-                          "    837.0000,                !- Specific Heat {J/kg-K}",
-                          "    0.9000000,               !- Thermal Absorptance",
-                          "    0.7500000,               !- Solar Absorptance",
-                          "    0.7500000;               !- Visible Absorptance",
+        "  Material,",
+        "    IN05,                    !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.2458000,               !- Thickness {m}",
+        "    4.3000001E-02,           !- Conductivity {W/m-K}",
+        "    10.00000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
 
-                          "  Material,",
-                          "    PW03,                    !- Name",
-                          "    MediumSmooth,            !- Roughness",
-                          "    1.2700000E-02,           !- Thickness {m}",
-                          "    0.1150000,               !- Conductivity {W/m-K}",
-                          "    545.0000,                !- Density {kg/m3}",
-                          "    1213.000,                !- Specific Heat {J/kg-K}",
-                          "    0.9000000,               !- Thermal Absorptance",
-                          "    0.7800000,               !- Solar Absorptance",
-                          "    0.7800000;               !- Visible Absorptance",
+        "  Material,",
+        "    PW03,                    !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    1.2700000E-02,           !- Thickness {m}",
+        "    0.1150000,               !- Conductivity {W/m-K}",
+        "    545.0000,                !- Density {kg/m3}",
+        "    1213.000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7800000,               !- Solar Absorptance",
+        "    0.7800000;               !- Visible Absorptance",
 
-                          "  Material,",
-                          "    CC03,                    !- Name",
-                          "    MediumRough,             !- Roughness",
-                          "    0.1016000,               !- Thickness {m}",
-                          "    1.310000,                !- Conductivity {W/m-K}",
-                          "    2243.000,                !- Density {kg/m3}",
-                          "    837.0000,                !- Specific Heat {J/kg-K}",
-                          "    0.9000000,               !- Thermal Absorptance",
-                          "    0.6500000,               !- Solar Absorptance",
-                          "    0.6500000;               !- Visible Absorptance",
+        "  Material,",
+        "    CC03,                    !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.1016000,               !- Thickness {m}",
+        "    1.310000,                !- Conductivity {W/m-K}",
+        "    2243.000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
 
-                          "  Material,",
-                          "    HF-A3,                   !- Name",
-                          "    Smooth,                  !- Roughness",
-                          "    1.5000000E-03,           !- Thickness {m}",
-                          "    44.96960,                !- Conductivity {W/m-K}",
-                          "    7689.000,                !- Density {kg/m3}",
-                          "    418.0000,                !- Specific Heat {J/kg-K}",
-                          "    0.9000000,               !- Thermal Absorptance",
-                          "    0.2000000,               !- Solar Absorptance",
-                          "    0.2000000;               !- Visible Absorptance",
+        "  Material,",
+        "    HF-A3,                   !- Name",
+        "    Smooth,                  !- Roughness",
+        "    1.5000000E-03,           !- Thickness {m}",
+        "    44.96960,                !- Conductivity {W/m-K}",
+        "    7689.000,                !- Density {kg/m3}",
+        "    418.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.2000000,               !- Solar Absorptance",
+        "    0.2000000;               !- Visible Absorptance",
 
-                          "  Material:NoMass,",
-                          "    AR02,                    !- Name",
-                          "    VeryRough,               !- Roughness",
-                          "    7.8000002E-02,           !- Thermal Resistance {m2-K/W}",
-                          "    0.9000000,               !- Thermal Absorptance",
-                          "    0.7000000,               !- Solar Absorptance",
-                          "    0.7000000;               !- Visible Absorptance",
+        "  Material:NoMass,",
+        "    AR02,                    !- Name",
+        "    VeryRough,               !- Roughness",
+        "    7.8000002E-02,           !- Thermal Resistance {m2-K/W}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7000000,               !- Solar Absorptance",
+        "    0.7000000;               !- Visible Absorptance",
 
-                          "  Material:NoMass,",
-                          "    CP02,                    !- Name",
-                          "    Rough,                   !- Roughness",
-                          "    0.2170000,               !- Thermal Resistance {m2-K/W}",
-                          "    0.9000000,               !- Thermal Absorptance",
-                          "    0.7500000,               !- Solar Absorptance",
-                          "    0.7500000;               !- Visible Absorptance",
+        "  Material:NoMass,",
+        "    CP02,                    !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.2170000,               !- Thermal Resistance {m2-K/W}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
 
-                          "  Construction,",
-                          "    EXTWALL:LIVING,          !- Name",
-                          "    A1 - 1 IN STUCCO,        !- Outside Layer",
-                          "    GP01;                    !- Layer 3",
+        "  Construction,",
+        "    EXTWALL:LIVING,          !- Name",
+        "    A1 - 1 IN STUCCO,        !- Outside Layer",
+        "    GP01;                    !- Layer 3",
 
-                          "  Construction,",
-                          "    FLOOR:LIVING,            !- Name",
-                          "    CC03,                    !- Outside Layer",
-                          "    CP02;                    !- Layer 2",
+        "  Construction,",
+        "    FLOOR:LIVING,            !- Name",
+        "    CC03,                    !- Outside Layer",
+        "    CP02;                    !- Layer 2",
 
-                          "  Construction,",
-                          "    ROOF,                    !- Name",
-                          "    AR02,                    !- Outside Layer",
-                          "    PW03;                    !- Layer 2",
+        "  Construction,",
+        "    ROOF,                    !- Name",
+        "    AR02,                    !- Outside Layer",
+        "    PW03;                    !- Layer 2",
 
-                          "  Zone,",
-                          "    LIVING ZONE,             !- Name",
-                          "    0,                       !- Direction of Relative North {deg}",
-                          "    0,                       !- X Origin {m}",
-                          "    0,                       !- Y Origin {m}",
-                          "    0,                       !- Z Origin {m}",
-                          "    1,                       !- Type",
-                          "    1,                       !- Multiplier",
-                          "    autocalculate,           !- Ceiling Height {m}",
-                          "    autocalculate;           !- Volume {m3}",
+        "  Zone,",
+        "    LIVING ZONE,             !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
 
-                          "  GlobalGeometryRules,",
-                          "    UpperLeftCorner,         !- Starting Vertex Position",
-                          "    CounterClockWise,        !- Vertex Entry Direction",
-                          "    World;                   !- Coordinate System",
+        "  GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World;                   !- Coordinate System",
 
-                          "  BuildingSurface:Detailed,",
-                          "    Living:North,            !- Name",
-                          "    Wall,                    !- Surface Type",
-                          "    EXTWALL:LIVING,          !- Construction Name",
-                          "    LIVING ZONE,             !- Zone Name",
-                          "    Outdoors,                !- Outside Boundary Condition",
-                          "    ,                        !- Outside Boundary Condition Object",
-                          "    SunExposed,              !- Sun Exposure",
-                          "    WindExposed,             !- Wind Exposure",
-                          "    0.5000000,               !- View Factor to Ground",
-                          "    4,                       !- Number of Vertices",
-                          "    1,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
-                          "    1,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                          "    0,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                          "    0,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  BuildingSurface:Detailed,",
+        "    Living:North,            !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    1,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    1,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
 
-                          "  BuildingSurface:Detailed,",
-                          "    Living:East,             !- Name",
-                          "    Wall,                    !- Surface Type",
-                          "    EXTWALL:LIVING,          !- Construction Name",
-                          "    LIVING ZONE,             !- Zone Name",
-                          "    Outdoors,                !- Outside Boundary Condition",
-                          "    ,                        !- Outside Boundary Condition Object",
-                          "    SunExposed,              !- Sun Exposure",
-                          "    WindExposed,             !- Wind Exposure",
-                          "    0.5000000,               !- View Factor to Ground",
-                          "    4,                       !- Number of Vertices",
-                          "    1,0,1,  !- X,Y,Z ==> Vertex 1 {m}",
-                          "    1,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                          "    1,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                          "    1,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  BuildingSurface:Detailed,",
+        "    Living:East,             !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    1,0,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    1,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
 
-                          "  BuildingSurface:Detailed,",
-                          "    Living:South,            !- Name",
-                          "    Wall,                    !- Surface Type",
-                          "    EXTWALL:LIVING,          !- Construction Name",
-                          "    LIVING ZONE,             !- Zone Name",
-                          "    Outdoors,                !- Outside Boundary Condition",
-                          "    ,                        !- Outside Boundary Condition Object",
-                          "    SunExposed,              !- Sun Exposure",
-                          "    WindExposed,             !- Wind Exposure",
-                          "    0.5000000,               !- View Factor to Ground",
-                          "    4,                       !- Number of Vertices",
-                          "    0,0,1,  !- X,Y,Z ==> Vertex 1 {m}",
-                          "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                          "    1,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                          "    1,0,1;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  BuildingSurface:Detailed,",
+        "    Living:South,            !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,0,1;  !- X,Y,Z ==> Vertex 4 {m}",
 
-                          "  BuildingSurface:Detailed,",
-                          "    Living:West,             !- Name",
-                          "    Wall,                    !- Surface Type",
-                          "    EXTWALL:LIVING,          !- Construction Name",
-                          "    LIVING ZONE,             !- Zone Name",
-                          "    Outdoors,                !- Outside Boundary Condition",
-                          "    ,                        !- Outside Boundary Condition Object",
-                          "    SunExposed,              !- Sun Exposure",
-                          "    WindExposed,             !- Wind Exposure",
-                          "    0.5000000,               !- View Factor to Ground",
-                          "    4,                       !- Number of Vertices",
-                          "    0,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
-                          "    0,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                          "    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                          "    0,0,1;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  BuildingSurface:Detailed,",
+        "    Living:West,             !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,0,1;  !- X,Y,Z ==> Vertex 4 {m}",
 
-                          "  BuildingSurface:Detailed,",
-                          "    Living:Floor,            !- Name",
-                          "    FLOOR,                   !- Surface Type",
-                          "    FLOOR:LIVING,            !- Construction Name",
-                          "    LIVING ZONE,             !- Zone Name",
-                          "    Surface,                 !- Outside Boundary Condition",
-                          "    Living:Floor,            !- Outside Boundary Condition Object",
-                          "    NoSun,                   !- Sun Exposure",
-                          "    NoWind,                  !- Wind Exposure",
-                          "    0,                       !- View Factor to Ground",
-                          "    4,                       !- Number of Vertices",
-                          "    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
-                          "    0,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
-                          "    1,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
-                          "    1,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  BuildingSurface:Detailed,",
+        "    Living:Floor,            !- Name",
+        "    FLOOR,                   !- Surface Type",
+        "    FLOOR:LIVING,            !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Living:Floor,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
 
-                          "  BuildingSurface:Detailed,",
-                          "    Living:Ceiling,          !- Name",
-                          "    ROOF,                 !- Surface Type",
-                          "    ROOF,          !- Construction Name",
-                          "    LIVING ZONE,             !- Zone Name",
-                          "    Outdoors,                !- Outside Boundary Condition",
-                          "    ,                        !- Outside Boundary Condition Object",
-                          "    SunExposed,              !- Sun Exposure",
-                          "    WindExposed,             !- Wind Exposure",
-                          "    0,                       !- View Factor to Ground",
-                          "    4,                       !- Number of Vertices",
-                          "    0,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
-                          "    0,0,1,  !- X,Y,Z ==> Vertex 2 {m}",
-                          "    1,0,1,  !- X,Y,Z ==> Vertex 3 {m}",
-                          "    1,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  BuildingSurface:Detailed,",
+        "    Living:Ceiling,          !- Name",
+        "    ROOF,                 !- Surface Type",
+        "    ROOF,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,1,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,0,1,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
 
-                          "  ZoneProperty:LocalEnvironment,",
-                          "    LocEnv:LIVING ZONE,           !- Name",
-                          "    LIVING ZONE,                  !- Exterior Surface Name",
-                          "    OutdoorAirNode:0001;          !- Outdoor Air Node Name",
+        "  ZoneProperty:LocalEnvironment,",
+        "    LocEnv:LIVING ZONE,           !- Name",
+        "    LIVING ZONE,                  !- Exterior Surface Name",
+        "    OutdoorAirNode:0001;          !- Outdoor Air Node Name",
 
-                          "  OutdoorAir:Node,",
-                          "    OutdoorAirNode:0001,          !- Name",
-                          "    ,                             !- Height Above Ground",
-                          "    OutdoorAirNodeDryBulb:0001,   !- Drybulb Temperature Schedule Name",
-                          "    OutdoorAirNodeWetBulb:0001,   !- Wetbulb Schedule Name",
-                          "    OutdoorAirNodeWindSpeed:0001, !- Wind Speed Schedule Name",
-                          "    OutdoorAirNodeWindDir:0001;   !- Wind Direction Schedule Name",
+        "  OutdoorAir:Node,",
+        "    OutdoorAirNode:0001,          !- Name",
+        "    ,                             !- Height Above Ground",
+        "    OutdoorAirNodeDryBulb:0001,   !- Drybulb Temperature Schedule Name",
+        "    OutdoorAirNodeWetBulb:0001,   !- Wetbulb Schedule Name",
+        "    OutdoorAirNodeWindSpeed:0001, !- Wind Speed Schedule Name",
+        "    OutdoorAirNodeWindDir:0001;   !- Wind Direction Schedule Name",
 
-                          "  ScheduleTypeLimits,",
-                          "    Any Number;                   !- Name",
+        "  ScheduleTypeLimits,",
+        "    Any Number;                   !- Name",
 
-                          "  Schedule:Compact,",
-                          "    OutdoorAirNodeDryBulb:0001,   !- Name",
-                          "    Any Number,                   !- Schedule Type Limits Name",
-                          "    Through: 12/31,               !- Field 1",
-                          "    For: AllDays,                 !- Field 2",
-                          "    Until: 24:00, 15.0;           !- Field 3",
+        "  Schedule:Compact,",
+        "    OutdoorAirNodeDryBulb:0001,   !- Name",
+        "    Any Number,                   !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 15.0;           !- Field 3",
 
-                          "  Schedule:Compact,",
-                          "    OutdoorAirNodeWetBulb:0001,   !- Name",
-                          "    Any Number,                   !- Schedule Type Limits Name",
-                          "    Through: 12/31,               !- Field 1",
-                          "    For: AllDays,                 !- Field 2",
-                          "    Until: 24:00, 12.0;           !- Field 3",
+        "  Schedule:Compact,",
+        "    OutdoorAirNodeWetBulb:0001,   !- Name",
+        "    Any Number,                   !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 12.0;           !- Field 3",
 
-                          "  Schedule:Compact,",
-                          "    OutdoorAirNodeWindSpeed:0001, !- Name",
-                          "    Any Number,                   !- Schedule Type Limits Name",
-                          "    Through: 12/31,               !- Field 1",
-                          "    For: AllDays,                 !- Field 2",
-                          "    Until: 24:00, 1.23;           !- Field 3",
+        "  Schedule:Compact,",
+        "    OutdoorAirNodeWindSpeed:0001, !- Name",
+        "    Any Number,                   !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 1.23;           !- Field 3",
 
-                          "  Schedule:Compact,",
-                          "    OutdoorAirNodeWindDir:0001,   !- Name",
-                          "    Any Number,                   !- Schedule Type Limits Name",
-                          "    Through: 12/31,               !- Field 1",
-                          "    For: AllDays,                 !- Field 2",
-                          "    Until: 24:00, 90;             !- Field 3"});
+        "  Schedule:Compact,",
+        "    OutdoorAirNodeWindDir:0001,   !- Name",
+        "    Any Number,                   !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 90;             !- Field 3"
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(state.outputFiles);
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1272,7 +1275,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_DOUBLE_EQ(0.012611481326656135, DataLoopNode::Node(1).HumRat);
     EXPECT_DOUBLE_EQ(57247.660939392081, DataLoopNode::Node(1).Enthalpy);
 
-    InitHeatBalance();
+    InitHeatBalance(state.outputFiles);
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
@@ -1290,7 +1293,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataEnvironment::WindSpeed = 1.5;
     DataEnvironment::WindDir = 90.0;
 
-    InitHeatBalance();
+    InitHeatBalance(state.outputFiles);
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
@@ -1304,7 +1307,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
     // Test eio output for HVACSystemRootFindingAlgorithm
 
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -1328,7 +1330,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "REGULAFALSITHENBISECTION");
 }
@@ -1338,7 +1340,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
     // Test that root solver algorithm is RegulaFalsi when no HVACSystemRootFindingAlgorithm object exists
 
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -1359,7 +1360,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi");
 }
@@ -1370,7 +1371,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataIPShortCuts::lAlphaFieldBlanks = true;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
         "    No,                      !- Do System Sizing Calculation",
@@ -1567,7 +1567,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation(OutputFiles::getSingleton());
+    SimulationManager::ManageSimulation(state);
     DataGlobals::DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
     WeatherManager::Envrn = 1;
 
@@ -1576,9 +1576,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataGlobals::HourOfDay = 11;
     DataGlobals::CurrentTime = 11.0;
     WeatherManager::SetCurrentWeather();
-    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
+    HeatBalanceManager::ManageHeatBalance(state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
-    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
+    HeatBalanceManager::ManageHeatBalance(state);
     // Find the fenestration surface
     int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
     int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", DataHeatBalance::Construct);
@@ -1593,9 +1593,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataGlobals::HourOfDay = 14;
     DataGlobals::CurrentTime = 14.0;
     WeatherManager::SetCurrentWeather();
-    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
+    HeatBalanceManager::ManageHeatBalance(state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
-    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
+    HeatBalanceManager::ManageHeatBalance(state);
     int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", DataHeatBalance::Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
     transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
@@ -1618,7 +1618,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1645,7 +1645,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1671,7 +1671,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_TRUE(DataHeatBalance::AnyEMPD);
@@ -1694,7 +1694,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1717,7 +1717,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1730,7 +1730,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
 {
 
     bool errorsfound = false;
-    
+
     std::string const idf_objects = delimited_string({
         "  Building, My Building;",
         "WindowMaterial:Glazing:EquivalentLayer,",
@@ -1763,16 +1763,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
         "0.84,                    !- Front Side Infrared Emissivity {dimensionless}",
         "0.84;                    !- Back Side Infrared Emissivity {dimensionless}",
     });
-    
+
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsfound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsfound);
 
     EXPECT_FALSE(errorsfound);
     EXPECT_NEAR(DataHeatBalance::Material(1).Resistance,0.158,0.0001);
-    
+
 }
-    
+
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
 {
 
@@ -1807,11 +1807,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    ProcessScheduleInput(state.outputFiles);
 
     // call get material data to auto-generate IRTSurface material
     ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHeatBalance::TotMaterials, 1);
     int MaterNum = 1;
@@ -1900,7 +1900,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    ProcessScheduleInput(state.outputFiles);
 
     // skip call to get material data since this doesn't use IRT
     ErrorsFound = false;
@@ -1915,7 +1915,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
     "   ** Severe  ** CreateAirBoundaryConstructionsConstruction:AirBoundary=\"AIR BOUNDARY WITH BAD MIXING SCHEDULE\", invalid (not found) Simple Mixing Schedule Name=\"xyz\".",
     "   ** Severe  ** Errors found in creating the constructions defined with Construction:AirBoundary.",
     "   ** Warning ** This building has no thermal mass which can cause an unstable solution.",
-    "   **   ~~~   ** Use Material object for all opaque material definitions except very light insulation layers." 
+    "   **   ~~~   ** Use Material object for all opaque material definitions except very light insulation layers."
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
@@ -1943,17 +1943,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
         "Material:InfraredTransparent,",
         "IRTMaterial1;            !- Name",
     });
-    
+
     ASSERT_TRUE(process_idf(idf_objects));
-    
+
     bool ErrorsFound(false); // If errors detected in input
 
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
-    
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
+
     ASSERT_FALSE(ErrorsFound);
-    
+
     int MaterNum = 1;
-    
+
     EXPECT_EQ(Material(MaterNum).ROnly, true);
     EXPECT_NEAR(Material(MaterNum).Resistance, 0.01, 0.00001);
     EXPECT_NEAR(Material(MaterNum).AbsorpThermal, 0.9999, 0.00001);
@@ -1962,7 +1962,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
     EXPECT_NEAR(Material(MaterNum).AbsorpSolarInput, 1.0, 0.00001);
     EXPECT_NEAR(Material(MaterNum).AbsorpVisible, 1.0, 0.00001);
     EXPECT_NEAR(Material(MaterNum).AbsorpVisibleInput, 1.0, 0.00001);
-    
+
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
@@ -1972,7 +1972,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataHeatBalance::TotConstructs = 3;
     DataHeatBalance::Construct.allocate( DataHeatBalance::TotConstructs);
-    
+
     DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Wall;
     DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
     DataSurfaces::Surface(3).Class = DataSurfaces::SurfaceClass_Window;
@@ -1997,15 +1997,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     DataHeatBalSurface::TH(2,1,1) = 34.0;
     DataHeatBalSurface::TH(2,1,2) = 35.0;
     DataHeatBalSurface::TH(2,1,3) = 36.0;
-    
+
     Real64 ZeroResult = 0.0;
 
     HeatBalanceManager::UpdateWindowFaceTempsNonBSDFWin();
-    
+
     // First surface is NOT a window so these should NOT be set
     EXPECT_NEAR(FenLaySurfTempFront(1,1),ZeroResult,0.0001);
     EXPECT_NEAR(FenLaySurfTempBack(1,1),ZeroResult,0.0001);
-    
+
     // Second surface is a window so these should be set
     EXPECT_NEAR(FenLaySurfTempFront(1,2),DataHeatBalSurface::TH(1,1,2),0.0001);
     EXPECT_NEAR(FenLaySurfTempBack(SurfsForRegWindow,2),DataHeatBalSurface::TH(2,1,2),0.0001);
@@ -2018,10 +2018,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisectionInputTest)
 {
-    // Test eio output for HVACSystemRootFindingAlgorithm 
+    // Test eio output for HVACSystemRootFindingAlgorithm
 
     std::string const idf_objects = delimited_string({
-        "Version,9.2;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -2037,14 +2036,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisec
         ";                !- Infiltration Balancing Zones",
         " HVACSystemRootFindingAlgorithm,",
         " Bisection;!- Algorithm",
-
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "BISECTION");
 }

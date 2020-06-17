@@ -71,6 +71,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -507,7 +508,7 @@ namespace RefrigeratedCase {
         CaseWIZoneReport.deallocate();
     }
 
-    void ManageRefrigeratedCaseRacks()
+    void ManageRefrigeratedCaseRacks(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -536,7 +537,7 @@ namespace RefrigeratedCase {
 
         if (!ManageRefrigeration) return;
 
-        CheckRefrigerationInput();
+        CheckRefrigerationInput(state);
 
         InitRefrigeration();
 
@@ -570,7 +571,7 @@ namespace RefrigeratedCase {
         if (HaveDetailedTransRefrig) SimulateDetailedTransRefrigSystems();
     }
 
-    void GetRefrigerationInput()
+    void GetRefrigerationInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -870,7 +871,7 @@ namespace RefrigeratedCase {
                     RefrigPresentInZone(RefrigCase(CaseNum).ActualZoneNum) = true;
                 }
 
-                RefrigCase(CaseNum).ZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(RefrigCase(CaseNum).ZoneName);
+                RefrigCase(CaseNum).ZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, RefrigCase(CaseNum).ZoneName);
 
                 RefrigCase(CaseNum).RatedAmbientTemp = Numbers(1);
                 if (Numbers(1) <= 0.0) {
@@ -1308,7 +1309,7 @@ namespace RefrigeratedCase {
                 if (RefrigCase(CaseNum).RAFrac > 0.0) {
                     std::string callDescription = CurrentModuleObject + "=" + RefrigCase(CaseNum).Name;
                     RefrigCase(CaseNum).ZoneRANode =
-                        DataZoneEquipment::GetReturnAirNodeForZone(RefrigCase(CaseNum).ZoneName, retNodeName, callDescription);
+                        DataZoneEquipment::GetReturnAirNodeForZone(state, RefrigCase(CaseNum).ZoneName, retNodeName, callDescription);
                 }
 
                 if (RefrigCase(CaseNum).ActualZoneNum >= 0) {
@@ -1759,7 +1760,7 @@ namespace RefrigeratedCase {
                     } else {
                         RefrigPresentInZone(WalkIn(WalkInID).ZoneNum(ZoneID)) = true;
                     }
-                    WalkIn(WalkInID).ZoneNodeNum(ZoneID) = DataZoneEquipment::GetSystemNodeNumberForZone(WalkIn(WalkInID).ZoneName(ZoneID));
+                    WalkIn(WalkInID).ZoneNodeNum(ZoneID) = DataZoneEquipment::GetSystemNodeNumberForZone(state, WalkIn(WalkInID).ZoneName(ZoneID));
                     if (WalkIn(WalkInID).ZoneNum(ZoneID) >= 0) {
                         if (WalkIn(WalkInID).ZoneNodeNum(ZoneID) == 0) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name +
@@ -2506,7 +2507,7 @@ namespace RefrigeratedCase {
                                     cAlphaFieldNames(AlphaNum) + " not valid: " + Alphas(AlphaNum));
                     ErrorsFound = true;
                 }
-                AirChillerSet(SetID).ZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(AirChillerSet(SetID).ZoneName);
+                AirChillerSet(SetID).ZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, AirChillerSet(SetID).ZoneName);
                 if (AirChillerSet(SetID).ZoneNodeNum == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AirChillerSet(SetID).Name + "\" System Node Number not found for " +
                                     cAlphaFieldNames(AlphaNum) + " = " + Alphas(AlphaNum));
@@ -3025,7 +3026,7 @@ namespace RefrigeratedCase {
                             ErrorsFound = true;
                         } else { // alpha (15) not blank
                             RefrigRack(RackNum).HeatRejectionZoneNum = UtilityRoutines::FindItemInList(Alphas(15), DataHeatBalance::Zone);
-                            RefrigRack(RackNum).HeatRejectionZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(Alphas(15));
+                            RefrigRack(RackNum).HeatRejectionZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(15));
                             if (RefrigRack(RackNum).HeatRejectionZoneNum == 0) {
                                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " +
                                                 cAlphaFieldNames(15) + " not valid: " + Alphas(15));
@@ -3165,7 +3166,7 @@ namespace RefrigeratedCase {
                         // need to clearly id node number for air inlet conditions and zone number for casecredit assignment
                         if (Condenser(CondNum).InletAirZoneNum != 0) {
                             // set condenser flag (later used to set system flag) and zone flag
-                            Condenser(CondNum).InletAirNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(Alphas(4));
+                            Condenser(CondNum).InletAirNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(4));
                             Condenser(CondNum).CondenserRejectHeatToZone = true;
                             RefrigPresentInZone(Condenser(CondNum).InletAirZoneNum) = true;
                         } else { // not in a conditioned zone, so see if it's outside
@@ -3801,7 +3802,7 @@ namespace RefrigeratedCase {
                         // need to clearly id node number for air inlet conditions and zone number for casecredit assignment
                         if (GasCooler(GCNum).InletAirZoneNum != 0) {
                             // set condenser flag (later used to set system flag) and zone flag
-                            GasCooler(GCNum).InletAirNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(Alphas(4));
+                            GasCooler(GCNum).InletAirNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(4));
                             GasCooler(GCNum).GasCoolerRejectHeatToZone = true;
                             RefrigPresentInZone(GasCooler(GCNum).InletAirZoneNum) = true;
                         } else { // not in a conditioned zone, so see if it's outside
@@ -4268,7 +4269,7 @@ namespace RefrigeratedCase {
                     if (!lNumericBlanks(NumNum) && !lAlphaBlanks(AlphaNum)) {
                         Secondary(SecondaryNum).SumUADistPiping = Numbers(NumNum);
                         Secondary(SecondaryNum).DistPipeZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), DataHeatBalance::Zone);
-                        Secondary(SecondaryNum).DistPipeZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(Alphas(AlphaNum));
+                        Secondary(SecondaryNum).DistPipeZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
 
                         if (Secondary(SecondaryNum).DistPipeZoneNum == 0) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", invalid  " +
@@ -4310,7 +4311,7 @@ namespace RefrigeratedCase {
                     if (!lNumericBlanks(NumNum) && !lAlphaBlanks(AlphaNum)) {
                         Secondary(SecondaryNum).SumUAReceiver = Numbers(NumNum);
                         Secondary(SecondaryNum).ReceiverZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), DataHeatBalance::Zone);
-                        Secondary(SecondaryNum).ReceiverZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(Alphas(AlphaNum));
+                        Secondary(SecondaryNum).ReceiverZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
 
                         if (Secondary(SecondaryNum).ReceiverZoneNum == 0) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", invalid  " +
@@ -5207,7 +5208,7 @@ namespace RefrigeratedCase {
                 if (!lNumericBlanks(2) && !lAlphaBlanks(AlphaNum)) {
                     System(RefrigSysNum).SumUASuctionPiping = Numbers(2);
                     System(RefrigSysNum).SuctionPipeActualZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), DataHeatBalance::Zone);
-                    System(RefrigSysNum).SuctionPipeZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(Alphas(AlphaNum));
+                    System(RefrigSysNum).SuctionPipeZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
                     if (System(RefrigSysNum).SuctionPipeZoneNodeNum == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name +
                                         "\", System Node Number not found for " + cAlphaFieldNames(AlphaNum) + " = " + Alphas(AlphaNum) +
@@ -6016,7 +6017,7 @@ namespace RefrigeratedCase {
                     TransSystem(TransRefrigSysNum).SumUASuctionPipingMT = Numbers(3);
                     TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumMT =
                         UtilityRoutines::FindItemInList(Alphas(AlphaNum), DataHeatBalance::Zone);
-                    TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumMT = DataZoneEquipment::GetSystemNodeNumberForZone(Alphas(AlphaNum));
+                    TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumMT = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
                     if (TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumMT == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
                                         "\", System Node Number not found for " + cAlphaFieldNames(AlphaNum) + " = \"" + Alphas(AlphaNum) +
@@ -6044,7 +6045,7 @@ namespace RefrigeratedCase {
                     TransSystem(TransRefrigSysNum).SumUASuctionPipingLT = Numbers(4);
                     TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumLT =
                         UtilityRoutines::FindItemInList(Alphas(AlphaNum), DataHeatBalance::Zone);
-                    TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumLT = DataZoneEquipment::GetSystemNodeNumberForZone(Alphas(AlphaNum));
+                    TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumLT = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
                     if (TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumLT == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
                                         "\", System Node Number not found for " + cAlphaFieldNames(AlphaNum) + " = \"" + Alphas(AlphaNum) +
@@ -6337,7 +6338,7 @@ namespace RefrigeratedCase {
         }     // NumSimulationGasCooler > 0
 
         // echo input to eio file.
-        ReportRefrigerationComponents(OutputFiles::getSingleton());
+        ReportRefrigerationComponents(state.outputFiles);
 
         if (ErrorsFound) {
             ShowFatalError(RoutineName + " Previous errors cause program termination");
@@ -10114,11 +10115,11 @@ namespace RefrigeratedCase {
         }
     }
 
-    PlantComponent *RefrigCondenserData::factory(std::string const &objectName)
+    PlantComponent *RefrigCondenserData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
         if (GetRefrigerationInputFlag) {
-            CheckRefrigerationInput();
+            CheckRefrigerationInput(state);
             GetRefrigerationInputFlag = false;
         }
         // Now look for this particular object in list
@@ -10133,13 +10134,13 @@ namespace RefrigeratedCase {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void RefrigCondenserData::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void RefrigCondenserData::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         InitRefrigeration();
         InitRefrigerationPlantConnections();
     }
 
-    void RefrigCondenserData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void RefrigCondenserData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                        bool const FirstHVACIteration,
                                        Real64 &EP_UNUSED(CurLoad),
                                        bool const EP_UNUSED(RunFlag))
@@ -10271,11 +10272,11 @@ namespace RefrigeratedCase {
         this->UpdateCondenser();
                     }
 
-    PlantComponent *RefrigRackData::factory(std::string const &objectName)
+    PlantComponent *RefrigRackData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
         if (GetRefrigerationInputFlag) {
-            CheckRefrigerationInput();
+            CheckRefrigerationInput(state);
             GetRefrigerationInputFlag = false;
                     }
         // Now look for this particular object in list
@@ -10290,13 +10291,13 @@ namespace RefrigeratedCase {
         return nullptr; // LCOV_EXCL_LINE
         }
 
-    void RefrigRackData::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void RefrigRackData::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
             InitRefrigeration();
             InitRefrigerationPlantConnections();
         }
 
-    void RefrigRackData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void RefrigRackData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                   bool const FirstHVACIteration,
                                   Real64 &EP_UNUSED(CurLoad),
                                   bool const EP_UNUSED(RunFlag))
@@ -12669,7 +12670,7 @@ namespace RefrigeratedCase {
         }
     }
 
-    void GetRefrigeratedRackIndex(std::string const &Name,
+    void GetRefrigeratedRackIndex(EnergyPlusData &state, std::string const &Name,
                                   int &IndexPtr,
                                   int const SysType,
                                   bool &ErrorsFound,
@@ -12686,7 +12687,7 @@ namespace RefrigeratedCase {
         // This subroutine sets an index for a given refrigerated rack or refrigeration condenser
         //  -- issues error message if the rack or condenser is not found.
 
-        CheckRefrigerationInput();
+        CheckRefrigerationInput(state);
 
         {
             auto const SELECT_CASE_var(SysType);
@@ -14171,7 +14172,7 @@ namespace RefrigeratedCase {
         }
     }
 
-    void CheckRefrigerationInput()
+    void CheckRefrigerationInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -14186,7 +14187,7 @@ namespace RefrigeratedCase {
 
         if (GetRefrigerationInputFlag) {
 
-            GetRefrigerationInput();
+            GetRefrigerationInput(state);
             SetupReportInput();
             GetRefrigerationInputFlag = false;
 
@@ -14201,7 +14202,7 @@ namespace RefrigeratedCase {
         } // GetRefrigerationInputFlag
     }
 
-    void SimAirChillerSet(std::string const &AirChillerSetName,
+    void SimAirChillerSet(EnergyPlusData &state, std::string const &AirChillerSetName,
                           int const ZoneNum,
                           bool const FirstHVACIteration,
                           Real64 &SysOutputProvided,
@@ -14225,7 +14226,7 @@ namespace RefrigeratedCase {
         int ChillerSetID;
         Real64 RemainingOutputToCoolingSP; // Remaining requested load in zone
 
-        CheckRefrigerationInput();
+        CheckRefrigerationInput(state);
 
         // Find the correct Chiller set
         if (AirChillerSetPtr == 0) {
@@ -14267,7 +14268,7 @@ namespace RefrigeratedCase {
 
         UseSysTimeStep = true;
 
-        ManageRefrigeratedCaseRacks();
+        ManageRefrigeratedCaseRacks(state);
 
         UseSysTimeStep = false;
 
@@ -14821,7 +14822,7 @@ namespace RefrigeratedCase {
         }
     }
 
-    void FigureRefrigerationZoneGains()
+    void FigureRefrigerationZoneGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -14835,7 +14836,7 @@ namespace RefrigeratedCase {
 
         static bool MyEnvrnFlag(true);
 
-        CheckRefrigerationInput();
+        CheckRefrigerationInput(state);
 
         if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
 

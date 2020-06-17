@@ -54,15 +54,13 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
 namespace PondGroundHeatExchanger {
-
-    extern Real64 const SmallNum;      // Very small number to avoid div0 errors
-    extern Real64 const StefBoltzmann; // Stefan-Boltzmann constant
 
     extern int NumOfPondGHEs; // Number of pond ground heat exchangers
 
@@ -108,17 +106,19 @@ namespace PondGroundHeatExchanger {
 
         int WaterIndex;
 
+        bool firstTimeThrough;
+
         // Default Constructor
         PondGroundHeatExchangerData()
             : DesignMassFlowRate(0.0), DesignCapacity(0.0), Depth(0.0), Area(0.0), TubeInDiameter(0.0), TubeOutDiameter(0.0), TubeConductivity(0.0),
               GrndConductivity(0.0), CircuitLength(0.0), BulkTemperature(0.0), PastBulkTemperature(0.0), NumCircuits(0), InletNodeNum(0),
               OutletNodeNum(0), FrozenErrIndex(0), ConsecutiveFrozen(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletTemp(0.0),
               OutletTemp(0.0), MassFlowRate(0.0), PondTemp(0.0), HeatTransferRate(0.0), Energy(0.0), OneTimeFlag(true), MyFlag(true),
-              setupOutputVarsFlag(true), WaterIndex(0)
+              setupOutputVarsFlag(true), WaterIndex(0), firstTimeThrough(true)
         {
         }
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         static PlantComponent *factory(std::string const &objectName);
 
@@ -138,11 +138,9 @@ namespace PondGroundHeatExchanger {
                                  Real64 massFlowRate       // Mass flow rate, in kg/s
         );
 
-        Real64 CalcSolarFlux();
+        Real64 CalcSolarFlux() const;
 
         void UpdatePondGroundHeatExchanger();
-
-        void ReportPondGroundHeatExchanger();
     };
 
     // Object Data

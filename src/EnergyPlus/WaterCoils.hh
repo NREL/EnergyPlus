@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -323,7 +324,7 @@ namespace WaterCoils {
     // Functions
     void clear_state();
 
-    void SimulateWaterCoilComponents(std::string const &CompName,
+    void SimulateWaterCoilComponents(EnergyPlusData &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64> QActual = _,
@@ -341,15 +342,12 @@ namespace WaterCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWaterCoil(OutputFiles &outputFiles,
-                       int const CoilNum,
-                       bool const FirstHVACIteration // unused1208
-    );
+    void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
 
     void                                   // refactor for coil report
     CalcAdjustedCoilUA(int const CoilNum); // refactor for coil report
 
-    void SizeWaterCoil(int const CoilNum);
+    void SizeWaterCoil(EnergyPlusData &state, int const CoilNum);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -520,12 +518,12 @@ namespace WaterCoils {
                                    bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
@@ -556,7 +554,7 @@ namespace WaterCoils {
                            bool &NodeNotFound         // true if matching water inlet node not found
     );
 
-    void CheckForSensorAndSetPointNode(int const SensorNodeNum, // controller sensor node number
+    void CheckForSensorAndSetPointNode(EnergyPlusData &state, int const SensorNodeNum, // controller sensor node number
                                        int const ControlledVar, // controlled variable type
                                        bool &NodeNotFound       // true if matching air outlet node not found
     );

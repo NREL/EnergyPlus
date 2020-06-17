@@ -297,7 +297,7 @@ namespace HVACControllers {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ManageControllers(std::string const &ControllerName,
+    void ManageControllers(EnergyPlusData &state, std::string const &ControllerName,
                            int &ControllerIndex,
                            bool const FirstHVACIteration,
                            int const AirLoopNum, // unused1208
@@ -310,7 +310,7 @@ namespace HVACControllers {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetControllerInput();
+    void GetControllerInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
@@ -320,7 +320,7 @@ namespace HVACControllers {
 
     void ResetController(int const ControlNum, bool const DoWarmRestartFlag, bool &IsConvergedFlag);
 
-    void InitController(int const ControlNum,
+    void InitController(EnergyPlusData &state, int const ControlNum,
                         bool &IsConvergedFlag);
 
     void SizeController(int const ControlNum);
@@ -380,7 +380,7 @@ namespace HVACControllers {
 
     void DumpAirLoopStatistics();
 
-    void WriteAirLoopStatistics(int const FileUnit, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats);
+    void WriteAirLoopStatistics(OutputFile &statisticsFile, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats);
 
     // Beginning of Tracing subroutines for the Controller Module
     // *****************************************************************************
@@ -413,22 +413,22 @@ namespace HVACControllers {
 
     void CheckControllerListOrder();
 
-    void CheckCoilWaterInletNode(int const WaterInletNodeNum, // input actuator node number
+    void CheckCoilWaterInletNode(EnergyPlusData &state, int const WaterInletNodeNum, // input actuator node number
                                  bool &NodeNotFound           // true if matching actuator node not found, false if found
     );
 
-    void GetControllerNameAndIndex(int const WaterInletNodeNum, // input actuator node number
+    void GetControllerNameAndIndex(EnergyPlusData &state, int const WaterInletNodeNum, // input actuator node number
                                    std::string &ControllerName, // controller name used by water coil
                                    int &ControllerIndex,        // controller index used by water coil
                                    bool &ErrorsFound            // true if matching actuator node not found
     );
 
-    void GetControllerActuatorNodeNum(std::string const &ControllerName, // name of coil controller
+    void GetControllerActuatorNodeNum(EnergyPlusData &state, std::string const &ControllerName, // name of coil controller
                                       int &WaterInletNodeNum,            // input actuator node number
                                       bool &NodeNotFound                 // true if matching actuator node not found, false if found
     );
 
-    int GetControllerIndex(std::string const &ControllerName // name of coil controller
+    int GetControllerIndex(EnergyPlusData &state, std::string const &ControllerName // name of coil controller
     );
 
 } // namespace HVACControllers

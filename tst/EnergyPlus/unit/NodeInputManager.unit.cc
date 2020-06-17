@@ -57,6 +57,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 
 using namespace EnergyPlus;
@@ -68,7 +69,6 @@ namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 {
-
     std::string const idf_objects = delimited_string({
         "OutdoorAir:Node, Test node;",
 
@@ -97,9 +97,9 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    NodeInputManager::SetupNodeVarsForReporting();
+    NodeInputManager::SetupNodeVarsForReporting(state.outputFiles);
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.outputFiles);
 
     EMSManager::FinishProcessingUserInput = true;
 

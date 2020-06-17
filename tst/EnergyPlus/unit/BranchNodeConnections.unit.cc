@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -1114,7 +1115,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData(OutputFiles::getSingleton());
+    GetProjectData(state.outputFiles);
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
     createFacilityElectricPowerServiceObject();
@@ -1122,7 +1123,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
     BeginSimFlag = true;
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
-    SizingManager::ManageSizing(OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state);
 
     bool ErrorsFound(false);
     BranchNodeConnections::CheckNodeConnections(ErrorsFound);
@@ -2122,7 +2123,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData(OutputFiles::getSingleton());
+    GetProjectData(state.outputFiles);
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
     createFacilityElectricPowerServiceObject();
@@ -2130,7 +2131,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
     BeginSimFlag = true;
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
-    SizingManager::ManageSizing(OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state);
 
     bool ErrorsFound(false);
     BranchNodeConnections::CheckNodeConnections(ErrorsFound);
