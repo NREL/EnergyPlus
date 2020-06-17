@@ -1289,7 +1289,7 @@ namespace SimulationManager {
                         // DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
                         // To do: Add code here for linking the Convergency Limit min system timestep
                         // DataConvergParams::MinTimeStepSys = 6.0/60.0; // Perform override using 1hr.
-                        int MinTimeStepSysOverrideValue = MinutesPerTimeStep;  // 60.0; 12.0; 6.0; 
+                        int MinTimeStepSysOverrideValue = 60.0;  // MinutesPerTimeStep; 30.0; 12.0; 6.0; 
                         // MinTimeStepSys = 6.0 / 60.0; // Perform override using 1hr.
                         if (MinTimeStepSysOverrideValue > MinutesPerTimeStep) {
                                 MinTimeStepSysOverrideValue = MinutesPerTimeStep;
