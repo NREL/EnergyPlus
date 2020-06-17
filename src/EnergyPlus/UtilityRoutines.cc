@@ -2056,7 +2056,6 @@ namespace UtilityRoutines {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CacheIPErrorFile;
         using DataGlobals::DoingInputProcessing;
         using DataGlobals::err_stream;
         using DataStringGlobals::IDDVerString;
@@ -2084,7 +2083,9 @@ namespace UtilityRoutines {
         if (!DoingInputProcessing) {
             if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
         } else {
-            ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
+            // CacheIPErrorFile is never opened or closed
+            // so this output would just go to stdout
+            // ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
         }
         if (present(OutUnit1)) {
             print(OutUnit1(), "  {}", ErrorMessage);

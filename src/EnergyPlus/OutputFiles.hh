@@ -75,7 +75,6 @@ public:
     explicit OutputFile(std::string FileName);
 
 private:
-
     std::unique_ptr<std::iostream> os;
     template <typename... Args> friend void print(OutputFile &of, fmt::string_view format_str, const Args &... args);
     friend class OutputFiles;
