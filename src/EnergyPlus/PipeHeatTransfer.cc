@@ -169,11 +169,11 @@ namespace PipeHeatTransfer {
 
     // Functions
 
-    PlantComponent *PipeHTData::factory(DataGlobal &dataGlobals, int objectType, std::string objectName)
+    PlantComponent *PipeHTData::factory(EnergyPlusData &state, int objectType, std::string objectName)
     {
         // Process the input data for pipes if it hasn't been done already
         if (GetPipeInputFlag) {
-            GetPipesHeatTransfer(dataGlobals);
+            GetPipesHeatTransfer(state);
             GetPipeInputFlag = false;
         }
         // Now look for this particular pipe in the list
@@ -236,7 +236,7 @@ namespace PipeHeatTransfer {
         this->PreviousPipeTemp = this->PipeTemp;
     }
 
-    void GetPipesHeatTransfer(DataGlobal &dataGlobals)
+    void GetPipesHeatTransfer(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -641,7 +641,7 @@ namespace PipeHeatTransfer {
             }
 
             // Get ground temperature model
-            PipeHT(Item).groundTempModel = GetGroundTempModelAndInit(dataGlobals, cAlphaArgs(7), cAlphaArgs(8));
+            PipeHT(Item).groundTempModel = GetGroundTempModelAndInit(state, cAlphaArgs(7), cAlphaArgs(8));
 
             // Select number of pipe sections.  Hanby's optimal number of 20 section is selected.
             NumSections = NumPipeSections;

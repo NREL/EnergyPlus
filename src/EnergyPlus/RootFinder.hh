@@ -100,7 +100,7 @@ namespace RootFinder {
     void IterateRootFinder(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
                            Real64 const X,                     // X value of current iterate
                            Real64 const Y,                     // Y value of current iterate
-                           Optional_bool IsDoneFlag = _        // If TRUE indicates that the iteration should be stopped
+                           bool &IsDoneFlag                    // If TRUE indicates that the iteration should be stopped
     );
 
     int CheckInternalConsistency(RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
@@ -127,10 +127,6 @@ namespace RootFinder {
 
     bool CheckRootFinderConvergence(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
                                     Real64 const Y                            // Y value for current iterate
-    );
-
-    bool CheckIncrementRoundOff(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
-                                Real64 const X                            // X value for current iterate
     );
 
     bool CheckBracketRoundOff(RootFinderDataType const &RootFinderData); // Data used by root finding algorithm

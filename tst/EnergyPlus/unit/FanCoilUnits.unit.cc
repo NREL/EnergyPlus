@@ -263,7 +263,7 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -576,7 +576,7 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -887,7 +887,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -1265,7 +1265,7 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -1584,7 +1584,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -1940,7 +1940,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -2276,7 +2276,7 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
 
     GetZoneData(ErrorsFound);
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     SetPredefinedTables();
     GetFanInput(state.fans);
@@ -2339,7 +2339,7 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
     DataEnvironment::DayOfYear_Schedule = 1;
     DataEnvironment::DayOfWeek = 2;
     DataGlobals::HourOfDay = 1;
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     UpdateScheduleValues();
 
     // fan coil can hit maximum iterations while trying to find the water mass flow rate to meet the load. In this case RegulaFalsi will return -1.
@@ -2650,7 +2650,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -3068,7 +3068,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
 
     GetFanCoilUnits(state);
@@ -3233,7 +3233,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 3 and near full air and water flow and meet capacity
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
-    EXPECT_NEAR(thisFanCoil.PLR, 0.970, 0.001);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.961, 0.001);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     // cycling fan proportional to PLR and fan speed ratio
     EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow, 0.0000000001);
@@ -3244,7 +3244,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 1 and moderate air and water flow and meet capacity
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
-    EXPECT_NEAR(thisFanCoil.PLR, 0.636, 0.001);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.632, 0.001);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     // cycling fan proportional to PLR and fan speed ratio
     EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio, 0.0000000001);
@@ -3255,7 +3255,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 2 and moderate air and water flow and meet capacity
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 2);
-    EXPECT_NEAR(thisFanCoil.PLR, 0.856, 0.001);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.850, 0.001);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     // cycling fan proportional to PLR and fan speed ratio
     EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.MedSpeedRatio, 0.0000000001);
@@ -3269,7 +3269,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 3 and near full air and water flow and meet capacity
     EXPECT_EQ(3, FanCoil(1).SpeedFanSel);
-    EXPECT_NEAR(FanCoil(1).PLR, 0.941, 0.001);
+    EXPECT_NEAR(FanCoil(1).PLR, 0.950, 0.001);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     // cycling fan proportional to PLR and fan speed ratio
     EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow, 0.0000000001);
@@ -3280,7 +3280,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 1 and moderate air and water flow and meet capacity
     EXPECT_EQ(1, FanCoil(1).SpeedFanSel);
-    EXPECT_NEAR(FanCoil(1).PLR, 0.500, 0.001);
+    EXPECT_NEAR(FanCoil(1).PLR, 0.501, 0.001);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     // cycling fan proportional to PLR and fan speed ratio
     EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio, 0.0000000001);
@@ -3291,7 +3291,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 2 and moderate air and water flow and meet capacity
     EXPECT_EQ(2, FanCoil(1).SpeedFanSel);
-    EXPECT_NEAR(FanCoil(1).PLR, 0.753, 0.001);
+    EXPECT_NEAR(FanCoil(1).PLR, 0.756, 0.001);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.MedSpeedRatio, 0.0000000001);
 }

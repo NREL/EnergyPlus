@@ -1,5 +1,9 @@
 project(ConvertESOMTR Fortran)
 
+cmake_minimum_required(VERSION 3.5.1)
+
+cmake_policy(SET CMP0012 NEW) # if() recognizes boolean constants
+
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
@@ -10,6 +14,7 @@ set(STATIC_EXE FALSE)
 
 set(SKIP_BUILD_RPATH TRUE)
 add_executable( convertESOMTR ${SRC} )
+set_target_properties(convertESOMTR PROPERTIES FOLDER Auxiliary)
 
 if(APPLE)
   if(CMAKE_Fortran_COMPILER MATCHES "ifort")

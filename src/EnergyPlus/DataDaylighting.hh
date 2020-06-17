@@ -63,6 +63,14 @@ namespace EnergyPlus {
 
 namespace DataDaylighting {
 
+    enum class SkyType : int
+    {
+        Clear = 1,
+        ClearTurbid,
+        Intermediate,
+        Overcast
+    };
+
     // Using/Aliasing
 
     // Data
@@ -166,8 +174,8 @@ namespace DataDaylighting {
         int NumOfDayltgExtWins;           // Number of associated exterior windows providing daylight to this zone
         Array1D_int DayltgExtWinSurfNums; // List of surface numbers of zone's exterior windows or
         // exterior windows in adjacent zones sharing interior windows with the zone
-        std::vector<std::vector<int>> ShadeDeployOrderExtWins; // describes how the fenestration surfaces should deploy the shades. 
-        // It is a list of lists. Each sublist is a group of fenestration surfaces that should be deployed together. Many times the 
+        std::vector<std::vector<int>> ShadeDeployOrderExtWins; // describes how the fenestration surfaces should deploy the shades.
+        // It is a list of lists. Each sublist is a group of fenestration surfaces that should be deployed together. Many times the
         // sublists a just a single index to a fenestration surface if they are deployed one at a time.
         Array1D_int MapShdOrdToLoopNum;  // list that maps back the original loop order when using ShadeDeployOrderExtWins for shade deployment
         Real64 MinIntWinSolidAng;     // Minimum solid angle subtended by an interior window in a zone
@@ -182,22 +190,22 @@ namespace DataDaylighting {
         Array3D<Real64> BackLumFromWinAtRefPt;   // (MaxRefPoints,2,50)
         Array3D<Real64> SourceLumFromWinAtRefPt; // (MaxRefPoints,2,50)
         // Allocatable daylight factor arrays
-        // Arguments for Dayl---Sky are:
-        //  1: Daylit window number (1 to NumOfDayltgExtWins)
-        //  2: Reference point number (1 to MaxRefPoints)
-        //  3: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
-        //  4: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
+        // Arguments (dimensions) for Dayl---Sky are:
+        //  1: Sun position index / HourOfDay (1 to 24)
+        //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
         //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
-        //  5: Sun position index (1 to 24)
+        //  3: Reference point number (1 to MaxRefPoints)
+        //  4: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
+        //  5: Daylit window number (1 to NumOfDayltgExtWins)
         Array5D<Real64> DaylIllFacSky;
         Array5D<Real64> DaylSourceFacSky;
         Array5D<Real64> DaylBackFacSky;
-        // Arguments for Dayl---Sun are:
-        //  1: Daylit window number (1 to NumOfDayltgExtWins)
-        //  2: Reference point number (1 to MaxRefPoints)
-        //  3: Shading index (1 to MaxShadeIndex; 1 = no shade; 2 = with shade, or, if blinds
+        // Arguments (dimensions) for Dayl---Sun are:
+        //  1: Sun position index / HourOfDay (1 to 24)
+        //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
         //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
-        //  4: Sun position index (1 to 24)
+        //  3: Reference point number (1 to MaxRefPoints)
+        //  4: Daylit window number (1 to NumOfDayltgExtWins)
         Array4D<Real64> DaylIllFacSun;
         Array4D<Real64> DaylIllFacSunDisk;
         Array4D<Real64> DaylSourceFacSun;
@@ -268,21 +276,22 @@ namespace DataDaylighting {
         Array3D<Real64> IllumFromWinAtMapPt;     // (MaxRefPoints,2,50)
         Array3D<Real64> BackLumFromWinAtMapPt;   // (MaxRefPoints,2,50)
         Array3D<Real64> SourceLumFromWinAtMapPt; // (MaxRefPoints,2,50)
-        //  1: Daylit window number (1 to NumOfDayltgExtWins)
-        //  2: Reference point number (1 to MaxRefPoints)
-        //  3: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
-        //  4: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
+        // Arguments (dimensions) for Dayl---Sky are:
+        //  1: Sun position index / HourOfDay (1 to 24)
+        //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
         //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
-        //  5: Sun position index (1 to 24)
+        //  3: Reference point number (1 to MaxRefPoints)
+        //  4: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
+        //  5: Daylit window number (1 to NumOfDayltgExtWins)
         Array5D<Real64> DaylIllFacSky;
         Array5D<Real64> DaylSourceFacSky;
         Array5D<Real64> DaylBackFacSky;
-        // Arguments for Dayl---Sun are:
-        //  1: Daylit window number (1 to NumOfDayltgExtWins)
-        //  2: Reference point number (1 to MaxRefPoints)
-        //  3: Shading index (1 to MaxShadeIndex; 1 = no shade; 2 = with shade, or, if blinds
+        // Arguments (dimensions) for Dayl---Sun are:
+        //  1: Sun position index / HourOfDay (1 to 24)
+        //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
         //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
-        //  4: Sun position index (1 to 24)
+        //  3: Reference point number (1 to MaxRefPoints)
+        //  4: Daylit window number (1 to NumOfDayltgExtWins)
         Array4D<Real64> DaylIllFacSun;
         Array4D<Real64> DaylIllFacSunDisk;
         Array4D<Real64> DaylSourceFacSun;

@@ -2633,8 +2633,6 @@ namespace SystemAvailabilityManager {
         Real64 PreStartTime;
         Real64 PreStartTimeTmr;
         Real64 DeltaTime;
-        int I;
-        int J;
         Real64 TempDiff;
         Real64 TempDiffHi;
         Real64 TempDiffLo;
@@ -2736,10 +2734,10 @@ namespace SystemAvailabilityManager {
             FanStartTime = 0.0;
             FanStartTimeTmr = 0.0;
             exitLoop = false;
-            for (I = 1; I <= 24; ++I) {
-                for (J = 1; J <= NumOfTimeStepInHour; ++J) {
+            for (int I = 1; I <= 24; ++I) {
+                for (int J = 1; J <= NumOfTimeStepInHour; ++J) {
                     if (DayValues(J, I) <= 0.0) continue;
-                    FanStartTime = I - 1 + 1 / NumOfTimeStepInHour * J;
+                    FanStartTime = I - 1 + 1.0 / NumOfTimeStepInHour * J - 0.01;
                     exitLoop = true;
                     break;
                 }
@@ -2747,10 +2745,10 @@ namespace SystemAvailabilityManager {
             }
 
             exitLoop = false;
-            for (I = 1; I <= 24; ++I) {
-                for (J = 1; J <= NumOfTimeStepInHour; ++J) {
+            for (int I = 1; I <= 24; ++I) {
+                for (int J = 1; J <= NumOfTimeStepInHour; ++J) {
                     if (DayValuesTmr(J, I) <= 0.0) continue;
-                    FanStartTimeTmr = I - 1 + 1 / NumOfTimeStepInHour * J;
+                    FanStartTimeTmr = I - 1 + 1.0 / NumOfTimeStepInHour * J - 0.01;
                     exitLoop = true;
                     break;
                 }
