@@ -1219,21 +1219,25 @@ namespace SimulationManager {
                     } else if (overrideModeValue == "MODE03") {
                         // Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler
                         overrideTimestep = true;
+                        overrideSystemTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                     } else if (overrideModeValue == "MODE04") {
                         // Mode02 plus Minimum Number of Warmup Days will be set to 1
                         overrideTimestep = true;
+                        overrideSystemTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                     } else if (overrideModeValue == "MODE05") {
                         // Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets
                         overrideTimestep = true;
+                        overrideSystemTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
                     } else if (overrideModeValue == "MODE06") {
                         // Mode04 plus internal variable MaxZoneTempDiff will be set to 1.00
                         overrideTimestep = true;
+                        overrideSystemTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
@@ -1241,6 +1245,7 @@ namespace SimulationManager {
                     } else if (overrideModeValue == "MODE07") {
                         // New Mode07 (temporarily named Mode05a in order to keep other parts intact as much as possible
                         overrideTimestep = true;
+                        overrideSystemTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
