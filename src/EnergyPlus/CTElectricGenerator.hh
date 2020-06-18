@@ -149,7 +149,7 @@ namespace CTElectricGenerator {
 
         void setupOutputVars();
 
-        void InitCTGenerators(BranchInputManagerData &data,
+        void InitCTGenerators(BranchInputManagerData &dataBranchInputManager,
                               bool RunFlag, bool FirstHVACIteration);
 
         void CalcCTGeneratorModel(bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);

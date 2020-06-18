@@ -293,7 +293,7 @@ namespace BoilerSteam {
         }
     }
 
-    void BoilerSpecs::initialize(BranchInputManagerData &data) // number of the current electric chiller being simulated
+    void BoilerSpecs::initialize(BranchInputManagerData &dataBranchInputManager) // number of the current electric chiller being simulated
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
@@ -316,7 +316,7 @@ namespace BoilerSteam {
             this->setupOutputVars();
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                 this->Name, DataPlant::TypeOf_Boiler_Steam, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");

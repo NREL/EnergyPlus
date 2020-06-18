@@ -582,7 +582,7 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::initialize(BranchInputManagerData &data,
+    void BLASTAbsorberSpecs::initialize(BranchInputManagerData &dataBranchInputManager,
                                         bool RunFlag, // TRUE when chiller operating
                                         Real64 MyLoad)
     {
@@ -608,7 +608,7 @@ namespace ChillerAbsorption {
 
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_Absorption,
                                                     this->CWLoopNum,
@@ -622,7 +622,7 @@ namespace ChillerAbsorption {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondInletNodeNum > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(data,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_Absorption,
                                                         this->CDLoopNum,
@@ -639,7 +639,7 @@ namespace ChillerAbsorption {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_Absorption, true);
             }
             if (this->GeneratorInletNodeNum > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(data,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_Absorption,
                                                         this->GenLoopNum,

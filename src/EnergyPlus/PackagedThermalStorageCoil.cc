@@ -1814,7 +1814,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void InitTESCoil(BranchInputManagerData &data, int &TESCoilNum)
+    void InitTESCoil(BranchInputManagerData &dataBranchInputManager, int &TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1881,7 +1881,7 @@ namespace PackagedThermalStorageCoil {
 
             if (TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
                 errFlag = false;
-                ScanPlantLoopsForObject(data, TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum, errFlag);
+                ScanPlantLoopsForObject(dataBranchInputManager, TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum, errFlag);
 
                 // double check node names match
                 if (errFlag) {

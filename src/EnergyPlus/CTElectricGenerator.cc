@@ -657,7 +657,7 @@ namespace CTElectricGenerator {
         }
     }
 
-    void CTGeneratorData::InitCTGenerators(BranchInputManagerData &data,
+    void CTGeneratorData::InitCTGenerators(BranchInputManagerData &dataBranchInputManager,
                                            bool const RunFlag, // TRUE when Generator operating
                                            bool const FirstHVACIteration)
     {
@@ -677,7 +677,7 @@ namespace CTElectricGenerator {
 
         if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     DataPlant::TypeOf_Generator_CTurbine,
                                                     this->HRLoopNum,

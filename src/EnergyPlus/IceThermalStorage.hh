@@ -155,7 +155,7 @@ namespace IceThermalStorage {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitSimpleIceStorage(BranchInputManagerData &data);
+        void InitSimpleIceStorage(BranchInputManagerData &dataBranchInputManager);
 
         void CalcIceStorageDormant();
 
@@ -254,7 +254,7 @@ namespace IceThermalStorage {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitDetailedIceStorage(BranchInputManagerData &data);
+        void InitDetailedIceStorage(BranchInputManagerData &dataBranchInputManager);
 
         void SimDetailedIceStorage();
 

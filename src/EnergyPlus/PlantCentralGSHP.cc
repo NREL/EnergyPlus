@@ -1397,7 +1397,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         }
     }
 
-    void WrapperSpecs::initialize(BranchInputManagerData &data,
+    void WrapperSpecs::initialize(BranchInputManagerData &dataBranchInputManager,
                                   Real64 MyLoad, // Demand Load
                                   int LoopNum    // Loop Number Index
     )
@@ -1424,7 +1424,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         if (this->MyWrapperFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     DataPlant::TypeOf_CentralGroundSourceHeatPump,
                                                     this->CWLoopNum,
@@ -1438,7 +1438,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                                     this->CHWInletNodeNum,
                                                     _);
 
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     DataPlant::TypeOf_CentralGroundSourceHeatPump,
                                                     this->HWLoopNum,
@@ -1452,7 +1452,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                                     this->HWInletNodeNum,
                                                     _);
 
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     DataPlant::TypeOf_CentralGroundSourceHeatPump,
                                                     this->GLHELoopNum,

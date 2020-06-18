@@ -159,7 +159,7 @@ namespace HVACCooledBeam {
 
     // Functions
 
-    void SimCoolBeam(BranchInputManagerData &data,
+    void SimCoolBeam(BranchInputManagerData &dataBranchInputManager,
                      std::string const &CompName,   // name of the cooled beam unit
                      bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                      int const ZoneNum,             // index of zone served by the unit
@@ -170,7 +170,7 @@ namespace HVACCooledBeam {
 
     void GetCoolBeams();
 
-    void InitCoolBeam(BranchInputManagerData &data,
+    void InitCoolBeam(BranchInputManagerData &dataBranchInputManager,
                       int const CBNum,              // number of the current cooled beam unit being simulated
                       bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     );

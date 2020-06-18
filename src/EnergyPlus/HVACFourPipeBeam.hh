@@ -113,7 +113,7 @@ namespace FourPipeBeam {
 
     private: // Methods
         void
-        init(BranchInputManagerData &data, bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step         MAYBE THIS SHOULD HAVE A DEFAULT ARG OF = false
+        init(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step         MAYBE THIS SHOULD HAVE A DEFAULT ARG OF = false
         );
 
         void set_size();

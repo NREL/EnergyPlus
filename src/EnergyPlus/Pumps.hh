@@ -255,7 +255,7 @@ namespace Pumps {
     // Functions
     void clear_state();
 
-    void SimPumps(BranchInputManagerData &data,
+    void SimPumps(BranchInputManagerData &dataBranchInputManager,
                   std::string const &PumpName, // Name of pump to be managed
                   int const LoopNum,           // Plant loop number
                   Real64 const FlowRequest,    // requested flow from adjacent demand side
@@ -273,7 +273,7 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void InitializePumps(BranchInputManagerData &data, int const PumpNum);
+    void InitializePumps(BranchInputManagerData &dataBranchInputManager, int const PumpNum);
 
     //*************************************************************************!
 

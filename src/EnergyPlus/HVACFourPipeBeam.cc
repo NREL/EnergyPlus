@@ -511,7 +511,7 @@ namespace FourPipeBeam {
         }
     }
 
-    void HVACFourPipeBeam::init(BranchInputManagerData &data,
+    void HVACFourPipeBeam::init(BranchInputManagerData &dataBranchInputManager,
                                 bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
     {
@@ -537,7 +537,7 @@ namespace FourPipeBeam {
         if (this->plantLoopScanFlag && allocated(PlantLoop)) {
             errFlag = false;
             if (this->beamCoolingPresent) {
-                ScanPlantLoopsForObject(data,
+                ScanPlantLoopsForObject(dataBranchInputManager,
                                         this->name,
                                         TypeOf_FourPipeBeamAirTerminal,
                                         this->cWLocation.loopNum,
@@ -555,7 +555,7 @@ namespace FourPipeBeam {
                 }
             }
             if (this->beamHeatingPresent) {
-                ScanPlantLoopsForObject(data,
+                ScanPlantLoopsForObject(dataBranchInputManager,
                                         this->name,
                                         TypeOf_FourPipeBeamAirTerminal,
                                         this->hWLocation.loopNum,

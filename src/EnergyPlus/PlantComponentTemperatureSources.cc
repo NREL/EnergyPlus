@@ -128,7 +128,7 @@ namespace PlantComponentTemperatureSources {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WaterSourceSpecs::initialize(BranchInputManagerData &data, Real64 &MyLoad)
+    void WaterSourceSpecs::initialize(BranchInputManagerData &dataBranchInputManager, Real64 &MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -151,7 +151,7 @@ namespace PlantComponentTemperatureSources {
             this->setupOutputVars();
             // Locate the component on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     DataPlant::TypeOf_WaterSource,
                                                     this->Location.loopNum,

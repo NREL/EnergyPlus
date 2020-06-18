@@ -176,7 +176,7 @@ namespace PlantLoadProfile {
 
     } // simulate()
 
-    void PlantProfileData::InitPlantProfile(BranchInputManagerData &data)
+    void PlantProfileData::InitPlantProfile(BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -214,7 +214,7 @@ namespace PlantLoadProfile {
         if (this->SetLoopIndexFlag) {
             if (allocated(PlantLoop)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(data,
+                ScanPlantLoopsForObject(dataBranchInputManager,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError("InitPlantProfile: Program terminated for previous conditions.");

@@ -170,7 +170,7 @@ namespace FluidCoolers {
         {
         }
 
-        void initialize(BranchInputManagerData &data);
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void setupOutputVars();
 

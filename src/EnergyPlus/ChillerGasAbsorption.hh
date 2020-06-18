@@ -218,7 +218,7 @@ namespace ChillerGasAbsorption {
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
-        void initialize(BranchInputManagerData &data);
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void setupOutputVariables();
 

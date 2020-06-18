@@ -1529,7 +1529,7 @@ namespace RefrigeratedCase {
 
     void InitRefrigeration();
 
-    void InitRefrigerationPlantConnections(BranchInputManagerData &data);
+    void InitRefrigerationPlantConnections(BranchInputManagerData &dataBranchInputManager);
 
     void SimulateDetailedRefrigerationSystems();
 

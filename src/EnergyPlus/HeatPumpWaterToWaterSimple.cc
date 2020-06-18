@@ -657,7 +657,7 @@ namespace HeatPumpWaterToWaterSimple {
         }
     }
 
-    void GshpSpecs::InitWatertoWaterHP(BranchInputManagerData &data,
+    void GshpSpecs::InitWatertoWaterHP(BranchInputManagerData &dataBranchInputManager,
                                        int const GSHPTypeNum,                  // Type of GSHP
                                        std::string const &EP_UNUSED(GSHPName), // User Specified Name of GSHP
                                        bool const EP_UNUSED(FirstHVACIteration),
@@ -718,7 +718,7 @@ namespace HeatPumpWaterToWaterSimple {
 
         if (this->MyPlantScanFlag) {
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     this->WWHPPlantTypeOfNum,
                                                     this->SourceLoopNum,
@@ -731,7 +731,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                     _,
                                                     this->SourceSideInletNodeNum,
                                                     _);
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     this->WWHPPlantTypeOfNum,
                                                     this->LoadLoopNum,

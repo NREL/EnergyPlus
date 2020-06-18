@@ -160,7 +160,7 @@ namespace Boilers {
 
         void SetupOutputVars();
 
-        void InitBoiler(BranchInputManagerData &data); // number of the current boiler being simulated
+        void InitBoiler(BranchInputManagerData &dataBranchInputManager); // number of the current boiler being simulated
 
         void SizeBoiler();
 

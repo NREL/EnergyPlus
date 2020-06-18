@@ -562,7 +562,7 @@ private: // Methods
 
     void dispatchStorage(Real64 const remainingPowerDemand);
 
-    Real64 calcLoadCenterThermalLoad(BranchInputManagerData &data); // returns heat rate called for from cogenerator(watts)
+    Real64 calcLoadCenterThermalLoad(BranchInputManagerData &dataBranchInputManager); // returns heat rate called for from cogenerator(watts)
 
 public: // data public for unit test
     enum class ElectricBussType : int

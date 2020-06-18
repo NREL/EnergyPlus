@@ -234,7 +234,7 @@ namespace SolarCollectors {
 
         void setupOutputVars();
 
-        void initialize(BranchInputManagerData &data);
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 

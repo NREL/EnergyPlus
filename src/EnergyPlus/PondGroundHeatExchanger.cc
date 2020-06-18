@@ -359,7 +359,7 @@ namespace PondGroundHeatExchanger {
         SetupOutputVariable("Pond Heat Exchanger Bulk Temperature", OutputProcessor::Unit::C, this->PondTemp, "Plant", "Average", this->Name);
     }
 
-    void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(BranchInputManagerData &data, bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+    void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
 
@@ -404,7 +404,7 @@ namespace PondGroundHeatExchanger {
         if (this->MyFlag) {
             // Locate the hx on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     DataPlant::TypeOf_GrndHtExchgPond,
                                                     this->LoopNum,

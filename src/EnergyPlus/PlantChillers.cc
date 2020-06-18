@@ -631,7 +631,7 @@ namespace PlantChillers {
         }
     }
 
-    void ElectricChillerSpecs::initialize(BranchInputManagerData &data, bool const RunFlag, Real64 const MyLoad)
+    void ElectricChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -653,7 +653,7 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables();
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     this->plantTypeOfNum,
                                                     this->CWLoopNum,
@@ -667,7 +667,7 @@ namespace PlantChillers {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(data,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->CDLoopNum,
@@ -684,7 +684,7 @@ namespace PlantChillers {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(data,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->HRLoopNum,
@@ -2451,7 +2451,7 @@ namespace PlantChillers {
         }
     }
 
-    void EngineDrivenChillerSpecs::initialize(BranchInputManagerData &data, bool const RunFlag, Real64 const MyLoad)
+    void EngineDrivenChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2473,7 +2473,7 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables();
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     this->plantTypeOfNum,
                                                     this->CWLoopNum,
@@ -2487,7 +2487,7 @@ namespace PlantChillers {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(data,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->CDLoopNum,
@@ -2504,7 +2504,7 @@ namespace PlantChillers {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(data,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->HRLoopNum,
@@ -4203,7 +4203,7 @@ namespace PlantChillers {
         }
     }
 
-    void GTChillerSpecs::initialize(BranchInputManagerData &data, bool const RunFlag, Real64 const MyLoad)
+    void GTChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4226,7 +4226,7 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables();
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     this->plantTypeOfNum,
                                                     this->CWLoopNum,
@@ -4240,7 +4240,7 @@ namespace PlantChillers {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(data,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->CDLoopNum,
@@ -4257,7 +4257,7 @@ namespace PlantChillers {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(data,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->HRLoopNum,
@@ -5783,7 +5783,7 @@ namespace PlantChillers {
         }
     }
 
-    void ConstCOPChillerSpecs::initialize(BranchInputManagerData &data, bool const RunFlag, Real64 const MyLoad)
+    void ConstCOPChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5810,7 +5810,7 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables();
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     this->plantTypeOfNum,
                                                     this->CWLoopNum,
@@ -5824,7 +5824,7 @@ namespace PlantChillers {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(data,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->CDLoopNum,

@@ -823,7 +823,7 @@ namespace PipeHeatTransfer {
 
     //==============================================================================
 
-    void PipeHTData::InitPipesHeatTransfer(BranchInputManagerData &data, bool const FirstHVACIteration // component number
+    void PipeHTData::InitPipesHeatTransfer(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // component number
     )
     {
 
@@ -890,7 +890,7 @@ namespace PipeHeatTransfer {
         // get some data only once
         if (this->OneTimeInit) {
             errFlag = false;
-            ScanPlantLoopsForObject(data,
+            ScanPlantLoopsForObject(dataBranchInputManager,
                 this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitPipesHeatTransfer: Program terminated due to previous condition(s).");

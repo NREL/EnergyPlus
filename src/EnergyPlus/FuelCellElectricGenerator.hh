@@ -545,7 +545,7 @@ namespace FuelCellElectricGenerator {
 
         static PlantComponent *factory_exhaust(std::string const &objectName);
 
-        void initialize(BranchInputManagerData &data);
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
@@ -599,7 +599,7 @@ namespace FuelCellElectricGenerator {
                                          Real64 &PgridOverage // electricity that can't be stored and needs to go out
         );
 
-        void SimFuelCellGenerator(BranchInputManagerData &data,
+        void SimFuelCellGenerator(BranchInputManagerData &dataBranchInputManager,
                                   bool RunFlag,  // simulate Generator when TRUE
                                   Real64 MyLoad, // demand on electric generator
                                   bool FirstHVACIteration);

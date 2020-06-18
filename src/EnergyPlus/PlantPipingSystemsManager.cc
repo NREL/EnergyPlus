@@ -2106,7 +2106,7 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::InitPipingSystems(BranchInputManagerData &data, Circuit * thisCircuit) {
+        void Domain::InitPipingSystems(BranchInputManagerData &dataBranchInputManager, Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2128,7 +2128,7 @@ namespace EnergyPlus {
                 }
 
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(data,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                         thisCircuit->Name,
                                                         TypeToLookFor,
                                                         thisCircuit->LoopNum,

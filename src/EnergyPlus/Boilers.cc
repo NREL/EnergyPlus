@@ -413,7 +413,7 @@ namespace Boilers {
         }
     }
 
-    void BoilerSpecs::InitBoiler(BranchInputManagerData &data) // number of the current boiler being simulated
+    void BoilerSpecs::InitBoiler(BranchInputManagerData &dataBranchInputManager) // number of the current boiler being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -439,7 +439,7 @@ namespace Boilers {
 
             // Locate the boilers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     DataPlant::TypeOf_Boiler_Simple,
                                                     this->LoopNum,

@@ -246,7 +246,7 @@ namespace OutsideEnergySources {
 
     }
 
-    void OutsideEnergySourceSpecs::initialize(BranchInputManagerData &data, Real64 MyLoad)
+    void OutsideEnergySourceSpecs::initialize(BranchInputManagerData &dataBranchInputManager, Real64 MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -269,7 +269,7 @@ namespace OutsideEnergySources {
         if (this->OneTimeInitFlag) {
             // Locate the unit on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(data, this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager, this->Name,
                                                     this->EnergyType,
                                     this->LoopNum,
                                     this->LoopSideNum,

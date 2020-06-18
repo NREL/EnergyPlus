@@ -209,7 +209,7 @@ namespace MicroCHPElectricGenerator {
 
         void setupOutputVars();
 
-        void InitMicroCHPNoNormalizeGenerators(BranchInputManagerData &data);
+        void InitMicroCHPNoNormalizeGenerators(BranchInputManagerData &dataBranchInputManager);
 
         void CalcUpdateHeatRecovery();
 

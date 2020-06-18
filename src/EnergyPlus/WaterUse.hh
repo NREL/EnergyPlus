@@ -250,7 +250,7 @@ namespace WaterUse {
 
     void clear_state();
 
-    void SimulateWaterUse(BranchInputManagerData &data, bool FirstHVACIteration);
+    void SimulateWaterUse(BranchInputManagerData &dataBranchInputManager, bool FirstHVACIteration);
 
     void GetWaterUseInput();
 

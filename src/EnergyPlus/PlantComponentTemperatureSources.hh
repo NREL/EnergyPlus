@@ -113,7 +113,7 @@ namespace PlantComponentTemperatureSources {
         // Destructor
         ~WaterSourceSpecs() = default;
 
-        void initialize(BranchInputManagerData &data, Real64 &MyLoad);
+        void initialize(BranchInputManagerData &dataBranchInputManager, Real64 &MyLoad);
 
         void setupOutputVars();
 

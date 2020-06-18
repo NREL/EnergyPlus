@@ -85,7 +85,7 @@ namespace PlantCondLoopOperation {
     // Functions
     void clear_state();
 
-    void ManagePlantLoadDistribution(BranchInputManagerData &data,
+    void ManagePlantLoadDistribution(BranchInputManagerData &dataBranchInputManager,
                                      int const LoopNum,     // PlantLoop data structure loop counter
                                      int const LoopSideNum, // PlantLoop data structure LoopSide counter
                                      int const BranchNum,   // PlantLoop data structure branch counter
@@ -143,7 +143,7 @@ namespace PlantCondLoopOperation {
     // Beginning Initialization Section of the Plant Loop Module
     //******************************************************************************
 
-    void InitLoadDistribution(BranchInputManagerData &data, bool const FirstHVACIteration);
+    void InitLoadDistribution(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration);
 
     // End Initialization Section of the Plant Loop Module
     //******************************************************************************

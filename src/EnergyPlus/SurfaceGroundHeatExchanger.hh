@@ -182,7 +182,7 @@ namespace SurfaceGroundHeatExchanger {
 
         static PlantComponent *factory(int objectType, std::string objectName);
 
-        void InitSurfaceGroundHeatExchanger(BranchInputManagerData &data);
+        void InitSurfaceGroundHeatExchanger(BranchInputManagerData &dataBranchInputManager);
 
         //==============================================================================
 

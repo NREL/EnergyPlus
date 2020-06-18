@@ -171,12 +171,12 @@ namespace SwimmingPool {
                                         bool &ErrorsFound
         );
 
-        void initialize(BranchInputManagerData &data, bool FirstHVACIteration // true during the first HVAC iteration
+        void initialize(BranchInputManagerData &dataBranchInputManager, bool FirstHVACIteration // true during the first HVAC iteration
         );
 
         void setupOutputVars();
 
-        void initSwimmingPoolPlantLoopIndex(BranchInputManagerData &data);
+        void initSwimmingPoolPlantLoopIndex(BranchInputManagerData &dataBranchInputManager);
 
         void initSwimmingPoolPlantNodeFlow(bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
         );

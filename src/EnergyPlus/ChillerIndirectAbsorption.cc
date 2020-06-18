@@ -673,7 +673,7 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void IndirectAbsorberSpecs::initialize(BranchInputManagerData &data, bool RunFlag, Real64 MyLoad)
+    void IndirectAbsorberSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -697,7 +697,7 @@ namespace ChillerIndirectAbsorption {
 
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_Indirect_Absorption,
                                                     this->CWLoopNum,
@@ -711,7 +711,7 @@ namespace ChillerIndirectAbsorption {
                                                     this->EvapInletNodeNum,
                                                     _);
 
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_Indirect_Absorption,
                                                     this->CDLoopNum,
@@ -728,7 +728,7 @@ namespace ChillerIndirectAbsorption {
                 this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_Indirect_Absorption, true);
 
             if (this->GeneratorInletNodeNum > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(data,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_Indirect_Absorption,
                                                         this->GenLoopNum,

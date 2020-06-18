@@ -249,7 +249,7 @@ namespace PipeHeatTransfer {
 
         void PushInnerTimeStepArrays();
 
-        void InitPipesHeatTransfer(BranchInputManagerData &data, bool const FirstHVACIteration // component number
+        void InitPipesHeatTransfer(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // component number
         );
 
         Real64 TBND(Real64 const z,       // Current Depth

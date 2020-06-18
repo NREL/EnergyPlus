@@ -297,7 +297,7 @@ struct BranchInputManagerData;
 
             virtual Real64 getGFunc(Real64) = 0;
 
-            virtual void initGLHESimVars(BranchInputManagerData &data) = 0;
+            virtual void initGLHESimVars(BranchInputManagerData &dataBranchInputManager) = 0;
 
             virtual Real64 calcHXResistance() = 0;
 
@@ -349,7 +349,7 @@ struct BranchInputManagerData;
 
             Real64 calcHXResistance();
 
-            void initGLHESimVars(BranchInputManagerData &data);
+            void initGLHESimVars(BranchInputManagerData &dataBranchInputManager);
 
             void getAnnualTimeConstant();
 
@@ -411,7 +411,7 @@ struct BranchInputManagerData;
 
             void calcGFunctions();
 
-            void initGLHESimVars(BranchInputManagerData &data);
+            void initGLHESimVars(BranchInputManagerData &dataBranchInputManager);
 
             void getAnnualTimeConstant();
 

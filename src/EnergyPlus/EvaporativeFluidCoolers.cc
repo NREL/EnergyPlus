@@ -1024,7 +1024,7 @@ namespace EvaporativeFluidCoolers {
         this->ReportEvapFluidCooler(RunFlag);
     }
 
-    void EvapFluidCoolerSpecs::InitEvapFluidCooler(BranchInputManagerData &data)
+    void EvapFluidCoolerSpecs::InitEvapFluidCooler(BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1069,7 +1069,7 @@ namespace EvaporativeFluidCoolers {
 
         if (this->OneTimeFlagForEachEvapFluidCooler) {
             // Locate the tower on the plant loops for later usage
-            PlantUtilities::ScanPlantLoopsForObject(data,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                 this->Name, this->TypeOf_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
 
             if (ErrorsFound) {

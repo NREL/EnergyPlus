@@ -207,7 +207,7 @@ namespace ChillerAbsorption {
 
         void getSizingFactor(Real64 &sizFac) override;
 
-        void initialize(BranchInputManagerData &data, bool RunFlag, Real64 MyLoad);
+        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad);
 
         void setupOutputVars();
 

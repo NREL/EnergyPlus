@@ -124,7 +124,7 @@ namespace BoilerSteam {
         {
         }
 
-        void initialize(BranchInputManagerData &data);
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void setupOutputVars();
 

@@ -152,7 +152,7 @@ namespace PlantCondLoopOperation {
         LoadEquipListOneTimeFlag = true;
     }
 
-    void ManagePlantLoadDistribution(BranchInputManagerData &data,
+    void ManagePlantLoadDistribution(BranchInputManagerData &dataBranchInputManager,
                                      int const LoopNum,     // PlantLoop data structure loop counter
                                      int const LoopSideNum, // PlantLoop data structure LoopSide counter
                                      int const BranchNum,   // PlantLoop data structure branch counter
@@ -263,12 +263,12 @@ namespace PlantCondLoopOperation {
         if ((CurSchemeType == UncontrolledOpSchemeType) || (CurSchemeType == CompSetPtBasedSchemeType)) {
             // No RangeVariable specified for these types
         } else if (CurSchemeType == EMSOpSchemeType) {
-            InitLoadDistribution(data, FirstHVACIteration);
+            InitLoadDistribution(dataBranchInputManager, FirstHVACIteration);
             // No RangeVariable specified for these types
         } else if (CurSchemeType == HeatingRBOpSchemeType) {
             // For zero demand, we need to clean things out before we leave
             if (LoopDemand < SmallLoad) {
-                InitLoadDistribution(data, FirstHVACIteration);
+                InitLoadDistribution(dataBranchInputManager, FirstHVACIteration);
                 this_component.MyLoad = 0.0;
                 this_component.ON = false;
                 return;
@@ -277,7 +277,7 @@ namespace PlantCondLoopOperation {
         } else if (CurSchemeType == CoolingRBOpSchemeType) {
             // For zero demand, we need to clean things out before we leave
             if (LoopDemand > (-1.0 * SmallLoad)) {
-                InitLoadDistribution(data, FirstHVACIteration);
+                InitLoadDistribution(dataBranchInputManager, FirstHVACIteration);
                 this_component.MyLoad = 0.0;
                 this_component.ON = false;
                 return;
@@ -1809,7 +1809,7 @@ namespace PlantCondLoopOperation {
     // Beginning Initialization Section of the Plant Loop Module
     //******************************************************************************
 
-    void InitLoadDistribution(BranchInputManagerData &data, bool const FirstHVACIteration)
+    void InitLoadDistribution(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -1891,7 +1891,7 @@ namespace PlantCondLoopOperation {
                             auto &this_equip(this_equip_list.Comp(EquipNum));
                             ThisTypeOfNum = UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes);
                             errFlag1 = false;
-                            PlantUtilities::ScanPlantLoopsForObject(data,
+                            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                                     this_equip.Name,
                                                                     ThisTypeOfNum,
                                                                     DummyLoopNum,

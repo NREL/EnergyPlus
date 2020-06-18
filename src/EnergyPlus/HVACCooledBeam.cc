@@ -149,7 +149,7 @@ namespace HVACCooledBeam {
 
     // Functions
 
-    void SimCoolBeam(BranchInputManagerData &data,
+    void SimCoolBeam(BranchInputManagerData &dataBranchInputManager,
                      std::string const &CompName,   // name of the cooled beam unit
                      bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                      int const ZoneNum,             // index of zone served by the unit
@@ -209,7 +209,7 @@ namespace HVACCooledBeam {
 
         DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(CoolBeam(CBNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
-        InitCoolBeam(data, CBNum, FirstHVACIteration);
+        InitCoolBeam(dataBranchInputManager, CBNum, FirstHVACIteration);
 
         ControlCoolBeam(CBNum, ZoneNum, ZoneNodeNum, FirstHVACIteration, NonAirSysOutput);
 
@@ -496,7 +496,7 @@ namespace HVACCooledBeam {
         }
     }
 
-    void InitCoolBeam(BranchInputManagerData &data,
+    void InitCoolBeam(BranchInputManagerData &dataBranchInputManager,
                       int const CBNum,              // number of the current cooled beam unit being simulated
                       bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
@@ -559,7 +559,7 @@ namespace HVACCooledBeam {
 
         if (PlantLoopScanFlag(CBNum) && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(data,
+            ScanPlantLoopsForObject(dataBranchInputManager,
                                     CoolBeam(CBNum).Name,
                                     TypeOf_CooledBeamAirTerminal,
                                     CoolBeam(CBNum).CWLoopNum,

@@ -912,7 +912,7 @@ namespace EnergyPlus {
 
             void PerformIterationLoop(Circuit * thisCircuit);
 
-            void InitPipingSystems(BranchInputManagerData &data, Circuit * thisCircuit);
+            void InitPipingSystems(BranchInputManagerData &dataBranchInputManager, Circuit * thisCircuit);
 
             void UpdatePipingSystems(Circuit * thisCircuit);
 

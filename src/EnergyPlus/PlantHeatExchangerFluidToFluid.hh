@@ -162,7 +162,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void setupOutputVars();
 
-        void initialize(BranchInputManagerData &data);
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void size();
 

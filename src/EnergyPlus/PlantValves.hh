@@ -105,7 +105,7 @@ namespace PlantValves {
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
-        void initialize(BranchInputManagerData &data);
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void calculate();
 

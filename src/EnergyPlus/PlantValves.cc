@@ -226,7 +226,7 @@ namespace PlantValves {
         }
     }
 
-    void TemperValveData::initialize(BranchInputManagerData &data)
+    void TemperValveData::initialize(BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -264,7 +264,7 @@ namespace PlantValves {
                 // Search thru PlantLoop Data Structure to check some things.
                 // Locate the component on the plant loops for later usage
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(data,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                                                         this->Name,
                                                         DataPlant::TypeOf_ValveTempering,
                                                         this->LoopNum,
