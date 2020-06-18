@@ -1,8 +1,0 @@
-eplusout.mtr
-eplusmtr.csv
-InteriorLights:Electricity
-Electricity:Building
-Electricity:Facility
-DistrictCooling:Facility
-DistrictHeating:Facility
-0
