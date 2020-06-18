@@ -1354,8 +1354,7 @@ namespace SurfaceGeometry {
                 if (SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
                 if (SurfaceTmp(SubSurfNum).Class == SurfaceClass_Window) continue;
                 if (SurfaceTmp(SubSurfNum).Class == SurfaceClass_GlassDoor) continue;
-                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass_TDD_Diffuser) continue;
-
+                
 
                 ++MovedSurfs;
                 Surface(MovedSurfs) = SurfaceTmp(SubSurfNum);
@@ -1372,9 +1371,7 @@ namespace SurfaceGeometry {
 
                 if (SurfaceTmp(SubSurfNum).Class == SurfaceClass_Moved) continue;
                 if (SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
-                if ((SurfaceTmp(SubSurfNum).Class != SurfaceClass_Window) && (SurfaceTmp(SubSurfNum).Class != SurfaceClass_GlassDoor) &&
-                    (SurfaceTmp(SubSurfNum).Class != SurfaceClass_TDD_Diffuser))
-                    continue;
+                if ((SurfaceTmp(SubSurfNum).Class != SurfaceClass_Window) && (SurfaceTmp(SubSurfNum).Class != SurfaceClass_GlassDoor)) continue;
 
                 ++MovedSurfs;
                 Surface(MovedSurfs) = SurfaceTmp(SubSurfNum);
@@ -1790,8 +1787,7 @@ namespace SurfaceGeometry {
                         Zone(ZoneNum).NonWindowSurfaceFirst = SurfNum;
                     }
                     if ((Zone(ZoneNum).WindowSurfaceFirst == 0) && ((Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window) ||
-                                                                    (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_GlassDoor) ||
-                                                                    (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_TDD_Diffuser))) {
+                                                                    (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_GlassDoor))) {
                         // Window surfaces are grouped last within each zone
                         Zone(ZoneNum).WindowSurfaceFirst = SurfNum;
                         Zone(ZoneNum).NonWindowSurfaceLast = SurfNum - 1;
@@ -1804,8 +1800,7 @@ namespace SurfaceGeometry {
         if (NumOfZones > 0) {
             Zone(NumOfZones).SurfaceLast = TotSurfaces;
             if ((Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass_Window) ||
-                (Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass_GlassDoor) ||
-                (Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass_TDD_Diffuser)) {
+                (Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass_GlassDoor)) {
                 Zone(NumOfZones).WindowSurfaceLast = TotSurfaces;
             } else {
                 // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will not
@@ -1817,8 +1812,7 @@ namespace SurfaceGeometry {
         for (int ZoneNum = 1; ZoneNum <= NumOfZones - 1; ++ZoneNum) {
             Zone(ZoneNum).SurfaceLast = Zone(ZoneNum + 1).SurfaceFirst - 1;
             if ((Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass_Window) ||
-                (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass_GlassDoor) ||
-                (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass_TDD_Diffuser)) {
+                (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass_GlassDoor)) {
                 Zone(ZoneNum).WindowSurfaceLast = Zone(ZoneNum + 1).SurfaceFirst - 1;
             } else {
                 // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will not
