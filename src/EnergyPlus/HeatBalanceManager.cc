@@ -381,7 +381,7 @@ namespace HeatBalanceManager {
         ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
 
         UpdateEMSTrendVariables();
-        EnergyPlus::PluginManagement::pluginManager->updatePluginValues();
+        EnergyPlus::PluginManagement::PluginManager::updatePluginValues();
 
         if (WarmupFlag && EndDayFlag) {
 

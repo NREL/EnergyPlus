@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
+#include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/Boilers.hh>
@@ -78,6 +79,8 @@ namespace EnergyPlus {
 
     struct EnergyPlusData : BaseGlobalStruct {
         // module globals
+
+        AirLoopHVACDOASData dataAirLoopHVACDOAS;
         BaseboardRadiatorData dataBaseboardRadiator;
         BaseboardElectricData dataBaseboardElectric;
         BoilersData dataBoilers;
@@ -112,6 +115,7 @@ namespace EnergyPlus {
 
         // all clear states
         void clear_state() override {
+            dataAirLoopHVACDOAS.clear_state();
             dataBaseboardElectric.clear_state();
             dataBaseboardRadiator.clear_state();
             dataBoilers.clear_state();

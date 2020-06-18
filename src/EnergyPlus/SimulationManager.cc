@@ -421,7 +421,7 @@ namespace SimulationManager {
             SetupPollutionMeterReporting();
             SystemReports::AllocateAndSetUpVentReports();
             if (EnergyPlus::PluginManagement::pluginManager) {
-                EnergyPlus::PluginManagement::pluginManager->setupOutputVariables();
+                EnergyPlus::PluginManagement::PluginManager::setupOutputVariables();
             }
             UpdateMeterReporting(state.outputFiles);
             CheckPollutionMeterReporting();
