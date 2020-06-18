@@ -139,19 +139,19 @@ namespace PhotovoltaicThermalCollectors {
         return nullptr;
     }
 
-    void PVTCollectorStruct::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
+    void PVTCollectorStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initialize(true);
+        this->initialize(state.dataBranchInputManager, true);
         this->size();
     }
 
-    void PVTCollectorStruct::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PVTCollectorStruct::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                       bool const FirstHVACIteration,
                                       Real64 &EP_UNUSED(CurLoad),
                                       bool const EP_UNUSED(RunFlag))
     {
 
-        this->initialize(FirstHVACIteration);
+        this->initialize(state.dataBranchInputManager, FirstHVACIteration);
         this->control();
         this->calculate();
         this->update();
@@ -445,7 +445,7 @@ namespace PhotovoltaicThermalCollectors {
             "Generator PVT Fluid Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.MdotWorkFluid, "System", "Average", this->Name);
     }
 
-    void PVTCollectorStruct::initialize(bool const FirstHVACIteration)
+    void PVTCollectorStruct::initialize(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -468,7 +468,7 @@ namespace PhotovoltaicThermalCollectors {
         if (this->SetLoopIndexFlag) {
             if (allocated(DataPlant::PlantLoop) && (this->PlantInletNodeNum > 0)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError("InitPVTcollectors: Program terminated for previous conditions.");

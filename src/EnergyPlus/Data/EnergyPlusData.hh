@@ -61,6 +61,7 @@
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
@@ -85,6 +86,7 @@ namespace EnergyPlus {
         BaseboardElectricData dataBaseboardElectric;
         BoilersData dataBoilers;
         BoilerSteamData dataSteamBoilers;
+        BranchInputManagerData dataBranchInputManager;
         ChillerAbsorberData dataChillerAbsorbers;
         ChillerElectricEIRData dataChillerElectricEIR;
         ChillerExhaustAbsorptionData dataChillerExhaustAbsorption;
@@ -119,6 +121,7 @@ namespace EnergyPlus {
             dataBaseboardElectric.clear_state();
             dataBaseboardRadiator.clear_state();
             dataBoilers.clear_state();
+            dataBranchInputManager.clear_state();
             dataSteamBoilers.clear_state();
             dataChillerAbsorbers.clear_state();
             dataChillerElectricEIR.clear_state();
