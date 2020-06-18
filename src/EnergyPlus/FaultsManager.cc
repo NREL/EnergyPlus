@@ -1081,37 +1081,37 @@ namespace FaultsManager {
             // Tower check and link
             {
                 // Read in tower input if not done yet
-                if (dataCondenserLoopTowers.GetInput) {
-                    CondenserLoopTowers::GetTowerInput();
-                    dataCondenserLoopTowers.GetInput = false;
+                if (state.dataCondenserLoopTowers.GetInput) {
+                    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+                    state.dataCondenserLoopTowers.GetInput = false;
                 }
                 // Check the tower name and tower type
-                int TowerNum = UtilityRoutines::FindItemInList(FaultsTowerFouling(jFault_TowerFouling).TowerName, dataCondenserLoopTowers.towers);
+                int TowerNum = UtilityRoutines::FindItemInList(FaultsTowerFouling(jFault_TowerFouling).TowerName, state.dataCondenserLoopTowers.towers);
                 if (TowerNum <= 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
                                     "\" not found.");
                     ErrorsFound = true;
                 } else {
                     // Link the tower with the fault model
-                    dataCondenserLoopTowers.towers(TowerNum).FaultyTowerFoulingFlag = true;
-                    dataCondenserLoopTowers.towers(TowerNum).FaultyTowerFoulingIndex = jFault_TowerFouling;
+                    state.dataCondenserLoopTowers.towers(TowerNum).FaultyTowerFoulingFlag = true;
+                    state.dataCondenserLoopTowers.towers(TowerNum).FaultyTowerFoulingIndex = jFault_TowerFouling;
 
                     // Check the faulty tower type
-                    if (!UtilityRoutines::SameString(dataCondenserLoopTowers.towers(TowerNum).TowerType,
+                    if (!UtilityRoutines::SameString(state.dataCondenserLoopTowers.towers(TowerNum).TowerType,
                                                      FaultsTowerFouling(jFault_TowerFouling).TowerType)) {
                         ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
                                          cAlphaArgs(4) + "\" not match the type of " + cAlphaFieldNames(5) +
                                          ". Tower type in the fault model is updated. ");
-                        FaultsTowerFouling(jFault_TowerFouling).TowerType = dataCondenserLoopTowers.towers(TowerNum).TowerType;
+                        FaultsTowerFouling(jFault_TowerFouling).TowerType = state.dataCondenserLoopTowers.towers(TowerNum).TowerType;
                     }
 
                     // Check the tower model
                     // Performance Input Method should be UFactorTimesAreaAndDesignWaterFlowRate to apply the fault model
-                    if (dataCondenserLoopTowers.towers(TowerNum).PerformanceInputMethod_Num != CondenserLoopTowers::PIM::UFactor) {
+                    if (state.dataCondenserLoopTowers.towers(TowerNum).PerformanceInputMethod_Num != CondenserLoopTowers::PIM::UFactor) {
                         ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                          cAlphaFieldNames(5) + ". Tower Performance Input Method is not UFactorTimesAreaAndDesignWaterFlowRate. " +
                                          "The tower fouling fault model will not be applied to the tower. ");
-                        dataCondenserLoopTowers.towers(TowerNum).FaultyTowerFoulingFlag = false;
+                        state.dataCondenserLoopTowers.towers(TowerNum).FaultyTowerFoulingFlag = false;
                     }
                 }
             }
@@ -1185,28 +1185,28 @@ namespace FaultsManager {
             // Tower check and link
             {
                 // Read in tower input if not done yet
-                if (dataCondenserLoopTowers.GetInput) {
-                    CondenserLoopTowers::GetTowerInput();
-                    dataCondenserLoopTowers.GetInput = false;
+                if (state.dataCondenserLoopTowers.GetInput) {
+                    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+                    state.dataCondenserLoopTowers.GetInput = false;
                 }
                 // Check the tower name and tower type
                 int TowerNum =
-                    UtilityRoutines::FindItemInList(FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerName, dataCondenserLoopTowers.towers);
+                    UtilityRoutines::FindItemInList(FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerName, state.dataCondenserLoopTowers.towers);
                 if (TowerNum <= 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
                                     "\" not found.");
                     ErrorsFound = true;
                 } else {
                     // Link the tower with the fault model
-                    dataCondenserLoopTowers.towers(TowerNum).FaultyCondenserSWTFlag = true;
-                    dataCondenserLoopTowers.towers(TowerNum).FaultyCondenserSWTIndex = jFault_CondenserSWT;
+                    state.dataCondenserLoopTowers.towers(TowerNum).FaultyCondenserSWTFlag = true;
+                    state.dataCondenserLoopTowers.towers(TowerNum).FaultyCondenserSWTIndex = jFault_CondenserSWT;
 
                     // Check the faulty tower type
-                    if (!UtilityRoutines::SameString(dataCondenserLoopTowers.towers(TowerNum).TowerType,
+                    if (!UtilityRoutines::SameString(state.dataCondenserLoopTowers.towers(TowerNum).TowerType,
                                                      FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType)) {
                         ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
                                          cAlphaArgs(4) + "\" not match the type of " + cAlphaFieldNames(5) + ". Tower type is updated. ");
-                        FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType = dataCondenserLoopTowers.towers(TowerNum).TowerType;
+                        FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType = state.dataCondenserLoopTowers.towers(TowerNum).TowerType;
                     }
                 }
             }

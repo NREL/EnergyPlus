@@ -508,15 +508,15 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput();
+    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
 
-    dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
-    dataCondenserLoopTowers.towers(1).SizeVSMerkelTower();
-    dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
+    state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
+    state.dataCondenserLoopTowers.towers(1).SizeVSMerkelTower();
+    state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
     Real64 MyLoad = 0.0;
-    dataCondenserLoopTowers.towers(1).calculateMerkelVariableSpeedTower(MyLoad);
-    dataCondenserLoopTowers.towers(1).update();
-    dataCondenserLoopTowers.towers(1).report(true);
+    state.dataCondenserLoopTowers.towers(1).calculateMerkelVariableSpeedTower(state, MyLoad);
+    state.dataCondenserLoopTowers.towers(1).update();
+    state.dataCondenserLoopTowers.towers(1).report(true);
 
     // test that tower is really not cooling with no load so temp in and out is the same issue #4927
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(9).Temp, DataLoopNode::Node(10).Temp);
@@ -900,14 +900,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput();
+    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
 
-    dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
-    dataCondenserLoopTowers.towers(1).SizeTower();
-    dataCondenserLoopTowers.towers(1).initialize();
-    dataCondenserLoopTowers.towers(1).calculateSingleSpeedTower(state.dataBranchInputManager);
-    dataCondenserLoopTowers.towers(1).update();
-    dataCondenserLoopTowers.towers(1).report(true);
+    state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
+    state.dataCondenserLoopTowers.towers(1).SizeTower(state);
+    state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
+    state.dataCondenserLoopTowers.towers(1).calculateSingleSpeedTower();
+    state.dataCondenserLoopTowers.towers(1).update();
+    state.dataCondenserLoopTowers.towers(1).report(true);
 
     // test that tower outlet temperature = set point temperature
     int inletNodeIndex = 0;
@@ -927,31 +927,31 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     // EXPECT_DOUBLE_EQ( 30.0, DataLoopNode::Node( outletNodeIndex ).Temp ); // outlet node temperature
 
     // input not needed for sizing (WasAutoSized = false) using NominalCapacity method but this variable should still size
-    EXPECT_FALSE(dataCondenserLoopTowers.towers(1).HighSpeedTowerUAWasAutoSized);
-    EXPECT_GT(dataCondenserLoopTowers.towers(1).HighSpeedTowerUA,
+    EXPECT_FALSE(state.dataCondenserLoopTowers.towers(1).HighSpeedTowerUAWasAutoSized);
+    EXPECT_GT(state.dataCondenserLoopTowers.towers(1).HighSpeedTowerUA,
               10000000.0); // nominal capacity input was huge at 1E+25 so all sized variables referencing capacity are very large
 
     // input not needed for sizing (WasAutoSized = false) using NominalCapacity method but this variable should still size
-    EXPECT_FALSE(dataCondenserLoopTowers.towers(1).DesignWaterFlowRateWasAutoSized);
-    EXPECT_GT(dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 10000000.0);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 5.382e-8 * dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
+    EXPECT_FALSE(state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRateWasAutoSized);
+    EXPECT_GT(state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 10000000.0);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 5.382e-8 * state.dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
 
     // autosized input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRateWasAutoSized);
-    EXPECT_GT(dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate, 10000000.0);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate,
-                     dataCondenserLoopTowers.towers(1).HighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRateWasAutoSized);
+    EXPECT_GT(state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate, 10000000.0);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate,
+                     state.dataCondenserLoopTowers.towers(1).HighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0);
 
     // autosized input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).HighSpeedFanPowerWasAutoSized);
-    EXPECT_GT(dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 10000000.0);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 0.0105 * dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).HighSpeedFanPowerWasAutoSized);
+    EXPECT_GT(state.dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 10000000.0);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 0.0105 * state.dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
 
     // autocalculate input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).FreeConvAirFlowRateWasAutoSized);
-    EXPECT_GT(dataCondenserLoopTowers.towers(1).FreeConvAirFlowRate, 10000000.0);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).FreeConvAirFlowRate,
-                     dataCondenserLoopTowers.towers(1).FreeConvAirFlowRateSizingFactor * dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).FreeConvAirFlowRateWasAutoSized);
+    EXPECT_GT(state.dataCondenserLoopTowers.towers(1).FreeConvAirFlowRate, 10000000.0);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).FreeConvAirFlowRate,
+                     state.dataCondenserLoopTowers.towers(1).FreeConvAirFlowRateSizingFactor * state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
@@ -1331,36 +1331,36 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput();
+    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
 
     // sized using user inputs in cooling tower instead of plant sizing object
-    dataCondenserLoopTowers.towers(1).SizeTower();
+    state.dataCondenserLoopTowers.towers(1).SizeTower(state);
 
     // input not needed for sizing
-    EXPECT_FALSE(dataCondenserLoopTowers.towers(1).HighSpeedTowerUAWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).HighSpeedTowerUA, 9595.0, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
+    EXPECT_FALSE(state.dataCondenserLoopTowers.towers(1).HighSpeedTowerUAWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).HighSpeedTowerUA, 9595.0, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
 
     // input not needed for sizing
-    EXPECT_FALSE(dataCondenserLoopTowers.towers(1).DesignWaterFlowRateWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 0.005382, 0.00001);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 5.382e-8 * dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
+    EXPECT_FALSE(state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRateWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 0.005382, 0.00001);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 5.382e-8 * state.dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
 
     // autosized input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRateWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate, 2.8262, 0.0001);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate,
-                     dataCondenserLoopTowers.towers(1).HighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRateWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate, 2.8262, 0.0001);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate,
+                     state.dataCondenserLoopTowers.towers(1).HighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0);
 
     // autosized input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).HighSpeedFanPowerWasAutoSized);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 1050);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 0.0105 * dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).HighSpeedFanPowerWasAutoSized);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 1050);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 0.0105 * state.dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
 
     // autocalculate input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).FreeConvAirFlowRateWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).FreeConvAirFlowRate, 0.28262, 0.00001);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).FreeConvAirFlowRate,
-                     dataCondenserLoopTowers.towers(1).FreeConvAirFlowRateSizingFactor * dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).FreeConvAirFlowRateWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).FreeConvAirFlowRate, 0.28262, 0.00001);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).FreeConvAirFlowRate,
+                     state.dataCondenserLoopTowers.towers(1).FreeConvAirFlowRateSizingFactor * state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
@@ -1746,50 +1746,50 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput();
+    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
 
     // sized using user inputs in cooling tower instead of plant sizing object
-    dataCondenserLoopTowers.towers(1).SizeTower();
+    state.dataCondenserLoopTowers.towers(1).SizeTower(state);
 
     // input not needed for sizing (NOT WasAutoSized)
-    EXPECT_FALSE(dataCondenserLoopTowers.towers(1).HighSpeedTowerUAWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).HighSpeedTowerUA, 9595.55, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
+    EXPECT_FALSE(state.dataCondenserLoopTowers.towers(1).HighSpeedTowerUAWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).HighSpeedTowerUA, 9595.55, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
 
     // input not needed for sizing (NOT WasAutoSized)
-    EXPECT_FALSE(dataCondenserLoopTowers.towers(1).DesignWaterFlowRateWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 0.005382, 0.00001);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 5.382e-8 * dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
+    EXPECT_FALSE(state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRateWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 0.005382, 0.00001);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 5.382e-8 * state.dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
 
     // autosized input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRateWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate, 2.8262, 0.0001);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate,
-                     dataCondenserLoopTowers.towers(1).HighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRateWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate, 2.8262, 0.0001);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate,
+                     state.dataCondenserLoopTowers.towers(1).HighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0);
 
     // autosized input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).HighSpeedFanPowerWasAutoSized);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 1050);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 0.0105 * dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).HighSpeedFanPowerWasAutoSized);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 1050);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 0.0105 * state.dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
 
     // autosized input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).LowSpeedAirFlowRateWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).LowSpeedAirFlowRate, 1.4131, 0.0001);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).LowSpeedAirFlowRate,
-                     dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate * dataCondenserLoopTowers.towers(1).LowSpeedAirFlowRateSizingFactor);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).LowSpeedAirFlowRateWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).LowSpeedAirFlowRate, 1.4131, 0.0001);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).LowSpeedAirFlowRate,
+                     state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate * state.dataCondenserLoopTowers.towers(1).LowSpeedAirFlowRateSizingFactor);
 
     // autosized input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).LowSpeedTowerUAWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).LowSpeedTowerUA, 346.0, 1.0);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).LowSpeedTowerUAWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).LowSpeedTowerUA, 346.0, 1.0);
 
     // autosized input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).LowSpeedFanPowerWasAutoSized);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).LowSpeedFanPower, 168);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).LowSpeedFanPower,
-                     dataCondenserLoopTowers.towers(1).LowSpeedFanPowerSizingFactor * dataCondenserLoopTowers.towers(1).HighSpeedFanPower);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).LowSpeedFanPowerWasAutoSized);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).LowSpeedFanPower, 168);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).LowSpeedFanPower,
+                     state.dataCondenserLoopTowers.towers(1).LowSpeedFanPowerSizingFactor * state.dataCondenserLoopTowers.towers(1).HighSpeedFanPower);
 
     // autosized input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).FreeConvTowerUAWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).FreeConvTowerUA, 168.0, 1.0);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).FreeConvTowerUAWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).FreeConvTowerUA, 168.0, 1.0);
 }
 
 TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
@@ -2230,40 +2230,40 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput();
+    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
 
     // sized using user inputs in cooling tower instead of plant sizing object
-    dataCondenserLoopTowers.towers(1).SizeVSMerkelTower();
+    state.dataCondenserLoopTowers.towers(1).SizeVSMerkelTower();
 
     // input not needed for sizing (NOT WasAutoSized)
-    EXPECT_FALSE(dataCondenserLoopTowers.towers(1).HighSpeedTowerUAWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).HighSpeedTowerUA, 9770.0, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
+    EXPECT_FALSE(state.dataCondenserLoopTowers.towers(1).HighSpeedTowerUAWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).HighSpeedTowerUA, 9770.0, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
 
     // input not needed for sizing (NOT WasAutoSized)
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).DesignWaterFlowRateWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 0.005382, 0.00001);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 5.382e-8 * dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRateWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 0.005382, 0.00001);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRate, 5.382e-8 * state.dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
 
     // autosized input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRateWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate, 2.7632, 0.0001);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate,
-                     dataCondenserLoopTowers.towers(1).TowerNominalCapacity * dataCondenserLoopTowers.towers(1).DesignAirFlowPerUnitNomCap);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRateWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate, 2.7632, 0.0001);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate,
+                     state.dataCondenserLoopTowers.towers(1).TowerNominalCapacity * state.dataCondenserLoopTowers.towers(1).DesignAirFlowPerUnitNomCap);
 
     // autosized input
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).HighSpeedFanPowerWasAutoSized);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 1050);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 0.0105 * dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).HighSpeedFanPowerWasAutoSized);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 1050);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).HighSpeedFanPower, 0.0105 * state.dataCondenserLoopTowers.towers(1).TowerNominalCapacity);
 
     // input not needed for sizing (NOT WasAutoSized)
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).FreeConvAirFlowRateWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).FreeConvAirFlowRate, 0.27632, 0.00001);
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).FreeConvAirFlowRate,
-                     dataCondenserLoopTowers.towers(1).FreeConvAirFlowRateSizingFactor * dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).FreeConvAirFlowRateWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).FreeConvAirFlowRate, 0.27632, 0.00001);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).FreeConvAirFlowRate,
+                     state.dataCondenserLoopTowers.towers(1).FreeConvAirFlowRateSizingFactor * state.dataCondenserLoopTowers.towers(1).HighSpeedAirFlowRate);
 
     // autosized input
-    EXPECT_FALSE(dataCondenserLoopTowers.towers(1).FreeConvTowerUAWasAutoSized);
-    EXPECT_NEAR(dataCondenserLoopTowers.towers(1).FreeConvTowerUA, 590.0, 1.0);
+    EXPECT_FALSE(state.dataCondenserLoopTowers.towers(1).FreeConvTowerUAWasAutoSized);
+    EXPECT_NEAR(state.dataCondenserLoopTowers.towers(1).FreeConvTowerUA, 590.0, 1.0);
 }
 
 TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
@@ -2659,19 +2659,19 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     SimulationManager::SetupSimulation(state, ErrorsFound);
 
     // get inputs of cooling tower object
-    CondenserLoopTowers::GetTowerInput();
+    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
     // check the low speed nominal capacity field is autosized
-    EXPECT_TRUE(dataCondenserLoopTowers.towers(1).TowerLowSpeedNomCapWasAutoSized);
+    EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).TowerLowSpeedNomCapWasAutoSized);
     // check user input value for high speed nominal capacity
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).TowerNominalCapacity, 100000.0);
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).TowerNominalCapacity, 100000.0);
 
     // autosized other input fields of cooling tower
-    dataCondenserLoopTowers.towers(1).SizeTower();
+    state.dataCondenserLoopTowers.towers(1).SizeTower(state);
     // size low speed nominal capacity
-    LowSpeedCoolTowerNomCap = dataCondenserLoopTowers.towers(1).TowerNominalCapacity * dataCondenserLoopTowers.towers(1).TowerLowSpeedNomCapSizingFactor;
-    EXPECT_DOUBLE_EQ(dataCondenserLoopTowers.towers(1).TowerLowSpeedNomCap, LowSpeedCoolTowerNomCap);
+    LowSpeedCoolTowerNomCap = state.dataCondenserLoopTowers.towers(1).TowerNominalCapacity * state.dataCondenserLoopTowers.towers(1).TowerLowSpeedNomCapSizingFactor;
+    EXPECT_DOUBLE_EQ(state.dataCondenserLoopTowers.towers(1).TowerLowSpeedNomCap, LowSpeedCoolTowerNomCap);
     // check the low speed nominal capacity is higher than that of free convection nominal capacity
-    EXPECT_GT(dataCondenserLoopTowers.towers(1).TowerLowSpeedNomCap, dataCondenserLoopTowers.towers(1).TowerFreeConvNomCap);
+    EXPECT_GT(state.dataCondenserLoopTowers.towers(1).TowerLowSpeedNomCap, state.dataCondenserLoopTowers.towers(1).TowerFreeConvNomCap);
 }
 
 TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_SizingPlant)
@@ -3054,7 +3054,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     DataGlobals::KickOffSimulation = true;
 
     // autosized other input fields of cooling tower. Tt throws, so we catch that so we can compare the error
-    ASSERT_THROW(dataCondenserLoopTowers.towers(1).SizeTower(), std::runtime_error);
+    ASSERT_THROW(state.dataCondenserLoopTowers.towers(1).SizeTower(state), std::runtime_error);
 
     std::string const error_string = delimited_string({
 
@@ -3448,15 +3448,15 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     DataGlobals::KickOffSimulation = true;
 
     // get inputs of cooling tower object
-    CondenserLoopTowers::GetTowerInput();
+    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
 
-    dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
+    state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
 
     // Fake a flow
-    dataCondenserLoopTowers.towers(1).DesignWaterFlowRate = 1000.0;
+    state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRate = 1000.0;
 
     // autosized other input fields of cooling tower. Tt throws, so we catch that so we can compare the error
-    ASSERT_THROW(dataCondenserLoopTowers.towers(1).SizeTower(), std::runtime_error);
+    ASSERT_THROW(state.dataCondenserLoopTowers.towers(1).SizeTower(state), std::runtime_error);
 
     std::string const error_string = delimited_string({
 
@@ -3916,8 +3916,8 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    CondenserLoopTowers::GetTowerInput();
-    auto &VSTower = dataCondenserLoopTowers.towers(1);
+    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    auto &VSTower = state.dataCondenserLoopTowers.towers(1);
 
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     DataGlobals::BeginEnvrnFlag = true;
@@ -3932,7 +3932,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
 
     VSTower.initialize(state.dataBranchInputManager);
     DataGlobals::BeginEnvrnFlag = false;
-    VSTower.SizeTower();
+    VSTower.SizeTower(state);
     VSTower.initialize(state.dataBranchInputManager);
 
     VSTower.InletWaterTemp = 35.0;
@@ -3943,10 +3943,10 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     DataPlant::PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).TempSetPoint = 30.0;
     VSTower.WaterMassFlowRate = VSTower.DesWaterMassFlowRate * WaterFlowRateRatio;
 
-    VSTower.calculateVariableSpeedTower();
+    VSTower.calculateVariableSpeedTower(state);
     EXPECT_DOUBLE_EQ(30.0, VSTower.OutletWaterTemp);
     EXPECT_DOUBLE_EQ(1.0, VSTower.FanCyclingRatio);
-    Real64 TowerOutletWaterTemp = VSTower.calculateVariableTowerOutletTemp(WaterFlowRateRatio, VSTower.airFlowRateRatio, AirWetBulbTemp);
+    Real64 TowerOutletWaterTemp = VSTower.calculateVariableTowerOutletTemp(state, WaterFlowRateRatio, VSTower.airFlowRateRatio, AirWetBulbTemp);
     EXPECT_NEAR(30.0, TowerOutletWaterTemp, 0.0001);
 
     // test case 2:
@@ -3961,12 +3961,12 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     VSTower.AirWetBulb = DataEnvironment::OutWetBulbTemp;
     VSTower.AirHumRat = DataEnvironment::OutHumRat;
 
-    VSTower.calculateVariableSpeedTower();
+    VSTower.calculateVariableSpeedTower(state);
     EXPECT_DOUBLE_EQ(30.0, VSTower.OutletWaterTemp);
     EXPECT_NEAR(0.5213, VSTower.FanCyclingRatio, 0.0001);
     // outside air condition is favorable that fan only needs to cycle at min flow to meet the setpoint
-    TowerOutletWaterTemp = VSTower.calculateVariableTowerOutletTemp(WaterFlowRateRatio, VSTower.MinimumVSAirFlowFrac, AirWetBulbTemp);
-    // this is tower outlet temperature at continous minimum fan flow
+    TowerOutletWaterTemp = VSTower.calculateVariableTowerOutletTemp(state, WaterFlowRateRatio, VSTower.MinimumVSAirFlowFrac, AirWetBulbTemp);
+    // this is tower outlet temperature at continuous minimum fan flow
     EXPECT_NEAR(26.9537, TowerOutletWaterTemp, 0.0001);
 }
 

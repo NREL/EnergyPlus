@@ -65,6 +65,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 struct BranchInputManagerData;
+struct CondenserLoopTowersData;
 
 namespace CondenserLoopTowers {
 
@@ -403,7 +404,7 @@ namespace CondenserLoopTowers {
 
         void setupOutputVariables();
 
-        void SizeTower();
+        void SizeTower(EnergyPlusData &state);
 
         void SizeVSMerkelTower();
 
@@ -411,26 +412,29 @@ namespace CondenserLoopTowers {
 
         void calculateTwoSpeedTower();
 
-        void calculateMerkelVariableSpeedTower(Real64 &MyLoad);
+        void calculateMerkelVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad);
 
-        void calculateVariableSpeedTower();
+        void calculateVariableSpeedTower(EnergyPlusData &state);
 
         Real64 calculateSimpleTowerOutletTemp(Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
 
-        Real64 calculateVariableTowerOutletTemp(Real64 WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
+        Real64 calculateVariableTowerOutletTemp(EnergyPlusData &state,
+                                                Real64 WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
                                                 Real64 airFlowRateRatioLocal, // current air flow rate ratio
                                                 Real64 Twb                 // current inlet air wet-bulb temperature (C, capped if applicable)
         );
 
         void calculateWaterUsage();
 
-        Real64 calculateVariableSpeedApproach(Real64 PctWaterFlow,  // Water flow ratio of cooling tower
+        Real64 calculateVariableSpeedApproach(CondenserLoopTowersData &dataCondenserLoopTowers,
+                                              Real64 PctWaterFlow,  // Water flow ratio of cooling tower
                                               Real64 airFlowRatioLocal, // Air flow ratio of cooling tower
                                               Real64 Twb,           // Inlet air wet-bulb temperature [C]
                                               Real64 Tr             // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
         );
 
-        void checkModelBounds(Real64 Twb,                      // current inlet air wet-bulb temperature (C)
+        void checkModelBounds(CondenserLoopTowersData &dataCondenserLoopTowers,
+                              Real64 Twb,                      // current inlet air wet-bulb temperature (C)
                               Real64 Tr,                       // requested range temperature for current time step (C)
                               Real64 Ta,                       // requested approach temperature for current time step (C)
                               Real64 WaterFlowRateRatio,       // current water flow rate ratio at water inlet node
@@ -448,22 +452,25 @@ namespace CondenserLoopTowers {
                           Array1D<Real64> const &Par // par(1) = design tower load [W]
         );
 
-        Real64 residualTa(Real64 FlowRatio,          // water or air flow ratio of cooling tower
+        Real64 residualTa(EnergyPlusData &state,
+                          Real64 FlowRatio,          // water or air flow ratio of cooling tower
                           Array1D<Real64> const &Par // par(1) = tower number
         );
 
-        Real64 residualTr(Real64 Trange,             // cooling tower range temperature [C]
+        Real64 residualTr(EnergyPlusData &state,
+                          Real64 Trange,             // cooling tower range temperature [C]
                           Array1D<Real64> const &Par // par(1) = tower number
         );
 
-        Real64 residualMerkelLoad(Real64 airFlowRateRatioLocal,  // fan speed ratio (1.0 is continuous, 0.0 is off)
+        Real64 residualMerkelLoad(EnergyPlusData &state,
+                                  Real64 airFlowRateRatioLocal,  // fan speed ratio (1.0 is continuous, 0.0 is off)
                                   Array1D<Real64> const &Par // par(1) = Tower number
         );
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(CondenserLoopTowersData &dataCondenserLoopTowers, std::string const &objectName);
     };
 
-    void GetTowerInput();
+    void GetTowerInput(CondenserLoopTowersData &dataCondenserLoopTowers);
 
 } // namespace CondenserLoopTowers
 
@@ -480,8 +487,6 @@ struct CondenserLoopTowersData : BaseGlobalStruct {
         UniqueSimpleTowerNames.clear();
     }
 };
-
-extern CondenserLoopTowersData dataCondenserLoopTowers;
 
 } // namespace EnergyPlus
 
