@@ -603,8 +603,10 @@ ZoneHVAC:HybridUnitaryHVAC,
     Main Relief Node,        !- Relief Node Name
     2.51,                    !- System Maximum Supply AirFlow Rate {m3/s}
     ,                        !- External Static Pressure at System Maximum Supply Air Flow Rate {Pa}
+    Yes,                     !- Fan Heat Included in Lookup Tables
+    ,                        !- Fan Heat Gain Location
+    ,                        !- Fan Heat Gain in Airstream Fraction
     1,                       !- Scaling Factor
-    6,                       !- Number of Operating Modes
     10,                      !- Minimum Time Between Mode Change {minutes}
     Electricity,             !- First fuel type
     NaturalGas,              !- Second fuel type
