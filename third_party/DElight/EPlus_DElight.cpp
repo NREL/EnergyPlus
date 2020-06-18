@@ -19,24 +19,24 @@
  * under contract with Lawrence Berkeley National Laboratory.
  **************************************************************/
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 
@@ -103,10 +103,9 @@ DllExport int	DElightDaylightFactors4EPlus(
 {
 	FILE *infile;						/* input file pointer */
 	FILE *outfile;						/* output file pointer */
-	int err;	// error return value from fopen_s
 	SUN_DATA sun_data;	/* sun data structure */
 
-    // Init return value  
+    // Init return value
     int iReturnVal = 0;
 
 	/* initialize BLDG and LIB structures */
@@ -122,9 +121,9 @@ DllExport int	DElightDaylightFactors4EPlus(
 
 	// Read the first heading line in the input file to determine input version
 	char cInputLine[MAX_CHAR_LINE+1];	/* Input line */
-	fgets(cInputLine, MAX_CHAR_LINE, infile);
+	if (fgets(cInputLine, MAX_CHAR_LINE, infile) == NULL) return -1;
 	char cInputVersion[MAX_CHAR_UNAME+1];
-	sscanf(cInputLine,"%*s %s\n",cInputVersion,_countof(cInputVersion));
+	sscanf(cInputLine,"%*s %s\n",cInputVersion); //,_countof(cInputVersion));
 
 	// If the input version is EPlus then use LoadDataFromEPlus()
 	if (strcmp(cInputVersion,"EPlus") == 0)
@@ -158,7 +157,7 @@ DllExport int	DElightDaylightFactors4EPlus(
 	/* Calculate geometrical values required for DF calcs. */
 	if (iSurfNodes > MAX_SURF_NODES) iSurfNodes = MAX_SURF_NODES;
 	if (iWndoNodes > MAX_WNDO_NODES) iWndoNodes = MAX_WNDO_NODES;
-	if (CalcGeomFromEPlus(bldg_ptr,iSurfNodes,iWndoNodes,pofdmpfile) < 0) {
+	if (CalcGeomFromEPlus(bldg_ptr) < 0) {
 		*pofdmpfile << "ERROR: DElight Bad return from CalcGeomFromEPlus()\n";
 		return(-4);
 	}
@@ -220,7 +219,7 @@ DllExport int	DElightDaylightFactors4EPlus(
 
 	/* Dump lib data. */
 	dump_lib(lib_ptr,outfile);
-                        
+
 	/* Close output file. */
 	fclose(outfile);
 
@@ -230,7 +229,7 @@ DllExport int	DElightDaylightFactors4EPlus(
 
 /******************************** subroutine DElightElecLtgCtrl4EPlus *******************************/
 // Called from DElightManagerC.cpp
-/* Calls key daylighting simulation modules necessary for calculating 
+/* Calls key daylighting simulation modules necessary for calculating
 //	Interior Illuminace levels at each Reference Point within a Zone, and
 //	the Power Reduction Factor for the Electric Lighting System defined in EnergyPlus. */
 /******************************** subroutine DElightElecLtgCtrl4EPlus *******************************/
@@ -255,19 +254,19 @@ DllExport int DElightElecLtgCtrl4EPlus(
 	// Calc interpolation indexes and ratios
 	int iphs, iths;				/* sun position alt and azm interpolation indexes */
 	double phratio, thratio;	/* sun position alt and azm interpolation displacement ratios */
-	if (CalcInterpolationVars(bldg_ptr, dSOLCOS, dMinAlt, dMaxAlt, dAltInc, dMinAzm, dMaxAzm, dAzmInc, &iphs, &iths, &phratio, &thratio, pofdmpfile) < 0) {
+	if (CalcInterpolationVars(bldg_ptr, dSOLCOS, dMinAlt, dMaxAlt, dAltInc, dMinAzm, dMaxAzm, dAzmInc, &iphs, &iths, &phratio, &thratio) < 0) {
 		*pofdmpfile << "ERROR: DElight Bad return from CalcInterpolationVars()\n";
 		return(-5);
 	}
 
 	// Calc interior daylight illuminance at each refpt
-	if (CalcZoneInteriorIllum(zone_ptr, dHISKF, dHISUNF, dCloudFraction, iphs, iths, phratio, thratio, pofdmpfile) < 0) {
+	if (CalcZoneInteriorIllum(zone_ptr, dHISKF, dHISUNF, dCloudFraction, iphs, iths, phratio, thratio) < 0) {
 		*pofdmpfile << "ERROR: DElight Bad return from CalcZoneInteriorIllum()\n";
 		return(-6);
 	}
 
 	// Calc electric lighting power reduction factor for the given zone
-	// Create a new SUN2_DATA instance and 
+	// Create a new SUN2_DATA instance and
 	// init the fsunup to 1.0 for no correction due to partial timestep sun up
 	SUN2_DATA *sun2_ptr = new SUN2_DATA;
 	sun2_ptr->fsunup = 1.0;
@@ -275,7 +274,7 @@ DllExport int DElightElecLtgCtrl4EPlus(
 	if ((iDltsysRetVal = dltsys(zone_ptr, sun2_ptr, pofdmpfile)) < 0) {
         // If errors were detected then write error and return, else write warning and return
         if (iDltsysRetVal != -10) {
-			*pofdmpfile << "ERROR: DElight error return from dltsys()\n"; 
+			*pofdmpfile << "ERROR: DElight error return from dltsys()\n";
 			return(-7);
         }
         else {

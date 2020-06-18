@@ -616,10 +616,29 @@ namespace HybridUnitaryAirConditioners {
 
                 // In each time step, the result for system power, fan power, gas use, water user, or supply airflow rate will be determined as :
                 // TableValue * SysMaxSupply * ScalingFactor
-                // N3, \field Scaling Factor
-                ZoneHybridUnitaryAirConditioner(UnitLoop).ScalingFactor = Numbers(3);
-                // the two numbers above are used to generate a overal scaling factor
-                ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate = Numbers(1) * Numbers(3);
+                // A13, \field Fan Heat Included in Lookup Tables
+                ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGain = false;
+                if (!lAlphaBlanks(13)) {
+                    if (UtilityRoutines::SameString(Alphas(13), "Yes")) {
+                        ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGain = false;
+                    } else if (UtilityRoutines::SameString(Alphas(13), "No")) {
+                        ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGain = true;
+                    } else {
+                        ShowSevereError(cCurrentModuleObject + " = " + ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+                        ShowContinueError("Illegal " + cAlphaFieldNames(13) + " = " + Alphas(13));
+                        ErrorsFound = true;
+                    }
+                }
+                // A14, \field Fan Heat Gain Location
+                if (!lAlphaBlanks(14)) {
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGainLocation = Alphas(14);
+                }
+                // N3, \field Fan Heat in Air Stream Fraction
+                ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatInAirFrac = Numbers(3);
+                // N4, \field Scaling Factor
+                ZoneHybridUnitaryAirConditioner(UnitLoop).ScalingFactor = Numbers(4);
+                // the two numbers above are used to generate a overall scaling factor
+                ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate = Numbers(1) * Numbers(4);
                 if (DataEnvironment::StdRhoAir > 1) {
                     // SystemMaximumSupplyAirFlowRate*ScalingFactor*AirDensity;
                     ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate = ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * DataEnvironment::StdRhoAir;
@@ -627,36 +646,37 @@ namespace HybridUnitaryAirConditioners {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate = ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * 1.225;
                 }
 
-                // N4, \field Number of Operating Modes
-                int Numberofoperatingmodes = 0;
-                if (lNumericBlanks(4)) {
-                    ShowSevereError("Invalid number of operating modes" + cNumericFields(5));
-                    ShowFatalError(RoutineName + "Errors found in getting input.");
-                    ShowContinueError(
-                        "... Preceding condition causes terminascaler*1.2041*pZoneHybridUnitaryAirConditioner->SystemMaximumSupplyAirFlowRatetion.");
-                } else {
-                    Numberofoperatingmodes = Numbers(4) - 1; // zero based count
-                }
                 // N5, \field Minimum Time Between Mode Change
-                // A13, \field First fuel type
-                ZoneHybridUnitaryAirConditioner(UnitLoop).FirstFuelType = Alphas(13);
-                // A14, \field Second fuel type
-                ZoneHybridUnitaryAirConditioner(UnitLoop).SecondFuelType = Alphas(14);
-                // A15, \field Third fuel type
-                ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelType = Alphas(15);
-                // A16, \field Objective Function Minimizes
+                // A15, \field First fuel type
+                ZoneHybridUnitaryAirConditioner(UnitLoop).FirstFuelType = Alphas(15);
+                // A16, \field Second fuel type
+                ZoneHybridUnitaryAirConditioner(UnitLoop).SecondFuelType = Alphas(16);
+                // A17, \field Third fuel type
+                ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelType = Alphas(17);
+                // A18, \field Objective Function Minimizes
 
-                // A17, \ OA requirement pointer
-                ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(17), OARequirements);
+                // A19, \ OA requirement pointer
+                ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(19), OARequirements);
                 if (ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Alphas(1) + " invalid data");
-                    ShowContinueError("Invalid-not found" + cAlphaFieldNames(17) + "=\"" + Alphas(17) + "\".");
+                    ShowContinueError("Invalid-not found" + cAlphaFieldNames(19) + "=\"" + Alphas(19) + "\".");
                     ErrorsFound = true;
                 } else {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).OutdoorAir = true;
                 }
 
-                for (int modeIter = 0; modeIter <= Numberofoperatingmodes; ++modeIter) {
+                int FirstModeAlphaNumber = 20;
+                int NumberOfAlphasPerMode = 9;
+                int Numberofoperatingmodes = 0;
+                for (int i = FirstModeAlphaNumber; i <= NumAlphas; i = i + NumberOfAlphasPerMode) {
+                    if (!lAlphaBlanks(i)) {
+                        ++Numberofoperatingmodes;
+                    } else {
+                        break;
+                    }
+                }
+
+                for (int modeIter = 0; modeIter <= Numberofoperatingmodes - 1; ++modeIter) {
                     ErrorsFound = ZoneHybridUnitaryAirConditioner(UnitLoop).ParseMode(
                         Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
                     if (ErrorsFound) {
@@ -1135,6 +1155,21 @@ namespace HybridUnitaryAirConditioners {
                                 "System",
                                 "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+
+            if (ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGain) {
+                SetupOutputVariable("Zone Hybrid Unitary HVAC Fan Rise in Air Temperature",
+                                    OutputProcessor::Unit::deltaC,
+                                    ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatTemp,
+                                    "System",
+                                    "Average",
+                                    ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+                SetupOutputVariable("Zone Hybrid Unitary HVAC Fan Heat Gain to Air",
+                                    OutputProcessor::Unit::W,
+                                    ZoneHybridUnitaryAirConditioner(UnitLoop).PowerLossToAir,
+                                    "System",
+                                    "Average",
+                                    ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+            }
 
             int index = 0;
 

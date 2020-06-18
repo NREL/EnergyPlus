@@ -5583,7 +5583,8 @@ namespace WaterThermalTanks {
         if (this->scanPlantLoopsFlag && allocated(DataPlant::PlantLoop)) {
             if ((this->UseInletNode > 0) && (this->HeatPumpNum == 0)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        this->Name,
                                                         this->TypeNum,
                                                         this->UseSide.loopNum,
                                                         this->UseSide.loopSideNum,
@@ -5603,7 +5604,8 @@ namespace WaterThermalTanks {
                 // this is a heat pump water heater, need a separate block because TypeOf_HeatPumpWtrHeater shows up on Branch
                 //  (input should probably have been the associated tank )
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(HPWaterHeater(this->HeatPumpNum).Name,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        HPWaterHeater(this->HeatPumpNum).Name,
                                                         HPWaterHeater(this->HeatPumpNum).TypeNum,
                                                         this->UseSide.loopNum,
                                                         this->UseSide.loopSideNum,
@@ -5621,7 +5623,8 @@ namespace WaterThermalTanks {
             }
             if ((this->SourceInletNode > 0) && (this->DesuperheaterNum == 0) && (this->HeatPumpNum == 0)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        this->Name,
                                                         this->TypeNum,
                                                         this->SrcSide.loopNum,
                                                         this->SrcSide.loopSideNum,
@@ -5643,7 +5646,7 @@ namespace WaterThermalTanks {
             }
             this->scanPlantLoopsFlag = false;
         }
-        
+
         if (this->SetLoopIndexFlag && allocated(DataPlant::PlantLoop)) {
             if ((this->UseInletNode > 0) && (this->HeatPumpNum == 0)) {
                 Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
@@ -8595,7 +8598,7 @@ namespace WaterThermalTanks {
                     }
                     this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
                     if (HeatPump.bIsIHP)
-                        VariableSpeedCoils::SimVariableSpeedCoils(state, 
+                        VariableSpeedCoils::SimVariableSpeedCoils(state,
                             "", VSCoilNum, DataHVACGlobals::CycFanCycCoil, EMP1, EMP2, EMP3, 1, hpPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
                     else
                         VariableSpeedCoils::SimVariableSpeedCoils(state, HeatPump.DXCoilName,
@@ -8614,7 +8617,7 @@ namespace WaterThermalTanks {
                 } else {
                     this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
                     if (HeatPump.bIsIHP)
-                        VariableSpeedCoils::SimVariableSpeedCoils(state, 
+                        VariableSpeedCoils::SimVariableSpeedCoils(state,
                             "", VSCoilNum, DataHVACGlobals::CycFanCycCoil, EMP1, EMP2, EMP3, 1, hpPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
                     else
                         VariableSpeedCoils::SimVariableSpeedCoils(state, HeatPump.DXCoilName,
@@ -8956,7 +8959,7 @@ namespace WaterThermalTanks {
 
                         this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
 
-                        VariableSpeedCoils::SimVariableSpeedCoils(state, 
+                        VariableSpeedCoils::SimVariableSpeedCoils(state,
                             "", VSCoilNum, DataHVACGlobals::CycFanCycCoil, EMP1, EMP2, EMP3, 1, hpPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
 
                         IntegratedHeatPump::IntegratedHeatPumps(HeatPump.DXCoilNum).CurMode = IHPMode;
@@ -11697,7 +11700,7 @@ namespace WaterThermalTanks {
                                 } else {
                                     Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                                 }
-                                DXCoils::SimDXCoil(state, 
+                                DXCoils::SimDXCoil(state,
                                     HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, DataHVACGlobals::CycFanCycCoil, 1.0);
                                 DataLoopNode::Node(HPWaterHeater(HPNum).CondWaterInletNode).Temp = this->TankTemp;
                             }
