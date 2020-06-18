@@ -1,5 +1,9 @@
 project(Basement Fortran)
 
+cmake_minimum_required(VERSION 3.5.1)
+
+cmake_policy(SET CMP0012 NEW) # if() recognizes boolean constants
+
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
