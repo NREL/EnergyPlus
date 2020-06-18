@@ -131,6 +131,7 @@ namespace EnergyPlus {
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataZoneTempPredictorCorrector.clear_state();
         };
     };
 

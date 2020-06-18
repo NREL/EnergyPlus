@@ -446,6 +446,8 @@ namespace ZoneTempPredictorCorrector {
             AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.deallocate();
             AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.deallocate();
             NumOnOffCtrZone = 0;
+
+            AdapComfortSetPointSummerDesDay = Array1D<Real64>(7, -1);
         }
     };
 
