@@ -2819,7 +2819,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
     BeginSimFlag = true;
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
@@ -3999,7 +3999,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
     BeginSimFlag = true;
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
@@ -5417,7 +5417,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
     BeginSimFlag = true;
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
@@ -6660,7 +6660,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
     BeginSimFlag = true;
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;

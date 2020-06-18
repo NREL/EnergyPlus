@@ -721,7 +721,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     OutputProcessor::GetReportVariableInput(state.outputFiles);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(); // just gets input and
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
@@ -1471,7 +1471,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     OutputProcessor::GetReportVariableInput(state.outputFiles);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(); // just gets input and
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and
     SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
