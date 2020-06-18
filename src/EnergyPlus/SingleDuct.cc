@@ -2080,7 +2080,8 @@ namespace SingleDuct {
                 (this->ReheatComp_PlantType == TypeOf_CoilSteamAirHeating)) {
                 // setup plant topology indices for plant fed heating coils
                 errFlag = false;
-                ScanPlantLoopsForObject(this->ReheatName,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        this->ReheatName,
                                         this->ReheatComp_PlantType,
                                         this->HWLoopNum,
                                         this->HWLoopSide,
@@ -2192,7 +2193,7 @@ namespace SingleDuct {
             Real64 CurrentEnvZoneTurndownMinAirFrac = 1.0;
             if (this->ZoneTurndownMinAirFracSchExist) {
                 CurrentEnvZoneTurndownMinAirFrac = ScheduleManager::GetScheduleMinValue(this->ZoneTurndownMinAirFracSchPtr);
-            } 
+            }
             if ((this->SysType_Num == SingleDuctVAVReheat || this->SysType_Num == SingleDuctCBVAVReheat) ||
                 (this->SysType_Num == SingleDuctCBVAVNoReheat)) {
                 // need the lowest schedule value
@@ -2375,7 +2376,7 @@ namespace SingleDuct {
         this->CoolRate = 0.0;
         this->HeatEnergy = 0.0;
         this->CoolEnergy = 0.0;
-        
+
         // update to the current minimum air flow fraction
         this->ZoneMinAirFrac = this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
 

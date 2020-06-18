@@ -1149,7 +1149,8 @@ namespace FanCoilUnits {
         if (MyPlantScanFlag(FanCoilNum) && allocated(PlantLoop)) {
             errFlag = false;
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil_Water) {
-                ScanPlantLoopsForObject(FanCoil(FanCoilNum).HCoilName,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        FanCoil(FanCoilNum).HCoilName,
                                         FanCoil(FanCoilNum).HCoilPlantTypeOfNum,
                                         FanCoil(FanCoilNum).HeatCoilLoopNum,
                                         FanCoil(FanCoilNum).HeatCoilLoopSide,
@@ -1181,7 +1182,8 @@ namespace FanCoilUnits {
 
             if ((FanCoil(FanCoilNum).CCoilPlantTypeOfNum == TypeOf_CoilWaterCooling) ||
                 (FanCoil(FanCoilNum).CCoilPlantTypeOfNum == TypeOf_CoilWaterDetailedFlatCooling)) {
-                ScanPlantLoopsForObject(FanCoil(FanCoilNum).CCoilPlantName,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        FanCoil(FanCoilNum).CCoilPlantName,
                                         FanCoil(FanCoilNum).CCoilPlantTypeOfNum,
                                         FanCoil(FanCoilNum).CoolCoilLoopNum,
                                         FanCoil(FanCoilNum).CoolCoilLoopSide,
@@ -3614,21 +3616,21 @@ namespace FanCoilUnits {
             } else if (FanCoil(FanCoilNum).SpeedFanSel == 3) {
 
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(state, 
+                    Fans::SimulateFanComponents(state,
                         FanCoil(FanCoilNum).FanName, FirstHVACIteration, FanCoil(FanCoilNum).FanIndex, 1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
                 } else {
                     HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
             } else { // using 1.0 here for fan speed ratio seems wrong if FCU max flow rate is different than the fan maximum flow rate
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(state, 
+                    Fans::SimulateFanComponents(state,
                         FanCoil(FanCoilNum).FanName, FirstHVACIteration, FanCoil(FanCoilNum).FanIndex, 0.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
                 } else {
                     HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, 0.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
             }
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil_HXAssist) {
-                SimHXAssistedCoolingCoil(state, 
+                SimHXAssistedCoolingCoil(state,
                     FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
@@ -3661,7 +3663,7 @@ namespace FanCoilUnits {
                 HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, ActFanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil_HXAssist) {
-                SimHXAssistedCoolingCoil(state, 
+                SimHXAssistedCoolingCoil(state,
                     FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
@@ -3688,7 +3690,7 @@ namespace FanCoilUnits {
             }
 
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil_HXAssist) {
-                SimHXAssistedCoolingCoil(state, 
+                SimHXAssistedCoolingCoil(state,
                     FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index);
