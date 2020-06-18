@@ -1589,9 +1589,9 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     DataSizing::ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow = 0.0002;
 
     // Initial design air volume flow rate based on the design conditions
-    WaterCoil(2).DesAirVolFlowRate = 1.0;
+    WaterCoil(2).DesAirVolFlowRate = DataSizing::AutoSize;
     // Initial design water flow rate based on the design conditions
-    WaterCoil(2).MaxWaterVolFlowRate = 0.00014;
+    WaterCoil(2).MaxWaterVolFlowRate = DataSizing::AutoSize;
 
     // normal cooling simulation for constant fan variable flow fan coil
     Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);

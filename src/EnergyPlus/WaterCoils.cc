@@ -2195,7 +2195,7 @@ namespace WaterCoils {
                 }
                 bPRINT = false;       // do not print this sizing request since the autosized value is needed and this input may not be autosized (we
                                       // should print this!)
-                TempSize = AutoSize;  // get the autosized air volume flow rate for use in other calculations
+                TempSize = WaterCoil(CoilNum).DesAirVolFlowRate;  // get the autosized air volume flow rate for use in other calculations
                 SizingString.clear(); // doesn't matter
                 CompName = WaterCoil(CoilNum).Name;
                 RequestSizing(state, CompType, CompName, CoolingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
@@ -2235,13 +2235,12 @@ namespace WaterCoils {
                 TempSize = AutoSize;
                 RequestSizing(state, CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName);
                 DataCapacityUsedForSizing = TempSize;
-                TempSize = AutoSize;
+                TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
                 RequestSizing(state, CompType, CompName, CoolingWaterflowSizing, SizingString, TempSize, bPRINT, RoutineName);
                 // Check if the water flow rate is defined in parent HVAC equipment and set water coil design water flow rate accordingly
                 if (CurZoneEqNum > 0) {
                     if (ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent) {
                         DataWaterFlowUsedForSizing = ZoneEqSizing(CurZoneEqNum).MaxCWVolFlow;
-                        WaterCoil(CoilNum).MaxWaterVolFlowRate = ZoneEqSizing(CurZoneEqNum).MaxCWVolFlow;
                     } else {
                         DataWaterFlowUsedForSizing = TempSize;
                     }
@@ -2591,7 +2590,7 @@ namespace WaterCoils {
 
                 FieldNum = 2; // N2 , \field Maximum Water Flow Rate
                 SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m3/s]";
-                TempSize = AutoSize;
+                TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
                 SizingMethod = HeatingWaterflowSizing;
 
                 if (WaterCoil(CoilNum).CoilPerfInpMeth == NomCap && NomCapUserInp) {
