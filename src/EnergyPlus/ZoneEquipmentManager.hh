@@ -161,15 +161,15 @@ namespace ZoneEquipmentManager {
 
         Array1D<Real64> AvgData; // scratch array for storing averaged data
         int NumOfTimeStepInDay; // number of zone time steps in a day
-        bool GetZoneEquipmentInputFlag = true;
-        bool SizeZoneEquipmentOneTimeFlag = true;
+        bool GetZoneEquipmentInputFlag;
+        bool SizeZoneEquipmentOneTimeFlag;
 
         Array1D<ZoneEquipmentManager::SimulationOrder> PrioritySimOrder;
 
-        bool reportDOASZoneSizingHeader = true;
-        bool InitZoneEquipmentOneTimeFlag = true;
-        bool InitZoneEquipmentEnvrnFlag = true;
-        bool FirstPassZoneEquipFlag = true; // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
+        bool reportDOASZoneSizingHeader;
+        bool InitZoneEquipmentOneTimeFlag;
+        bool InitZoneEquipmentEnvrnFlag;
+        bool FirstPassZoneEquipFlag; // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
 
         void clear_state() override
         {
@@ -182,6 +182,12 @@ namespace ZoneEquipmentManager {
             PrioritySimOrder.deallocate();
             FirstPassZoneEquipFlag = true;
             reportDOASZoneSizingHeader = true;
+        }
+
+        // Default Constructor
+        ZoneEquipmentManagerData() : GetZoneEquipmentInputFlag(true), SizeZoneEquipmentOneTimeFlag(true), 
+            reportDOASZoneSizingHeader(true), InitZoneEquipmentOneTimeFlag(true), InitZoneEquipmentEnvrnFlag(true), FirstPassZoneEquipFlag(true)
+        {
         }
     };
 
