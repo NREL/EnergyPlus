@@ -322,6 +322,12 @@ namespace AirflowNetworkBalanceManager {
         // VAV terminal set only
         if (present(FirstHVACIteration) && FirstHVACIteration) VAVTerminalRatio = 0.0;
 
+        // Set AirLoop Number for fans
+        if (FirstHVACIteration && dataAirflowNetworkBalanceManager.AssignFanAirLoopNumFlag) {
+            AssignFanAirLoopNum();
+            dataAirflowNetworkBalanceManager.AssignFanAirLoopNumFlag = false;
+        }
+
         if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
             if (dataAirflowNetworkBalanceManager.ValidateDistributionSystemFlag) {
                 ValidateDistributionSystem(state);
@@ -9013,6 +9019,24 @@ namespace AirflowNetworkBalanceManager {
         if (VentCtrlNum == VentCtrEnum::NOVENT) { // Novent
             OpenFactor = 0.0;
             SurfaceWindow(SurfNum).VentingOpenFactorMultRep = -1.0;
+        }
+    }
+
+    void AssignFanAirLoopNum()
+    {
+        // Assign the system Fan AirLoop Number based on the zone inlet node
+
+        for (int i = 1; i <= AirflowNetworkNumOfZones; i++) {
+            for (int j = 1; j <= NumOfZones; j++) {
+                if (!ZoneEquipConfig(j).IsControlled) continue;
+                if ((MultizoneZoneData(i).ZoneNum == j) && (ZoneEquipConfig(j).NumInletNodes > 0)) {
+                    for (int k = 1; k <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; k++) {
+                        if (DisSysCompCVFData(k).AirLoopNum == 0) {
+                            DisSysCompCVFData(k).AirLoopNum = ZoneEquipConfig(j).InletNodeAirLoopNum(1);
+                        }
+                    }
+                }
+            }
         }
     }
 
