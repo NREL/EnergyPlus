@@ -1057,9 +1057,9 @@ namespace TARCOGOutput {
                               const Array1D<Real64> &Al,
                               const Array1D<Real64> &Ar,
                               const Array1D<Real64> &Ah,
-                              const Array1D_int &SupportPillar,
-                              const Array1D<Real64> &PillarSpacing,
-                              const Array1D<Real64> &PillarRadius,
+                              const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
+                              const Array1D<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
+                              const Array1D<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
                               const Array1D<Real64> &SlatThick,
                               const Array1D<Real64> &SlatWidth,
                               const Array1D<Real64> &SlatAngle,
