@@ -2777,8 +2777,7 @@ namespace ScheduleManager {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
-
+        
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -2830,7 +2829,6 @@ namespace ScheduleManager {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
 
         // Return value
         Real64 scheduleValue(0.0);
