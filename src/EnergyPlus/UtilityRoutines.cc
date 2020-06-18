@@ -2086,6 +2086,7 @@ namespace UtilityRoutines {
             // CacheIPErrorFile is never opened or closed
             // so this output would just go to stdout
             // ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
+            std::cout << ErrorMessage << '\n';
         }
         if (present(OutUnit1)) {
             print(OutUnit1(), "  {}", ErrorMessage);
