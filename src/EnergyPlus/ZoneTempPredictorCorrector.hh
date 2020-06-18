@@ -403,17 +403,6 @@ namespace ZoneTempPredictorCorrector {
 
         Array1D<Real64> AdapComfortSetPointSummerDesDay;
 
-        // Default Constructor
-        ZoneTempPredictorCorrectorData() : NumSingleTempHeatingControls(0), NumSingleTempCoolingControls(0), NumSingleTempHeatCoolControls(0),
-            NumDualTempHeatCoolControls(0), NumSingleFangerHeatingControls(0), NumSingleFangerCoolingControls(0), NumSingleFangerHeatCoolControls(0),
-            NumDualFangerHeatCoolControls(0), NumStageCtrZone(0), NumOnOffCtrZone(0), AnnualAnyZoneTempOscillate(0), 
-            AnnualAnyZoneTempOscillateDuringOccupancy(0), AnnualAnyZoneTempOscillateInDeadband(0), OscillationVariablesNeeded(false),
-            InitZoneAirSetPointsOneTimeFlag(true), SetupOscillationOutputFlag(true)
-        {
-            AdapComfortSetPointSummerDesDay.allocate(7);
-            AdapComfortSetPointSummerDesDay = -1;
-        }
-
         void clear_state() override
         {
             HumidityControlZoneUniqueNames.clear();
@@ -459,6 +448,17 @@ namespace ZoneTempPredictorCorrector {
             NumOnOffCtrZone = 0;
 
             AdapComfortSetPointSummerDesDay = Array1D<Real64>(7, -1);
+        }
+
+        // Default Constructor
+        ZoneTempPredictorCorrectorData() : NumSingleTempHeatingControls(0), NumSingleTempCoolingControls(0), NumSingleTempHeatCoolControls(0),
+            NumDualTempHeatCoolControls(0), NumSingleFangerHeatingControls(0), NumSingleFangerCoolingControls(0), NumSingleFangerHeatCoolControls(0),
+            NumDualFangerHeatCoolControls(0), NumStageCtrZone(0), NumOnOffCtrZone(0), AnnualAnyZoneTempOscillate(0), 
+            AnnualAnyZoneTempOscillateDuringOccupancy(0), AnnualAnyZoneTempOscillateInDeadband(0), OscillationVariablesNeeded(false),
+            InitZoneAirSetPointsOneTimeFlag(true), SetupOscillationOutputFlag(true)
+        {
+            AdapComfortSetPointSummerDesDay.allocate(7);
+            AdapComfortSetPointSummerDesDay = -1;
         }
     };
 
