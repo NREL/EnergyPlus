@@ -838,10 +838,41 @@ To illustrate how to use the PerformancePrecisionTradeoffs object and the \_perf
 
 % table X
 {\scriptsize
-\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.6in}p{0.5in}p{0.5in}p{0.6in}p{0.6in}p{0.65in}}
+% \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.6in}p{0.5in}p{0.5in}p{0.6in}p{0.6in}p{0.65in}}
+\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.5in}p{0.5in}p{0.5in}p{0.4in}p{0.5in}p{0.5in}p{0.5in}p{0.6in}p{0.5in}}
 % \begin{longtable}[c]{cccccccrr}
 \caption{PerfLog Mode Columns\label{table:perflog_mode_columns}} \tabularnewline
 \toprule
+%Run & 
+%Direct Coil & 
+%Radiant Algorithm & 
+%Override Mode & 
+%Timesteps& 
+%Min Warmup& 
+%Suppress Resets & 
+%MaxZone TempDiff & 
+%Runtime {[}seconds{]} \tabularnewline
+%\midrule
+%\endfirsthead
+
+%1  & FALSE & ScriptF    & NORMAL & 6 & 1 & FALSE & 0.30 & 158.05 \tabularnewline
+%2  & FALSE & ScriptF    & MODE01 & 1 & 1 & FALSE & 0.30 & 55.07  \tabularnewline
+%3  & False & ScriptF    & Mode02 &   &   & False &      &        \tabularnewline
+%4  & FALSE & ScriptF    & MODE03 & 1 & 1 & FALSE & 0.30 & 52.39  \tabularnewline
+%5  & FALSE & ScriptF    & MODE04 & 1 & 1 & FALSE & 0.30 & 52.42  \tabularnewline
+%6  & FALSE & ScriptF    & MODE05 & 1 & 1 & TRUE  & 0.30 & 51.74  \tabularnewline
+%7  & FALSE & ScriptF    & MODE06 & 1 & 1 & TRUE  & 1.00 & 32.74  \tabularnewline
+%8  & False & ScriptF    & MODE07 &   &   & True  &      &        \tabularnewline
+%9  & TRUE  & ScriptF    & NORMAL & 6 & 1 & FALSE & 0.30 & 161.89 \tabularnewline
+%10 & FALSE & CarrollMRT & NORMAL & 6 & 1 & FALSE & 0.30 & 171.00 \tabularnewline
+%11 & FALSE & CarrollMRT & MODE01 & 1 & 1 & FALSE & 0.30 & 54.19  \tabularnewline
+%12 & False & CarrollMRT & Mode02 &   &   & False &      &        \tabularnewline
+%13 & FALSE & CarrollMRT & MODE03 & 1 & 1 & FALSE & 0.30 & 53.85  \tabularnewline
+%14 & FALSE & CarrollMRT & MODE04 & 1 & 1 & FALSE & 0.30 & 51.21  \tabularnewline
+%15 & FALSE & CarrollMRT & MODE05 & 1 & 1 & TRUE  & 0.30 & 51.14  \tabularnewline
+%16 & FALSE & CarrollMRT & MODE06 & 1 & 1 & TRUE  & 1.00 & 32.76  \tabularnewline
+%17 & False & CarrollMRT & Mode07 &   &   & True  &      &        \tabularnewline
+
 Run & 
 Direct Coil & 
 Radiant Algorithm & 
@@ -849,36 +880,41 @@ Override Mode &
 Timesteps& 
 Min Warmup& 
 Suppress Resets & 
+System Timestep {[}min{]} &
 MaxZone TempDiff & 
-Runtime {[}seconds{]} \tabularnewline
+MaxAllowed DelTemp &
+Runtime {[}sec{]} \tabularnewline
 \midrule
 \endfirsthead
 
-1  & FALSE & ScriptF    & NORMAL & 6 & 1 & FALSE & 0.30 & 158.05 \tabularnewline
-2  & FALSE & ScriptF    & MODE01 & 1 & 1 & FALSE & 0.30 & 55.07  \tabularnewline
-3  & False & ScriptF    & Mode02 &   &   & False &      &        \tabularnewline
-4  & FALSE & ScriptF    & MODE03 & 1 & 1 & FALSE & 0.30 & 52.39  \tabularnewline
-5  & FALSE & ScriptF    & MODE04 & 1 & 1 & FALSE & 0.30 & 52.42  \tabularnewline
-6  & FALSE & ScriptF    & MODE05 & 1 & 1 & TRUE  & 0.30 & 51.74  \tabularnewline
-7  & FALSE & ScriptF    & MODE06 & 1 & 1 & TRUE  & 1.00 & 32.74  \tabularnewline
-8  & False & ScriptF    & MODE07 &   &   & True  &      &        \tabularnewline
-9  & TRUE  & ScriptF    & NORMAL & 6 & 1 & FALSE & 0.30 & 161.89 \tabularnewline
-10 & FALSE & CarrollMRT & NORMAL & 6 & 1 & FALSE & 0.30 & 171.00 \tabularnewline
-11 & FALSE & CarrollMRT & MODE01 & 1 & 1 & FALSE & 0.30 & 54.19  \tabularnewline
-12 & False & CarrollMRT & Mode02 &   &   & False &      &        \tabularnewline
-13 & FALSE & CarrollMRT & MODE03 & 1 & 1 & FALSE & 0.30 & 53.85  \tabularnewline
-14 & FALSE & CarrollMRT & MODE04 & 1 & 1 & FALSE & 0.30 & 51.21  \tabularnewline
-15 & FALSE & CarrollMRT & MODE05 & 1 & 1 & TRUE  & 0.30 & 51.14  \tabularnewline
-16 & FALSE & CarrollMRT & MODE06 & 1 & 1 & TRUE  & 1.00 & 32.76  \tabularnewline
-17 & False & CarrollMRT & Mode07 &   &   & True  &      &        \tabularnewline
+1  & FALSE & ScriptF    & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 178.82 \tabularnewline
+2  & FALSE & ScriptF    & MODE01 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 61.75  \tabularnewline
+3  & FALSE & ScriptF    & MODE02 & 1 & 1 & FALSE & 60 & 0.30 & 0.002 & 30.15  \tabularnewline
+4  & FALSE & ScriptF    & MODE03 & 1 & 1 & FALSE & 60 & 0.30 & 0.002 & 31.94  \tabularnewline
+5  & FALSE & ScriptF    & MODE04 & 1 & 1 & FALSE & 60 & 0.30 & 0.002 & 29.62  \tabularnewline
+6  & FALSE & ScriptF    & MODE05 & 1 & 1 & TRUE  & 60 & 0.30 & 0.002 & 32.01  \tabularnewline
+7  & FALSE & ScriptF    & MODE06 & 1 & 1 & TRUE  & 60 & 1.00 & 0.002 & 29.80  \tabularnewline
+8  & FALSE & ScriptF    & MODE07 & 1 & 1 & TRUE  & 60 & 1.00 & 0.1   & 29.67  \tabularnewline
+9  & TRUE  & ScriptF    & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 176.87 \tabularnewline
+10 & FALSE & CarrollMRT & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 199.23 \tabularnewline
+11 & FALSE & CarrollMRT & MODE01 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 61.38  \tabularnewline
+12 & FALSE & CarrollMRT & MODE02 & 1 & 1 & False & 60 & 0.30 & 0.002 & 36.59  \tabularnewline
+13 & FALSE & CarrollMRT & MODE03 & 1 & 1 & FALSE & 60 & 0.30 & 0.002 & 30.00  \tabularnewline
+14 & FALSE & CarrollMRT & MODE04 & 1 & 1 & FALSE & 60 & 0.30 & 0.002 & 29.53  \tabularnewline
+15 & FALSE & CarrollMRT & MODE05 & 1 & 1 & TRUE  & 60 & 0.30 & 0.002 & 29.83  \tabularnewline
+16 & FALSE & CarrollMRT & MODE06 & 1 & 1 & TRUE  & 60 & 1.00 & 0.002 & 29.50  \tabularnewline
+17 & FALSE & CarrollMRT & MODE07 & 1 & 1 & TRUE  & 60 & 1.00 & 0.1   & 30.47  \tabularnewline
+
 
 \bottomrule
 \end{longtable}
 }
 
-This example uses 17 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffs object, but fewer trials could have been made to reach a similar conclusion. The first run shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 8 are just stepping through the Override Modes. Run 9 employs the Use Coil Direct Solution option, but the time for the simulation went up, so it was not used anymore.  Runs 10 through 17 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. Mode03, Moded04, and Mode05 only save a few seconds compared to Mode01, which takes about one-third of the time of the baseline Run 1 time. Mode06 saves the most time with both ScriptF and CarrollMRT taking about one-fifth of the original time. Mode06 seems like the natural choice, but we need to look at other results in the \_perflog.csv file first before we come to that conclusion.
+% This example uses 17 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffs object, but fewer trials could have been made to reach a similar conclusion. The first run shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 8 are just stepping through the Override Modes. Run 9 employs the Use Coil Direct Solution option, but the time for the simulation went up, so it was not used anymore.  Runs 10 through 17 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. Mode03, Moded04, and Mode05 only save a few seconds compared to Mode01, which takes about one-third of the time of the baseline Run 1 time. Mode06 saves the most time with both ScriptF and CarrollMRT taking about one-fifth of the original time. Mode06 seems like the natural choice, but we need to look at other results in the \_perflog.csv file first before we come to that conclusion.
 
-These example simulations each took three minutes or less to try. If your building takes much longer than a few minutes, you might want to temporarily change your run period to just a  month or even a week to tune the PerformancePrecisionTradeoffs object inputs. If temporarily shortening the run period is necessary, it is best to pick a month or week that has some cooling and some heating. Just remember to set your run period back to a full year before coming to any conclusions about the building or energy efficiency options being considered for the building.
+This example uses 17 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffs object, but fewer trials could have been made to reach a similar conclusion. The first run shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 8 are just stepping through the Override Modes. Run 9 employs the Use Coil Direct Solution option, but the time for the simulation was almost the same, so it was not used anymore.  Runs 10 through 17 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. The biggest savings of the computational time were from Mode01 and Mode02 application. Compared to the Normal mode (Run 1) baseline, applying Mode01 (Run 2) immediately reduced the simulation time to about one-third. Then again, by applying Mode02 (Run 3), it saves about 50\% simulation time compared to Mode02 (Run 2). Mode03 to Mode07 only save a few seconds compared to Mode02, which takes about one-sixth of the time of the baseline Run 1 time. In general, Mode02 to Mode07 significantly saves the computation time with both ScriptF and CarrollMRT taking about one-sixth of the original time. These modes seem like the good choice for faster simulations, but we need to look at other results in the \_perflog.csv file first before we come to that conclusion.
+
+These example simulations each took aobut three minutes or less to try. If your building takes much longer than a few minutes, you might want to temporarily change your run period to just a month or even a week to tune the PerformancePrecisionTradeoffs object inputs. If temporarily shortening the run period is necessary, it is best to pick a month or week that has some cooling and some heating. Just remember to set your run period back to a full year before coming to any conclusions about the building or energy efficiency options being considered for the building.
 
 
 % table X
@@ -897,23 +933,42 @@ Override Mode &
 \midrule
 \endfirsthead
 
-1  & False & ScriptF  & NORMAL & 3,103,200 & 756,352 & 213,489 & 158.05 \tabularnewline
-2  & False & ScriptF  & MODE01 & 3,093,683 & 738,559 & 211,747 & 55.07  \tabularnewline
-3  & False & ScriptF  & Mode02 &           &         &         &        \tabularnewline
-4  & False & ScriptF  & MODE03 & 3,097,292 & 746,356 & 212,704 & 52.39  \tabularnewline
-5  & False & ScriptF  & MODE04 & 3,097,292 & 746,356 & 212,704 & 52.42  \tabularnewline
-6  & False & ScriptF  & MODE05 & 3,097,292 & 746,356 & 212,704 & 51.74  \tabularnewline
-7  & False & ScriptF  & MODE06 & 3,098,474 & 743,652 & 213,207 & 32.74  \tabularnewline
-8  & False & ScriptF  & Mode07 &           &         &         &        \tabularnewline
-9  & True  & ScriptF  & NORMAL & 3,103,200 & 756,352 & 213,489 & 161.89 \tabularnewline
-10 & False & CarrollMRT & NORMAL & 3,256,436 & 498,372 & 267,030 & 171.00 \tabularnewline
-11 & False & CarrollMRT & MODE01 & 3,245,912 & 486,067 & 265,166 & 54.19  \tabularnewline
-12 & False & CarrollMRT & Mode02 &           &         &         &        \tabularnewline
-13 & False & CarrollMRT & MODE03 & 3,243,835 & 492,423 & 265,212 & 53.85  \tabularnewline
-14 & False & CarrollMRT & MODE04 & 3,243,835 & 492,423 & 265,212 & 51.21  \tabularnewline
-15 & False & CarrollMRT & MODE05 & 3,243,835 & 492,423 & 265,212 & 51.14  \tabularnewline
-16 & False & CarrollMRT & MODE06 & 3,244,804 & 490,038 & 265,528 & 32.76  \tabularnewline
-17 & False & CarrollMRT & Mode07 &           &         &         &        \tabularnewline
+%1  & False & ScriptF  & NORMAL & 3,103,200 & 756,352 & 213,489 & 158.05 \tabularnewline
+%2  & False & ScriptF  & MODE01 & 3,093,683 & 738,559 & 211,747 & 55.07  \tabularnewline
+%3  & False & ScriptF  & Mode02 &           &         &         &        \tabularnewline
+%4  & False & ScriptF  & MODE03 & 3,097,292 & 746,356 & 212,704 & 52.39  \tabularnewline
+%5  & False & ScriptF  & MODE04 & 3,097,292 & 746,356 & 212,704 & 52.42  \tabularnewline
+%6  & False & ScriptF  & MODE05 & 3,097,292 & 746,356 & 212,704 & 51.74  \tabularnewline
+%7  & False & ScriptF  & MODE06 & 3,098,474 & 743,652 & 213,207 & 32.74  \tabularnewline
+%8  & False & ScriptF  & Mode07 &           &         &         &        \tabularnewline
+%9  & True  & ScriptF  & NORMAL & 3,103,200 & 756,352 & 213,489 & 161.89 \tabularnewline
+%10 & False & CarrollMRT & NORMAL & 3,256,436 & 498,372 & 267,030 & 171.00 \tabularnewline
+%11 & False & CarrollMRT & MODE01 & 3,245,912 & 486,067 & 265,166 & 54.19  \tabularnewline
+%12 & False & CarrollMRT & Mode02 &           &         &         &        \tabularnewline
+%13 & False & CarrollMRT & MODE03 & 3,243,835 & 492,423 & 265,212 & 53.85  \tabularnewline
+%14 & False & CarrollMRT & MODE04 & 3,243,835 & 492,423 & 265,212 & 51.21  \tabularnewline
+%15 & False & CarrollMRT & MODE05 & 3,243,835 & 492,423 & 265,212 & 51.14  \tabularnewline
+%16 & False & CarrollMRT & MODE06 & 3,244,804 & 490,038 & 265,528 & 32.76  \tabularnewline
+%17 & False & CarrollMRT & Mode07 &           &         &         &        \tabularnewline
+
+1  & FALSE & ScriptF  & NORMAL &  3,103,447 &	 755,635 &	 213,488 &	178.82 \tabularnewline
+2  & FALSE & ScriptF  & MODE01 &  3,095,147 &	 741,358 &	 212,016 &	61.75  \tabularnewline
+3  & FALSE & ScriptF  & MODE02 &  3,098,109 &	 753,074 &	 211,243 &	30.15  \tabularnewline
+4  & FALSE & ScriptF  & MODE03 &  3,096,331 &	 766,580 &	 211,613 &	31.94  \tabularnewline
+5  & FALSE & ScriptF  & MODE04 &  3,096,331 &	 766,580 &	 211,613 &	29.62  \tabularnewline
+6  & FALSE & ScriptF  & MODE05 & 3,097,292 & 746,356 & 212,704 & 51.74  \tabularnewline
+7  & FALSE & ScriptF  & MODE06 & 3,098,474 & 743,652 & 213,207 & 32.74  \tabularnewline
+8  & FALSE & ScriptF  & Mode07 &           &         &         &        \tabularnewline
+9  & TRUE  & ScriptF  & NORMAL & 3,103,200 & 756,352 & 213,489 & 161.89 \tabularnewline
+10 & FALSE & CarrollMRT & NORMAL & 3,256,436 & 498,372 & 267,030 & 171.00 \tabularnewline
+11 & FALSE & CarrollMRT & MODE01 & 3,245,912 & 486,067 & 265,166 & 54.19  \tabularnewline
+12 & FALSE & CarrollMRT & Mode02 &           &         &         &        \tabularnewline
+13 & FALSE & CarrollMRT & MODE03 & 3,243,835 & 492,423 & 265,212 & 53.85  \tabularnewline
+14 & FALSE & CarrollMRT & MODE04 & 3,243,835 & 492,423 & 265,212 & 51.21  \tabularnewline
+15 & FALSE & CarrollMRT & MODE05 & 3,243,835 & 492,423 & 265,212 & 51.14  \tabularnewline
+16 & FALSE & CarrollMRT & MODE06 & 3,244,804 & 490,038 & 265,528 & 32.76  \tabularnewline
+17 & FALSE & CarrollMRT & Mode07 &           &         &         &        \tabularnewline
+
 \bottomrule
 \end{longtable}
 }
