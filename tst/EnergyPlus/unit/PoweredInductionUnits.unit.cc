@@ -212,7 +212,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
 
     DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
-    PoweredInductionUnits::InitPIU(SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
+    PoweredInductionUnits::InitPIU(state.dataBranchInputManager, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     Fans::InitFan(state, 1, FirstHVACIteration);
     DataGlobals::BeginEnvrnFlag = false;
     FirstHVACIteration = false;
@@ -429,7 +429,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
 
     DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
-    PoweredInductionUnits::InitPIU(SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
+    PoweredInductionUnits::InitPIU(state.dataBranchInputManager, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     Fans::InitFan(state, 1, FirstHVACIteration);
     DataGlobals::BeginEnvrnFlag = false;
     FirstHVACIteration = false;

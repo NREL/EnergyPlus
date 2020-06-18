@@ -1,17 +1,17 @@
 /// This file is based on xml_parser.c that is copyrighted by
-/// QTronic GmbH and that is distributed under the BSD license. 
-/// The original file, its copyright notice and its license can 
+/// QTronic GmbH and that is distributed under the BSD license.
+/// The original file, its copyright notice and its license can
 /// be found in FMI/Copyright
 ///
-/// The file has been modified and renamed to xml_parser_cosim.c 
-/// for use with the FMU standard for co-simulation. 
+/// The file has been modified and renamed to xml_parser_cosim.c
+/// for use with the FMU standard for co-simulation.
 /// The original file was developed for model exchange.
 
 /// Copyright notice of original file that served as the basis of this imlementation.
-/* ------------------------------------------------------------------------- 
+/* -------------------------------------------------------------------------
  * xml_parser.h
  * A parser for file modelVariables.xml of an FMU.
- * Copyright 2010 QTronic GmbH. All rights reserved. 
+ * Copyright 2010 QTronic GmbH. All rights reserved.
  * -------------------------------------------------------------------------*/
 
 #ifndef xml_parser_cosim_h
@@ -144,7 +144,7 @@ double getDouble (void* element, Att a, ValueStatus* vs);
 int getInt (void* element, Att a, ValueStatus* vs);
 unsigned int getUInt (void* element, Att a, ValueStatus* vs);
 char getBoolean (void* element, Att a, ValueStatus* vs);
-Enu getEnumValue (void* element, Att a, ValueStatus* vs);
+int getEnumValue (void* element, Att a, ValueStatus* vs);
 void freeElement (void* element);
 
 // Convenience methods for AST access. To be used afer successful validation only.

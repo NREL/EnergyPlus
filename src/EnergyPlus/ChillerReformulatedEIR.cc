@@ -165,18 +165,18 @@ namespace ChillerReformulatedEIR {
         sizFac = this->SizFac;
     }
 
-    void ReformulatedEIRChillerSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
+    void ReformulatedEIRChillerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
         bool runFlag = true;
         Real64 myLoad = 0.0;
-        this->initialize(runFlag, myLoad);
+        this->initialize(state.dataBranchInputManager, runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->size();
         }
     }
 
-    void ReformulatedEIRChillerSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ReformulatedEIRChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -190,7 +190,7 @@ namespace ChillerReformulatedEIR {
         //  up reporting variables.
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->initialize(RunFlag, CurLoad);
+            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
             this->control(CurLoad, RunFlag, FirstHVACIteration);
             this->update(CurLoad, RunFlag);
         } else if (calledFromLocation.loopNum == this->CDLoopNum) {
@@ -725,7 +725,7 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void ReformulatedEIRChillerSpecs::initialize(bool const RunFlag, Real64 const MyLoad)
+    void ReformulatedEIRChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -749,7 +749,8 @@ namespace ChillerReformulatedEIR {
 
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_Chiller_ElectricReformEIR,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
@@ -762,7 +763,8 @@ namespace ChillerReformulatedEIR {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         DataPlant::TypeOf_Chiller_ElectricReformEIR,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
@@ -778,7 +780,8 @@ namespace ChillerReformulatedEIR {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_ElectricReformEIR, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         DataPlant::TypeOf_Chiller_ElectricReformEIR,
                                                         this->HRLoopNum,
                                                         this->HRLoopSideNum,
@@ -1431,7 +1434,7 @@ namespace ChillerReformulatedEIR {
                     ShowContinueError(format("Cond Temp(C) = {:7.2F}", fmt::join(CondTempArray, " ")));
 
                     ShowContinueError(format("Curve Output = {:7.2F}", fmt::join(CurveValArray, " ")));
-                    
+
                     ErrorsFound = true;
                 }
             }

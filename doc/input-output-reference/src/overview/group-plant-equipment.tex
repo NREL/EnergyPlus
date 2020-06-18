@@ -1550,7 +1550,7 @@ This field is optional.~ It can be used to control heat recovery operation of th
 
 This field is optional.~ It can be used to refine the model and controls for heat recovery operation of the chiller.~ The node named here should have a setpoint placed on it by a setpoint manager.~ If the plant loop's demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.~ If the plant loop's demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.~ When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller's that are able to produce relatively higher temperature heated fluilds.
 
-\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-11}
+\paragraph{Field: End-Use Subcategory}
 
 This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the chiller will be assigned to the ``General'' end-use subcategory.
 

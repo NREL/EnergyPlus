@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -117,14 +116,14 @@ namespace Boilers {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void BoilerSpecs::simulate(EnergyPlusData &EP_UNUSED(state),
+    void BoilerSpecs::simulate(EnergyPlusData &state,
                                const PlantLocation &EP_UNUSED(calledFromLocation),
                                bool const EP_UNUSED(FirstHVACIteration),
                                Real64 &CurLoad,
                                bool const RunFlag)
     {
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
-        this->InitBoiler();
+        this->InitBoiler(state.dataBranchInputManager);
         this->CalcBoilerModel(CurLoad, RunFlag, sim_component.FlowCtrl);
         this->UpdateBoilerRecords(CurLoad, RunFlag);
     }
@@ -141,9 +140,9 @@ namespace Boilers {
         SizFactor = this->SizFac;
     }
 
-    void BoilerSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
+    void BoilerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->InitBoiler();
+        this->InitBoiler(state.dataBranchInputManager);
         this->SizeBoiler();
     }
 
@@ -415,7 +414,7 @@ namespace Boilers {
         }
     }
 
-    void BoilerSpecs::InitBoiler() // number of the current boiler being simulated
+    void BoilerSpecs::InitBoiler(BranchInputManagerData &dataBranchInputManager) // number of the current boiler being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -441,7 +440,8 @@ namespace Boilers {
 
             // Locate the boilers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_Boiler_Simple,
                                                     this->LoopNum,
                                                     this->LoopSideNum,
