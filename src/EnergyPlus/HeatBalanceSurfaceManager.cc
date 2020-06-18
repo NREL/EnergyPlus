@@ -2570,9 +2570,6 @@ namespace HeatBalanceSurfaceManager {
                 CalcInteriorSolarDistribution();
             }
 
-            //if (!WarmupFlag) {
-            //    ShowContinueErrorTimeStamp("   InitSolarHeatGains after CalcInteriorSolarDistribution: AWinCFOverlap(1, 9)=" + General::RoundSigDigits(AWinCFOverlap(1, 9), 6));
-            //}
             for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
 
                 // TH 3/24/2010 - QBV is not used!
@@ -2889,21 +2886,10 @@ namespace HeatBalanceSurfaceManager {
                                             // accounting for absorptances from beam hitting back of the window which passes through rest of exterior
                                             // windows
                                             //auto& thisState(SurfaceWindow(SurfNum).ComplexFen.State(CurrentState));
-                                            //if (Surface(SurfNum).Name == "ROOM 102 WEST WINDOW" && !WarmupFlag) {
-                                            //    ShowContinueErrorTimeStamp("InitSolarHeatGains: Surface=" + Surface(SurfNum).Name + ", Lay=" + General::RoundSigDigits(Lay)
-                                            //        + ", SurfNum=" + General::RoundSigDigits(SurfNum)
-                                            //        + ", WinSkyFtAbs=" + General::RoundSigDigits(thisState.WinSkyFtAbs(Lay), 4)
-                                            //        + ", WinSkyGndAbs=" + General::RoundSigDigits(thisState.WinSkyGndAbs(Lay), 4)
-                                            //        + ", AWinSurf=" + General::RoundSigDigits(AWinSurf(Lay, SurfNum), 4)
-                                            //        + ", AWinCFOverlap=" + General::RoundSigDigits(AWinCFOverlap(Lay, SurfNum), 4));
-                                            //}
                                             QRadSWwinAbs(Lay, SurfNum) =
                                                 SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyFtAbs(Lay) * SkySolarInc +
                                                 SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyGndAbs(Lay) * GndSolarInc +
                                                 AWinSurf(Lay, SurfNum) * BeamSolar + AWinCFOverlap(Lay, SurfNum) * BeamSolar;
-                                            //if (Surface(SurfNum).Name == "ROOM 102 WEST WINDOW" && !WarmupFlag) {
-                                            //    ShowContinueError("    QRadSWwinAbs(Lay, SurfNum)=" + General::RoundSigDigits(QRadSWwinAbs(Lay, SurfNum), 4));
-                                            //}
                                         }
                                         // Total solar absorbed in solid layer (W), for reporting
                                         QRadSWwinAbsLayer(Lay, SurfNum) = QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
@@ -3399,14 +3385,6 @@ namespace HeatBalanceSurfaceManager {
                     if (ShadeFlag <= 0) { // No window shading
                         for (IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                             QRadSWwinAbs(IGlass, SurfNum) += QS(solEnclosureNum) * Construct(ConstrNum).AbsDiffBack(IGlass);
-                            //if (Surface(SurfNum).Name == "ROOM 102 WEST WINDOW" && !WarmupFlag) {
-                            //    ShowContinueErrorTimeStamp("InitSolarDistribution 3400: Surface=" + Surface(SurfNum).Name + ", IGlass=" + General::RoundSigDigits(IGlass)
-                            //        + ", SurfNum=" + General::RoundSigDigits(SurfNum)
-                            //        + ", solEnclosureNum=" + General::RoundSigDigits(solEnclosureNum)
-                            //        + ", QS=" + General::RoundSigDigits(QS(solEnclosureNum), 4)
-                            //        + ", AbsDiffBack=" + General::RoundSigDigits(Construct(ConstrNum).AbsDiffBack(IGlass))
-                            //        + ", QRadSWwinAbs=" + General::RoundSigDigits(QRadSWwinAbs(IGlass, SurfNum), 4));
-                            //}
                         }
                     } else if (ConstrNumSh != 0 && (ShadeFlag == IntShadeOn || ShadeFlag >= 3)) {
                         // Interior, exterior or between-glass shade, screen or blind in place
@@ -3608,11 +3586,6 @@ namespace HeatBalanceSurfaceManager {
                     TotGlassLayers = Construct(ConstrNum).TotGlassLayers;
                     for (IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                         QRadSWwinAbs(IGlass, SurfNum) += InitialDifSolwinAbs(IGlass, SurfNum);
-                        //if (Surface(SurfNum).Name == "ROOM 102 WEST WINDOW" && !WarmupFlag) {
-                        //    ShowContinueErrorTimeStamp("InitSolarDistribution 3600: Surface=" + Surface(SurfNum).Name + ", IGlass=" + General::RoundSigDigits(IGlass)
-                        //        + ", SurfNum=" + General::RoundSigDigits(SurfNum)
-                        //        + ", InitialDifSolwinAbs=" + General::RoundSigDigits(InitialDifSolwinAbs(IGlass, SurfNum), 4));
-                        //}
                     }
                 } else if (SurfaceWindow(SurfNum).WindowModelType == WindowEQLModel) {
 
@@ -3666,10 +3639,6 @@ namespace HeatBalanceSurfaceManager {
                             //Real64 qRadSW = QRadSWwinAbs(IGlass, SurfNum);
                             //Real64 area = Surface(SurfNum).Area;
                             //std::string name = Surface(SurfNum).Name;
-                            //if (name == "ROOM 102 WEST WINDOW" && !WarmupFlag) {
-                            //    ShowContinueErrorTimeStamp("InitSolarDistribution: Surface="+name+"  IGlass="+General::RoundSigDigits(IGlass)
-                            //        +" qRadSW="+General::RoundSigDigits(qRadSW,4) +" Area="+General::RoundSigDigits(area,2));
-                            //}
                             SWwinAbsTotalReport(SurfNum) += QRadSWwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
                         }
                     } else if (ShadeFlag == IntShadeOn || ShadeFlag >= 3) {
@@ -6607,8 +6576,6 @@ namespace HeatBalanceSurfaceManager {
                 }
             } // ...end of loop to check for convergence
 
-            //ShowContinueErrorTimeStamp("CalcHeatBalanceInsideSurf2: InsideSurfIterations=" + RoundSigDigits(InsideSurfIterations) + "  MaxDelTemp=" + RoundSigDigits(MaxDelTemp, 8));
-
             if (!DataHeatBalance::AnyCondFD) {
                 if (MaxDelTemp <= MaxAllowedDelTemp) Converged = true;
             } else {
@@ -7392,9 +7359,6 @@ namespace HeatBalanceSurfaceManager {
                     MaxDelTemp = std::max(absDif, MaxDelTemp);
                 }
             } // ...end of loop to check for convergence
-
-            // ShowContinueErrorTimeStamp("CalcHeatBalanceInsideSurf2: InsideSurfIterations=" + RoundSigDigits(InsideSurfIterations) + "  MaxDelTemp="
-            // + RoundSigDigits(MaxDelTemp, 8));
 
             if (MaxDelTemp <= MaxAllowedDelTemp) Converged = true;
 

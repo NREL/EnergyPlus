@@ -51,7 +51,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGasses90.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
@@ -776,10 +775,8 @@ namespace TarcogShading {
                 P2 = -H / H02;
             }
 
-            //beta1 = std::pow(e, P1);
-            //beta2 = std::pow(e, P2);
-            beta1 = General::epexp(P1);
-            beta2 = General::epexp(P2);
+            beta1 = std::pow(e, P1);
+            beta2 = std::pow(e, P2);
 
             alpha1 = 1.0 - beta1;
             alpha2 = 1.0 - beta2;
