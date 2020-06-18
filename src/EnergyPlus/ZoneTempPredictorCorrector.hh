@@ -352,21 +352,21 @@ namespace ZoneTempPredictorCorrector {
 
         Array1D_string const cZControlTypes;
 
-        int NumSingleTempHeatingControls = 0;
-        int NumSingleTempCoolingControls = 0;
-        int NumSingleTempHeatCoolControls = 0;
-        int NumDualTempHeatCoolControls = 0;
+        int NumSingleTempHeatingControls;
+        int NumSingleTempCoolingControls;
+        int NumSingleTempHeatCoolControls;
+        int NumDualTempHeatCoolControls;
 
         // Number of Thermal comfort control types
-        int NumSingleFangerHeatingControls = 0;
-        int NumSingleFangerCoolingControls = 0;
-        int NumSingleFangerHeatCoolControls = 0;
-        int NumDualFangerHeatCoolControls = 0;
+        int NumSingleFangerHeatingControls;
+        int NumSingleFangerCoolingControls;
+        int NumSingleFangerHeatCoolControls;
+        int NumDualFangerHeatCoolControls;
 
         // Number of zone with staged controlled objects
-        int NumStageCtrZone = 0;
+        int NumStageCtrZone;
         // Number of zone with onoff thermostat
-        int NumOnOffCtrZone = 0;
+        int NumOnOffCtrZone;
 
         Array1D<Real64> ZoneSetPointLast;
         Array1D<Real64> TempIndZnLd;
@@ -381,13 +381,13 @@ namespace ZoneTempPredictorCorrector {
         Real64 AnyZoneTempOscillate;
         Real64 AnyZoneTempOscillateDuringOccupancy;
         Real64 AnyZoneTempOscillateInDeadband;
-        Real64 AnnualAnyZoneTempOscillate = 0.0;
-        Real64 AnnualAnyZoneTempOscillateDuringOccupancy = 0.0;
-        Real64 AnnualAnyZoneTempOscillateInDeadband = 0.0;
-        bool OscillationVariablesNeeded = false;
+        Real64 AnnualAnyZoneTempOscillate;
+        Real64 AnnualAnyZoneTempOscillateDuringOccupancy;
+        Real64 AnnualAnyZoneTempOscillateInDeadband;
+        bool OscillationVariablesNeeded;
 
-        bool InitZoneAirSetPointsOneTimeFlag = true;
-        bool SetupOscillationOutputFlag = true;
+        bool InitZoneAirSetPointsOneTimeFlag;
+        bool SetupOscillationOutputFlag;
 
         // Object Data
         std::unordered_set<std::string> HumidityControlZoneUniqueNames;
@@ -401,7 +401,18 @@ namespace ZoneTempPredictorCorrector {
         Array1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
         ZoneTempPredictorCorrector::AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
 
-        Array1D<Real64> AdapComfortSetPointSummerDesDay{(7,-1)};
+        Array1D<Real64> AdapComfortSetPointSummerDesDay;
+
+        // Default Constructor
+        ZoneTempPredictorCorrectorData() : NumSingleTempHeatingControls(0), NumSingleTempCoolingControls(0), NumSingleTempHeatCoolControls(0),
+            NumDualTempHeatCoolControls(0), NumSingleFangerHeatingControls(0), NumSingleFangerCoolingControls(0), NumSingleFangerHeatCoolControls(0),
+            NumDualFangerHeatCoolControls(0), NumStageCtrZone(0), NumOnOffCtrZone(0), AnnualAnyZoneTempOscillate(0), 
+            AnnualAnyZoneTempOscillateDuringOccupancy(0), AnnualAnyZoneTempOscillateInDeadband(0), OscillationVariablesNeeded(false),
+            InitZoneAirSetPointsOneTimeFlag(true), SetupOscillationOutputFlag(true)
+        {
+            AdapComfortSetPointSummerDesDay.allocate(7);
+            AdapComfortSetPointSummerDesDay = -1;
+        }
 
         void clear_state() override
         {
