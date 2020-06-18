@@ -4163,6 +4163,8 @@ This output is the operating part-load ratio of the boiler. The part-load ratio 
 
 \paragraph{Boiler Efficiency {[]}}\label{boiler-efficiency}
 
+This output is the thermal efficiency for the boiler during heating operation. It is calculated by multiplying the normalized output of the boiler efficiency curve and the nominal thermal efficiency.
+
 \emph{Note that this variable is reported as zero when the boiler is not operating. When reported for frequencies longer than ``detailed'' (such as timestep, hourly, daily, monthly or environment), this output will only be meaningful when the boiler is operating for the entire reporting period. To determine an efficiency for a longer time period, compute the efficiency based on boiler heating rate divided by boiler gas rate over the desired period.}
 
 \paragraph{Boiler \textless{}Fuel Type\textgreater{} Rate {[}W{]}}\label{boiler-fuel-type-rate-w}
@@ -4410,6 +4412,8 @@ OtherFuel2:
 These outputs are the heating output (load) of the boiler. Energy is metered on Boilers:EnergyTransfer, EnergyTransfer:Plant, and EnergyTransfer:Facility.
 
 \paragraph{Boiler Steam Efficiency {[]}}\label{boiler-steam-efficiency}
+
+This output is the thermal efficiency for the boiler during heating operation. It is calculated as the boiler heat transfer rate (Boiler Heating Rate) divided by the ``fuel'' consumption rate by the boiler.
 
 \emph{Note that this variable is reported as zero when the boiler is not operating. When reported for frequencies longer than ``detailed'' (such as timestep, hourly, daily, monthly or environment), this output will only be meaningful when the boiler is operating for the entire reporting period. To determine an efficiency for a longer time period, compute the efficiency based on boiler heating rate divided by boiler \textless{}Fuel Type\textgreater{} rate over the desired period.}
 
