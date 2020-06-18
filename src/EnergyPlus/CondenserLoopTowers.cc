@@ -131,12 +131,12 @@ namespace CondenserLoopTowers {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void CoolingTower::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+    void CoolingTower::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                 bool const EP_UNUSED(FirstHVACIteration),
                                 Real64 &CurLoad,
                                 bool const RunFlag)
     {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
             this->calculateSingleSpeedTower();
         } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
@@ -163,9 +163,9 @@ namespace CondenserLoopTowers {
         SizFactor = this->SizFac;
     }
 
-    void CoolingTower::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
+    void CoolingTower::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
             this->SizeVSMerkelTower();
         } else {
@@ -1821,7 +1821,7 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void CoolingTower::initialize()
+    void CoolingTower::initialize(BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1849,7 +1849,7 @@ namespace CondenserLoopTowers {
 
             // Locate the tower on the plant loops for later usage
             bool ErrorsFound = false;
-            PlantUtilities::ScanPlantLoopsForObject(
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                 this->Name, this->TowerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
             if (ErrorsFound) {
                 ShowFatalError("initialize: Program terminated due to previous condition(s).");

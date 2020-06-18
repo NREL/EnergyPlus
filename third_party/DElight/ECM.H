@@ -19,31 +19,30 @@
  * under contract with Lawrence Berkeley National Laboratory.
  **************************************************************/
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 
 int	dillum(
 	double cloud_fraction,	/* fraction of sky covered by clouds (0.0=clear 1.0=overcast) */
 	BLDG *bldg_ptr,			/* building data structure pointer */
-	LIB *lib_ptr,			/* library data structure pointer */
 	SUN_DATA *sun_ptr,		/* pointer to sun data structure */
 	RUN_DATA *run_ptr,		/* pointer to runtime data structure */
 	int wx_flag,			/* weather availability flag */
@@ -100,9 +99,9 @@ int	dextil(
 	double chilsu,	/* current hour clear sky horiz illum sun component from davail() */
 	double chilsk,	/* current hour clear sky horiz illum sky component from davail() */
 	double ohilsk,	/* current hour overcast sky horiz illum sky component from davail() */
-	double cdirlw,	/* CIE luminous efficacy for direct solar radiation from clear sky */
-	double cdiflw,	/* CIE luminous efficacy for diffuse radiation from clear sky */
-	double odiflw,	/* CIE luminous efficacy for diffuse radiation from overcast sky */
+	//double cdirlw,	/* CIE luminous efficacy for direct solar radiation from clear sky */
+	//double cdiflw,	/* CIE luminous efficacy for diffuse radiation from clear sky */
+	//double odiflw,	/* CIE luminous efficacy for diffuse radiation from overcast sky */
 	double phsun,		/* sun altitude (radians) */
 	double solic[MONTHS],/* extraterrestrial illum for first day of each month */
 	int imon,			/* current month */
@@ -112,7 +111,6 @@ int	dextil(
 
 int	dintil(
 	ZONE *zone_ptr,	/* bldg->zone data structure pointer */
-	LIB *lib_ptr,	/* library data structure pointer */
 	int imon,		/* current month */
 	int ihr,		/* current hour */
 	double hisunf,	/* current hour clear sky horiz illum sun component */
@@ -121,8 +119,7 @@ int	dintil(
 	int iphs,		/* sun altitude interpolation lower bound index */
 	int iths,		/* sun azimuth interpolation lower bound index */
 	double phratio,	/* sun altitude interpolation displacement ratio */
-	double thratio,	/* sun azimuth interpolation displacement ratio */
-	ofstream* pofdmpfile);	/* ptr to dump file */
+	double thratio);	/* sun azimuth interpolation displacement ratio */
 
 int calc_sun(
 	double *phsun_ptr,	/* sun position altitude */

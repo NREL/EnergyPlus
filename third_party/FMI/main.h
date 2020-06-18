@@ -63,7 +63,7 @@ typedef fmiStatus (*fDoStep) (fmiComponent c, fmiReal currentCommunicationPoint,
 
 typedef struct FMU{
 	int index;
-	fmiString instanceName;
+	char* instanceName;
 	fmiString modelID;
 	fmiString modelGUID;
 	ModelDescription* modelDescription;

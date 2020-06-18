@@ -166,7 +166,7 @@ namespace PhotovoltaicThermalCollectors {
 
         void setupReportVars();
 
-        void initialize(bool FirstHVACIteration);
+        void initialize(BranchInputManagerData &dataBranchInputManager, bool FirstHVACIteration);
 
         void size();
 

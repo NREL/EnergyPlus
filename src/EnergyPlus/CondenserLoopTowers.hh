@@ -64,6 +64,7 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+struct BranchInputManagerData;
 
 namespace CondenserLoopTowers {
 
@@ -398,7 +399,7 @@ namespace CondenserLoopTowers {
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        void initialize();
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void setupOutputVariables();
 

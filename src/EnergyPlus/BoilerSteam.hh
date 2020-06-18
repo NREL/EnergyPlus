@@ -62,6 +62,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 struct BoilerSteamData;
+struct BranchInputManagerData;
 
 namespace BoilerSteam {
 
@@ -123,7 +124,7 @@ namespace BoilerSteam {
         {
         }
 
-        void initialize();
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void setupOutputVars();
 
