@@ -135,11 +135,6 @@ namespace HybridEvapCoolingModel {
         int MODE_BLOCK_OFFSET_Number;
         int BLOCK_HEADER_OFFSET_Number;
         bool ValidPointer(int curve_pointer);
-        bool ValidateArrays(Array1D_string Alphas,
-                            Array1D_string cAlphaFields,
-                            Array1D<Real64> Numbers,
-                            Array1D_string cNumericFields,
-                            std::string cCurrentModuleObject);
         bool ParseMode(int ModeCounter,
                        std::vector<CMode> *OperatingModes,
                        Real64 ScalingFactor,
@@ -240,6 +235,9 @@ namespace HybridEvapCoolingModel {
         int AvailStatus;
 
         Real64 SystemMaximumSupplyAirFlowRate;           // taken from IDF N1, the system max supply flow rate in m3/s.
+        bool FanHeatGain;             // .TRUE. = fan heat gain is accounted for in the lookup tables
+        std::string FanHeatGainLocation;             // Fan heat gain location
+        Real64 FanHeatInAirFrac;             // the fraction of fan heat in air stream to calculate fan heat gain if not in lookup tables
         Real64 ScalingFactor;                            // taken from IDF N3, linear scaling factor.
         Real64 ScaledSystemMaximumSupplyAirMassFlowRate; // the scaled system max supply mass flow rate in m3/s.
         Real64 ScaledSystemMaximumSupplyAirVolumeFlowRate; // the scaled system max supply volume flow rate in m3/s.
@@ -317,6 +315,8 @@ namespace HybridEvapCoolingModel {
         Real64 InletRH;
         Real64 OutletVolumetricFlowRate;
         Real64 OutletMassFlowRate; // Inlet is primary process air node at inlet to cooler
+        Real64 PowerLossToAir;
+        Real64 FanHeatTemp;
         Real64 OutletTemp;
         Real64 OutletWetBulbTemp;
         Real64 OutletHumRat;
