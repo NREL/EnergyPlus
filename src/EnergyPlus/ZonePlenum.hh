@@ -191,13 +191,13 @@ namespace ZonePlenum {
 
     struct ZonePlenumData : BaseGlobalStruct {
 
-        bool GetInputFlag = true; // Flag set to make sure you get input once
-        bool InitAirZoneReturnPlenumEnvrnFlag = true;
-        bool InitAirZoneReturnPlenumOneTimeFlag = true;
+        bool GetInputFlag; // Flag set to make sure you get input once
+        bool InitAirZoneReturnPlenumEnvrnFlag;
+        bool InitAirZoneReturnPlenumOneTimeFlag;
 
-        int NumZonePlenums = 0;       // The Number of ZonePlenums found in the Input
-        int NumZoneReturnPlenums = 0; // The Number of ZoneReturnPlenums found in the Input
-        int NumZoneSupplyPlenums = 0; // The Number of ZoneSupplyPlenums found in the Input
+        int NumZonePlenums;       // The Number of ZonePlenums found in the Input
+        int NumZoneReturnPlenums; // The Number of ZoneReturnPlenums found in the Input
+        int NumZoneSupplyPlenums; // The Number of ZoneSupplyPlenums found in the Input
         Array1D_bool CheckRetEquipName;
         Array1D_bool CheckSupEquipName;
 
@@ -215,6 +215,13 @@ namespace ZonePlenum {
             NumZoneSupplyPlenums = 0;
             ZoneRetPlenCond.deallocate();
             ZoneSupPlenCond.deallocate();
+        }
+
+        // Default Constructor
+        ZonePlenumData()
+            : GetInputFlag(true), InitAirZoneReturnPlenumEnvrnFlag(true), InitAirZoneReturnPlenumOneTimeFlag(true),
+              NumZonePlenums(0), NumZoneReturnPlenums(0), NumZoneSupplyPlenums(0)
+        {
         }
     };
 
