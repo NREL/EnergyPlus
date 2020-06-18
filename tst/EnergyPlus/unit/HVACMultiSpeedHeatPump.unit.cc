@@ -1264,8 +1264,8 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     MixedAir::GetOutsideAirSysInputs(state);
     MixedAir::GetOAControllerInputs(state);
     SplitterComponent::GetSplitterInput();
-    BranchInputManager::GetMixerInput();
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::GetMixerInput(state.dataBranchInputManager);
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
     GetZoneAirLoopEquipment();
     SingleDuct::GetSysInput(state);
 

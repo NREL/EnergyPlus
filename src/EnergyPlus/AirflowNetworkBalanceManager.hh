@@ -156,6 +156,8 @@ namespace AirflowNetworkBalanceManager {
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     );
 
+    void AssignFanAirLoopNum();
+
     void ValidateDistributionSystem(EnergyPlusData &state);
 
     void ValidateFanFlowRate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
@@ -262,6 +264,7 @@ namespace AirflowNetworkBalanceManager {
         int NumOfOAFans = 0;                            // number of OutdoorAir fans
         int NumOfReliefFans = 0;                        // number of OutdoorAir relief fans
         bool AirflowNetworkGetInputFlag = true;
+        bool AssignFanAirLoopNumFlag = true;
         bool ValidateDistributionSystemFlag = true;
         Array1D<Real64> FacadeAng = Array1D<Real64>(5);  // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
         Array1D<Real64> LoopPartLoadRatio;
@@ -317,6 +320,7 @@ namespace AirflowNetworkBalanceManager {
             NumOfOAFans = 0;
             NumOfReliefFans = 0;
             AirflowNetworkGetInputFlag = true;
+            AssignFanAirLoopNumFlag = true;
             ValidateDistributionSystemFlag = true;
             FacadeAng = Array1D<Real64>(5);
             AirflowNetworkZnRpt.deallocate();

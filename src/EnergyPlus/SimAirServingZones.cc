@@ -75,7 +75,6 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/UnitarySystem.hh>
@@ -765,7 +764,7 @@ namespace SimAirServingZones {
             BranchListName = Alphas(4);
             AvailManagerListName = Alphas(3);
             ConnectorListName = Alphas(5);
-            PrimaryAirSystem(AirSysNum).NumBranches = NumBranchesInBranchList(BranchListName);
+            PrimaryAirSystem(AirSysNum).NumBranches = NumBranchesInBranchList(state.dataBranchInputManager, BranchListName);
             if (PrimaryAirSystem(AirSysNum).NumBranches == 0) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", insufficient information.");
                 ShowContinueError("...there must be at least 1 branch specified.");
@@ -774,12 +773,12 @@ namespace SimAirServingZones {
             BranchNames.allocate(PrimaryAirSystem(AirSysNum).NumBranches);
             BranchNames = "";
             // get the branch lists
-            GetBranchList(PrimaryAirSystem(AirSysNum).Name, BranchListName, PrimaryAirSystem(AirSysNum).NumBranches, BranchNames, "Air");
+            GetBranchList(state.dataBranchInputManager, PrimaryAirSystem(AirSysNum).Name, BranchListName, PrimaryAirSystem(AirSysNum).NumBranches, BranchNames, "Air");
             PrimaryAirSystem(AirSysNum).Branch.allocate(PrimaryAirSystem(AirSysNum).NumBranches);
             // Cycle through all of the branches and set up the branch data
             for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirSysNum).NumBranches; ++BranchNum) {
                 PrimaryAirSystem(AirSysNum).Branch(BranchNum).Name = BranchNames(BranchNum);
-                NumCompsOnBranch = NumCompsInBranch(BranchNames(BranchNum));
+                NumCompsOnBranch = NumCompsInBranch(state.dataBranchInputManager, BranchNames(BranchNum));
                 if (NumCompsOnBranch <= 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", insufficient information.");
                     ShowContinueError("...Branch=\"" + BranchNames(BranchNum) + "\", no components on branch.");
@@ -793,7 +792,8 @@ namespace SimAirServingZones {
                 OutletNodeNames.allocate(NumCompsOnBranch);
                 OutletNodeNumbers.dimension(NumCompsOnBranch, 0);
 
-                GetBranchData(PrimaryAirSystem(AirSysNum).Name,
+                GetBranchData(state.dataBranchInputManager,
+                              PrimaryAirSystem(AirSysNum).Name,
                               BranchNames(BranchNum),
                               DummyInteger(1),
                               DummyInteger(2),
@@ -977,7 +977,7 @@ namespace SimAirServingZones {
                     ShowContinueError("ConnectorList object=\"" + ConnectorListName + "\" not found in input.");
                 }
                 errFlag = false;
-                GetNumSplitterMixerInConntrList("AirLoop", ConnectorListName, NumofSplitters, NumofMixers, errFlag);
+                GetNumSplitterMixerInConntrList(state.dataBranchInputManager, "AirLoop", ConnectorListName, NumofSplitters, NumofMixers, errFlag);
                 if (errFlag) {
                 }
             }
@@ -987,7 +987,8 @@ namespace SimAirServingZones {
                 inputProcessor->getObjectDefMaxArgs("Connector:Splitter", NumParams, NumAlphas, NumNodes);
                 NodeNames.allocate(NumAlphas);
                 NodeNumbers.allocate(NumAlphas);
-                GetLoopSplitter(PrimaryAirSystem(AirSysNum).Name,
+                GetLoopSplitter(state.dataBranchInputManager,
+                                PrimaryAirSystem(AirSysNum).Name,
                                 ConnectorListName,
                                 PrimaryAirSystem(AirSysNum).Splitter.Name,
                                 PrimaryAirSystem(AirSysNum).Splitter.Exists,
@@ -1047,7 +1048,8 @@ namespace SimAirServingZones {
                 inputProcessor->getObjectDefMaxArgs("Connector:Mixer", NumParams, NumAlphas, NumNodes);
                 NodeNames.allocate(NumAlphas);
                 NodeNumbers.allocate(NumAlphas);
-                GetLoopMixer(PrimaryAirSystem(AirSysNum).Name,
+                GetLoopMixer(state.dataBranchInputManager,
+                             PrimaryAirSystem(AirSysNum).Name,
                              ConnectorListName,
                              PrimaryAirSystem(AirSysNum).Mixer.Name,
                              PrimaryAirSystem(AirSysNum).Mixer.Exists,
@@ -3621,7 +3623,7 @@ namespace SimAirServingZones {
                 if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
             } else if (SELECT_CASE_var == CoilUserDefined) { // Coil:UserDefined
-                SimCoilUserDefined(CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
+                SimCoilUserDefined(state.dataBranchInputManager, CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
 
             } else if (SELECT_CASE_var == UnitarySystemModel) { // 'AirLoopHVAC:UnitarySystem'
                 Real64 sensOut = 0.0;

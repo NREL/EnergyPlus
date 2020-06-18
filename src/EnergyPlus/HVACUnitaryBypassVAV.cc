@@ -796,7 +796,7 @@ namespace HVACUnitaryBypassVAV {
                         int ActualCoolCoilType = HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(state,
                             CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
                         if (ActualCoolCoilType == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-                            DXCoils::GetDXCoilIndex(HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, 
+                            DXCoils::GetDXCoilIndex(HVACHXAssistedCoolingCoil::GetHXDXCoilName(state,
                                                         CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXCoilErrFlag),
                                                     CBVAV(CBVAVNum).DXCoolCoilIndexNum,
                                                     DXCoilErrFlag,
@@ -811,13 +811,13 @@ namespace HVACUnitaryBypassVAV {
                         } else if (ActualCoolCoilType == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                             CBVAV(CBVAVNum).DXCoolCoilIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(
                                 "Coil:Cooling:DX:VariableSpeed",
-                                HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, 
+                                HVACHXAssistedCoolingCoil::GetHXDXCoilName(state,
                                     CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXCoilErrFlag),
                                 DXCoilErrFlag);
                             if (DXCoilErrFlag) ShowContinueError("...occurs in " + CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
                             OANodeErrFlag = false;
                             CBVAV(CBVAVNum).CondenserNodeNum = VariableSpeedCoils::GetVSCoilCondenserInletNode(
-                                HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, 
+                                HVACHXAssistedCoolingCoil::GetHXDXCoilName(state,
                                     CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXCoilErrFlag),
                                 OANodeErrFlag);
                             if (OANodeErrFlag) ShowContinueError("Occurs in " + CurrentModuleObject + " = " + CBVAV(CBVAVNum).Name);
@@ -1442,7 +1442,8 @@ namespace HVACUnitaryBypassVAV {
                 if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
 
                     ErrorFlag = false;
-                    PlantUtilities::ScanPlantLoopsForObject(CBVAV(CBVAVNum).HeatCoilName,
+                    PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                            CBVAV(CBVAVNum).HeatCoilName,
                                                             DataPlant::TypeOf_CoilWaterSimpleHeating,
                                                             CBVAV(CBVAVNum).LoopNum,
                                                             CBVAV(CBVAVNum).LoopSide,
@@ -1473,7 +1474,8 @@ namespace HVACUnitaryBypassVAV {
                 } else if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
 
                     ErrorFlag = false;
-                    PlantUtilities::ScanPlantLoopsForObject(CBVAV(CBVAVNum).HeatCoilName,
+                    PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                            CBVAV(CBVAVNum).HeatCoilName,
                                                             DataPlant::TypeOf_CoilSteamAirHeating,
                                                             CBVAV(CBVAVNum).LoopNum,
                                                             CBVAV(CBVAVNum).LoopSide,
@@ -3704,7 +3706,7 @@ namespace HVACUnitaryBypassVAV {
         bool FirstHVACIter = (Par(5) == 1.0);
         bool HXUnitOn = (Par(6) == 1.0); // flag to enable heat exchanger
 
-        HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state, 
+        HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
             CBVAV(CBVAVNumTemp).DXCoolCoilName, FirstHVACIter, On, PartLoadFrac, CoilIndex, DataHVACGlobals::ContFanCycCoil, HXUnitOn);
 
         Real64 OutletAirTemp = DataLoopNode::Node(CBVAV(CBVAVNumTemp).DXCoilOutletNode).Temp;
@@ -4001,7 +4003,7 @@ namespace HVACUnitaryBypassVAV {
                                                          CBVAV(CBVAVNum).CompNum);
 
                     // simulate the steam heating coil
-                    SteamCoils::SimulateSteamCoilComponents(state, 
+                    SteamCoils::SimulateSteamCoilComponents(state,
                         CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, HeatCoilLoad, QCoilActual, FanMode);
                 }
             }
@@ -4034,7 +4036,7 @@ namespace HVACUnitaryBypassVAV {
                                                          CBVAV(CBVAVNum).BranchNum,
                                                          CBVAV(CBVAVNum).CompNum);
                     // simulate the steam heating coil
-                    SteamCoils::SimulateSteamCoilComponents(state, 
+                    SteamCoils::SimulateSteamCoilComponents(state,
                         CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, HeatCoilLoad, QCoilActual, FanMode);
                 }
             }

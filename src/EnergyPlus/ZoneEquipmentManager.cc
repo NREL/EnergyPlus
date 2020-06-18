@@ -3283,7 +3283,8 @@ namespace ZoneEquipmentManager {
                         NonAirSystemResponse(ActualZoneNum) += SysOutputProvided;
 
                     } else if (SELECT_CASE_var == UserDefinedZoneHVACForcedAir_Num) {
-                        SimZoneAirUserDefined(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimZoneAirUserDefined(state.dataBranchInputManager,
+                                              PrioritySimOrder(EquipTypeNum).EquipName,
                                               ActualZoneNum,
                                               SysOutputProvided,
                                               LatOutputProvided,
