@@ -20,7 +20,6 @@
 #include <ObjexxFCL/gio_Fmt.hh> // Convenience include
 #include <ObjexxFCL/Print.hh>
 #include <ObjexxFCL/Read.hh>
-#include <ObjexxFCL/Write.hh>
 
 // C++ Headers
 #include <ios>

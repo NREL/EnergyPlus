@@ -48,10 +48,12 @@
 #ifndef OutputFiles_hh_INCLUDED
 #define OutputFiles_hh_INCLUDED
 
-#include <ObjexxFCL/gio.hh>
+#include <fstream>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <ostream>
+#include <vector>
+#include <cassert>
 
 namespace EnergyPlus {
 class OutputFile
