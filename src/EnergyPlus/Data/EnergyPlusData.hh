@@ -106,6 +106,8 @@ namespace EnergyPlus {
         // after we've plumbed enough of the functions to allow
         OutputFiles outputFiles;
 
+        ZoneDehumidifierData dataZoneDehumidifier;
+
         EnergyPlusData() {
             OutputFiles::setSingleton(&outputFiles);
         }
@@ -135,6 +137,7 @@ namespace EnergyPlus {
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataZoneDehumidifier.clear_state();
         };
     };
 

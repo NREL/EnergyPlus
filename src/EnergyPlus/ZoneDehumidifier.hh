@@ -52,10 +52,15 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+    // Forward Declarations
+    struct EnergyPlusData;
+    struct ZoneDehumidifierData;
 
 namespace ZoneDehumidifier {
 
@@ -75,7 +80,7 @@ namespace ZoneDehumidifier {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    extern int NumDehumidifiers; // Number of zone dehumidifier objects in the input file
+    //extern int NumDehumidifiers; // Number of zone dehumidifier objects in the input file
 
     extern bool GetInputFlag; // Set to FALSE after first time input is "gotten"
     extern Array1D_bool CheckEquipName;
@@ -182,9 +187,9 @@ namespace ZoneDehumidifier {
                              int &CompIndex                 // Index to the zone dehumidifier
     );
 
-    void GetZoneDehumidifierInput();
+    void GetZoneDehumidifierInput(ZoneDehumidifierData &dataZoneDehumidifier);
 
-    void InitZoneDehumidifier(int const ZoneDehumNum); // Number of the current zone dehumidifier being simulated
+    void InitZoneDehumidifier(ZoneDehumidifierData &dataZoneDehumidifier, int const ZoneDehumNum); // Number of the current zone dehumidifier being simulated
 
     void SizeZoneDehumidifier();
 
@@ -198,9 +203,20 @@ namespace ZoneDehumidifier {
 
     void ReportZoneDehumidifier(int const DehumidNum); // Index of the current zone dehumidifier being simulated
 
-    bool GetZoneDehumidifierNodeNumber(int const NodeNumber); // Node being tested
+    bool GetZoneDehumidifierNodeNumber(ZoneDehumidifierData &dataZoneDehumidifier, int const NodeNumber); // Node being tested
 
 } // namespace ZoneDehumidifier
+
+    struct ZoneDehumidifierData : BaseGlobalStruct {
+
+        int NumDehumidifiers; // Number of zone dehumidifier objects in the input file
+
+        void clear_state() override {
+            NumDehumidifiers = 0;
+        }
+        // Default Constructor
+        ZoneDehumidifierData() : NumDehumidifiers(0) {}
+    };
 
 } // namespace EnergyPlus
 

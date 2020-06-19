@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -135,7 +136,7 @@ namespace ZoneDehumidifier {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    int NumDehumidifiers(0); // Number of zone dehumidifier objects in the input file
+    //int NumDehumidifiers(0); // Number of zone dehumidifier objects in the input file
 
     bool GetInputFlag(true); // Set to FALSE after first time input is "gotten"
     Array1D_bool CheckEquipName;
@@ -162,7 +163,7 @@ namespace ZoneDehumidifier {
 
     void clear_state()
     {
-        NumDehumidifiers = 0;
+        //NumDehumidifiers = 0;
         GetInputFlag = true;
         CheckEquipName.deallocate();
         ZoneDehumid.deallocate();
@@ -226,9 +227,9 @@ namespace ZoneDehumidifier {
             CompIndex = ZoneDehumidNum;
         } else {
             ZoneDehumidNum = CompIndex;
-            if (ZoneDehumidNum > NumDehumidifiers || ZoneDehumidNum < 1) {
+            if (ZoneDehumidNum > dataZoneDehumidifier.NumDehumidifiers || ZoneDehumidNum < 1) {
                 ShowFatalError("SimZoneDehumidifier:  Invalid CompIndex passed= " + TrimSigDigits(ZoneDehumidNum) +
-                               ", Number of Units= " + TrimSigDigits(NumDehumidifiers) + ", Entered Unit name= " + CompName);
+                               ", Number of Units= " + TrimSigDigits(dataZoneDehumidifier.NumDehumidifiers) + ", Entered Unit name= " + CompName);
             }
             if (CheckEquipName(ZoneDehumidNum)) {
                 if (CompName != ZoneDehumid(ZoneDehumidNum).Name) {
@@ -250,7 +251,7 @@ namespace ZoneDehumidifier {
         ReportZoneDehumidifier(ZoneDehumidNum);
     }
 
-    void GetZoneDehumidifierInput()
+    void GetZoneDehumidifierInput(ZoneDehumidifierData &dataZoneDehumidifier)
     {
 
         // SUBROUTINE INFORMATION:
@@ -305,10 +306,10 @@ namespace ZoneDehumidifier {
         static int TotalArgs(0);        // Total number of alpha and numeric arguments (max)
         Real64 CurveVal;                // Output from curve object (water removal or energy factor curves)
 
-        NumDehumidifiers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        dataZoneDehumidifier.NumDehumidifiers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
-        ZoneDehumid.allocate(NumDehumidifiers);
-        CheckEquipName.dimension(NumDehumidifiers, true);
+        ZoneDehumid.allocate(dataZoneDehumidifier.NumDehumidifiers);
+        CheckEquipName.dimension(dataZoneDehumidifier.NumDehumidifiers, true);
 
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
@@ -319,7 +320,7 @@ namespace ZoneDehumidifier {
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNumbers, true);
 
-        for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex) {
+        for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= dataZoneDehumidifier.NumDehumidifiers; ++ZoneDehumidIndex) {
 
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           ZoneDehumidIndex,
@@ -517,7 +518,7 @@ namespace ZoneDehumidifier {
             ShowFatalError(RoutineName + ':' + CurrentModuleObject + ": Errors found in input.");
         }
 
-        for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex) {
+        for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= dataZoneDehumidifier.NumDehumidifiers; ++ZoneDehumidIndex) {
             // Set up report variables for the dehumidifiers
             SetupOutputVariable("Zone Dehumidifier Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
@@ -613,7 +614,7 @@ namespace ZoneDehumidifier {
         }
     }
 
-    void InitZoneDehumidifier(int const ZoneDehumNum) // Number of the current zone dehumidifier being simulated
+    void InitZoneDehumidifier(ZoneDehumidifierData &dataZoneDehumidifier, int const ZoneDehumNum) // Number of the current zone dehumidifier being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -662,7 +663,7 @@ namespace ZoneDehumidifier {
 
         // Do the one time initializations
         if (MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(NumDehumidifiers);
+            MyEnvrnFlag.allocate(dataZoneDehumidifier.NumDehumidifiers);
             //    ALLOCATE(MySizeFlag(NumDehumidifiers))
             MyEnvrnFlag = true;
             //    MySizeFlag = .TRUE.
@@ -672,7 +673,7 @@ namespace ZoneDehumidifier {
         // Need to check all dehumidifiers to see if they are on Zone Equipment List or issue warning
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
-            for (LoopIndex = 1; LoopIndex <= NumDehumidifiers; ++LoopIndex) {
+            for (LoopIndex = 1; LoopIndex <= dataZoneDehumidifier.NumDehumidifiers; ++LoopIndex) {
                 if (CheckZoneEquipmentList(ZoneDehumid(LoopIndex).UnitType, ZoneDehumid(LoopIndex).Name)) continue;
                 ShowSevereError("InitZoneDehumidifier: Zone Dehumidifier=\"" + ZoneDehumid(LoopIndex).UnitType + ',' + ZoneDehumid(LoopIndex).Name +
                                 "\" is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
@@ -1180,7 +1181,7 @@ namespace ZoneDehumidifier {
         }
     }
 
-    bool GetZoneDehumidifierNodeNumber(int const NodeNumber) // Node being tested
+    bool GetZoneDehumidifierNodeNumber(ZoneDehumidifierData &dataZoneDehumidifier, int const NodeNumber) // Node being tested
     {
 
         // FUNCTION INFORMATION:
@@ -1227,7 +1228,7 @@ namespace ZoneDehumidifier {
         }
 
         FindZoneDehumidifierNodeNumber = false;
-        for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex) {
+        for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= dataZoneDehumidifier.NumDehumidifiers; ++ZoneDehumidIndex) {
             if (NodeNumber == ZoneDehumid(ZoneDehumidIndex).AirInletNodeNum) {
                 FindZoneDehumidifierNodeNumber = true;
                 break;
