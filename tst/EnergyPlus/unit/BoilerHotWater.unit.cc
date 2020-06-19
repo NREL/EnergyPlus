@@ -270,12 +270,12 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
     DataPlant::PlantFirstSizesOkayToReport = true;
     DataPlant::PlantFinalSizesOkayToReport = true;
 
-    thisBoiler.InitBoiler();
+    thisBoiler.InitBoiler(state.dataBranchInputManager);
     thisBoiler.SizeBoiler();
 
     // run through init again after sizing is complete to set mass flow rate and run calc function
     DataGlobals::BeginEnvrnFlag = true;
-    thisBoiler.InitBoiler();
+    thisBoiler.InitBoiler(state.dataBranchInputManager);
     thisBoiler.CalcBoilerModel(MyLoad, RunFlag, DataBranchAirLoopPlant::ControlType_SeriesActive);
 
     // check boiler part load ratio and the resultant boiler efficiency
