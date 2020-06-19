@@ -49,48 +49,28 @@
 #define ZoneContaminantPredictorCorrector_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+    // Forward Declarations
+    struct EnergyPlusData;
+    struct ZoneContaminantPredictorCorrectorData;
+
 namespace ZoneContaminantPredictorCorrector {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern bool GetZoneAirContamInputFlag; // True when need to get input
-    extern int TotGCGenConstant;           // Number of constant generic contaminant sources and sinks
-    extern int TotGCGenPDriven;            // Number of pressure driven generic contaminant sources and sinks
-    extern int TotGCGenCutoff;             // Number of cutoff model generic contaminant sources and sinks
-    extern int TotGCGenDecay;              // Number of decay model generic contaminant sources and sinks
-    extern int TotGCBLDiff;                // Number of boudary layer diffusion generic contaminant model
-    extern int TotGCDVS;                   // Number of deposition velocity sink generic contaminant model
-    extern int TotGCDRS;                   // Number of deposition rate sink generic contaminant model
-
-    // SUBROUTINE SPECIFICATIONS:
-
-    // Functions
-
-    void clear_state();
-
-    void ManageZoneContaminanUpdates(int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+    void ManageZoneContaminanUpdates(ZoneContaminantPredictorCorrectorData &dataZoneContaminantPredictorCorrector, int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
                                      bool const ShortenTimeStepSys,
                                      bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                                      Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void GetZoneContaminanInputs();
+    void GetZoneContaminanInputs(ZoneContaminantPredictorCorrectorData &dataZoneContaminantPredictorCorrector);
 
     void GetZoneContaminanSetPoints();
 
-    void InitZoneContSetPoints();
+    void InitZoneContSetPoints(ZoneContaminantPredictorCorrectorData &dataZoneContaminantPredictorCorrector);
 
     void PredictZoneContaminants(bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
@@ -117,6 +97,35 @@ namespace ZoneContaminantPredictorCorrector {
     );
 
 } // namespace ZoneContaminantPredictorCorrector
+
+    struct ZoneContaminantPredictorCorrectorData : BaseGlobalStruct {
+
+        bool GetZoneAirContamInputFlag; // True when need to get input
+        int TotGCGenConstant;           // Number of constant generic contaminant sources and sinks
+        int TotGCGenPDriven;            // Number of pressure driven generic contaminant sources and sinks
+        int TotGCGenCutoff;             // Number of cutoff model generic contaminant sources and sinks
+        int TotGCGenDecay;              // Number of decay model generic contaminant sources and sinks
+        int TotGCBLDiff;                // Number of boudary layer diffusion generic contaminant model
+        int TotGCDVS;                   // Number of deposition velocity sink generic contaminant model
+        int TotGCDRS;                   // Number of deposition rate sink generic contaminant model
+
+        void clear_state() override {
+            GetZoneAirContamInputFlag = true;
+            TotGCGenConstant = 0;
+            TotGCGenPDriven = 0;
+            TotGCGenCutoff = 0;
+            TotGCGenDecay = 0;
+            TotGCBLDiff = 0;
+            TotGCDVS = 0;
+            TotGCDRS = 0;
+            DataContaminantBalance::Contaminant.CO2Simulation = false;
+            DataContaminantBalance::Contaminant.GenericContamSimulation = false;
+        }
+
+        // Default Constructor
+        ZoneContaminantPredictorCorrectorData() : GetZoneAirContamInputFlag(true), TotGCGenConstant(0), TotGCGenPDriven(0),
+                                                  TotGCGenCutoff(0), TotGCGenDecay(0), TotGCBLDiff(0), TotGCDVS(0), TotGCDRS(0) {}
+    };
 
 } // namespace EnergyPlus
 

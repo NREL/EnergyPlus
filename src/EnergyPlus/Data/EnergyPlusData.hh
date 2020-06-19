@@ -73,6 +73,7 @@
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <unordered_map>
 #include <string>
 
@@ -106,6 +107,7 @@ namespace EnergyPlus {
         // after we've plumbed enough of the functions to allow
         OutputFiles outputFiles;
 
+        ZoneContaminantPredictorCorrectorData dataZoneContaminantPredictorCorrector;
         EnergyPlusData() {
             OutputFiles::setSingleton(&outputFiles);
         }
@@ -135,6 +137,7 @@ namespace EnergyPlus {
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataZoneContaminantPredictorCorrector.clear_state();
         };
     };
 
