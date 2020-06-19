@@ -1174,20 +1174,21 @@ The increasing mode number roughly corresponds with increased speed. Mode01 to M
 
 This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxZoneTempDiff variable within EnergyPlus. This variable sets the maximum zone temperature change before the HVAC timestep is shortened. Larger values result in fewer iterations. To understand this input completely, please review the use of the MaxZoneTempDiff variable in the ManageHVAC() routine located in the HVACManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.3 ($^\circ$C), which is also the default value. Testing has been done with a value of 1.0, which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 1.0 have not been tested.
 
+\paragraph{Field: MaxAllowedDelTemp}\label{max-allowed-del-temp}
+
+This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxAllowedDelTemp variable within EnergyPlus. This variable sets the maximum surface temperature change before the HVAC timestep is shortened. Similar to the MaxZoneTempDiff parameter, larger MaxAllowedDelTemp values result in fewer iterations. To understand this input completely, please review the use of the MaxAllowedDetTemp variable in the CalcHeatBalanceInsideSurf2() routine located in the HeatBalanceSurfaceManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.002 ($^\circ$C), which is also the default value. Testing has been done with a value of 0.1, which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 0.1 have not been tested.
+
 
 An IDF example:
 
 \begin{lstlisting}
 PerformancePrecisionTradeoffs,
-  Yes,                      !- Use Coil Direct Solutions
-  CarrollMRT;               !- Zone Radiant Exchange Algorithm
-  Mode06,                   !- Override Mode
-  0.3;                      !- MaxZoneTempDiff
+Yes,                      !- Use Coil Direct Solutions
+CarrollMRT;               !- Zone Radiant Exchange Algorithm
+Mode06,                   !- Override Mode
+0.3,                      !- MaxZoneTempDiff
+0.1;                      !- MaxAllowedDelTemp
 \end{lstlisting}
-
-\paragraph{Field: MaxAllowedDelTemp}\label{max-allowed-del-temp}
-
-This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxAllowedDelTemp variable within EnergyPlus. This variable sets the maximum surface temperature change before the HVAC timestep is shortened. Similar to the MaxZoneTempDiff parameter, larger MaxAllowedDelTemp values result in fewer iterations. To understand this input completely, please review the use of the MaxAllowedDetTemp variable in the CalcHeatBalanceInsideSurf2() routine located in the HeatBalanceSurfaceManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.002 ($^\circ$C), which is also the default value. Testing has been done with a value of 0.1, which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 0.1 have not been tested.
 
 
 \subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}
