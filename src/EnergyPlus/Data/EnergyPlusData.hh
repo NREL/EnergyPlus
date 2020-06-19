@@ -73,6 +73,7 @@
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/ZoneDehumidifier.hh>
 #include <unordered_map>
 #include <string>
 
