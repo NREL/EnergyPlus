@@ -91,7 +91,14 @@ void registerProgressCallback(void (*f)(int const)) {
     EnergyPlus::DataGlobals::progressCallback = f;
 }
 
-void registerStdOutCallback(void (*f)(const char * message)) {
+void registerStdOutCallback(void (*f)(const char *)) {
+    const auto stdf = [f](const std::string & message) {
+        f(message.c_str());
+    };
+    registerStdOutCallback(stdf);
+}
+
+void registerStdOutCallback(std::function<void (const std::string &)> f) {
     EnergyPlus::DataGlobals::messageCallback = f;
 }
 

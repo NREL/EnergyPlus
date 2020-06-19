@@ -53,6 +53,11 @@
 #include <EnergyPlus/api/EnergyPlusAPI.h>
 
 #ifdef __cplusplus
+
+#include <functional>
+
+ENERGYPLUSLIB_API void registerErrorCallback(std::function<void(EnergyPlus::Error e, const std::string &)> f);
+
 extern "C" {
 #endif
 
@@ -85,7 +90,7 @@ ENERGYPLUSLIB_API const char * apiVersionFromEPlus();
 ///          error message if needed.
 /// \remark A future version of this method will enable additional functionality including an argument indicating the
 ///         error type, and allowing the return value from this callback to determine how EnergyPlus should behave.
-ENERGYPLUSLIB_API void registerErrorCallback(void (*f)(const char * errorMessage));
+ENERGYPLUSLIB_API void registerErrorCallback(void (*f)(int, const char * errorMessage));
 
 
 /// \brief This typedef is a convenient pointer to an internal glycol property class inside EnergyPlus.

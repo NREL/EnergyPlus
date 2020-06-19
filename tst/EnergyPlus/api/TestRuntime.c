@@ -91,7 +91,7 @@ void progressHandler(int const progress) {
     }
 }
 
-void errorHandler(const char * message) {
+void errorHandler(int level, const char * message) {
     char * warning = strstr(message, "Warning");
     if (warning) {
         numWarnings++;

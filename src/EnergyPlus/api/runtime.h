@@ -71,7 +71,7 @@ ENERGYPLUSLIB_API void callbackEndOfZoneSizing(std::function<void ()> f);
 ENERGYPLUSLIB_API void callbackEndOfSystemSizing(std::function<void ()> f);
 ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(std::function<void ()> f);
 ENERGYPLUSLIB_API void callbackUnitarySystemSizing(std::function<void ()> f);
-//ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(std::function<void ()> f);
+ENERGYPLUSLIB_API void registerStdOutCallback(std::function<void (const std::string &)>);
 
 extern "C" {
 
@@ -118,6 +118,10 @@ ENERGYPLUSLIB_API void cClearAllStates();
 /// \see cClearAllStates
 /// \see requestVariable
 ENERGYPLUSLIB_API int energyplus(int argc, const char *argv[]);
+
+/// \brief Cleanly terminate the simulation
+/// \details This function is able to stop the simulation before reaching the end of a runperiod. Calling this function
+//           will ensure that all finalization routines are called and that all output files are closed.
 ENERGYPLUSLIB_API void stopSimulation();
 
 /// \brief Asks EnergyPlus to issue a warning message to the error file.

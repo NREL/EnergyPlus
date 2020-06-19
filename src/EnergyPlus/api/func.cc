@@ -64,8 +64,15 @@ const char * apiVersionFromEPlus() {
     return EnergyPlus::DataStringGlobals::PythonAPIVersion.c_str();
 }
 
-void registerErrorCallback(void (*f)(const char * errorMessage)) {
+void registerErrorCallback(std::function<void(EnergyPlus::Error, const std::string &)> f) {
     EnergyPlus::DataGlobals::errorCallback = f;
+}
+
+void registerErrorCallback(void (*f)(int, const char *)) {
+    const auto stdf = [f](EnergyPlus::Error e, const std::string & message) {
+        f(static_cast<int>(e), message.c_str());
+    };
+    registerErrorCallback(stdf);
 }
 
 Glycol glycolNew(const char* glycolName) {
