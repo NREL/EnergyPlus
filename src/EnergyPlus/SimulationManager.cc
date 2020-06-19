@@ -1209,46 +1209,45 @@ namespace SimulationManager {
                         // Zone Time step (TimeStep object) will be set to one timestep per hour
                         overrideTimestep = true;
                     } else if (overrideModeValue == "MODE02") {
-                        // Zone Time step (TimeStep object) will be set to one timestep per hour
-                        overrideTimestep = true;
-                        // Here add flags related to setting the System Timesteps: (to be implemented)
-                        ///////////////
-                        overrideSystemTimestep = true;
-                        // Set flags related to limiting system time step to 1 hr (via ConvergenceLimits)
-                        ///////////////
-                    } else if (overrideModeValue == "MODE03") {
                         // Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler
                         overrideTimestep = true;
-                        overrideSystemTimestep = true;
+                        // overrideSystemTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
-                    } else if (overrideModeValue == "MODE04") {
+                    } else if (overrideModeValue == "MODE03") {
                         // Mode02 plus Minimum Number of Warmup Days will be set to 1
                         overrideTimestep = true;
-                        overrideSystemTimestep = true;
+                        // overrideSystemTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
-                    } else if (overrideModeValue == "MODE05") {
+                    } else if (overrideModeValue == "MODE04") {
                         // Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets
                         overrideTimestep = true;
-                        overrideSystemTimestep = true;
+                        // overrideSystemTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
-                    } else if (overrideModeValue == "MODE06") {
-                        // Mode04 plus internal variable MaxZoneTempDiff will be set to 1.00
+                    } else if (overrideModeValue == "MODE05") {
+                        // Mode04 plus Minimun System Timestep will be set to 1hr
                         overrideTimestep = true;
-                        overrideSystemTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
+                        overrideSystemTimestep = true;
+                    } else if (overrideModeValue == "MODE06") {
+                        // Mode05 plus internal variable MaxZoneTempDiff will be set to 1.00
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                        overrideMinNumWarmupDays = true;
+                        overrideBeginEnvResetSuppress = true;
+                        overrideSystemTimestep = true;
                         overrideMaxZoneTempDiff = true;
                     } else if (overrideModeValue == "MODE07") {
-                        // New Mode07 (temporarily named Mode05a in order to keep other parts intact as much as possible
+                        // Mode06 plus internal variable MaxAllowedDelTemp will be set to 0.1
                         overrideTimestep = true;
-                        overrideSystemTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
+                        overrideSystemTimestep = true;
                         overrideMaxZoneTempDiff = true;
                         // To do: Add the flags related to the Max allowed Temperature change between iteration steps
                         //////////
@@ -1286,22 +1285,6 @@ namespace SimulationManager {
                         DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
                         DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
                     }
-                    if (overrideSystemTimestep) {
-                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the lower limit of System TimeSteps has been changed to 1 hr.");
-                        // DataGlobals::NumOfTimeStepInHour = 1;
-                        // DataGlobals::TimeStepZone = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
-                        // DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
-                        // DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
-                        // To do: Add code here for linking the Convergency Limit min system timestep
-                        // DataConvergParams::MinTimeStepSys = 6.0/60.0; // Perform override using 1hr.
-                        int MinTimeStepSysOverrideValue = 60.0;  // MinutesPerTimeStep; 30.0; 12.0; 6.0; 
-                        // MinTimeStepSys = 6.0 / 60.0; // Perform override using 1hr.
-                        if (MinTimeStepSysOverrideValue > MinutesPerTimeStep) {
-                                MinTimeStepSysOverrideValue = MinutesPerTimeStep;
-                        }
-                        MinTimeStepSys = MinTimeStepSysOverrideValue / 60.0; 
-                        LimitNumSysSteps = int(TimeStepZone / MinTimeStepSys);
-                    }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(
                             "Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
@@ -1316,6 +1299,23 @@ namespace SimulationManager {
                         ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Begin Environment Reset Mode has been changed to "
                                          "SuppressAllBeginEnvironmentResets.");
                         DataEnvironment::forceBeginEnvResetSuppress = true;
+                    }
+                    if (overrideSystemTimestep) {
+                        ShowWarningError(
+                            "Due to PerformancePrecisionTradeoffs Override Mode, the lower limit of System TimeSteps has been changed to 1 hr.");
+                        // DataGlobals::NumOfTimeStepInHour = 1;
+                        // DataGlobals::TimeStepZone = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
+                        // DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
+                        // DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
+                        // To do: Add code here for linking the Convergency Limit min system timestep
+                        // DataConvergParams::MinTimeStepSys = 6.0/60.0; // Perform override using 1hr.
+                        int MinTimeStepSysOverrideValue = 60.0; // MinutesPerTimeStep; 30.0; 12.0; 6.0;
+                        // MinTimeStepSys = 6.0 / 60.0; // Perform override using 1hr.
+                        if (MinTimeStepSysOverrideValue > MinutesPerTimeStep) {
+                            MinTimeStepSysOverrideValue = MinutesPerTimeStep;
+                        }
+                        MinTimeStepSys = MinTimeStepSysOverrideValue / 60.0;
+                        LimitNumSysSteps = int(TimeStepZone / MinTimeStepSys);
                     }
                     if (overrideMaxZoneTempDiff) {
                         ShowWarningError(
