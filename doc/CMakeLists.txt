@@ -4,6 +4,13 @@ cmake_minimum_required(VERSION 3.5.1)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+if(NOT EXISTS ${PYTHON_EXECUTABLE})
+  # we are making *a Python 3.6 Interpreter* a required dependency, so find it here
+  find_package(PythonInterp 3.6 REQUIRED)
+endif()
+
+option( DOCS_TESTING "Test the docs for issues" OFF )
+
 # this _should_ find the xelatex compiler, but for some reason it isn't populating for me
 find_package(LATEX)
 # so we'll create a cache variable which will be available to the add_subdirectory call below
@@ -14,7 +21,7 @@ string(REPLACE pdflatex xelatex XELATEX ${PDFLATEX_COMPILER})
 set(TEX_INTERACTION "batchmode" CACHE STRING "Choose the interaction mode for TeX.")
 set_property(CACHE TEX_INTERACTION PROPERTY STRINGS "nonstopmode" "batchmode")
 if( EXISTS ${XELATEX} )
-# and if it does, just add the doc/CMakeLists commands
+  # and if it does, just add the doc/CMakeLists commands
   # let's create a folder to drop ONLY PDFs in once they are built, this will allow easy upload to s3
   file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/pdf)
   file(COPY ${PROJECT_SOURCE_DIR}/index.html DESTINATION ${PROJECT_BINARY_DIR}/pdf)

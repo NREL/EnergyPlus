@@ -106,6 +106,13 @@ namespace FileSystem {
 
     std::string getAbsolutePath(std::string const &path)
     {
+        /*
+         * Returns the absolute path for a given relative path.
+         *
+         * If the relative path points to a symlink, the symlink will
+         * be resolved, and this function will return the absolute path
+         * of the link.
+         */
 
 #ifdef _WIN32
         char absolutePath[1024];
@@ -142,6 +149,11 @@ namespace FileSystem {
 
     std::string getProgramPath()
     {
+        /*
+         * Returns the relative path to the executable file (including symlinks).
+         *
+         * To resolve symlinks, wrap this call in getAbsolutePath().
+         */
         char executableRelativePath[1024];
 
 #ifdef __APPLE__

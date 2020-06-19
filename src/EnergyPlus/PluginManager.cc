@@ -127,7 +127,7 @@ namespace PluginManagement {
         // In this case, the current executable path will be the E+ install root
         // Which is where we find the Python Wrapper Shared Library
         if (wrapperDLLHandle) return; // already found
-        std::string programPath = FileSystem::getProgramPath();
+        std::string programPath = FileSystem::getAbsolutePath(FileSystem::getProgramPath());
         std::string programDir = FileSystem::getParentDirectoryPath(programPath);
         std::string sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
         // set the path to the python library
@@ -777,7 +777,7 @@ namespace PluginManagement {
     {
 #if LINK_WITH_PYTHON == 1
         // we'll need the program directory for a few things so get it once here at the top and sanitize it
-        std::string programPath = FileSystem::getProgramPath();
+        std::string programPath = FileSystem::getAbsolutePath(FileSystem::getProgramPath());
         std::string programDir = FileSystem::getParentDirectoryPath(programPath);
         std::string sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
 
