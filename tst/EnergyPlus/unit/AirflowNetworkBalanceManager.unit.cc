@@ -19784,7 +19784,7 @@ std::string const idf_objects = delimited_string({
     DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(1) = 1;
     DataZoneEquipment::ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
     AirflowNetwork::DisSysNodeData(9).EPlusNodeNum = 50;
-    AirflowNetwork::AirflowNetworkExchangeData.allocate(5);
+    // AirflowNetwork::AirflowNetworkExchangeData.allocate(5);
     ManageAirflowNetworkBalance(state, true);
     EXPECT_EQ(AirflowNetwork::DisSysCompCVFData(1).AirLoopNum,1);
 
