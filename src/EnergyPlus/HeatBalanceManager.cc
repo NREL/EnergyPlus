@@ -5519,6 +5519,17 @@ namespace HeatBalanceManager {
 
         ZoneHeatIndex.dimension(NumOfZones, 0.0);
         ZoneHumidex.dimension(NumOfZones, 0.0);
+        ZoneNumOcc.dimension(NumOfZones, 0);
+        ZoneHeatIndexHourBins.allocate(NumOfZones);
+        ZoneHumidexHourBins.allocate(NumOfZones);
+        ZoneHeatIndexOccuHourBins.allocate(NumOfZones);
+        ZoneHumidexOccuHourBins.allocate(NumOfZones);
+
+        ZoneOccPierceSET.dimension(NumOfZones, 0);
+        ZoneOccPierceSETLastStep.dimension(NumOfZones, 0);
+        ZoneLowSETHours.allocate(NumOfZones);
+        ZoneHighSETHours.allocate(NumOfZones);
+
         CountWarmupDayPoints = 0;
     }
 

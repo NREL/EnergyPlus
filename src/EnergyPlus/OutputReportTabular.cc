@@ -80,6 +80,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
@@ -1999,7 +2000,7 @@ namespace OutputReportTabular {
             for (iReport = 1; iReport <= NumAlphas; ++iReport) {
                 nameFound = false;
                 if (AlphArray(iReport).empty()) {
-                    ShowFatalError("Blank report name in Oputput:Table:SummaryReports");
+                    ShowFatalError("Blank report name in Output:Table:SummaryReports");
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AnnualBuildingUtilityPerformanceSummary")) {
                     displayTabularBEPS = true;
                     WriteTabularFiles = true;
@@ -5702,6 +5703,8 @@ namespace OutputReportTabular {
             WriteEioTables(OutputFiles::getSingleton());
             WriteLoadComponentSummaryTables();
             WriteHeatEmissionTable();
+
+            if (displayThermalResilienceSummary) WriteThermalResilienceTables();
 
             coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
             WritePredefinedTables();                                // moved to come after zone load components is finished
@@ -11245,6 +11248,212 @@ namespace OutputReportTabular {
                 ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Adaptive Comfort Report", "Entire Facility", "People Summary");
             }
+        }
+    }
+
+    void WriteResilienceBinsTable(int const columnNum,
+                                  std::string const tblTitle,
+                                  std::string const tblSubTitle,
+                                  std::string const sqlTitle,
+                                  std::vector<std::string> const &columnHeadNames,
+                                  Array1D<std::vector<double>> const &ZoneBins)
+    {
+        Array1D_string columnHead;
+        Array1D_int columnWidth;
+        Array1D_string rowHead;
+        Array2D_string tableBody;
+
+        WriteSubtitle(tblSubTitle);
+
+        columnHead.allocate(columnNum);
+        rowHead.allocate(NumOfZones + 4);
+        tableBody.allocate(columnNum, NumOfZones + 4);
+        columnWidth.allocate(columnNum);
+        columnWidth = 10;
+
+        for (int j = 0; j < columnNum; j++) {
+            columnHead(j + 1) = columnHeadNames[j];
+        }
+        tableBody = "";
+        std::vector<double> columnMax(columnNum, 0);
+        std::vector<double> columnMin(columnNum, 0);
+        std::vector<double> columnSum(columnNum, 0);
+        for (int j = 0; j < columnNum; j++) {
+            columnMin[j] = ZoneBins(1)[j];
+        }
+        for (int i = 1; i <= NumOfZones; ++i) {
+            rowHead(i) = Zone(i).Name;
+            for (int j = 0; j < columnNum; j++) {
+                double curValue = ZoneBins(i)[j];
+                if (curValue > columnMax[j]) columnMax[j] = curValue;
+                if (curValue < columnMin[j]) columnMin[j] = curValue;
+                columnSum[j] += curValue;
+                tableBody(j + 1, i) = RealToStr(curValue, 2);
+            }
+        }
+        rowHead(NumOfZones + 1) = "Min";
+        rowHead(NumOfZones + 2) = "Max";
+        rowHead(NumOfZones + 3) = "Average";
+        rowHead(NumOfZones + 4) = "Sum";
+        for (int j = 0; j < columnNum; j++) {
+            tableBody(j + 1, NumOfZones + 1) = RealToStr(columnMin[j], 2);
+            tableBody(j + 1, NumOfZones + 2) = RealToStr(columnMax[j], 2);
+            tableBody(j + 1, NumOfZones + 3) = RealToStr(columnSum[j] / NumOfZones, 2);
+            tableBody(j + 1, NumOfZones + 4) = RealToStr(columnSum[j], 2);
+        }
+
+        WriteTable(tableBody, rowHead, columnHead, columnWidth);
+        if (sqlite) {
+            sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, sqlTitle, "Entire Facility", tblSubTitle);
+        }
+        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead,  tblTitle, "Entire Facility", tblSubTitle);
+        }
+    }
+
+    void WriteSETHoursTable(int const columnNum,
+                            std::string const tblSubTitle,
+                            std::vector<std::string> const &columnHeadNames,
+                            Array1D<std::vector<double>> const &ZoneBins)
+    {
+        Array1D_string columnHead;
+        Array1D_int columnWidth;
+        Array1D_string rowHead;
+        Array2D_string tableBody;
+        std::string tblTitle = "Annual Thermal Resilience Summary";
+        std::string sqlTitle = "AnnualThermalResilienceSummary";
+
+        WriteSubtitle(tblSubTitle);
+
+        columnHead.allocate(columnNum);
+        rowHead.allocate(NumOfZones + 3);
+        tableBody.allocate(columnNum, NumOfZones + 3);
+        columnWidth.allocate(columnNum);
+        columnWidth = 10;
+
+        for (int j = 0; j < columnNum; j++) {
+            columnHead(j + 1) = columnHeadNames[j];
+        }
+        tableBody = "";
+        std::vector<double> columnMax(columnNum - 1, 0);
+        std::vector<double> columnMin(columnNum - 1, 0);
+        std::vector<double> columnSum(columnNum - 1, 0);
+        for (int j = 0; j < columnNum - 1; j++) {
+            columnMin[j] = ZoneBins(1)[j];
+        }
+        for (int i = 1; i <= NumOfZones; ++i) {
+            rowHead(i) = Zone(i).Name;
+            for (int j = 0; j < columnNum - 1; j++) {
+                double curValue = ZoneBins(i)[j];
+                if (curValue > columnMax[j]) columnMax[j] = curValue;
+                if (curValue < columnMin[j]) columnMin[j] = curValue;
+                columnSum[j] += curValue;
+                tableBody(j + 1, i) = RealToStr(curValue, 2);
+            }
+            std::string startDateTime = DateToString(int(ZoneBins(i)[columnNum - 1]));
+            tableBody(columnNum, i) = startDateTime;
+        }
+        rowHead(NumOfZones + 1) = "Min";
+        rowHead(NumOfZones + 2) = "Max";
+        rowHead(NumOfZones + 3) = "Average";
+        for (int j = 0; j < columnNum; j++) {
+            tableBody(j + 1, NumOfZones + 1) = RealToStr(columnMin[j], 2);
+            tableBody(j + 1, NumOfZones + 2) = RealToStr(columnMax[j], 2);
+            tableBody(j + 1, NumOfZones + 3) = RealToStr(columnSum[j] / NumOfZones, 2);
+        }
+        tableBody(columnNum, NumOfZones + 1) = "-";
+        tableBody(columnNum, NumOfZones + 2) = "-";
+        tableBody(columnNum, NumOfZones + 3) = "-";
+
+        WriteTable(tableBody, rowHead, columnHead, columnWidth);
+        if (sqlite) {
+            sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, sqlTitle, "Entire Facility", tblSubTitle);
+        }
+        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead,  tblTitle, "Entire Facility", tblSubTitle);
+        }
+    }
+
+    void WriteThermalResilienceTables()
+    {
+
+        // Using/Aliasing
+        using DataHeatBalFanSys::ZoneHeatIndexHourBins;
+        using DataHeatBalFanSys::ZoneHeatIndexOccuHourBins;
+        using DataHeatBalFanSys::ZoneHumidexHourBins;
+        using DataHeatBalFanSys::ZoneHumidexOccuHourBins;
+        using DataHeatBalFanSys::ZoneLowSETHours;
+        using DataHeatBalFanSys::ZoneHighSETHours;
+
+        if (NumOfZones > 0) {
+            std::string tblTitle = "Annual Thermal Resilience Summary";
+            std::string sqlTitle = "AnnualThermalResilienceSummary";
+            WriteReportHeaders(tblTitle, "Entire Facility", OutputProcessor::StoreType::Averaged);
+
+            int columnNum = 5;
+            std::string subTitle = "Heat Index Hours";
+            std::vector<std::string> columnHeadNames = { "Safe (≤ 80°F) [Hours]",
+                                                         "Caution (80, 90°F] [Hours]",
+                                                         "Extreme Caution (90, 105°F] [Hours]",
+                                                         "Danger (105, 130°F] [Hours]",
+                                                         "Extreme Danger (> 130°F) [Hours]" };
+            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneHeatIndexHourBins);
+
+            subTitle = "Heat Index OccupantHours";
+            columnHeadNames = { "Safe (≤ 80°F) [OccupantHours]",
+                                "Caution (80, 90°F] [OccupantHours]",
+                                "Extreme Caution (90, 105°F] [OccupantHours]",
+                                "Danger (105, 130°F] [OccupantHours]",
+                                "Extreme Danger (> 130°F) [OccupantHours]" };
+            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneHeatIndexOccuHourBins);
+
+            subTitle = "Humidex Hours";
+            columnHeadNames = { "Little to no Discomfort (≤ 29) [Hours]",
+                                "Some Discomfort (29, 40] [Hours]",
+                                "Great Discomfort; Avoid Exertion (40, 45] [Hours]",
+                                "Dangerous (45, 50] [Hours]",
+                                "Heat Stroke Quite Possible (> 50) [Hours]" };
+            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneHumidexHourBins);
+
+            subTitle = "Humidex OccupantHours";
+            columnHeadNames = { "Little to no Discomfort (≤ 29) [OccupantHours]",
+                                "Some Discomfort (29, 40] [OccupantHours]",
+                                "Great Discomfort; Avoid Exertion (40, 45] [OccupantHours]",
+                                "Dangerous (45, 50] [OccupantHours]",
+                                "Heat Stroke Quite Possible (> 50) [OccupantHours]" };
+            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneHumidexOccuHourBins);
+
+            bool hasPierceSET = true;
+            if (TotPeople == 0) {
+                hasPierceSET = false;
+                ShowWarningError( "Writing Annual Thermal Resilience Summary - SET Hours reports: "
+                                  "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
+                                  "but no People object is defined.");
+            }
+            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+                if (!People(iPeople).Pierce) {
+                    hasPierceSET = false;
+                    ShowWarningError( "Writing Annual Thermal Resilience Summary - SET Hours reports: "
+                                      "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
+                                      "but no Pierce model is defined in " + People(iPeople).Name + " object.");
+                }
+            }
+
+            if (hasPierceSET) {
+                columnNum = 4;
+                subTitle = "Heating SET Hours";
+                columnHeadNames = {"SET ≤ 12.2°C Hours (°C)", "SET ≤ 12.2°C OccupantHours (°C)",
+                                   "Longest SET ≤ 12.2°C Duration [Hours]", "Start Time of the Longest SET ≤ 12.2°C Duration"};
+                WriteSETHoursTable(columnNum, subTitle, columnHeadNames, ZoneLowSETHours);
+
+                subTitle = "Cooling SET Hours";
+                columnHeadNames = {"SET > 30°C Hours (°C)", "SET > 30°C OccupantHours (°C)",
+                                   "Longest SET > 30°C Duration [Hours]", "Start Time of the Longest SET > 30°C Duration"};
+                WriteSETHoursTable(columnNum, subTitle, columnHeadNames, ZoneHighSETHours);
+            }
+
         }
     }
 

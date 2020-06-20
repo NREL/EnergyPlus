@@ -16,7 +16,7 @@ EnergyPlus currently calculates at each time-step a set of variables (e.g., zone
 
 ## Overview ##
 
-We reviewed literature on resilience metrics [1] and propose to add the following metrics in EnergyPlus on thermal, visual, and indoor air quality (IAQ) resilience as optional report variables and summary tables. Each metric can be calculated and reported when users declare it as an input. The selected resilience metrics (e.g., thermal metrics: Heat Index, Humidex, and SET) are well defined, calculable, and have been adopted by government agency and industry.
+We reviewed literature on resilience metrics [1] and propose to add the following metrics in EnergyPlus on thermal, visual, and indoor air quality - CO<sub>2</sub> resilience as optional report variables and summary tables. Each metric can be calculated and reported when users declare it as an input. The selected resilience metrics (e.g., thermal metrics: Heat Index, Humidex, and SET) are well defined, calculable, and have been adopted by government agency and industry.
 
 
 1. Thermal Resilience
@@ -25,7 +25,7 @@ We reviewed literature on resilience metrics [1] and propose to add the followin
 
 The heat index (HI) is an index that combines air temperature and relative humidity (Steadman 1979), in shaded areas, to posit a human-perceived equivalent temperature, as how hot it would feel if the humidity were some other value in the shade. The HI measures the temperature feels like to the human body when relative humidity is combined with the air temperature. HI is widely used in the United States. The Occupational Safety and Health Administration (OSHA) uses HI as an indicator to assess heat stress [2]. This has important considerations for the human body's comfort.  When the body gets too hot, it begins to perspire or sweat to cool itself off.  If the perspiration is not able to evaporate, the body cannot regulate its temperature. When the atmospheric moisture content (i.e. relative humidity) is high, the rate of evaporation from the body decreases.  In other words, the human body feels warmer in humid conditions.  The opposite is true when the relative humidity decreases because the rate of perspiration increases.  
 
-Table 1 developed by U.S. National Oceanic and Atmospheric Administration (NOAA) is used to look up the heat index by temperature (°C) and relative humidity (%). The HI effects on human health are categorized at four levels: Caution, Extreme caution, Danger and Extreme danger, defined in Table 2 and color coded in Table 1.
+Table 1 developed by U.S. National Oceanic and Atmospheric Administration (NOAA) is used to look up the heat index by temperature (°C) and relative humidity (%). The HI effects on human health are categorized at five levels: Safe, Caution, Extreme caution, Danger and Extreme danger, defined in Table 2 and color coded in Table 1.
 
 **Table 1. Heat Index lookup table**
 
@@ -34,41 +34,59 @@ Table 1 developed by U.S. National Oceanic and Atmospheric Administration (NOAA)
 **Table 2. Definition of four levels of Heat Index**
 |Heat Index in Celsius|Heat Index in Fahrenheit|Heat Index Level                                                                                                   |
 |---------------------|------------------------|-------------------------------------------------------------------------------------------------------------------|
-|Less than 26 °C      |Less than 80 °F         |Safe: no risk of heat hazard                                                                                       |
-|26-32 °C             |80–90 °F                |Caution: fatigue is possible with prolonged exposure and activity. Continuing activity could result in heat cramps.|
-|32-41 °C             |90–105 °F               |Extreme caution: heat cramps and heat exhaustion are possible. Continuing activity could result in heat stroke.    |
-|41-54 °C             |105–130 °F              |Danger: heat cramps and heat exhaustion are likely; heat stroke is probable with continued activity.               |
-|over 54 °C           |over 130 °F             |Extreme danger: heat stroke is imminent.                                                                           |
+|Less than 26.7 °C    |Less than 80 °F         |Safe: no risk of heat hazard                                                                                       |
+|26.7 - 32.2 °C       |80–90 °F                |Caution: fatigue is possible with prolonged exposure and activity. Continuing activity could result in heat cramps.|
+|32.2 - 40.6 °C       |90–105 °F               |Extreme caution: heat cramps and heat exhaustion are possible. Continuing activity could result in heat stroke.    |
+|40.6 - 54.4 °C       |105–130 °F              |Danger: heat cramps and heat exhaustion are likely; heat stroke is probable with continued activity.               |
+|over 54.4 °C         |over 130 °F             |Extreme danger: heat stroke is imminent.  
+                                                                         
+The computation of the heat index is a refinement of a result obtained by multiple regression analysis carried out by Lans P. Rothfusz and described in a 1990 National Weather Service (NWS) Technical Attachment (SR 90-23). The calculation is based on degree Fahrenheit.
 
-We adopt the formula derived by Anderson et al. to approximate the original tables by Steadman [3,4]. It is the result of a multivariate fit to a model of the human body. This equation reproduces Table 1 (except the values at 90 °F (32 °C) and 45%/70% relative humidity vary unrounded by less than ±1, respectively) [5].
+The regression equation of Rothfusz is
 
 HI = c<sub>1</sub> + c<sub>2</sub>T + c<sub>3</sub>R + c<sub>4</sub>TR + c<sub>5</sub>T<sup>2</sup> + c<sub>6</sub>R<sup>2</sup> + c<sub>7</sub>T<sup>2</sup>R + c<sub>8</sub>TR<sup>2</sup> + c<sub>9</sub>T<sup>2</sup>R<sup>2</sup> &nbsp;&nbsp; Eq. (1)
 
 where
 
-HI = heat index (in degrees Celsius),
+HI = heat index (expressed as an apparent temperature in degrees Fahrenheit),
 
-T = ambient dry-bulb temperature (in degrees Celsius),
+T = ambient dry-bulb temperature (in degrees Fahrenheit),
 
 R = relative humidity (percentage value between 0 and 100),
 
-c1 = -8.78469475556,
+c1 = -42.379,
 
-c2 = 1.61139411,
+c2 = 2.04901523,
 
-c3 = 2.33854883889,
+c3 = 10.14333127,
 
-c4 = -0.14611605,
+c4 = .22475541,
 
-c5 = -0.012308094,
+c5 = .00683783,
 
-c6 = -0.0164248277778,
+c6 = .05481717,
 
-c7 = 0.002211732,
+c7 = .00122874,
 
-c8 = 0.00072546,
+c8 = .00085282,
 
-c9 = -0.000003582.
+c9 = .00000199.
+
+If the RH is less than 13% and the temperature is between 80 and 112 degrees F, then the following adjustment is subtracted from HI:
+
+HI = (13 - R) / 4 * (17 - |T - 95|)^{0.5}; &nbsp;&nbsp; Eq. (2)
+
+Otherwise, if the RH is greater than 85% and the temperature is between 80 and 87 degrees F, then the following adjustment is added to HI:
+
+HI = (R - 85) / 10 * (87 - T) / 5;  &nbsp;&nbsp; Eq. (3)
+
+The Rothfusz regression is not appropriate when conditions of temperature and humidity warrant a heat index value below about 80 degrees F. In those cases, a simpler formula is applied to calculate values consistent with Steadman's results:
+
+HI = 0.5 * (T + 61.0 + (T - 68.0) * 1.2 + (RH * 0.094));  &nbsp;&nbsp; Eq. (4)
+
+In practice, the simple formula is computed first and the result averaged with the temperature. If this heat index value is 80 degrees F or higher, the full regression equation along with any adjustment as described above is applied.
+
+The Rothfusz regression is not valid for extreme temperature and relative humidity conditions beyond the range of data considered by Steadman.
 
 For HI, we propose to:
 
@@ -80,19 +98,24 @@ For HI, we propose to:
 
 The humidex (short for humidity index) is an index number used by Canadian meteorologists to describe how hot the weather feels to the average person, by combining the effect of heat and humidity. The term humidex was first coined in 1965 [6]. The humidex is a nominally dimensionless quantity (though generally recognized by the public as equivalent to the degree Celsius) based on the dew-point temperature [7].
 
-The standard scale of comfort based on Humidex is:
+The Humidex effects on human health are categorized at five levels: Little to no discomfort, Some discomfort, Great discomfort; avoid exertion, Dangerous and Heat stroke imminent, defined in Table 3 and color coded in Table 4.
 
-**Table 3. Definition of four levels of Humidex**
+**Table 3. Humidex lookup table**
+
+![Diagram](Humidex_Chart.jpg)
+
+**Table 4. Definition of four levels of Humidex**
 |Humidex Value  |Humidex Level  |
 |---------------|---------------|
-|20 to 29       |Little to no discomfort|
+|Below 29       |Little to no discomfort|
 |29 to 40       |Some discomfort|
 |40 to 45       |Great discomfort; avoid exertion|
-|Above 45       |Dangerous; heat stroke quite possible.|
+|45 to 50       |Dangerous|
+|Above 50       |Heat stroke imminent|
 
 The humidex (H) formula is:
 
-$H = T_{air} + \frac{5}{9}(6.11 * exp^{5417.7530 * (\frac{1}{273.16} - \frac{1}{273.15 + T_{dew}})} - 10)$ &nbsp;&nbsp; Eq. (2)
+$H = T_{air} + \frac{5}{9}(6.11 * exp^{5417.7530 * (\frac{1}{273.16} - \frac{1}{273.15 + T_{dew}})} - 10)$ &nbsp;&nbsp; Eq. (5)
 
 Where,
 
@@ -123,7 +146,7 @@ LEED Passive Survivability defines the Thermal Safety Temperatures for Path 2 us
 
 EnergyPlus calculates and reports SET as a time-step report variable. We propose to calculate the aggregated the SET-Hours and the SET-OccupantHours (at zone level) for both cooling and heating as one of the tabular reports for thermal resilience. We would also report the longest continuous unmet time duration in hours and the time of their occurrences.
 
-2. Indoor Air Quality
+2. Indoor Air Quality - CO<sub>2</sub>
 
 For indoor air quality, we chose to use CO<sub>2</sub> concentration at the zone level as an indicator. CO<sub>2</sub> at very high concentrations (e.g., greater than 5,000 ppm) can pose a health risk, referring to Appendix D Summary of Selected Air Quality Guidelines in ASHRAE Standard 62.1-2016, "Ventilation for Acceptable Indoor Air Quality". At concentrations above 15,000 ppm, some loss of mental acuity has been noted. The Occupational Safety and Health Administration (OSHA) of the US Department of Labor defined the Permissible Exposure Limits (PEL) and Short-Term Exposure Limit (STEL) of CO2 level to be 5,000 ppm and 30,000 ppm accordingly [10].
 
@@ -219,19 +242,31 @@ For: **Entire Facility**
 
 **Humidex Hours**
 
-|          |Little to no discomfort (≤ 29) [Hours] |Some discomfort (29, 40] [Hours] |Great discomfort; avoid exertion (40, 45] [Hours] |Dangerous; heat stroke quite possible (> 45) [Hours] |
-|----------|------|------|------|------|
-|Space_1   |      |      |      |      |
-|…         |      |      |      |      |
-|Space_N   |      |      |      |      |
-|Min       |      |      |      |      |
-|Max       |      |      |      |      |
-|Average   |      |      |      |      |
-|Sum       |      |      |      |      |
+|          |Little to No Discomfort (≤ 29) [Hours] |Some Discomfort (29, 40] [Hours] |Great Discomfort; Avoid Exertion (40, 45] [Hours] |Dangerous (45, 50] [Hours] |Heat Stroke Quite Possible (> 50) [Hours] |
+|----------|------|------|------|------|------|
+|Space_1   |      |      |      |      |      |
+|…         |      |      |      |      |      |
+|Space_N   |      |      |      |      |      |
+|Min       |      |      |      |      |      |
+|Max       |      |      |      |      |      |
+|Average   |      |      |      |      |      |
+|Sum       |      |      |      |      |      |
 
 **Humidex OccupantHours**
 
-|          |Little to no discomfort (≤ 29) [OccupantHours] |Some discomfort (29, 40] [OccupantHours] |Great discomfort; avoid exertion (40, 45] [OccupantHours] |Dangerous; heat stroke quite possible (> 45) [OccupantHours] |
+|          |Little to No Discomfort (≤ 29) [OccupantHours] |Some Discomfort (29, 40] [OccupantHours] |Great Discomfort; Avoid Exertion (40, 45] [OccupantHours] |Dangerous (45, 50] [OccupantHours] |Heat Stroke Quite Possible (> 50) [OccupantHours] |
+|----------|------|------|------|------|------|
+|Space_1   |      |      |      |      |      |
+|…         |      |      |      |      |      |
+|Space_N   |      |      |      |      |      |
+|Min       |      |      |      |      |      |
+|Max       |      |      |      |      |      |
+|Average   |      |      |      |      |      |
+|Sum       |      |      |      |      |      |
+
+**Heating SET Hours**
+
+|          |SET ≤ 12.2°C Hours (°C)|SET ≤ 12.2°C OccupantHours (°C)|Longest SET ≤ 12.2°C Duration [Hours] |Start Time of the Longest SET ≤ 12.2°C Duration|
 |----------|------|------|------|------|
 |Space_1   |      |      |      |      |
 |…         |      |      |      |      |
@@ -239,32 +274,10 @@ For: **Entire Facility**
 |Min       |      |      |      |      |
 |Max       |      |      |      |      |
 |Average   |      |      |      |      |
-|Sum       |      |      |      |      |
 
-**SET Hours**
-|          |SET ≤ 12.2°C Hours |SET ∈ (12.2, 30°C] Hours |SET > 30°C Hours |
-|----------|------|------|------|
-|Space_1   |      |      |      |
-|…         |      |      |      |
-|Space_N   |      |      |      |
-|Min       |      |      |      | 
-|Max       |      |      |      |
-|Average   |      |      |      |
-|Sum       |      |      |      |
+**Cooling SET Hours**
 
-**SET OccupantHours**
-|          |SET ≤ 12.2°C OccupantHours |SET ∈ (12.2, 30°C] OccupantHours |SET > 30°C OccupantHours |
-|----------|------|------|------|
-|Space_1   |      |      |      |
-|…         |      |      |      | 
-|Space_N   |      |      |      |
-|Min       |      |      |      |
-|Max       |      |      |      |
-|Average   |      |      |      |
-|Sum       |      |      |      |
-
-**SET Longest Continuous Unmet Duration**
-|          |Longest SET ≤ 12.2°C Duration [Hours] |Time of Longest SET ≤ 12.2°C Duration |Longest SET >30°C Duration [Hours] |Time of Longest SET >30°C Duration |
+|          |SET > 30°C Hours (°C)|SET > 30°C OccupantHours (°C)|Longest SET > 30°C Duration [Hours] |Start Time of the Longest SET > 30°C Duration|
 |----------|------|------|------|------|
 |Space_1   |      |      |      |      |
 |…         |      |      |      |      |
@@ -272,8 +285,6 @@ For: **Entire Facility**
 |Min       |      |      |      |      |
 |Max       |      |      |      |      |
 |Average   |      |      |      |      |
-|Sum       |      |      |      |      |
-
 
 Report: **Indoor Air Quality Resilience Summary**
 
@@ -343,8 +354,8 @@ To be developed.
 
 The `Output:Table:SummaryReports` object will be modified to take three new keys as the choice:
 - **ThermalResilienceSummary** for indoor thermal resilience unmet hours & occupant·hours summary report
-- **IAQResilienceHoursSummary** for indoor air quality resilience unmet hours & occupant·hours summary report
-- **VisualResilienceHoursSummary** for indoor illuminance resilience unmet hours & occupant·hours summary report
+- **CO2ResilienceSummary** for indoor air quality - CO<sub>2</sub> resilience unmet hours & occupant·hours summary report
+- **VisualResilienceSummary** for indoor illuminance resilience unmet hours & occupant·hours summary report
 
 ## Outputs Description ##
 

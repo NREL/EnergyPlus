@@ -234,6 +234,17 @@ namespace DataHeatBalFanSys {
 
     extern Array1D<Real64> ZoneHeatIndex;
     extern Array1D<Real64> ZoneHumidex;
+    extern Array1D_int ZoneNumOcc;
+
+    extern Array1D<std::vector<double>> ZoneHeatIndexHourBins;
+    extern Array1D<std::vector<double>> ZoneHumidexHourBins;
+    extern Array1D<std::vector<double>> ZoneHeatIndexOccuHourBins;
+    extern Array1D<std::vector<double>> ZoneHumidexOccuHourBins;
+
+    extern Array1D<Real64> ZoneOccPierceSET;
+    extern Array1D<Real64> ZoneOccPierceSETLastStep;
+    extern Array1D<std::vector<Real64>> ZoneLowSETHours;
+    extern Array1D<std::vector<Real64>> ZoneHighSETHours;
 
     // Types
 

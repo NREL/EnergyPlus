@@ -4870,50 +4870,199 @@ namespace HeatBalanceSurfaceManager {
 
     void ReportThermalResilience() {
 
-        double c1 = -8.78469475556;
-        double c2 = 1.61139411;
-        double c3 = 2.33854883889;
-        double c4 = -0.14611605;
-        double c5 = -0.012308094;
-        double c6 = -0.0164248277778;
-        double c7 = 0.002211732;
-        double c8 = 0.00072546;
-        double c9 = -0.000003582;
+        double c1 = -42.379;
+        double c2 = 2.04901523;
+        double c3 = 10.14333127;
+        double c4 = -.22475541;
+        double c5 = -.00683783;
+        double c6 = -.05481717;
+        double c7 = .00122874;
+        double c8 = .00085282;
+        double c9 = -.00000199;
 
-        if (ManageSurfaceHeatBalancefirstTime) {
+        int HINoBins = 5; // Heat Index range - number of bins
+        int HumidexNoBins = 5; // Humidex range - number of bins
+        int SETNoBins = 4; // SET report column numbers
+        static std::vector<double> lowSETLongestHours(NumOfZones, 0.0);
+        static std::vector<double> highSETLongestHours(NumOfZones, 0.0);
+        static std::vector<int> lowSETLongestStart(NumOfZones, 0.0);
+        static std::vector<int> highSETLongestStart(NumOfZones, 0.0);
+        static bool hasPierceSET = true;
+
+
+        if (BeginSimFlag) {
+            if (TotPeople == 0) hasPierceSET = false;
+            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+                if (!People(iPeople).Pierce) {
+                    hasPierceSET = false;
+                }
+            }
+
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                ZoneHeatIndexHourBins(ZoneNum).resize(HINoBins, 0.0);
+                ZoneHeatIndexOccuHourBins(ZoneNum).resize(HINoBins, 0.0);
+                ZoneHumidexHourBins(ZoneNum).resize(HumidexNoBins, 0.0);
+                ZoneHumidexOccuHourBins(ZoneNum).resize(HumidexNoBins, 0.0);
+                if (hasPierceSET) {
+                    ZoneLowSETHours(ZoneNum).resize(SETNoBins, 0.0);
+                    ZoneHighSETHours(ZoneNum).resize(SETNoBins, 0.0);
+                }
                 SetupOutputVariable("Zone Heat Index",
                                     OutputProcessor::Unit::C,
-                                    DataHeatBalFanSys::ZoneHeatIndex(ZoneNum),
+                                    ZoneHeatIndex(ZoneNum),
                                     "Zone",
                                     "State",
                                     Zone(ZoneNum).Name);
-                SetupOutputVariable("Zone Humidity Index ",
+                SetupOutputVariable("Zone Humidity Index",
                                     OutputProcessor::Unit::None,
-                                    DataHeatBalFanSys::ZoneHumidex(ZoneNum),
+                                    ZoneHumidex(ZoneNum),
                                     "Zone",
                                     "State",
                                     Zone(ZoneNum).Name);
             }
 
         }
+
+        // Calculate Heat Index and Humidex.
+        // The heat index equation set is fit to Fahrenheit units, so the zone air temperature values are first convert to F,
+        // then heat index is calculated and converted back to C.
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
-            double ZoneT = DataHeatBalFanSys::ZTAV(ZoneNum);
-            double ZoneW = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
-            double ZoneRH = Psychrometrics::PsyRhFnTdbWPb(ZoneT, ZoneW, OutBaroPress);
-            double HI = c1 + c2 * ZoneT + c3 * ZoneRH + c4 * ZoneT * ZoneRH +
-                        c5 * ZoneT * ZoneT + c6 * ZoneRH * ZoneRH +
-                        c7 * ZoneT * ZoneT * ZoneRH + c8 * ZoneT * ZoneRH * ZoneRH +
-                        c9 * ZoneT * ZoneT * ZoneRH * ZoneRH;
+            double ZoneT = ZTAV(ZoneNum);
+            double ZoneW = ZoneAirHumRatAvg(ZoneNum);
+            double ZoneRH = Psychrometrics::PsyRhFnTdbWPb(ZoneT, ZoneW, OutBaroPress) * 100.0;
+            double ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
+            double HI;
+
+            if (ZoneTF < 80) {
+                HI = 0.5 * (ZoneTF + 61.0 + (ZoneTF - 68.0) * 1.2 + (ZoneRH * 0.094));
+            } else {
+                HI = c1 + c2 * ZoneTF + c3 * ZoneRH + c4 * ZoneTF * ZoneRH + c5 * ZoneTF * ZoneTF + c6 * ZoneRH * ZoneRH +
+                     c7 * ZoneTF * ZoneTF * ZoneRH + c8 * ZoneTF * ZoneRH * ZoneRH + c9 * ZoneTF * ZoneTF * ZoneRH * ZoneRH;
+            }
+
+            if (ZoneRH < 13 && ZoneTF < 112) {
+                HI -= (13 - ZoneRH) / 4 * std::sqrt((17 - abs(ZoneTF - 95)) / 17);
+            } else if (ZoneRH > 85 && ZoneTF < 87) {
+                HI += (ZoneRH - 85) / 10 * (87 - ZoneTF) / 5;
+            }
+            HI = (HI - 32.0) * (5.0 / 9.0);
+
             double TDewPointK = Psychrometrics::PsyTdpFnWPb(ZoneW, OutBaroPress) + KelvinConv;
             double e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
             double h = 5.0 / 9.0 * (e - 10.0);
             double Humidex = ZoneT + h;
 
-            DataHeatBalFanSys::ZoneHeatIndex(ZoneNum) = HI;
-            DataHeatBalFanSys::ZoneHumidex(ZoneNum) = Humidex;
-        } // loop over zones
+            ZoneHeatIndex(ZoneNum) = HI;
+            ZoneHumidex(ZoneNum) = Humidex;
+        }
+        if (OutputReportTabular::displayThermalResilienceSummary && ksRunPeriodWeather == KindOfSim) {
+            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+                int ZoneNum = People(iPeople).ZonePtr;
+                ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(People(iPeople).NumberOfPeoplePtr);
+                ZoneOccPierceSETLastStep(ZoneNum) = ZoneOccPierceSET(ZoneNum);
+                if (ZoneNumOcc(ZoneNum) > 0) {
+                    if (People(iPeople).Pierce) {
+                        ZoneOccPierceSET(ZoneNum) = ThermalComfort::ThermalComfortData(iPeople).PierceSET;
+                    } else {
+                        ZoneOccPierceSET(ZoneNum) = NAN;
+                    }
+                } else {
+                    ZoneOccPierceSET(ZoneNum) = NAN;
+                }
+            }
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                double HI = ZoneHeatIndex(ZoneNum);
+                double Humidex = ZoneHumidex(ZoneNum);
 
+                int NumOcc = ZoneNumOcc(ZoneNum);
+                if (HI <= 26.7) {
+                    ZoneHeatIndexHourBins(ZoneNum)[0] += TimeStepZone;
+                    ZoneHeatIndexOccuHourBins(ZoneNum)[0] += NumOcc * TimeStepZone;
+                } else if (HI > 26.7 && HI <= 32.2) {
+                    ZoneHeatIndexHourBins(ZoneNum)[1] += TimeStepZone;
+                    ZoneHeatIndexOccuHourBins(ZoneNum)[1] += NumOcc * TimeStepZone;
+                } else if (HI > 32.2 && HI <= 40.6) {
+                    ZoneHeatIndexHourBins(ZoneNum)[2] += TimeStepZone;
+                    ZoneHeatIndexOccuHourBins(ZoneNum)[2] += NumOcc * TimeStepZone;
+                } else if (HI > 40.6 && HI <= 54.4) {
+                    ZoneHeatIndexHourBins(ZoneNum)[3] += TimeStepZone;
+                    ZoneHeatIndexOccuHourBins(ZoneNum)[3] += NumOcc * TimeStepZone;
+                } else {
+                    ZoneHeatIndexHourBins(ZoneNum)[4] += TimeStepZone;
+                    ZoneHeatIndexOccuHourBins(ZoneNum)[4] += NumOcc * TimeStepZone;
+                }
+
+                if (Humidex <= 29) {
+                    ZoneHumidexHourBins(ZoneNum)[0] += TimeStepZone;
+                    ZoneHumidexOccuHourBins(ZoneNum)[0] += NumOcc * TimeStepZone;
+                } else if (Humidex > 29 && Humidex <= 40) {
+                    ZoneHumidexHourBins(ZoneNum)[1] += TimeStepZone;
+                    ZoneHumidexOccuHourBins(ZoneNum)[1] += NumOcc * TimeStepZone;
+                } else if (Humidex > 40 && Humidex <= 45) {
+                    ZoneHumidexHourBins(ZoneNum)[2] += TimeStepZone;
+                    ZoneHumidexOccuHourBins(ZoneNum)[2] += NumOcc * TimeStepZone;
+                } else if (Humidex > 45 && Humidex <= 50) {
+                    ZoneHumidexHourBins(ZoneNum)[3] += TimeStepZone;
+                    ZoneHumidexOccuHourBins(ZoneNum)[3] += NumOcc * TimeStepZone;
+                } else {
+                    ZoneHumidexHourBins(ZoneNum)[4] += TimeStepZone;
+                    ZoneHumidexOccuHourBins(ZoneNum)[4] += NumOcc * TimeStepZone;
+                }
+
+                if (hasPierceSET) {
+                    int encodedMonDayHrMin;
+                    if (NumOcc > 0) {
+                        double PierceSET = ZoneOccPierceSET(ZoneNum);
+                        double PierceSETLast = ZoneOccPierceSETLastStep(ZoneNum);
+
+                        if (PierceSET <= 12.2) {
+                            ZoneLowSETHours(ZoneNum)[0] += (12.2 - PierceSET) * TimeStepZone;
+                            ZoneLowSETHours(ZoneNum)[1] += (12.2 - PierceSET) * NumOcc * TimeStepZone;
+                            // Reset duration when last step is out of range.
+                            if (isnan(PierceSETLast) || PierceSETLast > 12.2) {
+                                General::EncodeMonDayHrMin(encodedMonDayHrMin, Month, DayOfMonth, HourOfDay,
+                                                           TimeStepZone * (TimeStep - 1) * 60);
+                                lowSETLongestHours[ZoneNum - 1] = 0;
+                                lowSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
+                            }
+                            // Keep the longest duration record.
+                            lowSETLongestHours[ZoneNum - 1] += TimeStepZone;
+                            if (lowSETLongestHours[ZoneNum - 1] > ZoneLowSETHours(ZoneNum)[2]) {
+                                ZoneLowSETHours(ZoneNum)[2] = lowSETLongestHours[ZoneNum - 1];
+                                ZoneLowSETHours(ZoneNum)[3] = lowSETLongestStart[ZoneNum - 1];
+                            }
+                        } else if (PierceSET > 30) {
+                            ZoneHighSETHours(ZoneNum)[0] += (PierceSET - 30) * TimeStepZone;
+                            ZoneHighSETHours(ZoneNum)[1] += (PierceSET - 30) * NumOcc * TimeStepZone;
+                            if (isnan(PierceSETLast) || PierceSETLast <= 30) {
+                                General::EncodeMonDayHrMin(encodedMonDayHrMin, Month, DayOfMonth, HourOfDay,
+                                                           TimeStepZone * (TimeStep - 1) * 60);
+//                                std::string startDateTime = OutputReportTabular::DateToString(int(encodedMonDayHrMin));
+                                highSETLongestHours[ZoneNum - 1] = 0;
+                                highSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
+                            }
+                            highSETLongestHours[ZoneNum - 1] += TimeStepZone;
+                            if (highSETLongestHours[ZoneNum - 1] > ZoneHighSETHours(ZoneNum)[2]) {
+                                ZoneHighSETHours(ZoneNum)[2] = highSETLongestHours[ZoneNum - 1];
+                                ZoneHighSETHours(ZoneNum)[3] = highSETLongestStart[ZoneNum - 1];
+                            }
+                        }
+                    } else {
+                        // No occupants: record the last time step duration if longer than the record.
+                        if (lowSETLongestHours[ZoneNum - 1] > ZoneLowSETHours(ZoneNum)[2]) {
+                            ZoneLowSETHours(ZoneNum)[2] = lowSETLongestHours[ZoneNum - 1];
+                            ZoneLowSETHours(ZoneNum)[3] = lowSETLongestStart[ZoneNum - 1];
+                        }
+                        if (highSETLongestHours[ZoneNum - 1] > ZoneHighSETHours(ZoneNum)[2]) {
+                            ZoneHighSETHours(ZoneNum)[2] = highSETLongestHours[ZoneNum - 1];
+                            ZoneHighSETHours(ZoneNum)[3] = highSETLongestStart[ZoneNum - 1];
+                        }
+                        lowSETLongestHours[ZoneNum - 1] = 0;
+                        highSETLongestHours[ZoneNum - 1] = 0;
+                    }
+                }
+            }
+        } // loop over zones
     }
 
     void ReportSurfaceHeatBalance()
