@@ -19772,7 +19772,7 @@ std::string const idf_objects = delimited_string({
     DataHeatBalFanSys::ZoneAirHumRat(5) = 0.001;
 
     DataZoneEquipment::GetZoneEquipmentData(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     SimAirServingZones::GetAirPathData(state);
 
     // Read AirflowNetwork inputs
