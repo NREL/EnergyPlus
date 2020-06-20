@@ -420,7 +420,7 @@ I recommend reading the LEED RELI documentation (not perfect, but interesting).
 
 > Reply: We read LEED's passive survibability - I think it has rooms to improve. It is very different between comfort (a small range around neutral temperature and humidity) and stretched health risk (e.g., heat index of danger or extreme dangerous conditions). Most of ASHRAE Standard 55 would not apply to thermal resilience.
 
-- *From Liam O'Brien*:
+- *From Clint Andrews*:
 
 Regarding the importance of being able to model the effects on indoor conditions due to electricity outages.
 
@@ -440,7 +440,7 @@ Today's interest in resilience and adaptability replays a prior debate about rob
 
 ## Acknowledgments ##
 
-We thank Paul Mathew, Ronnen Levinson, Lino Sanchez, and Jessica Granderson of LBNL for providing some valuable references.
+We thank Paul Mathew, Ronnen Levinson, Lino Sanchez, and Jessica Granderson of LBNL, Liam O'Brien of Carleton University, and Clinton Andrews of Rutgers University for providing some valuable references.
 
 ## References ##
 
