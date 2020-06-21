@@ -74,7 +74,7 @@
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/WindowManager.hh>
-#include <EnergyPlus/WindowManagerExteriorData.hh>
+//#include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <unordered_map>
 #include <string>
 

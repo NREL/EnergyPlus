@@ -101,7 +101,7 @@ namespace WindowManager {
 
         // Tarcog thermal system for solving heat transfer through the window
         auto aFactory = CWCEHeatTransferFactory(surface, SurfNum);
-        auto aSystem = aFactory.getTarcogSystem(HextConvCoeff);
+        auto aSystem = aFactory.getTarcogSystem(dataWindowManager, HextConvCoeff);
         aSystem->setTolerance(solutionTolerance);
 
         // get previous timestep temperatures solution for faster iterations
@@ -270,10 +270,10 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSingleSystem> CWCEHeatTransferFactory::getTarcogSystem(Real64 const t_HextConvCoeff)
+    std::shared_ptr<CSingleSystem> CWCEHeatTransferFactory::getTarcogSystem(WindowManagerData &dataWindowManager, Real64 const t_HextConvCoeff)
     {
         auto Indoor = getIndoor();
-        auto Outdoor = getOutdoor(t_HextConvCoeff);
+        auto Outdoor = getOutdoor(dataWindowManager, t_HextConvCoeff);
         auto aIGU = getIGU();
 
         // pick-up all layers and put them in IGU (this includes gap layers as well)

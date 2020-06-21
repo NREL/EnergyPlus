@@ -104,7 +104,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
     PlantLoop(1).FluidType = 2;
     QBBRadSource(1) = 0.0;
 
-    CalcHWBaseboard(BBNum, LoadMet);
+    CalcHWBaseboard(state.dataWindowManager, BBNum, LoadMet);
 
     EXPECT_NEAR(14746.226690452937, HWBaseboard(1).TotPower, 0.000001);
     EXPECT_NEAR(50.349854486072232, HWBaseboard(1).AirOutletTemp, 0.000001);
@@ -183,7 +183,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = HWBaseboard(1).WaterOutletNode;
 
     // zero zone load case, so zero LoadMet must be returned
-    CalcHWBaseboard(BBNum, LoadMet);
+    CalcHWBaseboard(state.dataWindowManager, BBNum, LoadMet);
 
     EXPECT_EQ(0.0, LoadMet);
     EXPECT_EQ(0.0, HWBaseboard(1).TotPower);

@@ -8895,11 +8895,11 @@ namespace SolarShading {
         CalcAborbedOnExteriorOpaqueSurfaces();
 
         if (dataWindowManager.winOpticalModel->isSimplifiedModel()) {
-            CalcInteriorSolarDistributionWCESimple();
+            CalcInteriorSolarDistributionWCESimple(dataWindowManager);
         } // else for built in BSDF (possible future implementation)
     }
 
-    void CalcInteriorSolarDistributionWCESimple()
+    void CalcInteriorSolarDistributionWCESimple(WindowManagerData &dataWindowManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8956,7 +8956,7 @@ namespace SolarShading {
 
                 int ConstrNum = Surface(SurfNum2).Construction;
                 if (window.ShadedConstruction > 0) ConstrNum = window.ShadedConstruction;
-                auto aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(WavelengthRange::Solar, ConstrNum);
+                auto aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(dataWindowManager, WavelengthRange::Solar, ConstrNum);
 
                 ///////////////////////////////////////////////
                 // Solar absorbed in window layers

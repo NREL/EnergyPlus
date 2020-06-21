@@ -3118,7 +3118,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
         // Surface simulation
         InitSurfaceHeatBalance(state);
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
-        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
+        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state.dataWindowManager);
 
         // Air simulation
         InitAirHeatBalance();

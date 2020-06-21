@@ -54,7 +54,6 @@
 
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Vectors.hh>
-#include <EnergyPlus/WindowManager.hh>
 
 namespace EnergyPlus {
 namespace DataHeatBalance {
@@ -140,7 +139,7 @@ namespace WindowManager {
                        int const t_ConstrNum,
                        std::shared_ptr<SingleLayerOptics::CScatteringLayer> const &t_Layer);
 
-        std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> getEquivalentLayer(FenestrationCommon::WavelengthRange const t_Range,
+        std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> getEquivalentLayer(WindowManagerData &dataWindowManager, FenestrationCommon::WavelengthRange const t_Range,
                                                                                    int const t_ConstrNum);
 
         static void clearState();

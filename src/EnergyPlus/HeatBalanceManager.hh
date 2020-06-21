@@ -155,13 +155,13 @@ namespace HeatBalanceManager {
 
     void SetPreConstructionInputParameters();
 
-    void GetProjectControlData(OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if errors detected during getting data
+    void GetProjectControlData(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if errors detected during getting data
 
     void GetSiteAtmosphereData(EnergyPlus::OutputFiles &outputFiles, bool &ErrorsFound);
 
     void GetMaterialData(OutputFiles &outputFiles, bool &ErrorsFound); // set to true if errors found in input
 
-    void GetWindowGlassSpectralData(bool &ErrorsFound); // set to true if errors found in input
+    void GetWindowGlassSpectralData(WindowManagerData &dataWindowManager, bool &ErrorsFound); // set to true if errors found in input
 
     void ValidateMaterialRoughness(int const MaterNum,           // Which Material number being validated.
                                    std::string const &Roughness, // Roughness String

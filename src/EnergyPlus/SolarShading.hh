@@ -338,7 +338,7 @@ namespace SolarShading {
 
     void CalcInteriorSolarDistributionWCE(WindowManagerData &dataWindowManager);
 
-    void CalcInteriorSolarDistributionWCESimple();
+    void CalcInteriorSolarDistributionWCESimple(WindowManagerData &dataWindowManager);
 
     int WindowScheduledSolarAbs(int const SurfNum, // Surface number
                                 int const ConstNum // Construction number

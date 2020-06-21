@@ -61,6 +61,7 @@
 #include "OutputFiles.hh"
 #include <EnergyPlus/ConductionTransferFunctionCalc.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -87,7 +88,6 @@
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -358,7 +358,7 @@ namespace HeatBalanceManager {
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(state.outputFiles);                                                                // Initialize all heat balance related parameters
+        InitHeatBalance(state.dataWindowManager, state.outputFiles);                                                                // Initialize all heat balance related parameters
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -444,11 +444,11 @@ namespace HeatBalanceManager {
 
         // FLOW:
 
-        GetProjectControlData(state.outputFiles, ErrorsFound);
+        GetProjectControlData(state, state.outputFiles, ErrorsFound);
 
         GetSiteAtmosphereData(state.outputFiles, ErrorsFound);
 
-        GetWindowGlassSpectralData(ErrorsFound);
+        GetWindowGlassSpectralData(state.dataWindowManager, ErrorsFound);
 
         GetMaterialData(state.outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
@@ -653,7 +653,7 @@ namespace HeatBalanceManager {
         // Construction:InternalSource
     }
 
-    void GetProjectControlData(OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors detected during getting data
+    void GetProjectControlData(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors detected during getting data
     {
 
         // SUBROUTINE INFORMATION:
@@ -1206,7 +1206,7 @@ namespace HeatBalanceManager {
             AlphaName(3) = "NO";
         }
 
-        WindowManager::initWindowModel();
+        WindowManager::initWindowModel(state.dataWindowManager);
 
         static constexpr auto Format_728(
             "! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
@@ -3907,7 +3907,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void GetWindowGlassSpectralData(bool &ErrorsFound) // set to true if errors found in input
+    void GetWindowGlassSpectralData(WindowManagerData &dataWindowManager, bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -3959,7 +3959,7 @@ namespace HeatBalanceManager {
         CurrentModuleObject = "MaterialProperty:GlazingSpectralData";
         TotSpectralData = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         SpectralData.allocate(TotSpectralData);
-        if (TotSpectralData > 0) SpecDataProps.allocate(MaxSpectralDataElements * 4);
+        if (TotSpectralData > 0) SpecDataProps.allocate(dataWindowManager.MaxSpectralDataElements * 4);
 
         for (Loop = 1; Loop <= TotSpectralData; ++Loop) {
 
@@ -3990,12 +3990,12 @@ namespace HeatBalanceManager {
                                   TrimSigDigits(SpecDataNumProp));
                 ShowContinueError("... remainder after div by 4 = " + TrimSigDigits(mod(SpecDataNumProp, 4)) +
                                   ", remainder items will be set to 0.0");
-                SpecDataProps({SpecDataNumProp + 1, min(SpecDataNumProp + 4, MaxSpectralDataElements * 4)}) = 0.0;
+                SpecDataProps({SpecDataNumProp + 1, min(SpecDataNumProp + 4, dataWindowManager.MaxSpectralDataElements * 4)}) = 0.0;
             }
-            if (TotLam > MaxSpectralDataElements) {
+            if (TotLam > dataWindowManager.MaxSpectralDataElements) {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid set.");
-                ShowContinueError("... More than max [" + TrimSigDigits(MaxSpectralDataElements) +
+                ShowContinueError("... More than max [" + TrimSigDigits(dataWindowManager.MaxSpectralDataElements) +
                                   "] (Wavelength,Trans,ReflFront,ReflBack) entries in set.");
                 continue;
             }

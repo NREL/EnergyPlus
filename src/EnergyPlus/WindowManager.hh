@@ -57,10 +57,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/WindowManagerExteriorData.hh>
-#include <EnergyPlus/WindowModel.hh>
+#include <EnergyPlus/WindowManagerExteriorData.hh>   //for CWindowConstructionsSimplified
+#include <EnergyPlus/WindowModel.hh>  // for CWindowOpticalModel
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -491,6 +489,8 @@ namespace WindowManager {
         Real64 A67;
 
         int MaxNumOfIncidentAngles;
+        int const MaxSpectralDataElements; // Maximum number in Spectral Data arrays.
+        //TEMP MOVED FROM DataHeatBalance.hh -BLB
 
         Array2D<Real64> wlt; // Spectral data wavelengths for each glass layer in a glazing system
                                                               // Following data, Spectral data for each layer for each wavelength in wlt
@@ -615,16 +615,16 @@ namespace WindowManager {
             A23 = 0.0;
             A45 = 0.0;
             A67 = 0.0;
-            wlt = Array2D<Real64>(5, EnergyPlus::DataHeatBalance::MaxSpectralDataElements, 0.0);
-            t = Array2D<Real64>(5, DataHeatBalance::MaxSpectralDataElements, 0.0);
-            rff = Array2D<Real64>(5, DataHeatBalance::MaxSpectralDataElements, 0.0);
-            rbb = Array2D<Real64>(5, DataHeatBalance::MaxSpectralDataElements, 0.0);
-            tPhi = Array2D<Real64>(5, DataHeatBalance::MaxSpectralDataElements, 0.0);
-            rfPhi = Array2D<Real64>(5, DataHeatBalance::MaxSpectralDataElements, 0.0);
-            rbPhi = Array2D<Real64>(5, DataHeatBalance::MaxSpectralDataElements, 0.0);
-            tadjPhi = Array2D<Real64>(5, DataHeatBalance::MaxSpectralDataElements, 0.0);
-            rfadjPhi = Array2D<Real64>(5, DataHeatBalance::MaxSpectralDataElements, 0.0);
-            rbadjPhi = Array2D<Real64>(5, DataHeatBalance::MaxSpectralDataElements, 0.0);
+            wlt = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            t = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            rff = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            rbb = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            tPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            rfPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            rbPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            tadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            rfadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            rbadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
             numpt = Array1D_int(5, 0);
             stPhi = Array1D<Real64>(nume, 0.0);
             srfPhi = Array1D<Real64>(nume, 0.0);
@@ -655,7 +655,7 @@ namespace WindowManager {
             AbsRadGlassFace(10, 0.0), thetas(10, 0.0), thetasPrev(10, 0.0), fvec(10, 0.0), fjac(10, 10, 0.0), 
             dtheta(5, 0.0), zir(10, 10, 0.0), ziri(10, 10, 0.0), ddeldt(10, 10, 0.0), dtddel(10, 10, 0.0), 
             qf(10, 0.0), hf(10, 0.0), der(5, 10, 0.0), dhf(5, 10, 0.0), sour(10, 0.0), delta(5, 0.0), 
-            hcgap(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0), arhs(6, 0.0), MaxNumOfIncidentAngles(20)
+            hcgap(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0), arhs(6, 0.0), MaxNumOfIncidentAngles(20), MaxSpectralDataElements(800)
         {
             AirProps.allocate(8);
             AirProps = {1.29, -0.4e-2, 2.41e-2, 7.6e-5, 1.73e-5, 1.0e-7, 0.72, 1.8e-3};
@@ -691,26 +691,26 @@ namespace WindowManager {
                 0.0610, 0.0446, 0.0320, 0.0232, 0.0170, 0.0119, 0.0082, 0.0158, 0.0041, 0.0029, 0.0021, 0.0015, 0.0010, 0.0007,
                 0.0005, 0.0004, 0.0002, 0.0002, 0.0001, 0.0001, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000};
 
-            wlt.allocate(5, DataHeatBalance::MaxSpectralDataElements);
+            wlt.allocate(5, MaxSpectralDataElements);
             wlt = 0.0;
 
-            t.allocate(5, DataHeatBalance::MaxSpectralDataElements);
+            t.allocate(5, MaxSpectralDataElements);
             t = (0.0);        // normal transmittance
-            rff.allocate(5, DataHeatBalance::MaxSpectralDataElements);
+            rff.allocate(5, MaxSpectralDataElements);
             rff = (0.0);      // normal front reflectance
-            rbb.allocate(5, DataHeatBalance::MaxSpectralDataElements);
+            rbb.allocate(5, MaxSpectralDataElements);
             rbb = (0.0);      // normal back reflectance
-            tPhi.allocate(5, DataHeatBalance::MaxSpectralDataElements);
+            tPhi.allocate(5, MaxSpectralDataElements);
             tPhi = (0.0);     // transmittance at angle of incidence
-            rfPhi.allocate(5, DataHeatBalance::MaxSpectralDataElements);
+            rfPhi.allocate(5, MaxSpectralDataElements);
             rfPhi = (0.0);    // front reflectance at angle of incidence
-            rbPhi.allocate(5, DataHeatBalance::MaxSpectralDataElements);
+            rbPhi.allocate(5, MaxSpectralDataElements);
             rbPhi = (0.0);    // back reflectance at angle of incidence
-            tadjPhi.allocate(5, DataHeatBalance::MaxSpectralDataElements);
+            tadjPhi.allocate(5, MaxSpectralDataElements);
             tadjPhi = (0.0);  // transmittance at angle of incidence
-            rfadjPhi.allocate(5, DataHeatBalance::MaxSpectralDataElements);
+            rfadjPhi.allocate(5, MaxSpectralDataElements);
             rfadjPhi = (0.0); // front reflectance at angle of incidence
-            rbadjPhi.allocate(5, DataHeatBalance::MaxSpectralDataElements);
+            rbadjPhi.allocate(5, MaxSpectralDataElements);
             rbadjPhi = (0.0); // back reflectance at angle of incidence
 
             numpt.allocate(5);             // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer

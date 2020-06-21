@@ -160,7 +160,7 @@ namespace WindowManager {
         // check and read custom solar and/or visible spectrum data if any
         CheckAndReadCustomSprectrumData(dataWindowManager);
         if (dataWindowManager.inExtWindowModel->isExternalLibraryModel()) {
-            InitWCE_SimplifiedOpticalData(outputFiles);
+            InitWCE_SimplifiedOpticalData(dataWindowManager, outputFiles);
         } else {
             InitGlassOpticalCalculations(dataWindowManager, outputFiles);
         }

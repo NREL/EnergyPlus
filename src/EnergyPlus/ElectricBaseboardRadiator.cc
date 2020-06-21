@@ -188,7 +188,7 @@ namespace ElectricBaseboardRadiator {
 
             if (SELECT_CASE_var == BaseboardRadiator_Electric) { // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC'
                 // Simulate baseboard
-                CalcElectricBaseboard(BaseboardNum, ControlledZoneNum);
+                CalcElectricBaseboard(state.dataWindowManager, BaseboardNum, ControlledZoneNum);
 
             } else {
                 ShowSevereError("SimElecBaseboard: Errors in Baseboard=" + ElecBaseboard(BaseboardNum).EquipName);
@@ -749,7 +749,7 @@ namespace ElectricBaseboardRadiator {
         }
     }
 
-    void CalcElectricBaseboard(int const BaseboardNum, int const EP_UNUSED(ControlledZoneNum))
+    void CalcElectricBaseboard(WindowManagerData &dataWindowManager, int const BaseboardNum, int const EP_UNUSED(ControlledZoneNum))
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -819,7 +819,7 @@ namespace ElectricBaseboardRadiator {
                 DistributeBBElecRadGains();
                 // Now "simulate" the system by recalculating the heat balances
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataWindowManager, ZoneNum);
                 // Here an assumption is made regarding radiant heat transfer to people.
                 // While the radiant heat transfer to people array will be used by the thermal comfort
                 // routines, the energy transfer to people would get lost from the perspective
@@ -844,13 +844,13 @@ namespace ElectricBaseboardRadiator {
                     QBBElecRadSource(BaseboardNum) = 0.0;
                     DistributeBBElecRadGains();
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataWindowManager, ZoneNum);
                     TempZeroSourceSumHATsurf = SumHATsurf(ZoneNum);
                     // Now, turn it back on:
                     QBBElecRadSource(BaseboardNum) = RadHeat;
                     DistributeBBElecRadGains();
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataWindowManager, ZoneNum);
                     // Recalculate LoadMet with new ZeroSource... term and see if it is positive now.  If not, shut it down.
                     LoadMet = (SumHATsurf(ZoneNum) - TempZeroSourceSumHATsurf) + (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) +
                               (RadHeat * ElecBaseboard(BaseboardNum).FracDistribPerson);

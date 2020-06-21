@@ -55,8 +55,8 @@
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Shape.hh>
-#include <EnergyPlus/WindowManager.hh>
-#include <EnergyPlus/WindowManagerExteriorData.hh>
+//#include <EnergyPlus/WindowManager.hh>
+//#include <EnergyPlus/WindowManagerExteriorData.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>

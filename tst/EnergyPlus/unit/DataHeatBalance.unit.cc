@@ -803,7 +803,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // read project control data
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
