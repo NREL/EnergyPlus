@@ -195,7 +195,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(OutputFiles &outputFiles);
+    void InitHeatBalance(WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
 
     void AllocateHeatBalArrays();
 

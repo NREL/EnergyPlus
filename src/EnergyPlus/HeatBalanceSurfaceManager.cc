@@ -2191,7 +2191,7 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void InitSolarHeatGains()
+    void InitSolarHeatGains(WindowManagerData &dataWindowManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2550,7 +2550,7 @@ namespace HeatBalanceSurfaceManager {
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface();
 
-            if (inExtWindowModel->isExternalLibraryModel() && winOpticalModel->isSimplifiedModel()) {
+            if (dataWindowManager.inExtWindowModel->isExternalLibraryModel() && dataWindowManager.winOpticalModel->isSimplifiedModel()) {
                 CalcInteriorSolarDistributionWCE();
             } else {
                 CalcInteriorSolarDistribution();
@@ -2751,7 +2751,7 @@ namespace HeatBalanceSurfaceManager {
                             } else { // Exterior window
 
                                 if (SurfaceWindow(SurfNum).WindowModelType != WindowBSDFModel &&
-                                    SurfaceWindow(SurfNum).WindowModelType != WindowEQLModel && !inExtWindowModel->isExternalLibraryModel()) {
+                                    SurfaceWindow(SurfNum).WindowModelType != WindowEQLModel && !dataWindowManager.inExtWindowModel->isExternalLibraryModel()) {
                                     TotGlassLay = Construct(ConstrNum).TotGlassLayers;
                                     for (Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                         AbsDiffWin(Lay) = Construct(ConstrNum).AbsDiff(Lay);
@@ -2907,7 +2907,7 @@ namespace HeatBalanceSurfaceManager {
                                         QRadSWwinAbsTot(SurfNum) += QRadSWwinAbsLayer(Lay, SurfNum);
                                     }
                                     QRadSWwinAbsTotEnergy(SurfNum) = QRadSWwinAbsTot(SurfNum) * TimeStepZoneSec;
-                                } else if (inExtWindowModel->isExternalLibraryModel()) {
+                                } else if (dataWindowManager.inExtWindowModel->isExternalLibraryModel()) {
                                     std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(SurfNum2, BSDFHemisphere::Incoming);
                                     Real64 Theta = incomingAngle.first;
                                     Real64 Phi = incomingAngle.second;

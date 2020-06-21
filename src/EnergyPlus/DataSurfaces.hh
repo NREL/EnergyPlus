@@ -49,11 +49,14 @@
 #define DataSurfaces_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Shape.hh>
+#include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindowManagerExteriorData.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -65,6 +68,9 @@
 #include <vector>
 
 namespace EnergyPlus {
+
+    //forward declarations
+    struct WindowManagerData;
 
 namespace DataSurfaces {
 
@@ -830,7 +836,7 @@ namespace DataSurfaces {
 
         Real64 getOutsideAirTemperature(const int t_SurfNum) const;
 
-        Real64 getOutsideIR(const int t_SurfNum) const;
+        Real64 getOutsideIR(WindowManagerData &dataWindowManager, const int t_SurfNum) const;
 
         static Real64 getSWIncident(const int t_SurfNum);
 

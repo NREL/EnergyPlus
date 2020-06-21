@@ -8874,7 +8874,7 @@ namespace SolarShading {
         }
     }
 
-    void CalcInteriorSolarDistributionWCE()
+    void CalcInteriorSolarDistributionWCE(WindowManagerData &dataWindowManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8894,7 +8894,7 @@ namespace SolarShading {
 
         CalcAborbedOnExteriorOpaqueSurfaces();
 
-        if (winOpticalModel->isSimplifiedModel()) {
+        if (dataWindowManager.winOpticalModel->isSimplifiedModel()) {
             CalcInteriorSolarDistributionWCESimple();
         } // else for built in BSDF (possible future implementation)
     }

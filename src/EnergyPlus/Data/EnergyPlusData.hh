@@ -73,6 +73,8 @@
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <unordered_map>
 #include <string>
 
@@ -106,6 +108,8 @@ namespace EnergyPlus {
         // after we've plumbed enough of the functions to allow
         OutputFiles outputFiles;
 
+        WindowManagerData dataWindowManager;
+
         EnergyPlusData() {
             OutputFiles::setSingleton(&outputFiles);
         }
@@ -135,6 +139,7 @@ namespace EnergyPlus {
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataWindowManager.clear_state();
         };
     };
 

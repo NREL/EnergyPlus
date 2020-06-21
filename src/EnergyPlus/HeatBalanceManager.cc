@@ -5154,7 +5154,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(OutputFiles &outputFiles)
+    void InitHeatBalance(WindowManagerData &dataWindowManager, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5218,7 +5218,7 @@ namespace HeatBalanceManager {
             DisplayString("Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
-            InitWindowOpticalCalculations(outputFiles);
+            InitWindowOpticalCalculations(dataWindowManager, outputFiles);
             InitDaylightingDevices(OutputFiles::getSingleton()); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(); // Initialize the shadowing calculations

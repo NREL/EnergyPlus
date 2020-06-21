@@ -52,7 +52,9 @@
 #include <memory>
 #include <vector>
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Vectors.hh>
+#include <EnergyPlus/WindowManager.hh>
 
 namespace EnergyPlus {
 namespace DataHeatBalance {
@@ -89,6 +91,8 @@ class CMultiLayerScattered;
 } // namespace MultiLayerOptics
 
 namespace EnergyPlus {
+    //forward declaration
+    struct WindowManagerData;
 
 namespace WindowManager {
 
@@ -119,8 +123,8 @@ namespace WindowManager {
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(int const t_SampleDataPtr);
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData>
         getSpectralSample(DataHeatBalance::MaterialProperties const &t_MaterialProperties);
-        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultSolarRadiationSpectrum();
-        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultVisiblePhotopicResponse();
+        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultSolarRadiationSpectrum(WindowManagerData &dataWindowManager);
+        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultVisiblePhotopicResponse(WindowManagerData &dataWindowManager);
     };
 
     ///////////////////////////////////////////////////////////////////////////////
