@@ -1252,7 +1252,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     ASSERT_TRUE(process_idf(idf_objects));
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
 
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet
@@ -1262,10 +1262,10 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 2; // 1st zone is 402, so this is 2nd direct air unit
     DataZoneEquipment::ZoneEquipList(2).EquipIndex(1) = 1; // 2nd zone is 401, so this is 1st direct air unit
     MixedAir::GetOutsideAirSysInputs(state);
-    MixedAir::GetOAControllerInputs(state, outputFiles());
+    MixedAir::GetOAControllerInputs(state);
     SplitterComponent::GetSplitterInput();
-    BranchInputManager::GetMixerInput();
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::GetMixerInput(state.dataBranchInputManager);
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
     GetZoneAirLoopEquipment();
     SingleDuct::GetSysInput(state);
 
@@ -1273,7 +1273,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     SimAirServingZones::GetAirPathData(state);
     SimAirServingZones::InitAirLoops(state, FirstHVACIteration);
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(outputFiles());
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.outputFiles);
 
     CurDeadBandOrSetback.allocate(2);
     CurDeadBandOrSetback(1) = false;

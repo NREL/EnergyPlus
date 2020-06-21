@@ -88,7 +88,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test)
 
     bool ErrorsFound(false);
 
-    HeatBalanceAirManager::GetRoomAirModelParameters(outputFiles(), ErrorsFound);
+    HeatBalanceAirManager::GetRoomAirModelParameters(state.outputFiles, ErrorsFound);
 
     EXPECT_TRUE(ErrorsFound);
 

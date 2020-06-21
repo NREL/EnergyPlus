@@ -404,6 +404,27 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with Z, insert the rules here
 
+              CASE('ZONEHVAC:HYBRIDUNITARYHVAC')
+                ObjectName = "ZoneHVAC:HybridUnitaryHVAC"
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  ! fields 1-14 same
+                  OutArgs(1:14)=InArgs(1:14)
+                  ! insert Fan Heat Included in Lookup Tables field
+                  OutArgs(15)='Yes'
+                  ! insert Fan Heat Gain Location
+                  OutArgs(16)=Blank
+                  ! insert Fan Heat Gain In Airstream Fraction field
+                  OutArgs(17)=Blank
+                  ! same Scaling Factor
+                  OutArgs(18)=InArgs(15)
+                  ! remove Number of Operating Modes
+                  OutArgs(19)=InArgs(17)
+                  ! all others equal
+                  OutArgs(20:CurArgs+2)=InArgs(18:CurArgs)
+                  CurArgs = CurArgs + 2
+                  NoDiff = .false.
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                   Changes for report variables, meters, tables -- update names                                   !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

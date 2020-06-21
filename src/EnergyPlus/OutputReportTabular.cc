@@ -764,7 +764,7 @@ namespace OutputReportTabular {
             OutputReportTabularAnnual::GetInputTabularAnnual();
             OutputReportTabularAnnual::checkAggregationOrderForAnnual();
             GetInputTabularTimeBins();
-            GetInputTabularStyle(OutputFiles::getSingleton());
+            GetInputTabularStyle(state.outputFiles);
             GetInputOutputTableSummaryReports();
             // noel -- noticed this was called once and very slow -- sped up a little by caching keys
             InitializeTabularMonthly();
@@ -5672,7 +5672,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports(EnergyPlusData &state, OutputFiles &outputFiles)
+    void WriteTabularReports(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -5693,14 +5693,14 @@ namespace OutputReportTabular {
             // call each type of report in turn
             WriteBEPSTable();
             WriteTableOfContents();
-            WriteVeriSumTable(outputFiles);
+            WriteVeriSumTable(state.outputFiles);
             WriteDemandEndUseSummary();
             WriteSourceEnergyEndUseSummary();
             WriteComponentSizing();
             WriteSurfaceShadowing();
             WriteCompCostTable();
             WriteAdaptiveComfortTable();
-            WriteEioTables(OutputFiles::getSingleton());
+            WriteEioTables(state.outputFiles);
             WriteLoadComponentSummaryTables();
             WriteHeatEmissionTable();
 
@@ -5717,23 +5717,23 @@ namespace OutputReportTabular {
         }
 
         constexpr static auto variable_fmt{" {}={:12}\n"};
-        outputFiles.audit.ensure_open("WriteTabularReports");
-        print(outputFiles.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
-        print(outputFiles.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
-        print(outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
-        print(outputFiles.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
-        print(outputFiles.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
-        print(outputFiles.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
-        print(outputFiles.audit, variable_fmt, "sizeReportName", sizeReportName);
-        print(outputFiles.audit, variable_fmt, "numReportName", numReportName);
-        print(outputFiles.audit, variable_fmt, "sizeSubTable", sizeSubTable);
-        print(outputFiles.audit, variable_fmt, "numSubTable", numSubTable);
-        print(outputFiles.audit, variable_fmt, "sizeColumnTag", sizeColumnTag);
-        print(outputFiles.audit, variable_fmt, "numColumnTag", numColumnTag);
-        print(outputFiles.audit, variable_fmt, "sizeTableEntry", sizeTableEntry);
-        print(outputFiles.audit, variable_fmt, "numTableEntry", numTableEntry);
-        print(outputFiles.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
-        print(outputFiles.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
+        state.outputFiles.audit.ensure_open("WriteTabularReports");
+        print(state.outputFiles.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
+        print(state.outputFiles.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
+        print(state.outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
+        print(state.outputFiles.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
+        print(state.outputFiles.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
+        print(state.outputFiles.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
+        print(state.outputFiles.audit, variable_fmt, "sizeReportName", sizeReportName);
+        print(state.outputFiles.audit, variable_fmt, "numReportName", numReportName);
+        print(state.outputFiles.audit, variable_fmt, "sizeSubTable", sizeSubTable);
+        print(state.outputFiles.audit, variable_fmt, "numSubTable", numSubTable);
+        print(state.outputFiles.audit, variable_fmt, "sizeColumnTag", sizeColumnTag);
+        print(state.outputFiles.audit, variable_fmt, "numColumnTag", numColumnTag);
+        print(state.outputFiles.audit, variable_fmt, "sizeTableEntry", sizeTableEntry);
+        print(state.outputFiles.audit, variable_fmt, "numTableEntry", numTableEntry);
+        print(state.outputFiles.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
+        print(state.outputFiles.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
     }
 
     void parseStatLine(const std::string &lineIn,

@@ -117,10 +117,10 @@ derivative works thereof, in binary and source code form.
 #include "utilXml.h"
 
 
-FILE *f1 = NULL; 
+FILE *f1 = NULL;
 int REQUIRED_READ_LENGTH  = 0;
 int REQUIRED_WRITE_LENGTH = 0;
-int SERVER_VERSION = 0; 
+int SERVER_VERSION = 0;
 
 // Global variable to check for FMUExport case
 int FMUEXPORT = 0;
@@ -137,10 +137,10 @@ int FMUEXPORT = 0;
 ///\param bufLen The length of the character array \c buffer. This parameter will
 ///              be set to the new size of \c buffer if memory was reallocated.
 ///\return 0 if no error occurred.
-int save_append(char* *buffer, const char *toAdd, int *bufLen){
-  const int size = 1024;
-  const int nNewCha = strlen(toAdd);
-  const int nBufCha = strlen(*buffer);
+int save_append(char* *buffer, const char *toAdd, size_t *bufLen){
+  const size_t size = 1024;
+  const size_t nNewCha = strlen(toAdd);
+  const size_t nBufCha = strlen(*buffer);
   // reallocate memory if needed
   if ( *bufLen < nNewCha + nBufCha + 1){
     *bufLen = *bufLen + size * (((nNewCha + nBufCha) / size)+1);
@@ -175,7 +175,7 @@ int assembleBuffer(int flag,
 		    int nDbl, int nInt, int nBoo,
 		    double curSimTim,
 		    double dblVal[], int intVal[], int booVal[],
-		    char* *buffer, int *bufLen)
+		    char* *buffer, size_t *bufLen)
 {
   int i;
   int retVal;
@@ -317,7 +317,6 @@ int disassembleHeaderBuffer(const char* buffer,
   int retVal;    // return value
   //////////////////////////////////////////////////////
   // Get first few integers to set up dictionaray
-  int i;
   // set number of received values to zero to ensure that
   // if retVal != 0, we have the values initialized
   *nDbl = 0;
@@ -429,7 +428,7 @@ int getsocketportnumber(const char *const docname) {
   int retVal;
   char *xPat = "//ipc/socket[@port]";
   char *res;
-  int i;
+  size_t i;
   res = malloc(BUFFER_LENGTH);
   if (res == NULL) {
     perror("malloc failed in getsocketportnumber.");
@@ -468,7 +467,7 @@ int getmainversionnumber(){
 /// \return 0 if successful, or -1 if an error occured.
 int getsockethost(const char *const docname, char *const hostname) {
   char *xPat = "//ipc/socket[@hostname]";
-  int i;
+  size_t i;
   int r = getxmlvalue(docname, xPat, hostname, &i, BUFFER_LENGTH);
   return r;
 }
@@ -669,7 +668,7 @@ int writetosocket(const int *sockfd,
   int retVal;
   // buffer used to exchange data
   char *buffer;
-  int bufLen = REQUIRED_WRITE_LENGTH;
+  size_t bufLen = REQUIRED_WRITE_LENGTH;
 
 #ifdef NDEBUG
   if (f1 == NULL) // open file
@@ -734,7 +733,7 @@ if (*sockfd < 0 ){
 #endif
 
 #ifdef _MSC_VER
-    retVal = send(*sockfd,buffer,strlen(buffer), 0);
+    retVal = send(*sockfd,buffer,(int)strlen(buffer), 0);
 #else
   retVal = write(*sockfd,buffer,strlen(buffer));
 #endif
@@ -897,7 +896,7 @@ int readfromsocket(const int *sockfd, int *flaRea,
 		   double *curSimTim,
 		   double dblValRea[], int intValRea[], int booValRea[])
 {
-  int retVal, i;
+  int retVal;
   char *inpBuf;
   /////////////////////////////////////////////////////
   // make sure that the socketFD is valid
@@ -976,6 +975,7 @@ int readfromsocket(const int *sockfd, int *flaRea,
 ///\return The exit value of the \c read command.
 int readbufferfromsocket(const int *sockfd,
 			 char *buffer, int *bufLen){
+  (void)bufLen;
   int retVal;
   int reachedEnd = 0;
   // The number 8192 needs to be the same as in Server.java

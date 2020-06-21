@@ -1115,15 +1115,15 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData(outputFiles());
+    GetProjectData(state.outputFiles);
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
     BeginSimFlag = true;
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
-    SizingManager::ManageSizing(state, outputFiles());
+    SizingManager::ManageSizing(state);
 
     bool ErrorsFound(false);
     BranchNodeConnections::CheckNodeConnections(ErrorsFound);
@@ -2123,15 +2123,15 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData(outputFiles());
+    GetProjectData(state.outputFiles);
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
     BeginSimFlag = true;
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
-    SizingManager::ManageSizing(state, outputFiles());
+    SizingManager::ManageSizing(state);
 
     bool ErrorsFound(false);
     BranchNodeConnections::CheckNodeConnections(ErrorsFound);

@@ -59,11 +59,14 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
 
 namespace PipeHeatTransfer {
 
@@ -238,7 +241,7 @@ namespace PipeHeatTransfer {
         {
         }
 
-        static PlantComponent *factory(DataGlobal &dataGlobals, int objectType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
         void clear_state();
 
@@ -246,7 +249,7 @@ namespace PipeHeatTransfer {
 
         void PushInnerTimeStepArrays();
 
-        void InitPipesHeatTransfer(bool const FirstHVACIteration // component number
+        void InitPipesHeatTransfer(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // component number
         );
 
         Real64 TBND(Real64 const z,       // Current Depth
@@ -281,7 +284,7 @@ namespace PipeHeatTransfer {
     // Object Data
     extern Array1D<PipeHTData> PipeHT;
 
-    void GetPipesHeatTransfer(DataGlobal &dataGlobals);
+    void GetPipesHeatTransfer(EnergyPlusData &state);
 
 } // namespace PipeHeatTransfer
 

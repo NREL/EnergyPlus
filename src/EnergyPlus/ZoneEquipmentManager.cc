@@ -265,7 +265,7 @@ namespace ZoneEquipmentManager {
         InitZoneEquipment(FirstHVACIteration);
 
         if (ZoneSizingCalc) {
-            SizeZoneEquipment();
+            SizeZoneEquipment(state.outputFiles);
         } else {
             SimZoneEquipment(state, FirstHVACIteration, SimAir);
             ZoneEquipSimulatedOnce = true;
@@ -548,7 +548,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void SizeZoneEquipment()
+    void SizeZoneEquipment(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -626,7 +626,7 @@ namespace ZoneEquipmentManager {
         Real64 HR90L;                         // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 
         if (SizeZoneEquipmentOneTimeFlag) {
-            SetUpZoneSizingArrays(OutputFiles::getSingleton());
+            SetUpZoneSizingArrays(outputFiles);
             SizeZoneEquipmentOneTimeFlag = false;
         }
 
@@ -1560,7 +1560,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void UpdateZoneSizing(DataGlobal const &dataGlobals, OutputFiles &outputFiles, int const CallIndicator)
+    void UpdateZoneSizing(EnergyPlusData &state, int const CallIndicator)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1955,7 +1955,7 @@ namespace ZoneEquipmentManager {
                     }
                 }
 
-            } else if (SELECT_CASE_var == dataGlobals.EndZoneSizingCalc) {
+            } else if (SELECT_CASE_var == state.dataGlobals.EndZoneSizingCalc) {
 
                 // candidate EMS calling point to customize CalcFinalZoneSizing
                 bool anyEMSRan;
@@ -2006,12 +2006,12 @@ namespace ZoneEquipmentManager {
                         }
                     }
 
-                    print(outputFiles.zsz, "Time");
+                    print(state.outputFiles.zsz, "Time");
                     for (I = 1; I <= NumOfZones; ++I) {
                         if (!ZoneEquipConfig(I).IsControlled) continue;
 
                         static constexpr auto ZSizeFmt11("{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}");
-                        print(outputFiles.zsz,
+                        print(state.outputFiles.zsz,
                               ZSizeFmt11,
                               SizingFileColSep,
                               CalcFinalZoneSizing(I).ZoneName,
@@ -2135,7 +2135,7 @@ namespace ZoneEquipmentManager {
                         }
                     }
 
-                    print(outputFiles.zsz, "\n");
+                    print(state.outputFiles.zsz, "\n");
                     //      HourFrac = 0.0
                     Minutes = 0;
                     TimeStepIndex = 0;
@@ -2160,11 +2160,11 @@ namespace ZoneEquipmentManager {
                             }
 
                             static constexpr auto ZSizeFmt20("{:02}:{:02}:00");
-                            print(outputFiles.zsz, ZSizeFmt20, HourPrint, Minutes);
+                            print(state.outputFiles.zsz, ZSizeFmt20, HourPrint, Minutes);
                             for (I = 1; I <= NumOfZones; ++I) {
                                 if (!ZoneEquipConfig(I).IsControlled) continue;
                                 static constexpr auto ZSizeFmt21("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
-                                print(outputFiles.zsz,
+                                print(state.outputFiles.zsz,
                                       ZSizeFmt21,
                                       SizingFileColSep,
                                       CalcFinalZoneSizing(I).HeatLoadSeq(TimeStepIndex),
@@ -2175,16 +2175,16 @@ namespace ZoneEquipmentManager {
                                       SizingFileColSep,
                                       CalcFinalZoneSizing(I).CoolFlowSeq(TimeStepIndex));
                             }
-                            print(outputFiles.zsz, "\n");
+                            print(state.outputFiles.zsz, "\n");
                         }
                     }
-                    print(outputFiles.zsz, "Peak");
+                    print(state.outputFiles.zsz, "Peak");
 
                     for (I = 1; I <= NumOfZones; ++I) {
                         if (!ZoneEquipConfig(I).IsControlled) continue;
 
                         static constexpr auto ZSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
-                        print(outputFiles.zsz,
+                        print(state.outputFiles.zsz,
                               ZSizeFmt31,
                               SizingFileColSep,
                               CalcFinalZoneSizing(I).DesHeatLoad,
@@ -2195,13 +2195,13 @@ namespace ZoneEquipmentManager {
                               SizingFileColSep,
                               CalcFinalZoneSizing(I).DesCoolMassFlow);
                     }
-                    print(outputFiles.zsz, "\n");
+                    print(state.outputFiles.zsz, "\n");
 
-                    print(outputFiles.zsz, "\nPeak Vol Flow (m3/s)");
+                    print(state.outputFiles.zsz, "\nPeak Vol Flow (m3/s)");
                     for (I = 1; I <= NumOfZones; ++I) {
                         if (!ZoneEquipConfig(I).IsControlled) continue;
                         static constexpr auto ZSizeFmt41("{}{}{}{:12.6E}{}{:12.6E}");
-                        print(outputFiles.zsz,
+                        print(state.outputFiles.zsz,
                               ZSizeFmt41,
                               SizingFileColSep,
                               SizingFileColSep,
@@ -2210,8 +2210,8 @@ namespace ZoneEquipmentManager {
                               SizingFileColSep,
                               CalcFinalZoneSizing(I).DesCoolVolFlow);
                     }
-                    print(outputFiles.zsz, "\n");
-                    outputFiles.zsz.close();
+                    print(state.outputFiles.zsz, "\n");
+                    state.outputFiles.zsz.close();
                 }
 
                 // Move data from Calc arrays to user modified arrays
@@ -3283,7 +3283,8 @@ namespace ZoneEquipmentManager {
                         NonAirSystemResponse(ActualZoneNum) += SysOutputProvided;
 
                     } else if (SELECT_CASE_var == UserDefinedZoneHVACForcedAir_Num) {
-                        SimZoneAirUserDefined(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimZoneAirUserDefined(state.dataBranchInputManager,
+                                              PrioritySimOrder(EquipTypeNum).EquipName,
                                               ActualZoneNum,
                                               SysOutputProvided,
                                               LatOutputProvided,

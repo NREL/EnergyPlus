@@ -48,11 +48,12 @@
 #ifndef OutputFiles_hh_INCLUDED
 #define OutputFiles_hh_INCLUDED
 
-#include "DataGlobals.hh"
-#include <ObjexxFCL/gio.hh>
+#include <fstream>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <ostream>
+#include <vector>
+#include <cassert>
 
 namespace EnergyPlus {
 class OutputFile
@@ -67,14 +68,15 @@ public:
     OutputFile &ensure_open(const std::string &caller);
 
     std::string fileName;
-    void open();
+    void open(const bool forAppend = false);
     std::fstream::pos_type position() const noexcept;
     std::vector<std::string> getLines();
     void open_as_stringstream();
     std::string get_output();
+    void flush();
+    explicit OutputFile(std::string FileName);
 
 private:
-    explicit OutputFile(std::string FileName);
     std::unique_ptr<std::iostream> os;
     template <typename... Args> friend void print(OutputFile &of, fmt::string_view format_str, const Args &... args);
     friend class OutputFiles;
@@ -93,22 +95,13 @@ public:
             of.ensure_open(caller);
             return of;
         }
+        OutputFile try_open() {
+            OutputFile of{fileName};
+            of.open();
+            return of;
+        }
     };
 
-    class GIOOutputFile
-    {
-    public:
-        void close();
-        void open_at_end();
-
-    private:
-        explicit GIOOutputFile(int const FileID, std::string FileName);
-        int fileID;
-        std::string fileName;
-        std::reference_wrapper<std::ostream> os;
-        template <typename... Args> friend void print(OutputFiles::GIOOutputFile &of, fmt::string_view format_str, const Args &... args);
-        friend class OutputFiles;
-    };
 
     OutputFile audit{"eplusout.audit"};
     OutputFile eio{"eplusout.eio"};
@@ -124,6 +117,12 @@ public:
     std::string outputSszTabFileName{"eplusssz.tab"};
     std::string outputSszTxtFileName{"eplusssz.txt"};
 
+    OutputFile map{""};
+    std::string outputMapCsvFileName{"eplusmap.csv"};
+    std::string outputMapTabFileName{"eplusmap.tab"};
+    std::string outputMapTxtFileName{"eplusmap.txt"};
+
+
     OutputFile mtr{"eplusout.mtr"};
     OutputFile bnd{"eplusout.bnd"};
 
@@ -136,11 +135,44 @@ public:
     OutputFileName sci{"eplusout.sci"};
     OutputFileName wrl{"eplusout.wrl"};
 
-    static OutputFiles makeOutputFiles();
+    OutputFileName delightIn{"eplusout.delightin"};
+
+    OutputFile mtd{"eplusout.mtd"};
+    OutputFile edd{"eplusout.edd"};
+    OutputFile shade{"eplusshading.csv"};
+
+    OutputFileName screenCsv{"eplusscreen.csv"};
+    OutputFileName endFile{"eplusout.end"};
+
     static OutputFiles &getSingleton();
+    static void setSingleton(OutputFiles *newSingleton) noexcept;
 
 private:
-    OutputFiles();
+    static OutputFiles *&getSingletonInternal();
+};
+
+class SharedFileHandle
+{
+    std::shared_ptr<OutputFile> file;
+    OutputFile *ptr()
+    {
+        if (!file) {
+            file = std::make_shared<OutputFile>("");
+        }
+
+        return file.get();
+    }
+
+public:
+    OutputFile &operator*()
+    {
+        return *ptr();
+    }
+
+    OutputFile *operator->()
+    {
+        return ptr();
+    }
 };
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count);
@@ -170,11 +202,6 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
 template <typename... Args> void print(std::ostream &os, fmt::string_view format_str, const Args &... args)
 {
     EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...), sizeof...(Args));
-}
-
-template <typename... Args> void print(OutputFiles::GIOOutputFile &outputFile, fmt::string_view format_str, const Args &... args)
-{
-    EnergyPlus::vprint(outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
 template <typename... Args> void print(OutputFile &outputFile, fmt::string_view format_str, const Args &... args)

@@ -128,9 +128,9 @@ namespace PlantChillers {
         sizFac = this->SizFac;
     }
 
-    void BaseChillerSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
+    void BaseChillerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
-        this->initialize(false, 0.0);
+        this->initialize(state.dataBranchInputManager, false, 0.0);
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->size();
         }
@@ -599,10 +599,10 @@ namespace PlantChillers {
         }
     }
 
-    void ElectricChillerSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ElectricChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
-            this->initialize(RunFlag, CurLoad);
+            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
             this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(CurLoad, RunFlag);
@@ -631,7 +631,7 @@ namespace PlantChillers {
         }
     }
 
-    void ElectricChillerSpecs::initialize(bool const RunFlag, Real64 const MyLoad)
+    void ElectricChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -653,7 +653,8 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables();
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     this->plantTypeOfNum,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
@@ -666,7 +667,8 @@ namespace PlantChillers {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         this->plantTypeOfNum,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
@@ -682,7 +684,8 @@ namespace PlantChillers {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         this->plantTypeOfNum,
                                                         this->HRLoopNum,
                                                         this->HRLoopSideNum,
@@ -1908,10 +1911,10 @@ namespace PlantChillers {
         return nullptr;
     }
 
-    void EngineDrivenChillerSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void EngineDrivenChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
-            this->initialize(RunFlag, CurLoad);
+            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
             this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(CurLoad, RunFlag);
@@ -2184,42 +2187,16 @@ namespace PlantChillers {
             thisChiller.MaxExhaustperPowerOutput = DataIPShortCuts::rNumericArgs(23);
             thisChiller.DesignMinExitGasTemp = DataIPShortCuts::rNumericArgs(24);
 
-            thisChiller.FuelType = DataIPShortCuts::cAlphaArgs(12);
-
-            {
-                auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(12));
-
-                if (SELECT_CASE_var == "NATURALGAS") {
-                    thisChiller.FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "DIESEL") {
-                    thisChiller.FuelType = "Diesel";
-
-                } else if (SELECT_CASE_var == "GASOLINE") {
-                    thisChiller.FuelType = "Gasoline";
-
-                } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    thisChiller.FuelType = "FuelOil#1";
-
-                } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    thisChiller.FuelType = "FuelOil#2";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    thisChiller.FuelType = "Propane";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    thisChiller.FuelType = "OtherFuel1";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    thisChiller.FuelType = "OtherFuel2";
-
-                } else {
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + '=' + DataIPShortCuts::cAlphaArgs(12));
-                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError(
-                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
-                    ErrorsFound = true;
-                }
+            // Validate fuel type input
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(12), thisChiller.FuelType, FuelTypeError);
+            if (FuelTypeError) {
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + '=' + DataIPShortCuts::cAlphaArgs(12));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(
+                    "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
+                ErrorsFound = true;
+                FuelTypeError = false;
             }
 
             thisChiller.FuelHeatingValue = DataIPShortCuts::rNumericArgs(25);
@@ -2474,7 +2451,7 @@ namespace PlantChillers {
         }
     }
 
-    void EngineDrivenChillerSpecs::initialize(bool const RunFlag, Real64 const MyLoad)
+    void EngineDrivenChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2496,7 +2473,8 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables();
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     this->plantTypeOfNum,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
@@ -2509,7 +2487,8 @@ namespace PlantChillers {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         this->plantTypeOfNum,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
@@ -2525,7 +2504,8 @@ namespace PlantChillers {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         this->plantTypeOfNum,
                                                         this->HRLoopNum,
                                                         this->HRLoopSideNum,
@@ -3733,10 +3713,10 @@ namespace PlantChillers {
         return nullptr;
     }
 
-    void GTChillerSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void GTChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
-            this->initialize(RunFlag, CurLoad);
+            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
             this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(CurLoad, RunFlag);
@@ -4059,39 +4039,15 @@ namespace PlantChillers {
             }
 
             // Fuel Type Case Statement
-            {
-                auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(10));
-                if (SELECT_CASE_var == "NATURALGAS") {
-                    thisChiller.FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "DIESEL") {
-                    thisChiller.FuelType = "Diesel";
-
-                } else if (SELECT_CASE_var == "GASOLINE") {
-                    thisChiller.FuelType = "Gasoline";
-
-                } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    thisChiller.FuelType = "FuelOil#1";
-
-                } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    thisChiller.FuelType = "FuelOil#2";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    thisChiller.FuelType = "Propane";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    thisChiller.FuelType = "OtherFuel1";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    thisChiller.FuelType = "OtherFuel2";
-
-                } else {
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + DataIPShortCuts::cAlphaArgs(10));
-                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError(
-                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
-                    ErrorsFound = true;
-                }
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(10), thisChiller.FuelType, FuelTypeError);
+            if (FuelTypeError) {
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + DataIPShortCuts::cAlphaArgs(10));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(
+                    "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
+                ErrorsFound = true;
+                FuelTypeError = false;
             }
 
             thisChiller.HeatRecMaxTemp = DataIPShortCuts::rNumericArgs(46);
@@ -4247,7 +4203,7 @@ namespace PlantChillers {
         }
     }
 
-    void GTChillerSpecs::initialize(bool const RunFlag, Real64 const MyLoad)
+    void GTChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4270,7 +4226,8 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables();
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     this->plantTypeOfNum,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
@@ -4283,7 +4240,8 @@ namespace PlantChillers {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         this->plantTypeOfNum,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
@@ -4299,7 +4257,8 @@ namespace PlantChillers {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         this->plantTypeOfNum,
                                                         this->HRLoopNum,
                                                         this->HRLoopSideNum,
@@ -5502,10 +5461,10 @@ namespace PlantChillers {
         return nullptr;
     }
 
-    void ConstCOPChillerSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ConstCOPChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->initialize(RunFlag, CurLoad);
+            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
             this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(CurLoad, RunFlag);
@@ -5824,7 +5783,7 @@ namespace PlantChillers {
         }
     }
 
-    void ConstCOPChillerSpecs::initialize(bool const RunFlag, Real64 const MyLoad)
+    void ConstCOPChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5851,7 +5810,8 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables();
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     this->plantTypeOfNum,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
@@ -5864,7 +5824,8 @@ namespace PlantChillers {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         this->plantTypeOfNum,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,

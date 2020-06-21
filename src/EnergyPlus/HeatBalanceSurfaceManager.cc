@@ -512,16 +512,19 @@ namespace HeatBalanceSurfaceManager {
         // Calculate factors that are used to determine how much long-wave radiation from internal
         // gains is absorbed by interior surfaces
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Absorption Factors");
-        if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange(OutputFiles::getSingleton());
+        if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange(state.outputFiles);
         ComputeIntThermalAbsorpFactors();
 
         // Calculate factors for diffuse solar absorbed by room surfaces and interior shades
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Diffuse Solar Absorption Factors");
         ComputeIntSWAbsorpFactors();
 
-        // Calculate factors for exchange of diffuse solar between zones through interzone windows
-        if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Diffuse Solar Exchange through Interzone Windows");
-        ComputeDifSolExcZonesWIZWindows(NumOfZones);
+        if (InterZoneWindow) {
+            if (InitSurfaceHeatBalancefirstTime)  {
+                DisplayString("Computing Interior Diffuse Solar Exchange through Interzone Windows");
+            }
+            ComputeDifSolExcZonesWIZWindows(NumOfZones);
+        }
 
         // For daylit zones, calculate interior daylight illuminance at reference points and
         // simulate lighting control system to get overhead electric lighting reduction
@@ -722,12 +725,12 @@ namespace HeatBalanceSurfaceManager {
                         DayltgInterReflIllFrIntWins(NZ);
                         DayltgGlareWithIntWins(ZoneDaylight(NZ).GlareIndexAtRefPt, NZ);
                     }
-                    DayltgElecLightingControl(NZ);
+                    DayltgElecLightingControl(state.outputFiles, NZ);
                 }
             }
         } else if (mapResultsToReport && TimeStep == NumOfTimeStepInHour) {
             for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
-                ReportIllumMap(MapNum);
+                ReportIllumMap(state.outputFiles, MapNum);
             }
             mapResultsToReport = false;
         }
@@ -2611,7 +2614,8 @@ namespace HeatBalanceSurfaceManager {
             }
 
             for (int enclNum = 1; enclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclNum) {
-                QSDifSol(enclNum) *= FractDifShortZtoZ(enclNum, enclNum) * VMULT(enclNum);
+                if (InterZoneWindow) QSDifSol(enclNum) *= FractDifShortZtoZ(enclNum, enclNum) * VMULT(enclNum);
+                else QSDifSol(enclNum) *= VMULT(enclNum);
             }
 
             //    RJH - 09-12-07 commented out report varariable calcs here since they refer to old distribution method
@@ -3309,9 +3313,15 @@ namespace HeatBalanceSurfaceManager {
 
         // COMPUTE CONVECTIVE GAINS AND ZONE FLUX DENSITY.
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
-            QS(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * VMULT(enclosureNum);
-            // CR 8695, VMULT not based on visible
-            QSLights(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * VMULT(enclosureNum);
+            if (InterZoneWindow) {
+                QS(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * VMULT(enclosureNum);
+                // CR 8695, VMULT not based on visible
+                QSLights(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * VMULT(enclosureNum);
+            } else {
+                QS(enclosureNum) *= VMULT(enclosureNum);
+                QSLights(enclosureNum) *= VMULT(enclosureNum);
+            }
+
         }
 
         // COMPUTE RADIANT GAINS ON SURFACES
