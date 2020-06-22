@@ -26,9 +26,9 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#define WINDOWS 1
+#define IS_WINDOWS 1
 #else
-#define WINDOWS 0
+#define IS_WINDOWS 0
 #define HANDLE void *
 /* See http://www.yolinux.com/TUTORIALS/LibraryArchives-StaticAndDynamic.html */
 #include <sys/stat.h> // for creating dirs on Linux

@@ -155,8 +155,6 @@ namespace AirflowNetwork {
 
     // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
     extern Array1D<Real64> SUMF;
-    extern int Unit11;
-    extern int Unit21;
 
     // Large opening variables
     extern Array1D<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
@@ -266,13 +264,13 @@ namespace AirflowNetwork {
     void DUMPVD(std::string const &S,     // Description
                 const Array1D<Real64> &V, // Output values
                 int const n,              // Array size
-                int const UOUT            // Output file unit
+                std::ostream &UOUT        // Output file
     );
 
     void DUMPVR(std::string const &S,     // Description
                 const Array1D<Real64> &V, // Output values
                 int const n,              // Array size
-                int const UOUT            // Output file unit
+                std::ostream &UOUT        // Output file
     );
 
     int AFEDOP(int const j,                // Component number

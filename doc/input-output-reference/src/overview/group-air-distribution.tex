@@ -8,12 +8,12 @@ The only numeric input is the design primary air flow rate. This item is input j
 
 The next series of names refer to nodes for the various inlet and outlet points of the air loop. The air loop starts where the zone equipment ends. This is a single point consisting of the return air duct once all of the zone return air streams have been collected (if the loop has a return path). While in reality, there is really only one point, for clarity within the simulation components and consistency with the other HVAC loop sections, this point in the systems is defined as two points: one that resides with the zone equipment simulation and one that is acted upon by the air loop simulation. Both node names must be entered into the input file (if the loop has a return path), and both nodes must have unique names. Similarly, the end points of the air loop that also correspond to the beginning points of the zone equipment loop must also be defined. These consist of names referencing lists of up to three pairs of node names as shown below. Up to three air loop outlets are allowed to accommodate the simulation of three deck systems.
 
-\paragraph{Schedules And Availability Manager}\label{schedules-and-availability-manager}
+\paragraph{Schedules And Availability Manager}
 Regarding component schedules, the general rule is don't schedule any components except the supply fan and the corresponding availability manager(s). Beyond that, every component should always be available and let the controls determine what runs or doesn't run. If a component other than the supply fan is scheduled off, then it will remain off even if the night cycle manager turns on the system.
 
 \subsubsection{Inputs}\label{inputs-002}
 
-\paragraph{Field: Name}\label{field-name-002}
+\paragraph{Field: Name}
 
 This field is a unique, user assigned name for a single instance of an AirLoopHVAC object. Any other object referencing this AirLoopHVAC will use this name.
 
@@ -813,7 +813,7 @@ The name of a specific \textbf{\hyperref[airflownetworkmultizonewindpressurecoef
 
 This field is used to specify whether the pressure curve is symmetric or not. \textbf{Yes} for curves that should be evaluated from 0 to 180 degrees. \textbf{No} for curves that should be evaluated from 0 to 360 degrees.
 
-\paragraph{Field: Wind Angle Type}\label{field-wind-angle-type}
+\paragraph{Field: Wind Angle Type}
 
 This field is used to specify whether the angle used to compute the wind pressure coefficient is absolute or relative. \textbf{Relative} for computing the angle between the wind direction and the surface azimuth. \textbf{Absolute} for using the wind direction angle directly.
 
