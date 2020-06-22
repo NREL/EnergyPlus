@@ -130,6 +130,10 @@ void change_file_date(filename,dosdate,tmu_date)
 
   ut.actime=ut.modtime=mktime(&newdate);
   utime(filename,&ut);
+#else
+  (void)filename;
+  (void)dosdate;
+  (void)tmu_date;
 #endif
 #endif
 }
@@ -147,6 +151,8 @@ int mymkdir(dirname)
 #else
 #ifdef unix
     ret = mkdir (dirname,0775);
+#else
+  (void)dirname;
 #endif
 #endif
     return ret;
@@ -341,7 +347,6 @@ int do_extract_currentfile(uf,popt_extract_without_path,popt_overwrite,password)
     uInt size_buf;
 
     unz_file_info64 file_info;
-    uLong ratio=0;
     err = unzGetCurrentFileInfo64(uf,&file_info,filename_inzip,sizeof(filename_inzip),NULL,0,NULL,0);
 
     if (err!=UNZ_OK)
@@ -499,7 +504,6 @@ int do_extract(uf,opt_extract_without_path,opt_overwrite,password)
     uLong i;
     unz_global_info64 gi;
     int err;
-    FILE* fout=NULL;
 
     err = unzGetGlobalInfo64(uf,&gi);
     if (err!=UNZ_OK)
@@ -533,7 +537,6 @@ int do_extract_onefile(uf,filename,opt_extract_without_path,opt_overwrite,passwo
     int opt_overwrite;
     const char* password;
 {
-    int err = UNZ_OK;
     if (unzLocateFile(uf,filename,CASESENSITIVITY)!=UNZ_OK)
     {
         printf("file %s not found in the zipfile\n",filename);
@@ -558,14 +561,11 @@ int do_extract_onefile(uf,filename,opt_extract_without_path,opt_overwrite,passwo
 int unpackmz(const char *filNam, char *tmpPat)
 {
     const char *zipfilename=filNam;
-    const char *filename_to_extract=NULL;
     const char *password=NULL;
     char filename_try[MAXFILENAME+16] = "";
     int ret_value=0;
-    int opt_do_extract=1;
     int opt_do_extract_withoutpath=0;
     int opt_overwrite=1;
-    int opt_extractdir=1;
     const char *dirname=tmpPat;
     char *cmd;
     char cwd[1024];
@@ -640,7 +640,7 @@ int unpackmz(const char *filNam, char *tmpPat)
 #ifdef _WIN32
   _chdir(dirname); // Command in windows
 #else
-  int i_unused = chdir(dirname); // Command in linux
+  if (chdir(dirname) < 0) return -1; // Command in linux
 #endif
 
   ret_value = do_extract(uf, opt_do_extract_withoutpath, opt_overwrite, password); // Extract all files
@@ -650,7 +650,7 @@ int unpackmz(const char *filNam, char *tmpPat)
 #ifdef _WIN32
   _chdir(cwd); // Command in windows
 #else
-  int j_unused = chdir(cwd); // Command in linux
+  if (chdir(cwd) < 0) return -1; // Command in linux
 #endif
 
   return ret_value;

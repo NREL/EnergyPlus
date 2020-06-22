@@ -673,11 +673,14 @@ namespace TARCOGMain {
             CurGap(i) = gap(i);
         }
 
+        Files files;
+
         //  Prepare common debug variables:
-        PrepDebugFilesAndVariables(Debug_dir, Debug_file, Debug_mode, win_ID, igu_ID, nperr);
+        PrepDebugFilesAndVariables(files, Debug_dir, Debug_file, Debug_mode, win_ID, igu_ID);
 
         // Check input arguments:
-        nperr = ArgCheck(nlayer,
+        nperr = ArgCheck(files,
+                         nlayer,
                          iwd,
                          tout,
                          tind,
@@ -789,7 +792,8 @@ namespace TARCOGMain {
         if (GoAhead(nperr)) {
 
             if (standard == ISO15099) {
-                Calc_ISO15099(nlayer,
+                Calc_ISO15099(files,
+                              nlayer,
                               iwd,
                               tout,
                               tind,
@@ -883,7 +887,8 @@ namespace TARCOGMain {
                               NumOfIterations,
                               edgeGlCorrFac);
             } else if ((standard == EN673) || (standard == EN673Design)) {
-                Calc_EN673(standard,
+                Calc_EN673(files,
+                           standard,
                            nlayer,
                            tout,
                            tind,
@@ -967,7 +972,8 @@ namespace TARCOGMain {
 
                     // after performed deflection recalculate temperatures with new gap widths
                     if (standard == ISO15099) {
-                        Calc_ISO15099(nlayer,
+                        Calc_ISO15099(files,
+                                      nlayer,
                                       iwd,
                                       tout,
                                       tind,
@@ -1061,7 +1067,8 @@ namespace TARCOGMain {
                                       NumOfIterations,
                                       edgeGlCorrFac);
                     } else if ((standard == EN673) || (standard == EN673Design)) {
-                        Calc_EN673(standard,
+                        Calc_EN673(files,
+                                   standard,
                                    nlayer,
                                    tout,
                                    tind,
@@ -1122,7 +1129,7 @@ namespace TARCOGMain {
             }     // if ((CalcDeflection.eq.DEFLECTION_CALC_TEMPERATURE).or.(CalcDeflection.eq.DEFLECTION_CALC_GAP_WIDTHS)) then
         }         // if (GoAhead(nperr)) then
 
-        FinishDebugOutputFiles(nperr);
+        FinishDebugOutputFiles(files, nperr);
     }
 
 } // namespace TARCOGMain

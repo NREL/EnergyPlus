@@ -31,7 +31,7 @@
 #include <cctype>
 #include <iomanip>
 #include <iostream>
-#include <strstream>
+#include <sstream>
 using namespace std;
 
 #include "DEF.H"
@@ -56,11 +56,12 @@ istream &operator >> (istream &s, point3 &p)	//	WLC 06/06/2003 major rewrite
 {
     point3	result;
     Char	c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 	
 	// Expected format: [1 2 3]
 	
-    while (s >> c && isspace(c));
+    while (s >> c && isspace(c)) {;} // skip through spaces
+
 	if (s.eof()) return(s);
 	if (s.fail()) {
 //		cerr << "Point3:ReadError1: unrecoverable failbit\n";
@@ -84,7 +85,8 @@ istream &operator >> (istream &s, point3 &p)	//	WLC 06/06/2003 major rewrite
 		return(s);
 	}
 		
-	while (s >> c && isspace(c));
+	while (s >> c && isspace(c)) {;} // skip through spaces
+
 	if (c != ']')	{
     	s.clear(ios::failbit);
 //	    cerr << "Point3:ReadError3: Expected ']' - got \'" << c << "\'" << "\n";

@@ -150,8 +150,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     Zone(1).SurfaceLast = 2;
     Surface.allocate(2);
 
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    state.dataZonePlenum.NumZoneReturnPlenums = 0;
+    state.dataZonePlenum.NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(1);
     VAMFL.allocate(1);
@@ -200,7 +200,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     // HybridModel
     HybridModelZone(1).PeopleCountCalc_H = false;
 
-    CorrectZoneHumRat(1);
+    CorrectZoneHumRat(state.dataZonePlenum, 1);
     EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
 
     // Case 2 - Unbalanced exhaust flow
@@ -227,7 +227,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     MixingMassFlowZone(1) = 0.0;
     MDotOA(1) = 0.0;
 
-    CorrectZoneHumRat(1);
+    CorrectZoneHumRat(state.dataZonePlenum, 1);
     EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
 
     // Case 3 - Balanced exhaust flow with proper source flow from mixing
@@ -254,7 +254,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     MixingMassFlowZone(1) = 0.02;
     MDotOA(1) = 0.0;
 
-    CorrectZoneHumRat(1);
+    CorrectZoneHumRat(state.dataZonePlenum, 1);
     EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
 
     // Case 4 - Balanced exhaust flow without source flow from mixing
@@ -281,16 +281,16 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     MixingMassFlowZone(1) = 0.0;
     MDotOA(1) = 0.0;
 
-    CorrectZoneHumRat(1);
+    CorrectZoneHumRat(state.dataZonePlenum, 1);
     EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
 
     // Add a section to check #6119 by L. Gu on 5/16/17
-    CorrectZoneHumRat(1);
+    CorrectZoneHumRat(state.dataZonePlenum, 1);
     EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
 
     // Issue 6233
     Zone(1).IsControlled = true;
-    CorrectZoneHumRat(1);
+    CorrectZoneHumRat(state.dataZonePlenum, 1);
     EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
 }
 
@@ -1045,17 +1045,17 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     HConvIn(2) = 0.5;
     HConvIn(3) = 0.5;
 
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    state.dataZonePlenum.NumZoneReturnPlenums = 0;
+    state.dataZonePlenum.NumZoneSupplyPlenums = 0;
 
-    CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
+    CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
     EXPECT_EQ(5.0, SumHA);
     EXPECT_EQ(300.0, SumHATsurf);
     EXPECT_EQ(150.0, SumHATref);
 
     Node(1).MassFlowRate = 0.0;
     Node(2).MassFlowRate = 0.0;
-    CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
+    CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
     EXPECT_EQ(10.0, SumHA);
     EXPECT_EQ(300.0, SumHATsurf);
     EXPECT_EQ(50.0, SumHATref);

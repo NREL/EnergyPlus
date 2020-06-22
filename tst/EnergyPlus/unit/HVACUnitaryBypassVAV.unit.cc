@@ -664,7 +664,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     ZoneEquipmentManager::ManageZoneEquipment(state, firstHVACIteration, simZone, simAir);
     SimAirServingZones::GetAirPathData(state);
     SplitterComponent::GetSplitterInput();
-    SimAirServingZones::InitAirLoops(state, firstHVACIteration);
+    SimAirServingZones::InitAirLoops(state, state.dataZonePlenum, firstHVACIteration);
 
     // set up zone load indicators
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(2);
