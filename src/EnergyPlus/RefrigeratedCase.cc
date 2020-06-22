@@ -9211,7 +9211,7 @@ namespace RefrigeratedCase {
         }
     }
 
-    void InitRefrigerationPlantConnections()
+    void InitRefrigerationPlantConnections(BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9233,18 +9233,19 @@ namespace RefrigeratedCase {
                 if (Condenser(RefCondLoop).CondenserType != DataHeatBalance::RefrigCondenserTypeWater) continue;
 
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(Condenser(RefCondLoop).Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        Condenser(RefCondLoop).Name,
                                                         DataPlant::TypeOf_RefrigSystemWaterCondenser,
-                                        Condenser(RefCondLoop).PlantLoopNum,
-                                        Condenser(RefCondLoop).PlantLoopSideNum,
-                                        Condenser(RefCondLoop).PlantBranchNum,
-                                        Condenser(RefCondLoop).PlantCompNum,
-                                        errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                                        Condenser(RefCondLoop).PlantLoopNum,
+                                                        Condenser(RefCondLoop).PlantLoopSideNum,
+                                                        Condenser(RefCondLoop).PlantBranchNum,
+                                                        Condenser(RefCondLoop).PlantCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
                 if (errFlag) {
                     ShowFatalError("InitRefrigerationPlantConnections: Program terminated due to previous condition(s).");
                 }
@@ -9265,18 +9266,19 @@ namespace RefrigeratedCase {
                 if (RefrigRack(RefCompRackLoop).CondenserType != DataHeatBalance::RefrigCondenserTypeWater) continue;
 
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(RefrigRack(RefCompRackLoop).Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        RefrigRack(RefCompRackLoop).Name,
                                                         DataPlant::TypeOf_RefrigerationWaterCoolRack,
-                                        RefrigRack(RefCompRackLoop).PlantLoopNum,
-                                        RefrigRack(RefCompRackLoop).PlantLoopSideNum,
-                                        RefrigRack(RefCompRackLoop).PlantBranchNum,
-                                        RefrigRack(RefCompRackLoop).PlantCompNum,
-                                        errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                                                        RefrigRack(RefCompRackLoop).PlantLoopNum,
+                                                        RefrigRack(RefCompRackLoop).PlantLoopSideNum,
+                                                        RefrigRack(RefCompRackLoop).PlantBranchNum,
+                                                        RefrigRack(RefCompRackLoop).PlantCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
                 if (errFlag) {
                     ShowFatalError("InitRefrigerationPlantConnections: Program terminated due to previous condition(s).");
                 }
@@ -10134,13 +10136,13 @@ namespace RefrigeratedCase {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void RefrigCondenserData::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
+    void RefrigCondenserData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         InitRefrigeration();
-        InitRefrigerationPlantConnections();
+        InitRefrigerationPlantConnections(state.dataBranchInputManager);
     }
 
-    void RefrigCondenserData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+    void RefrigCondenserData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                        bool const FirstHVACIteration,
                                        Real64 &EP_UNUSED(CurLoad),
                                        bool const EP_UNUSED(RunFlag))
@@ -10172,7 +10174,7 @@ namespace RefrigeratedCase {
         int PlantBranchIndex(0);
         int PlantCompIndex(0);
 
-        InitRefrigerationPlantConnections();
+        InitRefrigerationPlantConnections(state.dataBranchInputManager);
 
         std::string TypeName;
         std::string ErrIntro;
@@ -10291,13 +10293,13 @@ namespace RefrigeratedCase {
         return nullptr; // LCOV_EXCL_LINE
         }
 
-    void RefrigRackData::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
+    void RefrigRackData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
             InitRefrigeration();
-            InitRefrigerationPlantConnections();
+            InitRefrigerationPlantConnections(state.dataBranchInputManager);
         }
 
-    void RefrigRackData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+    void RefrigRackData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                   bool const FirstHVACIteration,
                                   Real64 &EP_UNUSED(CurLoad),
                                   bool const EP_UNUSED(RunFlag))
@@ -10329,7 +10331,7 @@ namespace RefrigeratedCase {
         int PlantBranchIndex(0);
         int PlantCompIndex(0);
 
-        InitRefrigerationPlantConnections();
+        InitRefrigerationPlantConnections(state.dataBranchInputManager);
 
         std::string TypeName;
         std::string ErrIntro;
