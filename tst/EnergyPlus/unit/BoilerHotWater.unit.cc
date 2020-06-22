@@ -53,15 +53,21 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::Boilers;
+using namespace EnergyPlus::DataBranchAirLoopPlant;
+using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataSizing;
+using namespace EnergyPlus::Psychrometrics;
 
 TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
 {
@@ -182,4 +188,96 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
 
     // Additional tests for fuel type input
     EXPECT_EQ(state.dataBoilers.Boiler(1).BoilerFuelTypeForOutputVariable, "Gas");
+}
+
+TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
+{
+
+    bool RunFlag(true);
+    Real64 MyLoad(1000000.0);
+
+    DataPlant::TotNumLoops = 2;
+    DataEnvironment::OutBaroPress = 101325.0;
+    DataEnvironment::StdRhoAir = 1.20;
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DataGlobals::TimeStep = 1;
+    DataGlobals::MinutesPerTimeStep = 60;
+
+    Psychrometrics::InitializePsychRoutines();
+
+    std::string const idf_objects = delimited_string({
+        "Boiler:HotWater,",
+        "  Boiler 1,                !- Name",
+        "  NaturalGas,              !- Fuel Type",
+        "  Autosize,                !- Nominal Capacity {W}",
+        "  0.8,                     !- Nominal Thermal Efficiency",
+        "  LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable",
+        "  BoilerEfficiency,        !- Normalized Boiler Efficiency Curve Name",
+        "  Autosize,                !- Design Water Flow Rate {m3/s}",
+        "  0.0,                     !- Minimum Part Load Ratio",
+        "  1.2,                     !- Maximum Part Load Ratio",
+        "  1.0,                     !- Optimum Part Load Ratio",
+        "  Node boiler 1 inlet,     !- Boiler Water Inlet Node Name",
+        "  Node boiler 1 outlet,    !- Boiler Water Outlet Node Name",
+        "  99.9,                    !- Water Outlet Upper Temperature Limit {C}",
+        "  NotModulated,            !- Boiler Flow Mode",
+        "  ,                        !- Parasitic Electric Load {W}",
+        "  1;                       !- Sizing Factor",
+
+        "Curve:Quadratic,",
+        "  BoilerEfficiency,        !- Name",
+        "  0.5887682,               !- Coefficient1 Constant",
+        "  0.7888184,               !- Coefficient2 x",
+        "  -0.3862498,              !- Coefficient3 x**2",
+        "  0,                       !- Minimum Value of x",
+        "  1;                       !- Maximum Value of x",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects, false));
+
+    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
+        auto &loop(DataPlant::PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(DataPlant::PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(DataPlant::PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
+    }
+
+    GetBoilerInput(state.dataBoilers);
+    auto &thisBoiler = state.dataBoilers.Boiler(1);
+
+    DataPlant::PlantLoop(1).Name = "HotWaterLoop";
+    DataPlant::PlantLoop(1).FluidName = "HotWater";
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = thisBoiler.Name;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Boiler_Simple;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisBoiler.BoilerInletNodeNum;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisBoiler.BoilerOutletNodeNum;
+
+    DataSizing::PlantSizData.allocate(1);
+    DataSizing::PlantSizData(1).DesVolFlowRate = 0.1;
+    DataSizing::PlantSizData(1).DeltaT = 10;
+
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    DataPlant::PlantFirstSizesOkayToReport = true;
+    DataPlant::PlantFinalSizesOkayToReport = true;
+
+    thisBoiler.InitBoiler(state.dataBranchInputManager);
+    thisBoiler.SizeBoiler();
+
+    // run through init again after sizing is complete to set mass flow rate and run calc function
+    DataGlobals::BeginEnvrnFlag = true;
+    thisBoiler.InitBoiler(state.dataBranchInputManager);
+    thisBoiler.CalcBoilerModel(MyLoad, RunFlag, DataBranchAirLoopPlant::ControlType_SeriesActive);
+
+    // check boiler part load ratio and the resultant boiler efficiency
+    EXPECT_NEAR(thisBoiler.BoilerPLR, 0.24, 0.01);
+    Real64 ExpectedBoilerEff = (0.5887682 + 0.7888184 * thisBoiler.BoilerPLR - 0.3862498 * pow(thisBoiler.BoilerPLR,2)) * thisBoiler.NomEffic;
+    EXPECT_NEAR(thisBoiler.BoilerEff, ExpectedBoilerEff,0.01);
 }

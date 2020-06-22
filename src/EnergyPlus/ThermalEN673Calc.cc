@@ -91,7 +91,8 @@ namespace ThermalEN673Calc {
 
     // Functions
 
-    void Calc_EN673(int const standard,
+    void Calc_EN673(TARCOGOutput::Files &files,
+                    int const standard,
                     int const nlayer,
                     Real64 const tout,
                     Real64 const tind,
@@ -220,7 +221,7 @@ namespace ThermalEN673Calc {
                 solar_EN673(dir, totsol, rtot, rs, nlayer, asol, sft, standard, nperr, ErrorMessage);
                 if (GoAhead(nperr)) {
                     shgc = sft;
-                    if (WriteDebugOutput) WriteOutputEN673(OutArgumentsFile, DBGD, nlayer, ufactor, hout, hin, Ra, Nu, hg, hr, hs, nperr);
+                    if (files.WriteDebugOutput) WriteOutputEN673(files.DebugOutputFile, files.DBGD, nlayer, ufactor, hout, hin, Ra, Nu, hg, hr, hs, nperr);
                 } // GoAhead after solar
             }     // GoAhead after EN673ISO10292
         }         // GopAhead after propcon90

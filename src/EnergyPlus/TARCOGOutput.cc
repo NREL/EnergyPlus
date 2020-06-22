@@ -46,20 +46,16 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGOutput.hh>
 #include <EnergyPlus/TARCOGParams.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -94,43 +90,17 @@ namespace TARCOGOutput {
     using namespace TARCOGGassesParams;
     using namespace TARCOGParams;
 
-    // Data
-    // variables:
-    // bi...Debug files handles:
-    // character(len=1000) :: DebugDir
-    std::string DBGD;
-    std::string FileMode;
-    std::string FilePosition;
-    bool WriteDebugOutput;
-    int DebugMode;
     int winID;
     int iguID;
-
-    int InArgumentsFile(statusClosed);
-    int OutArgumentsFile(statusClosed);
-    int WINCogFile(statusClosed);
-
-    // Intermediate debug files
-    int IterationCSVFileNumber(statusClosed);
-    int TarcogIterationsFileNumber(statusClosed);
-
-    std::string IterationCSVName("IterationResults.csv");
-
-    // integer, parameter :: IterationHHAT = 102
-    // character(len=1000)    :: IterationHHATName = 'IterationHHAT.csv'
-
-    std::string WinCogFileName("test.w7");
-    // character(len=1000)    :: SHGCFileName = 'test.w7'
-    std::string DebugOutputFileName("Tarcog.dbg");
 
     std::string const VersionNumber(" 7.0.15.00 ");
     std::string const VersionCompileDateCC(" August 02, 2012");
 
-    static ObjexxFCL::gio::Fmt fmtLD("*");
-
     // Functions
 
-    void WriteInputArguments(Real64 const tout,
+    void WriteInputArguments(OutputFile &InArgumentsFile,
+                             const std::string &DBGD,
+                             Real64 const tout,
                              Real64 const tind,
                              Real64 const trmin,
                              Real64 const wso,
@@ -236,227 +206,222 @@ namespace TARCOGOutput {
         int j;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_10001("('TARCOG v.',A,'compiled ',A)");
-        static ObjexxFCL::gio::Fmt Format_1000("('TARCOG input arguments:')");
-        static ObjexxFCL::gio::Fmt Format_1001("('TARCOG debug output, ',I4,'-',I2.2,'-',I2.2,', ',I2.2,':',I2.2,':',I2.2)");
-        static ObjexxFCL::gio::Fmt Format_1002("('     WindowID:',I8,'  - Not specified')");
-        static ObjexxFCL::gio::Fmt Format_1003("('     WindowID:',I8,' ')");
-        static ObjexxFCL::gio::Fmt Format_1006("('     IGUID:   ',I8,'  - Not specified')");
-        static ObjexxFCL::gio::Fmt Format_1007("('     IGUID:   ',I8,' ')");
-        static ObjexxFCL::gio::Fmt Format_1005("('Simulation parameters:')");
-        static ObjexxFCL::gio::Fmt Format_1010("('  Tout       =  ',F10.6,' K ( ',F7.3,' deg C) - Outdoor temperature')");
-        static ObjexxFCL::gio::Fmt Format_1015("('  Tint       =  ',F10.6,' K ( ',F7.3,' deg C) - Indoor temperature')");
-        static ObjexxFCL::gio::Fmt Format_1014("('Adjusted input arguments:')");
-        static ObjexxFCL::gio::Fmt Format_1013("(' Gass coefficients:')");
-        static ObjexxFCL::gio::Fmt Format_1016("('  Trmout     =  ',F10.6,' K ( ',F7.3,' deg C) - Outdoor mean radiant temp.')");
-        static ObjexxFCL::gio::Fmt Format_1017("('  Gout       =  ',F10.6,' ')");
-        static ObjexxFCL::gio::Fmt Format_1018("('  Gin        =  ',F10.6,' ')");
-        static ObjexxFCL::gio::Fmt Format_1019("('  Ebsky      =  ',F10.6,' ')");
-        static ObjexxFCL::gio::Fmt Format_10191("('  Ebroom     =  ',F10.6,' ')");
-        static ObjexxFCL::gio::Fmt Format_1020("('  Trmin      =  ',F10.6,' K ( ',F7.3,' deg C) - Indoor mean radiant temp.')");
-        static ObjexxFCL::gio::Fmt Format_1030("('  wso        =  ',F7.3,'    - Outdoor wind speed [m/s]')");
-        static ObjexxFCL::gio::Fmt Format_1032("('  iwd        =    0        - Wind direction - windward')");
-        static ObjexxFCL::gio::Fmt Format_1033("('  iwd        =    1        - Wind direction - leeward')");
-        static ObjexxFCL::gio::Fmt Format_1035("('  wsi        =  ',F7.3,'    - Indoor forced air speed [m/s]')");
-        static ObjexxFCL::gio::Fmt Format_1040("('  dir        = ',F8.3,'    - Direct solar radiation [W/m^2]')");
-        static ObjexxFCL::gio::Fmt Format_1041("('  outir       = ',F8.3,'    - IR radiation [W/m^2]')");
-        static ObjexxFCL::gio::Fmt Format_1045("('  isky       =  ',I3,'        - Flag for handling tsky, esky')");
-        static ObjexxFCL::gio::Fmt Format_1050("('  tsky           =  ',F10.6,' K ( ',F7.3,' deg C) - Night sky temperature')");
-        static ObjexxFCL::gio::Fmt Format_1055("('  esky           =  ',F7.3,'    - Effective night sky emmitance')");
-        static ObjexxFCL::gio::Fmt Format_1060("('  fclr           =  ',F7.3,'    - Fraction of sky that is clear')");
-        static ObjexxFCL::gio::Fmt Format_1061("('  VacuumPressure =  ',F7.3,'    - maximum allowed gas pressure to be considered as vacuum')");
-        static ObjexxFCL::gio::Fmt Format_1062("('  VacuumMaxGapThickness =  ',F7.3,'    - maximum allowed vacuum gap thickness with support pillar')");
-        static ObjexxFCL::gio::Fmt Format_1063("('  ibc(1)         =  ',I3,'        - Outdoor BC switch')");
-        static ObjexxFCL::gio::Fmt Format_1065("('  hout           =  ',F9.5,'  - Outdoor film coeff. [W/m^2-K]')");
-        static ObjexxFCL::gio::Fmt Format_1066("('  ibc(2)         =  ',I3,'        - Indoor BC switch')");
-        static ObjexxFCL::gio::Fmt Format_1068("('  hin            =  ',F9.5,'  - Indoor film coeff. [W/m^2-K]')");
-        static ObjexxFCL::gio::Fmt Format_1070("('  standard   =  ',I3,'        - ISO 15099 calc. standard')");
-        static ObjexxFCL::gio::Fmt Format_1071("('  standard   =  ',I3,'        - EN 673/ISO 10292 Declared calc. standard')");
-        static ObjexxFCL::gio::Fmt Format_1072("('  standard   =  ',I3,'        - EN 673/ISO 10292 Design calc. standard')");
-        static ObjexxFCL::gio::Fmt Format_10731("('  ThermalMod =  ',I3,'        - ISO15099 thermal model')");
-        static ObjexxFCL::gio::Fmt Format_10732("('  ThermalMod =  ',I3,'        - Scaled Cavity Width (SCW) thermal model')");
-        static ObjexxFCL::gio::Fmt Format_10733("('  ThermalMod =  ',I3,'        - Convective Scalar Model (CSM) thermal model')");
-        static ObjexxFCL::gio::Fmt Format_10740("('  SDScalar =  ',F7.5,'      - Factor of Venetian SD layer contribution to convection',/,/,' (only if "
-                                     "ThermalModel = 2, otherwise ignored)')");
-        static ObjexxFCL::gio::Fmt Format_1075("('IGU parameters:')");
-        static ObjexxFCL::gio::Fmt Format_1076("('  height     =  ',F10.6,' - IGU cavity height [m]')");
-        static ObjexxFCL::gio::Fmt Format_1077("('  heightt    =  ',F10.6,' - Total window height [m]')");
-        static ObjexxFCL::gio::Fmt Format_1078("('  width      =  ',F10.6,' - Window width [m]')");
-        static ObjexxFCL::gio::Fmt Format_1079("('  tilt       =  ',F7.3,'    - Window tilt [deg]')");
-        static ObjexxFCL::gio::Fmt Format_1080("('  totsol     =  ',F10.6,' - Total solar transmittance of IGU')");
-        static ObjexxFCL::gio::Fmt Format_1081("('  nlayer     =  ',I3,'        - Number of glazing layers')");
-        static ObjexxFCL::gio::Fmt Format_1089("('IGU layers list:')");
-        static ObjexxFCL::gio::Fmt Format_10802("(' Layer',I3,' : ',I1,'              - Specular layer - Monolyhtic Glass')");
-        static ObjexxFCL::gio::Fmt Format_10803("(' Layer',I3,' : ',I1,'              - Laminated Glass')");
-        static ObjexxFCL::gio::Fmt Format_10804("(' Layer',I3,' : ',I1,'              - Horizontal Venetian Blind')");
-        static ObjexxFCL::gio::Fmt Format_10805("(' Layer',I3,' : ',I1,'              - Woven Shade')");
-        static ObjexxFCL::gio::Fmt Format_10806("(' Layer',I3,' : ',I1,'              - Diffuse Shade')");
-        static ObjexxFCL::gio::Fmt Format_10809("(' Layer',I3,' : ',I1,'              - UNKNOWN TYPE!')");
-        static ObjexxFCL::gio::Fmt Format_10810("(' Layer',I3,' : ',I1,'              - Vertical Venetian Blind')");
-        static ObjexxFCL::gio::Fmt Format_1085("('    nslice     = ',I3,'          - Number of slices')");
-        static ObjexxFCL::gio::Fmt Format_1086("('    LaminateA  = ',F12.8,' - A coeff.')");
-        static ObjexxFCL::gio::Fmt Format_1087("('    LaminateB  = ',F12.8,' - B coeff.')");
-        static ObjexxFCL::gio::Fmt Format_1088("('    sumsol     = ',F12.8,' - Absorbed solar energy [W/m^2]')");
-        static ObjexxFCL::gio::Fmt Format_1090("('    thick   = ',F10.6,'   - Thickness [m]')");
-        static ObjexxFCL::gio::Fmt Format_1091("('    scon    = ',F10.6,'   - Thermal conductivity [W/m-K]')");
-        static ObjexxFCL::gio::Fmt Format_1092("('    asol    = ',F12.8,' - Absorbed solar energy [W/m^2]')");
-        static ObjexxFCL::gio::Fmt Format_1093("('    tir     = ',F12.8,' - IR transmittance')");
-        static ObjexxFCL::gio::Fmt Format_1094("('    emis1   = ',F10.6,'   - IR outdoor emissivity')");
-        static ObjexxFCL::gio::Fmt Format_1095("('    emis2   = ',F10.6,'   - IR indoor emissivity')");
-        static ObjexxFCL::gio::Fmt Format_1100("('    Atop    = ',F10.6,'   - Top opening area [m^2]')");
-        static ObjexxFCL::gio::Fmt Format_1101("('    Abot    = ',F10.6,'   - Bottom opening area [m^2]')");
-        static ObjexxFCL::gio::Fmt Format_1102("('    Al      = ',F10.6,'   - Left opening area [m^2]')");
-        static ObjexxFCL::gio::Fmt Format_1103("('    Ar      = ',F10.6,'   - Right opening area [m^2]')");
-        static ObjexxFCL::gio::Fmt Format_1105("('    Ah      = ',F10.6,'   - Total area of holes [m^2]')");
-        static ObjexxFCL::gio::Fmt Format_11051("('    SlatThick   = ',F10.6,'   - Slat thickness [m]')");
-        static ObjexxFCL::gio::Fmt Format_11052("('    SlatWidth   = ',F10.6,'   - Slat width [m]')");
-        static ObjexxFCL::gio::Fmt Format_11053("('    SlatAngle   = ',F10.6,'   - Slat tilt angle [deg]')");
-        static ObjexxFCL::gio::Fmt Format_11054("('    SlatCond    = ',F10.6,'   - Conductivity of the slat material [W/m.K]')");
-        static ObjexxFCL::gio::Fmt Format_11055("('    SlatSpacing = ',F10.6,'   - Distance between slats [m]')");
-        static ObjexxFCL::gio::Fmt Format_11056("('    SlatCurve   = ',F10.6,'   - Curvature radius of the slat [m]')");
-        static ObjexxFCL::gio::Fmt Format_1110("('IGU Gaps:')");
-        static ObjexxFCL::gio::Fmt Format_1111("(' Gap ',I2,':')");
-        static ObjexxFCL::gio::Fmt Format_11110("(' Outdoor space:')");
-        static ObjexxFCL::gio::Fmt Format_11111("(' Indoor space:')");
-        static ObjexxFCL::gio::Fmt Format_1112("('    gap        = ',F12.5,' - Gap width [m]')");
-        static ObjexxFCL::gio::Fmt Format_1113("('    presure    = ',F12.5,' - Gas pressure [N/m^2]')");
-        static ObjexxFCL::gio::Fmt Format_1114("('    nmix       = ',I6,'       - Num. of gasses in a gas mix')");
-        static ObjexxFCL::gio::Fmt Format_1115("('      Gas ',I1,':     ',A,'     ',F6.2,' %')");
-        static ObjexxFCL::gio::Fmt Format_1120("('    vvent      = ',F12.5,' - Forced ventilation speed [m/s]')");
-        static ObjexxFCL::gio::Fmt Format_1121("('    tvent      = ',F12.5,' - Temperature in connected gap [K]')");
-        static ObjexxFCL::gio::Fmt Format_1130("('      Gas mix coefficients - gas ',i1,', ',F6.2,' %')");
-        static ObjexxFCL::gio::Fmt Format_1131("('        gcon   = ',F11.6,', ',F11.6,', ',F11.6,' - Conductivity')");
-        static ObjexxFCL::gio::Fmt Format_1132("('        gvis   = ',F11.6,', ',F11.6,', ',F11.6,' - Dynamic viscosity')");
-        static ObjexxFCL::gio::Fmt Format_1133("('        gcp    = ',F11.6,', ',F11.6,', ',F11.6,' - Spec.heat @ const.P')");
-        static ObjexxFCL::gio::Fmt Format_1134("('        wght   = ',F11.6,'                           - Molecular weight')");
-        static ObjexxFCL::gio::Fmt Format_1198("('=====  =====  =====  =====  =====  =====  =====  =====  =====  =====  =====')");
+        // static constexpr auto Format_10001("TARCOG v.{}compiled {}\n");
+        static constexpr auto Format_1000("TARCOG input arguments:\n");
+        static constexpr auto Format_1001("TARCOG debug output, {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
+        static constexpr auto Format_1002("     WindowID:{:8}  - Not specified\n");
+        static constexpr auto Format_1003("     WindowID:{:8} \n");
+        static constexpr auto Format_1006("     IGUID:   {:8}  - Not specified\n");
+        static constexpr auto Format_1007("     IGUID:   {:8} \n");
+        static constexpr auto Format_1005("Simulation parameters:\n");
+        static constexpr auto Format_1010("  Tout       =  {:10.6F} K ( {:7.3F} deg C) - Outdoor temperature\n");
+        static constexpr auto Format_1015("  Tint       =  {:10.6F} K ( {:7.3F} deg C) - Indoor temperature\n");
+        // static constexpr auto Format_1016("  Trmout     =  {:10.6F} K ( {:7.3F} deg C) - Outdoor mean radiant temp.\n");
+        // static constexpr auto Format_1017("  Gout       =  {:10.6F} \n");
+        // static constexpr auto Format_1018("  Gin        =  {:10.6F} \n");
+        // static constexpr auto Format_1019("  Ebsky      =  {:10.6F} \n");
+        // static constexpr auto Format_10191("  Ebroom     =  {:10.6F} \n");
+        static constexpr auto Format_1020("  Trmin      =  {:10.6F} K ( {:7.3F} deg C) - Indoor mean radiant temp.\n");
+        static constexpr auto Format_1030("  wso        =  {:7.3F}    - Outdoor wind speed [m/s]\n");
+        static constexpr auto Format_1032("  iwd        =    0        - Wind direction - windward\n");
+        static constexpr auto Format_1033("  iwd        =    1        - Wind direction - leeward\n");
+        static constexpr auto Format_1035("  wsi        =  {:7.3F}    - Indoor forced air speed [m/s]\n");
+        static constexpr auto Format_1040("  dir        = {:8.3F}    - Direct solar radiation [W/m^2]\n");
+        static constexpr auto Format_1041("  outir       = {:8.3F}    - IR radiation [W/m^2]\n");
+        static constexpr auto Format_1045("  isky       =  {:3}        - Flag for handling tsky, esky\n");
+        static constexpr auto Format_1050("  tsky           =  {:10.6F} K ( {:7.3F} deg C) - Night sky temperature\n");
+        static constexpr auto Format_1055("  esky           =  {:7.3F}    - Effective night sky emmitance\n");
+        static constexpr auto Format_1060("  fclr           =  {:7.3F}    - Fraction of sky that is clear\n");
+        static constexpr auto Format_1061("  VacuumPressure =  {:7.3F}    - maximum allowed gas pressure to be considered as vacuum\n");
+        static constexpr auto Format_1062("  VacuumMaxGapThickness =  {:7.3F}    - maximum allowed vacuum gap thickness with support pillar\n");
+        static constexpr auto Format_1063("  ibc(1)         =  {:3}        - Outdoor BC switch\n");
+        static constexpr auto Format_1065("  hout           =  {:9.5F}  - Outdoor film coeff. [W/m^2-K]\n");
+        static constexpr auto Format_1066("  ibc(2)         =  {:3}        - Indoor BC switch\n");
+        static constexpr auto Format_1068("  hin            =  {:9.5F}  - Indoor film coeff. [W/m^2-K]\n");
+        static constexpr auto Format_1070("  standard   =  {:3}        - ISO 15099 calc. standard\n");
+        static constexpr auto Format_1071("  standard   =  {:3}        - EN 673/ISO 10292 Declared calc. standard\n");
+        static constexpr auto Format_1072("  standard   =  {:3}        - EN 673/ISO 10292 Design calc. standard\n");
+        static constexpr auto Format_10731("  ThermalMod =  {:3}        - ISO15099 thermal model\n");
+        static constexpr auto Format_10732("  ThermalMod =  {:3}        - Scaled Cavity Width (SCW) thermal model\n");
+        static constexpr auto Format_10733("  ThermalMod =  {:3}        - Convective Scalar Model (CSM) thermal model\n");
+        static constexpr auto Format_10740("  SDScalar =  {:7.5F}      - Factor of Venetian SD layer contribution to convection\n\n (only if "
+                                           "ThermalModel = 2, otherwise ignored)\n");
+        static constexpr auto Format_1075("IGU parameters:\n");
+        static constexpr auto Format_1076("  height     =  {:10.6F} - IGU cavity height [m]\n");
+        static constexpr auto Format_1077("  heightt    =  {:10.6F} - Total window height [m]\n");
+        static constexpr auto Format_1078("  width      =  {:10.6F} - Window width [m]\n");
+        static constexpr auto Format_1079("  tilt       =  {:7.3F}    - Window tilt [deg]\n");
+        static constexpr auto Format_1080("  totsol     =  {:10.6F} - Total solar transmittance of IGU\n");
+        static constexpr auto Format_1081("  nlayer     =  {:3}        - Number of glazing layers\n");
+        static constexpr auto Format_1089("IGU layers list:\n");
+        static constexpr auto Format_10802(" Layer{:3} : {:1}              - Specular layer - Monolyhtic Glass\n");
+        static constexpr auto Format_10803(" Layer{:3} : {:1}              - Laminated Glass\n");
+        static constexpr auto Format_10804(" Layer{:3} : {:1}              - Horizontal Venetian Blind\n");
+        static constexpr auto Format_10805(" Layer{:3} : {:1}              - Woven Shade\n");
+        static constexpr auto Format_10806(" Layer{:3} : {:1}              - Diffuse Shade\n");
+        static constexpr auto Format_10809(" Layer{:3} : {:1}              - UNKNOWN TYPE!\n");
+        static constexpr auto Format_10810(" Layer{:3} : {:1}              - Vertical Venetian Blind\n");
+        static constexpr auto Format_1085("    nslice     = {:3}          - Number of slices\n");
+        static constexpr auto Format_1090("    thick   = {:10.6F}   - Thickness [m]\n");
+        static constexpr auto Format_1091("    scon    = {:10.6F}   - Thermal conductivity [W/m-K]\n");
+        static constexpr auto Format_1092("    asol    = {:12.8F} - Absorbed solar energy [W/m^2]\n");
+        static constexpr auto Format_1093("    tir     = {:12.8F} - IR transmittance\n");
+        static constexpr auto Format_1094("    emis1   = {:10.6F}   - IR outdoor emissivity\n");
+        static constexpr auto Format_1095("    emis2   = {:10.6F}   - IR indoor emissivity\n");
+        static constexpr auto Format_1100("    Atop    = {:10.6F}   - Top opening area [m^2]\n");
+        static constexpr auto Format_1101("    Abot    = {:10.6F}   - Bottom opening area [m^2]\n");
+        static constexpr auto Format_1102("    Al      = {:10.6F}   - Left opening area [m^2]\n");
+        static constexpr auto Format_1103("    Ar      = {:10.6F}   - Right opening area [m^2]\n");
+        static constexpr auto Format_1105("    Ah      = {:10.6F}   - Total area of holes [m^2]\n");
+        static constexpr auto Format_11051("    SlatThick   = {:10.6F}   - Slat thickness [m]\n");
+        static constexpr auto Format_11052("    SlatWidth   = {:10.6F}   - Slat width [m]\n");
+        static constexpr auto Format_11053("    SlatAngle   = {:10.6F}   - Slat tilt angle [deg]\n");
+        static constexpr auto Format_11054("    SlatCond    = {:10.6F}   - Conductivity of the slat material [W/m.K]\n");
+        static constexpr auto Format_11055("    SlatSpacing = {:10.6F}   - Distance between slats [m]\n");
+        static constexpr auto Format_11056("    SlatCurve   = {:10.6F}   - Curvature radius of the slat [m]\n");
+        static constexpr auto Format_1110("IGU Gaps:\n");
+        static constexpr auto Format_1111(" Gap {:2}:\n");
+        static constexpr auto Format_11110(" Outdoor space:\n");
+        static constexpr auto Format_11111(" Indoor space:\n");
+        static constexpr auto Format_1112("    gap        = {:12.5F} - Gap width [m]\n");
+        static constexpr auto Format_1113("    presure    = {:12.5F} - Gas pressure [N/m^2]\n");
+        static constexpr auto Format_1114("    nmix       = {:6}       - Num. of gasses in a gas mix\n");
+        static constexpr auto Format_1115("      Gas {:1}:     {}     {:6.2F} %\n");
+        static constexpr auto Format_1120("    vvent      = {:12.5F} - Forced ventilation speed [m/s]\n");
+        static constexpr auto Format_1121("    tvent      = {:12.5F} - Temperature in connected gap [K]\n");
+        static constexpr auto Format_1130("      Gas mix coefficients - gas {:1}, {:6.2F} %\n");
+        static constexpr auto Format_1131("        gcon   = {:11.6F}, {:11.6F}, {:11.6F} - Conductivity\n");
+        static constexpr auto Format_1132("        gvis   = {:11.6F}, {:11.6F}, {:11.6F} - Dynamic viscosity\n");
+        static constexpr auto Format_1133("        gcp    = {:11.6F}, {:11.6F}, {:11.6F} - Spec.heat @ const.P\n");
+        static constexpr auto Format_1134("        wght   = {:11.6F}                           - Molecular weight\n");
+        static constexpr auto Format_1198("=====  =====  =====  =====  =====  =====  =====  =====  =====  =====  =====\n");
 
         // bi...Create debug file w/ Tarcog's input arguments:
 
         // File is not open and nothing cannot be written
-        if (InArgumentsFile == statusClosed) return;
+        if (!InArgumentsFile.good()) return;
 
         date_and_time(real_CLOCK(1), real_CLOCK(2), real_CLOCK(3), DATE_TIME);
 
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD);
+        print(InArgumentsFile, "\n");
         //  write(InArgumentsFile, 10001) VersionNumber, VersionCompileDateCC
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1001) << DATE_TIME(1) << DATE_TIME(2) << DATE_TIME(3) << DATE_TIME(5) << DATE_TIME(6) << DATE_TIME(7);
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD);
+        print(InArgumentsFile, Format_1001, DATE_TIME(1), DATE_TIME(2), DATE_TIME(3), DATE_TIME(5), DATE_TIME(6), DATE_TIME(7));
+        print(InArgumentsFile, "\n");
 
         if (winID == -1) {
-            ObjexxFCL::gio::write(InArgumentsFile, Format_1002) << winID;
+            print(InArgumentsFile, Format_1002, winID);
         } else {
-            ObjexxFCL::gio::write(InArgumentsFile, Format_1003) << winID;
+            print(InArgumentsFile, Format_1003, winID);
         }
 
         if (iguID == -1) {
-            ObjexxFCL::gio::write(InArgumentsFile, Format_1006) << iguID;
+            print(InArgumentsFile, Format_1006, iguID);
         } else {
-            ObjexxFCL::gio::write(InArgumentsFile, Format_1007) << iguID;
+            print(InArgumentsFile, Format_1007, iguID);
         }
 
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD) << "    Debug dir:     " + DBGD;
+        print(InArgumentsFile, "     Debug dir:     {}\n", DBGD);
 
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1000);
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1005);
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1010) << tout << tout - KelvinConv;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1015) << tind << tind - KelvinConv;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1020) << trmin << trmin - KelvinConv;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1030) << wso;
-        if (iwd == 0) ObjexxFCL::gio::write(InArgumentsFile, Format_1032); // windward
-        if (iwd == 1) ObjexxFCL::gio::write(InArgumentsFile, Format_1033); // leeward
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1035) << wsi;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1040) << dir;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1041) << outir;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1045) << isky;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1050) << tsky << tsky - KelvinConv;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1055) << esky;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1060) << fclr;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1061) << VacuumPressure;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1062) << VacuumMaxGapThickness;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1063) << ibc(1);
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1065) << hout;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1066) << ibc(2);
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1068) << hin;
+        print(InArgumentsFile, "\n");
+        print(InArgumentsFile, Format_1000);
+        print(InArgumentsFile, "\n");
+        print(InArgumentsFile, Format_1005);
+        print(InArgumentsFile, Format_1010, tout, tout - KelvinConv);
+        print(InArgumentsFile, Format_1015, tind, tind - KelvinConv);
+        print(InArgumentsFile, Format_1020, trmin, trmin - KelvinConv);
+        print(InArgumentsFile, Format_1030, wso);
+        if (iwd == 0) print(InArgumentsFile, Format_1032); // windward
+        if (iwd == 1) print(InArgumentsFile, Format_1033); // leeward
+        print(InArgumentsFile, Format_1035, wsi);
+        print(InArgumentsFile, Format_1040, dir);
+        print(InArgumentsFile, Format_1041, outir);
+        print(InArgumentsFile, Format_1045, isky);
+        print(InArgumentsFile, Format_1050, tsky, tsky - KelvinConv);
+        print(InArgumentsFile, Format_1055, esky);
+        print(InArgumentsFile, Format_1060, fclr);
+        print(InArgumentsFile, Format_1061, VacuumPressure);
+        print(InArgumentsFile, Format_1062, VacuumMaxGapThickness);
+        print(InArgumentsFile, Format_1063, ibc(1));
+        print(InArgumentsFile, Format_1065, hout);
+        print(InArgumentsFile, Format_1066, ibc(2));
+        print(InArgumentsFile, Format_1068, hin);
 
-        if (standard == ISO15099) ObjexxFCL::gio::write(InArgumentsFile, Format_1070) << standard;
-        if (standard == EN673) ObjexxFCL::gio::write(InArgumentsFile, Format_1071) << standard;
-        if (standard == EN673Design) ObjexxFCL::gio::write(InArgumentsFile, Format_1072) << standard;
+        if (standard == ISO15099) print(InArgumentsFile, Format_1070, standard);
+        if (standard == EN673) print(InArgumentsFile, Format_1071, standard);
+        if (standard == EN673Design) print(InArgumentsFile, Format_1072, standard);
 
         if (ThermalMod == THERM_MOD_ISO15099) {
-            ObjexxFCL::gio::write(InArgumentsFile, Format_10731) << ThermalMod;
-            ObjexxFCL::gio::write(InArgumentsFile, Format_10740) << SDScalar;
+            print(InArgumentsFile, Format_10731, ThermalMod);
+            print(InArgumentsFile, Format_10740, SDScalar);
         }
 
         if (ThermalMod == THERM_MOD_SCW) {
-            ObjexxFCL::gio::write(InArgumentsFile, Format_10732) << ThermalMod;
-            ObjexxFCL::gio::write(InArgumentsFile, Format_10740) << SDScalar;
+            print(InArgumentsFile, Format_10732, ThermalMod);
+            print(InArgumentsFile, Format_10740, SDScalar);
         }
 
         if (ThermalMod == THERM_MOD_CSM) {
-            ObjexxFCL::gio::write(InArgumentsFile, Format_10733) << ThermalMod;
-            ObjexxFCL::gio::write(InArgumentsFile, Format_10740) << SDScalar;
+            print(InArgumentsFile, Format_10733, ThermalMod);
+            print(InArgumentsFile, Format_10740, SDScalar);
         }
 
         //    if (ThermalMod.eq.THERM_MOD_CSM)
         //        write(InArgumentsFile, 10740) SDScalar
 
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD);
+        print(InArgumentsFile, "\n");
 
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1075);
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1076) << height;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1077) << heightt;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1078) << width;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1079) << tilt;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1080) << totsol;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1081) << nlayer;
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD);
+        print(InArgumentsFile, Format_1075);
+        print(InArgumentsFile, Format_1076, height);
+        print(InArgumentsFile, Format_1077, heightt);
+        print(InArgumentsFile, Format_1078, width);
+        print(InArgumentsFile, Format_1079, tilt);
+        print(InArgumentsFile, Format_1080, totsol);
+        print(InArgumentsFile, Format_1081, nlayer);
+        print(InArgumentsFile, "\n");
 
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1089);
+        print(InArgumentsFile, Format_1089);
         for (i = 1; i <= nlayer; ++i) {
             {
                 auto const SELECT_CASE_var(LayerType(i));
                 if (SELECT_CASE_var == DIFFSHADE) { // Diffuse Shade
-                    ObjexxFCL::gio::write(InArgumentsFile, Format_10806) << i << LayerType(i);
+                    print(InArgumentsFile, Format_10806, i, LayerType(i));
                 } else if (SELECT_CASE_var == WOVSHADE) { // Woven Shade
-                    ObjexxFCL::gio::write(InArgumentsFile, Format_10805) << i << LayerType(i);
+                    print(InArgumentsFile, Format_10805, i, LayerType(i));
                 } else if (SELECT_CASE_var == VENETBLIND_HORIZ) { // Horizontal venetian blind
-                    ObjexxFCL::gio::write(InArgumentsFile, Format_10804) << i << LayerType(i);
+                    print(InArgumentsFile, Format_10804, i, LayerType(i));
                 } else if (SELECT_CASE_var == VENETBLIND_VERT) { // Vertical venetian blind
-                    ObjexxFCL::gio::write(InArgumentsFile, Format_10810) << i << LayerType(i);
+                    print(InArgumentsFile, Format_10810, i, LayerType(i));
                 } else if (SELECT_CASE_var == SPECULAR) { // Specular layer
                     if (nslice(i) <= 1) {
-                        ObjexxFCL::gio::write(InArgumentsFile, Format_10802) << i << LayerType(i); // Monolithic glass
+                        print(InArgumentsFile, Format_10802, i, LayerType(i)); // Monolithic glass
                     } else {
-                        ObjexxFCL::gio::write(InArgumentsFile, Format_10803) << i << LayerType(i); // Laminated layer
+                        print(InArgumentsFile, Format_10803, i, LayerType(i)); // Laminated layer
                     }
                 } else {
-                    ObjexxFCL::gio::write(InArgumentsFile, Format_10809) << i << LayerType(i);
+                    print(InArgumentsFile, Format_10809, i, LayerType(i));
                 }
             }
 
-            ObjexxFCL::gio::write(InArgumentsFile, Format_1090) << thick(i);
-            ObjexxFCL::gio::write(InArgumentsFile, Format_1091) << scon(i);
-            ObjexxFCL::gio::write(InArgumentsFile, Format_1092) << asol(i);
-            ObjexxFCL::gio::write(InArgumentsFile, Format_1093) << tir(2 * i - 1);
-            ObjexxFCL::gio::write(InArgumentsFile, Format_1094) << emis(2 * i - 1);
-            ObjexxFCL::gio::write(InArgumentsFile, Format_1095) << emis(2 * i);
+            print(InArgumentsFile, Format_1090, thick(i));
+            print(InArgumentsFile, Format_1091, scon(i));
+            print(InArgumentsFile, Format_1092, asol(i));
+            print(InArgumentsFile, Format_1093, tir(2 * i - 1));
+            print(InArgumentsFile, Format_1094, emis(2 * i - 1));
+            print(InArgumentsFile, Format_1095, emis(2 * i));
 
             if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) { // SD layer
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1100) << Atop(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1101) << Abot(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1102) << Al(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1103) << Ar(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1105) << Ah(i);
+                print(InArgumentsFile, Format_1100, Atop(i));
+                print(InArgumentsFile, Format_1101, Abot(i));
+                print(InArgumentsFile, Format_1102, Al(i));
+                print(InArgumentsFile, Format_1103, Ar(i));
+                print(InArgumentsFile, Format_1105, Ah(i));
 
-                ObjexxFCL::gio::write(InArgumentsFile, Format_11051) << SlatThick(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_11052) << SlatWidth(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_11053) << SlatAngle(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_11054) << SlatCond(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_11055) << SlatSpacing(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_11056) << SlatCurve(i);
+                print(InArgumentsFile, Format_11051, SlatThick(i));
+                print(InArgumentsFile, Format_11052, SlatWidth(i));
+                print(InArgumentsFile, Format_11053, SlatAngle(i));
+                print(InArgumentsFile, Format_11054, SlatCond(i));
+                print(InArgumentsFile, Format_11055, SlatSpacing(i));
+                print(InArgumentsFile, Format_11056, SlatCurve(i));
 
                 // bi...Input arguments correction patch:
 
@@ -478,30 +443,30 @@ namespace TARCOGOutput {
             }
 
             if (nslice(i) > 1) { // SD layer
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1085) << nslice(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1085) << LaminateA(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1085) << LaminateB(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1085) << sumsol(i);
+                print(InArgumentsFile, Format_1085, nslice(i));
+                print(InArgumentsFile, Format_1085, LaminateA(i));
+                print(InArgumentsFile, Format_1085, LaminateB(i));
+                print(InArgumentsFile, Format_1085, sumsol(i));
             }
         } // i - layers
 
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD);
+        print(InArgumentsFile, "\n");
 
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1110);
+        print(InArgumentsFile, Format_1110);
 
         for (i = 1; i <= nlayer + 1; ++i) { // loop through gaps:
-            if ((i > 1) && (i <= nlayer)) ObjexxFCL::gio::write(InArgumentsFile, Format_1111) << i - 1;
-            if (i == 1) ObjexxFCL::gio::write(InArgumentsFile, Format_11110);
-            if (i == nlayer + 1) ObjexxFCL::gio::write(InArgumentsFile, Format_11111);
-            if ((i > 1) && (i <= nlayer)) ObjexxFCL::gio::write(InArgumentsFile, Format_1112) << gap(i - 1);
-            ObjexxFCL::gio::write(InArgumentsFile, Format_1113) << presure(i);
+            if ((i > 1) && (i <= nlayer)) print(InArgumentsFile, Format_1111, i - 1);
+            if (i == 1) print(InArgumentsFile, Format_11110);
+            if (i == nlayer + 1) print(InArgumentsFile, Format_11111);
+            if ((i > 1) && (i <= nlayer)) print(InArgumentsFile, Format_1112, gap(i - 1));
+            print(InArgumentsFile, Format_1113, presure(i));
             if ((i > 1) && (i <= nlayer)) {
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1120) << vvent(i);
+                print(InArgumentsFile, Format_1120, vvent(i));
             }
             if ((i > 1) && (i <= nlayer)) {
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1121) << tvent(i);
+                print(InArgumentsFile, Format_1121, tvent(i));
             }
-            ObjexxFCL::gio::write(InArgumentsFile, Format_1114) << nmix(i);
+            print(InArgumentsFile, Format_1114, nmix(i));
 
             // if (mgas.eq.1) then ! call gasses by names:
             //  do  j = 1, nmix(i)
@@ -515,21 +480,21 @@ namespace TARCOGOutput {
             // if (mgas.eq.0) then ! show received gass properties:
             for (j = 1; j <= nmix(i); ++j) {
                 // if (iprop(i, j).eq.1) write(InArgumentsFile, 1115) iprop(i, j), ' ' 100*frct(i, j) ! Air
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1115) << iprop(j, i) << ' ' << 100 * frct(j, i); // gas
+                print(InArgumentsFile, Format_1115, iprop(j, i), ' ', 100 * frct(j, i)); // gas
                 // if (iprop(i, j).eq.2) write(InArgumentsFile, 1116) iprop(i, j), 100*frct(i, j) ! Argon
                 // if (iprop(i, j).eq.3) write(InArgumentsFile, 1117) iprop(i, j), 100*frct(i, j) ! Krypton
                 // if (iprop(i, j).eq.4) write(InArgumentsFile, 1118) iprop(i, j), 100*frct(i, j) ! Xenon
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1130) << iprop(j, i) << 100 * frct(j, i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1131) << xgcon(1, iprop(j, i)) << xgcon(2, iprop(j, i)) << xgcon(3, iprop(j, i));
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1132) << xgvis(1, iprop(j, i)) << xgvis(2, iprop(j, i)) << xgvis(3, iprop(j, i));
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1133) << xgcp(1, iprop(j, i)) << xgcp(2, iprop(j, i)) << xgcp(3, iprop(j, i));
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1134) << xwght(iprop(j, i));
+                print(InArgumentsFile, Format_1130, iprop(j, i), 100 * frct(j, i));
+                print(InArgumentsFile, Format_1131, xgcon(1, iprop(j, i)), xgcon(2, iprop(j, i)), xgcon(3, iprop(j, i)));
+                print(InArgumentsFile, Format_1132, xgvis(1, iprop(j, i)), xgvis(2, iprop(j, i)), xgvis(3, iprop(j, i)));
+                print(InArgumentsFile, Format_1133, xgcp(1, iprop(j, i)), xgcp(2, iprop(j, i)), xgcp(3, iprop(j, i)));
+                print(InArgumentsFile, Format_1134, xwght(iprop(j, i)));
             } // - j - one mix
               // end if  ! MGAS = 1 - "table" gasses
         }     // i - gas loop
 
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1198);
+        print(InArgumentsFile, "\n");
+        print(InArgumentsFile, Format_1198);
 
         // close(InArgumentsFile)
 
@@ -539,7 +504,7 @@ namespace TARCOGOutput {
         //!!
         //!!!!!!!!!!!!!!!!!!
 
-        // 1000  format('TARCOG input arguments list - ',I4,'-',I2.2,'-',I2.2, ', ', I2.2,':',I2.2,':',I2.2)
+        // 1000  format('TARCOG input arguments list - {:4}-{:02}-',I2.2, ', ', I2.2,':{:02}:',I2.2)
 
         // 1010  format('  Tout       =  ', F10.6,  ' - Outdoor temperature [K]')
         // 1015  format('  Tin        =  ', F10.6,  ' - Indoor temperature [K]')
@@ -557,7 +522,7 @@ namespace TARCOGOutput {
         // 1199  format('-----  *****  -----  *****  -----  *****  -----  *****  -----  *****  -----')
     }
 
-    void WriteModifiedArguments(int const InArgumentsFile,
+    void WriteModifiedArguments(OutputFile &InArgumentsFile,
                                 std::string const &EP_UNUSED(DBGD),
                                 Real64 const esky,
                                 Real64 const trmout,
@@ -599,72 +564,71 @@ namespace TARCOGOutput {
         int j;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_1014("('Adjusted input arguments:')");
-        static ObjexxFCL::gio::Fmt Format_1013("(' Gass coefficients:')");
-        static ObjexxFCL::gio::Fmt Format_1016("('  Trmout     =  ',F10.6,' K ( ',F7.3,' deg C) - Outdoor mean radiant temp.')");
-        static ObjexxFCL::gio::Fmt Format_1017("('  Gout       =  ',F10.6,' ')");
-        static ObjexxFCL::gio::Fmt Format_1018("('  Gin        =  ',F10.6,' ')");
-        static ObjexxFCL::gio::Fmt Format_1019("('  Ebsky      =  ',F10.6,' ')");
-        static ObjexxFCL::gio::Fmt Format_10191("('  Ebroom     =  ',F10.6,' ')");
-        static ObjexxFCL::gio::Fmt Format_1020("('  Trmin      =  ',F10.6,' K ( ',F7.3,' deg C) - Indoor mean radiant temp.')");
-        static ObjexxFCL::gio::Fmt Format_1055("('  esky       =  ',F7.3,'    - Effective night sky emmitance')");
-        static ObjexxFCL::gio::Fmt Format_1084("(' Layer',I3,' : ',I1,'              - Venetian Blind')");
-        static ObjexxFCL::gio::Fmt Format_1090("('    thick   = ',F10.6,'   - Thickness [m]')");
-        static ObjexxFCL::gio::Fmt Format_1091("('    scon    = ',F10.6,'   - Thermal conductivity [W/m-K]')");
-        static ObjexxFCL::gio::Fmt Format_1130("('      Gas mix coefficients - gas ',i1,', ',F6.2,' %')");
-        static ObjexxFCL::gio::Fmt Format_1131("('        gcon   = ',F11.6,', ',F11.6,', ',F11.6,' - Conductivity')");
-        static ObjexxFCL::gio::Fmt Format_1132("('        gvis   = ',F11.6,', ',F11.6,', ',F11.6,' - Dynamic viscosity')");
-        static ObjexxFCL::gio::Fmt Format_1133("('        gcp    = ',F11.6,', ',F11.6,', ',F11.6,' - Spec.heat @ const.P')");
-        static ObjexxFCL::gio::Fmt Format_1134("('        wght   = ',F11.6,'                           - Molecular weight')");
-        static ObjexxFCL::gio::Fmt Format_1110("('IGU Gaps:')");
-        static ObjexxFCL::gio::Fmt Format_1111("(' Gap ',I2,':')");
-        static ObjexxFCL::gio::Fmt Format_1112("(' Gap width: ',F11.8)");
-        static ObjexxFCL::gio::Fmt Format_11110("(' Outdoor space:')");
-        static ObjexxFCL::gio::Fmt Format_11111("(' Indoor space:')");
-        static ObjexxFCL::gio::Fmt Format_1198("('=====  =====  =====  =====  =====  =====  =====  =====  =====  =====  =====')");
+        static constexpr auto Format_1014("Adjusted input arguments:\n");
+        static constexpr auto Format_1013(" Gass coefficients:\n");
+        static constexpr auto Format_1016("  Trmout     =  {:10.6F} K ( {:7.3F} deg C) - Outdoor mean radiant temp.\n");
+        static constexpr auto Format_1017("  Gout       =  {:10.6F} \n");
+        static constexpr auto Format_1018("  Gin        =  {:10.6F} \n");
+        static constexpr auto Format_1019("  Ebsky      =  {:10.6F} \n");
+        static constexpr auto Format_10191("  Ebroom     =  {:10.6F} \n");
+        static constexpr auto Format_1020("  Trmin      =  {:10.6F} K ( {:7.3F} deg C) - Indoor mean radiant temp.\n");
+        static constexpr auto Format_1055("  esky       =  {:7.3F}    - Effective night sky emmitance\n");
+        static constexpr auto Format_1084(" Layer{:3} : {:1}              - Venetian Blind\n");
+        static constexpr auto Format_1090("    thick   = {:10.6F}   - Thickness [m]\n");
+        static constexpr auto Format_1091("    scon    = {:10.6F}   - Thermal conductivity [W/m-K]\n");
+        static constexpr auto Format_1130("      Gas mix coefficients - gas {:1}, {:6.2F} %\n");
+        static constexpr auto Format_1131("        gcon   = {:11.6F}, {:11.6F}, {:11.6F} - Conductivity\n");
+        static constexpr auto Format_1132("        gvis   = {:11.6F}, {:11.6F}, {:11.6F} - Dynamic viscosity\n");
+        static constexpr auto Format_1133("        gcp    = {:11.6F}, {:11.6F}, {:11.6F} - Spec.heat @ const.P\n");
+        static constexpr auto Format_1134("        wght   = {:11.6F}                           - Molecular weight\n");
+        static constexpr auto Format_1111(" Gap {:2}:\n");
+        static constexpr auto Format_1112(" Gap width: {:11.8F}\n");
+        static constexpr auto Format_11110(" Outdoor space:\n");
+        static constexpr auto Format_11111(" Indoor space:\n");
+        static constexpr auto Format_1198("=====  =====  =====  =====  =====  =====  =====  =====  =====  =====  =====\n");
 
         // open(unit=InArgumentsFile,  file=TRIM(DBGD)//DebugOutputFileName,  status='unknown', access=FileMode, &
         //        position=FilePosition, form='formatted', iostat=nperr)
         // if (nperr.ne.0)  open(unit=InArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode, &
         //        position=FilePosition, form='formatted', iostat=nperr)
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1014);
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1055) << esky;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1016) << trmout << trmout - KelvinConv;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1020) << trmin << trmin - KelvinConv;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1019) << ebsky;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_10191) << ebroom;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1017) << Gout;
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1018) << Gin;
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD);
+        print(InArgumentsFile, "\n");
+        print(InArgumentsFile, Format_1014);
+        print(InArgumentsFile, "\n");
+        print(InArgumentsFile, Format_1055, esky);
+        print(InArgumentsFile, Format_1016, trmout, trmout - KelvinConv);
+        print(InArgumentsFile, Format_1020, trmin, trmin - KelvinConv);
+        print(InArgumentsFile, Format_1019, ebsky);
+        print(InArgumentsFile, Format_10191, ebroom);
+        print(InArgumentsFile, Format_1017, Gout);
+        print(InArgumentsFile, Format_1018, Gin);
+        print(InArgumentsFile, "\n");
 
         for (i = 1; i <= nlayer; ++i) {
             if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) { // SD layer
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1084) << i << LayerType(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1090) << thick(i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1091) << scon(i);
+                print(InArgumentsFile, Format_1084, i, LayerType(i));
+                print(InArgumentsFile, Format_1090, thick(i));
+                print(InArgumentsFile, Format_1091, scon(i));
             }
         }
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD);
+        print(InArgumentsFile, "\n");
 
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1013);
+        print(InArgumentsFile, Format_1013);
         for (i = 1; i <= nlayer + 1; ++i) { // loop through gaps:
-            if ((i > 1) && (i <= nlayer)) ObjexxFCL::gio::write(InArgumentsFile, Format_1111) << i - 1;
-            if ((i > 1) && (i <= nlayer)) ObjexxFCL::gio::write(InArgumentsFile, Format_1112) << gap(i - 1);
-            if (i == 1) ObjexxFCL::gio::write(InArgumentsFile, Format_11110);
-            if (i == nlayer + 1) ObjexxFCL::gio::write(InArgumentsFile, Format_11111);
+            if ((i > 1) && (i <= nlayer)) print(InArgumentsFile, Format_1111, i - 1);
+            if ((i > 1) && (i <= nlayer)) print(InArgumentsFile, Format_1112, gap(i - 1));
+            if (i == 1) print(InArgumentsFile, Format_11110);
+            if (i == nlayer + 1) print(InArgumentsFile, Format_11111);
             //    write(InArgumentsFile, 1111) i-1
             for (j = 1; j <= nmix(i); ++j) {
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1130) << j << 100 * frct(j, i);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1131) << xgcon(1, j) << xgcon(2, j) << xgcon(3, j);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1132) << xgvis(1, j) << xgvis(2, j) << xgvis(3, j);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1133) << xgcp(1, j) << xgcp(2, j) << xgcp(3, j);
-                ObjexxFCL::gio::write(InArgumentsFile, Format_1134) << xwght(j);
+                print(InArgumentsFile, Format_1130, j, 100 * frct(j, i));
+                print(InArgumentsFile, Format_1131, xgcon(1, j), xgcon(2, j), xgcon(3, j));
+                print(InArgumentsFile, Format_1132, xgvis(1, j), xgvis(2, j), xgvis(3, j));
+                print(InArgumentsFile, Format_1133, xgcp(1, j), xgcp(2, j), xgcp(3, j));
+                print(InArgumentsFile, Format_1134, xwght(j));
             } // j - gas mix
         }     // i - gaps
-        ObjexxFCL::gio::write(InArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(InArgumentsFile, Format_1198);
+        print(InArgumentsFile, "\n");
+        print(InArgumentsFile, Format_1198);
         // close(InArgumentsFile)
 
         //!!!!!!!!!!!!!!!!!!
@@ -674,7 +638,7 @@ namespace TARCOGOutput {
         //!!!!!!!!!!!!!!!!!!
     }
 
-    void WriteOutputArguments(int &OutArgumentsFile,
+    void WriteOutputArguments(OutputFile &OutArgumentsFile,
                               std::string const &EP_UNUSED(DBGD),
                               int const nlayer,
                               Real64 const tamb,
@@ -750,79 +714,73 @@ namespace TARCOGOutput {
         int i;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_2000("('TARCOG calculation results - ',I4,'-',I2.2,'-',I2.2,', ',I2.2,':',I2.2,':',I2.2)");
-        static ObjexxFCL::gio::Fmt Format_2120("('  Ufactor  = ',F12.6)");
-        static ObjexxFCL::gio::Fmt Format_2130("('  SHGC     = ',F12.6)");
-        static ObjexxFCL::gio::Fmt Format_2131("('  SHGC_OLD = ',F12.6)");
-        static ObjexxFCL::gio::Fmt Format_2132("('  SC       = ',F12.6)");
-        static ObjexxFCL::gio::Fmt Format_2140("('  hcin  = ',F10.6,3x,'hrin  = ',F10.6,3x,'hin  = ',F10.6)");
-        static ObjexxFCL::gio::Fmt Format_2150("('  hcout = ',F10.6,3x,'hrout = ',F10.6,3x,'hout = ',F10.6)");
-        static ObjexxFCL::gio::Fmt Format_2155("('  Ra(',I1,') =',F15.6,'        Nu(',I1,') =',F12.6)");
-        static ObjexxFCL::gio::Fmt Format_2160("('  hcgas(',I1,') =',F15.6,'      hrgas(',I1,') =',F24.6)");
-        static ObjexxFCL::gio::Fmt Format_2165("('  rhum  =',F15.6,'        rhout =',F12.6)");
-        static ObjexxFCL::gio::Fmt Format_2170("('  hflux    = ',F12.6)");
-        static ObjexxFCL::gio::Fmt Format_2105("('                                            Tamb =',F11.6,' K ( ',F7.3,' deg C)')");
-        static ObjexxFCL::gio::Fmt Format_2110("('  ----------------- ------------------   Theta',I2,' =',F11.6,' K ( ',F7.3,' deg C)')");
-        static ObjexxFCL::gio::Fmt Format_2111("('  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
-                                    "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\   Theta',I2,' =',F11.6,' K ( ',F7.3,' "
-                                    "deg C)')");
-        static ObjexxFCL::gio::Fmt Format_2112("('  +++++++++++++++++ ++++++++++++++++++   Theta',I2,' =',F11.6,' K ( ',F7.3,' deg C)')");
-        static ObjexxFCL::gio::Fmt Format_2113("('  ooooooooooooooooo oooooooooooooooooo   Theta',I2,' =',F11.6,' K ( ',F7.3,' deg C)')");
-        static ObjexxFCL::gio::Fmt Format_2115("('                                           Troom =',F11.6,' K ( ',F7.3,' deg C)')");
-        static ObjexxFCL::gio::Fmt Format_2180("('           qout =',F12.5)");
-        static ObjexxFCL::gio::Fmt Format_2190("('  |     qpane',i2,' =',F12.5,'        |')");
-        static ObjexxFCL::gio::Fmt Format_2195("('  |     qpane',i2,' =',F12.5,'        |         keffc',i2,' =',F11.6)");
-        static ObjexxFCL::gio::Fmt Format_2199("('  |      qlayer',i2,' =',F12.5,'       |')");
-        static ObjexxFCL::gio::Fmt Format_2210("('            qin =',F11.6)");
-        static ObjexxFCL::gio::Fmt Format_2300("('            q',i2,' =',F12.5)");
-        static ObjexxFCL::gio::Fmt Format_2310("('        qprim',i2,' =',F12.5)");
-        static ObjexxFCL::gio::Fmt Format_2320("('           qv',i2,' =',F12.5)");
-        static ObjexxFCL::gio::Fmt Format_2321("('       airspd',i2,' =',F12.5,'    keff',i2,' =',F12.5)");
-        static ObjexxFCL::gio::Fmt Format_2322("('           qc',i2,' =',F12.5,'      qr',i2,' =',F12.5)");
-        static ObjexxFCL::gio::Fmt Format_2330("('  ShadeEmisRatioIn  =',F11.6,'        ShadeEmisRatioOut =',F11.6)");
-        static ObjexxFCL::gio::Fmt Format_2331("('  ShadeHcRatioIn    =',F11.6,'        ShadeHcRatioOut   =',F11.6)");
-        static ObjexxFCL::gio::Fmt Format_2332("('  HcUnshadedIn      =',F11.6,'        HcUnshadedOut     =',F11.6)");
-        static ObjexxFCL::gio::Fmt Format_2340("('  ')");
-        static ObjexxFCL::gio::Fmt Format_2350("('Heat Flux Flow and Temperatures of Layer Surfaces:')");
-        static ObjexxFCL::gio::Fmt Format_2351("('Basic IGU properties:')");
-        static ObjexxFCL::gio::Fmt Format_2220("('  he = ',F8.4,',',3x,'hi = ',F8.4)");
-        static ObjexxFCL::gio::Fmt Format_2230("('  hg',I2,' =',E15.6,'      hr',I2,' =',E15.6,'      hs',I2,' =',E15.6)");
-        static ObjexxFCL::gio::Fmt Format_3333("('Flux (non-solar pass): ',F12.6,' ; Flux per W7: ',F12.6)");
-        static ObjexxFCL::gio::Fmt Format_4205("('  Ebsky =',F11.6,' [W/m2], Gout =',F11.6,' [W/m2]')");
-        static ObjexxFCL::gio::Fmt Format_4215("('  Ebroom =',F11.6,' [W/m2], Gin  =',F11.6,' [W/m2]')");
-        static ObjexxFCL::gio::Fmt Format_4110("('  Ef',I2,' =',F11.6,' [W/m2], Rf',I2,' =',F11.6,' [W/m2]')");
-        static ObjexxFCL::gio::Fmt Format_4111("('  ----------------- ------------------')");
-        static ObjexxFCL::gio::Fmt Format_4112("('  Ef',I2,' =',F11.6,' [W/m2], Rf',I2,' =',F11.6,' [W/m2]')");
-        static ObjexxFCL::gio::Fmt Format_4113("('  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
-                                    "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\')");
-        static ObjexxFCL::gio::Fmt Format_4114("('  Ef',I2,' =',F11.6,' [W/m2], Rf',I2,' =',F11.6,' [W/m2]')");
-        static ObjexxFCL::gio::Fmt Format_4115("('  +++++++++++++++++ ++++++++++++++++++')");
-        static ObjexxFCL::gio::Fmt Format_4116("('  Ef',I2,' =',F11.6,' [W/m2], Rf',I2,' =',F11.6,' [W/m2]')");
-        static ObjexxFCL::gio::Fmt Format_4117("('  ooooooooooooooooo oooooooooooooooooo')");
-        static ObjexxFCL::gio::Fmt Format_4120("('  Eb',I2,' =',F11.6,' [W/m2], Rb',I2,' =',F11.6,' [W/m2]')");
-        static ObjexxFCL::gio::Fmt Format_4121("('  ----------------- ------------------')");
-        static ObjexxFCL::gio::Fmt Format_4122("('  Eb',I2,' =',F11.6,' [W/m2], Rb',I2,' =',F11.6,' [W/m2]')");
-        static ObjexxFCL::gio::Fmt Format_4123("('  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
-                                    "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\')");
-        static ObjexxFCL::gio::Fmt Format_4124("('  Eb',I2,' =',F11.6,' [W/m2], Rb',I2,' =',F11.6,' [W/m2]')");
-        static ObjexxFCL::gio::Fmt Format_4125("('  +++++++++++++++++ ++++++++++++++++++')");
-        static ObjexxFCL::gio::Fmt Format_4126("('  Eb',I2,' =',F11.6,' [W/m2], Rb',I2,' =',F11.6,' [W/m2]')");
-        static ObjexxFCL::gio::Fmt Format_4127("('  ooooooooooooooooo oooooooooooooooooo')");
-        static ObjexxFCL::gio::Fmt Format_4190("('  |                     |')");
-        static ObjexxFCL::gio::Fmt Format_4350("('Energy balances on Layer Surfaces:')");
+        static constexpr auto Format_2000("TARCOG calculation results - {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
+        static constexpr auto Format_2120("  Ufactor  = {:12.6F}\n");
+        static constexpr auto Format_2130("  SHGC     = {:12.6F}\n");
+        static constexpr auto Format_2131("  SHGC_OLD = {:12.6F}\n");
+        static constexpr auto Format_2132("  SC       = {:12.6F}\n");
+        static constexpr auto Format_2140("  hcin  = {:10.6F}   hrin  = {:10.6F}   hin  = {:10.6F}\n");
+        static constexpr auto Format_2150("  hcout = {:10.6F}   hrout = {:10.6F}   hout = {:10.6F}\n");
+        static constexpr auto Format_2155("  Ra({:1}) ={:15.6F}        Nu({:1}) ={:12.6F}\n");
+        static constexpr auto Format_2160("  hcgas({:1}) ={:15.6F}      hrgas({:1}) ={:24.6F}\n");
+        static constexpr auto Format_2170("  hflux    = {:12.6F}\n");
+        static constexpr auto Format_2105("                                            Tamb ={:11.6F} K ( {:7.3F} deg C)\n");
+        static constexpr auto Format_2110("  ----------------- ------------------   Theta{:2} ={:11.6F} K ( {:7.3F} deg C)\n");
+        static constexpr auto Format_2111(
+            "  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
+            "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\   Theta{:2} ={:11.6F} K ( {:7.3F} "
+            "deg C)\n");
+        static constexpr auto Format_2112("  +++++++++++++++++ ++++++++++++++++++   Theta{:2} ={:11.6F} K ( {:7.3F} deg C)\n");
+        static constexpr auto Format_2115("                                           Troom ={:11.6F} K ( {:7.3F} deg C)\n");
+        static constexpr auto Format_2180("           qout ={:12.5F}\n");
+        static constexpr auto Format_2190("  |     qpane{:2} ={:12.5F}        |\n");
+        static constexpr auto Format_2195("  |     qpane{:2} ={:12.5F}        |         keffc{:2} ={:11.6F}\n");
+        static constexpr auto Format_2199("  |      qlayer{:2} ={:12.5F}       |\n");
+        static constexpr auto Format_2210("            qin ={:11.6F}\n");
+        static constexpr auto Format_2300("            q{:2} ={:12.5F}\n");
+        static constexpr auto Format_2320("           qv{:2} ={:12.5F}\n");
+        static constexpr auto Format_2321("       airspd{:2} ={:12.5F}    keff{:2} ={:12.5F}\n");
+        static constexpr auto Format_2322("           qc{:2} ={:12.5F}      qr{:2} ={:12.5F}\n");
+        static constexpr auto Format_2330("  ShadeEmisRatioIn  ={:11.6F}        ShadeEmisRatioOut ={:11.6F}\n");
+        static constexpr auto Format_2331("  ShadeHcRatioIn    ={:11.6F}        ShadeHcRatioOut   ={:11.6F}\n");
+        static constexpr auto Format_2332("  HcUnshadedIn      ={:11.6F}        HcUnshadedOut     ={:11.6F}\n");
+        static constexpr auto Format_2350("Heat Flux Flow and Temperatures of Layer Surfaces:\n");
+        static constexpr auto Format_2351("Basic IGU properties:\n");
+        static constexpr auto Format_4205("  Ebsky ={:11.6F} [W/m2], Gout ={:11.6F} [W/m2]\n");
+        static constexpr auto Format_4215("  Ebroom ={:11.6F} [W/m2], Gin  ={:11.6F} [W/m2]\n");
+        static constexpr auto Format_4110("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
+        static constexpr auto Format_4111("  ----------------- ------------------\n");
+        static constexpr auto Format_4112("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
+        static constexpr auto Format_4113("  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
+                                          "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n");
+        static constexpr auto Format_4114("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
+        static constexpr auto Format_4115("  +++++++++++++++++ ++++++++++++++++++\n");
+        static constexpr auto Format_4116("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
+        static constexpr auto Format_4117("  ooooooooooooooooo oooooooooooooooooo\n");
+        static constexpr auto Format_4120("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
+        static constexpr auto Format_4121("  ----------------- ------------------\n");
+        static constexpr auto Format_4122("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
+        static constexpr auto Format_4123("  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
+                                          "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n");
+        static constexpr auto Format_4124("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
+        static constexpr auto Format_4125("  +++++++++++++++++ ++++++++++++++++++\n");
+        static constexpr auto Format_4126("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
+        static constexpr auto Format_4127("  ooooooooooooooooo oooooooooooooooooo\n");
+        static constexpr auto Format_4190("  |                     |\n");
+        static constexpr auto Format_4350("Energy balances on Layer Surfaces:\n");
 
         // open(unit=OutArgumentsFile,  file=TRIM(DBGD)//DebugOutputFileName,  status='unknown', access=FileMode, &
         //      position=FilePosition, form='formatted', iostat=nperr)
         // if (nperr.ne.0)  open(unit=OutArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode, &
         //      position=FilePosition, form='formatted', iostat=nperr)
         date_and_time(real_CLOCK(1), real_CLOCK(2), real_CLOCK(3), DATE_TIME);
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2000) << DATE_TIME(1) << DATE_TIME(2) << DATE_TIME(3) << DATE_TIME(5) << DATE_TIME(6) << DATE_TIME(7);
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2350);
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2105) << tamb << tamb - KelvinConv;
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2180) << q(1);
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_2000, DATE_TIME(1), DATE_TIME(2), DATE_TIME(3), DATE_TIME(5), DATE_TIME(6), DATE_TIME(7));
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_2350);
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_2105, tamb, tamb - KelvinConv);
+        print(OutArgumentsFile, Format_2180, q(1));
 
         // bi  Write out layer properties:
         for (i = 1; i <= nlayer; ++i) {
@@ -830,25 +788,25 @@ namespace TARCOGOutput {
             {
                 auto const SELECT_CASE_var(LayerType(i));
                 if (SELECT_CASE_var == SPECULAR) { // Specular layer
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2110) << 2 * i - 1 << theta(2 * i - 1) << theta(2 * i - 1) - KelvinConv;
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2190) << i << q(2 * i);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2110) << 2 * i << theta(2 * i) << theta(2 * i) - KelvinConv;
+                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - KelvinConv);
+                    print(OutArgumentsFile, Format_2190, i, q(2 * i));
+                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - KelvinConv);
                 } else if (SELECT_CASE_var == VENETBLIND_HORIZ || SELECT_CASE_var == VENETBLIND_VERT) { // Venetian blind
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2111) << 2 * i - 1 << theta(2 * i - 1) << theta(2 * i - 1) - KelvinConv;
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2195) << i << q(2 * i) << i << ShadeGapKeffConv(i);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2111) << 2 * i << theta(2 * i) << theta(2 * i) - KelvinConv;
+                    print(OutArgumentsFile, Format_2111, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - KelvinConv);
+                    print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
+                    print(OutArgumentsFile, Format_2111, 2 * i, theta(2 * i), theta(2 * i) - KelvinConv);
                 } else if (SELECT_CASE_var == WOVSHADE) { // Venetian blind
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2112) << 2 * i - 1 << theta(2 * i - 1) << theta(2 * i - 1) - KelvinConv;
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2195) << i << q(2 * i) << i << ShadeGapKeffConv(i);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2112) << 2 * i << theta(2 * i) << theta(2 * i) - KelvinConv;
+                    print(OutArgumentsFile, Format_2112, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - KelvinConv);
+                    print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
+                    print(OutArgumentsFile, Format_2112, 2 * i, theta(2 * i), theta(2 * i) - KelvinConv);
                 } else if (SELECT_CASE_var == DIFFSHADE) { // Venetian blind
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2110) << 2 * i - 1 << theta(2 * i - 1) << theta(2 * i - 1) - KelvinConv;
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2190) << i << q(2 * i);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2110) << 2 * i << theta(2 * i) << theta(2 * i) - KelvinConv;
+                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - KelvinConv);
+                    print(OutArgumentsFile, Format_2190, i, q(2 * i));
+                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - KelvinConv);
                 } else {
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2110) << 2 * i - 1 << theta(2 * i - 1) << theta(2 * i - 1) - KelvinConv;
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2199) << i << q(2 * i);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2110) << 2 * i << theta(2 * i) << theta(2 * i) - KelvinConv;
+                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - KelvinConv);
+                    print(OutArgumentsFile, Format_2199, i, q(2 * i));
+                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - KelvinConv);
                 }
             }
 
@@ -856,108 +814,107 @@ namespace TARCOGOutput {
 
             // bi  Write out gap properties:
             if (i != nlayer) {
-                ObjexxFCL::gio::write(OutArgumentsFile, Format_2300) << i << q(2 * i + 1);
-                ObjexxFCL::gio::write(OutArgumentsFile, Format_2320) << i << qv(i + 1);
+                print(OutArgumentsFile, Format_2300, i, q(2 * i + 1));
+                print(OutArgumentsFile, Format_2320, i, qv(i + 1));
                 if (vvent(i + 1) == 0) {
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_2321) << i << vfreevent(i + 1) << i << Keff(i);
+                    print(OutArgumentsFile, Format_2321, i, vfreevent(i + 1), i, Keff(i));
                 } else {
                     if (i > 1) {
-                        ObjexxFCL::gio::write(OutArgumentsFile, Format_2321)
-                            << i << vvent(i + 1) << i
-                            << Keff(i - 1); // Autodesk:BoundsViolation Keff(i-1) @ i=1: Fixed in 8.2 by surrounding if block
+                        print(OutArgumentsFile, Format_2321, i, vvent(i + 1), i, Keff(i - 1));
+                        // Autodesk:BoundsViolation Keff(i-1) @ i=1: Fixed in 8.2 by surrounding if block
                     }
                 }
-                ObjexxFCL::gio::write(OutArgumentsFile, Format_2322) << i << qcgas(i + 1) << i << qrgas(i + 1);
+                print(OutArgumentsFile, Format_2322, i, qcgas(i + 1), i, qrgas(i + 1));
                 //      write(OutArgumentsFile, 2323) i, Keff(i)
                 // write(OutArgumentsFile, 2310) i, qprim(2*i + 1)
             } else {
-                ObjexxFCL::gio::write(OutArgumentsFile, Format_2210) << q(2 * i + 1);
+                print(OutArgumentsFile, Format_2210, q(2 * i + 1));
             }
         } // i - layers
 
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2115) << troom << troom - KelvinConv;
+        print(OutArgumentsFile, Format_2115, troom, troom - KelvinConv);
 
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
+        print(OutArgumentsFile, "\n");
 
         // Simon: Write energy balances on layer surfaces
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_4350);
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_4205) << ebsky << Gout;
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
+        print(OutArgumentsFile, Format_4350);
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_4205, ebsky, Gout);
+        print(OutArgumentsFile, "\n");
 
         for (i = 1; i <= nlayer; ++i) {
             {
                 auto const SELECT_CASE_var(LayerType(i));
                 if (SELECT_CASE_var == SPECULAR) { // Specular layer
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4110) << i << Ebf(i) << i << Rf(i);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4111);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4190);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4121);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4120) << i << Ebb(i) << i << Rb(i);
+                    print(OutArgumentsFile, Format_4110, i, Ebf(i), i, Rf(i));
+                    print(OutArgumentsFile, Format_4111);
+                    print(OutArgumentsFile, Format_4190);
+                    print(OutArgumentsFile, Format_4121);
+                    print(OutArgumentsFile, Format_4120, i, Ebb(i), i, Rb(i));
                 } else if (SELECT_CASE_var == VENETBLIND_HORIZ || SELECT_CASE_var == VENETBLIND_VERT) { // Venetian blind
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4112) << i << Ebf(i) << i << Rf(i);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4113);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4190);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4123);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4122) << i << Ebb(i) << i << Rb(i);
+                    print(OutArgumentsFile, Format_4112, i, Ebf(i), i, Rf(i));
+                    print(OutArgumentsFile, Format_4113);
+                    print(OutArgumentsFile, Format_4190);
+                    print(OutArgumentsFile, Format_4123);
+                    print(OutArgumentsFile, Format_4122, i, Ebb(i), i, Rb(i));
                 } else if (SELECT_CASE_var == WOVSHADE) { // Venetian blind
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4114) << i << Ebf(i) << i << Rf(i);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4115);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4190);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4125);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4124) << i << Ebb(i) << i << Rb(i);
+                    print(OutArgumentsFile, Format_4114, i, Ebf(i), i, Rf(i));
+                    print(OutArgumentsFile, Format_4115);
+                    print(OutArgumentsFile, Format_4190);
+                    print(OutArgumentsFile, Format_4125);
+                    print(OutArgumentsFile, Format_4124, i, Ebb(i), i, Rb(i));
                 } else if (SELECT_CASE_var == DIFFSHADE) {
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4116) << i << Ebf(i) << i << Rf(i);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4117);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4190);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4127);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4126) << i << Ebb(i) << i << Rb(i);
+                    print(OutArgumentsFile, Format_4116, i, Ebf(i), i, Rf(i));
+                    print(OutArgumentsFile, Format_4117);
+                    print(OutArgumentsFile, Format_4190);
+                    print(OutArgumentsFile, Format_4127);
+                    print(OutArgumentsFile, Format_4126, i, Ebb(i), i, Rb(i));
                 } else {
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4110) << i << Ebf(i) << i << Rf(i);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4111);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4190);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4121);
-                    ObjexxFCL::gio::write(OutArgumentsFile, Format_4120) << i << Ebb(i) << i << Rb(i);
+                    print(OutArgumentsFile, Format_4110, i, Ebf(i), i, Rf(i));
+                    print(OutArgumentsFile, Format_4111);
+                    print(OutArgumentsFile, Format_4190);
+                    print(OutArgumentsFile, Format_4121);
+                    print(OutArgumentsFile, Format_4120, i, Ebb(i), i, Rb(i));
                 }
             }
-            ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
+            print(OutArgumentsFile, "\n");
         }
 
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_4215) << ebroom << Gin;
+        print(OutArgumentsFile, Format_4215, ebroom, Gin);
 
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2351);
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2120) << ufactor;
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2130) << shgc;
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2132) << sc;
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2170) << hflux;
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2131) << shgct;
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2140) << hcin << hrin << hcin + hrin;
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2150) << hcout << hrout << hcout + hrout;
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_2351);
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_2120, ufactor);
+        print(OutArgumentsFile, Format_2130, shgc);
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_2132, sc);
+        print(OutArgumentsFile, Format_2170, hflux);
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_2131, shgct);
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_2140, hcin, hrin, hcin + hrin);
+        print(OutArgumentsFile, Format_2150, hcout, hrout, hcout + hrout);
 
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
+        print(OutArgumentsFile, "\n");
         for (i = 1; i <= nlayer - 1; ++i) {
-            ObjexxFCL::gio::write(OutArgumentsFile, Format_2155) << i << Ra(i) << i << Nu(i);
+            print(OutArgumentsFile, Format_2155, i, Ra(i), i, Nu(i));
         }
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2330) << ShadeEmisRatioIn << ShadeEmisRatioOut;
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2331) << ShadeHcRatioIn << ShadeHcRatioOut;
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2332) << HcUnshadedIn << HcUnshadedOut;
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_2330, ShadeEmisRatioIn, ShadeEmisRatioOut);
+        print(OutArgumentsFile, Format_2331, ShadeHcRatioIn, ShadeHcRatioOut);
+        print(OutArgumentsFile, Format_2332, HcUnshadedIn, HcUnshadedOut);
 
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
+        print(OutArgumentsFile, "\n");
         for (i = 2; i <= nlayer; ++i) {
-            ObjexxFCL::gio::write(OutArgumentsFile, Format_2160) << i << hcgas(i) << i << hrgas(i);
+            print(OutArgumentsFile, Format_2160, i, hcgas(i), i, hrgas(i));
         }
 
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, "('  Error Tolerance = ', e12.6)") << AchievedErrorTolerance;
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, "  Error Tolerance = {:12.6E}\n", AchievedErrorTolerance);
 
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, "('  Number of Iterations = ', i6)") << NumOfIter;
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, "  Number of Iterations = {}\n", NumOfIter);
 
         //  write(OutArgumentsFile, *)
         //  write(OutArgumentsFile, 3333) flux_nonsolar, qeff
@@ -971,13 +928,13 @@ namespace TARCOGOutput {
         //!!!!!!!!!!!!!!!!!!
 
         // 2101  format(' SHGC =   ',F8.6,6x,' SHGC_OLD = ',F8.6,2x,' SC = ',F8.6)
-        // 2110  format(' Theta(',I3,') = ',F12.6)
+        // 2110  format(' Theta({:3}) = ',F12.6)
         // 2111  format(/'Pane #:', I3/)
         // 2112  format('Number of panes: ',I2)
-        // 2113  format('    Thetaslice(',I3,',',I3') = ',F12.6)
+        // 2113  format('    Thetaslice({:3},',I3') = ',F12.6)
 
         // 2105  format('                                            Tamb =',F11.6)
-        // 2110  format('  ----------------- ------------------   Theta',I2,' =',F11.6)
+        // 2110  format('  ----------------- ------------------   Theta{:2} =',F11.6)
         // 2115  format('                                           Troom =',F11.6)
 
         // 2190  format('  |       qpane', i2,' =',  F11.6,'       |         keffc', i2,' =',  F11.6)
@@ -986,7 +943,7 @@ namespace TARCOGOutput {
         // 2323  format('         keff', i2,' =',  F12.5)
     }
 
-    void WriteOutputEN673(int &OutArgumentsFile,
+    void WriteOutputEN673(OutputFile &OutArgumentsFile,
                           std::string const &EP_UNUSED(DBGD),
                           int const nlayer,
                           Real64 const ufactor,
@@ -1016,35 +973,35 @@ namespace TARCOGOutput {
         int i;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_2000("('TARCOG calculation results - ',I4,'-',I2.2,'-',I2.2,', ',I2.2,':',I2.2,':',I2.2)");
-        static ObjexxFCL::gio::Fmt Format_2351("('Basic IGU properties:')");
-        static ObjexxFCL::gio::Fmt Format_2120("('  Ufactor  = ',F12.6)");
-        static ObjexxFCL::gio::Fmt Format_2220("('  he = ',F8.4,',',3x,'hi = ',F8.4)");
-        static ObjexxFCL::gio::Fmt Format_2155("('  Ra(',I1,') =',F15.6,'        Nu(',I1,') =',F12.6)");
-        static ObjexxFCL::gio::Fmt Format_2230("('  hg',I2,' =',E15.6,'      hr',I2,' =',E15.6,'      hs',I2,' =',E15.6)");
+        static constexpr auto Format_2000("TARCOG calculation results - {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
+        static constexpr auto Format_2351("Basic IGU properties:\n");
+        static constexpr auto Format_2120("  Ufactor  = {:12.6F}\n");
+        static constexpr auto Format_2220("  he = {:8.4F},   hi = {:8.4F}\n");
+        static constexpr auto Format_2155("  Ra({:1}) ={:15.6F}        Nu({:1}) ={:12.6F}\n");
+        static constexpr auto Format_2230("  hg{:2} ={:15.6E}      hr{:2} ={:15.6E}      hs{:2} ={:15.6E}\n");
 
         // open(unit=OutArgumentsFile,  file=TRIM(DBGD)//DebugOutputFileName,  status='unknown', access=FileMode,  &
         //      position=FilePosition, form='formatted', iostat=nperr)
         // if (nperr.ne.0)  open(unit=OutArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode,  &
         //      position=FilePosition, form='formatted', iostat=nperr)
         date_and_time(real_CLOCK(1), real_CLOCK(2), real_CLOCK(3), DATE_TIME);
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2000) << DATE_TIME(1) << DATE_TIME(2) << DATE_TIME(3) << DATE_TIME(5) << DATE_TIME(6) << DATE_TIME(7);
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_2000, DATE_TIME(1), DATE_TIME(2), DATE_TIME(3), DATE_TIME(5), DATE_TIME(6), DATE_TIME(7));
+        print(OutArgumentsFile, "\n");
 
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2351);
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2120) << ufactor;
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-        ObjexxFCL::gio::write(OutArgumentsFile, Format_2220) << hout << hin;
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_2351);
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_2120, ufactor);
+        print(OutArgumentsFile, "\n");
+        print(OutArgumentsFile, Format_2220, hout, hin);
+        print(OutArgumentsFile, "\n");
         for (i = 1; i <= nlayer - 1; ++i) {
-            ObjexxFCL::gio::write(OutArgumentsFile, Format_2155) << i << Ra(i) << i << Nu(i);
+            print(OutArgumentsFile, Format_2155, i, Ra(i), i, Nu(i));
         }
-        ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
+        print(OutArgumentsFile, "\n");
         for (i = 1; i <= nlayer - 1; ++i) {
-            ObjexxFCL::gio::write(OutArgumentsFile, Format_2230) << i << hg(i) << i << hr(i) << i << hs(i);
+            print(OutArgumentsFile, Format_2230, i, hg(i), i, hr(i), i, hs(i));
         }
         // close(OutArgumentsFile)
 
@@ -1055,7 +1012,8 @@ namespace TARCOGOutput {
         //!!!!!!!!!!!!!!!!!!
     }
 
-    void WriteTARCOGInputFile(std::string const &VerNum,
+    void WriteTARCOGInputFile(Files &files,
+                              std::string const &VerNum,
                               Real64 const tout,
                               Real64 const tind,
                               Real64 const trmin,
@@ -1178,71 +1136,64 @@ namespace TARCOGOutput {
         Array1D_int DATE_TIME(8);
         Array1D_string real_CLOCK(3);
 
-        static std::string dynFormat;
-
         // Formats
-        static ObjexxFCL::gio::Fmt Format_111("('*')");
-        static ObjexxFCL::gio::Fmt Format_112("('* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *')");
-        static ObjexxFCL::gio::Fmt Format_113("('*------------------------------------------------------------')");
-        static ObjexxFCL::gio::Fmt Format_200("('* General options:')");
-        static ObjexxFCL::gio::Fmt Format_210("('* <nlayer, debug, standard, ThermalMod, CalcDeflection, SDScalar, VacuumPressure, VacuumMaxGapThickness>')");
-        static ObjexxFCL::gio::Fmt Format_300("('* Environmental settings:')");
-        static ObjexxFCL::gio::Fmt Format_310("('* <tout, tind, wso, iwd, wsi, dir, outir, isky, tsky, esky, fclr, trmin, Pa, Pini, Tini>')");
-        static ObjexxFCL::gio::Fmt Format_400("('* Overall IGU properties:')");
-        static ObjexxFCL::gio::Fmt Format_410("('* <totsol, tilt, height, heightt, width>')");
-        static ObjexxFCL::gio::Fmt Format_600("('* Outdoor environment:')");
-        static ObjexxFCL::gio::Fmt Format_610("('* <ibc(1), hout, presure(1), 1, 1, 1.0, vvent(1), tvent(1)>')");
-        static ObjexxFCL::gio::Fmt Format_700("('* IGU definition:')");
-        static ObjexxFCL::gio::Fmt Format_800("('* Indoor environment:')");
-        static ObjexxFCL::gio::Fmt Format_810("('* <ibc(2), hin, presure(nlayer+1), 1, 1, 1.0, vvent(nlayer+1), tvent(nlayer+1)>')");
-        static ObjexxFCL::gio::Fmt Format_900("('* End file')");
-        static ObjexxFCL::gio::Fmt Format_10001("('* created by TARCOG v. ',A)");
-        static ObjexxFCL::gio::Fmt Format_1001("('* TARCOG debug output for WinCOG, ',I4,'-',I2.2,'-',I2.2,', ',I2.2,':',I2.2,':',I2.2)");
-        static ObjexxFCL::gio::Fmt Format_1002("('*     WindowID:   ',I8,'  - Not specified')");
-        static ObjexxFCL::gio::Fmt Format_1003("('*     WindowID:   ',I8,' ')");
-        static ObjexxFCL::gio::Fmt Format_1006("('*     IGUID:      ',I8,'  - Not specified')");
-        static ObjexxFCL::gio::Fmt Format_1007("('*     IGUID:      ',I8,' ')");
-        static ObjexxFCL::gio::Fmt Format_1008("('*     Num Layers: ',I8,' ')");
-        static ObjexxFCL::gio::Fmt Format_1010("('    ',I1,', ',I1,', ',I1,', ',I1,', ',I1,', ',F24.12,', ',F24.12,', ',F24.12)");
-        static ObjexxFCL::gio::Fmt Format_1020("('    ',F24.12,', ',F24.12,', ',F24.12,', ',I1,', ',F24.12,', ',F24.12,', ',F24.12,', ',I1,', ',F24.12,', "
-                                    "',F24.12,', ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12)");
-        static ObjexxFCL::gio::Fmt Format_1030("('    ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12)");
-        static ObjexxFCL::gio::Fmt Format_1031("('    ',F24.12,', ',F24.12,', ',I3,', ',F24.12,', ',I3,', ',I3,', ',F24.12,', ',F24.12,', ',F24.12,', "
-                                    "',F24.12,', ',F24.12,', ',F24.12,', ',I2,', ',I2,', ',I2,', ',I2)");
-        static ObjexxFCL::gio::Fmt Format_1034("('* <PillarSpacing(i), PillarRadius(i)')");
-        static ObjexxFCL::gio::Fmt Format_1035("('    ',F24.12,', ',F24.12)");
-        static ObjexxFCL::gio::Fmt Format_1040("('    ',I1,', ',F24.12,', ',F24.12,', ',I1,', ',I1,', ',F24.12,', ',F24.12,', ',F24.12)");
-        static ObjexxFCL::gio::Fmt Format_1048("('* <gap(i), GapDef(i), presure(i+1), nmix(i+1), (iprop(i+1, j), j=1,nmix(i+1)), (frct(i+1, j), "
-                                    "',/,/,'j=1,nmix(i+1)), vvent(i), tvent(i), SupportPillar(i)>')");
-        static ObjexxFCL::gio::Fmt Format_1049("('* Gap ',I1,':')");
-        static ObjexxFCL::gio::Fmt Format_1041("('    ',F24.12,', ',F24.12,', ',I1,', ',I1,', ',F24.12,', ',F24.12,', ',F24.12)");
-        static ObjexxFCL::gio::Fmt Format_1042("('    ',F24.12,', ',F24.12,', ',I1,', ',I1,', ',I1,', ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12)");
-        static ObjexxFCL::gio::Fmt Format_1043(
-            "('    ',F24.12,', ',F24.12,', ',I1,', ',I1,', ',I1,', ',I1,', ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12)");
-        static ObjexxFCL::gio::Fmt Format_1050(
-            "('* <scon(i), asol(i), thick(i), emis(2*i-1), emis(2*i), tir(2*i-1), YoungsMod(i),',/,/,' PoissonsRat(i), LayerType(i), nslice(i)>')");
-        static ObjexxFCL::gio::Fmt Format_1051(
-            "('    ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12,', ',I1,', ',I1)");
-        static ObjexxFCL::gio::Fmt Format_1052("('* <Atop(i), Abot(i), Al(i), Ar(i), Ah(i)>')");
-        static ObjexxFCL::gio::Fmt Format_1053("('    ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12)");
-        static ObjexxFCL::gio::Fmt Format_1054("('* <SlatThick(i), SlatWidth(i), SlatAngle(i), SlatCond(i), SlatSpacing(i), SlatCurve(i)>')");
-        static ObjexxFCL::gio::Fmt Format_1055("('    ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12,', ',F24.12)");
-        static ObjexxFCL::gio::Fmt Format_1060("('* Layer ',I1,' - specular-glass:')");
-        static ObjexxFCL::gio::Fmt Format_1061("('* Layer ',I1,' - venetian blind:')");
-        static ObjexxFCL::gio::Fmt Format_1062("('* Layer ',I1,' - woven shade:')");
-        static ObjexxFCL::gio::Fmt Format_1063("('* Layer ',I1,' - diffuse shade:')");
-        static ObjexxFCL::gio::Fmt Format_1064("('* Layer ',I1,' - ???:')");
-        static ObjexxFCL::gio::Fmt Format_2000("('* Gas coefficients information')");
-        static ObjexxFCL::gio::Fmt Format_2010("('    ',I2)");
-        static ObjexxFCL::gio::Fmt Format_2011("('* <NumberOfGasses>')");
-        static ObjexxFCL::gio::Fmt Format_2020("('    ',ES12.6)");
-        static ObjexxFCL::gio::Fmt Format_2021("('* <MolecularWeight>')");
-        static ObjexxFCL::gio::Fmt Format_2030("(', ',ES12.6,$)");
-        static ObjexxFCL::gio::Fmt Format_2031("('* <gconA, gconB, gconC>')");
-        static ObjexxFCL::gio::Fmt Format_2032("('* <gvisA, gvisB, gvisC>')");
-        static ObjexxFCL::gio::Fmt Format_2033("('* <gcpA, gcpB, gcpC>')");
-        static ObjexxFCL::gio::Fmt Format_2034("('* <Gamma>')");
-        static ObjexxFCL::gio::Fmt Format_1198("(' *************************************************')");
+        static constexpr auto Format_111("*\n");
+        static constexpr auto Format_112("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n");
+        static constexpr auto Format_113("*------------------------------------------------------------\n");
+        static constexpr auto Format_200("* General options:\n");
+        static constexpr auto Format_210(
+            "* <nlayer, debug, standard, ThermalMod, CalcDeflection, SDScalar, VacuumPressure, VacuumMaxGapThickness>\n");
+        static constexpr auto Format_300("* Environmental settings:\n");
+        static constexpr auto Format_310("* <tout, tind, wso, iwd, wsi, dir, outir, isky, tsky, esky, fclr, trmin, Pa, Pini, Tini>\n");
+        static constexpr auto Format_400("* Overall IGU properties:\n");
+        static constexpr auto Format_410("* <totsol, tilt, height, heightt, width>\n");
+        static constexpr auto Format_600("* Outdoor environment:\n");
+        static constexpr auto Format_610("* <ibc(1), hout, presure(1), 1, 1, 1.0, vvent(1), tvent(1)>\n");
+        static constexpr auto Format_700("* IGU definition:\n");
+        static constexpr auto Format_800("* Indoor environment:\n");
+        static constexpr auto Format_810("* <ibc(2), hin, presure(nlayer+1), 1, 1, 1.0, vvent(nlayer+1), tvent(nlayer+1)>\n");
+        static constexpr auto Format_900("* End file\n");
+        static constexpr auto Format_10001("* created by TARCOG v. {}\n");
+        static constexpr auto Format_1001("* TARCOG debug output for WinCOG, {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
+        static constexpr auto Format_1002("*     WindowID:   {:8}  - Not specified\n");
+        static constexpr auto Format_1003("*     WindowID:   {:8} \n");
+        static constexpr auto Format_1006("*     IGUID:      {:8}  - Not specified\n");
+        static constexpr auto Format_1007("*     IGUID:      {:8} \n");
+        static constexpr auto Format_1008("*     Num Layers: {:8} \n");
+        static constexpr auto Format_1010("    {:1}, {:1}, {:1}, {:1}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}\n");
+        static constexpr auto Format_1020("    {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:24.12F}, {:24.12F}, "
+                                          "{:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
+        static constexpr auto Format_1030("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
+        // static constexpr auto Format_1031("    {:24.12F}, {:24.12F}, {:3}, {:24.12F}, {:3}, {:3}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, "
+        //                                  "{:24.12F}, {:24.12F}, {:2}, {:2}, {:2}, {:2}\n");
+        static constexpr auto Format_1034("* <PillarSpacing(i), PillarRadius(i)\n");
+        static constexpr auto Format_1035("    {:24.12F}, {:24.12F}\n");
+        static constexpr auto Format_1040("    {:1}, {:24.12F}, {:24.12F}, {:1}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}\n");
+        static constexpr auto Format_1048("* <gap(i), GapDef(i), presure(i+1), nmix(i+1), (iprop(i+1, j), j=1,nmix(i+1)), (frct(i+1, j), "
+                                          "\n\nj=1,nmix(i+1)), vvent(i), tvent(i), SupportPillar(i)>\n");
+        static constexpr auto Format_1049("* Gap {:1}:\n");
+        static constexpr auto Format_1050(
+            "* <scon(i), asol(i), thick(i), emis(2*i-1), emis(2*i), tir(2*i-1), YoungsMod(i),\n\n PoissonsRat(i), LayerType(i), nslice(i)>\n");
+        static constexpr auto Format_1051("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:1}\n");
+        static constexpr auto Format_1052("* <Atop(i), Abot(i), Al(i), Ar(i), Ah(i)>\n");
+        static constexpr auto Format_1053("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
+        static constexpr auto Format_1054("* <SlatThick(i), SlatWidth(i), SlatAngle(i), SlatCond(i), SlatSpacing(i), SlatCurve(i)>\n");
+        static constexpr auto Format_1055("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
+        static constexpr auto Format_1060("* Layer {:1} - specular-glass:\n");
+        static constexpr auto Format_1061("* Layer {:1} - venetian blind:\n");
+        static constexpr auto Format_1062("* Layer {:1} - woven shade:\n");
+        static constexpr auto Format_1063("* Layer {:1} - diffuse shade:\n");
+        static constexpr auto Format_1064("* Layer {:1} - ???:\n");
+        static constexpr auto Format_2000("* Gas coefficients information\n");
+        static constexpr auto Format_2010("    {:2}\n");
+        static constexpr auto Format_2011("* <NumberOfGasses>\n");
+        static constexpr auto Format_2020("    {:12.6E}\n");
+        static constexpr auto Format_2021("* <MolecularWeight>\n");
+        static constexpr auto Format_2030(", {:12.6E}");
+        static constexpr auto Format_2031("* <gconA, gconB, gconC>\n");
+        static constexpr auto Format_2032("* <gvisA, gvisB, gvisC>\n");
+        static constexpr auto Format_2033("* <gcpA, gcpB, gcpC>\n");
+        static constexpr auto Format_2034("* <Gamma>\n");
 
         // open(unit=WINCogFile,  file=TRIM(DBGD)//TRIM(WinCogFileName),  status='unknown', access=FileMode, &
         //       position=FilePosition, form='formatted', iostat=nperr)
@@ -1261,170 +1212,177 @@ namespace TARCOGOutput {
 
         date_and_time(real_CLOCK(1), real_CLOCK(2), real_CLOCK(3), DATE_TIME);
 
-        ObjexxFCL::gio::write(WINCogFile, Format_112);
-        ObjexxFCL::gio::write(WINCogFile, Format_111);
-        ObjexxFCL::gio::write(WINCogFile, Format_1001) << DATE_TIME(1) << DATE_TIME(2) << DATE_TIME(3) << DATE_TIME(5) << DATE_TIME(6) << DATE_TIME(7);
-        ObjexxFCL::gio::write(WINCogFile, Format_10001) << VerNum; //, VerDat
-        ObjexxFCL::gio::write(WINCogFile, Format_111);
+        print(files.WINCogFile, Format_112);
+        print(files.WINCogFile, Format_111);
+        print(files.WINCogFile, Format_1001, DATE_TIME(1), DATE_TIME(2), DATE_TIME(3), DATE_TIME(5), DATE_TIME(6), DATE_TIME(7));
+        print(files.WINCogFile, Format_10001, VerNum); //, VerDat
+        print(files.WINCogFile, Format_111);
 
         if (winID == -1) {
-            ObjexxFCL::gio::write(WINCogFile, Format_1002) << winID;
+            print(files.WINCogFile, Format_1002, winID);
         } else {
-            ObjexxFCL::gio::write(WINCogFile, Format_1003) << winID;
+            print(files.WINCogFile, Format_1003, winID);
         }
         if (iguID == -1) {
-            ObjexxFCL::gio::write(WINCogFile, Format_1006) << iguID;
+            print(files.WINCogFile, Format_1006, iguID);
         } else {
-            ObjexxFCL::gio::write(WINCogFile, Format_1007) << iguID;
+            print(files.WINCogFile, Format_1007, iguID);
         }
 
-        ObjexxFCL::gio::write(WINCogFile, Format_1008) << nlayer;
-        ObjexxFCL::gio::write(WINCogFile, Format_111);
-        ObjexxFCL::gio::write(WINCogFile, Format_112);
+        print(files.WINCogFile, Format_1008, nlayer);
+        print(files.WINCogFile, Format_111);
+        print(files.WINCogFile, Format_112);
 
         // bi...Write main body:
 
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
-        ObjexxFCL::gio::write(WINCogFile, Format_200);
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
-        ObjexxFCL::gio::write(WINCogFile, Format_210);
-        ObjexxFCL::gio::write(WINCogFile, Format_1010) << nlayer << 2 << standard << ThermalMod << CalcDeflection << SDScalar << VacuumPressure
-                                            << VacuumMaxGapThickness;
+        print(files.WINCogFile, Format_113);
+        print(files.WINCogFile, Format_200);
+        print(files.WINCogFile, Format_113);
+        print(files.WINCogFile, Format_210);
+        print(files.WINCogFile, Format_1010, nlayer, 2, standard, ThermalMod, CalcDeflection, SDScalar, VacuumPressure, VacuumMaxGapThickness);
 
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
-        ObjexxFCL::gio::write(WINCogFile, Format_300);
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
-        ObjexxFCL::gio::write(WINCogFile, Format_310);
-        ObjexxFCL::gio::write(WINCogFile, Format_1020) << tout << tind << wso << iwd << wsi << dir << outir << isky << tsky << esky << fclr << trmin << Pa
-                                            << Pini << Tini;
+        print(files.WINCogFile, Format_113);
+        print(files.WINCogFile, Format_300);
+        print(files.WINCogFile, Format_113);
+        print(files.WINCogFile, Format_310);
+        print(files.WINCogFile, Format_1020, tout, tind, wso, iwd, wsi, dir, outir, isky, tsky, esky, fclr, trmin, Pa, Pini, Tini);
 
         // if (mgas.eq.0) then
         NumOfProvGasses = 0;
         while (xwght(NumOfProvGasses + 1) != 0) {
             ++NumOfProvGasses;
         }
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
-        ObjexxFCL::gio::write(WINCogFile, Format_2000);
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
-        ObjexxFCL::gio::write(WINCogFile, Format_2011);
-        ObjexxFCL::gio::write(WINCogFile, Format_2010) << NumOfProvGasses;
+        print(files.WINCogFile, Format_113);
+        print(files.WINCogFile, Format_2000);
+        print(files.WINCogFile, Format_113);
+        print(files.WINCogFile, Format_2011);
+        print(files.WINCogFile, Format_2010, NumOfProvGasses);
         for (i = 1; i <= NumOfProvGasses; ++i) {
-            ObjexxFCL::gio::write(WINCogFile, Format_2021);
-            ObjexxFCL::gio::write(WINCogFile, Format_2020) << xwght(i);
-            ObjexxFCL::gio::write(WINCogFile, Format_2031);
-            ObjexxFCL::gio::write(Format_2020) << xgcon(1, 1);
+            print(files.WINCogFile, Format_2021);
+            print(files.WINCogFile, Format_2020, xwght(i));
+            print(files.WINCogFile, Format_2031);
+            //            ObjexxFCL::gio::write(Format_2020) ,  xgcon(1, 1);
             for (j = 2; j <= 3; ++j) {
-                ObjexxFCL::gio::write(WINCogFile, Format_2030) << xgcon(j, i);
+                print(files.WINCogFile, Format_2030, xgcon(j, i));
             }
-            ObjexxFCL::gio::write(WINCogFile);
-            ObjexxFCL::gio::write(WINCogFile, Format_2032);
-            ObjexxFCL::gio::write(Format_2020) << xgvis(1, 1);
+            print(files.WINCogFile, "\n");
+            print(files.WINCogFile, Format_2032);
+            //            ObjexxFCL::gio::write(Format_2020) , xgvis(1, 1);
             for (j = 2; j <= 3; ++j) {
-                ObjexxFCL::gio::write(WINCogFile, Format_2030) << xgvis(j, i);
+                print(files.WINCogFile, Format_2030, xgvis(j, i));
             }
-            ObjexxFCL::gio::write(WINCogFile);
-            ObjexxFCL::gio::write(WINCogFile, Format_2033);
-            ObjexxFCL::gio::write(Format_2020) << xgcp(1, 1);
+            print(files.WINCogFile, "\n");
+            print(files.WINCogFile, Format_2033);
+            //            ObjexxFCL::gio::write(Format_2020) ,  xgcp(1, 1);
             for (j = 2; j <= 3; ++j) {
-                ObjexxFCL::gio::write(WINCogFile, Format_2030) << xgcp(j, i);
+                print(files.WINCogFile, Format_2030, xgcp(j, i));
             }
-            ObjexxFCL::gio::write(WINCogFile);
-            ObjexxFCL::gio::write(WINCogFile, Format_2034);
-            ObjexxFCL::gio::write(WINCogFile, Format_2020) << gama(i);
+            print(files.WINCogFile, "\n");
+            print(files.WINCogFile, Format_2034);
+            print(files.WINCogFile, Format_2020, gama(i));
         } // i = 1, NumProvGasses
         // end if
 
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
-        ObjexxFCL::gio::write(WINCogFile, Format_400);
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
-        ObjexxFCL::gio::write(WINCogFile, Format_410);
-        ObjexxFCL::gio::write(WINCogFile, Format_1030) << totsol << tilt << height << heightt << width;
+        print(files.WINCogFile, Format_113);
+        print(files.WINCogFile, Format_400);
+        print(files.WINCogFile, Format_113);
+        print(files.WINCogFile, Format_410);
+        print(files.WINCogFile, Format_1030, totsol, tilt, height, heightt, width);
 
-        // write(WINCogFile,500)
-        // write(WINCogFile,*) SlatLength, SlatSpacing, SlatAngle, &
+        // write(files.WINCogFile,500)
+        // write(files.WINCogFile,*) SlatLength, SlatSpacing, SlatAngle, &
         //    CurvatureRadius, SubdivisionNumber, Rf, Rb, T, Ef_IR, Eb_IR, T_IR, &
         //    NumThetas, SOLMethod, FIRMethod, SOLhemCalc, SOLdifCalc
-        // write(WINCogFile,*) '    0.016, 0.012, 45, 0.0, 5, 0, 0.70, 0.40, 0.00, 0.90, 0.90, 0.00, 1, 1, 1, 1'
-        // write(WINCogFile,117)
-        // write(WINCogFile,*) '    0.003, 0.01, 0.8, 0.6, 1, 1, 1'
-        // write(WINCogFile,118)
-        // write(WINCogFile,*) '    1'
-        // write(WINCogFile,*) '    0'
-        // write(WINCogFile,*) '    1'
-        // write(WINCogFile,*) '    0'
+        // write(files.WINCogFile,*) '    0.016, 0.012, 45, 0.0, 5, 0, 0.70, 0.40, 0.00, 0.90, 0.90, 0.00, 1, 1, 1, 1'
+        // write(files.WINCogFile,117)
+        // write(files.WINCogFile,*) '    0.003, 0.01, 0.8, 0.6, 1, 1, 1'
+        // write(files.WINCogFile,118)
+        // write(files.WINCogFile,*) '    1'
+        // write(files.WINCogFile,*) '    0'
+        // write(files.WINCogFile,*) '    1'
+        // write(files.WINCogFile,*) '    0'
 
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
-        ObjexxFCL::gio::write(WINCogFile, Format_600);
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
-        ObjexxFCL::gio::write(WINCogFile, Format_610);
-        ObjexxFCL::gio::write(WINCogFile, Format_1040) << ibc(1) << hout << presure(1) << 1 << 1 << 1.0 << vvent(1) << tvent(1);
+        print(files.WINCogFile, Format_113);
+        print(files.WINCogFile, Format_600);
+        print(files.WINCogFile, Format_113);
+        print(files.WINCogFile, Format_610);
+        print(files.WINCogFile, Format_1040, ibc(1), hout, presure(1), 1, 1, 1.0, vvent(1), tvent(1));
 
-        ObjexxFCL::gio::write(WINCogFile, Format_700);
+        print(files.WINCogFile, Format_700);
 
         for (i = 1; i <= nlayer; ++i) {
-            ObjexxFCL::gio::write(WINCogFile, Format_113);
+            print(files.WINCogFile, Format_113);
             if (LayerType(i) == SPECULAR) {
-                ObjexxFCL::gio::write(WINCogFile, Format_1060) << i;
+                print(files.WINCogFile, Format_1060, i);
             } else if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
-                ObjexxFCL::gio::write(WINCogFile, Format_1061) << i;
+                print(files.WINCogFile, Format_1061, i);
             } else if (LayerType(i) == WOVSHADE) {
-                ObjexxFCL::gio::write(WINCogFile, Format_1062) << i;
+                print(files.WINCogFile, Format_1062, i);
             } else if (LayerType(i) == DIFFSHADE) {
-                ObjexxFCL::gio::write(WINCogFile, Format_1063) << i;
+                print(files.WINCogFile, Format_1063, i);
             } else {
-                ObjexxFCL::gio::write(WINCogFile, Format_1064) << i;
+                print(files.WINCogFile, Format_1064, i);
             }
-            ObjexxFCL::gio::write(WINCogFile, Format_113);
+            print(files.WINCogFile, Format_113);
 
-            ObjexxFCL::gio::write(WINCogFile, Format_1050);
-            ObjexxFCL::gio::write(WINCogFile, Format_1051) << scon(i) << asol(i) << thick(i) << emis(2 * i - 1) << emis(2 * i) << tir(2 * i - 1) << YoungsMod(i)
-                                                << PoissonsRat(i) << LayerType(i) << nslice(i);
+            print(files.WINCogFile, Format_1050);
+            print(files.WINCogFile,
+                  Format_1051,
+                  scon(i),
+                  asol(i),
+                  thick(i),
+                  emis(2 * i - 1),
+                  emis(2 * i),
+                  tir(2 * i - 1),
+                  YoungsMod(i),
+                  PoissonsRat(i),
+                  LayerType(i),
+                  nslice(i));
 
             if (IsShadingLayer(LayerType(i))) {
-                ObjexxFCL::gio::write(WINCogFile, Format_1052);
-                ObjexxFCL::gio::write(WINCogFile, Format_1053) << Atop(i) << Abot(i) << Al(i) << Ar(i) << Ah(i);
+                print(files.WINCogFile, Format_1052);
+                print(files.WINCogFile, Format_1053, Atop(i), Abot(i), Al(i), Ar(i), Ah(i));
             }
 
             if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
-                ObjexxFCL::gio::write(WINCogFile, Format_1054);
-                ObjexxFCL::gio::write(WINCogFile, Format_1055) << SlatThick(i) << SlatWidth(i) << SlatAngle(i) << SlatCond(i) << SlatSpacing(i) << SlatCurve(i);
+                print(files.WINCogFile, Format_1054);
+                print(files.WINCogFile, Format_1055, SlatThick(i), SlatWidth(i), SlatAngle(i), SlatCond(i), SlatSpacing(i), SlatCurve(i));
             }
 
             if (i < nlayer) {
-                ObjexxFCL::gio::write(WINCogFile, Format_113);
-                ObjexxFCL::gio::write(WINCogFile, Format_1049) << i;
-                ObjexxFCL::gio::write(WINCogFile, Format_113);
-                ObjexxFCL::gio::write(WINCogFile, Format_1048);
-                ObjexxFCL::gio::write(WINCogFile, "('    ',F24.12, ', ', F24.12,', ',F24.12,', ',I1,', ',$)")
-                    << gap(i) << GapDef(i) << presure(i + 1) << nmix(i + 1);
+                print(files.WINCogFile, Format_113);
+                print(files.WINCogFile, Format_1049, i);
+                print(files.WINCogFile, Format_113);
+                print(files.WINCogFile, Format_1048);
+                print(files.WINCogFile, "    {:24.12F}, {:24.12F}, {:24.12F}, {:1}, ", gap(i), GapDef(i), presure(i + 1), nmix(i + 1));
                 for (j = 1; j <= nmix(i + 1); ++j) {
-                    ObjexxFCL::gio::write(WINCogFile, "(I1,', ',$)") << iprop(j, i + 1);
+                    print(files.WINCogFile, "{:1}, ", iprop(j, i + 1));
                 }
                 for (j = 1; j <= nmix(i + 1); ++j) {
-                    ObjexxFCL::gio::write(WINCogFile, "(F24.12,', ',$)") << frct(j, i + 1);
+                    print(files.WINCogFile, "{:24.12F}, ", frct(j, i + 1));
                 }
-                ObjexxFCL::gio::write(WINCogFile, "('    ',F24.12,', ', F24.12,', ',F24.12,', ',I1)") << vvent(i + 1) << tvent(i + 1) << SupportPillar(i);
+                print(files.WINCogFile, "    {:24.12F}, {:24.12F}, {:1}, \n", vvent(i + 1), tvent(i + 1), SupportPillar(i));
                 if (SupportPillar(i) == YES_SupportPillar) {
-                    ObjexxFCL::gio::write(WINCogFile, Format_1034);
-                    ObjexxFCL::gio::write(WINCogFile, Format_1035) << PillarSpacing(i) << PillarRadius(i);
+                    print(files.WINCogFile, Format_1034);
+                    print(files.WINCogFile, Format_1035, PillarSpacing(i), PillarRadius(i));
                 }
             }
         } //  i - layers
 
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
-        ObjexxFCL::gio::write(WINCogFile, Format_800);
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
+        print(files.WINCogFile, Format_113);
+        print(files.WINCogFile, Format_800);
+        print(files.WINCogFile, Format_113);
 
-        ObjexxFCL::gio::write(WINCogFile, Format_810);
-        ObjexxFCL::gio::write(WINCogFile, Format_1040) << ibc(2) << hin << presure(nlayer + 1) << 1 << 1 << 1.0 << vvent(nlayer + 1) << tvent(nlayer + 1);
+        print(files.WINCogFile, Format_810);
+        print(files.WINCogFile, Format_1040, ibc(2), hin, presure(nlayer + 1), 1, 1, 1.0, vvent(nlayer + 1), tvent(nlayer + 1));
 
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
-        ObjexxFCL::gio::write(WINCogFile, Format_900);
-        ObjexxFCL::gio::write(WINCogFile, Format_113);
-        //  write(WINCogFile, 1198)
-        ObjexxFCL::gio::write(WINCogFile, fmtLD);
+        print(files.WINCogFile, Format_113);
+        print(files.WINCogFile, Format_900);
+        print(files.WINCogFile, Format_113);
+        //  write(files.WINCogFile, 1198)
+        print(files.WINCogFile, "\n");
 
-        // close(WINCogFile)
+        // close(files.WINCogFile)
 
         //!!!!!!!!!!!!!!!!!!
         //!!
@@ -1441,59 +1399,54 @@ namespace TARCOGOutput {
         // 2020  format('    ',F12.6)
     }
 
-    void FinishDebugOutputFiles(int const nperr)
+    void FinishDebugOutputFiles(Files &files, int const nperr)
     {
 
         // Locals
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_2360("('TARCOG status: ',I3,' - Normal termination.')");
-        static ObjexxFCL::gio::Fmt Format_2361("('TARCOG status: ',I3,' - Warning!')");
-        static ObjexxFCL::gio::Fmt Format_2362("('TARCOG status: ',I3,' - Error!')");
-        static ObjexxFCL::gio::Fmt Format_1199("('#####  #####  #####  #####  #####  #####  #####  #####  #####  #####  #####')");
+        static constexpr auto Format_2360("TARCOG status: {:3} - Normal termination.\n");
+        static constexpr auto Format_2361("TARCOG status: {:3} - Warning!\n");
+        static constexpr auto Format_2362("TARCOG status: {:3} - Error!\n");
+        static constexpr auto Format_1199("#####  #####  #####  #####  #####  #####  #####  #####  #####  #####  #####\n");
 
-        if (WriteDebugOutput) {
+        if (files.WriteDebugOutput) {
             // open(unit=OutArgumentsFile,  file=TRIM(DBGD)//DebugOutputFileName,  status='unknown', position='APPEND',  &
             //      &  form='formatted', iostat=ferr)
             // if (ferr.ne.0) open(unit=OutArgumentsFile,  file=DebugOutputFileName,  status='unknown', position='APPEND',  &
             //      &  form='formatted', iostat=ferr)
 
-            ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
+            print(files.DebugOutputFile, "\n");
             if ((nperr > 0) && (nperr < 1000)) {
-                ObjexxFCL::gio::write(OutArgumentsFile, Format_2362) << nperr;
+                print(files.DebugOutputFile, Format_2362, nperr);
             } else if ((nperr >= 1000)) {
-                ObjexxFCL::gio::write(OutArgumentsFile, Format_2361) << nperr;
+                print(files.DebugOutputFile, Format_2361, nperr);
             } else {
-                ObjexxFCL::gio::write(OutArgumentsFile, Format_2360) << nperr;
+                print(files.DebugOutputFile, Format_2360, nperr);
             }
 
-            ObjexxFCL::gio::write(OutArgumentsFile, fmtLD);
-            ObjexxFCL::gio::write(OutArgumentsFile, Format_1199);
-            ObjexxFCL::gio::write(OutArgumentsFile, Format_1199);
+            print(files.DebugOutputFile, "\n");
+            print(files.DebugOutputFile, Format_1199);
+            print(files.DebugOutputFile, Format_1199);
 
-            // close(OutArgumentsFile)
+            // close(DebugOutputFile)
         } // debug
 
         // Close debug files
-        if (InArgumentsFile != statusClosed) {
-            ObjexxFCL::gio::close(InArgumentsFile);
-            InArgumentsFile = statusClosed;
-            OutArgumentsFile = statusClosed; // This is same is InArgumentsFile
+        if (files.DebugOutputFile.good()) {
+            files.DebugOutputFile.close();
         }
 
-        if (WINCogFile != statusClosed) {
-            ObjexxFCL::gio::close(WINCogFile);
-            WINCogFile = statusClosed;
+        if (files.WINCogFile.good()) {
+            files.WINCogFile.close();
         }
 
-        if (IterationCSVFileNumber != statusClosed) {
-            ObjexxFCL::gio::close(IterationCSVFileNumber);
-            IterationCSVFileNumber = statusClosed;
+        if (files.IterationCSVFile.good()) {
+            files.IterationCSVFile.close();
         }
 
-        if (TarcogIterationsFileNumber != statusClosed) {
-            ObjexxFCL::gio::close(TarcogIterationsFileNumber);
-            TarcogIterationsFileNumber = statusClosed;
+        if (files.TarcogIterationsFile.good()) {
+            files.TarcogIterationsFile.close();
         }
 
         //!!!!!!!!!!!!!!!!!!
@@ -1504,140 +1457,67 @@ namespace TARCOGOutput {
     }
 
     void PrepDebugFilesAndVariables(
-        std::string const &Debug_dir, std::string const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID, int &nperr)
+        Files &files, std::string const &Debug_dir, std::string const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID)
     {
 
         // Locals
         char LastPathChar;
         std::string::size_type LastPathCharIndex;
 
-        DBGD = Debug_dir;
+        files.DBGD = Debug_dir;
 
         LastPathCharIndex = len(Debug_dir);
         if (LastPathCharIndex > 0) {
             LastPathChar = Debug_dir[LastPathCharIndex - 1];
-            if (LastPathChar != '/') DBGD = Debug_dir + '/';
-            if ((LastPathChar == '/') && (LastPathCharIndex == 1)) DBGD = "";
+            if (LastPathChar != '/') files.DBGD = Debug_dir + '/';
+            if ((LastPathChar == '/') && (LastPathCharIndex == 1)) files.DBGD = "";
         }
 
         // DebugDir = Debug_dir
-        DebugMode = Debug_mode;
+        files.DebugMode = Debug_mode;
         winID = win_ID;
         iguID = igu_ID;
 
         // setup file names if file name is provided, otherwise keep default
         if (Debug_file != "") {
-            WinCogFileName = Debug_file + ".w7";
+            files.WINCogFileName = Debug_file + ".w7";
             // SHGCFileName = TRIM(Debug_file)//'_SHGC.w7'
-            DebugOutputFileName = Debug_file + ".dbg";
+            files.DebugOutputFileName = Debug_file + ".dbg";
         }
 
         // bi...Write debug output files - if debug flag > 0:
 
-        WriteDebugOutput = false;
+        files.WriteDebugOutput = false;
         if ((Debug_mode > minDebugFlag) && (Debug_mode <= maxDebugFlag)) {
 
-            WriteDebugOutput = true;
-            if (Debug_mode == appendResultsToFile) FilePosition = "APPEND";
-            if ((Debug_mode == resultsToNewFile) || (Debug_mode == saveIntermediateResults)) FileMode = "SEQUENTIAL";
-
-            InArgumentsFile = GetNewUnitNumber();
-            //      open(newunit=InArgumentsFile,  file=TRIM(DBGD)//DebugOutputFileName,  status='unknown', access=FileMode,  &
-            //              position=FilePosition, form='formatted', iostat=nperr)
-            {
-                IOFlags flags;
-                flags.ACCESS(FileMode);
-                flags.FORM("formatted");
-                flags.STATUS("unknown");
-                flags.POSITION(FilePosition);
-                ObjexxFCL::gio::open(InArgumentsFile, DBGD + DebugOutputFileName, flags);
-                nperr = flags.ios();
+            files.WriteDebugOutput = true;
+            if (Debug_mode == appendResultsToFile) {
+                files.FilePosition = "APPEND";
+                files.FileMode = "SEQUENTIAL";
+            }
+            if ((Debug_mode == resultsToNewFile) || (Debug_mode == saveIntermediateResults)) {
+                files.FilePosition = "ASIS";
+                files.FileMode = "SEQUENTIAL";
             }
 
-            //      if (nperr.ne.0)  open(newunit=InArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode,  &
-            //              position=FilePosition, form='formatted', iostat=nperr)
-            if (nperr != 0) {
-                IOFlags flags;
-                flags.ACCESS(FileMode);
-                flags.FORM("formatted");
-                flags.STATUS("unknown");
-                flags.POSITION(FilePosition);
-                ObjexxFCL::gio::open(InArgumentsFile, DebugOutputFileName, flags);
-                nperr = flags.ios();
-            }
+            const auto open_file = [&](OutputFile &of, const std::string &fileName, const bool forAppend) {
+                of.fileName = files.DBGD + fileName;
+                of.open(forAppend);
 
-            OutArgumentsFile = InArgumentsFile;
+                if (!of.good()) {
+                    of.fileName = fileName;
+                    of.open(forAppend);
+                }
 
-            WINCogFile = GetNewUnitNumber();
-            //      open(newunit=WINCogFile,  file=TRIM(DBGD)//TRIM(WinCogFileName),  status='unknown', access=FileMode, &
-            //             position=FilePosition, form='formatted', iostat=nperr)
-            {
-                IOFlags flags;
-                flags.ACCESS(FileMode);
-                flags.FORM("formatted");
-                flags.STATUS("unknown");
-                flags.POSITION(FilePosition);
-                ObjexxFCL::gio::open(WINCogFile, DBGD + WinCogFileName, flags);
-                nperr = flags.ios();
-            }
-            //      if (nperr.ne.0) open(newunit=WINCogFile,  file=TRIM(WinCogFileName),  status='unknown', access=FileMode, &
-            //                            position=FilePosition, form='formatted', iostat=nperr)
-            if (nperr != 0) {
-                IOFlags flags;
-                flags.ACCESS(FileMode);
-                flags.FORM("formatted");
-                flags.STATUS("unknown");
-                flags.POSITION(FilePosition);
-                ObjexxFCL::gio::open(WINCogFile, WinCogFileName, flags);
-                nperr = flags.ios();
-            }
+                std::clog << "File: '" << of.fileName << "': " << of.good() << std::endl;
+            };
+
+            open_file(files.DebugOutputFile, files.DebugOutputFileName, files.FilePosition == "APPEND");
+            open_file(files.WINCogFile, files.WINCogFileName, files.FilePosition == "APPEND");
 
             if (Debug_mode == saveIntermediateResults) {
-                TarcogIterationsFileNumber = GetNewUnitNumber();
-                //        open(newunit=TarcogIterationsFileNumber,  file=TRIM(DBGD)//'TarcogIterations.dbg',  status='unknown', position='APPEND',  &
-                //              form='formatted', iostat=nperr)
-                {
-                    IOFlags flags;
-                    flags.FORM("formatted");
-                    flags.STATUS("unknown");
-                    flags.POSITION("APPEND");
-                    ObjexxFCL::gio::open(TarcogIterationsFileNumber, DBGD + DataStringGlobals::TarcogIterationsFileName, flags);
-                    nperr = flags.ios();
-                }
-
-                //        if (nperr.ne.0)  open(newunit=TarcogIterationsFileNumber, file='TarcogIterations.dbg',status='unknown', position='APPEND', &
-                //              &  form='formatted', iostat=nperr)
-                if (nperr != 0) {
-                    IOFlags flags;
-                    flags.FORM("formatted");
-                    flags.STATUS("unknown");
-                    flags.POSITION("APPEND");
-                    ObjexxFCL::gio::open(TarcogIterationsFileNumber, DataStringGlobals::TarcogIterationsFileName, flags);
-                    nperr = flags.ios();
-                }
-
-                IterationCSVFileNumber = GetNewUnitNumber();
-                //        open(newunit=IterationCSVFileNumber,  file=TRIM(DBGD)//TRIM(IterationCSVName),  status='unknown', position='APPEND',  &
-                //              form='formatted', iostat=nperr)
-                {
-                    IOFlags flags;
-                    flags.FORM("formatted");
-                    flags.STATUS("unknown");
-                    flags.POSITION("APPEND");
-                    ObjexxFCL::gio::open(IterationCSVFileNumber, DBGD + IterationCSVName, flags);
-                    nperr = flags.ios();
-                }
-
-                //        if (nperr.ne.0)  open(newunit=IterationCSVFileNumber,  file=TRIM(IterationCSVName),  status='unknown', position='APPEND',  &
-                //              form='formatted', iostat=nperr)
-                if (nperr != 0) {
-                    IOFlags flags;
-                    flags.FORM("formatted");
-                    flags.STATUS("unknown");
-                    flags.POSITION("APPEND");
-                    ObjexxFCL::gio::open(IterationCSVFileNumber, IterationCSVName, flags);
-                    nperr = flags.ios();
-                }
+                open_file(files.TarcogIterationsFile, files.TarcogIterationsFileName, true);
+                open_file(files.IterationCSVFile, files.IterationCSVName, true);
             }
         }
     }
