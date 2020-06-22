@@ -462,7 +462,7 @@ namespace CommandLineInterface {
         outputDelightOutFileName = "eplusout.delightout";
         outputDelightEldmpFileName = "eplusout.delighteldmp";
         outputDelightDfdmpFileName = "eplusout.delightdfdmp";
-        EnergyPlusIniFileName = "Energy+.ini";
+        state.inputFiles.iniFile.fileName = "Energy+.ini";
         inStatFileName = weatherFilePathWithoutExtension + ".stat";
         eplusADSFileName = inputDirPathName + "eplusADS.inp";
 
@@ -518,39 +518,24 @@ namespace CommandLineInterface {
         }
 
         // Read path from INI file if it exists
-        int LFN; // Unit Number for reads
-        std::string::size_type TempIndx;
-        int iostatus;
 
         // Check for IDD and IDF files
-        if (fileExists(EnergyPlusIniFileName)) {
-            LFN = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.ACTION("read");
-                ObjexxFCL::gio::open(LFN, EnergyPlusIniFileName, flags);
-                iostatus = flags.ios();
-            }
-            if (iostatus != 0) {
-                DisplayString("ERROR: Could not open file " + EnergyPlusIniFileName + " for input (read).");
+        if (fileExists(state.inputFiles.iniFile.fileName)) {
+            auto iniFile = state.inputFiles.iniFile.try_open();
+            if (!iniFile.good()) {
+                DisplayString("ERROR: Could not open file " + iniFile.fileName + " for input (read).");
                 exit(EXIT_FAILURE);
             }
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(LFN, flags);
-                CurrentWorkingFolder = flags.name();
-            }
+            CurrentWorkingFolder = iniFile.fileName;
             // Relying on compiler to supply full path name here
-            TempIndx = index(CurrentWorkingFolder, pathChar, true);
+            const auto TempIndx = index(CurrentWorkingFolder, pathChar, true);
             if (TempIndx == std::string::npos) {
                 CurrentWorkingFolder = "";
             } else {
                 CurrentWorkingFolder.erase(TempIndx + 1);
             }
             //       Get directories from ini file
-            ReadINIFile(LFN, "program", "dir", ProgramPath);
-
-            ObjexxFCL::gio::close(LFN);
+            ReadINIFile(iniFile, "program", "dir", ProgramPath);
 
             inputIddFileName = ProgramPath + "Energy+.idd";
         }
@@ -632,7 +617,7 @@ namespace CommandLineInterface {
     //     Rewinding is a big performance hit and should be avoided if possible
     //     Case-insensitive comparison is much faster than converting strings to upper or lower case
     //     Each strip and case conversion is a heap hit and should be avoided if possible
-    void ReadINIFile(int const UnitNumber,               // Unit number of the opened INI file
+    void ReadINIFile(InputFile &inputFile,               // Unit number of the opened INI file
                      std::string const &Heading,         // Heading for the parameters ('[heading]')
                      std::string const &KindofParameter, // Kind of parameter to be found (String)
                      std::string &DataOut                // Output from the retrieval
@@ -673,8 +658,7 @@ namespace CommandLineInterface {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string LINE;
-        static std::string LINEOut;
+
         std::string Param;
         std::string::size_type ILB;
         std::string::size_type IRB;
@@ -682,10 +666,6 @@ namespace CommandLineInterface {
         std::string::size_type IPAR;
         std::string::size_type IPOS;
         std::string::size_type ILEN;
-        int ReadStat;
-        bool EndofFile;
-        bool Found;
-        bool NewHeading;
 
         // Formats
         static ObjexxFCL::gio::Fmt Format_700("(A)");
@@ -697,25 +677,19 @@ namespace CommandLineInterface {
         Param = KindofParameter;
         strip(Param);
         ILEN = len(Param);
-        ObjexxFCL::gio::rewind(UnitNumber); // Performance Ouch!
-        EndofFile = false;
-        Found = false;
-        NewHeading = false;
+        inputFile.rewind();
+        bool Found = false;
+        bool NewHeading = false;
 
-        while (!EndofFile && !Found) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(UnitNumber, Format_700, flags) >> LINE;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) {
-                EndofFile = true;
-                break;
-            }
+        while (inputFile.good() && !Found) {
+            const auto readResult = inputFile.readLine();
 
-            if (len(LINE) == 0) continue; // Ignore Blank Lines
+            if (readResult.eof) { break; }
 
-            ConvertCaseToLower(LINE, LINEOut); // Turn line into lower case
+            if (readResult.data.empty()) { continue; } // Ignore Blank Lines
+
+            std::string LINEOut;
+            ConvertCaseToLower(readResult.data, LINEOut); // Turn line into lower case
             //        LINE=LINEOut
 
             if (!has(LINEOut, Heading)) continue;
@@ -727,21 +701,16 @@ namespace CommandLineInterface {
             if (!has(LINEOut, '[' + Heading + ']')) continue; // Must be really correct heading line
 
             //                                  Heading line found, now looking for Kind
-            while (!EndofFile && !NewHeading) {
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(UnitNumber, Format_700, flags) >> LINE;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat < GoodIOStatValue) {
-                    EndofFile = true;
-                    break;
-                }
-                strip(LINE);
+            while (inputFile.good() && !NewHeading) {
+                const auto innerReadResult = inputFile.readLine();
+                if (innerReadResult.eof) { break; }
 
-                if (len(LINE) == 0) continue; // Ignore Blank Lines
+                auto line = innerReadResult.data;
+                strip(line);
 
-                ConvertCaseToLower(LINE, LINEOut); // Turn line into lower case
+                if (line.empty()) continue; // Ignore Blank Lines
+
+                ConvertCaseToLower(line, LINEOut); // Turn line into lower case
                 //         LINE=LINEOut
 
                 ILB = index(LINEOut, '[');
@@ -763,7 +732,7 @@ namespace CommandLineInterface {
                 //                                  parameter = found
                 //                                  Set output string to start with non-blank character
 
-                DataOut = stripped(LINE.substr(IEQ + 1));
+                DataOut = stripped(line.substr(IEQ + 1));
                 Found = true;
                 break;
             }

@@ -50,11 +50,63 @@
 #include "DataStringGlobals.hh"
 #include "UtilityRoutines.hh"
 
-#include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
 #include <stdexcept>
 
 namespace EnergyPlus {
+
+InputFile &InputFile::ensure_open(const std::string &caller)
+{
+    if (!good()) {
+        open();
+    }
+    if (!good()) {
+        ShowFatalError(fmt::format("{}: Could not open file {} for input (write).", caller, fileName));
+    }
+    return *this;
+}
+
+bool InputFile::good() const
+{
+    if (is) {
+        return is->good();
+    } else {
+        return false;
+    }
+}
+
+void InputFile::close()
+{
+    is.reset();
+}
+
+InputFile::ReadResult<std::string> InputFile::readLine() noexcept
+{
+    if (is) {
+        std::string line;
+        std::getline(*is, line);
+        return {std::move(line), is->eof()};
+    } else {
+        return {"", true};
+    }
+}
+
+InputFile::InputFile(std::string FileName) : fileName(std::move(FileName))
+{
+}
+
+std::ostream::pos_type InputFile::position() const noexcept
+{
+    return is->tellg();
+}
+
+void InputFile::open()
+{
+    is = std::unique_ptr<std::istream>(new std::fstream(fileName.c_str(), std::ios_base::in));
+}
+
+
+
 
 InputOutputFile &InputOutputFile::ensure_open(const std::string &caller)
 {

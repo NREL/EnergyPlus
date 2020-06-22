@@ -114,7 +114,6 @@ namespace DataStringGlobals {
     extern std::string outputPerfLogFileName;
     extern std::string outputSqlFileName;
     extern std::string outputSqliteErrFileName;
-    extern std::string EnergyPlusIniFileName;
     extern std::string inStatFileName;
     extern std::string eplusADSFileName;
     extern std::string outputCsvFileName;

@@ -101,12 +101,11 @@ namespace EnergyPlus {
         PlantChillersData dataPlantChillers;
         //OutputReportTabular outputReportTabular;
 
-        // todo: move this from a reference to an object value
-        // after we have eliminated all calls to getSingleton
-        // after we've plumbed enough of the functions to allow
         OutputFiles outputFiles;
+        InputFiles inputFiles;
 
         EnergyPlusData() {
+            // todo, try to eliminate the need for the singleton
             OutputFiles::setSingleton(&outputFiles);
         }
 

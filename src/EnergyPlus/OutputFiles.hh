@@ -57,6 +57,38 @@
 
 namespace EnergyPlus {
 
+class InputFile
+{
+public:
+    template<typename Type>
+    struct ReadResult {
+        ReadResult(Type data_, bool eof_) : data{std::move(data_)}, eof{eof_} {}
+
+        Type data;
+        bool eof = false;
+    };
+
+    void close();
+    bool good() const;
+
+    // opens the file if it is not currently open and returns
+    // a reference back to itself
+    InputFile &ensure_open(const std::string &caller);
+
+    std::string fileName;
+    void open();
+    std::fstream::pos_type position() const noexcept;
+
+    void rewind() noexcept { if (is) { is->seekg(0); } }
+
+    ReadResult<std::string> readLine() noexcept;
+
+    explicit InputFile(std::string FileName);
+
+private:
+    std::unique_ptr<std::istream> is;
+    friend class OutputFiles;
+};
 
 class InputOutputFile
 {
@@ -84,25 +116,36 @@ private:
     friend class OutputFiles;
 };
 
+template <typename FileType> struct IOFileName
+{
+    std::string fileName;
+    FileType open(const std::string &caller)
+    {
+        FileType file{fileName};
+        file.ensure_open(caller);
+        return file;
+    }
+    FileType try_open()
+    {
+        FileType file{fileName};
+        file.open();
+        return file;
+    }
+};
+
+using OutputFileName = IOFileName<InputOutputFile>;
+using InputFileName = IOFileName<InputFile>;
+
+class InputFiles
+{
+public:
+    InputFileName iniFile{"EnergyPlus.ini"};
+};
 
 class OutputFiles
 {
 public:
 
-    struct OutputFileName
-    {
-        std::string fileName;
-        InputOutputFile open(const std::string &caller) {
-            InputOutputFile of{fileName};
-            of.ensure_open(caller);
-            return of;
-        }
-        InputOutputFile try_open() {
-            InputOutputFile of{fileName};
-            of.open();
-            return of;
-        }
-    };
 
     InputOutputFile audit{"eplusout.audit"};
     InputOutputFile eio{"eplusout.eio"};
@@ -143,6 +186,7 @@ public:
 
     OutputFileName screenCsv{"eplusscreen.csv"};
     OutputFileName endFile{"eplusout.end"};
+
 
     static OutputFiles &getSingleton();
     static void setSingleton(OutputFiles *newSingleton) noexcept;
