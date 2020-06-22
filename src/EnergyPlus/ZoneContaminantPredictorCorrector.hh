@@ -80,7 +80,7 @@ namespace ZoneContaminantPredictorCorrector {
 
     void clear_state();
 
-    void ManageZoneContaminanUpdates(int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+    void ManageZoneContaminanUpdates(ZonePlenumData &dataZonePlenum, int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
                                      bool const ShortenTimeStepSys,
                                      bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                                      Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
@@ -111,7 +111,7 @@ namespace ZoneContaminantPredictorCorrector {
                          Real64 &RhoAir               // Air density
     );
 
-    void CorrectZoneContaminants(bool const ShortenTimeStepSys,
+    void CorrectZoneContaminants(ZonePlenumData &dataZonePlenum, bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
