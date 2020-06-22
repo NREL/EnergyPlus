@@ -57,8 +57,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/WindowManagerExteriorData.hh>   //for CWindowConstructionsSimplified
-#include <EnergyPlus/WindowModel.hh>  // for CWindowOpticalModel
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -71,6 +69,7 @@ namespace WindowManager {
 
     class CWindowModel;
     class CWindowOpticalModel;
+    class CWindowConstructionsSimplified;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE WindowManager:
     //   Optical Calculation Routines
