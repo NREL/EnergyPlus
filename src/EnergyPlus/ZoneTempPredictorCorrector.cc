@@ -57,6 +57,7 @@
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -76,7 +77,6 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>

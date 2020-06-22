@@ -72,6 +72,7 @@
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataCostEstimate.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
@@ -96,7 +97,6 @@
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HybridModel.hh>

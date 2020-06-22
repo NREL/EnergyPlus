@@ -61,6 +61,7 @@
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/CoolTower.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -86,7 +87,6 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>

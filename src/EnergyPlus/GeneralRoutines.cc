@@ -59,6 +59,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -73,7 +74,6 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>

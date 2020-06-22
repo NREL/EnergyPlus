@@ -54,10 +54,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-  class OutputFiles;
+    // Forward declarations
+    struct EnergyPlusData;
+    class OutputFiles;
 
 namespace InternalHeatGains {
 
