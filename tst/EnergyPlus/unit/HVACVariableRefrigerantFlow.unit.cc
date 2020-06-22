@@ -5565,7 +5565,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read equipment list and connections
 
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
     // Get plant loop data
     PlantManager::GetPlantLoopData(state);
     PlantManager::GetPlantInput(state);

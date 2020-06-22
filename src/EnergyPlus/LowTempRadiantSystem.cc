@@ -326,7 +326,7 @@ namespace LowTempRadiantSystem {
             } else {
                 ShowFatalError("SimLowTempRadiantSystem: Illegal system type for system " + CompName);
             }
-            
+
             if ((SystemType == HydronicSystem) || (SystemType == ConstantFlowSystem) || (SystemType == ElectricSystem) ) {
                 baseSystem->calculateLowTemperatureRadiantSystem(LoadMet);
                 baseSystem->updateLowTemperatureRadiantSystemSurfaces();
@@ -496,9 +496,9 @@ namespace LowTempRadiantSystem {
             ++BaseNum;
             RadSysTypes(BaseNum).Name = Alphas(1);
             RadSysTypes(BaseNum).SystemType = HydronicSystem;
-            
+
             auto &thisRadSys (HydrRadSys(Item));
-            
+
             // General user input data
             thisRadSys.Name = Alphas(1);
 
@@ -828,10 +828,10 @@ namespace LowTempRadiantSystem {
             ++BaseNum;
             RadSysTypes(BaseNum).Name = Alphas(1);
             RadSysTypes(BaseNum).SystemType = ConstantFlowSystem;
-            
+
             // General user input data
             auto &thisCFloSys (CFloRadSys(Item));
-            
+
             thisCFloSys.Name = Alphas(1);
 
             thisCFloSys.SchedName = Alphas(2);
@@ -1078,7 +1078,7 @@ namespace LowTempRadiantSystem {
 
             // General user input data
             auto &thisElecSys (ElecRadSys(Item));
-            
+
             thisElecSys.Name = Alphas(1);
 
             thisElecSys.SchedName = Alphas(2);
@@ -1336,9 +1336,9 @@ namespace LowTempRadiantSystem {
         // Set up the output variables for low temperature radiant systems
         // ZoneHVAC:LowTemperatureRadiant:VariableFlow (HydrRadSys)
         for (Item = 1; Item <= NumOfHydrLowTempRadSys; ++Item) {
-            
+
             auto &thisHydrSys (HydrRadSys(Item));
-            
+
             SetupOutputVariable(
                 "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, thisHydrSys.HeatPower, "System", "Average", thisHydrSys.Name);
             SetupOutputVariable("Zone Radiant HVAC Heating Energy",
@@ -1433,9 +1433,9 @@ namespace LowTempRadiantSystem {
         // Set up the output variables for low temperature radiant systems
         // ZoneHVAC:LowTemperatureRadiant:ConstantFlow (CFloRadSys)
         for (Item = 1; Item <= NumOfCFloLowTempRadSys; ++Item) {
-            
+
             auto &thisCFloSys (CFloRadSys(Item));
-            
+
             SetupOutputVariable(
                 "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, thisCFloSys.HeatPower, "System", "Average", thisCFloSys.Name);
             SetupOutputVariable("Zone Radiant HVAC Heating Energy",
@@ -1576,9 +1576,9 @@ namespace LowTempRadiantSystem {
         for (Item = 1; Item <= NumOfElecLowTempRadSys; ++Item) {
             // Set up the output variables for low temperature radiant systems
             // ZoneHVAC:LowTemperatureRadiant:Electric (ElecRadSys)
-            
+
             auto &thisElecSys (ElecRadSys(Item));
-                     
+
             SetupOutputVariable(
                 "Zone Radiant HVAC Electric Power", OutputProcessor::Unit::W, thisElecSys.ElecPower, "System", "Average", thisElecSys.Name);
             SetupOutputVariable("Zone Radiant HVAC Electric Energy",
@@ -1768,7 +1768,8 @@ namespace LowTempRadiantSystem {
             if (MyPlantScanFlagHydr(RadSysNum) && allocated(PlantLoop)) {
                 errFlag = false;
                 if (HydrRadSys(RadSysNum).HotWaterInNode > 0) {
-                    ScanPlantLoopsForObject(HydrRadSys(RadSysNum).Name,
+                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                            HydrRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_VarFlow,
                                             HydrRadSys(RadSysNum).HWLoopNum,
                                             HydrRadSys(RadSysNum).HWLoopSide,
@@ -1785,7 +1786,8 @@ namespace LowTempRadiantSystem {
                     }
                 }
                 if (HydrRadSys(RadSysNum).ColdWaterInNode > 0) {
-                    ScanPlantLoopsForObject(HydrRadSys(RadSysNum).Name,
+                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                            HydrRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_VarFlow,
                                             HydrRadSys(RadSysNum).CWLoopNum,
                                             HydrRadSys(RadSysNum).CWLoopSide,
@@ -1811,7 +1813,8 @@ namespace LowTempRadiantSystem {
             if (MyPlantScanFlagCFlo(RadSysNum) && allocated(PlantLoop)) {
                 errFlag = false;
                 if (CFloRadSys(RadSysNum).HotWaterInNode > 0) {
-                    ScanPlantLoopsForObject(CFloRadSys(RadSysNum).Name,
+                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                            CFloRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_ConstFlow,
                                             CFloRadSys(RadSysNum).HWLoopNum,
                                             CFloRadSys(RadSysNum).HWLoopSide,
@@ -1828,7 +1831,8 @@ namespace LowTempRadiantSystem {
                     }
                 }
                 if (CFloRadSys(RadSysNum).ColdWaterInNode > 0) {
-                    ScanPlantLoopsForObject(CFloRadSys(RadSysNum).Name,
+                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                            CFloRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_ConstFlow,
                                             CFloRadSys(RadSysNum).CWLoopNum,
                                             CFloRadSys(RadSysNum).CWLoopSide,
@@ -3075,9 +3079,9 @@ namespace LowTempRadiantSystem {
             }
         } else { // Unit might be on-->this section is intended to control the water mass flow rate being
             // sent to the radiant system
-            
+
             ControlTemp = this->setRadiantSystemControlTemperature();
-            
+
             if (this->HotSetptSchedPtr > 0) {
                 SetPointTemp = GetCurrentScheduleValue(this->HotSetptSchedPtr);
                 OffTempHeat = SetPointTemp + 0.5 * this->HotThrottlRange;
@@ -3546,7 +3550,7 @@ namespace LowTempRadiantSystem {
                         for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
                             SurfNum = this->SurfacePtr(RadSurfNum3);
                             // Determine the heat exchanger "effectiveness" term
-                            
+
                             EpsMdotCp = calculateHXEffectivenessTerm(WaterTempIn, WaterMassFlow, this->SurfaceFrac(RadSurfNum3), this->NumCircuits(RadSurfNum3));
 
                             if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF) {
@@ -3726,7 +3730,7 @@ namespace LowTempRadiantSystem {
             // mass flow rate being sent to the radiant system
 
             // Set the current setpoint temperature (same procedure for either heating or cooling)
-            
+
             SetPointTemp = this->setRadiantSystemControlTemperature();
 
             // Avoid problems when there is no heating or cooling control because the system only cools or heats
@@ -4318,7 +4322,7 @@ namespace LowTempRadiantSystem {
             for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
                 SurfNum = this->SurfacePtr(RadSurfNum);
                 // Determine the heat exchanger "effectiveness" term
-                
+
                 EpsMdotCp = calculateHXEffectivenessTerm(WaterTempIn, WaterMassFlow, this->SurfaceFrac(RadSurfNum), this->NumCircuits(RadSurfNum));
 
                 // Obtain the heat balance coefficients and calculate the intermediate coefficients
@@ -4749,7 +4753,7 @@ namespace LowTempRadiantSystem {
             OffTemp = SetPtTemp + 0.5 * this->ThrottlRange;
 
             // Determine the control temperature--what the setpoint/offtemp is being compared to for unit operation
-            
+
             ControlTemp = this->setRadiantSystemControlTemperature();
 
             if (ControlTemp < OffTemp) { // HEATING MODE
@@ -4805,7 +4809,7 @@ namespace LowTempRadiantSystem {
        static std::string const RoutineName("UpdateLowTempRadiantSystem");
 
        for (int radSurfNum = 1; radSurfNum <= this->NumOfSurfaces; ++radSurfNum) {
-           
+
            int surfNum = this->SurfacePtr(radSurfNum);
 
            if (LastSysTimeElapsed(surfNum) == SysTimeElapsed) {
@@ -4825,7 +4829,7 @@ namespace LowTempRadiantSystem {
 
     void VariableFlowRadiantSystemData::updateLowTemperatureRadiantSystem()
     {
-    
+
         // Using/Aliasing
         using DataHeatBalance::Zone;
         using DataLoopNode::Node;
@@ -4845,7 +4849,7 @@ namespace LowTempRadiantSystem {
 
         // For a hydronic system, calculate the water side outlet conditions and set the
         // appropriate conditions on the correct HVAC node.
-        
+
         // First sum up all of the heat sources/sinks associated with this system
         Real64 TotalHeatSource(0.0); // Total heat source or sink for a particular radiant system (sum of all surface source/sinks)
         for (int radSurfNum = 1; radSurfNum <= this->NumOfSurfaces; ++radSurfNum) {
@@ -4898,7 +4902,7 @@ namespace LowTempRadiantSystem {
             } else { // HeatingMode or not on
                 SafeCopyPlantNode(waterInletNode, waterOutletNode);
             }
-            
+
             this->checkForOutOfRangeTemperatureResult(Node(waterOutletNode).Temp, Node(waterInletNode).Temp);
         }
 
@@ -5027,7 +5031,7 @@ namespace LowTempRadiantSystem {
                     outletTemp,
                     outletTemp);
             }
-            
+
             if (warnTooHigh) {
                 if (this->OutRangeHiErrorCount == 0) {
                     ShowSevereMessage("UpdateLowTempRadiantSystem: model result for fluid outlet temperature is not physical.");
@@ -5149,7 +5153,7 @@ namespace LowTempRadiantSystem {
         Real64 MUactual;
         Real64 PRactual;
         Real64 Eff; // HX effectiveness
-        
+
         // First find out where we are in the range of temperatures
         Index = 1;
         while (Index <= NumOfPropDivisions) {
@@ -5331,7 +5335,7 @@ namespace LowTempRadiantSystem {
 
     void VariableFlowRadiantSystemData::reportLowTemperatureRadiantSystem()
     {
-    
+
         // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHeatBalance::Zone;
@@ -5450,7 +5454,7 @@ namespace LowTempRadiantSystem {
         } else {
             this->CondCausedTimeOff = 0.0;
         }
-        
+
     }
 
     void ElectricRadiantSystemData::reportLowTemperatureRadiantSystem()
