@@ -329,7 +329,7 @@ namespace WindowManager {
     {
     }
 
-    void CWCEMaterialDualBandFactory::init(WindowManagerData &dataWindowManager)
+    void CWCEMaterialDualBandFactory::init(WindowManagerData &EP_UNUSED(dataWindowManager))
     {
         if (m_Range == WavelengthRange::Visible) {
             m_Material = createVisibleRangeMaterial();
