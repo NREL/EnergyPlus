@@ -3766,7 +3766,7 @@ namespace ZoneTempPredictorCorrector {
             // Calculate the various heat balance sums
 
             // NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
-            CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
+            CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
 
             // Sum all convective internal gains except for people: SumIntGainExceptPeople
             if (HybridModel::FlagHybridModel_PC) {
@@ -5090,7 +5090,7 @@ namespace ZoneTempPredictorCorrector {
             ManageAirModel(state, ZoneNum);
 
             // Calculate the various heat balance sums
-            CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
+            CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
 
             // Sum all convective internal gains except for people: SumIntGainExceptPeople
             if (HybridModel::FlagHybridModel_PC) {
@@ -5252,7 +5252,7 @@ namespace ZoneTempPredictorCorrector {
             SNLoadCoolEnergy(ZoneNum) = std::abs(min(SNLoad, 0.0) * TimeStepSys * SecInHour);
 
             // Final humidity calcs
-            CorrectZoneHumRat(ZoneNum);
+            CorrectZoneHumRat(state.dataZonePlenum, ZoneNum);
 
             ZoneAirHumRat(ZoneNum) = ZoneAirHumRatTemp(ZoneNum);
             ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(ZT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress, RoutineName);
@@ -5299,7 +5299,7 @@ namespace ZoneTempPredictorCorrector {
                 }
             }
 
-            CalcZoneComponentLoadSums(ZoneNum,
+            CalcZoneComponentLoadSums(state.dataZonePlenum, ZoneNum,
                                       TempDepCoef,
                                       TempIndCoef,
                                       ZnAirRpt(ZoneNum).SumIntGains,
@@ -5582,7 +5582,7 @@ namespace ZoneTempPredictorCorrector {
         } // zone loop
     }
 
-    void CorrectZoneHumRat(int const ZoneNum)
+    void CorrectZoneHumRat(ZonePlenumData &dataZonePlenum, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5605,8 +5605,8 @@ namespace ZoneTempPredictorCorrector {
         using DataSurfaces::HeatTransferModel_HAMT;
         using DataSurfaces::Surface;
         using DataZoneEquipment::ZoneEquipConfig;
-        using ZonePlenum::ZoneRetPlenCond;
-        using ZonePlenum::ZoneSupPlenCond;
+        //using ZonePlenum::ZoneRetPlenCond;
+        //using ZonePlenum::ZoneSupPlenCond;
 
         using DataGlobals::TimeStepZone;
 
@@ -5670,16 +5670,16 @@ namespace ZoneTempPredictorCorrector {
             // Do the calculations for the plenum zone
         } else if (ZoneRetPlenumAirFlag) {
             ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
-            for (NodeNum = 1; NodeNum <= ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
+            for (NodeNum = 1; NodeNum <= dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
 
-                MoistureMassFlowRate += (Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate *
-                                         Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).HumRat) /
+                MoistureMassFlowRate += (Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate *
+                                         Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).HumRat) /
                                         ZoneMult;
-                ZoneMassFlowRate += Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
+                ZoneMassFlowRate += Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
             } // NodeNum
             // add in the leak flow
-            for (ADUListIndex = 1; ADUListIndex <= ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
-                ADUNum = ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
+            for (ADUListIndex = 1; ADUListIndex <= dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
+                ADUNum = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
                 if (AirDistUnit(ADUNum).UpStreamLeak) {
                     ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                     MoistureMassFlowRate += (AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).HumRat) / ZoneMult;
@@ -5695,9 +5695,9 @@ namespace ZoneTempPredictorCorrector {
         } else if (ZoneSupPlenumAirFlag) {
             ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
             MoistureMassFlowRate +=
-                (Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate * Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).HumRat) /
+                (Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate * Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).HumRat) /
                 ZoneMult;
-            ZoneMassFlowRate += Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate / ZoneMult;
+            ZoneMassFlowRate += Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate / ZoneMult;
         }
 
         // Calculate hourly humidity ratio from infiltration + humdidity added from latent load + system added moisture
@@ -6295,7 +6295,7 @@ namespace ZoneTempPredictorCorrector {
         PreviousMeasuredHumRat1(ZoneNum) = Zone(ZoneNum).ZoneMeasuredHumidityRatio;
     }
 
-    void CalcZoneSums(int const ZoneNum,  // Zone number
+    void CalcZoneSums(ZonePlenumData &dataZonePlenum, int const ZoneNum,  // Zone number
                       Real64 &SumIntGain, // Zone sum of convective internal gains
                       Real64 &SumHA,      // Zone sum of Hc*Area
                       Real64 &SumHATsurf, // Zone sum of Hc*Area*Tsurf
@@ -6337,8 +6337,8 @@ namespace ZoneTempPredictorCorrector {
         using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
-        using ZonePlenum::ZoneRetPlenCond;
-        using ZonePlenum::ZoneSupPlenCond;
+        //using ZonePlenum::ZoneRetPlenCond;
+        //using ZonePlenum::ZoneSupPlenCond;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6427,7 +6427,7 @@ namespace ZoneTempPredictorCorrector {
 
         } else if (ZoneRetPlenumAirFlag) {
             ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
-            auto const &zrpc(ZoneRetPlenCond(ZoneRetPlenumNum));
+            auto const &zrpc(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum));
             Real64 const air_hum_rat(ZoneAirHumRat(ZoneNum));
             for (int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
                 // Get node conditions
@@ -6441,9 +6441,9 @@ namespace ZoneTempPredictorCorrector {
                 SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
             } // NodeNum
             // add in the leaks
-            for (int ADUListIndex = 1, ADUListIndex_end = ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ADUListIndex <= ADUListIndex_end;
+            for (int ADUListIndex = 1, ADUListIndex_end = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ADUListIndex <= ADUListIndex_end;
                  ++ADUListIndex) {
-                ADUNum = ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
+                ADUNum = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
                 if (AirDistUnit(ADUNum).UpStreamLeak) {
                     ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
@@ -6467,8 +6467,8 @@ namespace ZoneTempPredictorCorrector {
         } else if (ZoneSupPlenumAirFlag) {
             ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
             // Get node conditions
-            NodeTemp = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
-            MassFlowRate = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
+            NodeTemp = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
+            MassFlowRate = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
             CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
             SumSysMCp += MassFlowRate * CpAir;
@@ -6581,7 +6581,7 @@ namespace ZoneTempPredictorCorrector {
         } // SurfNum
     }
 
-    void CalcZoneComponentLoadSums(int const ZoneNum,        // Zone number
+    void CalcZoneComponentLoadSums(ZonePlenumData &dataZonePlenum, int const ZoneNum,        // Zone number
                                    Real64 const TempDepCoef, // Dependent coefficient
                                    Real64 const TempIndCoef, // Independent coefficient
                                    Real64 &SumIntGains,      // Zone sum of convective internal gains
@@ -6629,8 +6629,8 @@ namespace ZoneTempPredictorCorrector {
         using General::RoundSigDigits;
         using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
-        using ZonePlenum::ZoneRetPlenCond;
-        using ZonePlenum::ZoneSupPlenCond;
+        //using ZonePlenum::ZoneRetPlenCond;
+        //using ZonePlenum::ZoneSupPlenCond;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6747,18 +6747,18 @@ namespace ZoneTempPredictorCorrector {
 
         } else if (ZoneRetPlenumAirFlag) {
             ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
-            for (NodeNum = 1; NodeNum <= ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
+            for (NodeNum = 1; NodeNum <= dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
                 // Get node conditions
-                NodeTemp = Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
+                NodeTemp = Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
+                MassFlowRate = Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
                 CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
                 SumMCpDTsystem += MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
 
             } // NodeNum
             // add in the leaks
-            for (ADUListIndex = 1; ADUListIndex <= ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
-                ADUNum = ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
+            for (ADUListIndex = 1; ADUListIndex <= dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
+                ADUNum = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
                 if (AirDistUnit(ADUNum).UpStreamLeak) {
                     ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
@@ -6778,8 +6778,8 @@ namespace ZoneTempPredictorCorrector {
         } else if (ZoneSupPlenumAirFlag) {
             ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
             // Get node conditions
-            NodeTemp = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
-            MassFlowRate = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
+            NodeTemp = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
+            MassFlowRate = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
             CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
             SumMCpDTsystem += MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));

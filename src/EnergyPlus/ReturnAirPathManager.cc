@@ -300,7 +300,7 @@ namespace ReturnAirPathManager {
 
                 } else if (SELECT_CASE_var == ZoneReturnPlenum_Type) { // 'AirLoopHVAC:ReturnPlenum'
 
-                    SimAirZonePlenum(state, ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                    SimAirZonePlenum(state, state.dataZonePlenum, ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
                                      ZoneReturnPlenum_Type,
                                      ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
 
