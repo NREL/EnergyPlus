@@ -57,6 +57,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/WindowModel.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 
