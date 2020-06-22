@@ -2623,7 +2623,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 {
 
     int NumOfZones = 1;
-    DataGlobals::BeginSimFlag = true;
     DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather;
     OutputReportTabular::displayThermalResilienceSummary = true;
     DataEnvironment::Month = 7;
@@ -2672,7 +2671,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(28, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
     // Heat Index Case 2: Zone RH > 85, 80 < T < 87 F;
-    DataGlobals::BeginSimFlag = false;
     DataGlobals::HourOfDay = 2;
     DataHeatBalFanSys::ZTAV(1) = 27;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.02035; // RH = 90%

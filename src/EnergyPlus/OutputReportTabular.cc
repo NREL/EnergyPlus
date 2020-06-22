@@ -296,6 +296,8 @@ namespace OutputReportTabular {
     bool displayHeatEmissionsSummary(false);
     bool displayEioSummary(false);
     bool displayThermalResilienceSummary(false);
+    bool displayCO2ResilienceSummary(false);
+    bool displayVisualResilienceSummary(false);
 
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
@@ -588,6 +590,8 @@ namespace OutputReportTabular {
         displayEconomicResultSummary = false;
         displayHeatEmissionsSummary = false;
         displayThermalResilienceSummary = false;
+        displayCO2ResilienceSummary = false;
+        displayVisualResilienceSummary = false;
         displayEioSummary = false;
         meterNumTotalsBEPS = Array1D_int(numResourceTypes, 0);
         meterNumTotalsSource = Array1D_int(numSourceTypes, 0);
@@ -2069,6 +2073,14 @@ namespace OutputReportTabular {
                     displayThermalResilienceSummary = true;
                     WriteTabularFiles = true;
                     nameFound = true;
+                } else if (UtilityRoutines::SameString(AlphArray(iReport), "CO2ResilienceSummary")) {
+                    displayCO2ResilienceSummary = true;
+                    WriteTabularFiles = true;
+                    nameFound = true;
+                } else if (UtilityRoutines::SameString(AlphArray(iReport), "VisualResilienceSummary")) {
+                    displayVisualResilienceSummary = true;
+                    WriteTabularFiles = true;
+                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "EnergyMeters")) {
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2093,6 +2105,8 @@ namespace OutputReportTabular {
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
                     displayThermalResilienceSummary = true;
+                    displayCO2ResilienceSummary = true;
+                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2114,6 +2128,8 @@ namespace OutputReportTabular {
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
                     displayThermalResilienceSummary = true;
+                    displayCO2ResilienceSummary = true;
+                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2145,6 +2161,8 @@ namespace OutputReportTabular {
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
                     displayThermalResilienceSummary = true;
+                    displayCO2ResilienceSummary = true;
+                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2169,6 +2187,8 @@ namespace OutputReportTabular {
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
                     displayThermalResilienceSummary = true;
+                    displayCO2ResilienceSummary = true;
+                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;

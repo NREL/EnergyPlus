@@ -274,7 +274,9 @@ namespace HeatBalanceSurfaceManager {
         ReportSurfaceHeatBalance();
         if (ZoneSizingCalc) GatherComponentLoadsSurface();
 
-        ReportThermalResilience();
+        if (OutputReportTabular::displayThermalResilienceSummary) {
+            ReportThermalResilience();
+        }
 
         ManageSurfaceHeatBalancefirstTime = false;
     }
@@ -4898,9 +4900,9 @@ namespace HeatBalanceSurfaceManager {
         static std::vector<int> lowSETLongestStart(NumOfZones, 0.0);
         static std::vector<int> highSETLongestStart(NumOfZones, 0.0);
         static bool hasPierceSET = true;
+        static bool oneTimeFlag = true;
 
-
-        if (BeginSimFlag) {
+        if (oneTimeFlag) {
             if (TotPeople == 0) hasPierceSET = false;
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 if (!People(iPeople).Pierce) {
@@ -4909,13 +4911,13 @@ namespace HeatBalanceSurfaceManager {
             }
 
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
-                ZoneHeatIndexHourBins(ZoneNum).resize(HINoBins, 0.0);
-                ZoneHeatIndexOccuHourBins(ZoneNum).resize(HINoBins, 0.0);
-                ZoneHumidexHourBins(ZoneNum).resize(HumidexNoBins, 0.0);
-                ZoneHumidexOccuHourBins(ZoneNum).resize(HumidexNoBins, 0.0);
+                ZoneHeatIndexHourBins(ZoneNum).assign(HINoBins, 0.0);
+                ZoneHeatIndexOccuHourBins(ZoneNum).assign(HINoBins, 0.0);
+                ZoneHumidexHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
+                ZoneHumidexOccuHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
                 if (hasPierceSET) {
-                    ZoneLowSETHours(ZoneNum).resize(SETNoBins, 0.0);
-                    ZoneHighSETHours(ZoneNum).resize(SETNoBins, 0.0);
+                    ZoneLowSETHours(ZoneNum).assign(SETNoBins, 0.0);
+                    ZoneHighSETHours(ZoneNum).assign(SETNoBins, 0.0);
                 }
                 SetupOutputVariable("Zone Heat Index",
                                     OutputProcessor::Unit::C,
@@ -4930,7 +4932,7 @@ namespace HeatBalanceSurfaceManager {
                                     "State",
                                     Zone(ZoneNum).Name);
             }
-
+            oneTimeFlag = false;
         }
 
         // Calculate Heat Index and Humidex.
@@ -4965,7 +4967,8 @@ namespace HeatBalanceSurfaceManager {
             ZoneHeatIndex(ZoneNum) = HI;
             ZoneHumidex(ZoneNum) = Humidex;
         }
-        if (OutputReportTabular::displayThermalResilienceSummary && ksRunPeriodWeather == KindOfSim) {
+
+        if (ksRunPeriodWeather == KindOfSim) {
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 int ZoneNum = People(iPeople).ZonePtr;
                 ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(People(iPeople).NumberOfPeoplePtr);
