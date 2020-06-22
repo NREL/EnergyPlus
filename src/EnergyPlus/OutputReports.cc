@@ -323,7 +323,7 @@ static std::string normalizeName(std::string name)
     return name;
 }
 
-static void WriteDXFCommon(OutputFile &of, const std::string &ColorScheme)
+static void WriteDXFCommon(InputOutputFile &of, const std::string &ColorScheme)
 {
     using DataHeatBalance::BuildingName;
     using DataHeatBalance::Zone;
@@ -452,7 +452,7 @@ static void WriteDXFCommon(OutputFile &of, const std::string &ColorScheme)
     }
 }
 
-static void DXFDaylightingReferencePoints(OutputFile &of, bool const DELight)
+static void DXFDaylightingReferencePoints(InputOutputFile &of, bool const DELight)
 {
     using namespace DataSurfaceColors;
     using DataDaylighting::ZoneDaylight;

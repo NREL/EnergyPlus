@@ -56,7 +56,9 @@
 #include <cassert>
 
 namespace EnergyPlus {
-class OutputFile
+
+
+class InputOutputFile
 {
 public:
     void close();
@@ -65,7 +67,7 @@ public:
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
-    OutputFile &ensure_open(const std::string &caller);
+    InputOutputFile &ensure_open(const std::string &caller);
 
     std::string fileName;
     void open(const bool forAppend = false);
@@ -74,11 +76,11 @@ public:
     void open_as_stringstream();
     std::string get_output();
     void flush();
-    explicit OutputFile(std::string FileName);
+    explicit InputOutputFile(std::string FileName);
 
 private:
     std::unique_ptr<std::iostream> os;
-    template <typename... Args> friend void print(OutputFile &of, fmt::string_view format_str, const Args &... args);
+    template <typename... Args> friend void print(InputOutputFile &of, fmt::string_view format_str, const Args &... args);
     friend class OutputFiles;
 };
 
@@ -90,45 +92,43 @@ public:
     struct OutputFileName
     {
         std::string fileName;
-        OutputFile open(const std::string &caller) {
-            OutputFile of{fileName};
+        InputOutputFile open(const std::string &caller) {
+            InputOutputFile of{fileName};
             of.ensure_open(caller);
             return of;
         }
-        OutputFile try_open() {
-            OutputFile of{fileName};
+        InputOutputFile try_open() {
+            InputOutputFile of{fileName};
             of.open();
             return of;
         }
     };
 
+    InputOutputFile audit{"eplusout.audit"};
+    InputOutputFile eio{"eplusout.eio"};
+    InputOutputFile eso{"eplusout.eso"}; // (hourly data only)
 
-    OutputFile audit{"eplusout.audit"};
-    OutputFile eio{"eplusout.eio"};
-    OutputFile eso{"eplusout.eso"}; // (hourly data only)
-
-    OutputFile zsz{""};
+    InputOutputFile zsz{""};
     std::string outputZszCsvFileName{"epluszsz.csv"};
     std::string outputZszTabFileName{"epluszsz.tab"};
     std::string outputZszTxtFileName{"epluszsz.txt"};
 
-    OutputFile ssz{""};
+    InputOutputFile ssz{""};
     std::string outputSszCsvFileName{"eplusssz.csv"};
     std::string outputSszTabFileName{"eplusssz.tab"};
     std::string outputSszTxtFileName{"eplusssz.txt"};
 
-    OutputFile map{""};
+    InputOutputFile map{""};
     std::string outputMapCsvFileName{"eplusmap.csv"};
     std::string outputMapTabFileName{"eplusmap.tab"};
     std::string outputMapTxtFileName{"eplusmap.txt"};
 
+    InputOutputFile mtr{"eplusout.mtr"};
+    InputOutputFile bnd{"eplusout.bnd"};
 
-    OutputFile mtr{"eplusout.mtr"};
-    OutputFile bnd{"eplusout.bnd"};
+    InputOutputFile debug{"eplusout.dbg"};
 
-    OutputFile debug{"eplusout.dbg"};
-
-    OutputFile dfs{"eplusout.dfs"};
+    InputOutputFile dfs{"eplusout.dfs"};
 
     OutputFileName sln{"eplusout.sln"};
     OutputFileName dxf{"eplusout.dxf"};
@@ -137,9 +137,9 @@ public:
 
     OutputFileName delightIn{"eplusout.delightin"};
 
-    OutputFile mtd{"eplusout.mtd"};
-    OutputFile edd{"eplusout.edd"};
-    OutputFile shade{"eplusshading.csv"};
+    InputOutputFile mtd{"eplusout.mtd"};
+    InputOutputFile edd{"eplusout.edd"};
+    InputOutputFile shade{"eplusshading.csv"};
 
     OutputFileName screenCsv{"eplusscreen.csv"};
     OutputFileName endFile{"eplusout.end"};
@@ -153,23 +153,23 @@ private:
 
 class SharedFileHandle
 {
-    std::shared_ptr<OutputFile> file;
-    OutputFile *ptr()
+    std::shared_ptr<InputOutputFile> file;
+    InputOutputFile *ptr()
     {
         if (!file) {
-            file = std::make_shared<OutputFile>("");
+            file = std::make_shared<InputOutputFile>("");
         }
 
         return file.get();
     }
 
 public:
-    OutputFile &operator*()
+    InputOutputFile &operator*()
     {
         return *ptr();
     }
 
-    OutputFile *operator->()
+    InputOutputFile *operator->()
     {
         return ptr();
     }
@@ -204,7 +204,7 @@ template <typename... Args> void print(std::ostream &os, fmt::string_view format
     EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
-template <typename... Args> void print(OutputFile &outputFile, fmt::string_view format_str, const Args &... args)
+template <typename... Args> void print(InputOutputFile &outputFile, fmt::string_view format_str, const Args &... args)
 {
     assert(outputFile.os);
     EnergyPlus::vprint(*outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));

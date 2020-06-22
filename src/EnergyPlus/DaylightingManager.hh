@@ -480,7 +480,7 @@ namespace DaylightingManager {
     void CheckForGeometricTransform(bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio);
 
     void WriteDaylightMapTitle(int const mapNum,
-                               OutputFile &mapFile,
+                               InputOutputFile &mapFile,
                                std::string const &mapName,
                                std::string const &environmentName,
                                int const ZoneNum,

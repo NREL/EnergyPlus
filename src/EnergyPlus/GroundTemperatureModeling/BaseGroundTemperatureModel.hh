@@ -83,7 +83,7 @@ public:
     virtual Real64 getGroundTempAtTimeInMonths(Real64 const, int const) = 0;
 
 protected:
-    static void write_ground_temps(OutputFile &os, const std::string &name, const Array1D<Real64> &data)
+    static void write_ground_temps(InputOutputFile &os, const std::string &name, const Array1D<Real64> &data)
     {
         print(os,
               "! <Site:GroundTemperature:{}>,Jan{{C}},Feb{{C}},Mar{{C}},Apr{{C}},May{{C}},Jun{{C}},Jul{{C}},Aug{{C}},Sep{{C}},Oct{{C}},Nov{{C}},Dec{{C}}\n", name);

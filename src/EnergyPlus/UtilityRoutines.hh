@@ -62,7 +62,7 @@
 #include <functional>
 
 namespace EnergyPlus {
-class OutputFile;
+class InputOutputFile;
 
 int AbortEnergyPlus(EnergyPlusData &state);
 
@@ -134,7 +134,7 @@ public:
     {}
 };
 
-using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::OutputFile>>;
+using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
 void ShowFatalError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 

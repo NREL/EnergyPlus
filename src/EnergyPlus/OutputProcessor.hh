@@ -66,7 +66,7 @@
 namespace EnergyPlus {
 
     // Forward declarations
-    class OutputFile;
+    class InputOutputFile;
     class OutputFiles;
     struct EnergyPlusData;
     struct DataGlobal;
@@ -759,7 +759,7 @@ namespace OutputProcessor {
 
     void AddEndUseSubcategory(std::string const &ResourceName, std::string const &EndUseName, std::string const &EndUseSubName);
 
-    void WriteTimeStampFormatData(OutputFile &outputFile,
+    void WriteTimeStampFormatData(InputOutputFile &outputFile,
                                   ReportingFrequency const reportingInterval, // Reporting frequency.
                                   int const reportID,                         // The ID of the time stamp
                                   std::string const &reportIDString,          // The ID of the time stamp
@@ -775,7 +775,7 @@ namespace OutputProcessor {
                                   Optional_string_const DayType = _           // The day tied for the data (e.g., Monday)
     );
 
-    void WriteYearlyTimeStamp(OutputFile &outputFile,
+    void WriteYearlyTimeStamp(InputOutputFile &outputFile,
                               std::string const &reportIDString,    // The ID of the time stamp
                               std::string const &yearOfSimChr,      // the year of the simulation
                               bool writeToSQL);

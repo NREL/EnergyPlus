@@ -316,7 +316,7 @@ namespace Psychrometrics {
 #ifdef EP_psych_stats
     void ShowPsychrometricSummary(OutputFile &auditFile)
 #else
-    void ShowPsychrometricSummary(OutputFile &)
+    void ShowPsychrometricSummary(InputOutputFile &)
 #endif
     {
 

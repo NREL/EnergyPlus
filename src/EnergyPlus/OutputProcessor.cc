@@ -3968,7 +3968,7 @@ namespace OutputProcessor {
         }
     }
     void WriteTimeStampFormatData(
-        OutputFile &outputFile,
+        InputOutputFile &outputFile,
         ReportingFrequency const reportingInterval, // See Module Parameter Definitons for ReportEach, ReportTimeStep, ReportHourly, etc.
         int const reportID,                         // The ID of the time stamp
         std::string const &reportIDString,          // The ID of the time stamp
@@ -4132,7 +4132,7 @@ namespace OutputProcessor {
         }
     }
 
-    void WriteYearlyTimeStamp(OutputFile &outputFile,
+    void WriteYearlyTimeStamp(InputOutputFile &outputFile,
                               std::string const &reportIDString,   // The ID of the time stamp
                               std::string const &yearOfSimChr,     // the year of the simulation
                               bool writeToSQL)
@@ -4204,7 +4204,7 @@ namespace OutputProcessor {
             UnitsString = unitEnumToString(unitsForVar);
         }
 
-        const auto write = [&](OutputFile &file, const int interval) {
+        const auto write = [&](InputOutputFile &file, const int interval) {
             if (file.good()) {
                 print(file, "{},{},{},{} [{}]{}\n", reportIDChr, interval, keyedValue, variableName, UnitsString, FreqString);
             }
@@ -4304,7 +4304,7 @@ namespace OutputProcessor {
         std::string const FreqString(frequencyNotice(storeType, reportingInterval));
 
         const auto print_meter = [&](OutputFiles& ofs, const int frequency) {
-            const auto out = [&](OutputFile &of) {
+            const auto out = [&](InputOutputFile &of) {
                 if (of.good()) {
                     if (cumulativeMeterFlag) {
                         static constexpr auto fmt{"{},{},Cumulative {} [{}]{}\n"};

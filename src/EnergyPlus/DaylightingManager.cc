@@ -784,7 +784,7 @@ namespace DaylightingManager {
 
         // open a new file eplusout.dfs for saving the daylight factors
         if (CreateDFSReportFile) {
-            OutputFile &dfs = outputFiles.dfs.ensure_open("CalcDayltgCoefficients");
+            InputOutputFile &dfs = outputFiles.dfs.ensure_open("CalcDayltgCoefficients");
             print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
             print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
             print(dfs, "{}\n",
@@ -10027,7 +10027,7 @@ namespace DaylightingManager {
 
             FirstTimeMaps(MapNum) = false;
 
-            auto openMapFile = [&](const std::string &fileName) -> OutputFile & {
+            auto openMapFile = [&](const std::string &fileName) -> InputOutputFile & {
                 auto &outputFile = *IllumMap(MapNum).mapFile;
                 outputFile.fileName = fileName + fmt::to_string(MapNum);
                 outputFile.ensure_open("ReportIllumMap");
@@ -10940,7 +10940,7 @@ namespace DaylightingManager {
     }
 
     void WriteDaylightMapTitle(int const mapNum,
-                               OutputFile &mapFile,
+                               InputOutputFile &mapFile,
                                std::string const &mapName,
                                std::string const &environmentName,
                                int const ZoneNum,

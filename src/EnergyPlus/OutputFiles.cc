@@ -56,7 +56,7 @@
 
 namespace EnergyPlus {
 
-OutputFile &OutputFile::ensure_open(const std::string &caller)
+InputOutputFile &InputOutputFile::ensure_open(const std::string &caller)
 {
     if (!good()) {
         open();
@@ -67,7 +67,7 @@ OutputFile &OutputFile::ensure_open(const std::string &caller)
     return *this;
 }
 
-bool OutputFile::good() const
+bool InputOutputFile::good() const
 {
     if (os) {
         return os->good();
@@ -76,12 +76,12 @@ bool OutputFile::good() const
     }
 }
 
-void OutputFile::close()
+void InputOutputFile::close()
 {
     os.reset();
 }
 
-void OutputFile::del()
+void InputOutputFile::del()
 {
     if (os) {
         os.reset();
@@ -89,19 +89,19 @@ void OutputFile::del()
     }
 }
 
-void OutputFile::open_as_stringstream()
+void InputOutputFile::open_as_stringstream()
 {
     os = std::unique_ptr<std::iostream>(new std::stringstream());
 }
 
-void OutputFile::flush()
+void InputOutputFile::flush()
 {
     if (os) {
         os->flush();
     }
 }
 
-std::string OutputFile::get_output()
+std::string InputOutputFile::get_output()
 {
     auto *ss = dynamic_cast<std::stringstream *>(os.get());
     if (ss) {
@@ -111,16 +111,16 @@ std::string OutputFile::get_output()
     }
 }
 
-OutputFile::OutputFile(std::string FileName) : fileName(std::move(FileName))
+InputOutputFile::InputOutputFile(std::string FileName) : fileName(std::move(FileName))
 {
 }
 
-std::ostream::pos_type OutputFile::position() const noexcept
+std::ostream::pos_type InputOutputFile::position() const noexcept
 {
     return os->tellg();
 }
 
-void OutputFile::open(const bool forAppend)
+void InputOutputFile::open(const bool forAppend)
 {
     auto appendMode = [=]() {
         if (forAppend) {
@@ -133,7 +133,7 @@ void OutputFile::open(const bool forAppend)
     os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
 }
 
-std::vector<std::string> OutputFile::getLines()
+std::vector<std::string> InputOutputFile::getLines()
 {
     if (os) {
         // avoid saving and reloading the file by simply reading the current input stream
