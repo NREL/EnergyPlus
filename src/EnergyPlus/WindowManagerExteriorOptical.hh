@@ -144,7 +144,7 @@ namespace WindowManager {
                                     const FenestrationCommon::WavelengthRange t_Range);
 
     protected:
-        void init(WindowManagerData &dataWindowManager) override;
+        void init(WindowManagerData &EP_UNUSED(dataWindowManager)) override;
         virtual std::shared_ptr<SingleLayerOptics::CMaterialSingleBand> createVisibleRangeMaterial() = 0;
         virtual std::shared_ptr<SingleLayerOptics::CMaterialSingleBand> createSolarRangeMaterial() = 0;
     };
