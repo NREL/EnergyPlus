@@ -53,9 +53,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+//#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+
+    // Forward Declarations
+    struct EnergyPlusData;
 
 namespace DataSurfaces {
     struct SurfaceData;

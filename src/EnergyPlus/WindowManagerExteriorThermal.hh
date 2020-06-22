@@ -48,7 +48,7 @@
 #ifndef WindowManagerExteriorThermal_hh_INCLUDED
 #define WindowManagerExteriorThermal_hh_INCLUDED
 
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+//#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 

@@ -57,7 +57,7 @@
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+//#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -69,6 +69,9 @@
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
+
+    // Forward Declarations
+    struct EnergyPlusData;
 
 namespace DataHeatBalance {
 

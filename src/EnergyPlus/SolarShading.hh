@@ -61,12 +61,15 @@
 #endif
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+//#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+    // Forward Declarations
+    struct EnergyPlusData;
 
 namespace SolarShading {
 

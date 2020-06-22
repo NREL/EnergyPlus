@@ -49,7 +49,7 @@
 #define DataSurfaces_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+//#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
@@ -69,7 +69,8 @@
 
 namespace EnergyPlus {
 
-    //forward declarations
+    // Forward Declarations
+    struct EnergyPlusData;
     struct WindowManagerData;
 
 namespace DataSurfaces {

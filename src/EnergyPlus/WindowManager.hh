@@ -56,7 +56,9 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/WindowModel.hh>
+#include <EnergyPlus/WindowManagerExteriorData.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
