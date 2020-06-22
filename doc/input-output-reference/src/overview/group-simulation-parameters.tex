@@ -887,23 +887,23 @@ Runtime {[}sec{]} \tabularnewline
 \midrule
 \endfirsthead
 
-1  & FALSE & ScriptF    & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 178.82 \tabularnewline
-2  & FALSE & ScriptF    & MODE01 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 61.75  \tabularnewline
-3  & FALSE & ScriptF    & MODE02 & 1 & 1 & FALSE & 60 & 0.30 & 0.002 & 30.15  \tabularnewline
-4  & FALSE & ScriptF    & MODE03 & 1 & 1 & FALSE & 60 & 0.30 & 0.002 & 31.94  \tabularnewline
-5  & FALSE & ScriptF    & MODE04 & 1 & 1 & FALSE & 60 & 0.30 & 0.002 & 29.62  \tabularnewline
-6  & FALSE & ScriptF    & MODE05 & 1 & 1 & TRUE  & 60 & 0.30 & 0.002 & 32.01  \tabularnewline
-7  & FALSE & ScriptF    & MODE06 & 1 & 1 & TRUE  & 60 & 1.00 & 0.002 & 29.80  \tabularnewline
-8  & FALSE & ScriptF    & MODE07 & 1 & 1 & TRUE  & 60 & 1.00 & 0.1   & 29.67  \tabularnewline
-9  & TRUE  & ScriptF    & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 176.87 \tabularnewline
-10 & FALSE & CarrollMRT & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 199.23 \tabularnewline
-11 & FALSE & CarrollMRT & MODE01 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 61.38  \tabularnewline
-12 & FALSE & CarrollMRT & MODE02 & 1 & 1 & False & 60 & 0.30 & 0.002 & 36.59  \tabularnewline
-13 & FALSE & CarrollMRT & MODE03 & 1 & 1 & FALSE & 60 & 0.30 & 0.002 & 30.00  \tabularnewline
-14 & FALSE & CarrollMRT & MODE04 & 1 & 1 & FALSE & 60 & 0.30 & 0.002 & 29.53  \tabularnewline
-15 & FALSE & CarrollMRT & MODE05 & 1 & 1 & TRUE  & 60 & 0.30 & 0.002 & 29.83  \tabularnewline
-16 & FALSE & CarrollMRT & MODE06 & 1 & 1 & TRUE  & 60 & 1.00 & 0.002 & 29.50  \tabularnewline
-17 & FALSE & CarrollMRT & MODE07 & 1 & 1 & TRUE  & 60 & 1.00 & 0.1   & 30.47  \tabularnewline
+1  & FALSE & ScriptF    & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 185.12 \tabularnewline
+2  & FALSE & ScriptF    & MODE01 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 75.73  \tabularnewline
+3  & FALSE & ScriptF    & MODE02 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 71.37  \tabularnewline
+4  & FALSE & ScriptF    & MODE03 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 66.17  \tabularnewline
+5  & FALSE & ScriptF    & MODE04 & 1 & 1 & TRUE  & 1  & 0.30 & 0.002 & 61.31  \tabularnewline
+6  & FALSE & ScriptF    & MODE05 & 1 & 1 & TRUE  & 60 & 0.30 & 0.002 & 33.30  \tabularnewline
+7  & FALSE & ScriptF    & MODE06 & 1 & 1 & TRUE  & 60 & 1.00 & 0.002 & 32.20  \tabularnewline
+8  & FALSE & ScriptF    & MODE07 & 1 & 1 & TRUE  & 60 & 1.00 & 0.1   & 26.38  \tabularnewline
+9  & TRUE  & ScriptF    & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 178.86 \tabularnewline
+10 & FALSE & CarrollMRT & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 185.07 \tabularnewline
+11 & FALSE & CarrollMRT & MODE01 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 70.30  \tabularnewline
+12 & FALSE & CarrollMRT & MODE02 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 66.85  \tabularnewline
+13 & FALSE & CarrollMRT & MODE03 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 65.76  \tabularnewline
+14 & FALSE & CarrollMRT & MODE04 & 1 & 1 & TRUE  & 1  & 0.30 & 0.002 & 54.46  \tabularnewline
+15 & FALSE & CarrollMRT & MODE05 & 1 & 1 & TRUE  & 60 & 0.30 & 0.002 & 28.09  \tabularnewline
+16 & FALSE & CarrollMRT & MODE06 & 1 & 1 & TRUE  & 60 & 1.00 & 0.002 & 27.87  \tabularnewline
+17 & FALSE & CarrollMRT & MODE07 & 1 & 1 & TRUE  & 60 & 1.00 & 0.1   & 27.39  \tabularnewline
 
 
 \bottomrule
@@ -912,7 +912,11 @@ Runtime {[}sec{]} \tabularnewline
 
 % This example uses 17 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffs object, but fewer trials could have been made to reach a similar conclusion. The first run shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 8 are just stepping through the Override Modes. Run 9 employs the Use Coil Direct Solution option, but the time for the simulation went up, so it was not used anymore.  Runs 10 through 17 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. Mode03, Moded04, and Mode05 only save a few seconds compared to Mode01, which takes about one-third of the time of the baseline Run 1 time. Mode06 saves the most time with both ScriptF and CarrollMRT taking about one-fifth of the original time. Mode06 seems like the natural choice, but we need to look at other results in the \_perflog.csv file first before we come to that conclusion.
 
-This example uses 17 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffs object, but fewer trials could have been made to reach a similar conclusion. The first run shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 8 are just stepping through the Override Modes. Run 9 employs the Use Coil Direct Solution option, but the time for the simulation was almost the same, so it was not used anymore.  Runs 10 through 17 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. The biggest savings of the computational time were from Mode01 and Mode02 application. Compared to the Normal mode (Run 1) baseline, applying Mode01 (Run 2) immediately reduced the simulation time to about one-third. Then again, by applying Mode02 (Run 3), it saves about 50\% simulation time compared to Mode02 (Run 2). Mode03 to Mode07 only save a few seconds compared to Mode02, which takes about one-sixth of the time of the baseline Run 1 time. In general, Mode02 to Mode07 significantly saves the computation time with both ScriptF and CarrollMRT taking about one-sixth of the original time. These modes seem like the good choice for faster simulations, but we need to look at other results in the \_perflog.csv file first before we come to that conclusion.
+This example uses 17 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffs object, but fewer trials could have been made to reach a similar conclusion. The first run (Normal mode) shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 8 are just stepping through the Override Modes. Run 9 employs the Use Coil Direct Solution option, but the time gain for the simulation was not so significant, so it was not used anymore in later runs.  Runs 10 through 17 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. The biggest savings of the computational time were from Mode01 and Mode02 application. Compared to the Normal mode (Run 1) baseline, applying Mode01 (Run 2) immediately reduced the simulation time to about 40.9\%. Then again, by applying Mode02 (Run 3), it saves about 5.8\% simulation time compared to Mode02 (Run 2); Mode03 (Run 4) saves about 7.3\% compared to Mode02 (Run 3); and Mode04 (Run 5) saves about 7.3\% on top of Mode03 (Run 4). Compared to the normal baseline (Run 1), Mode04 (Run 5) only consumes than one third (33.1\%) of the computation time of Run 1. 
+
+Next, when Mode05 is (Run 6) is applied, the computational time was significantly reduced--Mode05 cut the computational time by nearly a half compared to Mode04 (Run 5). The run time for Mode05 (Run 6) is only 54.3\% of Mode05; and is only 18.0\% of the Normal baseline (Run 1). Mode06 (Run 7) cut about a second, or about 3.3\% computational time compared to Mode 05 (Run 6); the overall simulation time of Mode06 (Run 7) is about 17.4\% of the Normal baseline. The final Mode07 (Run 8), cuts simulation time about 18.0\% compard to Mode06 (Run 7); and the overall run time for Mode07 is only 14.25\% (or one-seventh) of the baseline norma).
+
+In general, Mode05 to Mode07 significantly saves the computation time with both ScriptF and CarrollMRT taking about one-seventh to one-fifth of the original Normal simulation time. These modes seem like the good choice for faster simulations, but we need to look at other results in the \_perflog.csv file first before we come to that conclusion.
 
 These example simulations each took aobut three minutes or less to try. If your building takes much longer than a few minutes, you might want to temporarily change your run period to just a month or even a week to tune the PerformancePrecisionTradeoffs object inputs. If temporarily shortening the run period is necessary, it is best to pick a month or week that has some cooling and some heating. Just remember to set your run period back to a full year before coming to any conclusions about the building or energy efficiency options being considered for the building.
 
