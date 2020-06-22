@@ -1017,23 +1017,23 @@ Override Mode &
 %16 & FALSE & CarrollMRT & MODE06 & 88.15 & 62.33 & 74.9  & 50 & 32.76  \tabularnewline
 %17 & False & CarrollMRT & Mode07 &       &       &       &    &        \tabularnewline
 
-1  & FALSE & ScriptF    & NORMAL & 2.92	 & 2.75	 & 0.17	 & 46 &	178.82 \tabularnewline
-2  & FALSE & ScriptF    & MODE01 & 7.5	 & 2.17	 & 6.17	 & 47 &	61.75  \tabularnewline
-3  & FALSE & ScriptF    & MODE02 & 380	 & 277	 & 299	 & 48 &	30.15  \tabularnewline
-4  & FALSE & ScriptF    & MODE03 & 158	 & 87	 & 122	 & 50 & 31.94  \tabularnewline
-5  & FALSE & ScriptF    & MODE04 & 158	 & 87	 & 122	 & 51 &	29.62  \tabularnewline
-6  & FALSE & ScriptF    & MODE05 & 158	 & 87	 & 122	 & 52 &	32.01  \tabularnewline
-7  & FALSE & ScriptF    & MODE06 & 158	 & 87	 & 122	 & 53 &	29.8   \tabularnewline
-8  & FALSE & ScriptF    & MODE07 & 155	 & 91	 & 122	 & 54 &	29.67  \tabularnewline
-9  & TRUE  & ScriptF    & NORMAL & 2.92	 & 2.75	 & 0.17	 & 47 & 176.87 \tabularnewline
-10 & FALSE & CarrollMRT & NORMAL & 2.14	 & 1.97	 & 0.17	 & 47 &	199.23 \tabularnewline
-11 & FALSE & CarrollMRT & MODE01 & 7.74	 & 0.95	 & 6.08	 & 48 &	61.38  \tabularnewline
-12 & FALSE & CarrollMRT & MODE02 & 383	 & 273	 & 316	 & 49 &	36.59  \tabularnewline
-13 & FALSE & CarrollMRT & MODE03 & 150	 & 74	 & 108	 & 50 &	30.00  \tabularnewline
-14 & FALSE & CarrollMRT & MODE04 & 150	 & 74	 & 108	 & 51 &	29.53  \tabularnewline
-15 & FALSE & CarrollMRT & MODE05 & 150	 & 74	 & 108	 & 52 &	29.83  \tabularnewline
-16 & FALSE & CarrollMRT & MODE06 & 150	 & 74	 & 108	 & 53 &	29.5   \tabularnewline
-17 & FALSE & CarrollMRT & MODE07 & 151	 & 76	 & 113	 & 54 &	30.47  \tabularnewline
+1  & FALSE & ScriptF    & NORMAL & 2.92	 & 2.75	 & 0.17	 & 46 &	185.12 \tabularnewline
+2  & FALSE & ScriptF    & MODE01 & 7.5	 & 2.17	 & 6.17	 & 47 &	75.73  \tabularnewline
+3  & FALSE & ScriptF    & MODE02 & 9.25	 & 4	 & 8.25	 & 48 &	71.37  \tabularnewline
+4  & FALSE & ScriptF    & MODE03 & 9.25	 & 4	 & 8.25	 & 49 & 66.17  \tabularnewline
+5  & FALSE & ScriptF    & MODE04 & 9.25	 & 4	 & 8.25	 & 50 &	61.31  \tabularnewline
+6  & FALSE & ScriptF    & MODE05 & 158	 & 87	 & 122	 & 52 &	33.30  \tabularnewline
+7  & FALSE & ScriptF    & MODE06 & 158	 & 87	 & 122	 & 53 &	32.20  \tabularnewline
+8  & FALSE & ScriptF    & MODE07 & 155	 & 91	 & 122	 & 54 &	26.38  \tabularnewline
+9  & TRUE  & ScriptF    & NORMAL & 2.92	 & 2.75	 & 0.17	 & 47 & 178.86 \tabularnewline
+10 & FALSE & CarrollMRT & NORMAL & 2.14	 & 1.97	 & 0.17	 & 47 &	185.07 \tabularnewline
+11 & FALSE & CarrollMRT & MODE01 & 7.74	 & 0.95	 & 6.08	 & 48 &	70.30  \tabularnewline
+12 & FALSE & CarrollMRT & MODE02 & 9.99	 & 3.33	 & 7.53	 & 49 &	66.85  \tabularnewline
+13 & FALSE & CarrollMRT & MODE03 & 9.99	 & 3.33	 & 7.53	 & 50 &	65.76  \tabularnewline
+14 & FALSE & CarrollMRT & MODE04 & 9.99	 & 3.33	 & 7.53	 & 51 &	56.46  \tabularnewline
+15 & FALSE & CarrollMRT & MODE05 & 150	 & 74	 & 108	 & 52 &	28.09  \tabularnewline
+16 & FALSE & CarrollMRT & MODE06 & 150	 & 74	 & 108	 & 53 &	27.87   \tabularnewline
+17 & FALSE & CarrollMRT & MODE07 & 151	 & 76	 & 113	 & 54 &	27.39  \tabularnewline
 
 \bottomrule
 \end{longtable}
@@ -1042,9 +1042,9 @@ Override Mode &
 
 % The number of hours any zone is oscillating for Run 1 the Normal baseline case using Script F is only 3.48 hours, with almost none of the hours in the dead band and nearly all during occupancy. This changes when considering the other ScriptF cases using Mode01 to Mode06 (Run 2 to Run 7).  For these cases, the oscillating hours increase but are still less than 10 per year, while more than doubling, on an absolute basis, a small change. The change is even more minor when considering the hours with the dead band, which for Run 2 to 6 only increases about an hour. Similar numbers are shown for the CarrollMRT cases for Mode01 to Mode05. The most significant change is Mode06, which for both ScriptF and CarrollMRT raise the oscillating hours to nearly 90. This is a substantial change that does indicate a significant shift in the way the simulation is behaving. It would be easy to eliminate using Mode05 if it wasn’t for the fact that it is also substantially faster than the other modes. No severe errors were reported for any of these simulations, so no column is shown for them, and the column for warnings shows a small increase. After investigating the changes, the change in the count warning messages was not considered important.
 
-The number of hours any zone is oscillating for Run 1 the Normal baseline case using Script F is only 2.92 hours, with almost none of the hours in the dead band and nearly all during occupancy. This changes when considering the other ScriptF cases using Mode01 to Mode07 (Run 2 to Run 8).  For Mode01, the oscillating hours increase but are still less than 8 hours per year, while more than doubling, on an absolute basis, a small change. The change is even more minor when considering the hours with the dead band, which for Run 1 even decreased by a small amount. However, for Mode02 to Mode07, the oscillating hours increase significantly, by more than one order of magnitude to aroudn 155 to 380 hours per year. The numbers are also reflected in the oscillating hours during occupancy and the oscillating hours during dead band.  For the CarrollMRT cases, similar trend can be observed when applying Mode01, and from Mode02 to Mode07.  The most significant change is Mode02, which for both ScriptF and CarrollMRT raise the oscillating hours to about 380. This is a substantial change that does indicate a significant shift in the way the simulation is behaving. The oscillation could be moderately tamed by applying any of the subsequent modes (Modes03 to Modes07), without too much loss in the simulation speed. On the other hand, however, the warnings for all the seventeen cases were not too much different from, all ranging from 46 to 54. No severe errors were reported for any of these simulations, so no column is shown for them, and the column for warnings shows a small increase. After investigating the changes, the change in the count warning messages was not considered important.
+The number of hours any zone is oscillating for Run 1 the Normal baseline case using Script F is only 2.92 hours, with almost none of the hours in the dead band and nearly all during occupancy. This changes when considering the other ScriptF cases using Mode01 to Mode07 (Run 2 to Run 8).  For Mode01, the oscillating hours increase but are still less than 8 hours per year, while more than doubling, on an absolute basis, a small change. The change is even more minor when considering the hours with the occupancy, which for Mode02 (Run 2) even decreased by a small amount. The oscillation in the deadband for Mode02 (Run 2) increased about 6 hours. For Mode02 to Mode04, there is an increase of about 2 hours for each oscillating hour categories (the total, occupancy, and deadband), though they are considered to be a relatively minor change especially when comparing further with the succeeding Mode05 and Mode07.For Mode05 to Mode07, the oscillating hours increase significantly, by more than one order of magnitude to aroudn 155 to 158 hours per year. The numbers are also reflected in the oscillating hours during occupancy and the oscillating hours during dead band.  For the CarrollMRT cases, similar trend can be observed when applying Mode01, and from Mode02 to Mode07.  The most significant change is Mode02, which for both ScriptF and CarrollMRT raise the oscillating hours to about 155--158. This is a substantial change that does indicate a significant shift in the way the simulation is behaving. The oscillation could be moderately tamed by applying any of the subsequent modes (Modes03 to Modes07), without too much loss in the simulation speed. On the other hand, however, the warnings for all the seventeen cases were not too much different from each other, all ranging from 46 to 54. No severe errors were reported for any of these simulations, so no column is shown for them, and the column for warnings shows a small increase. After investigating the changes, the change in the count warning messages was not considered important.
 
-The decision on which mode to use is up to the individual modelers, but for these simulations, Run 5 is recommended. Run 5 does not use direct coil solution, uses ScriptF, and Mode04. This simulation time also shows a slight advantages over the other cases. It saves time compared to Mode01 and has relatively less oscillating hours than Mode02. Further, it does not add too much additional overrides, which should be avoided if not adding value. Higher modes such as Mode05 to Mode07 for this model were just about the same time as Mode04. Mode02 was avoided because of the substantially larger oscillating hours.
+The decision on which mode to use is up to the individual modelers. However for these simulations runs, it can be clearly divided into three tiers based on the simulation speed (computation time) and the numerical stability (oscillation hours): the normal run tier, which gains the least (the best) oscillations, but take the longest computation time; the second tier include Mode02 to Mode04, where the simulatoin can be cut to roughly to one-third of the Normal run baseline, but with a minor penalty for increased ocsillation hours; the third tier, which can achieve an superior running time advantage (reaching around one-fifth to one-seventh of normal baseline), but with significant oscillation hours panlty of about one order of mangintude higher. For simulations conducted in these test modes, Runs 5 (Mode04) is recommended as a balanced option for speed and numerical stability (oscillations). It does not use direct coil solution, uses ScriptF, and Mode04. This simulation time also shows a slight advantages over the other cases. It saves time compared to Mode01-Mode03 and has the oscillating hours are still quite tamed. Further, it does not add too much additional overrides, which should be avoided if not adding value.  For extreme speed benifit, higher modes such as Mode05 to Mode07 definitely showed an advantaged as the compuatational time is only about half of that for Mode04, although substantially higher oscillating hours will be inccured as a downside.
 
 Additional guidance on how to make EnergyPlus faster appears in the ``Tips And Tricks for Using EnergyPlus'' document that is distributed with EnergyPlus within the section titled ``Platforms and Run-Time.''
 
