@@ -245,13 +245,13 @@ namespace DataDaylighting {
         Real64 Ymax;                  // Maximum Y value
         int Ynum;                     // Number of Y reference points (going E-W)
         Real64 Yinc;                  // Increment between Y reference points
-        int UnitNo;                   // Unit number for map output (later merged to final file)
+        SharedFileHandle mapFile;     // Unit number for map output (later merged to final file)
         bool HeaderXLineLengthNeeded; // X header will likely be the longest line in the file
         int HeaderXLineLength;        // actual length of this X header line
 
         // Default Constructor
         IllumMapData()
-            : Zone(0), Z(0.0), Xmin(0.0), Xmax(0.0), Xnum(0), Xinc(0.0), Ymin(0.0), Ymax(0.0), Ynum(0), Yinc(0.0), UnitNo(0),
+            : Zone(0), Z(0.0), Xmin(0.0), Xmax(0.0), Xnum(0), Xinc(0.0), Ymin(0.0), Ymax(0.0), Ynum(0), Yinc(0.0),
               HeaderXLineLengthNeeded(true), HeaderXLineLength(0)
         {
         }

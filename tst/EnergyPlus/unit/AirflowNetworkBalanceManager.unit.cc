@@ -16986,7 +16986,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
-TEST_F(EnergyPlusFixture, AirLoopNumTest)
+TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
 {
 
 std::string const idf_objects = delimited_string({

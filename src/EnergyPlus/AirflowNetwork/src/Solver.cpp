@@ -114,6 +114,40 @@ namespace AirflowNetwork {
 
     static std::string const BlankString;
 
+    // Common block AFEDAT
+    Array1D<Real64> AFECTL;
+    Array1D<Real64> AFLOW2;
+    Array1D<Real64> AFLOW;
+    Array1D<Real64> PS;
+    Array1D<Real64> PW;
+
+    // Common block CONTRL
+    Real64 PB(0.0);
+    int LIST(0);
+
+    // Common block ZONL
+    // Array1D<Real64> RHOZ;
+    // Array1D<Real64> SQRTDZ;
+    // Array1D<Real64> VISCZ;
+    Array1D<Real64> SUMAF;
+    // Array1D<Real64> TZ; // Temperature [C]
+    // Array1D<Real64> WZ; // Humidity ratio [kg/kg]
+    Array1D<Real64> PZ; // Pressure [Pa]
+
+    // Other array variables
+    Array1D_int ID;
+    Array1D_int IK;
+    Array1D<Real64> AD;
+    Array1D<Real64> AU;
+
+#ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
+    Array1D_int newIK;     // noel
+    Array1D<Real64> newAU; // noel
+#endif
+
+    // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
+    Array1D<Real64> SUMF;
+
     // Large opening variables
     Array1D<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
     Array1D<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
@@ -469,11 +503,12 @@ namespace AirflowNetwork {
         int ITER;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_900("(,/,11X,'i    n    m       DP',12x,'F1',12X,'F2')");
-        static ObjexxFCL::gio::Fmt Format_901("(1X,A6,3I5,3F14.6)");
-        static ObjexxFCL::gio::Fmt Format_902("(,/,11X,'n       P',12x,'sumF')");
-        static ObjexxFCL::gio::Fmt Format_903("(1X,A6,I5,3F14.6)");
-        static ObjexxFCL::gio::Fmt Format_907("(,/,' CPU seconds for ',A,F12.3)");
+        
+        // static ObjexxFCL::gio::Fmt Format_900("(,/,11X,'i    n    m       DP',12x,'F1',12X,'F2')");
+        // static ObjexxFCL::gio::Fmt Format_901("(1X,A6,3I5,3F14.6)");
+        // static ObjexxFCL::gio::Fmt Format_902("(,/,11X,'n       P',12x,'sumF')");
+        // static ObjexxFCL::gio::Fmt Format_903("(1X,A6,I5,3F14.6)");
+        // static ObjexxFCL::gio::Fmt Format_907("(,/,' CPU seconds for ',A,F12.3)");
 
         // FLOW:
 
@@ -494,7 +529,7 @@ namespace AirflowNetwork {
             }
             properties[n].sqrtDensity = std::sqrt(properties[n].density);
             properties[n].viscosity = 1.71432e-5 + 4.828e-8 * properties[n].temperature;
-            //if (LIST >= 2) ObjexxFCL::gio::write(Unit21, Format_903) << "D,V:" << n << properties[n].density << properties[n].viscosity;
+            //if (LIST >= 2) ObjexxFCL::gio::write(outputFile, Format_903) << "D,V:" << n << properties[n].density << properties[n].viscosity;
         }
         // Compute stack pressures.
         for (i = 1; i <= NetworkNumOfLinks; ++i) {
@@ -522,12 +557,12 @@ namespace AirflowNetwork {
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
             SUMAF(n) = 0.0;
         }
-        //if (LIST >= 1) ObjexxFCL::gio::write(Unit21, Format_900);
+        //if (LIST >= 1) ObjexxFCL::gio::write(outputFile, Format_900);
         for (i = 1; i <= NetworkNumOfLinks; ++i) {
             n = AirflowNetworkLinkageData(i).NodeNums[0];
             m = AirflowNetworkLinkageData(i).NodeNums[1];
             //if (LIST >= 1) {
-            //    gio::write(Unit21, Format_901) << "Flow: " << i << n << m << AirflowNetworkLinkSimu(i).DP << AFLOW(i) << AFLOW2(i);
+            //    gio::write(outputFile, Format_901) << "Flow: " << i << n << m << AirflowNetworkLinkSimu(i).DP << AFLOW(i) << AFLOW2(i);
             //}
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_HOP) {
                 SUMAF(n) = SUMAF(n) - AFLOW(i);
@@ -538,7 +573,7 @@ namespace AirflowNetwork {
             }
         }
         //for (n = 1; n <= NetworkNumOfNodes; ++n) {
-        //    if (LIST >= 1) gio::write(Unit21, Format_903) << "Room: " << n << PZ(n) << SUMAF(n) << properties[n].temperature;
+        //    if (LIST >= 1) gio::write(outputFile, Format_903) << "Room: " << n << PZ(n) << SUMAF(n) << properties[n].temperature;
         //}
 
         for (i = 1; i <= NetworkNumOfLinks; ++i) {
@@ -613,7 +648,6 @@ namespace AirflowNetwork {
         // REAL(r64), INTENT(INOUT) :: AU(IK(NetworkNumOfNodes+1)-1) ! the upper triangle of [A] before and after factoring
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        //static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -650,15 +684,14 @@ namespace AirflowNetwork {
         Real64 ACC1;
         Array1D<Real64> CCF(NetworkNumOfNodes);
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_901("(A5,I3,2E14.6,0P,F8.4,F24.14)");
+        //auto &outputFile = std::cout;
 
         // FLOW:
         ACC1 = 0.0;
         ACCEL = 0;
         NSYM = 0;
         NNZE = IK(NetworkNumOfNodes + 1) - 1;
-        //if (LIST >= 2) ObjexxFCL::gio::write(Unit21, fmtLD) << "Initialization" << NetworkNumOfNodes << NetworkNumOfLinks << NNZE;
+        //if (LIST >= 2) print(outputFile, "Initialization{:16}{:16}{:16}\n", NetworkNumOfNodes, NetworkNumOfLinks, NNZE);
         ITER = 0;
 
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
@@ -675,11 +708,11 @@ namespace AirflowNetwork {
                 if (AirflowNetworkNodeData(n).NodeTypeNum == 0) PZ(n) = SUMF(n);
             }
             // Data dump.
-            //if (LIST >= 3) {
-            //    DUMPVD("AD:", AD, NetworkNumOfNodes, Unit21);
-            //    DUMPVD("AU:", AU, NNZE, Unit21);
-            //    DUMPVR("AF:", SUMF, NetworkNumOfNodes, Unit21);
-            //}
+//            if (LIST >= 3) {
+//                DUMPVD("AD:", AD, NetworkNumOfNodes, outputFile);
+//                DUMPVD("AU:", AU, NNZE, outputFile);
+//                DUMPVR("AF:", SUMF, NetworkNumOfNodes, outputFile);
+//            }
             // Solve linear system for approximate PZ.
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
             FACSKY(newAU, AD, newAU, newIK, NetworkNumOfNodes, NSYM);     // noel
@@ -688,21 +721,23 @@ namespace AirflowNetwork {
             FACSKY(AU, AD, AU, IK, NetworkNumOfNodes, NSYM);
             SLVSKY(AU, AD, AU, PZ, IK, NetworkNumOfNodes, NSYM);
 #endif
-            //if (LIST >= 2) DUMPVD("PZ:", PZ, NetworkNumOfNodes, Unit21);
+            //if (LIST >= 2) DUMPVD("PZ:", PZ, NetworkNumOfNodes, outputFile);
         }
         // Solve nonlinear airflow network equations by modified Newton's method.
 
         while (ITER < AirflowNetworkSimu.MaxIteration) {
             LFLAG = false;
             ++ITER;
-            //if (LIST >= 2) ObjexxFCL::gio::write(Unit21, fmtLD) << "Begin iteration " << ITER;
+//            if (LIST >= 2) {
+//                print(outputFile, "Begin iteration {}\n", ITER);
+//            }
             // Set up the Jacobian matrix.
             solver.filjac(NNZE, LFLAG);
             // Data dump.
-            //if (LIST >= 3) {
-            //    DUMPVR("SUMF:", SUMF, NetworkNumOfNodes, Unit21);
-            //    DUMPVR("SUMAF:", SUMAF, NetworkNumOfNodes, Unit21);
-            //}
+//            if (LIST >= 3) {
+//                DUMPVR("SUMF:", SUMF, NetworkNumOfNodes, outputFile);
+//                DUMPVR("SUMAF:", SUMAF, NetworkNumOfNodes, outputFile);
+//            }
             // Check convergence.
             CONVG = 1;
             SSUMF = 0.0;
@@ -720,10 +755,10 @@ namespace AirflowNetwork {
             if (CONVG == 1 && ITER > 1) return;
             if (ITER >= AirflowNetworkSimu.MaxIteration) break;
             // Data dump.
-            //if (LIST >= 3) {
-            //    DUMPVD("AD:", AD, NetworkNumOfNodes, Unit21);
-            //    DUMPVD("AU:", AU, NNZE, Unit21);
-            //}
+//            if (LIST >= 3) {
+//                DUMPVD("AD:", AD, NetworkNumOfNodes, outputFile);
+//                DUMPVD("AU:", AU, NNZE, outputFile);
+//            }
             // Solve AA * CCF = SUMF.
             for (n = 1; n <= NetworkNumOfNodes; ++n) {
                 CCF(n) = SUMF(n);
@@ -762,12 +797,13 @@ namespace AirflowNetwork {
                 }
             }
             // Data revision dump.
-            //if (LIST >= 2) {
-            //    for (n = 1; n <= NetworkNumOfNodes; ++n) {
-            //        if (AirflowNetworkNodeData(n).NodeTypeNum == 0)
-            //            ObjexxFCL::gio::write(Unit21, Format_901) << " Rev:" << n << SUMF(n) << CCF(n) << CEF(n) << PZ(n);
-            //    }
-            //}
+//            if (LIST >= 2) {
+//                for (n = 1; n <= NetworkNumOfNodes; ++n) {
+//                    if (AirflowNetworkNodeData(n).NodeTypeNum == 0) {
+//                        print(outputFile, "Rev: {:5}{:3}{:14.6E} {:8.4F}{:24.14F}", n, SUMF(n), CCF(n), CEF(n), PZ(n));
+//                    }
+//                }
+//            }
         }
 
         // Error termination.
@@ -882,8 +918,7 @@ namespace AirflowNetwork {
             }
             Real64 multiplier = 1.0;
             Real64 control = 1.0;
-            //if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << "PS:" << i << n << M << PS(i) << PW(i) << AirflowNetworkLinkSimu(i).DP;
-
+            //if (LIST >= 4) ObjexxFCL::gio::write(outputFile, Format_901) << "PS:" << i << n << M << PS(i) << PW(i) << AirflowNetworkLinkSimu(i).DP;
             j = AirflowNetworkLinkageData(i).CompNum;
 
             NF = AirflowNetworkLinkageData(i).element->calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
@@ -897,7 +932,7 @@ namespace AirflowNetwork {
             if (AirflowNetworkCompData(j).CompTypeNum == CompTypeNum_DOP) {
                 AFLOW2(i) = F[1];
             }
-            //if (LIST >= 3) ObjexxFCL::gio::write(Unit21, Format_901) << " NRi:" << i << n << M << AirflowNetworkLinkSimu(i).DP << F[0] << DF[0];
+            //if (LIST >= 3) ObjexxFCL::gio::write(outputFile, Format_901) << " NRi:" << i << n << M << AirflowNetworkLinkSimu(i).DP << F[0] << DF[0];
             FLAG = 1;
             if (AirflowNetworkNodeData(n).NodeTypeNum == 0) {
                 ++FLAG;
@@ -916,7 +951,7 @@ namespace AirflowNetwork {
             if (FLAG != 1) FILSKY(X, AirflowNetworkLinkageData(i).NodeNums, IK, AU, AD, FLAG);
             if (NF == 1) continue;
             AFLOW2(i) = F[1];
-            //if (LIST >= 3) ObjexxFCL::gio::write(Unit21, Format_901) << " NRj:" << i << n << m << AirflowNetworkLinkSimu(i).DP << F[1] << DF[1];
+            //if (LIST >= 3) ObjexxFCL::gio::write(outputFile, Format_901) << " NRj:" << i << n << m << AirflowNetworkLinkSimu(i).DP << F[1] << DF[1];
             FLAG = 1;
             if (AirflowNetworkNodeData(n).NodeTypeNum == 0) {
                 ++FLAG;
@@ -1059,8 +1094,6 @@ namespace AirflowNetwork {
         Real64 Tave;
         Real64 RhoCor;
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_901("(A5,6X,4E16.7)");
 
         // FLOW:
         // Calculate normal density and viscocity at Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
@@ -1116,7 +1149,10 @@ namespace AirflowNetwork {
                 }
             }
             // Select laminar or turbulent flow.
-            //if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << " generic crack: " << PDROP << FL << FT;
+//            if (LIST >= 4) {
+//                static ObjexxFCL::gio::Fmt Format_901("(A5,6X,4E16.7)");
+//                print(std::cout, " generic crack: {:5}      {:16.7E} {16.7E}\n", PDROP, FL, FT);
+//            }
             if (std::abs(FL) <= std::abs(FT)) {
                 F[0] = FL;
                 DF[0] = CDM;
@@ -1171,9 +1207,6 @@ namespace AirflowNetwork {
         Real64 FT;
         Real64 FTT;
         Real64 RE;
-
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
         // FLOW:
         // Get component properties
@@ -1599,7 +1632,7 @@ namespace AirflowNetwork {
     void DUMPVD(std::string const &S,    // Description
                 const Array1D<Real64> &V, // Output values
                 int const n,             // Array size
-                int const UOUT           // Output file unit
+                std::ostream &UOUT      // Output file unit
     )
     {
 
@@ -1642,22 +1675,20 @@ namespace AirflowNetwork {
         int i;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_901("(1X,A,$)");
-        static ObjexxFCL::gio::Fmt Format_902("(1X,5E15.07,$)");
 
         // FLOW:
         // Write values for debug
-        ObjexxFCL::gio::write(UOUT, Format_901) << S;
+        print(UOUT, " {}", S);
         for (i = 1; i <= n; ++i) {
-            ObjexxFCL::gio::write(UOUT, Format_902) << V(i);
+            print(UOUT, " {:15.7E}", V(i));
         }
-        ObjexxFCL::gio::write(UOUT);
+        print(UOUT, "\n");
     }
 
     void DUMPVR(std::string const &S,    // Description
                 const Array1D<Real64> &V, // Output values
                 int const n,             // Array size
-                int const UOUT           // Output file unit
+                std::ostream &UOUT           // Output file unit
     )
     {
 
@@ -1699,16 +1730,12 @@ namespace AirflowNetwork {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_901("(1X,A,$)");
-        static ObjexxFCL::gio::Fmt Format_902("(1X,5E15.07,$)");
-
         // FLOW:
-        ObjexxFCL::gio::write(UOUT, Format_901) << S;
+        print(UOUT, " {}", S);
         for (i = 1; i <= n; ++i) {
-            ObjexxFCL::gio::write(UOUT, Format_902) << V(i);
+            print(UOUT, " {:15.7E}", V(i));
         }
-        ObjexxFCL::gio::write(UOUT);
+        print(UOUT, "\n");
     }
 
     void PresProfile(int const il,                  // Linkage number

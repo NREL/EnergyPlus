@@ -220,13 +220,13 @@ namespace AirflowNetwork {
     void DUMPVD(std::string const &S,     // Description
                 const Array1D<Real64> &V, // Output values
                 int const n,              // Array size
-                int const UOUT            // Output file unit
+                std::ostream &UOUT        // Output file
     );
 
     void DUMPVR(std::string const &S,     // Description
                 const Array1D<Real64> &V, // Output values
                 int const n,              // Array size
-                int const UOUT            // Output file unit
+                std::ostream &UOUT        // Output file
     );
 
     void PresProfile(int const il,                  // Linkage number
