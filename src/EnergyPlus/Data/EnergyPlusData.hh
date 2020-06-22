@@ -73,6 +73,7 @@
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <unordered_map>
 #include <string>
@@ -107,6 +108,7 @@ namespace EnergyPlus {
         // after we've plumbed enough of the functions to allow
         OutputFiles outputFiles;
 
+        ZoneEquipmentManagerData dataZoneEquipmentManager;
         ZonePlenumData dataZonePlenum;
 
         EnergyPlusData() {
@@ -138,6 +140,7 @@ namespace EnergyPlus {
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataZoneEquipmentManager.clear_state();
             dataZonePlenum.clear_state();
         };
     };

@@ -397,7 +397,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
-    ManageZoneEquipment(state, FirstHVACIteration, SimZone,
+    ManageZoneEquipment(state, state.dataZoneEquipmentManager, FirstHVACIteration, SimZone,
                         SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
 
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
@@ -505,7 +505,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
-    ManageZoneEquipment(state, FirstHVACIteration, SimZone,
+    ManageZoneEquipment(state, state.dataZoneEquipmentManager, FirstHVACIteration, SimZone,
                         SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
 
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
