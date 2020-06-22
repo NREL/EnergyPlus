@@ -3100,7 +3100,7 @@ namespace FanCoilUnits {
                     // load is larger than capacity, thus run the fancoil unit at full capacity
                     PLR = 1.0;
                 } 
-                Calc4PipeFanCoil( state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
+                Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
                 PowerMet = QUnitOut;
                 AirMassFlow = Node(InletNode).MassFlowRate;
                 // CR9155 Remove specific humidity calculations
@@ -3108,6 +3108,7 @@ namespace FanCoilUnits {
                 SpecHumIn = Node(InletNode).HumRat;
                 // Latent rate (kg/s), dehumid = negative
                 LatOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn);
+                FanCoil(FanCoilNum).PLR = PLR;
 
                 // cycling fan constant water flow AND VarFanVarFlow
             } else if (SELECT_CASE_var == CCM_VarFanConsFlow) {
