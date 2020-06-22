@@ -349,7 +349,7 @@ namespace FanCoilUnits {
                           int const ControlledZoneNum,   // ZoneEquipConfig index
                           bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                           Real64 &LoadMet,               // load met by unit (watts)
-                          Optional<Real64> PLR = _       // Part Load Ratio, fraction of time step fancoil is on
+                          Optional<Real64> PLR = _      // Part Load Ratio, fraction of time step fancoil is on
     );
 
     void SimMultiStage4PipeFanCoil(EnergyPlusData &state, int &FanCoilNum,               // number of the current fan coil unit being simulated

@@ -76,7 +76,7 @@ namespace SZVAVModel {
     // parts of the simulation.
 
     // MODULE PARAMETER DEFINITIONS
-    // na
+    extern int const HCoil_Water;
 
     // DERIVED TYPE DEFINITIONS
     // na
