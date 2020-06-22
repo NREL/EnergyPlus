@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -833,19 +834,19 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
                                        ErrorsFound); // this calls GetSurfaceData() and SetFlagForWindowConstructionWithShadeOrBlindLayer()
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(Construct(4).Name, "WIN-CON-DOUBLEPANE"); // glass, air gap, glass
-    EXPECT_EQ(Construct(4).TotLayers, 3);               //  outer glass, air gap, inner glass
-    EXPECT_EQ(Construct(4).TotGlassLayers, 2);          // outer glass, inner glass
-    EXPECT_EQ(Construct(4).TotSolidLayers, 2);          // outer glass, inner glass
+    EXPECT_EQ(dataConstruction.Construct(4).Name, "WIN-CON-DOUBLEPANE"); // glass, air gap, glass
+    EXPECT_EQ(dataConstruction.Construct(4).TotLayers, 3);               //  outer glass, air gap, inner glass
+    EXPECT_EQ(dataConstruction.Construct(4).TotGlassLayers, 2);          // outer glass, inner glass
+    EXPECT_EQ(dataConstruction.Construct(4).TotSolidLayers, 2);          // outer glass, inner glass
 
     EXPECT_EQ(Material(4).Name, "SINGLEPANE"); // single pane glass
     EXPECT_EQ(Material(5).Name, "WINGAS");     // air gap
     EXPECT_EQ(Material(6).Name, "BLIND");      // window blind
 
     // construction layer material pointers. this construction has no blind
-    EXPECT_EQ(Construct(4).LayerPoint(1), 4); // glass, outer layer
-    EXPECT_EQ(Construct(4).LayerPoint(2), 5); // air gap
-    EXPECT_EQ(Construct(4).LayerPoint(3), 4); // glass, inner layer
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(1), 4); // glass, outer layer
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(2), 5); // air gap
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(3), 4); // glass, inner layer
 
     EXPECT_FALSE(SurfaceWindow(2).HasShadeOrBlindLayer); // the window construction has no blind
     // check if the construction has a blind material layer
@@ -858,24 +859,24 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_EQ(numEMSActuatorsAvailable, 0); // no EMS actuator because there is shade/blind layer
 
     // add a blind layer in between glass
-    Construct(4).TotLayers = 5;
-    Construct(4).TotGlassLayers = 2;
-    Construct(4).TotSolidLayers = 3;
-    Construct(4).LayerPoint(1) = 4; // glass
-    Construct(4).LayerPoint(2) = 5; // air gap
-    Construct(4).LayerPoint(3) = 6; // window blind
-    Construct(4).LayerPoint(4) = 5; // air gap
-    Construct(4).LayerPoint(5) = 4; // glass
+    dataConstruction.Construct(4).TotLayers = 5;
+    dataConstruction.Construct(4).TotGlassLayers = 2;
+    dataConstruction.Construct(4).TotSolidLayers = 3;
+    dataConstruction.Construct(4).LayerPoint(1) = 4; // glass
+    dataConstruction.Construct(4).LayerPoint(2) = 5; // air gap
+    dataConstruction.Construct(4).LayerPoint(3) = 6; // window blind
+    dataConstruction.Construct(4).LayerPoint(4) = 5; // air gap
+    dataConstruction.Construct(4).LayerPoint(5) = 4; // glass
     // updated contruction and material layers data
-    EXPECT_EQ(Construct(4).TotLayers, 5);      // outer glass, air gap, blind, air gap, inner glass
-    EXPECT_EQ(Construct(4).TotGlassLayers, 2); // outer glass, inner glass
-    EXPECT_EQ(Construct(4).TotSolidLayers, 3); // glass, blind, glass
+    EXPECT_EQ(dataConstruction.Construct(4).TotLayers, 5);      // outer glass, air gap, blind, air gap, inner glass
+    EXPECT_EQ(dataConstruction.Construct(4).TotGlassLayers, 2); // outer glass, inner glass
+    EXPECT_EQ(dataConstruction.Construct(4).TotSolidLayers, 3); // glass, blind, glass
     // construction layer material pointers. this construction has blind
-    EXPECT_EQ(Construct(4).LayerPoint(1), 4); // glass, outer layer
-    EXPECT_EQ(Construct(4).LayerPoint(2), 5); // air gap
-    EXPECT_EQ(Construct(4).LayerPoint(3), 6); // blind
-    EXPECT_EQ(Construct(4).LayerPoint(4), 5); // air gap
-    EXPECT_EQ(Construct(4).LayerPoint(5), 4); // glass, inner layer
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(1), 4); // glass, outer layer
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(2), 5); // air gap
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(3), 6); // blind
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(4), 5); // air gap
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(5), 4); // glass, inner layer
 
     // check if the construction has a blind material layer
     SetFlagForWindowConstructionWithShadeOrBlindLayer();

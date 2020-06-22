@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -61,15 +61,12 @@
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputFiles.hh>
-#include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ThermalComfort;
@@ -79,10 +76,6 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataRoomAirModel;
 using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace EnergyPlus::InternalHeatGains;
-using namespace EnergyPlus::HeatBalanceManager;
-using namespace EnergyPlus::OutputProcessor;
-using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalSurface;
 using namespace SimulationManager;
@@ -762,14 +755,13 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
 
     TH.deallocate();
     Surface.deallocate();
-    Construct.deallocate();
     Zone.deallocate();
     AngleFactorList.allocate(1);
     TotSurfaces = 3;
     NumOfZones = 1;
     TH.allocate(2, 2, TotSurfaces);
     Surface.allocate(TotSurfaces);
-    Construct.allocate(TotSurfaces);
+    dataConstruction.Construct.allocate(TotSurfaces);
     Zone.allocate(1);
 
     Surface(1).Area = 20.0;
@@ -781,9 +773,9 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     Surface(1).Construction = 1;
     Surface(2).Construction = 2;
     Surface(3).Construction = 3;
-    Construct(1).InsideAbsorpThermal = 1.0;
-    Construct(2).InsideAbsorpThermal = 0.9;
-    Construct(3).InsideAbsorpThermal = 0.8;
+    dataConstruction.Construct(1).InsideAbsorpThermal = 1.0;
+    dataConstruction.Construct(2).InsideAbsorpThermal = 0.9;
+    dataConstruction.Construct(3).InsideAbsorpThermal = 0.8;
     Surface(1).Zone = 1;
     Surface(2).Zone = 1;
     Surface(3).Zone = 1;
@@ -830,9 +822,9 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT)
     TotSurfaces = AngleFactorList(1).TotAngleFacSurfaces;
     TH.allocate(2, 2, TotSurfaces);
     Surface.deallocate();
-    Construct.deallocate();
+    dataConstruction.Construct.deallocate();
     Surface.allocate(TotSurfaces);
-    Construct.allocate(TotSurfaces);
+    dataConstruction.Construct.allocate(TotSurfaces);
 
     TH(2, 1, 1) = 20.0;
     TH(2, 1, 2) = 15.0;
@@ -840,9 +832,9 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT)
     Surface(1).Construction = 1;
     Surface(2).Construction = 2;
     Surface(3).Construction = 3;
-    Construct(1).InsideAbsorpThermal = 1.0;
-    Construct(2).InsideAbsorpThermal = 0.9;
-    Construct(3).InsideAbsorpThermal = 0.8;
+    dataConstruction.Construct(1).InsideAbsorpThermal = 1.0;
+    dataConstruction.Construct(2).InsideAbsorpThermal = 0.9;
+    dataConstruction.Construct(3).InsideAbsorpThermal = 0.8;
 
     RadTemp = CalcAngleFactorMRT(1);
     EXPECT_NEAR(RadTemp, 16.9, 0.1);
@@ -952,8 +944,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
 {
-    
-    // Set the data for the test    
+
+    // Set the data for the test
     TotPeople = 1;
     People.allocate(TotPeople);
     ThermalComfortData.allocate(TotPeople);
@@ -969,7 +961,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     QHWBaseboardToPerson.allocate(NumOfZones);
     QSteamBaseboardToPerson.allocate(NumOfZones);
     QElecBaseboardToPerson.allocate(NumOfZones);
-        
+
     People(1).ZonePtr = 1;
     People(1).NumberOfPeoplePtr = -1;
     People(1).NumberOfPeople = 5.0;
@@ -988,10 +980,10 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     People(1).ClothingType = 1;
     People(1).ClothingPtr = -1;
     People(1).AirVelocityPtr = 0;
-    
+
     ZTAVComf(1) = 25.0;
     MRT(1) = 26.0;
-    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006    
+    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
     DataEnvironment::OutBaroPress = 101217.;
     IsZoneDV(1) = IsZoneUI(1) = false;
     QHTRadSysToPerson(1) = 0.0;
@@ -1001,7 +993,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     QElecBaseboardToPerson(1) = 0.0;
 
     CalcThermalComfortPierce();
-    
+
     EXPECT_NEAR(ThermalComfortData(1).PiercePMVSET, -3.350, 0.005);
     EXPECT_NEAR(ThermalComfortData(1).PierceSET, 23.62, 0.01);
 

@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/ConductionTransferFunctionCalc.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -316,8 +317,8 @@ namespace EcoRoofManager {
         }
 
         if (SurfaceWindow(SurfNum).StormWinFlag == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
-        RoughSurf = Material(Construct(ConstrNum).LayerPoint(1)).Roughness;
-        AbsThermSurf = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+        RoughSurf = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Roughness;
+        AbsThermSurf = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         HMovInsul = 0.0;
 
         if (Surface(SurfNum).ExtWind) {
@@ -343,19 +344,19 @@ namespace EcoRoofManager {
                 ShowSevereError("CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF). EcoRoof model "
                                 "currently works only with CTF heat balance solution algorithm.");
             // ONLY READ ECOROOF PROPERTIES IN THE FIRST TIME
-            Zf = Material(Construct(ConstrNum).LayerPoint(1)).HeightOfPlants;              // Plant height (m)
-            LAI = Material(Construct(ConstrNum).LayerPoint(1)).LAI;                        // Leaf Area Index
-            Alphag = 1.0 - Material(Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;       // albedo rather than absorptivity
-            Alphaf = Material(Construct(ConstrNum).LayerPoint(1)).Lreflectivity;           // Leaf Reflectivity
-            epsilonf = Material(Construct(ConstrNum).LayerPoint(1)).LEmissitivity;         // Leaf Emisivity
-            StomatalResistanceMin = Material(Construct(ConstrNum).LayerPoint(1)).RStomata; // Leaf min stomatal resistance
-            epsilong = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;         // Soil Emisivity
-            MoistureMax = Material(Construct(ConstrNum).LayerPoint(1)).Porosity;           // Max moisture content in soil
-            MoistureResidual = Material(Construct(ConstrNum).LayerPoint(1)).MinMoisture;   // Min moisture content in soil
-            Moisture = Material(Construct(ConstrNum).LayerPoint(1)).InitMoisture;          // Initial moisture content in soil
+            Zf = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).HeightOfPlants;              // Plant height (m)
+            LAI = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).LAI;                        // Leaf Area Index
+            Alphag = 1.0 - Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;       // albedo rather than absorptivity
+            Alphaf = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Lreflectivity;           // Leaf Reflectivity
+            epsilonf = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).LEmissitivity;         // Leaf Emisivity
+            StomatalResistanceMin = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).RStomata; // Leaf min stomatal resistance
+            epsilong = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;         // Soil Emisivity
+            MoistureMax = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Porosity;           // Max moisture content in soil
+            MoistureResidual = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).MinMoisture;   // Min moisture content in soil
+            Moisture = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).InitMoisture;          // Initial moisture content in soil
             MeanRootMoisture = Moisture; // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
 
-            SoilThickness = Material(Construct(ConstrNum).LayerPoint(1)).Thickness; // Total thickness of soil layer (m)
+            SoilThickness = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Thickness; // Total thickness of soil layer (m)
 
             // DJS - This set of statements and the corresponding write statement in the UpdateSoilProps subroutine should
             //      be removed (or commented out) prior to deployment in a working version of EnergyPlus
@@ -406,9 +407,9 @@ namespace EcoRoofManager {
         // for Reverse DD testing
 
         if (BeginEnvrnFlag || WarmupFlag) {
-            Moisture = Material(Construct(ConstrNum).LayerPoint(1)).InitMoisture;    // Initial moisture content in soil
+            Moisture = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).InitMoisture;    // Initial moisture content in soil
             MeanRootMoisture = Moisture;                                             // Start the root zone moisture at the same value as the surface.
-            Alphag = 1.0 - Material(Construct(ConstrNum).LayerPoint(1)).AbsorpSolar; // albedo rather than absorptivity
+            Alphag = 1.0 - Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar; // albedo rather than absorptivity
         }
         // DJS July 2007
 
@@ -443,18 +444,18 @@ namespace EcoRoofManager {
             Tg = Tgold;
             Tf = Tfold;
 
-            if (Construct(ConstrNum).CTFCross(0) > 0.01) {
+            if (dataConstruction.Construct(ConstrNum).CTFCross(0) > 0.01) {
                 QuickConductionSurf = true;
-                F1temp = Construct(ConstrNum).CTFCross(0) / (Construct(ConstrNum).CTFInside(0) + HConvIn(SurfNum));
+                F1temp = dataConstruction.Construct(ConstrNum).CTFCross(0) / (dataConstruction.Construct(ConstrNum).CTFInside(0) + HConvIn(SurfNum));
                 Qsoilpart1 = -CTFConstOutPart(SurfNum) + F1temp * (CTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + QRadThermInAbs(SurfNum) +
-                                                                   Construct(ConstrNum).CTFSourceIn(0) * QsrcHist(SurfNum, 1) +
+                                                                   dataConstruction.Construct(ConstrNum).CTFSourceIn(0) * QsrcHist(SurfNum, 1) +
                                                                    HConvIn(SurfNum) * MAT(ZoneNum) + NetLWRadToSurf(SurfNum));
             } else {
-                Qsoilpart1 = -CTFConstOutPart(SurfNum) + Construct(ConstrNum).CTFCross(0) * TempSurfIn(SurfNum);
+                Qsoilpart1 = -CTFConstOutPart(SurfNum) + dataConstruction.Construct(ConstrNum).CTFCross(0) * TempSurfIn(SurfNum);
                 F1temp = 0.0;
             }
 
-            Qsoilpart2 = Construct(ConstrNum).CTFOutside(0) - F1temp * Construct(ConstrNum).CTFCross(0);
+            Qsoilpart2 = dataConstruction.Construct(ConstrNum).CTFOutside(0) - F1temp * dataConstruction.Construct(ConstrNum).CTFCross(0);
 
             Pa = StdBaroPress; // standard atmospheric pressure (apparently in Pascals)
             Tgk = Tg + KelvinConv;
@@ -793,10 +794,10 @@ namespace EcoRoofManager {
         if (UpdatebeginFlag) {
 
             // SET dry values that NEVER CHANGE
-            DryCond = Material(Construct(ConstrNum).LayerPoint(1)).Conductivity;
-            DryDens = Material(Construct(ConstrNum).LayerPoint(1)).Density;
-            DryAbsorp = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
-            DrySpecHeat = Material(Construct(ConstrNum).LayerPoint(1)).SpecHeat;
+            DryCond = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Conductivity;
+            DryDens = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Density;
+            DryAbsorp = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
+            DrySpecHeat = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SpecHeat;
 
             // DETERMINE RELATIVE THICKNESS OF TWO LAYERS OF SOIL (also unchanging)
             if (SoilThickness > 0.12) {
@@ -806,7 +807,7 @@ namespace EcoRoofManager {
             }
             // This loop outputs the minimum number of time steps needed to keep the solution stable
             // The equation is minimum timestep in seconds=161240*((number of layers)**(-2.3))*(Total thickness of the soil)**2.07
-            if (Material(Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 2) {
+            if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 2) {
                 Real64 const depth_limit(depth_fac * std::pow(TopDepth + RootDepth, 2.07));
                 for (index1 = 1; index1 <= 20; ++index1) {
                     if (double(MinutesPerTimeStep / index1) <= depth_limit) break;
@@ -906,7 +907,7 @@ namespace EcoRoofManager {
             Moisture = MoistureMax;
         }
 
-        if (Material(Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 1) {
+        if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 1) {
 
             // THE SECTION BELOW WAS THE INITIAL MOISTURE DISTRIBUTION MODEL.
             // Any line with "!-" was code.  A line with "!" was just a comment.  This is done in case this code needs to be resurected in the future.
@@ -1093,23 +1094,23 @@ namespace EcoRoofManager {
         // TestRatio variable is available just in case there are stability issues. If so, we can limit the amount
         // by which soil properties are allowed to vary in one time step (10% in example below).
 
-        TestRatio = SoilConductivity / Material(Construct(ConstrNum).LayerPoint(1)).Conductivity;
+        TestRatio = SoilConductivity / Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Conductivity;
         if (TestRatio > RatioMax) TestRatio = RatioMax;
         if (TestRatio < RatioMin) TestRatio = RatioMin;
-        Material(Construct(ConstrNum).LayerPoint(1)).Conductivity *= TestRatio;
-        SoilConductivity = Material(Construct(ConstrNum).LayerPoint(1)).Conductivity;
+        Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Conductivity *= TestRatio;
+        SoilConductivity = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Conductivity;
 
-        TestRatio = SoilDensity / Material(Construct(ConstrNum).LayerPoint(1)).Density;
+        TestRatio = SoilDensity / Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Density;
         if (TestRatio > RatioMax) TestRatio = RatioMax;
         if (TestRatio < RatioMin) TestRatio = RatioMin;
-        Material(Construct(ConstrNum).LayerPoint(1)).Density *= TestRatio;
-        SoilDensity = Material(Construct(ConstrNum).LayerPoint(1)).Density;
+        Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Density *= TestRatio;
+        SoilDensity = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Density;
 
-        TestRatio = SoilSpecHeat / Material(Construct(ConstrNum).LayerPoint(1)).SpecHeat;
+        TestRatio = SoilSpecHeat / Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SpecHeat;
         if (TestRatio > RatioMax) TestRatio = RatioMax;
         if (TestRatio < RatioMin) TestRatio = RatioMin;
-        Material(Construct(ConstrNum).LayerPoint(1)).SpecHeat *= TestRatio;
-        SoilSpecHeat = Material(Construct(ConstrNum).LayerPoint(1)).SpecHeat;
+        Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SpecHeat *= TestRatio;
+        SoilSpecHeat = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SpecHeat;
 
         // Now call InitConductionTransferFunction with the ConstrNum as the argument. As long as the argument is
         // non-zero InitConductionTransferFunction will ONLY update this construction. If the argument is 0 it will

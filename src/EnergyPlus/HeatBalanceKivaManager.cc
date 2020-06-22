@@ -57,6 +57,7 @@
 #endif
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -660,7 +661,7 @@ namespace HeatBalanceKivaManager {
         readWeatherData();
 
         auto &Surfaces = DataSurfaces::Surface;
-        auto &Constructs = DataHeatBalance::Construct;
+        auto &Constructs = dataConstruction.Construct;
         auto &Materials = DataHeatBalance::Material;
 
         int inst = 0;
@@ -1075,7 +1076,7 @@ namespace HeatBalanceKivaManager {
             if (kv.constructionNum == 0) {
                 constructionName = "<Default Footing Wall Construction>";
             } else {
-                constructionName = DataHeatBalance::Construct(kv.constructionNum).Name;
+                constructionName = dataConstruction.Construct(kv.constructionNum).Name;
             }
 
             std::string wallSurfaceString = "";

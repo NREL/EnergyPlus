@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include "OutputFiles.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -289,7 +290,7 @@ namespace MoistureBalanceEMPDManager {
                 continue; // Heat transfer surface only and not a window
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD) continue;
             ConstrNum = Surface(SurfNum).Construction;
-            MatNum = Construct(ConstrNum).LayerPoint(Construct(ConstrNum).TotLayers);
+            MatNum = dataConstruction.Construct(ConstrNum).LayerPoint(dataConstruction.Construct(ConstrNum).TotLayers);
             if (Material(MatNum).EMPDmu > 0.0 && Surface(SurfNum).Zone > 0) {
                 EMPDzone(Surface(SurfNum).Zone) = true;
             } else {
@@ -301,25 +302,25 @@ namespace MoistureBalanceEMPDManager {
                 if (DisplayExtraWarnings) {
                     ShowMessage("GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer in Surface=" +
                                 Surface(SurfNum).Name);
-                    ShowContinueError("with Construction=" + Construct(ConstrNum).Name);
+                    ShowContinueError("with Construction=" + dataConstruction.Construct(ConstrNum).Name);
                 }
             }
-            if (Construct(ConstrNum).TotLayers == 1) { // One layer construction
+            if (dataConstruction.Construct(ConstrNum).TotLayers == 1) { // One layer construction
                 continue;
             } else { // Multiple layer construction
-                if (Material(Construct(ConstrNum).LayerPoint(1)).EMPDMaterialProps &&
+                if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).EMPDMaterialProps &&
                     Surface(SurfNum).ExtBoundCond <= 0) { // The external layer is not exposed to zone
                     ShowSevereError("GetMoistureBalanceEMPDInput: EMPD properties are assigned to the outside layer in Construction=" +
-                                    Construct(ConstrNum).Name);
-                    ShowContinueError("..Outside layer material with EMPD properties = " + Material(Construct(ConstrNum).LayerPoint(1)).Name);
+                                    dataConstruction.Construct(ConstrNum).Name);
+                    ShowContinueError("..Outside layer material with EMPD properties = " + Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Name);
                     ShowContinueError("..A material with EMPD properties must be assigned to the inside layer of a construction.");
                     ErrorsFound = true;
                 }
-                for (Layer = 2; Layer <= Construct(ConstrNum).TotLayers - 1; ++Layer) {
-                    if (Material(Construct(ConstrNum).LayerPoint(Layer)).EMPDMaterialProps) {
+                for (Layer = 2; Layer <= dataConstruction.Construct(ConstrNum).TotLayers - 1; ++Layer) {
+                    if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).EMPDMaterialProps) {
                         ShowSevereError("GetMoistureBalanceEMPDInput: EMPD properties are assigned to a middle layer in Construction=" +
-                                        Construct(ConstrNum).Name);
-                        ShowContinueError("..Middle layer material with EMPD properties = " + Material(Construct(ConstrNum).LayerPoint(Layer)).Name);
+                                        dataConstruction.Construct(ConstrNum).Name);
+                        ShowContinueError("..Middle layer material with EMPD properties = " + Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Name);
                         ShowContinueError("..A material with EMPD properties must be assigned to the inside layer of a construction.");
                         ErrorsFound = true;
                     }
@@ -545,7 +546,7 @@ namespace MoistureBalanceEMPDManager {
             return;
         }
         ConstrNum = surface.Construction;
-        MatNum = Construct(ConstrNum).LayerPoint(Construct(ConstrNum).TotLayers); // Then find the material pointer
+        MatNum = dataConstruction.Construct(ConstrNum).LayerPoint(dataConstruction.Construct(ConstrNum).TotLayers); // Then find the material pointer
 
         auto const &material(Material(MatNum));
         if (material.EMPDmu <= 0.0) {
@@ -795,14 +796,14 @@ namespace MoistureBalanceEMPDManager {
               "Coating Thickness {m}\n");
 
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
-            if (Construct(ConstrNum).TypeIsWindow) continue;
-            MatNum = Construct(ConstrNum).LayerPoint(Construct(ConstrNum).TotLayers);
+            if (dataConstruction.Construct(ConstrNum).TypeIsWindow) continue;
+            MatNum = dataConstruction.Construct(ConstrNum).LayerPoint(dataConstruction.Construct(ConstrNum).TotLayers);
             if (Material(MatNum).EMPDMaterialProps) {
                 static constexpr auto Format_700(
                     " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
                 print(outputFiles.eio,
                       Format_700,
-                      Construct(ConstrNum).Name,
+                      dataConstruction.Construct(ConstrNum).Name,
                       Material(MatNum).Name,
                       Material(MatNum).EMPDmu,
                       Material(MatNum).MoistACoeff,

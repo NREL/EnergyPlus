@@ -62,6 +62,7 @@
 
 // EnergyPlus Headers
 #include "OutputFiles.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -232,7 +233,6 @@ namespace ConvectionCoefficients {
 
         // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
-        using DataHeatBalance::Construct;
         using DataHeatBalFanSys::MAT;
         using DataLoopNode::Node;
         using DataLoopNode::NumOfNodes;
@@ -364,7 +364,7 @@ namespace ConvectionCoefficients {
                         if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
 
                     } else if (SELECT_CASE_var1 == ASHRAETARP) {
-                        if (!Construct(Surface(SurfNum).Construction).TypeIsWindow) {
+                        if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) {
                             CalcASHRAEDetailedIntConvCoeff(SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
                         } else {
                             CalcISO15099WindowIntConvCoeff(SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
@@ -1302,7 +1302,7 @@ namespace ConvectionCoefficients {
             UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
             for (int surfNum : DataSurfaces::AllHTSurfaceList) {
                 auto &surf = Surface(surfNum);
-                if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundaryIRTSurface) {
+                if (dataConstruction.Construct(surf.Construction).TypeIsAirBoundaryIRTSurface) {
                     surf.IntConvCoeff = TotIntConvCoeff;
                 }
             }
@@ -1987,7 +1987,7 @@ namespace ConvectionCoefficients {
                 for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
-                    if (!Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
+                    if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
                     SurfacesOfType = true;
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
@@ -2211,7 +2211,7 @@ namespace ConvectionCoefficients {
                 for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
-                    if (!Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
+                    if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
                     SurfacesOfType = true;
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
@@ -2843,7 +2843,7 @@ namespace ConvectionCoefficients {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                     return CalcCeilingDiffuserIntConvCoeff(
-                        ACH, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height, Construct(Surface(SurfNum).Construction).TypeIsWindow);
+                        ACH, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height, dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow);
                 };
             } else {
                 HConvIn(SurfNum) = CalcCeilingDiffuserIntConvCoeff(ACH,
@@ -2852,7 +2852,7 @@ namespace ConvectionCoefficients {
                                                                    Surface(SurfNum).CosTilt,
                                                                    AirHumRat,
                                                                    Surface(SurfNum).Height,
-                                                                   Construct(Surface(SurfNum).Construction).TypeIsWindow);
+                                                                   dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow);
                 // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
                 if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
             }
@@ -2934,7 +2934,7 @@ namespace ConvectionCoefficients {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             if (ACH <= 3.0) { // Use the other convection algorithm
-                if (!Construct(Surface(SurfNum).Construction).TypeIsWindow) {
+                if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) {
                     CalcASHRAEDetailedIntConvCoeff(SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
                 } else {
                     CalcISO15099WindowIntConvCoeff(SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
@@ -4546,7 +4546,7 @@ namespace ConvectionCoefficients {
                                                                 Surface(SurfNum).CosTilt,
                                                                 AirHumRat,
                                                                 Surface(SurfNum).Height,
-                                                                Construct(Surface(SurfNum).Construction).TypeIsWindow);
+                                                                dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserCeiling) {
@@ -4564,7 +4564,7 @@ namespace ConvectionCoefficients {
                                                                   Surface(SurfNum).CosTilt,
                                                                   AirHumRat,
                                                                   Surface(SurfNum).Height,
-                                                                  Construct(Surface(SurfNum).Construction).TypeIsWindow);
+                                                                  dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow);
                 }
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserWalls) {
@@ -4582,7 +4582,7 @@ namespace ConvectionCoefficients {
                                                                 Surface(SurfNum).CosTilt,
                                                                 AirHumRat,
                                                                 Surface(SurfNum).Height,
-                                                                Construct(Surface(SurfNum).Construction).TypeIsWindow);
+                                                                dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow);
                 }
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     HnFn = [=](double, double, double, double, double) -> double { return tmpHc; };
@@ -4935,7 +4935,7 @@ namespace ConvectionCoefficients {
                 SurfWindSpeed = Surface(SurfNum).WindSpeed;
             }
 
-            int Roughness = Material(Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+            int Roughness = Material(dataConstruction.Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
 
             auto const SELECT_CASE_var(ForcedConvModelEqNum);
 
@@ -8713,7 +8713,7 @@ namespace ConvectionCoefficients {
 
         static int ErrorIndex(0);
 
-        int const RoughnessIndex = Material(Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+        int const RoughnessIndex = Material(dataConstruction.Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
         // find x, don't know x. avoid time consuming geometry algorithm
         x = std::sqrt(RoofArea) / 2.0; // quick simplification, geometry routines to develop
 

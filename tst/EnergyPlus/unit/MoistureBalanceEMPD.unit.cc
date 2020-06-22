@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -65,6 +65,8 @@
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 
@@ -119,8 +121,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
 
     // Construction
     surface.Construction = 1;
-    DataHeatBalance::Construct.allocate(1);
-    DataHeatBalance::ConstructionData &construction = DataHeatBalance::Construct(1);
+    dataConstruction.Construct.allocate(1);
+    Construction::Construction &construction = dataConstruction.Construct(1);
     construction.TotLayers = 1;
     construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", DataHeatBalance::Material);
 
@@ -245,8 +247,8 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
 
     // Construction
     surface.Construction = 1;
-    DataHeatBalance::Construct.allocate(1);
-    DataHeatBalance::ConstructionData &construction = DataHeatBalance::Construct(1);
+    dataConstruction.Construct.allocate(1);
+    Construction::Construction &construction = dataConstruction.Construct(1);
     construction.TotLayers = 1;
     construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", DataHeatBalance::Material);
 
@@ -337,8 +339,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Construction
     int constNum = 1;
     surface.Construction = constNum;
-    DataHeatBalance::Construct.allocate( constNum );
-    DataHeatBalance::ConstructionData &construction = DataHeatBalance::Construct( constNum );
+    dataConstruction.Construct.allocate( constNum );
+    Construction::Construction &construction = dataConstruction.Construct( constNum );
     construction.TotLayers = constNum;
     construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("WOOD", DataHeatBalance::Material);
 
@@ -367,7 +369,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     Real64 const KelvinConv(273.15);
     DataHeatBalSurface::TempSurfIn.allocate(surfNum);
     DataHeatBalSurface::TempSurfIn(surfNum) = 20.0;
-    
+
     // Calculate average vapor density [kg/m^3]
     Real64 Taver = DataHeatBalSurface::TempSurfIn(surfNum);
     // Calculate RH for use in material property calculations.

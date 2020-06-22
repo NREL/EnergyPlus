@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -68,7 +68,6 @@ using namespace FenestrationCommon;
 using namespace DataEnvironment;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataHeatBalFanSys;
 using namespace DataGlobals;
 using namespace General;
 
@@ -94,7 +93,7 @@ namespace WindowManager {
         auto &window(SurfaceWindow(SurfNum));
         auto &surface(Surface(SurfNum));
         auto ConstrNum = surface.Construction;
-        auto &construction(Construct(ConstrNum));
+        auto &construction(dataConstruction.Construct(ConstrNum));
 
         auto const solutionTolerance = 0.02;
 
@@ -309,7 +308,7 @@ namespace WindowManager {
             if (m_Window.StormWinFlag > 0) ConstrNum = m_Surface.StormWinShadedConstruction;
         }
 
-        auto &construction(Construct(ConstrNum));
+        auto &construction(dataConstruction.Construct(ConstrNum));
         auto LayPtr = construction.LayerPoint(t_Index);
         return &Material(LayPtr);
     }
@@ -339,7 +338,7 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     int CWCEHeatTransferFactory::getNumOfLayers() const
     {
-        return Construct(m_ConstructionNumber).TotLayers;
+        return dataConstruction.Construct(m_ConstructionNumber).TotLayers;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////

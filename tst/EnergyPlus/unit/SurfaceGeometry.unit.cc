@@ -51,11 +51,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
-#include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -69,7 +68,6 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::SurfaceGeometry;
 using namespace EnergyPlus::HeatBalanceManager;
-// using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 {
@@ -3194,8 +3192,8 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
     WindowShadingControl(3).FenestrationName(1) = "Fene-08";
     WindowShadingControl(3).FenestrationName(2) = "Fene-09";
 
-    Construct.allocate(1);
-    Construct(1).WindowTypeEQL = false;
+    dataConstruction.Construct.allocate(1);
+    dataConstruction.Construct(1).WindowTypeEQL = false;
 
     SurfaceTmp.allocate(9);
 
@@ -4451,7 +4449,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test1)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    
+
     bool ErrorsFound(false);
 
     DataGlobals::NumOfZones = 1;
@@ -4500,7 +4498,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test3)
     // Case 3) World coordinate system & Relative Rect. surf, coordinate system & Non-zero zone origin
 
     std::string const idf_objects = delimited_string({
-     
+
         "GlobalGeometryRules,",
         "    UpperLeftCorner,         !- Starting Vertex Position",
         "    CounterClockWise,        !- Vertex Entry Direction",
@@ -4523,7 +4521,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test3)
 
     GetGeometryParameters(state.outputFiles, ErrorsFound);
     EXPECT_TRUE(has_err_output(false));
-    
+
     std::string error_string = delimited_string({
         "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.",
         "   **   ~~~   ** Coordinate System=\"WORLD\"; while ",
@@ -4570,26 +4568,26 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
 TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
 {
     bool RevLayerDiffs;
-    Construct.allocate(6);
+    dataConstruction.Construct.allocate(6);
     Material.allocate(7);
-    
+
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
-    Construct(1).TotLayers = 3;
-    Construct(1).LayerPoint(1) = 1;
-    Construct(1).LayerPoint(2) = 2;
-    Construct(1).LayerPoint(3) = 3;
-    Construct(2).TotLayers = 3;
-    Construct(2).LayerPoint(1) = 3;
-    Construct(2).LayerPoint(2) = 2;
-    Construct(2).LayerPoint(3) = 1;
+    dataConstruction.Construct(1).TotLayers = 3;
+    dataConstruction.Construct(1).LayerPoint(1) = 1;
+    dataConstruction.Construct(1).LayerPoint(2) = 2;
+    dataConstruction.Construct(1).LayerPoint(3) = 3;
+    dataConstruction.Construct(2).TotLayers = 3;
+    dataConstruction.Construct(2).LayerPoint(1) = 3;
+    dataConstruction.Construct(2).LayerPoint(2) = 2;
+    dataConstruction.Construct(2).LayerPoint(3) = 1;
     RevLayerDiffs = true;
     // ExpectResult = false;
     CheckForReversedLayers(RevLayerDiffs, 1, 2, 3);
     EXPECT_FALSE(RevLayerDiffs);
 
     // Case 1a: Constructs with regular materials are not reverse of each other--material layers do not match in reverse (should get a "true" answer)
-    Construct(2).LayerPoint(1) = 1;
-    Construct(2).LayerPoint(3) = 3;
+    dataConstruction.Construct(2).LayerPoint(1) = 1;
+    dataConstruction.Construct(2).LayerPoint(3) = 3;
     Material(1).Group = RegularMaterial;
     Material(2).Group = RegularMaterial;
     Material(3).Group = RegularMaterial;
@@ -4599,14 +4597,14 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     EXPECT_TRUE(RevLayerDiffs);
 
     // Case 2a: Constructs are reverse of each other using WindowGlass, front/back properties properly switched (should get a "false" answer)
-    Construct(3).TotLayers = 3;
-    Construct(3).LayerPoint(1) = 4;
-    Construct(3).LayerPoint(2) = 2;
-    Construct(3).LayerPoint(3) = 5;
-    Construct(4).TotLayers = 3;
-    Construct(4).LayerPoint(1) = 4;
-    Construct(4).LayerPoint(2) = 2;
-    Construct(4).LayerPoint(3) = 5;
+    dataConstruction.Construct(3).TotLayers = 3;
+    dataConstruction.Construct(3).LayerPoint(1) = 4;
+    dataConstruction.Construct(3).LayerPoint(2) = 2;
+    dataConstruction.Construct(3).LayerPoint(3) = 5;
+    dataConstruction.Construct(4).TotLayers = 3;
+    dataConstruction.Construct(4).LayerPoint(1) = 4;
+    dataConstruction.Construct(4).LayerPoint(2) = 2;
+    dataConstruction.Construct(4).LayerPoint(3) = 5;
     Material(4).Group = WindowGlass;
     Material(4).Thickness = 0.15;
     Material(4).ReflectSolBeamFront = 0.35;
@@ -4651,10 +4649,10 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     EXPECT_TRUE(RevLayerDiffs);
 
     // Case 3a: Single layer constructs using Equivalent Glass, front/back properties properly switched (should get a "false" answer)
-    Construct(5).TotLayers = 1;
-    Construct(5).LayerPoint(1) = 6;
-    Construct(6).TotLayers = 1;
-    Construct(6).LayerPoint(1) = 7;
+    dataConstruction.Construct(5).TotLayers = 1;
+    dataConstruction.Construct(5).LayerPoint(1) = 6;
+    dataConstruction.Construct(6).TotLayers = 1;
+    dataConstruction.Construct(6).LayerPoint(1) = 7;
     Material(6).Group = GlassEquivalentLayer;
     Material(6).TausFrontBeamBeam = 0.39;
     Material(6).TausBackBeamBeam = 0.29;
@@ -5362,7 +5360,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     // For this test case, there are air boundaries
     // Between Zones 1 and 2
     // None between Zones 2 and 3
-    // Between Zones 3 and 4 
+    // Between Zones 3 and 4
     // Between Zones 4 and 5
     // Between Zones 1 and 5
     // This should trigger the enclosure merging and all five zones should share a radiant and solar enclosure

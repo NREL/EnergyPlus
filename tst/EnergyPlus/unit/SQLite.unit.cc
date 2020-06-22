@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include "Fixtures/SQLiteFixture.hh"
 #include <EnergyPlus/OutputProcessor.hh>
 
@@ -604,9 +605,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     materialData1->Thickness = 2;
     materialData1->VaporDiffus = 2;
 
-    auto const &constructData0 = std::unique_ptr<DataHeatBalance::ConstructionData>(new DataHeatBalance::ConstructionData());
+    auto const &constructData0 = std::unique_ptr<Construction::Construction>(new Construction::Construction());
     constructData0->Name = "test construction 1";
-    auto const &constructData1 = std::unique_ptr<DataHeatBalance::ConstructionData>(new DataHeatBalance::ConstructionData());
+    auto const &constructData1 = std::unique_ptr<Construction::Construction>(new Construction::Construction());
     constructData1->Name = "test construction 2";
     constructData1->TotLayers = 2;
     constructData1->TotSolidLayers = 2;

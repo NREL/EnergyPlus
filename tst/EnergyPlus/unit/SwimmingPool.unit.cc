@@ -51,20 +51,19 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/SwimmingPool.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SwimmingPool;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataPlant;
-using namespace EnergyPlus::DataHeatBalance;
 
 TEST_F(EnergyPlusFixture, SwimmingPool_MakeUpWaterVolFlow)
 {
@@ -266,7 +265,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     NumSwimmingPools = 1;
     Pool.allocate(NumSwimmingPools);
     DataSurfaces::Surface.allocate(1);
-    DataHeatBalance::Construct.allocate(1);
+    dataConstruction.Construct.allocate(1);
 
     // testing variables
     static std::string const Alpha1("FirstString");
@@ -334,7 +333,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     DataSurfaces::Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass_Floor;
     DataSurfaces::Surface(poolReference.SurfacePtr).MaterialMovInsulInt = 1;
     DataSurfaces::Surface(poolReference.SurfacePtr).Construction = 1;
-    DataHeatBalance::Construct(DataSurfaces::Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = true;
+    dataConstruction.Construct(DataSurfaces::Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = true;
 
     poolReference.ErrorCheckSetupPoolSurface(Alpha1,Alpha2,AlphaField2,ErrFnd);
 
@@ -347,7 +346,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     DataSurfaces::Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
     DataSurfaces::Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass_Wall;
     DataSurfaces::Surface(poolReference.SurfacePtr).MaterialMovInsulInt = 1;
-    DataHeatBalance::Construct(DataSurfaces::Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = false;
+    dataConstruction.Construct(DataSurfaces::Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = false;
 
     poolReference.ErrorCheckSetupPoolSurface(Alpha1,Alpha2,AlphaField2,ErrFnd);
 
@@ -360,7 +359,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     DataSurfaces::Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
     DataSurfaces::Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass_Floor;
     DataSurfaces::Surface(poolReference.SurfacePtr).MaterialMovInsulInt = 0;
-    DataHeatBalance::Construct(DataSurfaces::Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = false;
+    dataConstruction.Construct(DataSurfaces::Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = false;
     DataSurfaces::Surface(poolReference.SurfacePtr).Zone = 7;
     DataSurfaces::Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
     DataSurfaces::Surface(poolReference.SurfacePtr).IsPool = false;

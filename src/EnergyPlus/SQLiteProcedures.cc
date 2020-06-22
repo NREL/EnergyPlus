@@ -48,15 +48,13 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include "SQLiteProcedures.hh"
-#include "CommandLineInterface.hh"
 #include "DataEnvironment.hh"
 #include "DataGlobals.hh"
 #include "DataHeatBalance.hh"
-#include "DataPrecisionGlobals.hh"
 #include "DataRoomAirModel.hh"
 #include "DataStringGlobals.hh"
-#include "DataSystemVariables.hh"
 #include "General.hh"
 #include "InputProcessing/InputProcessor.hh"
 #include "ScheduleManager.hh"
@@ -149,7 +147,7 @@ void CreateSQLiteZoneExtendedOutput()
             sqlite->addMaterialData(materialNum, DataHeatBalance::Material(materialNum));
         }
         for (int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum) {
-            auto const &construction = DataHeatBalance::Construct(constructNum);
+            auto const &construction = dataConstruction.Construct(constructNum);
             if (construction.TotGlassLayers == 0) {
                 sqlite->addConstructionData(constructNum, construction, construction.UValue);
             } else {
@@ -2102,7 +2100,7 @@ void SQLite::addMaterialData(int const number, DataHeatBalance::MaterialProperti
 {
     materials.push_back(std::unique_ptr<Material>(new Material(m_errorStream, m_db, number, materialData)));
 }
-void SQLite::addConstructionData(int const number, DataHeatBalance::ConstructionData const &constructionData, double const &constructionUValue)
+void SQLite::addConstructionData(int const number, EnergyPlus::Construction::Construction const &constructionData, double const &constructionUValue)
 {
     constructions.push_back(std::unique_ptr<Construction>(new Construction(m_errorStream, m_db, number, constructionData, constructionUValue)));
 }

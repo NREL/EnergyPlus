@@ -57,6 +57,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -194,7 +195,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
     int ConstrNum = 1;
     int EQLNum = 0;
     InitEquivalentLayerWindowCalculations();
-    EQLNum = DataHeatBalance::Construct(ConstrNum).EQLConsPtr;
+    EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
     EXPECT_EQ(CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL, WindowEquivalentLayer::lscVBNOBM);
 }
 
@@ -938,8 +939,8 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
     GetConstructData(ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotConstructs);
     EXPECT_EQ(1, DataWindowEquivalentLayer::TotWinEquivLayerConstructs);
-    EXPECT_TRUE(DataHeatBalance::Construct(1).TypeIsWindow);
-    EXPECT_TRUE(DataHeatBalance::Construct(1).WindowTypeEQL);
+    EXPECT_TRUE(dataConstruction.Construct(1).TypeIsWindow);
+    EXPECT_TRUE(dataConstruction.Construct(1).WindowTypeEQL);
     EXPECT_TRUE(ErrorsFound); // error found due to invalid layer
 }
 
@@ -1957,14 +1958,14 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     }
     // get equivalent layer window contruction index
     for (int ConstrPtr = 1; ConstrPtr <= DataHeatBalance::TotConstructs; ++ConstrPtr) {
-        if (DataHeatBalance::Construct(ConstrPtr).WindowTypeEQL) {
+        if (dataConstruction.Construct(ConstrPtr).WindowTypeEQL) {
             ConstrNum = ConstrPtr;
         }
     }
     // check VB slat angle control for FixedSlatAngle
     EXPECT_EQ(DataHeatBalance::Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscNONE);
 
-    EQLNum = DataHeatBalance::Construct(ConstrNum).EQLConsPtr;
+    EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
     // check number of solid layers
     EXPECT_EQ(CFS(EQLNum).NL, 3);
     // check optical and thermal property of the VB layer (Inside Layer)
@@ -1973,7 +1974,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLF, 0.90);
     EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLB, 0.90);
     // check inside face effective emissivity
-    EXPECT_NEAR(DataHeatBalance::Construct(ConstrNum).InsideAbsorpThermal, 0.91024, 0.00001);
+    EXPECT_NEAR(dataConstruction.Construct(ConstrNum).InsideAbsorpThermal, 0.91024, 0.00001);
     // for fixed slate angle the emissivity remains the same
     EXPECT_NEAR(EQLWindowInsideEffectiveEmiss(ConstrNum), 0.91024, 0.00001);
 }

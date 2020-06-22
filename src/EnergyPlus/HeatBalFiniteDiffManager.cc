@@ -54,10 +54,10 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -72,7 +72,6 @@
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -110,9 +109,7 @@ namespace HeatBalFiniteDiffManager {
     using DataEnvironment::IsRain;
     using DataEnvironment::SkyTemp;
     using DataHeatBalance::Air;
-    using DataHeatBalance::Construct;
     using DataHeatBalance::Material;
-    using DataHeatBalance::MaxLayersInConstruct;
     using DataHeatBalance::QRadThermInAbs;
     using DataHeatBalance::RegularMaterial;
     using DataHeatBalance::TotConstructs;
@@ -145,9 +142,6 @@ namespace HeatBalFiniteDiffManager {
     using DataSurfaces::Surface;
     using DataSurfaces::SurfaceClass_Window;
     using DataSurfaces::TotSurfaces;
-    using Psychrometrics::PsyHgAirFnWTdb;
-    using Psychrometrics::PsyRhFnTdbRhovLBnd0C;
-    using Psychrometrics::PsyWFnTdbRhPb;
     // Fan system Source/Sink heat value, and source/sink location temp from CondFD
     using DataHeatBalFanSys::QPVSysSource;
     using DataHeatBalFanSys::QRadSysSource;
@@ -540,7 +534,7 @@ namespace HeatBalFiniteDiffManager {
                 if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
                 if (Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
                 ConstrNum = Surface(SurfNum).Construction;
-                if (Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
+                if (dataConstruction.Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
                 SurfaceFD(SurfNum).T = TempInitValue;
                 SurfaceFD(SurfNum).TOld = TempInitValue;
                 SurfaceFD(SurfNum).TT = TempInitValue;
@@ -591,7 +585,7 @@ namespace HeatBalFiniteDiffManager {
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
             if (Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
             ConstrNum = Surface(SurfNum).Construction;
-            if (Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
+            if (dataConstruction.Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
             SurfaceFD(SurfNum).T = SurfaceFD(SurfNum).TOld;
             SurfaceFD(SurfNum).Rhov = SurfaceFD(SurfNum).RhovOld;
             SurfaceFD(SurfNum).TD = SurfaceFD(SurfNum).TDOld;
@@ -687,20 +681,20 @@ namespace HeatBalFiniteDiffManager {
 
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
             // Need to skip window constructions and eventually window materials
-            if (Construct(ConstrNum).TypeIsWindow) continue;
+            if (dataConstruction.Construct(ConstrNum).TypeIsWindow) continue;
 
-            ConstructFD(ConstrNum).Name.allocate(Construct(ConstrNum).TotLayers);
-            ConstructFD(ConstrNum).Thickness.allocate(Construct(ConstrNum).TotLayers);
-            ConstructFD(ConstrNum).NodeNumPoint.allocate(Construct(ConstrNum).TotLayers);
-            ConstructFD(ConstrNum).DelX.allocate(Construct(ConstrNum).TotLayers);
-            ConstructFD(ConstrNum).TempStability.allocate(Construct(ConstrNum).TotLayers);
-            ConstructFD(ConstrNum).MoistStability.allocate(Construct(ConstrNum).TotLayers);
+            ConstructFD(ConstrNum).Name.allocate(dataConstruction.Construct(ConstrNum).TotLayers);
+            ConstructFD(ConstrNum).Thickness.allocate(dataConstruction.Construct(ConstrNum).TotLayers);
+            ConstructFD(ConstrNum).NodeNumPoint.allocate(dataConstruction.Construct(ConstrNum).TotLayers);
+            ConstructFD(ConstrNum).DelX.allocate(dataConstruction.Construct(ConstrNum).TotLayers);
+            ConstructFD(ConstrNum).TempStability.allocate(dataConstruction.Construct(ConstrNum).TotLayers);
+            ConstructFD(ConstrNum).MoistStability.allocate(dataConstruction.Construct(ConstrNum).TotLayers);
 
             TotNodes = 0;
             SigmaR(ConstrNum) = 0.0;
             SigmaC(ConstrNum) = 0.0;
 
-            for (Layer = 1; Layer <= Construct(ConstrNum).TotLayers; ++Layer) { // Begin layer loop ...
+            for (Layer = 1; Layer <= dataConstruction.Construct(ConstrNum).TotLayers; ++Layer) { // Begin layer loop ...
 
                 // Loop through all of the layers in the current construct. The purpose
                 // of this loop is to define the thermal properties and to.
@@ -715,7 +709,7 @@ namespace HeatBalFiniteDiffManager {
                 //  Change to implicit formulation still uses explicit stability, but
                 // now there are special equations for R-only layers.
 
-                CurrentLayer = Construct(ConstrNum).LayerPoint(Layer);
+                CurrentLayer = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
 
                 ConstructFD(ConstrNum).Name(Layer) = Material(CurrentLayer).Name;
                 ConstructFD(ConstrNum).Thickness(Layer) = Material(CurrentLayer).Thickness;
@@ -763,10 +757,10 @@ namespace HeatBalFiniteDiffManager {
 
                     Alpha = kt / (Material(CurrentLayer).Density * Material(CurrentLayer).SpecHeat);
                     mAlpha = 0.0;
-                } else if (Construct(ConstrNum).TypeIsIRT || Construct(ConstrNum).TypeIsAirBoundaryIRTSurface) { // make similar to air? (that didn't seem to work well)
-                    ShowSevereError("InitHeatBalFiniteDiff: Construction =\"" + Construct(ConstrNum).Name +
+                } else if (dataConstruction.Construct(ConstrNum).TypeIsIRT || dataConstruction.Construct(ConstrNum).TypeIsAirBoundaryIRTSurface) { // make similar to air? (that didn't seem to work well)
+                    ShowSevereError("InitHeatBalFiniteDiff: Construction =\"" + dataConstruction.Construct(ConstrNum).Name +
                                     "\" uses Material:InfraredTransparent. Cannot be used currently with finite difference calculations.");
-                    if (Construct(ConstrNum).IsUsed) {
+                    if (dataConstruction.Construct(ConstrNum).IsUsed) {
                         ShowContinueError("...since this construction is used in a surface, the simulation is not allowed.");
                         ErrorsFound = true;
                     } else {
@@ -853,7 +847,7 @@ namespace HeatBalFiniteDiffManager {
                 ConstructFD(ConstrNum).NodeXlocation.allocate(ConstructFD(ConstrNum).TotNodes + 1);
                 ConstructFD(ConstrNum).NodeXlocation = 0.0; // init them all
                 Ipts1 = 0;                                  // init counter
-                for (Layer = 1; Layer <= Construct(ConstrNum).TotLayers; ++Layer) {
+                for (Layer = 1; Layer <= dataConstruction.Construct(ConstrNum).TotLayers; ++Layer) {
                     OutwardMatLayerNum = Layer - 1;
                     for (LayerNode = 1; LayerNode <= ConstructFD(ConstrNum).NodeNumPoint(Layer); ++LayerNode) {
                         ++Ipts1;
@@ -861,7 +855,7 @@ namespace HeatBalFiniteDiffManager {
                             ConstructFD(ConstrNum).NodeXlocation(Ipts1) = 0.0; // first node is on outside face
 
                         } else if (LayerNode == 1) {
-                            if (OutwardMatLayerNum > 0 && OutwardMatLayerNum <= Construct(ConstrNum).TotLayers) {
+                            if (OutwardMatLayerNum > 0 && OutwardMatLayerNum <= dataConstruction.Construct(ConstrNum).TotLayers) {
                                 // later nodes are Delx away from previous, but use Delx from previous layer
                                 ConstructFD(ConstrNum).NodeXlocation(Ipts1) =
                                     ConstructFD(ConstrNum).NodeXlocation(Ipts1 - 1) + ConstructFD(ConstrNum).DelX(OutwardMatLayerNum);
@@ -873,7 +867,7 @@ namespace HeatBalFiniteDiffManager {
                         }
                     }
                 }
-                Layer = Construct(ConstrNum).TotLayers;
+                Layer = dataConstruction.Construct(ConstrNum).TotLayers;
                 ++Ipts1;
                 ConstructFD(ConstrNum).NodeXlocation(Ipts1) = ConstructFD(ConstrNum).NodeXlocation(Ipts1 - 1) + ConstructFD(ConstrNum).DelX(Layer);
             }
@@ -1059,7 +1053,7 @@ namespace HeatBalFiniteDiffManager {
         int const ConstrNum(Surface(Surf).Construction);
 
         int const TotNodes(ConstructFD(ConstrNum).TotNodes);
-        int const TotLayers(Construct(ConstrNum).TotLayers);
+        int const TotLayers(dataConstruction.Construct(ConstrNum).TotLayers);
 
         TempSurfInTmp = 0.0;
         TempSurfOutTmp = 0.0;
@@ -1259,20 +1253,20 @@ namespace HeatBalFiniteDiffManager {
 
             for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
 
-                if (Construct(ThisNum).TypeIsWindow) continue;
-                if (Construct(ThisNum).TypeIsIRT) continue;
-                if (Construct(ThisNum).TypeIsAirBoundaryIRTSurface) continue;
+                if (dataConstruction.Construct(ThisNum).TypeIsWindow) continue;
+                if (dataConstruction.Construct(ThisNum).TypeIsIRT) continue;
+                if (dataConstruction.Construct(ThisNum).TypeIsAirBoundaryIRTSurface) continue;
 
                 static constexpr auto Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
                 print(outputFiles.eio,
                       Format_700,
-                      Construct(ThisNum).Name,
+                      dataConstruction.Construct(ThisNum).Name,
                       ThisNum,
-                      Construct(ThisNum).TotLayers,
+                      dataConstruction.Construct(ThisNum).TotLayers,
                       int(ConstructFD(ThisNum).TotNodes + 1),
                       ConstructFD(ThisNum).DeltaTime / SecInHour);
 
-                for (Layer = 1; Layer <= Construct(ThisNum).TotLayers; ++Layer) {
+                for (Layer = 1; Layer <= dataConstruction.Construct(ThisNum).TotLayers; ++Layer) {
                     static constexpr auto Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");
                     print(outputFiles.eio,
                           Format_701,
@@ -1287,7 +1281,7 @@ namespace HeatBalFiniteDiffManager {
                 // now list each CondFD Node with its X distance from outside face in m along with other identifiers
                 Inodes = 0;
 
-                for (Layer = 1; Layer <= Construct(ThisNum).TotLayers; ++Layer) {
+                for (Layer = 1; Layer <= dataConstruction.Construct(ThisNum).TotLayers; ++Layer) {
                     OutwardMatLayerNum = Layer - 1;
                     for (LayerNode = 1; LayerNode <= ConstructFD(ThisNum).NodeNumPoint(Layer); ++LayerNode) {
                         ++Inodes;
@@ -1296,18 +1290,18 @@ namespace HeatBalFiniteDiffManager {
                                   Format_702,
                                   format("Node #{}", Inodes),
                                   ConstructFD(ThisNum).NodeXlocation(Inodes),
-                                  Construct(ThisNum).Name,
+                                  dataConstruction.Construct(ThisNum).Name,
                                   "Surface Outside Face",
                                   ConstructFD(ThisNum).Name(Layer));
 
                         } else if (LayerNode == 1) {
 
-                            if (OutwardMatLayerNum > 0 && OutwardMatLayerNum <= Construct(ThisNum).TotLayers) {
+                            if (OutwardMatLayerNum > 0 && OutwardMatLayerNum <= dataConstruction.Construct(ThisNum).TotLayers) {
                                 print(outputFiles.eio,
                                       Format_702,
                                       format("Node #{}", Inodes),
                                       ConstructFD(ThisNum).NodeXlocation(Inodes),
-                                      Construct(ThisNum).Name,
+                                      dataConstruction.Construct(ThisNum).Name,
                                       ConstructFD(ThisNum).Name(OutwardMatLayerNum),
                                       ConstructFD(ThisNum).Name(Layer));
                             }
@@ -1317,20 +1311,20 @@ namespace HeatBalFiniteDiffManager {
                                   Format_702,
                                   format("Node #{}", Inodes),
                                   ConstructFD(ThisNum).NodeXlocation(Inodes),
-                                  Construct(ThisNum).Name,
+                                  dataConstruction.Construct(ThisNum).Name,
                                   ConstructFD(ThisNum).Name(OutwardMatLayerNum),
                                   ConstructFD(ThisNum).Name(Layer));
                         }
                     }
                 }
 
-                Layer = Construct(ThisNum).TotLayers;
+                Layer = dataConstruction.Construct(ThisNum).TotLayers;
                 ++Inodes;
                 print(outputFiles.eio,
                       Format_702,
                       format("Node #{}", Inodes),
                       ConstructFD(ThisNum).NodeXlocation(Inodes),
-                      Construct(ThisNum).Name,
+                      dataConstruction.Construct(ThisNum).Name,
                       ConstructFD(ThisNum).Name(Layer),
                       "Surface Inside Face");
             }
@@ -1457,7 +1451,7 @@ namespace HeatBalFiniteDiffManager {
             // switch around arguments for the other surf and call routines as for interior side BC from opposite face
 
             int const ext_bound_construction(Surface(surface_ExtBoundCond).Construction);
-            int const LayIn(Construct(ext_bound_construction).TotLayers);       // layer number for call to interior eqs
+            int const LayIn(dataConstruction.Construct(ext_bound_construction).TotLayers);       // layer number for call to interior eqs
             int const NodeIn(ConstructFD(ext_bound_construction).TotNodes + 1); // node number "I" for call to interior eqs
             int const TotNodesPlusOne(TotNodes + 1);
             if (surface_ExtBoundCond == Surf) { // adiabatic surface, PT added since it is not the same as interzone wall
@@ -1534,7 +1528,7 @@ namespace HeatBalFiniteDiffManager {
             if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD) {
 
                 int const ConstrNum(surface.Construction);
-                int const MatLay(Construct(ConstrNum).LayerPoint(Lay));
+                int const MatLay(dataConstruction.Construct(ConstrNum).LayerPoint(Lay));
                 auto const &mat(Material(MatLay));
                 auto const &matFD(MaterialFD(MatLay));
 
@@ -1690,7 +1684,7 @@ namespace HeatBalFiniteDiffManager {
 
         int const ConstrNum(Surface(Surf).Construction);
 
-        int const MatLay(Construct(ConstrNum).LayerPoint(Lay));
+        int const MatLay(dataConstruction.Construct(ConstrNum).LayerPoint(Lay));
         auto const &mat(Material(MatLay));
         auto const &matFD(MaterialFD(MatLay));
 
@@ -1795,7 +1789,7 @@ namespace HeatBalFiniteDiffManager {
         if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD) { // HT Algo issue
 
             int const ConstrNum(surface.Construction);
-            auto const &construct(Construct(ConstrNum));
+            auto const &construct(dataConstruction.Construct(ConstrNum));
 
             int const MatLay(construct.LayerPoint(Lay));
             auto const &mat(Material(MatLay));
@@ -2123,7 +2117,7 @@ namespace HeatBalFiniteDiffManager {
         Real64 const QFac(NetLWRadToSurfFD + QHtRadSysSurfFD + QHWBaseboardSurfFD + QSteamBaseboardSurfFD + QElecBaseboardSurfFD + QRadSWInFD +
                           QRadThermInFD + QCoolingPanelSurfFD);
         if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD) {
-            int const MatLay(Construct(ConstrNum).LayerPoint(Lay));
+            int const MatLay(dataConstruction.Construct(ConstrNum).LayerPoint(Lay));
             auto const &mat(Material(MatLay));
             auto const &matFD(MaterialFD(MatLay));
 

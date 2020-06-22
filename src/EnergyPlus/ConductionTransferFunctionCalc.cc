@@ -53,14 +53,13 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/ConductionTransferFunctionCalc.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataConversions.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -105,7 +104,6 @@ namespace ConductionTransferFunctionCalc {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataHeatBalance; // This is the Heat balance super block data-only module
 
@@ -256,7 +254,7 @@ namespace ConductionTransferFunctionCalc {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_int AdjacentResLayerNum(MaxLayersInConstruct); // Layers that are adjacent to each other which are resistive
+        Array1D_int AdjacentResLayerNum(Construction::MaxLayersInConstruct); // Layers that are adjacent to each other which are resistive
         // only can and should be combined
         int AdjLayer;                             // Loop counter for adjacent resistance-only layers
         Real64 amatx;                             // Intermediate calculation variable
@@ -268,13 +266,13 @@ namespace ConductionTransferFunctionCalc {
         Real64 cnd;                               // Total thermal conductance (1/Rtot) of the bldg element
         int Constr;                               // Loop counter
         int ConstrNum;                            // Loop counter (construct number)
-        Array1D<Real64> cp(MaxLayersInConstruct); // Specific heat of a material layer
+        Array1D<Real64> cp(Construction::MaxLayersInConstruct); // Specific heat of a material layer
         bool CTFConvrg;                           // Set after CTFs are calculated, based on whether there are too
         // many CTF terms
         int CurrentLayer;                         // Pointer to material number in Material derived type (current layer)
-        Array1D<Real64> dl(MaxLayersInConstruct); // Thickness of a material layer
+        Array1D<Real64> dl(Construction::MaxLayersInConstruct); // Thickness of a material layer
         Real64 dtn;                               // Intermediate calculation of the time step
-        Array1D<Real64> dx(MaxLayersInConstruct); // Distance between nodes in a particular material layer
+        Array1D<Real64> dx(Construction::MaxLayersInConstruct); // Distance between nodes in a particular material layer
         Real64 dxn;                               // Intermediate calculation of nodal spacing
         Real64 dxtmp;                             // Intermediate calculation variable ( = 1/dx/cap)
         Real64 dyn;                               // Nodal spacing in the direction perpendicular to the main direction
@@ -287,21 +285,21 @@ namespace ConductionTransferFunctionCalc {
         int Layer1;                     // Loop counter
         int LayersInConstruct;          // Array containing the number of layers for each construct
         // Different from TotLayers because shades are not include in local var
-        Array1D<Real64> lr(MaxLayersInConstruct); // R value of a material layer
+        Array1D<Real64> lr(Construction::MaxLayersInConstruct); // R value of a material layer
         int Node;                                 // Loop counter
         int Node2;                                // Node number (modification of Node and NodeInRow)
         int NodeInLayer;                          // Loop counter
         int NodeInRow;                            // Loop counter
-        Array1D_int Nodes(MaxLayersInConstruct);  // Array containing the number of nodes per layer
+        Array1D_int Nodes(Construction::MaxLayersInConstruct);  // Array containing the number of nodes per layer
         int NumResLayers;                         // Number of resistive layers in the construction
         // property allowable, traditional value from BLAST
         int NumAdjResLayers;                         // Number of resistive layers that are adjacent
         int OppositeLayer;                           // Used for comparing constructions (to see if one is the reverse of another)
-        Array1D_bool ResLayer(MaxLayersInConstruct); // Set true if the layer must be handled as a resistive
+        Array1D_bool ResLayer(Construction::MaxLayersInConstruct); // Set true if the layer must be handled as a resistive
         bool RevConst;                               // Set true if one construct is the reverse of another (CTFs already
         // available)
-        Array1D<Real64> rho(MaxLayersInConstruct); // Density of a material layer
-        Array1D<Real64> rk(MaxLayersInConstruct);  // Thermal conductivity of a material layer
+        Array1D<Real64> rho(Construction::MaxLayersInConstruct); // Density of a material layer
+        Array1D<Real64> rk(Construction::MaxLayersInConstruct);  // Thermal conductivity of a material layer
         Real64 rs;                                 // Total thermal resistance of the building element
         Real64 SumXi;                              // Summation of all of the Xi terms (inside CTFs) for a construction
         Real64 SumYi;                              // Summation of all of the Xi terms (cross CTFs) for a construction
@@ -318,44 +316,44 @@ namespace ConductionTransferFunctionCalc {
 
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) { // Begin construction loop ...
 
-            Construct(ConstrNum).CTFCross = 0.0;
-            Construct(ConstrNum).CTFFlux = 0.0;
-            Construct(ConstrNum).CTFInside = 0.0;
-            Construct(ConstrNum).CTFOutside = 0.0;
-            Construct(ConstrNum).CTFSourceIn = 0.0;
-            Construct(ConstrNum).CTFSourceOut = 0.0;
-            Construct(ConstrNum).CTFTimeStep = 0.0;
-            Construct(ConstrNum).CTFTSourceOut = 0.0;
-            Construct(ConstrNum).CTFTSourceIn = 0.0;
-            Construct(ConstrNum).CTFTSourceQ = 0.0;
-            Construct(ConstrNum).CTFTUserOut = 0.0;
-            Construct(ConstrNum).CTFTUserIn = 0.0;
-            Construct(ConstrNum).CTFTUserSource = 0.0;
-            Construct(ConstrNum).NumHistories = 0;
-            Construct(ConstrNum).NumCTFTerms = 0;
-            Construct(ConstrNum).UValue = 0.0;
+            dataConstruction.Construct(ConstrNum).CTFCross = 0.0;
+            dataConstruction.Construct(ConstrNum).CTFFlux = 0.0;
+            dataConstruction.Construct(ConstrNum).CTFInside = 0.0;
+            dataConstruction.Construct(ConstrNum).CTFOutside = 0.0;
+            dataConstruction.Construct(ConstrNum).CTFSourceIn = 0.0;
+            dataConstruction.Construct(ConstrNum).CTFSourceOut = 0.0;
+            dataConstruction.Construct(ConstrNum).CTFTimeStep = 0.0;
+            dataConstruction.Construct(ConstrNum).CTFTSourceOut = 0.0;
+            dataConstruction.Construct(ConstrNum).CTFTSourceIn = 0.0;
+            dataConstruction.Construct(ConstrNum).CTFTSourceQ = 0.0;
+            dataConstruction.Construct(ConstrNum).CTFTUserOut = 0.0;
+            dataConstruction.Construct(ConstrNum).CTFTUserIn = 0.0;
+            dataConstruction.Construct(ConstrNum).CTFTUserSource = 0.0;
+            dataConstruction.Construct(ConstrNum).NumHistories = 0;
+            dataConstruction.Construct(ConstrNum).NumCTFTerms = 0;
+            dataConstruction.Construct(ConstrNum).UValue = 0.0;
 
             AdjacentResLayerNum = 0; // Zero this out for each construct
 
-            if (!Construct(ConstrNum).IsUsedCTF) {
+            if (!dataConstruction.Construct(ConstrNum).IsUsedCTF) {
                 continue;
             }
 
             // Initialize construct parameters
 
-            Construct(ConstrNum).CTFTimeStep = TimeStepZone;
+            dataConstruction.Construct(ConstrNum).CTFTimeStep = TimeStepZone;
             rs = 0.0;
             LayersInConstruct = 0;
             NumResLayers = 0;
             ResLayer = false;
 
-            for (Layer = 1; Layer <= Construct(ConstrNum).TotLayers; ++Layer) { // Begin layer loop ...
+            for (Layer = 1; Layer <= dataConstruction.Construct(ConstrNum).TotLayers; ++Layer) { // Begin layer loop ...
 
                 // Loop through all of the layers in the current construct. The purpose
                 // of this loop is to define the thermal properties necessary to
                 // calculate the CTFs.
 
-                CurrentLayer = Construct(ConstrNum).LayerPoint(Layer);
+                CurrentLayer = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
 
                 ++LayersInConstruct;
 
@@ -367,7 +365,7 @@ namespace ConductionTransferFunctionCalc {
                 cp(Layer) = Material(CurrentLayer).SpecHeat; // Must convert
                 // from kJ/kg-K to J/kg-k due to rk units
 
-                if (Construct(ConstrNum).SourceSinkPresent && !Material(CurrentLayer).WarnedForHighDiffusivity) {
+                if (dataConstruction.Construct(ConstrNum).SourceSinkPresent && !Material(CurrentLayer).WarnedForHighDiffusivity) {
                     // check for materials that are too conductive or thin
                     if ((rho(Layer) * cp(Layer)) > 0.0) {
                         Alpha = rk(Layer) / (rho(Layer) * cp(Layer));
@@ -448,7 +446,7 @@ namespace ConductionTransferFunctionCalc {
                         // then use the "exact" approach to model a massless layer
                         // based on the node equations for the state space method.
 
-                        if ((Layer == 1) || (Layer == Construct(ConstrNum).TotLayers) || (!Material(Construct(ConstrNum).LayerPoint(Layer)).ROnly)) {
+                        if ((Layer == 1) || (Layer == dataConstruction.Construct(ConstrNum).TotLayers) || (!Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).ROnly)) {
                             cp(Layer) = 1.007;
                             rho(Layer) = 1.1614;
                             rk(Layer) = 0.0263;
@@ -513,12 +511,12 @@ namespace ConductionTransferFunctionCalc {
                         // Now reduce the number of layers in construct since merger is complete
                         --LayersInConstruct;
                         // Also adjust layers with source/sinks if two layers are merged
-                        if (Construct(ConstrNum).SourceSinkPresent) {
-                            --Construct(ConstrNum).SourceAfterLayer;
-                            --Construct(ConstrNum).TempAfterLayer;
+                        if (dataConstruction.Construct(ConstrNum).SourceSinkPresent) {
+                            --dataConstruction.Construct(ConstrNum).SourceAfterLayer;
+                            --dataConstruction.Construct(ConstrNum).TempAfterLayer;
                         }
                     } else { // These are not adjacent layers and there is a logic flaw here (should not happen)
-                        ShowFatalError("Combining resistance layers failed for " + Construct(ConstrNum).Name);
+                        ShowFatalError("Combining resistance layers failed for " + dataConstruction.Construct(ConstrNum).Name);
                         ShowContinueError("This should never happen.  Contact EnergyPlus Support for further assistance.");
                     }
                 }
@@ -539,10 +537,10 @@ namespace ConductionTransferFunctionCalc {
 
             } // ... end of layer loop for units conversion.
 
-            if (Construct(ConstrNum).SolutionDimensions == 1) {
+            if (dataConstruction.Construct(ConstrNum).SolutionDimensions == 1) {
                 dyn = 0.0;
             } else {
-                dyn = (Construct(ConstrNum).ThicknessPerpend / CFL) / double(NumOfPerpendNodes - 1);
+                dyn = (dataConstruction.Construct(ConstrNum).ThicknessPerpend / CFL) / double(NumOfPerpendNodes - 1);
             }
 
             // Compute total construct conductivity and resistivity.
@@ -569,21 +567,21 @@ namespace ConductionTransferFunctionCalc {
                     // If a source or sink is present in this construction, do not allow any
                     // checks for reversed constructions, i.e., always force EnergyPlus to
                     // calculate CTF/QTFs.  So, don't even check for reversed constructions.
-                    if (Construct(ConstrNum).SourceSinkPresent) break; // Constr DO loop
+                    if (dataConstruction.Construct(ConstrNum).SourceSinkPresent) break; // Constr DO loop
 
-                    if (Construct(ConstrNum).TotLayers == Construct(Constr).TotLayers) { // Same number of layers--now | check for reversed construct.
+                    if (dataConstruction.Construct(ConstrNum).TotLayers == dataConstruction.Construct(Constr).TotLayers) { // Same number of layers--now | check for reversed construct.
 
                         RevConst = true;
 
-                        for (Layer = 1; Layer <= Construct(ConstrNum).TotLayers; ++Layer) { // Begin layers loop ...
+                        for (Layer = 1; Layer <= dataConstruction.Construct(ConstrNum).TotLayers; ++Layer) { // Begin layers loop ...
 
                             // RevConst is set to FALSE anytime a mismatch in materials is found.
                             // This will exit this DO immediately and go on to the next construct
                             // (if any remain).
 
-                            OppositeLayer = Construct(ConstrNum).TotLayers - Layer + 1;
+                            OppositeLayer = dataConstruction.Construct(ConstrNum).TotLayers - Layer + 1;
 
-                            if (Construct(ConstrNum).LayerPoint(Layer) != Construct(Constr).LayerPoint(OppositeLayer)) {
+                            if (dataConstruction.Construct(ConstrNum).LayerPoint(Layer) != dataConstruction.Construct(Constr).LayerPoint(OppositeLayer)) {
 
                                 RevConst = false;
                                 break; // Layer DO loop
@@ -593,7 +591,7 @@ namespace ConductionTransferFunctionCalc {
 
                         // If the reverse construction isn't used by any surfaces then the CTFs
                         // still need to be defined.
-                        if (RevConst && !Construct(Constr).IsUsedCTF) {
+                        if (RevConst && !dataConstruction.Construct(Constr).IsUsedCTF) {
                             RevConst = false;
                         }
 
@@ -602,18 +600,18 @@ namespace ConductionTransferFunctionCalc {
                             // calculated.  Copy CTF info for construction Constr to
                             // construction ConstrNum.
 
-                            Construct(ConstrNum).CTFTimeStep = Construct(Constr).CTFTimeStep;
-                            Construct(ConstrNum).NumHistories = Construct(Constr).NumHistories;
-                            Construct(ConstrNum).NumCTFTerms = Construct(Constr).NumCTFTerms;
+                            dataConstruction.Construct(ConstrNum).CTFTimeStep = dataConstruction.Construct(Constr).CTFTimeStep;
+                            dataConstruction.Construct(ConstrNum).NumHistories = dataConstruction.Construct(Constr).NumHistories;
+                            dataConstruction.Construct(ConstrNum).NumCTFTerms = dataConstruction.Construct(Constr).NumCTFTerms;
 
                             // Transfer the temperature and flux history terms to CTF arrays.
                             // Loop through the number of CTF history terms ...
-                            for (HistTerm = 0; HistTerm <= Construct(ConstrNum).NumCTFTerms; ++HistTerm) {
+                            for (HistTerm = 0; HistTerm <= dataConstruction.Construct(ConstrNum).NumCTFTerms; ++HistTerm) {
 
-                                Construct(ConstrNum).CTFInside(HistTerm) = Construct(Constr).CTFOutside(HistTerm);
-                                Construct(ConstrNum).CTFCross(HistTerm) = Construct(Constr).CTFCross(HistTerm);
-                                Construct(ConstrNum).CTFOutside(HistTerm) = Construct(Constr).CTFInside(HistTerm);
-                                if (HistTerm != 0) Construct(ConstrNum).CTFFlux(HistTerm) = Construct(Constr).CTFFlux(HistTerm);
+                                dataConstruction.Construct(ConstrNum).CTFInside(HistTerm) = dataConstruction.Construct(Constr).CTFOutside(HistTerm);
+                                dataConstruction.Construct(ConstrNum).CTFCross(HistTerm) = dataConstruction.Construct(Constr).CTFCross(HistTerm);
+                                dataConstruction.Construct(ConstrNum).CTFOutside(HistTerm) = dataConstruction.Construct(Constr).CTFInside(HistTerm);
+                                if (HistTerm != 0) dataConstruction.Construct(ConstrNum).CTFFlux(HistTerm) = dataConstruction.Construct(Constr).CTFFlux(HistTerm);
 
                             } // ... end of CTF history terms loop.
 
@@ -644,23 +642,23 @@ namespace ConductionTransferFunctionCalc {
                             Nodes(Layer) = 1;
                             dx(Layer) = dl(Layer);
                         } else {
-                            dxn = std::sqrt(2.0 * (rk(Layer) / rho(Layer) / cp(Layer)) * Construct(ConstrNum).CTFTimeStep);
+                            dxn = std::sqrt(2.0 * (rk(Layer) / rho(Layer) / cp(Layer)) * dataConstruction.Construct(ConstrNum).CTFTimeStep);
 
                             ipts1 = int(dl(Layer) / dxn); // number of nodes=thickness/spacing
 
                             // Limit the upper and lower bounds of the number of
                             // nodes to MaxCTFTerms and MinNodes respectively.
 
-                            if (ipts1 > MaxCTFTerms) { // Too many nodes
-                                Nodes(Layer) = MaxCTFTerms;
+                            if (ipts1 > Construction::MaxCTFTerms) { // Too many nodes
+                                Nodes(Layer) = Construction::MaxCTFTerms;
                             } else if (ipts1 < MinNodes) { // Too few nodes
                                 Nodes(Layer) = MinNodes;
                             } else { // Calculated number of nodes ok
                                 Nodes(Layer) = ipts1;
                             }
 
-                            if (Construct(ConstrNum).SolutionDimensions > 1) {
-                                if (ipts1 > MaxCTFTerms / 2) ipts1 = MaxCTFTerms / 2;
+                            if (dataConstruction.Construct(ConstrNum).SolutionDimensions > 1) {
+                                if (ipts1 > Construction::MaxCTFTerms / 2) ipts1 = Construction::MaxCTFTerms / 2;
                             }
 
                             dx(Layer) = dl(Layer) / double(Nodes(Layer)); // calc node spacing
@@ -680,7 +678,7 @@ namespace ConductionTransferFunctionCalc {
                     // layer-leaving one less node total for all layers.
 
                     --rcmax;
-                    if (Construct(ConstrNum).SolutionDimensions > 1) rcmax *= NumOfPerpendNodes;
+                    if (dataConstruction.Construct(ConstrNum).SolutionDimensions > 1) rcmax *= NumOfPerpendNodes;
 
                     // This section no longer needed as rcmax/number of total nodes is allowed to float.
                     // If reinstated, this node reduction section would have to be modified to account for
@@ -717,18 +715,18 @@ namespace ConductionTransferFunctionCalc {
                     // calculation has been requested.
                     NodeSource = 0;
                     NodeUserTemp = 0;
-                    if (Construct(ConstrNum).SourceSinkPresent) {
+                    if (dataConstruction.Construct(ConstrNum).SourceSinkPresent) {
 
-                        for (Layer = 1; Layer <= Construct(ConstrNum).SourceAfterLayer; ++Layer) {
+                        for (Layer = 1; Layer <= dataConstruction.Construct(ConstrNum).SourceAfterLayer; ++Layer) {
                             NodeSource += Nodes(Layer);
                         }
-                        if ((NodeSource > 0) && (Construct(ConstrNum).SolutionDimensions > 1))
+                        if ((NodeSource > 0) && (dataConstruction.Construct(ConstrNum).SolutionDimensions > 1))
                             NodeSource = ((NodeSource - 1) * NumOfPerpendNodes) + 1;
 
-                        for (Layer = 1; Layer <= Construct(ConstrNum).TempAfterLayer; ++Layer) {
+                        for (Layer = 1; Layer <= dataConstruction.Construct(ConstrNum).TempAfterLayer; ++Layer) {
                             NodeUserTemp += Nodes(Layer);
                         }
-                        if ((NodeUserTemp > 0) && (Construct(ConstrNum).SolutionDimensions > 1))
+                        if ((NodeUserTemp > 0) && (dataConstruction.Construct(ConstrNum).SolutionDimensions > 1))
                             NodeUserTemp = ((NodeUserTemp - 1) * NumOfPerpendNodes) + 1;
                     }
 
@@ -742,15 +740,15 @@ namespace ConductionTransferFunctionCalc {
                     // (see later code in this routine).
 
                     dtn = 0.0;
-                    Construct(ConstrNum).CTFTimeStep = 0.0;
+                    dataConstruction.Construct(ConstrNum).CTFTimeStep = 0.0;
                     for (Layer = 1; Layer <= LayersInConstruct; ++Layer) {
-                        if (Nodes(Layer) >= MaxCTFTerms) {
-                            if (Construct(ConstrNum).SolutionDimensions == 1) {
+                        if (Nodes(Layer) >= Construction::MaxCTFTerms) {
+                            if (dataConstruction.Construct(ConstrNum).SolutionDimensions == 1) {
                                 dtn = rho(Layer) * cp(Layer) * pow_2(dx(Layer)) / rk(Layer);
                             } else { // 2-D solution requested-->this changes length parameter in Fourier number calculation
                                 dtn = rho(Layer) * cp(Layer) * (pow_2(dx(Layer)) + pow_2(dyn)) / rk(Layer);
                             }
-                            if (dtn > Construct(ConstrNum).CTFTimeStep) Construct(ConstrNum).CTFTimeStep = dtn;
+                            if (dtn > dataConstruction.Construct(ConstrNum).CTFTimeStep) dataConstruction.Construct(ConstrNum).CTFTimeStep = dtn;
                         }
                     }
 
@@ -758,20 +756,20 @@ namespace ConductionTransferFunctionCalc {
                     // calculated time step for this construct, then CTFTimeStep must be
                     // revised.
 
-                    if (std::abs((TimeStepZone - Construct(ConstrNum).CTFTimeStep) / TimeStepZone) > 0.1) {
+                    if (std::abs((TimeStepZone - dataConstruction.Construct(ConstrNum).CTFTimeStep) / TimeStepZone) > 0.1) {
 
-                        if (Construct(ConstrNum).CTFTimeStep > TimeStepZone) {
+                        if (dataConstruction.Construct(ConstrNum).CTFTimeStep > TimeStepZone) {
 
                             // CTFTimeStep larger than TimeStepZone:  Make sure TimeStepZone
                             // divides evenly into CTFTimeStep
-                            Construct(ConstrNum).NumHistories = int((Construct(ConstrNum).CTFTimeStep / TimeStepZone) + 0.5);
-                            Construct(ConstrNum).CTFTimeStep = TimeStepZone * double(Construct(ConstrNum).NumHistories);
+                            dataConstruction.Construct(ConstrNum).NumHistories = int((dataConstruction.Construct(ConstrNum).CTFTimeStep / TimeStepZone) + 0.5);
+                            dataConstruction.Construct(ConstrNum).CTFTimeStep = TimeStepZone * double(dataConstruction.Construct(ConstrNum).NumHistories);
 
                         } else {
 
                             // CTFTimeStep smaller than TimeStepZone:  Set to TimeStepZone
-                            Construct(ConstrNum).CTFTimeStep = TimeStepZone;
-                            Construct(ConstrNum).NumHistories = 1;
+                            dataConstruction.Construct(ConstrNum).CTFTimeStep = TimeStepZone;
+                            dataConstruction.Construct(ConstrNum).NumHistories = 1;
                         }
                     }
 
@@ -814,7 +812,7 @@ namespace ConductionTransferFunctionCalc {
 
                         BMat(3) = 0.0;
 
-                        if (Construct(ConstrNum).SolutionDimensions == 1) {
+                        if (dataConstruction.Construct(ConstrNum).SolutionDimensions == 1) {
 
                             // Set up intermediate calculations for the first layer.
                             cap = rho(1) * cp(1) * dx(1);
@@ -1031,20 +1029,20 @@ namespace ConductionTransferFunctionCalc {
                         // determine the CTFs.  The Gammas are an intermediate
                         // calculations which are necessary before the CTFs can
                         // be computed in TransFuncCoeffs.
-                        DisplayNumberAndString(ConstrNum, "Calculating CTFs for \"" + Construct(ConstrNum).Name + "\", Construction #");
+                        DisplayNumberAndString(ConstrNum, "Calculating CTFs for \"" + dataConstruction.Construct(ConstrNum).Name + "\", Construction #");
 
                         //          CALL DisplayNumberAndString(ConstrNum,'Matrix exponential for Construction #')
-                        CalculateExponentialMatrix(Construct(ConstrNum).CTFTimeStep); // Compute exponential of AMat
+                        CalculateExponentialMatrix(dataConstruction.Construct(ConstrNum).CTFTimeStep); // Compute exponential of AMat
 
                         //          CALL DisplayNumberAndString(ConstrNum,'Invert Matrix for Construction #')
                         CalculateInverseMatrix(); // Compute inverse of AMat
 
                         //          CALL DisplayNumberAndString(ConstrNum,'Gamma calculation for Construction #')
-                        CalculateGammas(Construct(ConstrNum).CTFTimeStep, Construct(ConstrNum).SolutionDimensions);
+                        CalculateGammas(dataConstruction.Construct(ConstrNum).CTFTimeStep, dataConstruction.Construct(ConstrNum).SolutionDimensions);
                         // Compute "gamma"s from AMat, AExp, and AInv
 
                         //          CALL DisplayNumberAndString(ConstrNum,'Compute CTFs for Construction #')
-                        CalculateCTFs(Construct(ConstrNum).NumCTFTerms, Construct(ConstrNum).SolutionDimensions); // Compute CTFs
+                        CalculateCTFs(dataConstruction.Construct(ConstrNum).NumCTFTerms, dataConstruction.Construct(ConstrNum).SolutionDimensions); // Compute CTFs
 
                         // Now check to see if the number of transfer functions
                         // is greater than MaxCTFTerms.  If it is, then increase the
@@ -1058,9 +1056,9 @@ namespace ConductionTransferFunctionCalc {
                         // If too many terms, then solution did not converge.  Increase the
                         // number of histories and the time step.  Reset CTFConvrg to continue
                         // the DO loop.
-                        if (Construct(ConstrNum).NumCTFTerms > (MaxCTFTerms - 1)) {
-                            ++Construct(ConstrNum).NumHistories;
-                            Construct(ConstrNum).CTFTimeStep += TimeStepZone;
+                        if (dataConstruction.Construct(ConstrNum).NumCTFTerms > (Construction::MaxCTFTerms - 1)) {
+                            ++dataConstruction.Construct(ConstrNum).NumHistories;
+                            dataConstruction.Construct(ConstrNum).CTFTimeStep += TimeStepZone;
                             CTFConvrg = false;
                         }
 
@@ -1072,7 +1070,7 @@ namespace ConductionTransferFunctionCalc {
                             SumXi = s0(2, 2);
                             SumYi = s0(1, 2);
                             SumZi = s0(1, 1);
-                            for (HistTerm = 1; HistTerm <= Construct(ConstrNum).NumCTFTerms; ++HistTerm) {
+                            for (HistTerm = 1; HistTerm <= dataConstruction.Construct(ConstrNum).NumCTFTerms; ++HistTerm) {
                                 SumXi += s(2, 2, HistTerm);
                                 SumYi += s(1, 2, HistTerm);
                                 SumZi += s(1, 1, HistTerm);
@@ -1084,12 +1082,12 @@ namespace ConductionTransferFunctionCalc {
                             if (BiggestSum > 0.0) {
                                 if (((std::abs(SumXi - SumYi) / BiggestSum) > MaxAllowedCTFSumError) ||
                                     ((std::abs(SumZi - SumYi) / BiggestSum) > MaxAllowedCTFSumError)) {
-                                    ++Construct(ConstrNum).NumHistories;
-                                    Construct(ConstrNum).CTFTimeStep += TimeStepZone;
+                                    ++dataConstruction.Construct(ConstrNum).NumHistories;
+                                    dataConstruction.Construct(ConstrNum).CTFTimeStep += TimeStepZone;
                                     CTFConvrg = false;
                                 }
                             } else { // Something terribly wrong--the surface has no CTFs, not even an R-value
-                                ShowFatalError("Illegal construction definition, no CTFs calculated for " + Construct(ConstrNum).Name);
+                                ShowFatalError("Illegal construction definition, no CTFs calculated for " + dataConstruction.Construct(ConstrNum).Name);
                             }
                         }
 
@@ -1098,15 +1096,15 @@ namespace ConductionTransferFunctionCalc {
                         // be extremely rare since other checks should flag most bad user input.
                         // Thus, if the time step reaches a certain point, error out and let the
                         // user know that something needs to be checked in the input file.
-                        if (Construct(ConstrNum).CTFTimeStep >= MaxAllowedTimeStep) {
-                            ShowSevereError("CTF calculation convergence problem for Construction=\"" + Construct(ConstrNum).Name + "\".");
+                        if (dataConstruction.Construct(ConstrNum).CTFTimeStep >= MaxAllowedTimeStep) {
+                            ShowSevereError("CTF calculation convergence problem for Construction=\"" + dataConstruction.Construct(ConstrNum).Name + "\".");
                             ShowContinueError("...with Materials (outside layer to inside)");
-                            ShowContinueError("(outside)=\"" + Material(Construct(ConstrNum).LayerPoint(1)).Name + "\"");
-                            for (Layer = 2; Layer <= Construct(ConstrNum).TotLayers; ++Layer) {
-                                if (Layer != Construct(ConstrNum).TotLayers) {
-                                    ShowContinueError("(next)=\"" + Material(Construct(ConstrNum).LayerPoint(Layer)).Name + "\"");
+                            ShowContinueError("(outside)=\"" + Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Name + "\"");
+                            for (Layer = 2; Layer <= dataConstruction.Construct(ConstrNum).TotLayers; ++Layer) {
+                                if (Layer != dataConstruction.Construct(ConstrNum).TotLayers) {
+                                    ShowContinueError("(next)=\"" + Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Name + "\"");
                                 } else {
-                                    ShowContinueError("(inside)=\"" + Material(Construct(ConstrNum).LayerPoint(Layer)).Name + "\"");
+                                    ShowContinueError("(inside)=\"" + Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Name + "\"");
                                 }
                             }
                             ShowContinueError(
@@ -1139,9 +1137,9 @@ namespace ConductionTransferFunctionCalc {
 
                 // Set time step for construct to user time step and the number of
                 // inter-time step interpolations to 1
-                Construct(ConstrNum).CTFTimeStep = TimeStepZone;
-                Construct(ConstrNum).NumHistories = 1;
-                Construct(ConstrNum).NumCTFTerms = 1;
+                dataConstruction.Construct(ConstrNum).CTFTimeStep = TimeStepZone;
+                dataConstruction.Construct(ConstrNum).NumHistories = 1;
+                dataConstruction.Construct(ConstrNum).NumCTFTerms = 1;
 
                 s0(1, 1) = cnd;  // CTFs for current time
                 s0(2, 1) = -cnd; // step are set to the
@@ -1158,8 +1156,8 @@ namespace ConductionTransferFunctionCalc {
                 s(2, 2, 1) = 0.0; // are all
                 e(1) = 0.0;       // zero.
 
-                if (Construct(ConstrNum).SourceSinkPresent) {
-                    ShowSevereError("Sources/sinks not allowed in purely resistive constructions --> " + Construct(ConstrNum).Name);
+                if (dataConstruction.Construct(ConstrNum).SourceSinkPresent) {
+                    ShowSevereError("Sources/sinks not allowed in purely resistive constructions --> " + dataConstruction.Construct(ConstrNum).Name);
                     ErrorsFound = true;
                 }
 
@@ -1179,51 +1177,51 @@ namespace ConductionTransferFunctionCalc {
 
                 // Copy the CTFs into the storage arrays, converting them back to SI
                 // units in the process.  First the "zero" terms and then the history terms...
-                Construct(ConstrNum).CTFOutside(0) = s0(1, 1) * CFU;
-                Construct(ConstrNum).CTFCross(0) = s0(1, 2) * CFU;
-                Construct(ConstrNum).CTFInside(0) = -s0(2, 2) * CFU;
-                if (Construct(ConstrNum).SourceSinkPresent) {
+                dataConstruction.Construct(ConstrNum).CTFOutside(0) = s0(1, 1) * CFU;
+                dataConstruction.Construct(ConstrNum).CTFCross(0) = s0(1, 2) * CFU;
+                dataConstruction.Construct(ConstrNum).CTFInside(0) = -s0(2, 2) * CFU;
+                if (dataConstruction.Construct(ConstrNum).SourceSinkPresent) {
                     // QTFs...
-                    Construct(ConstrNum).CTFSourceOut(0) = s0(3, 1);
-                    Construct(ConstrNum).CTFSourceIn(0) = s0(3, 2);
+                    dataConstruction.Construct(ConstrNum).CTFSourceOut(0) = s0(3, 1);
+                    dataConstruction.Construct(ConstrNum).CTFSourceIn(0) = s0(3, 2);
                     // QTFs for temperature calculation at source/sink location
-                    Construct(ConstrNum).CTFTSourceOut(0) = s0(1, 3);
-                    Construct(ConstrNum).CTFTSourceIn(0) = s0(2, 3);
-                    Construct(ConstrNum).CTFTSourceQ(0) = s0(3, 3) / CFU;
-                    if (Construct(ConstrNum).TempAfterLayer != 0) {
+                    dataConstruction.Construct(ConstrNum).CTFTSourceOut(0) = s0(1, 3);
+                    dataConstruction.Construct(ConstrNum).CTFTSourceIn(0) = s0(2, 3);
+                    dataConstruction.Construct(ConstrNum).CTFTSourceQ(0) = s0(3, 3) / CFU;
+                    if (dataConstruction.Construct(ConstrNum).TempAfterLayer != 0) {
                         // QTFs for user specified interior temperature calculations...
-                        Construct(ConstrNum).CTFTUserOut(0) = s0(1, 4);
-                        Construct(ConstrNum).CTFTUserIn(0) = s0(2, 4);
-                        Construct(ConstrNum).CTFTUserSource(0) = s0(3, 4) / CFU;
+                        dataConstruction.Construct(ConstrNum).CTFTUserOut(0) = s0(1, 4);
+                        dataConstruction.Construct(ConstrNum).CTFTUserIn(0) = s0(2, 4);
+                        dataConstruction.Construct(ConstrNum).CTFTUserSource(0) = s0(3, 4) / CFU;
                     }
                 }
 
-                for (HistTerm = 1; HistTerm <= Construct(ConstrNum).NumCTFTerms; ++HistTerm) {
+                for (HistTerm = 1; HistTerm <= dataConstruction.Construct(ConstrNum).NumCTFTerms; ++HistTerm) {
                     // "REGULAR" CTFs...
-                    Construct(ConstrNum).CTFOutside(HistTerm) = s(1, 1, HistTerm) * CFU;
-                    Construct(ConstrNum).CTFCross(HistTerm) = s(1, 2, HistTerm) * CFU;
-                    Construct(ConstrNum).CTFInside(HistTerm) = -s(2, 2, HistTerm) * CFU;
-                    if (HistTerm != 0) Construct(ConstrNum).CTFFlux(HistTerm) = -e(HistTerm);
-                    if (Construct(ConstrNum).SourceSinkPresent) {
+                    dataConstruction.Construct(ConstrNum).CTFOutside(HistTerm) = s(1, 1, HistTerm) * CFU;
+                    dataConstruction.Construct(ConstrNum).CTFCross(HistTerm) = s(1, 2, HistTerm) * CFU;
+                    dataConstruction.Construct(ConstrNum).CTFInside(HistTerm) = -s(2, 2, HistTerm) * CFU;
+                    if (HistTerm != 0) dataConstruction.Construct(ConstrNum).CTFFlux(HistTerm) = -e(HistTerm);
+                    if (dataConstruction.Construct(ConstrNum).SourceSinkPresent) {
                         // QTFs...
-                        Construct(ConstrNum).CTFSourceOut(HistTerm) = s(3, 1, HistTerm);
-                        Construct(ConstrNum).CTFSourceIn(HistTerm) = s(3, 2, HistTerm);
+                        dataConstruction.Construct(ConstrNum).CTFSourceOut(HistTerm) = s(3, 1, HistTerm);
+                        dataConstruction.Construct(ConstrNum).CTFSourceIn(HistTerm) = s(3, 2, HistTerm);
                         // QTFs for temperature calculation at source/sink location
-                        Construct(ConstrNum).CTFTSourceOut(HistTerm) = s(1, 3, HistTerm);
-                        Construct(ConstrNum).CTFTSourceIn(HistTerm) = s(2, 3, HistTerm);
-                        Construct(ConstrNum).CTFTSourceQ(HistTerm) = s(3, 3, HistTerm) / CFU;
-                        if (Construct(ConstrNum).TempAfterLayer != 0) {
+                        dataConstruction.Construct(ConstrNum).CTFTSourceOut(HistTerm) = s(1, 3, HistTerm);
+                        dataConstruction.Construct(ConstrNum).CTFTSourceIn(HistTerm) = s(2, 3, HistTerm);
+                        dataConstruction.Construct(ConstrNum).CTFTSourceQ(HistTerm) = s(3, 3, HistTerm) / CFU;
+                        if (dataConstruction.Construct(ConstrNum).TempAfterLayer != 0) {
                             // QTFs for user specified interior temperature calculations...
-                            Construct(ConstrNum).CTFTUserOut(HistTerm) = s(1, 4, HistTerm);
-                            Construct(ConstrNum).CTFTUserIn(HistTerm) = s(2, 4, HistTerm);
-                            Construct(ConstrNum).CTFTUserSource(HistTerm) = s(3, 4, HistTerm) / CFU;
+                            dataConstruction.Construct(ConstrNum).CTFTUserOut(HistTerm) = s(1, 4, HistTerm);
+                            dataConstruction.Construct(ConstrNum).CTFTUserIn(HistTerm) = s(2, 4, HistTerm);
+                            dataConstruction.Construct(ConstrNum).CTFTUserSource(HistTerm) = s(3, 4, HistTerm) / CFU;
                         }
                     }
                 }
 
             } // ... end of the reversed construction IF block.
 
-            Construct(ConstrNum).UValue = cnd * CFU;
+            dataConstruction.Construct(ConstrNum).UValue = cnd * CFU;
 
             if (allocated(AExp)) AExp.deallocate();
             if (allocated(AMat)) AMat.deallocate();
@@ -2174,25 +2172,25 @@ namespace ConductionTransferFunctionCalc {
 
             for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
 
-                if (!Construct(ThisNum).IsUsedCTF) continue;
+                if (!dataConstruction.Construct(ThisNum).IsUsedCTF) continue;
 
                 static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
                 print(outputFiles.eio,
                       Format_700,
-                      Construct(ThisNum).Name,
+                      dataConstruction.Construct(ThisNum).Name,
                       ThisNum,
-                      Construct(ThisNum).TotLayers,
-                      Construct(ThisNum).NumCTFTerms,
-                      Construct(ThisNum).CTFTimeStep,
-                      Construct(ThisNum).UValue,
-                      Construct(ThisNum).OutsideAbsorpThermal,
-                      Construct(ThisNum).InsideAbsorpThermal,
-                      Construct(ThisNum).OutsideAbsorpSolar,
-                      Construct(ThisNum).InsideAbsorpSolar,
-                      DisplayMaterialRoughness(Construct(ThisNum).OutsideRoughness));
+                      dataConstruction.Construct(ThisNum).TotLayers,
+                      dataConstruction.Construct(ThisNum).NumCTFTerms,
+                      dataConstruction.Construct(ThisNum).CTFTimeStep,
+                      dataConstruction.Construct(ThisNum).UValue,
+                      dataConstruction.Construct(ThisNum).OutsideAbsorpThermal,
+                      dataConstruction.Construct(ThisNum).InsideAbsorpThermal,
+                      dataConstruction.Construct(ThisNum).OutsideAbsorpSolar,
+                      dataConstruction.Construct(ThisNum).InsideAbsorpSolar,
+                      DisplayMaterialRoughness(dataConstruction.Construct(ThisNum).OutsideRoughness));
 
-                for (I = 1; I <= Construct(ThisNum).TotLayers; ++I) {
-                    Layer = Construct(ThisNum).LayerPoint(I);
+                for (I = 1; I <= dataConstruction.Construct(ThisNum).TotLayers; ++I) {
+                    Layer = dataConstruction.Construct(ThisNum).LayerPoint(I);
                     {
                         auto const SELECT_CASE_var(Material(Layer).Group);
                         if (SELECT_CASE_var == Air) {
@@ -2212,53 +2210,53 @@ namespace ConductionTransferFunctionCalc {
                     }
                 }
 
-                for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
+                for (I = dataConstruction.Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
                     if (I != 0) {
                         static constexpr auto Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
                         print(outputFiles.eio,
                               Format_703,
                               I,
-                              Construct(ThisNum).CTFOutside(I),
-                              Construct(ThisNum).CTFCross(I),
-                              Construct(ThisNum).CTFInside(I),
-                              Construct(ThisNum).CTFFlux(I));
+                              dataConstruction.Construct(ThisNum).CTFOutside(I),
+                              dataConstruction.Construct(ThisNum).CTFCross(I),
+                              dataConstruction.Construct(ThisNum).CTFInside(I),
+                              dataConstruction.Construct(ThisNum).CTFFlux(I));
                     } else {
                         static constexpr auto Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
                         print(outputFiles.eio,
                               Format_704,
                               I,
-                              Construct(ThisNum).CTFOutside(I),
-                              Construct(ThisNum).CTFCross(I),
-                              Construct(ThisNum).CTFInside(I));
+                              dataConstruction.Construct(ThisNum).CTFOutside(I),
+                              dataConstruction.Construct(ThisNum).CTFCross(I),
+                              dataConstruction.Construct(ThisNum).CTFInside(I));
                     }
                 }
 
-                if (Construct(ThisNum).SourceSinkPresent) {
+                if (dataConstruction.Construct(ThisNum).SourceSinkPresent) {
                     // QTFs...
-                    for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
+                    for (I = dataConstruction.Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
                         static constexpr auto Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
-                        print(outputFiles.eio, Format_705, I, Construct(ThisNum).CTFSourceOut(I), Construct(ThisNum).CTFSourceIn(I));
+                        print(outputFiles.eio, Format_705, I, dataConstruction.Construct(ThisNum).CTFSourceOut(I), dataConstruction.Construct(ThisNum).CTFSourceIn(I));
                     }
                     // QTFs for source/sink location temperature calculation...
-                    for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
+                    for (I = dataConstruction.Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
                         static constexpr auto Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
                         print(outputFiles.eio,
                               Format_706,
                               I,
-                              Construct(ThisNum).CTFTSourceOut(I),
-                              Construct(ThisNum).CTFTSourceIn(I),
-                              Construct(ThisNum).CTFTSourceQ(I));
+                              dataConstruction.Construct(ThisNum).CTFTSourceOut(I),
+                              dataConstruction.Construct(ThisNum).CTFTSourceIn(I),
+                              dataConstruction.Construct(ThisNum).CTFTSourceQ(I));
                     }
-                    if (Construct(ThisNum).TempAfterLayer != 0) {
+                    if (dataConstruction.Construct(ThisNum).TempAfterLayer != 0) {
                         // QTFs for user specified interior temperature calculation...
-                        for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
+                        for (I = dataConstruction.Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
                             static constexpr auto Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
                             print(outputFiles.eio,
                                   Format_707,
                                   I,
-                                  Construct(ThisNum).CTFTUserOut(I),
-                                  Construct(ThisNum).CTFTUserIn(I),
-                                  Construct(ThisNum).CTFTUserSource(I));
+                                  dataConstruction.Construct(ThisNum).CTFTUserOut(I),
+                                  dataConstruction.Construct(ThisNum).CTFTUserIn(I),
+                                  dataConstruction.Construct(ThisNum).CTFTUserSource(I));
                         }
                     }
                 }
