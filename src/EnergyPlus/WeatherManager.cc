@@ -186,17 +186,12 @@ namespace WeatherManager {
                                                  {"FRIDAY", WeekDay::Friday},
                                                  {"SATURDAY", WeekDay::Saturday}};
 
-    bool Debugout(false);
-
     // MODULE VARIABLE DECLARATIONS:
 
     int YearOfSim(1); // The Present year of Simulation.
     int const NumDaysInYear(365);
     int EnvironmentReportNbr(0);      // Report number for the environment stamp
     std::string EnvironmentReportChr; // Report number for the environment stamp (character -- for printing)
-    int TimeStampReportNbr(0);        // Report number for the time stamp
-    std::string TimeStampReportChr;   // Report number for the time stamp (character -- for printing)
-    int WeatherDataReport(0);         // Report number for the weather data
     bool WeatherFileExists(false);    // Set to true if a weather file exists
     std::string LocationTitle;        // Location Title from input File
     bool LocationGathered(false);     // flag to show if Location exists on Input File (we assume one is there and correct on weather file)
@@ -319,7 +314,6 @@ namespace WeatherManager {
     Array1D<Real64> Interpolation;                        // Interpolation values based on Number of Time Steps in Hour
     Array1D<Real64> SolarInterpolation;                   // Solar Interpolation values based on Number of Time Steps in Hour
     Array1D_int EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31});
-    bool ErrorInWeatherFile(false);           // Set to TRUE when there is a problem with dates
     int LeapYearAdd(0);                       // Set during environment if leap year is active (adds 1 to number days in Feb)
     bool DatesShouldBeReset(false);           // True when weekdays should be reset
     bool StartDatesCycleShouldBeReset(false); // True when start dates on repeat should be reset
@@ -371,13 +365,9 @@ namespace WeatherManager {
     // Functions
     void clear_state()
     {
-        Debugout = false;
         YearOfSim = 1;             // The Present year of Simulation.
         EnvironmentReportNbr = 0;  // Report number for the environment stamp
         EnvironmentReportChr = ""; // Report number for the environment stamp (character -- for printing)
-        TimeStampReportNbr = 0;    // Report number for the time stamp
-        TimeStampReportChr = "";   // Report number for the time stamp (character -- for printing)
-        WeatherDataReport = 0;     // Report number for the weather data
         WeatherFileExists = false; // Set to true if a weather file exists
         LocationTitle = "";        // Location Title from input File
         LocationGathered = false;  // flag to show if Location exists on Input File (we assume one is
@@ -491,7 +481,6 @@ namespace WeatherManager {
         Interpolation.deallocate();                        // Interpolation values based on Number of Time Steps in Hour
         SolarInterpolation.deallocate();                   // Solar Interpolation values based on
 
-        ErrorInWeatherFile = false; // Set to TRUE when there is a problem with dates
         LeapYearAdd = 0;
         DatesShouldBeReset = false;
         StartDatesCycleShouldBeReset = false; // True when start dates on repeat should be reset
@@ -5056,12 +5045,10 @@ namespace WeatherManager {
         // routine also sends the weather file header information at the
         // Environment derived type.
 
-        ErrorInWeatherFile = false;
         if (!WeatherFileExists) { // No weather file exists but the user requested one--print error message
 
             if (DoWeathSim) {
                 ShowWarningError("Weather Environment(s) requested, but no weather file found");
-                ErrorInWeatherFile = true;
             }
 
         } // ... end of WeatherFileExists IF-THEN

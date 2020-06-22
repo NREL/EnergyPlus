@@ -111,21 +111,8 @@ namespace WeatherManager {
     extern int const GregorianToJulian; // JGDate argument for Gregorian to Julian Date conversion
     extern int const JulianToGregorian; // JGDate argument for Julian to Gregorian Date conversion
 
-    extern Real64 const Sigma;   // Stefan-Boltzmann constant
-    extern Real64 const TKelvin; // conversion from Kelvin to Celsius
-
-    extern Array1D_string const DaysOfWeek;
-
-    extern bool Debugout;
-
     extern int const NumDaysInYear;
-    extern int EnvironmentReportNbr;         // Report number for the environment stamp
-    extern std::string EnvironmentReportChr; // Report number for the environment stamp (character -- for printing)
-    extern int TimeStampReportNbr;           // Report number for the time stamp
-    extern std::string TimeStampReportChr;   // Report number for the time stamp (character -- for printing)
-    extern int WeatherDataReport;            // Report number for the weather data
     extern bool WeatherFileExists;           // Set to true if a weather file exists
-    extern std::string LocationTitle;        // Location Title from input File
     extern bool LocationGathered;            // flag to show if Location exists on Input File (we assume one is there and correct on weather file)
 
     extern Real64 WeatherFileLatitude;
@@ -134,115 +121,32 @@ namespace WeatherManager {
     extern Real64 WeatherFileElevation;
     extern int WeatherFileUnitNumber;                  // File unit number for the weather file
     extern Array1D<Real64> GroundTempsFCFromEPWHeader; // F or C factor method
-    extern Array1D<Real64> GroundReflectances;         // User Specified Ground Reflectances
-    extern Real64 SnowGndRefModifier;                  // Modifier to ground reflectance during snow
-    extern Real64 SnowGndRefModifierForDayltg;         // Modifier to ground reflectance during snow for daylighting
     extern int WaterMainsTempsMethod;                  // Water mains temperature calculation method
-    extern int WaterMainsTempsSchedule;                // Water mains temperature schedule
     extern Real64 WaterMainsTempsAnnualAvgAirTemp;     // Annual average outdoor air temperature (C)
     extern Real64 WaterMainsTempsMaxDiffAirTemp;       // Maximum difference in monthly average outdoor air temperatures (deltaC)
-    extern std::string WaterMainsTempsScheduleName;    // water mains tempeature schedule name
     extern bool wthFCGroundTemps;
-    extern Real64 RainAmount;
-    extern Real64 SnowAmount;
 
     extern int TotRunPers;    // Total number of Run Periods (Weather data) to Setup
     extern int TotRunDesPers; // Total number of Run Design Periods (Weather data) to Setup
 
     extern int NumSpecialDays;
     extern Array1D_int SpecialDayTypes; // To hold holiday types given in input file
-    extern Array1D_int WeekDayTypes;    // To hold Week day types using specified first day
     extern Array1D_int DSTIndex;        // To hold DST Index based on weather file or input
-
-    extern int NumDataPeriods;
 
     extern int NumIntervalsPerHour;
 
-    extern bool UseDaylightSaving;         // True if user says to use Weather File specified DaylightSaving Period
-    extern bool UseSpecialDays;            // True if user says to use Weather File specified Special Days for current RunPeriod
-    extern bool UseRainValues;             // True if rain values from weather file are to be used
-    extern bool UseSnowValues;             // True if snow values from weather file are to be used
-    extern bool EPWDaylightSaving;         // True if a DaylightSaving Time Period is input (EPW files)
-    extern bool IDFDaylightSaving;         // True if a DaylightSaving Time Period is input (IDF files)
-    extern bool DaylightSavingIsActive;    // True if a DaylightSavingPeriod should be used for Environment
     extern bool WFAllowsLeapYears;         // True if the Weather File (WF) header has "Yes" for Leap Years
-    extern int WFLeapYearInd;              // Indicator for current Weather file "Leap Year", used in DayOfYear calculations and others.
-    extern int curSimDayForEndOfRunPeriod; // normal=number days in sim, but different when repeating runperiods or multi-year files
     extern int Envrn;                      // Counter for environments
     extern int NumOfEnvrn;                 // Number of environments to be simulated
-    extern int NumEPWTypExtSets;           // Number of Typical/Extreme on weather file.
-    extern int NumWPSkyTemperatures;       // Number of WeatherProperty:SkyTemperature items in input file
 
-    extern Array2D_bool TodayIsRain;             // Rain indicator, true=rain
-    extern Array2D_bool TodayIsSnow;             // Snow indicator, true=snow
-    extern Array2D<Real64> TodayRainAmount;      // ficitious indicator of Rain
-    extern Array2D<Real64> TodaySnowAmount;      // ficitious indicator of Snow
-    extern Array2D<Real64> TodayOutDryBulbTemp;  // Dry bulb temperature of outside air
-    extern Array2D<Real64> TodayOutWetBulbTemp;  // Wet bulb temperature of outside air
-    extern Array2D<Real64> TodayOutDewPointTemp; // Dew Point Temperature of outside air
-    extern Array2D<Real64> TodayOutBaroPress;    // Barometric pressure of outside air
-    extern Array2D<Real64> TodayOutHumRat;       // Humidity ratio of outside air
-    extern Array2D<Real64> TodayOutRelHum;       // Relative Humidity of outside air
-    extern Array2D<Real64> TodayWindSpeed;       // Wind speed of outside air
-    extern Array2D<Real64> TodayWindDir;         // Wind direction of outside air
-    extern Array2D<Real64> TodaySkyTemp;         // Sky temperature
-    extern Array2D<Real64> TodayHorizIRSky;      // Horizontal IR from Sky
-    extern Array2D<Real64> TodayBeamSolarRad;    // Direct normal solar irradiance
-    extern Array2D<Real64> TodayDifSolarRad;     // Sky diffuse horizontal solar irradiance
     extern Array2D<Real64> TodayAlbedo;          // Albedo
-    extern Array2D<Real64> TodayLiquidPrecip;    // Liquid Precipitation Depth (mm)
 
-    extern Array2D_bool TomorrowIsRain;             // Rain indicator, true=rain
-    extern Array2D_bool TomorrowIsSnow;             // Snow indicator, true=snow
-    extern Array2D<Real64> TomorrowRainAmount;      // ficitious indicator of Rain
-    extern Array2D<Real64> TomorrowSnowAmount;      // ficitious indicator of Snow
-    extern Array2D<Real64> TomorrowOutDryBulbTemp;  // Dry bulb temperature of outside air
-    extern Array2D<Real64> TomorrowOutDewPointTemp; // Dew Point Temperature of outside air
-    extern Array2D<Real64> TomorrowOutBaroPress;    // Barometric pressure of outside air
     extern Array2D<Real64> TomorrowOutRelHum;       // Relative Humidity of outside air
-    extern Array2D<Real64> TomorrowWindSpeed;       // Wind speed of outside air
-    extern Array2D<Real64> TomorrowWindDir;         // Wind direction of outside air
-    extern Array2D<Real64> TomorrowSkyTemp;         // Sky temperature
     extern Array2D<Real64> TomorrowHorizIRSky;      // Horizontal IR from Sky
-    extern Array2D<Real64> TomorrowBeamSolarRad;    // Direct normal solar irradiance
-    extern Array2D<Real64> TomorrowDifSolarRad;     // Sky diffuse horizontal solar irradiance
-    extern Array2D<Real64> TomorrowAlbedo;          // Albedo
-    extern Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth
 
-    extern Array3D<Real64> DDDBRngModifier;  // Design Day Dry-bulb Temperature Range Modifier
-    extern Array3D<Real64> DDHumIndModifier; // Design Day relative humidity values
-    //   or wet-bulb modifiers (per HumIndType)
-    extern Array3D<Real64> DDBeamSolarValues;    // Design Day Beam Solar Values
-    extern Array3D<Real64> DDDiffuseSolarValues; // Design Day Relative Humidity Values
-
-    extern Array3D<Real64> DDSkyTempScheduleValues; // Sky temperature - DesignDay input
-
-    extern int RptIsRain;  // Rain Report Value
-    extern int RptIsSnow;  // Snow Report Value
-    extern int RptDayType; // DayType Report Value
-
-    extern Real64 HrAngle;                                       // Current Hour Angle
-    extern Real64 SolarAltitudeAngle;                            // Angle of Solar Altitude (degrees)
-    extern Real64 SolarAzimuthAngle;                             // Angle of Solar Azimuth (degrees)
-    extern Real64 HorizIRSky;                                    // Horizontal Infrared Radiation Intensity (W/m2)
     extern Real64 TimeStepFraction;                              // Fraction of hour each time step represents
-    extern Array1D<Real64> SPSiteDryBulbRangeModScheduleValue;   // reporting Drybulb Temperature Range Modifier Schedule Value
-    extern Array1D<Real64> SPSiteHumidityConditionScheduleValue; // reporting Humidity Condition Schedule Value
-    extern Array1D<Real64> SPSiteBeamSolarScheduleValue;         // reporting Beam Solar Schedule Value
-    extern Array1D<Real64> SPSiteDiffuseSolarScheduleValue;      // reporting Diffuse Solar Schedule Value
-    extern Array1D<Real64> SPSiteSkyTemperatureScheduleValue;    // reporting SkyTemperature Modifier Schedule Value
-    extern Array1D_int SPSiteScheduleNamePtr;                    // SP Site Schedule Name Ptrs
-    extern Array1D_string SPSiteScheduleUnits;                   // SP Site Schedule Units
-    extern int NumSPSiteScheduleNamePtrs;                        // Number of SP Site Schedules (DesignDay only)
-    extern int NumMissing;                                       // Number of hours of missing data
-    extern Array1D<Real64> Interpolation;                        // Interpolation values based on Number of Time Steps in Hour
-    extern Array1D<Real64> SolarInterpolation;                   // Solar Interpolation values based on Number of Time Steps in Hour
     extern Array1D_int EndDayOfMonth;
-    extern bool ErrorInWeatherFile;           // Set to TRUE when there is a problem with dates
     extern int LeapYearAdd;                   // Set during environment if leap year is active (adds 1 to number days in Feb)
-    extern bool DatesShouldBeReset;           // True when weekdays should be reset
-    extern bool StartDatesCycleShouldBeReset; // True when start dates on repeat should be reset
-    extern bool Jan1DatesShouldBeReset;       // True if Jan 1 should signal reset of dates
     extern bool RPReadAllWeatherData;         // True if need to read all weather data prior to simulation
 
     enum class WeekDay
