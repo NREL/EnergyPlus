@@ -145,7 +145,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
                           "  0.200000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}",
                           "  9.900000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}",
                           "  9.900000,0.000000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}",
-                          "BuildingSurface:Detailed,"
+                          "BuildingSurface:Detailed,",
                           "  Wall,                    !- Name",
                           "  Wall,                    !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
@@ -160,7 +160,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
                           "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
                           "  10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
                           "  10.00000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}",
-                          "BuildingSurface:Detailed,"
+                          "BuildingSurface:Detailed,",
                           "  Floor,                   !- Name",
                           "  Floor,                   !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
@@ -175,7 +175,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
                           "  0.000000,10.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
                           "  10.00000,10.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
                           "  10.00000,0.000000,0;  !- X,Y,Z ==> Vertex 4 {m}",
-                          "Zone,"
+                          "Zone,",
                           "  Zone,                    !- Name",
                           "  0,                       !- Direction of Relative North {deg}",
                           "  6.000000,                !- X Origin {m}",
@@ -202,6 +202,16 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     DataGlobals::BeginSimFlag = true;
     DataGlobals::BeginEnvrnFlag = true;
     DataEnvironment::OutBaroPress = 100000;
+
+    DataHeatBalFanSys::ZTAV.allocate(1);
+    DataHeatBalFanSys::ZT.allocate(1);
+    DataHeatBalance::MRT.allocate(1);
+    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(1);
+
+    DataHeatBalFanSys::ZT(1) = 0.0;
+    DataHeatBalFanSys::ZTAV(1) = 0.0;
+    DataHeatBalance::MRT(1) = 0.0;
+    DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.0;
 
     HeatBalanceManager::ManageHeatBalance(state);
 
@@ -386,7 +396,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
                           "  0.200000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}",
                           "  9.900000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}",
                           "  9.900000,0.000000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}",
-                          "BuildingSurface:Detailed,"
+                          "BuildingSurface:Detailed,",
                           "  Wall,                    !- Name",
                           "  Wall,                    !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
@@ -401,7 +411,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
                           "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
                           "  10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
                           "  10.00000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}",
-                          "BuildingSurface:Detailed,"
+                          "BuildingSurface:Detailed,",
                           "  Floor,                   !- Name",
                           "  Floor,                   !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
@@ -416,7 +426,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
                           "  0.000000,10.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
                           "  10.00000,10.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
                           "  10.00000,0.000000,0;  !- X,Y,Z ==> Vertex 4 {m}",
-                          "Zone,"
+                          "Zone,",
                           "  Zone,                    !- Name",
                           "  0,                       !- Direction of Relative North {deg}",
                           "  6.000000,                !- X Origin {m}",
@@ -2608,7 +2618,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
                           "  Through: 12/31,               !- Field 1",
                           "  For: AllDays,                 !- Field 2",
                           "  Until: 24:00, 15.0;           !- Field 3",
-                          "BuildingSurface:Detailed,"
+                          "BuildingSurface:Detailed,",
                           "  Wall,                    !- Name",
                           "  Wall,                    !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
