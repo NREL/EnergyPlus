@@ -417,7 +417,5 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     ZoneAirLoopEquipmentManager::clear_state();
     ZoneContaminantPredictorCorrector::clear_state();
     ZoneDehumidifier::clear_state();
-    ZoneEquipmentManager::clear_state();
-    ZonePlenum::clear_state();
     ResultsFramework::clear_state();
 }

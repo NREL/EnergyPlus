@@ -55,38 +55,38 @@ namespace EnergyPlus {
 
 namespace AirflowNetwork {
 
-    enum VentCtrEnum  // TODO: make enum class
+    enum VentControlType  // TODO: make enum class
     {
-        NONE = 0,           // Wrong input
-        TEMP = 1,           // Temperature venting control
-        ENTH = 2,           // Enthalpy venting control
-        CONST = 3,          // Constant venting control
+        None = 0,           // Wrong input
+        Temp = 1,           // Temperature venting control
+        Enth = 2,           // Enthalpy venting control
+        Const = 3,          // Constant venting control
         ASH55 = 4,
         CEN15251 = 5,
-        NOVENT = 6,         // No venting
-        ZONELEVEL = 7,      // ZoneLevel control for a heat transfer subsurface
-        ADJTEMP = 8,        // Temperature venting control based on adjacent zone conditions
-        ADJENTH = 9         // Enthalpy venting control based on adjacent zone conditions
+        NoVent = 6,         // No venting
+        ZoneLevel = 7,      // ZoneLevel control for a heat transfer subsurface
+        AdjTemp = 8,        // Temperature venting control based on adjacent zone conditions
+        AdjEnth = 9         // Enthalpy venting control based on adjacent zone conditions
     };
 
     enum OpenStatus  // TODO: make enum class
     {
-        FREEOPERATION = 0,           // Free operation
-        MINCHECKFORCEOPEN = 1,      // Force open when opening elapsed time is less than minimum opening time
-        MINCHECKFORCECLOSE = 2      // Force open when closing elapsed time is less than minimum closing time
+        FreeOperation = 0,           // Free operation
+        MinCheckForceOpen = 1,      // Force open when opening elapsed time is less than minimum opening time
+        MinCheckForceClose = 2      // Force open when closing elapsed time is less than minimum closing time
     };
 
     enum ProbabilityCheck  // TODO: make enum class
     {
-        NOACTION = 0,               // No action from probability check
-        FORCECHANGE = 1,            // Force open or close from probability check
-        KEEPSTATUS = 2              // Keep status at the previous time step from probability check
+        NoAction = 0,               // No action from probability check
+        ForceChange = 1,            // Force open or close from probability check
+        KeepStatus = 2              // Keep status at the previous time step from probability check
     };
 
     enum class EquivRec {
-        HEIGHT,             // Effective rectangle polygonal height selection
-        BASEASPECTRATIO,    // Effective rectangle base surface aspect ratio selection
-        USERASPECTRATIO     // Effective rectangle user input aspect ratio selection
+        Height,             // Effective rectangle polygonal height selection
+        BaseAspectRatio,    // Effective rectangle base surface aspect ratio selection
+        UserAspectRatio     // Effective rectangle user input aspect ratio selection
     };
 
     // Using/Aliasing
@@ -116,6 +116,32 @@ namespace AirflowNetwork {
     extern int const CompTypeNum_RVD; // Reheat VAV terminal damper
     extern int const CompTypeNum_OAF; // Distribution system OA
     extern int const CompTypeNum_REL; // Distribution system relief air
+
+    
+    enum class ComponentType
+    {
+        DOP = 1, // Detailed large opening component
+        SOP,     // Simple opening component
+        SCR,     // Surface crack component
+        SEL,     // Surface effective leakage ratio component
+        PLR,     // Distribution system crack component
+        DWC,     // Distribution system duct component
+        CVF,     // Distribution system constant volume fan component
+        FAN,     // Distribution system detailed fan component
+        MRR,     // Distribution system multiple curve fit power law resistant flow component
+        DMP,     // Distribution system damper component
+        ELR,     // Distribution system effective leakage ratio component
+        CPD,     // Distribution system constant pressure drop component
+        COI,     // Distribution system coil component
+        TMU,     // Distribution system terminal unit component
+        EXF,     // Zone exhaust fan
+        HEX,     // Distribution system heat exchanger
+        HOP,     // Horizontal opening component
+        RVD,     // Reheat VAV terminal damper
+        OAF,     // Distribution system OA
+        REL      // Distribution system relief air
+    };
+
 
     // EPlus component Type
     extern int const EPlusTypeNum_SCN; // Supply connection
@@ -318,7 +344,7 @@ namespace AirflowNetwork {
         // Default Constructor
         MultizoneZoneProp()
             : VentControl("NoVent"), Height(0.0), OpenFactor(1.0), LowValueTemp(0.0), UpValueTemp(100.0), LowValueEnth(0.0), UpValueEnth(300000.0),
-              ZoneNum(0), VentSchNum(0), VentCtrNum(VentCtrEnum::NONE), VentingSchNum(0), SingleSidedCpType("STANDARD"),
+              ZoneNum(0), VentSchNum(0), VentCtrNum(VentControlType::None), VentingSchNum(0), SingleSidedCpType("STANDARD"),
               BuildWidth(10.0), ASH55PeopleInd(0), CEN15251PeopleInd(0), OccupantVentilationControlNum(0), RAFNNodeNum(0)
         {
         }
@@ -353,7 +379,7 @@ namespace AirflowNetwork {
         // Modulating the Venting Open Factor with Enthalpic control
         std::string VentingSchName;                 // Name of ventilation temperature control schedule
         int VentSchNum;                             // Zone ventilation schedule number associated with ventilation schedule name
-        VentCtrEnum VentSurfCtrNum;                 // Ventilation control mode number: 1 "Temperature", 2 "ENTHALPIC", 3 "CONSTANT", 4 "NOVENT"
+        VentControlType VentSurfCtrNum;                 // Ventilation control mode number: 1 "Temperature", 2 "ENTHALPIC", 3 "CONSTANT", 4 "NOVENT"
         int VentingSchNum;                          // Ventilation schedule number
         int ZonePtr;                                // Pointer to inside face zone
         bool IndVentControl;                        // Individual surface venting control
@@ -383,25 +409,60 @@ namespace AirflowNetwork {
         MultizoneSurfaceProp()
             : Factor(0.0), SurfNum(0), NodeNums{{0, 0}}, OpenFactor(0.0), OpenFactorLast(0.0), EMSOpenFactorActuated(false), EMSOpenFactor(0.0),
               Height(0.0), Width(0.0), CHeight(0.0), VentControl("ZONELEVEL"), ModulateFactor(0.0), LowValueTemp(0.0), UpValueTemp(100.0),
-              LowValueEnth(0.0), UpValueEnth(300000.0), VentSchNum(0), VentSurfCtrNum(VentCtrEnum::NONE), VentingSchNum(0), ZonePtr(0),
+              LowValueEnth(0.0), UpValueEnth(300000.0), VentSchNum(0), VentSurfCtrNum(VentControlType::None), VentingSchNum(0), ZonePtr(0),
               IndVentControl(false), ExtLargeOpeningErrCount(0), ExtLargeOpeningErrIndex(0), OpenFactorErrCount(0), OpenFactorErrIndex(0), Multiplier(1.0),
               HybridVentClose(false), HybridCtrlGlobal(false), HybridCtrlMaster(false), WindModifier(1.0), OccupantVentilationControlNum(0),
-              OpeningStatus(OpenStatus::FREEOPERATION), PrevOpeningstatus(OpenStatus::FREEOPERATION),
-              CloseElapsedTime(0.0), OpenElapsedTime(0.0), ClosingProbStatus(ProbabilityCheck::NOACTION),
-              OpeningProbStatus(ProbabilityCheck::NOACTION), RAFNflag(false), NonRectangular(false),
-              EquivRecMethod(EquivRec::HEIGHT), EquivRecUserAspectRatio(1.0)
+              OpeningStatus(OpenStatus::FreeOperation), PrevOpeningstatus(OpenStatus::FreeOperation),
+              CloseElapsedTime(0.0), OpenElapsedTime(0.0), ClosingProbStatus(ProbabilityCheck::NoAction),
+              OpeningProbStatus(ProbabilityCheck::NoAction), RAFNflag(false), NonRectangular(false),
+              EquivRecMethod(EquivRec::Height), EquivRecUserAspectRatio(1.0)
         {
         }
     };
 
     struct AirflowElement
     {
+        AirflowElement()
+        {}
+
+        AirflowElement(const std::string &name) : name(name)
+        {}
+
+        virtual ~AirflowElement()
+        {}
+
+        std::string name; // Name of airflow element
+
+        virtual int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                              Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                              int const i,                // Linkage number
+                              const Real64 multiplier,    // Element multiplier
+                              const Real64 control,       // Element control signal
+                              const AirProperties &propN, // Node 1 properties
+                              const AirProperties &propM, // Node 2 properties
+                              std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+                              ) = 0;
+
+        // Make this abstract once all the classes implement it
+        virtual int calculate(const Real64 EP_UNUSED(PDROP),         // Total pressure drop across a component (P1 - P2) [Pa]
+                              const Real64 EP_UNUSED(multiplier),    // Element multiplier
+                              const Real64 EP_UNUSED(control),       // Element control signal
+                              const AirProperties &EP_UNUSED(propN), // Node 1 properties
+                              const AirProperties &EP_UNUSED(propM), // Node 2 properties
+                              std::array<Real64, 2> &EP_UNUSED(F),   // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &EP_UNUSED(DF)   // Partial derivative:  DF/DP
+                              )
+        {
+            return 1;
+        }
+
+        virtual ComponentType type() = 0;
     };
 
     struct DetailedOpening : public AirflowElement // Large detailed opening component
     {
         // Members
-        std::string Name;     // Name of large detailed opening component
         Real64 FlowCoef;      // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
         Real64 FlowExpo;      // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
         std::string TypeName; // Name of Large vertical opening type
@@ -446,18 +507,24 @@ namespace AirflowNetwork {
 
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const EP_UNUSED(i),     // Linkage number
+                      int const i,                // Linkage number
+                      const Real64 EP_UNUSED(multiplier),    // Element multiplier
+                      const Real64 EP_UNUSED(control),       // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::DOP;
+        }
     };
 
     struct SimpleOpening : public AirflowElement // Large simple opening component
     {
         // Members
-        std::string Name;  // Name of large simple opening component
         Real64 FlowCoef;   // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
         Real64 FlowExpo;   // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
         Real64 MinRhoDiff; // Minimum density difference for two-way flow
@@ -472,17 +539,23 @@ namespace AirflowNetwork {
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                       int const i,                // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::SOP;
+        }
     };
 
     struct HorizontalOpening : public AirflowElement // Large horizontal opening component
     {
         // Members
-        std::string Name;  // Name of large horizontal opening component
         Real64 FlowCoef;   // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
         Real64 FlowExpo;   // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
         Real64 Slope;      // Sloping plane angle
@@ -496,11 +569,18 @@ namespace AirflowNetwork {
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                       int const i,                // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::HOP;
+        }
     };
 
     struct ReferenceConditions // Surface crack standard conditions
@@ -525,7 +605,6 @@ namespace AirflowNetwork {
     struct SurfaceCrack : public AirflowElement // Surface crack component
     {
         // Members
-        std::string Name; // Name of crack component
         // std::string ExternalNodeNames; // Name of external node.Not required for internal surface
         Real64 FlowCoef;  // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
         Real64 FlowExpo;  // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
@@ -541,17 +620,32 @@ namespace AirflowNetwork {
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                       int const i,                // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        virtual int calculate(const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                              const Real64 multiplier,    // Element multiplier
+                              const Real64 control,       // Element control signal
+                              const AirProperties &propN, // Node 1 properties
+                              const AirProperties &propM, // Node 2 properties
+                              std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::SCR;
+        }
     };
 
     struct EffectiveLeakageArea : public AirflowElement // Surface effective leakage area component
     {
         // Members
-        std::string Name;   // Name of effective leakage area component
         Real64 ELA;         // Effective leakage area
         Real64 DischCoeff;  // Discharge coefficient
         Real64 RefDeltaP;   // Reference pressure difference
@@ -566,18 +660,33 @@ namespace AirflowNetwork {
 
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const i,                // Linkage number
+                      int const EP_UNUSED(i),     // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
+                      const AirProperties &propN,         // Node 1 properties
+                      const AirProperties &propM,         // Node 2 properties
+                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::SEL;
+        }
     };
 
     struct ZoneExhaustFan : public AirflowElement // Zone exhaust fan component
     {
         // Members
-        std::string Name; // Name of exhaust fan component
         Real64 FlowRate;  // mass flow rate
         int SchedPtr;     // Schedule pointer
         Real64 FlowCoef;  // Air Mass Flow Coefficient [kg/s at 1Pa]
@@ -600,11 +709,27 @@ namespace AirflowNetwork {
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                       int const i,                // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 control,               // Element control signal
+                      const AirProperties &propN,         // Node 1 properties
+                      const AirProperties &propM,         // Node 2 properties
+                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::EXF;
+        }
     };
 
     struct MultizoneExternalNodeProp // External node properties
@@ -664,11 +789,15 @@ namespace AirflowNetwork {
         int CompNum;                          // Element Number
         std::array<int, 2> NodeNums;          // Node numbers
         int LinkNum;                          // Linkage number
+        AirflowElement *element;              // Pointer to airflow element
 
         // Default Constructor
         AirflowNetworkLinkage() : NodeHeights{{0.0, 0.0}}, CompNum(0), NodeNums{{0, 0}}, LinkNum(0)
         {
         }
+
+        virtual ~AirflowNetworkLinkage()
+        {}
     };
 
     struct IntraZoneLinkageProp : public AirflowNetworkLinkage // Intra zone linkage data
@@ -701,7 +830,6 @@ namespace AirflowNetwork {
     struct DuctLeak : public AirflowElement // duct leak component
     {
         // Members
-        std::string Name; // Name of component leak
         Real64 FlowCoef;  // Air Mass Flow Coefficient [kg/s at 1Pa]
         Real64 FlowExpo;  // Air Mass Flow exponent [dimensionless]
 
@@ -713,17 +841,32 @@ namespace AirflowNetwork {
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                       int const i,                // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
+                      const AirProperties &propN,         // Node 1 properties
+                      const AirProperties &propM,         // Node 2 properties
+                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::PLR;
+        }
     };
 
     struct EffectiveLeakageRatio : public AirflowElement // effective leakage ratio component
     {
         // Members
-        std::string Name; // Name of component leak
         Real64 ELR;       // Value of effective leakage ratio
         Real64 FlowRate;  // Maximum airflow rate
         Real64 RefPres;   // Reference pressure difference
@@ -737,17 +880,32 @@ namespace AirflowNetwork {
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                       int const EP_UNUSED(i),     // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
+                      const AirProperties &propN,         // Node 1 properties
+                      const AirProperties &propM,         // Node 2 properties
+                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::ELR;
+        }
     };
 
     struct Duct : public AirflowElement // Duct component
     {
         // Members
-        std::string Name;         // Name of duct component
         Real64 L;                 // Duct length [m]
         Real64 hydraulicDiameter; // Hydraulic diameter [m]
         Real64 A;                 // Cross section area [m2]
@@ -777,18 +935,33 @@ namespace AirflowNetwork {
 
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const i,                // Linkage number
+                      int const EP_UNUSED(i),     // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
+                      const AirProperties &propN,         // Node 1 properties
+                      const AirProperties &propM,         // Node 2 properties
+                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::DWC;
+        }
     };
 
     struct Damper : public AirflowElement // Damper component
     {
         // Members
-        std::string Name; // Name of damper component
         Real64 LTP;       // Value for laminar turbulent transition
         Real64 LamFlow;   // Laminar flow coefficient
         Real64 TurFlow;   // Turbulent flow coefficient
@@ -808,17 +981,32 @@ namespace AirflowNetwork {
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                       int const i,                // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 control,               // Element control signal
+                      const AirProperties &propN,         // Node 1 properties
+                      const AirProperties &propM,         // Node 2 properties
+                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::DMP;
+        }
     };
 
     struct ConstantVolumeFan : public AirflowElement // Constant volume fan component
     {
         // Members
-        std::string Name;          // Name of detailed fan component
         Real64 FlowRate;           // Air volume flow rate
         Real64 Ctrl;               // Control ratio
         int FanTypeNum;            // Fan type: Constant volume or ONOFF
@@ -838,17 +1026,23 @@ namespace AirflowNetwork {
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                       int const i,                // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::CVF;
+        }
     };
 
     struct DetailedFan : public AirflowElement // Detailed fan component
     {
         // Members
-        std::string Name;      // Name of constant volume fan component
         Real64 FlowCoef;       // Coefficient for linear initialization [kg/s at 1Pa]
         Real64 FlowExpo;       // Turbulent flow coefficient [dimensionless]
         Real64 RhoAir;         // Reference air density
@@ -867,17 +1061,32 @@ namespace AirflowNetwork {
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                       int const i,                // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 control,    // Element control signal
+                      const AirProperties &propN,         // Node 1 properties
+                      const AirProperties &propM,         // Node 2 properties
+                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::FAN;
+        }
     };
 
     struct DisSysCompCoilProp : public AirflowElement // Coil component
     {
         // Members
-        std::string Name;         // Name of coil component
         std::string EPlusType;    // EnergyPlus coil type
         Real64 L;                 // Air path length
         Real64 hydraulicDiameter; // Air path hydraulic diameter
@@ -891,17 +1100,32 @@ namespace AirflowNetwork {
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                       int const i,                // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
+                      const AirProperties &propN,         // Node 1 properties
+                      const AirProperties &propM,         // Node 2 properties
+                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::COI;
+        }
     };
 
     struct DisSysCompHXProp : public AirflowElement // Coil component
     {
         // Members
-        std::string Name;         // Name of coil component
         std::string EPlusType;    // EnergyPlus coil type
         Real64 L;                 // Air path length
         Real64 hydraulicDiameter; // Air path hydraulic diameter
@@ -914,18 +1138,33 @@ namespace AirflowNetwork {
 
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const i,                // Linkage number
+                      int const EP_UNUSED(i),     // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
+                      const AirProperties &propN,         // Node 1 properties
+                      const AirProperties &propM,         // Node 2 properties
+                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::HEX;
+        }
     };
 
     struct DisSysCompTermUnitProp : public AirflowElement // Terminal unit component
     {
         // Members
-        std::string Name;         // Name of coil component
         std::string EPlusType;    // EnergyPlus coil type
         Real64 L;                 // Air path length
         Real64 hydraulicDiameter; // Air path hydraulic diameter
@@ -941,17 +1180,23 @@ namespace AirflowNetwork {
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                       int const i,                // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::TMU;
+        }
     };
 
     struct ConstantPressureDrop : public AirflowElement // Constant pressure drop component
     {
         // Members
-        std::string Name; // Name of constant pressure drop component
         Real64 A;         // cross section area
         Real64 DP;        // Pressure difference across the component
 
@@ -963,11 +1208,18 @@ namespace AirflowNetwork {
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                       int const i,                // Linkage number
+                      const Real64 EP_UNUSED(multiplier), // Element multiplier
+                      const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::CPD;
+        }
     };
 
     struct DisSysLinkageProp : public AirflowNetworkLinkage // Distribution system linkage data
@@ -1075,7 +1327,6 @@ namespace AirflowNetwork {
     struct OutdoorAirFan : public AirflowElement // OA fan component
     {
         // Members
-        std::string Name; // Name of exhaust fan component
         int SchedPtr;     // Schedule pointer
         Real64 FlowCoef;  // Air Mass Flow Coefficient [kg/s at 1Pa]
         Real64 FlowExpo;  // Air Mass Flow exponent [dimensionless]
@@ -1101,11 +1352,18 @@ namespace AirflowNetwork {
         virtual int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                               const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                               int const i,                // Linkage number
+                              const Real64 EP_UNUSED(multiplier), // Element multiplier
+                              const Real64 EP_UNUSED(control),    // Element control signal
                               const AirProperties &propN, // Node 1 properties
                               const AirProperties &propM, // Node 2 properties
                               std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                               std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::OAF;
+        }
     };
 
     struct ReliefFlow : public OutdoorAirFan // OA fan component
@@ -1119,11 +1377,18 @@ namespace AirflowNetwork {
         virtual int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                               const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                               int const i,                // Linkage number
+                              const Real64 EP_UNUSED(multiplier), // Element multiplier
+                              const Real64 EP_UNUSED(control),    // Element control signal
                               const AirProperties &propN, // Node 1 properties
                               const AirProperties &propM, // Node 2 properties
                               std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
                               std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::REL;
+        }
     };
 
     struct AirflowNetworkNodeSimuData // Node variable for simulation
@@ -1330,13 +1595,9 @@ namespace AirflowNetwork {
     // Object Data
     extern Array1D<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
     extern Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
-    extern Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
-    extern Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
-    extern Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
-    extern Array1D<AirflowNetworkNodeReportData> AirflowNetworkNodeReport;
-    extern Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport1;
-    extern AirflowNetworkSimuProp
-        AirflowNetworkSimu; // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr
+ 
+    extern AirflowNetworkSimuProp AirflowNetworkSimu;
+    // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr
                             // field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration |
                             // Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit |
                             // Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along
@@ -1352,7 +1613,6 @@ namespace AirflowNetwork {
     extern Array1D<DetailedOpening> MultizoneCompDetOpeningData;
     extern Array1D<SimpleOpening> MultizoneCompSimpleOpeningData;
     extern Array1D<HorizontalOpening> MultizoneCompHorOpeningData;
-    // extern Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
     extern Array1D<SurfaceCrack> MultizoneSurfaceCrackData;
     extern Array1D<EffectiveLeakageArea> MultizoneSurfaceELAData;
     extern Array1D<MultizoneExternalNodeProp> MultizoneExternalNodeData;
