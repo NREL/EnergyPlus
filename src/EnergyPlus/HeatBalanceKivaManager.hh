@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
+    struct ZoneTempPredictorCorrectorData;
     class OutputFiles;
     
 namespace HeatBalanceKivaManager {

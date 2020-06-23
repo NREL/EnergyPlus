@@ -1271,7 +1271,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
     // Get Air Loop HVAC Data
     SimAirServingZones::GetAirPathData(state);
-    SimAirServingZones::InitAirLoops(state, state.dataZonePlenum, FirstHVACIteration);
+    SimAirServingZones::InitAirLoops(state, FirstHVACIteration);
 
     ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.outputFiles);
 

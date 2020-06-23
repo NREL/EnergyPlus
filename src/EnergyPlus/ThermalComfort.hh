@@ -56,6 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    //forward declarations
+    struct ZoneTempPredictorCorrectorData;
 
 namespace ThermalComfort {
 
