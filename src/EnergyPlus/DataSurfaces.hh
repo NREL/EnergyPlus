@@ -49,14 +49,11 @@
 #define DataSurfaces_hh_INCLUDED
 
 // EnergyPlus Headers
-//#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Shape.hh>
-//#include <EnergyPlus/WindowManager.hh>
-//#include <EnergyPlus/WindowManagerExteriorData.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>

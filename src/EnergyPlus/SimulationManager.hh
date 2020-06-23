@@ -50,9 +50,9 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    struct EnergyPlusData;
     class OutputFiles;
 
 namespace SimulationManager {

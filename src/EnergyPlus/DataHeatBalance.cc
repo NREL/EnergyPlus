@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
@@ -111,9 +112,8 @@ namespace DataHeatBalance {
     int MaxSolidWinLayers(0);               // Maximum number of solid layers in a window construction
                                             // ** has to be big enough to hold no matter what window model
                                             //    each window model should validate layers individually
-//    int const MaxSpectralDataElements(800); // Maximum number in Spectral Data arrays.
-//    TEMP MOVE TO WindowManagerData -BLB
-
+    //int const MaxSpectralDataElements(800); // Maximum number in Spectral Data arrays.
+    //    TEMP MOVE TO WindowManagerData -BLB
     // Parameters to indicate material group type for use with the Material
     // derived type (see below):
 

@@ -57,7 +57,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-//#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include <functional>
 

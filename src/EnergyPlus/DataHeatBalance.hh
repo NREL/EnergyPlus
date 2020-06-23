@@ -57,7 +57,6 @@
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
-//#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -97,8 +96,8 @@ namespace DataHeatBalance {
     extern int const MaxLayersInConstruct;    // Maximum number of layers allowed in a single construction
     extern int const MaxCTFTerms;             // Maximum number of CTF terms allowed to still allow stability
     extern int MaxSolidWinLayers;             // Maximum number of solid layers in a window construction
-//    extern int const MaxSpectralDataElements; // Maximum number in Spectral Data arrays.
-//    TEMP MOVE TO WindowManagerData -BLB
+   // extern int const MaxSpectralDataElements; // Maximum number in Spectral Data arrays.
+   //    TEMP MOVE TO WindowManagerData -BLB
 
     // Parameters to indicate material group type for use with the Material
     // derived type (see below):

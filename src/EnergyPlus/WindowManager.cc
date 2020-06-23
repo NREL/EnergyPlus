@@ -152,11 +152,6 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Manages if optical calculation will be performed with internal or external routines
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
         // check and read custom solar and/or visible spectrum data if any
         CheckAndReadCustomSprectrumData(dataWindowManager);
         if (dataWindowManager.inExtWindowModel->isExternalLibraryModel()) {
@@ -184,31 +179,11 @@ namespace WindowManager {
         // Manages the calculation of the solar and visible properties of a multi-layer glazing
         // system from the properties of the individual glazing and shading layers
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace Vectors;
         using General::TrimSigDigits;
         using WindowEquivalentLayer::InitEquivalentLayerWindowCalculations;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoefNum;                    // Polynomial coefficient number
         int j;                          // Wavelength counter
         int TotLay;                     // Total solid and gas layers in a window construction
@@ -1567,23 +1542,7 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Initializes variables used in the window optical and thermal calculation.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using General::RoundSigDigits;
-
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int ConstrNum;        // Construction number
         int SurfNum;          // Surface number
@@ -1980,12 +1939,6 @@ namespace WindowManager {
         // Calculates visible average of property p by weighting with solar
         // spectral irradiance, e, and photopic response, y30
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Argument array dimensioning
         p.dim(dataWindowManager.nume);
 
@@ -2000,7 +1953,6 @@ namespace WindowManager {
         Real64 y30new;
         Real64 evis; // Solar spectrum value times photopic response
         //   times delta wavelength
-        // FLOW
 
         down = 0.0;
         up = 0.0;
@@ -2042,22 +1994,11 @@ namespace WindowManager {
         // Linearly interpolates between data points. Outputs yout, interpolated
         // value of y corresponding to xin
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Argument array dimensioning
         x.dim(npts);
         y.dim(npts);
 
-        // Locals
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         int i; // Counter
-
-        // FLOW
 
         for (i = 1; i <= npts; ++i) {
             if (xin <= x(i)) {
@@ -2143,12 +2084,6 @@ namespace WindowManager {
         // CalcWindowHeatBalance is called by CalcHeatBalanceInsideSurface once each
         // time step for each window.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataBSDFWindow;
         using DataHeatBalSurface::QConvOutReport;
@@ -2168,20 +2103,8 @@ namespace WindowManager {
         using WindowComplexManager::CalcComplexWindowThermal;
         using WindowEquivalentLayer::EQLWindowSurfaceHeatBalance;
 
-        // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // (temperature of innermost face) [C]
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int ZoneNum;    // Zone number corresponding to SurfNum
         int BlNum;      // Window blind number
@@ -2817,22 +2740,11 @@ namespace WindowManager {
         // Also evaluates Jacobian.
         // Currently limited to three glass layers.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Locals
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Array1D<Real64> hgap(5); // Gap gas conductance
         Real64 gr;               // Gap gas Grashof number
         Real64 con;              // Gap gas conductivity
         Real64 pr;               // Gap gas Prandtl number
         Real64 nu;               // Gap gas Nusselt number
-
-        // FLOW
 
         // Have to zero fvec each time since LUdecompostion and LUsolution may
         // add values to this array in unexpected places
@@ -2975,8 +2887,6 @@ namespace WindowManager {
         // heat balance at the glass and shade/blind faces. The system of linear equations is solved
         // by LU decomposition.
 
-        // REFERENCES:
-        // na
         // Using/Aliasing
         using ConvectionCoefficients::CalcISO15099WindowIntConvCoeff;
         using General::InterpSlatAng;
@@ -2988,21 +2898,9 @@ namespace WindowManager {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyTdbFnHW;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIterations(100); // Maximum allowed number of iterations (increased 9/01 from 15 to 50,
         //   increased 11/02 from 50 to 100)
         Real64 const errtemptol(0.02); // Tolerance on errtemp for convergence (increased from 0.01, 3/4/03)
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int ZoneNum;                    // Zone number corresponding to SurfNum
         int i;                          // Counter
@@ -3754,23 +3652,8 @@ namespace WindowManager {
         // Based on ISO/DIS 15099, "Thermal Performance of Windows, Doors and Shading Devices --
         // Detailed Calculations," 1/12/2000, Chapter 7, "Shading Devices."
 
-        // REFERENCES:
-        // na
-
-        // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //   air flow or bottom for downward air flow (K)
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int ConstrNumSh;  // Shaded construction number
         int MatNumSh;     // Material number of shade/blind layer
@@ -3967,26 +3850,10 @@ namespace WindowManager {
         // Based on ISO/DIS 15099, "Thermal Performance of Windows, Doors and Shading Devices --
         // Detailed Calculations," 1/12/2000, Chapter 7, "Shading Devices."
 
-        // REFERENCES:
-        // na
-
         // Argument array dimensioning
         TGapNew.dim(2);
         hcv.dim(2);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ConstrNumSh; // Shaded construction number
         int MatNumSh;    // Material number of shade/blind layer
         int nglassfaces; // Number of glass faces in contruction
@@ -4177,9 +4044,6 @@ namespace WindowManager {
         // Based on ISO/DIS 15099, "Thermal Performance of Windows, Doors and Shading Devices --
         // Detailed Calculations"
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -4187,16 +4051,6 @@ namespace WindowManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //   air flow or bottom for downward air flow (K)
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ConstrNum;    // Construction number of surface
         int NGlass;       // Number of glass layers in construction
         int GapNum;       // Number of airflow gap
@@ -4419,27 +4273,10 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Performs LU decomposition of a matrix.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //   as output: decomposed matrix
         //   if odd
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i; // Counters
         int j;
         int k;
@@ -4449,8 +4286,6 @@ namespace WindowManager {
         Real64 aamax;                  // Absolute value of largest element of matrix
         Real64 dum;                    // Temporary variable
         Real64 sum;                    // Sum of products of matrix elements
-
-        // FLOW
 
         assert(n <= 10); // vv sizing
 
@@ -4522,34 +4357,16 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Solves set of linear equations a.x = b
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //   b is also output as the solution, x
         //   b is also output as the solution, x
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i; // Counters
         int j;
         int ii; // Intermediate variables
         int ll;
         Real64 sum; // Summation variable
-
-        // FLOW
 
         ii = 0;
         for (i = 1; i <= n; ++i) {
@@ -4603,24 +4420,10 @@ namespace WindowManager {
         // REFERENCES:
         // Window5 source code; ISO 15099
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const pres(1.0e5);     // Gap gas pressure (Pa)
         Real64 const gaslaw(8314.51); // Molar gas constant (J/kMol-K)
         static Real64 const two_sqrt_2(2.0 * std::sqrt(2.0));
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // Tuned Arrays made static
         int IMix; // Counters of gases in a mixture
         int i;
@@ -4770,24 +4573,10 @@ namespace WindowManager {
         // REFERENCES:
         // See Subr. WindowGasConductance
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const pres(1.0e5);     // Gap gas pressure (Pa)
         Real64 const gaslaw(8314.51); // Molar gas constant (J/kMol-K)
         static Real64 const two_sqrt_2(2.0 * std::sqrt(2.0));
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IMix; // Counters of gases in a mixture
         int i;
         int j;
@@ -4872,29 +4661,11 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Initializes face temperature distribution prior to iteration
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Argument array dimensioning
         AbsRadShade.dim(2);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const hrad(5.3);    // Typical radiative conductance (W/m2-K)
         Real64 const resgap(0.21); // Typical gap resistance (m2-K/W)
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int i;                             // Face counter
         int ShadeFlag;                     // Shading flag
@@ -5130,17 +4901,10 @@ namespace WindowManager {
         // For a single glazing layer, calculate transmittance and reflectance at an arbitrary
         // angle of incidence given transmittance and reflectance at zero incidence angle.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
         // REFERENCES:
         // ASHRAE Handbook of Fundamentals, 2001, pp. 30.20-23,
         // "Optical Properties of Single Glazing Layers."
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tfp1; // Transmittance at cs for each polarization
         Real64 tfp2;
         Real64 rfp1; // Front reflectance at cs for each polarization
@@ -5213,7 +4977,6 @@ namespace WindowManager {
         Real64 tmp7;             // temporary value for calculations
         Real64 tmp8;             // temporary value for calculations
         Real64 tmp9;             // temporary value for calculations
-        // FLOW
 
         if (SimpleGlazingSystem) { // use alternate angular dependence model for block model of simple glazing input
 
@@ -5657,29 +5420,8 @@ namespace WindowManager {
         // METHODOLOGY EMPLOYED:
         // linear interpolation
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
         Real64 InterpResult;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
         InterpResult = F0 + ((X - X0) / (X1 - X0)) * (F1 - F0);
         return InterpResult;
     }
@@ -5711,26 +5453,9 @@ namespace WindowManager {
         // REFERENCES:
         // http://en.wikipedia.org/wiki/Bilinear_interpolation
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 InterpResult;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
         InterpResult = (Fx1y1 / ((X2 - X1) * (Y2 - Y1))) * (X2 - X) * (Y2 - Y) + (Fx2y1 / ((X2 - X1) * (Y2 - Y1))) * (X - X1) * (Y2 - Y) +
                        (Fx1y2 / ((X2 - X1) * (Y2 - Y1))) * (X2 - X) * (Y - Y1) + (Fx2y2 / ((X2 - X1) * (Y2 - Y1))) * (X - X1) * (Y - Y1);
         return InterpResult;
@@ -5760,26 +5485,6 @@ namespace WindowManager {
         // form C1*X + C2*X**2 + C3*X**3 + ... +CN*X**N, where N <= 6.
         // Adapted from BLAST subroutine LSQFIT.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Array2D<Real64> A(6, 6);  // Least squares derivative matrix
         Array1D<Real64> B(6);     // Least squares derivative vector
         Array2D<Real64> D(6, 16); // Powers of independent variable
@@ -5793,8 +5498,6 @@ namespace WindowManager {
         int KP1;
         int LP1;
         int NM1;
-
-        // FLOW
 
         // Set up least squares matrix
         for (M = N1; M <= N2; ++M) {
@@ -5877,30 +5580,11 @@ namespace WindowManager {
         // form C1*X + C2*X**2 + C3*X**3 + ... +CN*X**N, where N <= 6.
         // Adapted from BLAST subroutine LSQFIT.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Argument array dimensioning
         IndepVar.dim(19);
         DepVar.dim(19);
         CoeffsCurve.dim(6);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array2D<Real64> A(6, 6);  // Least squares derivative matrix
         Array1D<Real64> B(6);     // Least squares derivative vector
         Array2D<Real64> D(6, 16); // Powers of independent variable
@@ -5999,16 +5683,6 @@ namespace WindowManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // 0,10,20,...,80,90 degress
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 const DPhiR(10.0 * DegToRadians); // Half of 10-deg incidence angle increment (radians)
         int IPhi;                                // Incidence angle counter
 
@@ -6048,19 +5722,6 @@ namespace WindowManager {
         // Return value
         Real64 DiffuseAverageProfAngGnd;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Phi;  // Profile angle (radians)
         Real64 DPhi; // Phi increment
         int IPhi;    // Phi index
@@ -6108,19 +5769,6 @@ namespace WindowManager {
         // Return value
         Real64 DiffuseAverageProfAngSky;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Phi;  // Profile angle (radians)
         Real64 DPhi; // Phi increment
         int IPhi;    // Phi index
@@ -6898,30 +6546,16 @@ namespace WindowManager {
         // heat balance at the glass faces. The system of linear equations is solved
         // by LU decomposition.
 
-        // REFERENCES:
-        // na
-        // Using/Aliasing
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         // unused0909  USE DataEnvironment, ONLY: StdBaroPress
 
         // Argument array dimensioning
         hgap.dim(5);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIterations(100);  // Maximum allowed number of iterations
         Real64 const errtemptol(0.02); // Tolerance on errtemp for convergence
         static std::string const RoutineName("WindowTempsForNominalCond");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;                      // Counter
         Real64 gr;                  // Grashof number of gas in a gap
         Real64 con;                 // Gap gas conductivity
@@ -7168,17 +6802,6 @@ namespace WindowManager {
         // This is a shortened form of StartingWindowTemps for use in calculating
         // the nominal center-of-glass U-value.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const hrad(5.3);           // Typical radiative conductance (W/m2-K)
         Real64 const hcinStartValue(3.2); // Starting value for inside air film convective
         //   conductance (estimated for typical double glazing
@@ -7186,13 +6809,6 @@ namespace WindowManager {
         //   room air temp - inside surface temp = 14.2K)
         Real64 const resgap(0.21); // Typical gap resistance (m2-K/W)
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;                      // Face counter
         Array1D<Real64> rguess(11); // Combined radiative/convective resistance (m2-K/W) of
         // inside or outside air film, or gap
@@ -7240,13 +6856,6 @@ namespace WindowManager {
         // the calculation parameters for windows and their associated
         // materials.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataBSDFWindow::summerCondition;
         using DataBSDFWindow::winterCondition;
         using General::POLYF;
@@ -7257,21 +6866,9 @@ namespace WindowManager {
         using WindowComplexManager::CalcComplexWindowThermal;
         using WindowComplexManager::UpdateComplexWindows;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const Roughness(6, {"VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"});
         static Array1D_string const GasTypeName({0, 4}, {"Custom", "Air", "Argon", "Krypton", "Xenon"});
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool DoReport(false);
         static bool HasWindows(false);
         static bool HasComplexWindows(false);
@@ -7939,9 +7536,6 @@ namespace WindowManager {
         // Loop through all surfaces to determine which window has an exterior screen. Static
         // variables are defined here, dynamic variables are calculated in CalcScreenTransmittance.
 
-        // REFERENCES: na
-
-        // Using/Aliasing
         using General::RoundSigDigits;
 
         // Locals
@@ -7949,12 +7543,6 @@ namespace WindowManager {
         int const M(18);
         int const N(18);
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;     // Index to surface number
         int ScreenNum;   // Index to each screen used on exterior of window
         int ConstrNumSh; // Index to shaded construction
@@ -8203,20 +7791,9 @@ namespace WindowManager {
         // "Solar-Thermal Window Blind Model for DOE-2," H. Simmler, U. Fischer and
         // F. Winkelmann, Lawrence Berkeley National Laboratory, Jan. 1996.
 
-        // USE STATEMENTS:na
-
         // Argument array dimensioning
         c.dim(15);
         p.dim(16);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:na
-        // INTERFACE BLOCK SPECIFICATIONS:na
-        // DERIVED TYPE DEFINITIONS:na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 ri; // Front and back IR slat reflectance
         Real64 rib;
@@ -8528,24 +8105,15 @@ namespace WindowManager {
         //     The calculation for the reverse direction is done with the radiation source
         //     reflected at the window plane.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
         // REFERENCES:
         // "Solar-Thermal Window Blind Model for DOE-2," H. Simmler, U. Fischer and
         // F. Winkelmann, Lawrence Berkeley National Laboratory, Jan. 1996.
 
-        // USE STATEMENTS:
-
-        // Using/Aliasing
         using General::BlindBeamBeamTrans; // Blind beam-to-beam transmittance function
 
         // Argument array dimensioning
         c.dim(15);
         p.dim(16);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // The slat input properties are:
         // c(1)    0. (unused)
@@ -8586,11 +8154,6 @@ namespace WindowManager {
         // p(15)   IR emissivity back
         // p(16)   0.0 (unused)
 
-        // SUBROUTINE PARAMETER DEFINITIONS:na
-        // INTERFACE BLOCK SPECIFICATIONS:na
-        // DERIVED TYPE DEFINITIONS:na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 phib;                // Elevation angle of normal vector to front of slat (0 to pi radians)
         Real64 phis;                // Elevation angle of source vector; same as "profile angle" (-pi/2 to pi/2 radians)
         Real64 gamma;               // phib - phis (radians)
@@ -8746,15 +8309,9 @@ namespace WindowManager {
         // "Solar-Thermal Window Blind Model for DOE-2," H. Simmler, U. Fischer and
         // F. Winkelmann, Lawrence Berkeley National Laboratory, Jan. 1996.
 
-        // USE STATEMENTS:na
-
         // Argument array dimensioning
         F.dim(6, 6);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D<Real64> L(6); // Length of slat sections: L1 = L2 = h; L3, L5 = length
         Real64 L3;
         Real64 L5;
@@ -8846,19 +8403,11 @@ namespace WindowManager {
         // METHODOLOGY EMPLOYED:
         //     Uses LU decomposition.
 
-        // REFERENCES:na
-
-        // USE STATEMENTS:na
-
         // Argument array dimensioning
         a.dim(np, np);
         y.dim(np, np);
         indx.dim(np);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DEFINITIONS:
         int i; // Array indices
         int j;
         int d;
@@ -8894,32 +8443,10 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine performs a LU decompostion of given matrix.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         A.dim(NP, NP);
         INDX.dim(N);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D<Real64> VV(100);
         Real64 sum;
         Real64 aamax;
@@ -9012,35 +8539,10 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine performs back substitution of a LU matrix.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         A.dim(NP, NP);
         INDX.dim(N);
         B.dim(N);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         int j;
         int i;

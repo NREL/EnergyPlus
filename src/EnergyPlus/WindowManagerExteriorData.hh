@@ -52,7 +52,6 @@
 #include <memory>
 #include <vector>
 
-//#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Vectors.hh>
 
 namespace EnergyPlus {
