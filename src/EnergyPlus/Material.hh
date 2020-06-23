@@ -45,63 +45,28 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EcoRoofManager_hh_INCLUDED
-#define EcoRoofManager_hh_INCLUDED
+#ifndef Material_hh_INCLUDED
+#define Material_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
 
-namespace EcoRoofManager {
+namespace Material {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // na
+}   // namespace Material
 
-    // DERIVED TYPE DEFINITIONS
-    // na
+struct MaterialData : BaseGlobalStruct
+{
+    void clear_state() override
+    {
 
-    // MODULE VARIABLE DECLARATIONS:
+    }
+};
 
-    extern Real64 CumRunoff; // Cumulative runoff, updated each time step (m) mult by roof area to get volume
-    extern Real64 CumET;     // Cumulative evapotranspiration from soil and plants (m)
-    extern Real64 CumPrecip;
-    extern Real64 CumIrrigation; // Cumulative irrigation, updated each time step (m) mult by roof area to get volume
-    extern Real64 CurrentRunoff;
-    extern Real64 CurrentET;
-    extern Real64 CurrentPrecipitation; // units of (m) per timestep
-    extern Real64 CurrentIrrigation;    // units of (m) per timestep
+extern MaterialData dataMaterial;
 
-    extern Real64 Tfold; // leaf temperature from the previous time step
-    extern Real64 Tgold; // ground temperature from the previous time step
-    extern bool EcoRoofbeginFlag;
-
-    // Functions
-
-    void CalcEcoRoof(int const SurfNum, // Indicator of Surface Number for the current surface
-                     int const ZoneNum, // Indicator for zone number where the current surface
-                     int &ConstrNum,    // Indicator for construction index for the current surface
-                     Real64 &TempExt    // Exterior temperature boundary condition
-    );
-
-    void UpdateSoilProps(Real64 &Moisture,
-                         Real64 &MeanRootMoisture,
-                         Real64 const MoistureMax,
-                         Real64 const MoistureResidual,
-                         Real64 const SoilThickness,
-                         Real64 const Vfluxf, // Water mass flux from vegetation [m/s]
-                         Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
-                         int &ConstrNum,      // Indicator for contruction index for the current surface
-                         Real64 &Alphag,
-                         int const unit,    // unused1208
-                         Real64 const Tg,   // unused1208
-                         Real64 const Tf,   // unused1208
-                         Real64 const Qsoil // unused1208
-    );
-
-} // namespace EcoRoofManager
-
-} // namespace EnergyPlus
+}   // namespace EnergyPlus
 
 #endif

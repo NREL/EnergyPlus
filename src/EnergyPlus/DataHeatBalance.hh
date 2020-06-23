@@ -2368,7 +2368,7 @@ namespace DataHeatBalance {
 
     // Object Data
     extern Array1D<ZonePreDefRepType> ZonePreDefRep;
-    extern ZonePreDefRepType BuildingPreDefRep; // Autodesk:Note Removed explicit constructor that was missing some entries
+    extern ZonePreDefRepType BuildingPreDefRep;
     extern Array1D<ZoneSimData> ZoneIntGain;
     extern Array1D<MaterialProperties> Material;
     extern Array1D<GapSupportPillar> SupportPillar;

@@ -67,9 +67,12 @@ namespace Construction {
     using DataSurfaces::MaxSlatAngs;
     using DataWindowEquivalentLayer::CFSMAXNL;
 
-    extern int const MaxLayersInConstruct;    // Maximum number of layers allowed in a single construction
-    extern int const MaxCTFTerms;             // Maximum number of CTF terms allowed to still allow stability
-    extern int const MaxSpectralDataElements; // Maximum number in Spectral Data arrays.
+    int constexpr MaxLayersInConstruct(11);  // Maximum number of layers allowed in a single construction
+    int constexpr MaxCTFTerms(19);           // Maximum number of CTF terms allowed to still allow stability
+    // Note Sync with SurfaceGroundHeatExchanger::local::MaxCTFTerms
+    // ** has to be big enough to hold no matter what window model
+    //    each window model should validate layers individually
+    int constexpr MaxSpectralDataElements(800);     // Maximum number in Spectral Data arrays.
 
     struct ConstructionProps
     {
@@ -283,6 +286,8 @@ namespace Construction {
         }
 
         bool isGlazingConstruction();
+
+        int AssignReverseConstructionNumber(bool &ErrorsFound);
     };
 
 }   // namespace Construction
