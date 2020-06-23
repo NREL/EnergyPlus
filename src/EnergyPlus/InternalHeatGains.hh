@@ -71,7 +71,7 @@ namespace InternalHeatGains {
 
     void GetInternalHeatGainsInput(EnergyPlus::EnergyPlusData &state);
 
-    void InitInternalHeatGains(EnergyPlus::EnergyPlusData &state);
+    void InitInternalHeatGains(EnergyPlus::EnergyPlusData &state, ZonePlenumData &dataZonePlenum);
 
     void CheckReturnAirHeatGain();
 
