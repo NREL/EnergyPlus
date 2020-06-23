@@ -74,7 +74,9 @@
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/WindowManager.hh>
-//#include <EnergyPlus/WindowManagerExteriorData.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
+
 #include <unordered_map>
 #include <string>
 
@@ -109,6 +111,8 @@ namespace EnergyPlus {
         OutputFiles outputFiles;
 
         WindowManagerData dataWindowManager;
+        ZoneEquipmentManagerData dataZoneEquipmentManager;
+        ZonePlenumData dataZonePlenum;
 
         EnergyPlusData() {
             OutputFiles::setSingleton(&outputFiles);
@@ -140,6 +144,8 @@ namespace EnergyPlus {
             pipes.clear_state();
             dataPlantChillers.clear_state();
             dataWindowManager.clear_state();
+            dataZoneEquipmentManager.clear_state();
+            dataZonePlenum.clear_state();
         };
     };
 
