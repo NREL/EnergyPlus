@@ -62,15 +62,13 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataShadowingCombinations.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/General.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/PierceSurface.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -107,7 +105,6 @@ namespace WindowComplexManager {
 
     // Using/Aliasing
     using namespace DataComplexFenestration;
-    using namespace DataPrecisionGlobals;
     using namespace DataVectorTypes;
     using namespace DataBSDFWindow;
     using DataGlobals::DegToRadians;
@@ -2953,11 +2950,8 @@ namespace WindowComplexManager {
         using DataGlobals::StefanBoltzmann;
         using DataHeatBalance::GasCoeffsAir;
         using DataHeatBalance::SupportPillar;
-        using DataHeatBalSurface::HcExtSurf;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
-        using General::InterpSlatAng; // Function for slat angle interpolation
-        using General::InterpSw;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -3498,20 +3492,20 @@ namespace WindowComplexManager {
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = dataConstruction.Construct(ConstrNum).LayerPoint(Lay);
 
-            if ((Material(LayPtr).Group == WindowGlass) || (Material(LayPtr).Group == WindowSimpleGlazing)) {
+            if ((dataMaterial.Material(LayPtr).Group == WindowGlass) || (dataMaterial.Material(LayPtr).Group == WindowSimpleGlazing)) {
                 ++IGlass;
                 LayerType(IGlass) = 0; // this marks specular layer type
-                thick(IGlass) = Material(LayPtr).Thickness;
-                scon(IGlass) = Material(LayPtr).Conductivity;
-                emis(2 * IGlass - 1) = Material(LayPtr).AbsorpThermalFront;
-                emis(2 * IGlass) = Material(LayPtr).AbsorpThermalBack;
-                tir(2 * IGlass - 1) = Material(LayPtr).TransThermal;
-                tir(2 * IGlass) = Material(LayPtr).TransThermal;
-                YoungsMod(IGlass) = Material(LayPtr).YoungModulus;
-                PoissonsRat(IGlass) = Material(LayPtr).PoissonsRatio;
-            } else if (Material(LayPtr).Group == ComplexWindowShade) {
+                thick(IGlass) = dataMaterial.Material(LayPtr).Thickness;
+                scon(IGlass) = dataMaterial.Material(LayPtr).Conductivity;
+                emis(2 * IGlass - 1) = dataMaterial.Material(LayPtr).AbsorpThermalFront;
+                emis(2 * IGlass) = dataMaterial.Material(LayPtr).AbsorpThermalBack;
+                tir(2 * IGlass - 1) = dataMaterial.Material(LayPtr).TransThermal;
+                tir(2 * IGlass) = dataMaterial.Material(LayPtr).TransThermal;
+                YoungsMod(IGlass) = dataMaterial.Material(LayPtr).YoungModulus;
+                PoissonsRat(IGlass) = dataMaterial.Material(LayPtr).PoissonsRatio;
+            } else if (dataMaterial.Material(LayPtr).Group == ComplexWindowShade) {
                 ++IGlass;
-                TempInt = Material(LayPtr).ComplexShadePtr;
+                TempInt = dataMaterial.Material(LayPtr).ComplexShadePtr;
                 LayerType(IGlass) = ComplexShade(TempInt).LayerType;
 
                 thick(IGlass) = ComplexShade(TempInt).Thickness;
@@ -3534,19 +3528,19 @@ namespace WindowComplexManager {
                 SlatCond(IGlass) = ComplexShade(TempInt).SlatConductivity;
                 SlatSpacing(IGlass) = ComplexShade(TempInt).SlatSpacing;
                 SlatCurve(IGlass) = ComplexShade(TempInt).SlatCurve;
-            } else if (Material(LayPtr).Group == ComplexWindowGap) {
+            } else if (dataMaterial.Material(LayPtr).Group == ComplexWindowGap) {
                 ++IGap;
-                gap(IGap) = Material(LayPtr).Thickness;
-                presure(IGap) = Material(LayPtr).Pressure;
+                gap(IGap) = dataMaterial.Material(LayPtr).Thickness;
+                presure(IGap) = dataMaterial.Material(LayPtr).Pressure;
 
-                DeflectionPtr = Material(LayPtr).DeflectionStatePtr;
+                DeflectionPtr = dataMaterial.Material(LayPtr).DeflectionStatePtr;
                 if (DeflectionPtr != 0) {
                     GapDefMax(IGap) = DeflectionState(DeflectionPtr).DeflectedThickness;
                 } else {
                     GapDefMax(IGap) = gap(IGap);
                 }
 
-                PillarPtr = Material(LayPtr).SupportPillarPtr;
+                PillarPtr = dataMaterial.Material(LayPtr).SupportPillarPtr;
 
                 if (PillarPtr != 0) {
                     SupportPlr(IGap) = 1;
@@ -3554,26 +3548,26 @@ namespace WindowComplexManager {
                     PillarRadius(IGap) = SupportPillar(PillarPtr).Radius;
                 }
 
-                GasPointer = Material(LayPtr).GasPointer;
+                GasPointer = dataMaterial.Material(LayPtr).GasPointer;
 
-                nmix(IGap + 1) = Material(GasPointer).NumberOfGasesInMixture;
+                nmix(IGap + 1) = dataMaterial.Material(GasPointer).NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
-                    // iprop(IGap+1, IMix) = Material(LayPtr)%GasType(IMix)
-                    // iprop(IGap+1, IMix) = GetGasIndex(Material(LayPtr)%GasWght(IMix))
-                    frct(IMix, IGap + 1) = Material(GasPointer).GasFract(IMix);
+                    // iprop(IGap+1, IMix) = dataMaterial.Material(LayPtr)%GasType(IMix)
+                    // iprop(IGap+1, IMix) = GetGasIndex(dataMaterial.Material(LayPtr)%GasWght(IMix))
+                    frct(IMix, IGap + 1) = dataMaterial.Material(GasPointer).GasFract(IMix);
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
                     // to be correctly referenced by gap arrays
 
                     // First check if gas coefficients are already part of array.  Duplicates are not necessary
-                    CheckGasCoefs(Material(GasPointer).GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
+                    CheckGasCoefs(dataMaterial.Material(GasPointer).GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
                     if (feedData) {
-                        wght(iprop(IMix, IGap + 1)) = Material(GasPointer).GasWght(IMix);
-                        gama(iprop(IMix, IGap + 1)) = Material(GasPointer).GasSpecHeatRatio(IMix);
+                        wght(iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasWght(IMix);
+                        gama(iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasSpecHeatRatio(IMix);
                         for (i = 1; i <= 3; ++i) {
-                            gcon(i, iprop(IMix, IGap + 1)) = Material(GasPointer).GasCon(i, IMix);
-                            gvis(i, iprop(IMix, IGap + 1)) = Material(GasPointer).GasVis(i, IMix);
-                            gcp(i, iprop(IMix, IGap + 1)) = Material(GasPointer).GasCp(i, IMix);
+                            gcon(i, iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasCon(i, IMix);
+                            gvis(i, iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasVis(i, IMix);
+                            gcp(i, iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasCp(i, IMix);
                         }
                     } // IF feedData THEN
                 }
@@ -4024,7 +4018,6 @@ namespace WindowComplexManager {
     {
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using TARCOGGassesParams::maxgas;
 
         // Argument array dimensioning

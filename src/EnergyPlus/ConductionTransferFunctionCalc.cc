@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include "OutputFiles.hh"
 
@@ -359,43 +360,43 @@ namespace ConductionTransferFunctionCalc {
 
                 // Obtain thermal properties from the Material derived type
 
-                dl(Layer) = Material(CurrentLayer).Thickness;
-                rk(Layer) = Material(CurrentLayer).Conductivity;
-                rho(Layer) = Material(CurrentLayer).Density;
-                cp(Layer) = Material(CurrentLayer).SpecHeat; // Must convert
+                dl(Layer) = dataMaterial.Material(CurrentLayer).Thickness;
+                rk(Layer) = dataMaterial.Material(CurrentLayer).Conductivity;
+                rho(Layer) = dataMaterial.Material(CurrentLayer).Density;
+                cp(Layer) = dataMaterial.Material(CurrentLayer).SpecHeat; // Must convert
                 // from kJ/kg-K to J/kg-k due to rk units
 
-                if (dataConstruction.Construct(ConstrNum).SourceSinkPresent && !Material(CurrentLayer).WarnedForHighDiffusivity) {
+                if (dataConstruction.Construct(ConstrNum).SourceSinkPresent && !dataMaterial.Material(CurrentLayer).WarnedForHighDiffusivity) {
                     // check for materials that are too conductive or thin
                     if ((rho(Layer) * cp(Layer)) > 0.0) {
                         Alpha = rk(Layer) / (rho(Layer) * cp(Layer));
                         if (Alpha > HighDiffusivityThreshold) {
                             DeltaTimestep = TimeStepZoneSec;
                             ThicknessThreshold = std::sqrt(Alpha * DeltaTimestep * 3.0);
-                            if (Material(CurrentLayer).Thickness < ThicknessThreshold) {
+                            if (dataMaterial.Material(CurrentLayer).Thickness < ThicknessThreshold) {
                                 ShowSevereError("InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "
                                                 "material name = " +
-                                                Material(CurrentLayer).Name);
+                                                dataMaterial.Material(CurrentLayer).Name);
                                 ShowContinueError("High conductivity Material layers are not well supported for internal source constructions, "
                                                   "material conductivity = " +
-                                                  RoundSigDigits(Material(CurrentLayer).Conductivity, 3) + " [W/m-K]");
+                                                  RoundSigDigits(dataMaterial.Material(CurrentLayer).Conductivity, 3) + " [W/m-K]");
                                 ShowContinueError("Material thermal diffusivity = " + RoundSigDigits(Alpha, 3) + " [m2/s]");
                                 ShowContinueError("Material with this thermal diffusivity should have thickness > " +
                                                   RoundSigDigits(ThicknessThreshold, 5) + " [m]");
-                                if (Material(CurrentLayer).Thickness < ThinMaterialLayerThreshold) {
+                                if (dataMaterial.Material(CurrentLayer).Thickness < ThinMaterialLayerThreshold) {
                                     ShowContinueError("Material may be too thin to be modeled well, thickness = " +
-                                                      RoundSigDigits(Material(CurrentLayer).Thickness, 5) + " [m]");
+                                                      RoundSigDigits(dataMaterial.Material(CurrentLayer).Thickness, 5) + " [m]");
                                     ShowContinueError("Material with this thermal diffusivity should have thickness > " +
                                                       RoundSigDigits(ThinMaterialLayerThreshold, 5) + " [m]");
                                 }
-                                Material(CurrentLayer).WarnedForHighDiffusivity = true;
+                                dataMaterial.Material(CurrentLayer).WarnedForHighDiffusivity = true;
                             }
                         }
                     }
                 }
-                if (Material(CurrentLayer).Thickness > 3.0) {
+                if (dataMaterial.Material(CurrentLayer).Thickness > 3.0) {
                     ShowSevereError("InitConductionTransferFunctions: Material too thick for CTF calculation");
-                    ShowContinueError("material name = " + Material(CurrentLayer).Name);
+                    ShowContinueError("material name = " + dataMaterial.Material(CurrentLayer).Name);
                     ErrorsFound = true;
                 }
 
@@ -425,12 +426,12 @@ namespace ConductionTransferFunctionCalc {
 
                 if (ResLayer(Layer)) {                             // Resistive layer-check for R-value, etc.
                     ++NumResLayers;                                // Increment number of resistive layers
-                    lr(Layer) = Material(CurrentLayer).Resistance; // User defined thermal resistivity
+                    lr(Layer) = dataMaterial.Material(CurrentLayer).Resistance; // User defined thermal resistivity
                     if (lr(Layer) < RValueLowLimit) {              // User didn't define enough
                         // parameters to calculate CTFs for a building element
                         // containing this layer.
 
-                        ShowSevereError("InitConductionTransferFunctions: Material=" + Material(CurrentLayer).Name +
+                        ShowSevereError("InitConductionTransferFunctions: Material=" + dataMaterial.Material(CurrentLayer).Name +
                                         "R Value below lowest allowed value");
                         ShowContinueError("Lowest allowed value=[" + RoundSigDigits(RValueLowLimit, 3) + "], Material R Value=[" +
                                           RoundSigDigits(lr(Layer), 3) + "].");
@@ -446,7 +447,7 @@ namespace ConductionTransferFunctionCalc {
                         // then use the "exact" approach to model a massless layer
                         // based on the node equations for the state space method.
 
-                        if ((Layer == 1) || (Layer == dataConstruction.Construct(ConstrNum).TotLayers) || (!Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).ROnly)) {
+                        if ((Layer == 1) || (Layer == dataConstruction.Construct(ConstrNum).TotLayers) || (!dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).ROnly)) {
                             cp(Layer) = 1.007;
                             rho(Layer) = 1.1614;
                             rk(Layer) = 0.0263;
@@ -1099,12 +1100,12 @@ namespace ConductionTransferFunctionCalc {
                         if (dataConstruction.Construct(ConstrNum).CTFTimeStep >= MaxAllowedTimeStep) {
                             ShowSevereError("CTF calculation convergence problem for Construction=\"" + dataConstruction.Construct(ConstrNum).Name + "\".");
                             ShowContinueError("...with Materials (outside layer to inside)");
-                            ShowContinueError("(outside)=\"" + Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Name + "\"");
+                            ShowContinueError("(outside)=\"" + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Name + "\"");
                             for (Layer = 2; Layer <= dataConstruction.Construct(ConstrNum).TotLayers; ++Layer) {
                                 if (Layer != dataConstruction.Construct(ConstrNum).TotLayers) {
-                                    ShowContinueError("(next)=\"" + Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Name + "\"");
+                                    ShowContinueError("(next)=\"" + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Name + "\"");
                                 } else {
-                                    ShowContinueError("(inside)=\"" + Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Name + "\"");
+                                    ShowContinueError("(inside)=\"" + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Name + "\"");
                                 }
                             }
                             ShowContinueError(
@@ -2192,20 +2193,20 @@ namespace ConductionTransferFunctionCalc {
                 for (I = 1; I <= dataConstruction.Construct(ThisNum).TotLayers; ++I) {
                     Layer = dataConstruction.Construct(ThisNum).LayerPoint(I);
                     {
-                        auto const SELECT_CASE_var(Material(Layer).Group);
+                        auto const SELECT_CASE_var(dataMaterial.Material(Layer).Group);
                         if (SELECT_CASE_var == Air) {
                             static constexpr auto Format_702(" Material:Air,{},{:12.4N}\n");
-                            print(outputFiles.eio, Format_702, Material(Layer).Name, Material(Layer).Resistance);
+                            print(outputFiles.eio, Format_702, dataMaterial.Material(Layer).Name, dataMaterial.Material(Layer).Resistance);
                         } else {
                             static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
                             print(outputFiles.eio,
                                   Format_701,
-                                  Material(Layer).Name,
-                                  Material(Layer).Thickness,
-                                  Material(Layer).Conductivity,
-                                  Material(Layer).Density,
-                                  Material(Layer).SpecHeat,
-                                  Material(Layer).Resistance);
+                                  dataMaterial.Material(Layer).Name,
+                                  dataMaterial.Material(Layer).Thickness,
+                                  dataMaterial.Material(Layer).Conductivity,
+                                  dataMaterial.Material(Layer).Density,
+                                  dataMaterial.Material(Layer).SpecHeat,
+                                  dataMaterial.Material(Layer).Resistance);
                         }
                     }
                 }

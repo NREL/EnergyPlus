@@ -74,6 +74,7 @@
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -254,7 +255,6 @@ namespace PipeHeatTransfer {
         using DataGlobals::Pi;
         using DataGlobals::SecInHour;
         using DataHeatBalance::IntGainTypeOf_PipeIndoor;
-        using DataHeatBalance::Material;
         using DataHeatBalance::Zone;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
@@ -609,19 +609,19 @@ namespace PipeHeatTransfer {
             // Also get the soil material name
             // A7,  \field Soil Material
             PipeHT(Item).SoilMaterial = cAlphaArgs(6);
-            PipeHT(Item).SoilMaterialNum = UtilityRoutines::FindItemInList(cAlphaArgs(6), Material);
+            PipeHT(Item).SoilMaterialNum = UtilityRoutines::FindItemInList(cAlphaArgs(6), dataMaterial.Material);
             if (PipeHT(Item).SoilMaterialNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(6) + '=' + PipeHT(Item).SoilMaterial);
                 ShowContinueError("Found in " + cCurrentModuleObject + '=' + PipeHT(Item).Name);
                 ErrorsFound = true;
             } else {
-                PipeHT(Item).SoilDensity = Material(PipeHT(Item).SoilMaterialNum).Density;
-                PipeHT(Item).SoilDepth = Material(PipeHT(Item).SoilMaterialNum).Thickness;
-                PipeHT(Item).SoilCp = Material(PipeHT(Item).SoilMaterialNum).SpecHeat;
-                PipeHT(Item).SoilConductivity = Material(PipeHT(Item).SoilMaterialNum).Conductivity;
-                PipeHT(Item).SoilThermAbs = Material(PipeHT(Item).SoilMaterialNum).AbsorpThermal;
-                PipeHT(Item).SoilSolarAbs = Material(PipeHT(Item).SoilMaterialNum).AbsorpSolar;
-                PipeHT(Item).SoilRoughness = Material(PipeHT(Item).SoilMaterialNum).Roughness;
+                PipeHT(Item).SoilDensity = dataMaterial.Material(PipeHT(Item).SoilMaterialNum).Density;
+                PipeHT(Item).SoilDepth = dataMaterial.Material(PipeHT(Item).SoilMaterialNum).Thickness;
+                PipeHT(Item).SoilCp = dataMaterial.Material(PipeHT(Item).SoilMaterialNum).SpecHeat;
+                PipeHT(Item).SoilConductivity = dataMaterial.Material(PipeHT(Item).SoilMaterialNum).Conductivity;
+                PipeHT(Item).SoilThermAbs = dataMaterial.Material(PipeHT(Item).SoilMaterialNum).AbsorpThermal;
+                PipeHT(Item).SoilSolarAbs = dataMaterial.Material(PipeHT(Item).SoilMaterialNum).AbsorpSolar;
+                PipeHT(Item).SoilRoughness = dataMaterial.Material(PipeHT(Item).SoilMaterialNum).Roughness;
                 PipeHT(Item).PipeDepth = PipeHT(Item).SoilDepth + PipeHT(Item).PipeID / 2.0;
                 PipeHT(Item).DomainDepth = PipeHT(Item).PipeDepth * 2.0;
                 PipeHT(Item).SoilDiffusivity = PipeHT(Item).SoilConductivity / (PipeHT(Item).SoilDensity * PipeHT(Item).SoilCp);
@@ -746,7 +746,6 @@ namespace PipeHeatTransfer {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::Material;
         using General::TrimSigDigits;
 
         // Locals
@@ -777,27 +776,27 @@ namespace PipeHeatTransfer {
         // get pipe properties
         if (TotalLayers == 1) { // no insulation layer
 
-            this->PipeConductivity = Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Conductivity;
-            this->PipeDensity = Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Density;
-            this->PipeCp = Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).SpecHeat;
-            this->PipeOD = this->PipeID + 2.0 * Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Thickness;
+            this->PipeConductivity = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Conductivity;
+            this->PipeDensity = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Density;
+            this->PipeCp = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).SpecHeat;
+            this->PipeOD = this->PipeID + 2.0 * dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Thickness;
             this->InsulationOD = this->PipeOD;
             this->SumTK =
-                Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Thickness / Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Conductivity;
+                dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Thickness / dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Conductivity;
 
         } else if (TotalLayers >= 2) { // first layers are insulation, last layer is pipe
 
             for (LayerNum = 1; LayerNum <= TotalLayers - 1; ++LayerNum) {
-                Resistance += Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness /
-                              Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Conductivity;
-                Density = Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Density *
-                          Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
-                TotThickness += Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
-                SpHeat = Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).SpecHeat *
-                         Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
-                this->InsulationThickness = Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
-                this->SumTK += Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness /
-                               Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Conductivity;
+                Resistance += dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness /
+                              dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Conductivity;
+                Density = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Density *
+                          dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
+                TotThickness += dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
+                SpHeat = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).SpecHeat *
+                         dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
+                this->InsulationThickness = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
+                this->SumTK += dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness /
+                               dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Conductivity;
             }
 
             this->InsulationResistance = Resistance;
@@ -806,11 +805,11 @@ namespace PipeHeatTransfer {
             this->InsulationCp = SpHeat / TotThickness;
             this->InsulationThickness = TotThickness;
 
-            this->PipeConductivity = Material(dataConstruction.Construct(ConstructionNum).LayerPoint(TotalLayers)).Conductivity;
-            this->PipeDensity = Material(dataConstruction.Construct(ConstructionNum).LayerPoint(TotalLayers)).Density;
-            this->PipeCp = Material(dataConstruction.Construct(ConstructionNum).LayerPoint(TotalLayers)).SpecHeat;
+            this->PipeConductivity = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(TotalLayers)).Conductivity;
+            this->PipeDensity = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(TotalLayers)).Density;
+            this->PipeCp = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(TotalLayers)).SpecHeat;
 
-            this->PipeOD = this->PipeID + 2.0 * Material(dataConstruction.Construct(ConstructionNum).LayerPoint(TotalLayers)).Thickness;
+            this->PipeOD = this->PipeID + 2.0 * dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(TotalLayers)).Thickness;
             this->InsulationOD = this->PipeOD + 2.0 * this->InsulationThickness;
 
         } else {
@@ -849,7 +848,6 @@ namespace PipeHeatTransfer {
         using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
-        using DataHeatBalance::Material;
         using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;

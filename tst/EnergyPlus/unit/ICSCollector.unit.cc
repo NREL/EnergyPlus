@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -112,8 +113,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     dataConstruction.Construct.allocate(ConstrNum);
     dataConstruction.Construct(ConstrNum).LayerPoint.allocate(MatNum);
     dataConstruction.Construct(ConstrNum).LayerPoint(MatNum) = 1;
-    Material.allocate(MatNum);
-    Material(MatNum).AbsorpThermal = 0.8;
+    dataMaterial.Material.allocate(MatNum);
+    dataMaterial.Material(MatNum).AbsorpThermal = 0.8;
     // allocate exterior vented cavaity variable data
     ExtVentedCavity.allocate(1);
     ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
@@ -164,7 +165,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Surface.deallocate();
     dataConstruction.Construct(ConstrNum).LayerPoint.deallocate();
     dataConstruction.Construct.deallocate();
-    Material.deallocate();
+    dataMaterial.Material.deallocate();
     ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
     ExtVentedCavity.deallocate();
     Zone.deallocate();

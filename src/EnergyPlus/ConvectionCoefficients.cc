@@ -78,6 +78,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -4935,7 +4936,7 @@ namespace ConvectionCoefficients {
                 SurfWindSpeed = Surface(SurfNum).WindSpeed;
             }
 
-            int Roughness = Material(dataConstruction.Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+            int Roughness = dataMaterial.Material(dataConstruction.Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
 
             auto const SELECT_CASE_var(ForcedConvModelEqNum);
 
@@ -8713,7 +8714,7 @@ namespace ConvectionCoefficients {
 
         static int ErrorIndex(0);
 
-        int const RoughnessIndex = Material(dataConstruction.Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+        int const RoughnessIndex = dataMaterial.Material(dataConstruction.Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
         // find x, don't know x. avoid time consuming geometry algorithm
         x = std::sqrt(RoofArea) / 2.0; // quick simplification, geometry routines to develop
 

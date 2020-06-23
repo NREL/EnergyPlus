@@ -60,6 +60,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -839,9 +840,9 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_EQ(dataConstruction.Construct(4).TotGlassLayers, 2);          // outer glass, inner glass
     EXPECT_EQ(dataConstruction.Construct(4).TotSolidLayers, 2);          // outer glass, inner glass
 
-    EXPECT_EQ(Material(4).Name, "SINGLEPANE"); // single pane glass
-    EXPECT_EQ(Material(5).Name, "WINGAS");     // air gap
-    EXPECT_EQ(Material(6).Name, "BLIND");      // window blind
+    EXPECT_EQ(dataMaterial.Material(4).Name, "SINGLEPANE"); // single pane glass
+    EXPECT_EQ(dataMaterial.Material(5).Name, "WINGAS");     // air gap
+    EXPECT_EQ(dataMaterial.Material(6).Name, "BLIND");      // window blind
 
     // construction layer material pointers. this construction has no blind
     EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(1), 4); // glass, outer layer

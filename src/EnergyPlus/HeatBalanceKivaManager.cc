@@ -72,10 +72,11 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/ThermalComfort.hh> // MRT Weighting
+#include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -662,7 +663,7 @@ namespace HeatBalanceKivaManager {
 
         auto &Surfaces = DataSurfaces::Surface;
         auto &Constructs = dataConstruction.Construct;
-        auto &Materials = DataHeatBalance::Material;
+        auto &Materials = dataMaterial.Material;
 
         int inst = 0;
         int surfNum = 1;

@@ -67,6 +67,7 @@
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -101,8 +102,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     dataConstruction.Construct(ConstrNum).CTFCross(0) = 0.0;
     dataConstruction.Construct(ConstrNum).CTFOutside(0) = 1.0;
     dataConstruction.Construct(ConstrNum).SourceSinkPresent = true;
-    DataHeatBalance::Material.allocate(1);
-    DataHeatBalance::Material(1).Name = "TestMaterial";
+    dataMaterial.Material.allocate(1);
+    dataMaterial.Material(1).Name = "TestMaterial";
 
     DataHeatBalSurface::HcExtSurf.allocate(SurfNum);
     DataHeatBalSurface::HcExtSurf(SurfNum) = 1.0;
@@ -265,7 +266,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
     dataConstruction.Construct.allocate(DataHeatBalance::TotConstructs);
-    DataHeatBalance::Material.allocate(DataHeatBalance::TotMaterials);
+    dataMaterial.Material.allocate(DataHeatBalance::TotMaterials);
 
     DataSurfaces::Surface(1).HeatTransSurf = true;
     DataSurfaces::Surface(1).Construction = 1;
@@ -273,13 +274,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     dataConstruction.Construct(1).InsideAbsorpThermal = 0.9;
     dataConstruction.Construct(1).TransDiff = 0.0;
     DataSurfaces::Surface(1).MaterialMovInsulInt = 1;
-    DataHeatBalance::Material(1).AbsorpThermal = 0.2;
-    DataHeatBalance::Material(1).AbsorpSolar = 0.5;
+    dataMaterial.Material(1).AbsorpThermal = 0.2;
+    dataMaterial.Material(1).AbsorpSolar = 0.5;
 
     DataGlobals::NumOfZones = 0; // Reset this to skip part of the code in the unit tested routine
 
     DataSurfaces::Surface(1).SchedMovInsulInt = -1; // According to schedule manager protocol, an index of -1 returns a 1.0 value for the schedule
-    DataHeatBalance::Material(1).Resistance = 1.25;
+    dataMaterial.Material(1).Resistance = 1.25;
 
     ComputeIntThermalAbsorpFactors();
 

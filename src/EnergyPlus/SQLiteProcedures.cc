@@ -49,6 +49,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Material.hh>
 #include "SQLiteProcedures.hh"
 #include "DataEnvironment.hh"
 #include "DataGlobals.hh"
@@ -144,7 +145,7 @@ void CreateSQLiteZoneExtendedOutput()
             sqlite->addSurfaceData(surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class));
         }
         for (int materialNum = 1; materialNum <= DataHeatBalance::TotMaterials; ++materialNum) {
-            sqlite->addMaterialData(materialNum, DataHeatBalance::Material(materialNum));
+            sqlite->addMaterialData(materialNum, dataMaterial.Material(materialNum));
         }
         for (int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum) {
             auto const &construction = dataConstruction.Construct(constructNum);
@@ -2096,7 +2097,7 @@ void SQLite::addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData c
     zoneGroups.push_back(std::unique_ptr<ZoneGroup>(new ZoneGroup(m_errorStream, m_db, number, zoneGroupData)));
 }
 
-void SQLite::addMaterialData(int const number, DataHeatBalance::MaterialProperties const &materialData)
+void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialProperties const &materialData)
 {
     materials.push_back(std::unique_ptr<Material>(new Material(m_errorStream, m_db, number, materialData)));
 }

@@ -77,6 +77,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -1867,8 +1868,8 @@ namespace SurfaceGeometry {
                     // Use the new generic code (assuming only one blind) as follows
                     for (iTmp1 = 1; iTmp1 <= dataConstruction.Construct(ConstrNumSh).TotLayers; ++iTmp1) {
                         iTmp2 = dataConstruction.Construct(ConstrNumSh).LayerPoint(iTmp1);
-                        if (Material(iTmp2).Group == WindowBlind) {
-                            BlNum = Material(iTmp2).BlindDataPtr;
+                        if (dataMaterial.Material(iTmp2).Group == WindowBlind) {
+                            BlNum = dataMaterial.Material(iTmp2).BlindDataPtr;
                             SurfaceWindow(SurfNum).BlindNumber = BlNum;
                             // TH 2/18/2010. CR 8010
                             // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
@@ -1877,7 +1878,7 @@ namespace SurfaceGeometry {
                                 errFlag = false;
                                 AddVariableSlatBlind(BlNum, BlNumNew, errFlag);
                                 // point to the new blind
-                                Material(iTmp2).BlindDataPtr = BlNumNew;
+                                dataMaterial.Material(iTmp2).BlindDataPtr = BlNumNew;
                                 // window surface points to new blind
                                 SurfaceWindow(SurfNum).BlindNumber = BlNumNew;
                             }
@@ -1945,9 +1946,9 @@ namespace SurfaceGeometry {
             }
             if (LayNumOutside != dataConstruction.Construct(Surface(SurfNum).Construction).LayerPoint(1)) {
                 ShowSevereError(RoutineName + "Only one EcoRoof Material is currently allowed for all constructions.");
-                ShowContinueError("... first material=" + Material(LayNumOutside).Name);
+                ShowContinueError("... first material=" + dataMaterial.Material(LayNumOutside).Name);
                 ShowContinueError("... conflicting Construction=" + dataConstruction.Construct(Surface(SurfNum).Construction).Name +
-                                  " uses material=" + Material(dataConstruction.Construct(Surface(SurfNum).Construction).LayerPoint(1)).Name);
+                                  " uses material=" + dataMaterial.Material(dataConstruction.Construct(Surface(SurfNum).Construction).LayerPoint(1)).Name);
                 ErrorsFound = true;
             }
         }
@@ -4581,17 +4582,17 @@ namespace SurfaceGeometry {
                 if (dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers) != dataConstruction.Construct(ConstrNumSh).LayerPoint(TotShLayers)) {
                     ShowSevereError(cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
                     ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name +
-                                      ", Material=" + Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).Name);
+                                      ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).Name);
                     ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name +
-                                      ", Material=" + Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotShLayers)).Name);
+                                      ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotShLayers)).Name);
                     ErrorsFound = true;
                 }
                 if (dataConstruction.Construct(ConstrNum).LayerPoint(1) != dataConstruction.Construct(ConstrNumSh).LayerPoint(1)) {
                     ShowSevereError(cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
                     ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name +
-                                      ", Material=" + Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Name);
+                                      ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Name);
                     ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name +
-                                      ", Material=" + Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Name);
+                                      ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Name);
                     ErrorsFound = true;
                 }
                 if (TotGlassLayers == 2 || TotGlassLayers == 3) {
@@ -4600,33 +4601,33 @@ namespace SurfaceGeometry {
                     MatGap2 = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers);
                     MatSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 1);
                     if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
-                        MatGapCalc = std::abs(Material(MatGap).Thickness - (Material(MatGap1).Thickness + Material(MatGap2).Thickness));
+                        MatGapCalc = std::abs(dataMaterial.Material(MatGap).Thickness - (dataMaterial.Material(MatGap1).Thickness + dataMaterial.Material(MatGap2).Thickness));
                         if (MatGapCalc > 0.001) {
                             ShowSevereError(cRoutineName + ": The gap width(s) for the unshaded window construction " + dataConstruction.Construct(ConstrNum).Name);
                             ShowContinueError("are inconsistent with the gap widths for shaded window construction " + dataConstruction.Construct(ConstrNumSh).Name);
                             ShowContinueError("for window " + SurfaceTmp(SurfNum).Name + ", which has a between-glass blind.");
-                            ShowContinueError("..Material=" + Material(MatGap).Name + " thickness=" + RoundSigDigits(Material(MatGap).Thickness, 3) +
+                            ShowContinueError("..Material=" + dataMaterial.Material(MatGap).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap).Thickness, 3) +
                                               " -");
-                            ShowContinueError("..( Material=" + Material(MatGap1).Name +
-                                              " thickness=" + RoundSigDigits(Material(MatGap1).Thickness, 3) + " +");
-                            ShowContinueError("..Material=" + Material(MatGap2).Name + " thickness=" +
-                                              RoundSigDigits(Material(MatGap2).Thickness, 3) + " )=[" + RoundSigDigits(MatGapCalc, 3) + "] >.001");
+                            ShowContinueError("..( Material=" + dataMaterial.Material(MatGap1).Name +
+                                              " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap1).Thickness, 3) + " +");
+                            ShowContinueError("..Material=" + dataMaterial.Material(MatGap2).Name + " thickness=" +
+                                              RoundSigDigits(dataMaterial.Material(MatGap2).Thickness, 3) + " )=[" + RoundSigDigits(MatGapCalc, 3) + "] >.001");
                             ErrorsFound = true;
                         }
                     } else { // Between-glass shade
-                        MatGapCalc = std::abs(Material(MatGap).Thickness -
-                                              (Material(MatGap1).Thickness + Material(MatGap2).Thickness + Material(MatSh).Thickness));
+                        MatGapCalc = std::abs(dataMaterial.Material(MatGap).Thickness -
+                                              (dataMaterial.Material(MatGap1).Thickness + dataMaterial.Material(MatGap2).Thickness + dataMaterial.Material(MatSh).Thickness));
                         if (MatGapCalc > 0.001) {
                             ShowSevereError(cRoutineName + ": The gap width(s) for the unshaded window construction " + dataConstruction.Construct(ConstrNum).Name);
                             ShowContinueError("are inconsistent with the gap widths for shaded window construction " + dataConstruction.Construct(ConstrNumSh).Name);
                             ShowContinueError("for window " + SurfaceTmp(SurfNum).Name + ", which has a between-glass shade.");
-                            ShowContinueError("..Material=" + Material(MatGap).Name + " thickness=" + RoundSigDigits(Material(MatGap).Thickness, 3) +
+                            ShowContinueError("..Material=" + dataMaterial.Material(MatGap).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap).Thickness, 3) +
                                               " -");
-                            ShowContinueError("...( Material=" + Material(MatGap1).Name +
-                                              " thickness=" + RoundSigDigits(Material(MatGap1).Thickness, 3) + " +");
-                            ShowContinueError("..Material=" + Material(MatGap2).Name +
-                                              " thickness=" + RoundSigDigits(Material(MatGap2).Thickness, 3) + " +");
-                            ShowContinueError("..Material=" + Material(MatSh).Name + " thickness=" + RoundSigDigits(Material(MatSh).Thickness, 3) +
+                            ShowContinueError("...( Material=" + dataMaterial.Material(MatGap1).Name +
+                                              " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap1).Thickness, 3) + " +");
+                            ShowContinueError("..Material=" + dataMaterial.Material(MatGap2).Name +
+                                              " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap2).Thickness, 3) + " +");
+                            ShowContinueError("..Material=" + dataMaterial.Material(MatSh).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatSh).Thickness, 3) +
                                               " )=[" + RoundSigDigits(MatGapCalc, 3) + "] >.001");
                             ErrorsFound = true;
                         }
@@ -4749,7 +4750,7 @@ namespace SurfaceGeometry {
             for (Lay = 1; Lay <= dataConstruction.Construct(ConstrNum).TotLayers; ++Lay) {
                 LayerPtr = dataConstruction.Construct(ConstrNum).LayerPoint(Lay);
                 if (LayerPtr == 0) continue; // Error is caught already, will terminate later
-                if (Material(LayerPtr).Group == Shade || Material(LayerPtr).Group == WindowBlind || Material(LayerPtr).Group == Screen) ++NumShades;
+                if (dataMaterial.Material(LayerPtr).Group == Shade || dataMaterial.Material(LayerPtr).Group == WindowBlind || dataMaterial.Material(LayerPtr).Group == Screen) ++NumShades;
             }
             if (NumShades != 0) {
                 ShowSevereError(cRoutineName + ": Window \"" + SubSurfaceName + "\" must not directly reference");
@@ -4767,7 +4768,7 @@ namespace SurfaceGeometry {
             if (ConstrNum > 0) {
                 for (Lay = 1; Lay <= dataConstruction.Construct(ConstrNum).TotLayers; ++Lay) {
                     LayerPtr = dataConstruction.Construct(ConstrNum).LayerPoint(Lay);
-                    if (Material(LayerPtr).Group == WindowGlass && Material(LayerPtr).GlassTransDirtFactor < 1.0) {
+                    if (dataMaterial.Material(LayerPtr).Group == WindowGlass && dataMaterial.Material(LayerPtr).GlassTransDirtFactor < 1.0) {
                         ShowSevereError(cRoutineName + ": Interior Window or GlassDoor " + SubSurfaceName + " has a glass layer with");
                         ShowContinueError("Dirt Correction Factor for Solar and Visible Transmittance < 1.0");
                         ShowContinueError("A value less than 1.0 for this factor is only allowed for exterior windows and glass doors.");
@@ -7946,7 +7947,7 @@ namespace SurfaceGeometry {
 
             WindowShadingControl(ControlNum).SequenceNumber = int(rNumericArgs(1));
             WindowShadingControl(ControlNum).ShadedConstruction = UtilityRoutines::FindItemInList(cAlphaArgs(4), dataConstruction.Construct, TotConstructs);
-            WindowShadingControl(ControlNum).ShadingDevice = UtilityRoutines::FindItemInList(cAlphaArgs(9), Material, TotMaterials);
+            WindowShadingControl(ControlNum).ShadingDevice = UtilityRoutines::FindItemInList(cAlphaArgs(9), dataMaterial.Material, TotMaterials);
             WindowShadingControl(ControlNum).Schedule = GetScheduleIndex(cAlphaArgs(6));
             WindowShadingControl(ControlNum).SetPoint = rNumericArgs(2);
             WindowShadingControl(ControlNum).SetPoint2 = rNumericArgs(3);
@@ -8027,7 +8028,7 @@ namespace SurfaceGeometry {
             }
 
             if (WindowShadingControl(ControlNum).ShadingDevice > 0) {
-                if (Material(WindowShadingControl(ControlNum).ShadingDevice).Group == Screen &&
+                if (dataMaterial.Material(WindowShadingControl(ControlNum).ShadingDevice).Group == Screen &&
                     !(ControlType == "ALWAYSON" || ControlType == "ALWAYSOFF" || ControlType == "ONIFSCHEDULEALLOWS")) {
                     ErrorsFound = true;
                     ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(5) +
@@ -8037,7 +8038,7 @@ namespace SurfaceGeometry {
             } else {
                 if (WindowShadingControl(ControlNum).ShadedConstruction > 0) {
                     dataConstruction.Construct(WindowShadingControl(ControlNum).ShadedConstruction).IsUsed = true;
-                    if (Material(dataConstruction.Construct(WindowShadingControl(ControlNum).ShadedConstruction).LayerPoint(1)).Group == Screen &&
+                    if (dataMaterial.Material(dataConstruction.Construct(WindowShadingControl(ControlNum).ShadedConstruction).LayerPoint(1)).Group == Screen &&
                         !(ControlType == "ALWAYSON" || ControlType == "ALWAYSOFF" || ControlType == "ONIFSCHEDULEALLOWS")) {
                         ErrorsFound = true;
                         ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(5) +
@@ -8163,22 +8164,22 @@ namespace SurfaceGeometry {
                                     "= SwitchableGlazing but no matching shaded construction");
                     ErrorsFound = true;
                 }
-                if ((ShTyp == WSC_ST_InteriorShade || ShTyp == WSC_ST_ExteriorShade) && Material(IShadingDevice).Group != Shade) {
+                if ((ShTyp == WSC_ST_InteriorShade || ShTyp == WSC_ST_ExteriorShade) && dataMaterial.Material(IShadingDevice).Group != Shade) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(3) +
                                     "= InteriorShade or ExteriorShade but matching shading device is not a window shade");
-                    ShowContinueError(cAlphaFieldNames(8) + " in error=\"" + Material(IShadingDevice).Name + "\".");
+                    ShowContinueError(cAlphaFieldNames(8) + " in error=\"" + dataMaterial.Material(IShadingDevice).Name + "\".");
                     ErrorsFound = true;
                 }
-                if ((ShTyp == WSC_ST_ExteriorScreen) && Material(IShadingDevice).Group != Screen) {
+                if ((ShTyp == WSC_ST_ExteriorScreen) && dataMaterial.Material(IShadingDevice).Group != Screen) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(3) +
                                     "= ExteriorScreen but matching shading device is not a window screen");
-                    ShowContinueError(cAlphaFieldNames(8) + " in error=\"" + Material(IShadingDevice).Name + "\".");
+                    ShowContinueError(cAlphaFieldNames(8) + " in error=\"" + dataMaterial.Material(IShadingDevice).Name + "\".");
                     ErrorsFound = true;
                 }
-                if ((ShTyp == WSC_ST_InteriorBlind || ShTyp == WSC_ST_ExteriorBlind) && Material(IShadingDevice).Group != WindowBlind) {
+                if ((ShTyp == WSC_ST_InteriorBlind || ShTyp == WSC_ST_ExteriorBlind) && dataMaterial.Material(IShadingDevice).Group != WindowBlind) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(3) +
                                     "= InteriorBlind or ExteriorBlind but matching shading device is not a window blind");
-                    ShowContinueError(cAlphaFieldNames(8) + " in error=\"" + Material(IShadingDevice).Name + "\".");
+                    ShowContinueError(cAlphaFieldNames(8) + " in error=\"" + dataMaterial.Material(IShadingDevice).Name + "\".");
                     ErrorsFound = true;
                 }
                 if (ShTyp == WSC_ST_BetweenGlassShade || ShTyp == WSC_ST_BetweenGlassBlind) {
@@ -8204,7 +8205,7 @@ namespace SurfaceGeometry {
                 if (dataConstruction.Construct(IShadedConst).LayerPoint(NLayers) != 0) {
                     if (WindowShadingControl(ControlNum).ShadingType == WSC_ST_InteriorShade) {
                         IShadingDevice = dataConstruction.Construct(IShadedConst).LayerPoint(NLayers);
-                        if (Material(dataConstruction.Construct(IShadedConst).LayerPoint(NLayers)).Group != Shade) {
+                        if (dataMaterial.Material(dataConstruction.Construct(IShadedConst).LayerPoint(NLayers)).Group != Shade) {
                             ErrorsFound = true;
                             ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(4) +
                                             "=\"" + cAlphaArgs(4) + "\"");
@@ -8213,7 +8214,7 @@ namespace SurfaceGeometry {
                         }
                     } else if (WindowShadingControl(ControlNum).ShadingType == WSC_ST_ExteriorShade) {
                         IShadingDevice = dataConstruction.Construct(IShadedConst).LayerPoint(1);
-                        if (Material(dataConstruction.Construct(IShadedConst).LayerPoint(1)).Group != Shade) {
+                        if (dataMaterial.Material(dataConstruction.Construct(IShadedConst).LayerPoint(1)).Group != Shade) {
                             ErrorsFound = true;
                             ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(43) +
                                             "=\"" + cAlphaArgs(4) + "\"");
@@ -8222,7 +8223,7 @@ namespace SurfaceGeometry {
                         }
                     } else if (WindowShadingControl(ControlNum).ShadingType == WSC_ST_ExteriorScreen) {
                         IShadingDevice = dataConstruction.Construct(IShadedConst).LayerPoint(1);
-                        if (Material(dataConstruction.Construct(IShadedConst).LayerPoint(1)).Group != Screen) {
+                        if (dataMaterial.Material(dataConstruction.Construct(IShadedConst).LayerPoint(1)).Group != Screen) {
                             ErrorsFound = true;
                             ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(4) +
                                             "=\"" + cAlphaArgs(4) + "\"");
@@ -8231,7 +8232,7 @@ namespace SurfaceGeometry {
                         }
                     } else if (WindowShadingControl(ControlNum).ShadingType == WSC_ST_InteriorBlind) {
                         IShadingDevice = dataConstruction.Construct(IShadedConst).LayerPoint(NLayers);
-                        if (Material(dataConstruction.Construct(IShadedConst).LayerPoint(NLayers)).Group != WindowBlind) {
+                        if (dataMaterial.Material(dataConstruction.Construct(IShadedConst).LayerPoint(NLayers)).Group != WindowBlind) {
                             ErrorsFound = true;
                             ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(4) +
                                             "=\"" + cAlphaArgs(4) + "\"");
@@ -8240,7 +8241,7 @@ namespace SurfaceGeometry {
                         }
                     } else if (WindowShadingControl(ControlNum).ShadingType == WSC_ST_ExteriorBlind) {
                         IShadingDevice = dataConstruction.Construct(IShadedConst).LayerPoint(1);
-                        if (Material(dataConstruction.Construct(IShadedConst).LayerPoint(1)).Group != WindowBlind) {
+                        if (dataMaterial.Material(dataConstruction.Construct(IShadedConst).LayerPoint(1)).Group != WindowBlind) {
                             ErrorsFound = true;
                             ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" the " + cAlphaFieldNames(4) +
                                             "=\"" + cAlphaArgs(4) + "\"");
@@ -8250,10 +8251,10 @@ namespace SurfaceGeometry {
                     } else if (WindowShadingControl(ControlNum).ShadingType == WSC_ST_BetweenGlassShade) {
                         if (NLayers != 5 && NLayers != 7) BGShadeBlindError = true;
                         if (NLayers == 5) {
-                            if (Material(dataConstruction.Construct(IShadedConst).LayerPoint(3)).Group != Shade) BGShadeBlindError = true;
+                            if (dataMaterial.Material(dataConstruction.Construct(IShadedConst).LayerPoint(3)).Group != Shade) BGShadeBlindError = true;
                         }
                         if (NLayers == 7) {
-                            if (Material(dataConstruction.Construct(IShadedConst).LayerPoint(5)).Group != Shade) BGShadeBlindError = true;
+                            if (dataMaterial.Material(dataConstruction.Construct(IShadedConst).LayerPoint(5)).Group != Shade) BGShadeBlindError = true;
                         }
                         if (BGShadeBlindError) {
                             ErrorsFound = true;
@@ -8266,10 +8267,10 @@ namespace SurfaceGeometry {
                     } else if (WindowShadingControl(ControlNum).ShadingType == WSC_ST_BetweenGlassBlind) {
                         if (NLayers != 5 && NLayers != 7) BGShadeBlindError = true;
                         if (NLayers == 5) {
-                            if (Material(dataConstruction.Construct(IShadedConst).LayerPoint(3)).Group != WindowBlind) BGShadeBlindError = true;
+                            if (dataMaterial.Material(dataConstruction.Construct(IShadedConst).LayerPoint(3)).Group != WindowBlind) BGShadeBlindError = true;
                         }
                         if (NLayers == 7) {
-                            if (Material(dataConstruction.Construct(IShadedConst).LayerPoint(5)).Group != WindowBlind) BGShadeBlindError = true;
+                            if (dataMaterial.Material(dataConstruction.Construct(IShadedConst).LayerPoint(5)).Group != WindowBlind) BGShadeBlindError = true;
                         }
                         if (BGShadeBlindError) {
                             ErrorsFound = true;
@@ -8281,22 +8282,22 @@ namespace SurfaceGeometry {
                     }
                 }
                 if (IShadingDevice > 0) {
-                    if ((ShTyp == WSC_ST_InteriorShade || ShTyp == WSC_ST_ExteriorShade) && Material(IShadingDevice).Group != Shade) {
+                    if ((ShTyp == WSC_ST_InteriorShade || ShTyp == WSC_ST_ExteriorShade) && dataMaterial.Material(IShadingDevice).Group != Shade) {
                         ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaFieldNames(3) +
                                         "= InteriorShade or ExteriorShade but matching shading device is not a window shade");
-                        ShowContinueError("Shading Device in error=\"" + Material(IShadingDevice).Name + "\".");
+                        ShowContinueError("Shading Device in error=\"" + dataMaterial.Material(IShadingDevice).Name + "\".");
                         ErrorsFound = true;
                     }
-                    if ((ShTyp == WSC_ST_ExteriorScreen) && Material(IShadingDevice).Group != Screen) {
+                    if ((ShTyp == WSC_ST_ExteriorScreen) && dataMaterial.Material(IShadingDevice).Group != Screen) {
                         ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaFieldNames(3) +
                                         "= ExteriorScreen but matching shading device is not an exterior window screen.");
-                        ShowContinueError("Shading Device in error=\"" + Material(IShadingDevice).Name + "\".");
+                        ShowContinueError("Shading Device in error=\"" + dataMaterial.Material(IShadingDevice).Name + "\".");
                         ErrorsFound = true;
                     }
-                    if ((ShTyp == WSC_ST_InteriorBlind || ShTyp == WSC_ST_ExteriorBlind) && Material(IShadingDevice).Group != WindowBlind) {
+                    if ((ShTyp == WSC_ST_InteriorBlind || ShTyp == WSC_ST_ExteriorBlind) && dataMaterial.Material(IShadingDevice).Group != WindowBlind) {
                         ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" has " + cAlphaFieldNames(3) +
                                         "= InteriorBlind or ExteriorBlind but matching shading device is not a window blind.");
-                        ShowContinueError("Shading Device in error=\"" + Material(IShadingDevice).Name + "\".");
+                        ShowContinueError("Shading Device in error=\"" + dataMaterial.Material(IShadingDevice).Name + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -8417,7 +8418,7 @@ namespace SurfaceGeometry {
                                           cNumericFieldNames);
             ++StormWinNum;
             StormWindow(StormWinNum).BaseWindowNum = UtilityRoutines::FindItemInList(cAlphaArgs(1), Surface, TotSurfaces);
-            StormWindow(StormWinNum).StormWinMaterialNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Material, TotMaterials);
+            StormWindow(StormWinNum).StormWinMaterialNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), dataMaterial.Material, TotMaterials);
             StormWindow(StormWinNum).StormWinDistance = rNumericArgs(1);
             StormWindow(StormWinNum).MonthOn = rNumericArgs(2);
             StormWindow(StormWinNum).DayOfMonthOn = rNumericArgs(3);
@@ -8515,7 +8516,7 @@ namespace SurfaceGeometry {
                     ShowContinueError(cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\" not found as storm window layer.");
                     ErrorsFound = true;
                 } else {
-                    if (Material(MatNum).Group != WindowGlass) {
+                    if (dataMaterial.Material(MatNum).Group != WindowGlass) {
                         ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                         ShowContinueError(cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                           "must be a WindowMaterial:Glazing or WindowMaterial:Glazing:RefractionExtinctionMethod");
@@ -8743,7 +8744,7 @@ namespace SurfaceGeometry {
                     // Require that gas in airflow gap has type = air
                     MatGapFlow = dataConstruction.Construct(ConstrNum).LayerPoint(2);
                     if (dataConstruction.Construct(ConstrNum).TotGlassLayers == 3) MatGapFlow = dataConstruction.Construct(ConstrNum).LayerPoint(4);
-                    if (Material(MatGapFlow).GasType(1) != 1) {
+                    if (dataMaterial.Material(MatGapFlow).GasType(1) != 1) {
                         ErrorsFound = true;
                         ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", Gas type not air in airflow gap of construction " +
                                         dataConstruction.Construct(ConstrNum).Name);
@@ -8761,7 +8762,7 @@ namespace SurfaceGeometry {
                                 MatGapFlow1 = dataConstruction.Construct(ConstrNumSh).LayerPoint(4);
                                 MatGapFlow2 = dataConstruction.Construct(ConstrNumSh).LayerPoint(6);
                             }
-                            if (Material(MatGapFlow1).GasType(1) != 1 || Material(MatGapFlow2).GasType(1) != 1) {
+                            if (dataMaterial.Material(MatGapFlow1).GasType(1) != 1 || dataMaterial.Material(MatGapFlow2).GasType(1) != 1) {
                                 ErrorsFound = true;
                                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                                 "\", gas type must be air on either side of the shade/blind");
@@ -8934,14 +8935,14 @@ namespace SurfaceGeometry {
 
                 // Interior horizontal insulation
                 if (!lAlphaFieldBlanks(alpF)) {
-                    int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), Material);
+                    int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), dataMaterial.Material);
                     if (index == 0) {
                         ErrorsFound = true;
                         ShowSevereError("Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " +
                                         cAlphaFieldNames(alpF) + ", missing material = " + cAlphaArgs(alpF));
                         continue;
                     }
-                    auto &m = Material(index);
+                    auto &m = dataMaterial.Material(index);
                     if (m.Group != RegularMaterial || m.ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames(alpF) + "=\"" +
@@ -8986,14 +8987,14 @@ namespace SurfaceGeometry {
 
                 // Interior vertical insulation
                 if (!lAlphaFieldBlanks(alpF)) {
-                    int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), Material);
+                    int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), dataMaterial.Material);
                     if (index == 0) {
                         ErrorsFound = true;
                         ShowSevereError("Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " +
                                         cAlphaFieldNames(alpF) + ", missing material = " + cAlphaArgs(alpF));
                         continue;
                     }
-                    auto &m = Material(index);
+                    auto &m = dataMaterial.Material(index);
                     if (m.Group != RegularMaterial || m.ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames(alpF) + "=\"" +
@@ -9028,14 +9029,14 @@ namespace SurfaceGeometry {
 
                 // Exterior horizontal insulation
                 if (!lAlphaFieldBlanks(alpF)) {
-                    int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), Material);
+                    int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), dataMaterial.Material);
                     if (index == 0) {
                         ErrorsFound = true;
                         ShowSevereError("Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " +
                                         cAlphaFieldNames(alpF) + ", missing material = " + cAlphaArgs(alpF));
                         continue;
                     }
-                    auto &m = Material(index);
+                    auto &m = dataMaterial.Material(index);
                     if (m.Group != RegularMaterial || m.ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames(alpF) + "=\"" +
@@ -9080,14 +9081,14 @@ namespace SurfaceGeometry {
 
                 // Exterior vertical insulation
                 if (!lAlphaFieldBlanks(alpF)) {
-                    int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), Material);
+                    int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), dataMaterial.Material);
                     if (index == 0) {
                         ErrorsFound = true;
                         ShowSevereError("Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " +
                                         cAlphaFieldNames(alpF) + ", missing material = " + cAlphaArgs(alpF));
                         continue;
                     }
-                    auto &m = Material(index);
+                    auto &m = dataMaterial.Material(index);
                     if (m.Group != RegularMaterial || m.ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames(alpF) + "=\"" +
@@ -9155,14 +9156,14 @@ namespace SurfaceGeometry {
 
                 // Footing
                 if (!lAlphaFieldBlanks(alpF)) {
-                    int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), Material);
+                    int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), dataMaterial.Material);
                     if (index == 0) {
                         ErrorsFound = true;
                         ShowSevereError("Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " +
                                         cAlphaFieldNames(alpF) + ", missing material = " + cAlphaArgs(alpF));
                         continue;
                     }
-                    auto &m = Material(index);
+                    auto &m = dataMaterial.Material(index);
                     if (m.Group != RegularMaterial || m.ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames(alpF) + "=\"" +
@@ -9206,14 +9207,14 @@ namespace SurfaceGeometry {
                     for (int blockNum = 0; blockNum < numBlocks; blockNum++) {
                         Kiva::InputBlock block;
                         if (!lAlphaFieldBlanks(alpF)) {
-                            int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), Material);
+                            int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), dataMaterial.Material);
                             if (index == 0) {
                                 ErrorsFound = true;
                                 ShowSevereError("Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " +
                                                 cAlphaFieldNames(alpF) + ", missing material = " + cAlphaArgs(alpF));
                                 continue;
                             }
-                            auto &m = Material(index);
+                            auto &m = dataMaterial.Material(index);
                             if (m.Group != RegularMaterial || m.ROnly) {
                                 ErrorsFound = true;
                                 ShowSevereError(cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames(alpF) + "=\"" +
@@ -9703,7 +9704,7 @@ namespace SurfaceGeometry {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), SurfaceTmp, TotSurfaces);
-            MaterNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Material, TotMaterials);
+            MaterNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), dataMaterial.Material, TotMaterials);
             SchNum = GetScheduleIndex(cAlphaArgs(4));
             if (UtilityRoutines::SameString(cAlphaArgs(1), "Outside")) {
                 InslType = 1;
@@ -9725,7 +9726,7 @@ namespace SurfaceGeometry {
                     ShowContinueError(" invalid (not found) " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\"");
                     ErrorsFound = true;
                 } else {
-                    int const MaterialLayerGroup = Material(MaterNum).Group;
+                    int const MaterialLayerGroup = dataMaterial.Material(MaterNum).Group;
                     if ((MaterialLayerGroup == WindowSimpleGlazing) || (MaterialLayerGroup == ShadeEquivalentLayer) ||
                         (MaterialLayerGroup == DrapeEquivalentLayer) || (MaterialLayerGroup == BlindEquivalentLayer) ||
                         (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer)) {
@@ -9746,32 +9747,32 @@ namespace SurfaceGeometry {
                                     ShowSevereError(cCurrentModuleObject + ", " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                                     "\", already assigned.");
                                     ShowContinueError("\"Outside\", was already assigned Material=\"" +
-                                                      Material(SurfaceTmp(SurfNum).MaterialMovInsulInt).Name + "\".");
-                                    ShowContinueError("attempting to assign Material=\"" + Material(MaterNum).Name + "\".");
+                                                      dataMaterial.Material(SurfaceTmp(SurfNum).MaterialMovInsulInt).Name + "\".");
+                                    ShowContinueError("attempting to assign Material=\"" + dataMaterial.Material(MaterNum).Name + "\".");
                                     ErrorsFound = true;
                                 }
                                 SurfaceTmp(SurfNum).MaterialMovInsulExt = MaterNum;
                                 SurfaceTmp(SurfNum).SchedMovInsulExt = SchNum;
-                                if (Material(MaterNum).Resistance <= 0.0) {
-                                    if (Material(MaterNum).Conductivity <= 0.0 || Material(MaterNum).Thickness <= 0.0) {
+                                if (dataMaterial.Material(MaterNum).Resistance <= 0.0) {
+                                    if (dataMaterial.Material(MaterNum).Conductivity <= 0.0 || dataMaterial.Material(MaterNum).Thickness <= 0.0) {
                                         ShowSevereError(cCurrentModuleObject + ", " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                                         "\", invalid material.");
                                         ShowContinueError("\"Outside\", invalid material for movable insulation.");
-                                        ShowContinueError("Material=\"" + Material(MaterNum).Name + "\",Resistance=[" +
-                                                          RoundSigDigits(Material(MaterNum).Resistance, 3) +
+                                        ShowContinueError("Material=\"" + dataMaterial.Material(MaterNum).Name + "\",Resistance=[" +
+                                                          RoundSigDigits(dataMaterial.Material(MaterNum).Resistance, 3) +
                                                           "], must be > 0 for use in Movable Insulation.");
                                         ErrorsFound = true;
-                                    } else if (Material(MaterNum).Conductivity > 0.0) {
-                                        Material(MaterNum).Resistance = Material(MaterNum).Thickness / Material(MaterNum).Conductivity;
+                                    } else if (dataMaterial.Material(MaterNum).Conductivity > 0.0) {
+                                        dataMaterial.Material(MaterNum).Resistance = dataMaterial.Material(MaterNum).Thickness / dataMaterial.Material(MaterNum).Conductivity;
                                     }
                                 }
-                                if (Material(MaterNum).Conductivity <= 0.0) {
-                                    if (Material(MaterNum).Resistance <= 0.0) {
+                                if (dataMaterial.Material(MaterNum).Conductivity <= 0.0) {
+                                    if (dataMaterial.Material(MaterNum).Resistance <= 0.0) {
                                         ShowSevereError(cCurrentModuleObject + ", " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                                         "\", invalid material.");
                                         ShowContinueError("\"Outside\", invalid material for movable insulation.");
-                                        ShowContinueError("Material=\"" + Material(MaterNum).Name + "\",Conductivity=[" +
-                                                          RoundSigDigits(Material(MaterNum).Conductivity, 3) +
+                                        ShowContinueError("Material=\"" + dataMaterial.Material(MaterNum).Name + "\",Conductivity=[" +
+                                                          RoundSigDigits(dataMaterial.Material(MaterNum).Conductivity, 3) +
                                                           "], must be > 0 for use in Movable Insulation.");
                                         ErrorsFound = true;
                                     }
@@ -9781,23 +9782,23 @@ namespace SurfaceGeometry {
                                     ShowSevereError(cCurrentModuleObject + ", " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                                     "\", already assigned.");
                                     ShowContinueError("\"Inside\", was already assigned Material=\"" +
-                                                      Material(SurfaceTmp(SurfNum).MaterialMovInsulInt).Name + "\".");
-                                    ShowContinueError("attempting to assign Material=\"" + Material(MaterNum).Name + "\".");
+                                                      dataMaterial.Material(SurfaceTmp(SurfNum).MaterialMovInsulInt).Name + "\".");
+                                    ShowContinueError("attempting to assign Material=\"" + dataMaterial.Material(MaterNum).Name + "\".");
                                     ErrorsFound = true;
                                 }
                                 SurfaceTmp(SurfNum).MaterialMovInsulInt = MaterNum;
                                 SurfaceTmp(SurfNum).SchedMovInsulInt = SchNum;
-                                if (Material(MaterNum).Resistance <= 0.0) {
-                                    if (Material(MaterNum).Conductivity <= 0.0 || Material(MaterNum).Thickness <= 0.0) {
+                                if (dataMaterial.Material(MaterNum).Resistance <= 0.0) {
+                                    if (dataMaterial.Material(MaterNum).Conductivity <= 0.0 || dataMaterial.Material(MaterNum).Thickness <= 0.0) {
                                         ShowSevereError(cCurrentModuleObject + ", " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                                         "\", invalid material.");
                                         ShowContinueError("\"Inside\", invalid material for movable insulation.");
-                                        ShowContinueError("Material=\"" + Material(MaterNum).Name + "\",Resistance=[" +
-                                                          RoundSigDigits(Material(MaterNum).Resistance, 3) +
+                                        ShowContinueError("Material=\"" + dataMaterial.Material(MaterNum).Name + "\",Resistance=[" +
+                                                          RoundSigDigits(dataMaterial.Material(MaterNum).Resistance, 3) +
                                                           "], must be > 0 for use in Movable Insulation.");
                                         ErrorsFound = true;
-                                    } else if (Material(MaterNum).Conductivity > 0.0) {
-                                        Material(MaterNum).Resistance = Material(MaterNum).Thickness / Material(MaterNum).Conductivity;
+                                    } else if (dataMaterial.Material(MaterNum).Conductivity > 0.0) {
+                                        dataMaterial.Material(MaterNum).Resistance = dataMaterial.Material(MaterNum).Thickness / dataMaterial.Material(MaterNum).Conductivity;
                                     }
                                 }
                             } else {
@@ -11275,7 +11276,7 @@ namespace SurfaceGeometry {
         int TotLayersNew;         // Total layers in new (shaded) construction
         //  INTEGER :: loop                            ! DO loop index
 
-        ShDevName = Material(ShDevNum).Name;
+        ShDevName = dataMaterial.Material(ShDevNum).Name;
         ConstrNum = SurfaceTmp(SurfNum).Construction;
         ConstrName = dataConstruction.Construct(ConstrNum).Name;
         if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorShade || WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorBlind) {
@@ -11313,20 +11314,20 @@ namespace SurfaceGeometry {
                 // Interior shading device
                 dataConstruction.Construct(ConstrNewSh).LayerPoint({1, TotLayersOld}) = dataConstruction.Construct(ConstrNum).LayerPoint({1, TotLayersOld});
                 dataConstruction.Construct(ConstrNewSh).LayerPoint(TotLayersNew) = ShDevNum;
-                dataConstruction.Construct(ConstrNewSh).InsideAbsorpSolar = Material(ShDevNum).AbsorpSolar;
-                dataConstruction.Construct(ConstrNewSh).OutsideAbsorpSolar = Material(dataConstruction.Construct(ConstrNewSh).LayerPoint(1)).AbsorpSolar;
-                dataConstruction.Construct(ConstrNewSh).OutsideAbsorpThermal = Material(dataConstruction.Construct(ConstrNewSh).LayerPoint(1)).AbsorpThermalFront;
+                dataConstruction.Construct(ConstrNewSh).InsideAbsorpSolar = dataMaterial.Material(ShDevNum).AbsorpSolar;
+                dataConstruction.Construct(ConstrNewSh).OutsideAbsorpSolar = dataMaterial.Material(dataConstruction.Construct(ConstrNewSh).LayerPoint(1)).AbsorpSolar;
+                dataConstruction.Construct(ConstrNewSh).OutsideAbsorpThermal = dataMaterial.Material(dataConstruction.Construct(ConstrNewSh).LayerPoint(1)).AbsorpThermalFront;
             } else {
                 // Exterior shading device
                 dataConstruction.Construct(ConstrNewSh).LayerPoint(1) = ShDevNum;
                 dataConstruction.Construct(ConstrNewSh).LayerPoint({2, TotLayersNew}) = dataConstruction.Construct(ConstrNum).LayerPoint({1, TotLayersOld});
-                dataConstruction.Construct(ConstrNewSh).InsideAbsorpSolar = Material(dataConstruction.Construct(ConstrNewSh).LayerPoint(TotLayersNew)).AbsorpSolar;
-                dataConstruction.Construct(ConstrNewSh).OutsideAbsorpSolar = Material(ShDevNum).AbsorpSolar;
-                dataConstruction.Construct(ConstrNewSh).OutsideAbsorpThermal = Material(ShDevNum).AbsorpThermalFront;
+                dataConstruction.Construct(ConstrNewSh).InsideAbsorpSolar = dataMaterial.Material(dataConstruction.Construct(ConstrNewSh).LayerPoint(TotLayersNew)).AbsorpSolar;
+                dataConstruction.Construct(ConstrNewSh).OutsideAbsorpSolar = dataMaterial.Material(ShDevNum).AbsorpSolar;
+                dataConstruction.Construct(ConstrNewSh).OutsideAbsorpThermal = dataMaterial.Material(ShDevNum).AbsorpThermalFront;
             }
             // The following InsideAbsorpThermal applies only to inside glass; it is corrected
             //  later in InitGlassOpticalCalculations if construction has inside shade or blind.
-            dataConstruction.Construct(ConstrNewSh).InsideAbsorpThermal = Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayersOld)).AbsorpThermalBack;
+            dataConstruction.Construct(ConstrNewSh).InsideAbsorpThermal = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayersOld)).AbsorpThermalBack;
             dataConstruction.Construct(ConstrNewSh).OutsideRoughness = VerySmooth;
             dataConstruction.Construct(ConstrNewSh).DayltPropPtr = 0;
             dataConstruction.Construct(ConstrNewSh).CTFCross = 0.0;
@@ -11446,9 +11447,9 @@ namespace SurfaceGeometry {
                 MatIntSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLayers);
                 MatBGsh = 0;
                 if (TotLayers == 5) MatBGsh = dataConstruction.Construct(ConstrNumSh).LayerPoint(3);
-                if (TotGlassLayers <= 3 && (Material(MatIntSh).Group == Shade || Material(MatIntSh).Group == WindowBlind)) ShAndSt = true;
+                if (TotGlassLayers <= 3 && (dataMaterial.Material(MatIntSh).Group == Shade || dataMaterial.Material(MatIntSh).Group == WindowBlind)) ShAndSt = true;
                 if (MatBGsh > 0) {
-                    if (Material(MatBGsh).Group == Shade || Material(MatBGsh).Group == WindowBlind) ShAndSt = true;
+                    if (dataMaterial.Material(MatBGsh).Group == Shade || dataMaterial.Material(MatBGsh).Group == WindowBlind) ShAndSt = true;
                 }
                 if (!ShAndSt) {
                     ShowContinueError("Window=" + Surface(SurfNum).Name + " has a shaded construction to which a storm window cannot be applied.");
@@ -11480,70 +11481,70 @@ namespace SurfaceGeometry {
                     // If necessary, create new material corresponding to the air layer between the storm winddow
                     // and the rest of the window
                     MatNameStAir = "AIR:STORMWIN:" + ChrIntDistance + "MM";
-                    MatNewStAir = UtilityRoutines::FindItemInList(MatNameStAir, Material, TotMaterials);
+                    MatNewStAir = UtilityRoutines::FindItemInList(MatNameStAir, dataMaterial.Material, TotMaterials);
                     if (MatNewStAir == 0) {
                         // Create new material
                         MatNewStAir = TotMaterials + 1;
                         TotMaterials = MatNewStAir;
-                        Material.redimension(TotMaterials);
+                        dataMaterial.Material.redimension(TotMaterials);
                         NominalR.redimension(TotMaterials);
-                        Material(TotMaterials).Name = MatNameStAir;
-                        Material(TotMaterials).Group = WindowGas;
-                        Material(TotMaterials).Roughness = 3;
-                        Material(TotMaterials).Conductivity = 0.0;
-                        Material(TotMaterials).Density = 0.0;
-                        Material(TotMaterials).IsoMoistCap = 0.0;
-                        Material(TotMaterials).Porosity = 0.0;
-                        Material(TotMaterials).Resistance = 0.0;
-                        Material(TotMaterials).SpecHeat = 0.0;
-                        Material(TotMaterials).ThermGradCoef = 0.0;
-                        Material(TotMaterials).Thickness = StormWindow(StormWinNum).StormWinDistance;
-                        Material(TotMaterials).VaporDiffus = 0.0;
-                        Material(TotMaterials).GasType = 0;
-                        Material(TotMaterials).GasCon = 0.0;
-                        Material(TotMaterials).GasVis = 0.0;
-                        Material(TotMaterials).GasCp = 0.0;
-                        Material(TotMaterials).GasWght = 0.0;
-                        Material(TotMaterials).GasFract = 0.0;
-                        Material(TotMaterials).GasType(1) = 1;
-                        Material(TotMaterials).GlassSpectralDataPtr = 0;
-                        Material(TotMaterials).NumberOfGasesInMixture = 1;
-                        Material(TotMaterials).GasCon(1, 1) = 2.873e-3;
-                        Material(TotMaterials).GasCon(2, 1) = 7.760e-5;
-                        Material(TotMaterials).GasVis(1, 1) = 3.723e-6;
-                        Material(TotMaterials).GasVis(2, 1) = 4.940e-8;
-                        Material(TotMaterials).GasCp(1, 1) = 1002.737;
-                        Material(TotMaterials).GasCp(2, 1) = 1.2324e-2;
-                        Material(TotMaterials).GasWght(1) = 28.97;
-                        Material(TotMaterials).GasFract(1) = 1.0;
-                        Material(TotMaterials).AbsorpSolar = 0.0;
-                        Material(TotMaterials).AbsorpThermal = 0.0;
-                        Material(TotMaterials).AbsorpVisible = 0.0;
-                        Material(TotMaterials).Trans = 0.0;
-                        Material(TotMaterials).TransVis = 0.0;
-                        Material(TotMaterials).GlassTransDirtFactor = 0.0;
-                        Material(TotMaterials).ReflectShade = 0.0;
-                        Material(TotMaterials).ReflectShadeVis = 0.0;
-                        Material(TotMaterials).AbsorpThermalBack = 0.0;
-                        Material(TotMaterials).AbsorpThermalFront = 0.0;
-                        Material(TotMaterials).ReflectSolBeamBack = 0.0;
-                        Material(TotMaterials).ReflectSolBeamFront = 0.0;
-                        Material(TotMaterials).ReflectSolDiffBack = 0.0;
-                        Material(TotMaterials).ReflectSolDiffFront = 0.0;
-                        Material(TotMaterials).ReflectVisBeamBack = 0.0;
-                        Material(TotMaterials).ReflectVisBeamFront = 0.0;
-                        Material(TotMaterials).ReflectVisDiffBack = 0.0;
-                        Material(TotMaterials).ReflectVisDiffFront = 0.0;
-                        Material(TotMaterials).TransSolBeam = 0.0;
-                        Material(TotMaterials).TransThermal = 0.0;
-                        Material(TotMaterials).TransVisBeam = 0.0;
-                        Material(TotMaterials).BlindDataPtr = 0;
-                        Material(TotMaterials).WinShadeToGlassDist = 0.0;
-                        Material(TotMaterials).WinShadeTopOpeningMult = 0.0;
-                        Material(TotMaterials).WinShadeBottomOpeningMult = 0.0;
-                        Material(TotMaterials).WinShadeLeftOpeningMult = 0.0;
-                        Material(TotMaterials).WinShadeRightOpeningMult = 0.0;
-                        Material(TotMaterials).WinShadeAirFlowPermeability = 0.0;
+                        dataMaterial.Material(TotMaterials).Name = MatNameStAir;
+                        dataMaterial.Material(TotMaterials).Group = WindowGas;
+                        dataMaterial.Material(TotMaterials).Roughness = 3;
+                        dataMaterial.Material(TotMaterials).Conductivity = 0.0;
+                        dataMaterial.Material(TotMaterials).Density = 0.0;
+                        dataMaterial.Material(TotMaterials).IsoMoistCap = 0.0;
+                        dataMaterial.Material(TotMaterials).Porosity = 0.0;
+                        dataMaterial.Material(TotMaterials).Resistance = 0.0;
+                        dataMaterial.Material(TotMaterials).SpecHeat = 0.0;
+                        dataMaterial.Material(TotMaterials).ThermGradCoef = 0.0;
+                        dataMaterial.Material(TotMaterials).Thickness = StormWindow(StormWinNum).StormWinDistance;
+                        dataMaterial.Material(TotMaterials).VaporDiffus = 0.0;
+                        dataMaterial.Material(TotMaterials).GasType = 0;
+                        dataMaterial.Material(TotMaterials).GasCon = 0.0;
+                        dataMaterial.Material(TotMaterials).GasVis = 0.0;
+                        dataMaterial.Material(TotMaterials).GasCp = 0.0;
+                        dataMaterial.Material(TotMaterials).GasWght = 0.0;
+                        dataMaterial.Material(TotMaterials).GasFract = 0.0;
+                        dataMaterial.Material(TotMaterials).GasType(1) = 1;
+                        dataMaterial.Material(TotMaterials).GlassSpectralDataPtr = 0;
+                        dataMaterial.Material(TotMaterials).NumberOfGasesInMixture = 1;
+                        dataMaterial.Material(TotMaterials).GasCon(1, 1) = 2.873e-3;
+                        dataMaterial.Material(TotMaterials).GasCon(2, 1) = 7.760e-5;
+                        dataMaterial.Material(TotMaterials).GasVis(1, 1) = 3.723e-6;
+                        dataMaterial.Material(TotMaterials).GasVis(2, 1) = 4.940e-8;
+                        dataMaterial.Material(TotMaterials).GasCp(1, 1) = 1002.737;
+                        dataMaterial.Material(TotMaterials).GasCp(2, 1) = 1.2324e-2;
+                        dataMaterial.Material(TotMaterials).GasWght(1) = 28.97;
+                        dataMaterial.Material(TotMaterials).GasFract(1) = 1.0;
+                        dataMaterial.Material(TotMaterials).AbsorpSolar = 0.0;
+                        dataMaterial.Material(TotMaterials).AbsorpThermal = 0.0;
+                        dataMaterial.Material(TotMaterials).AbsorpVisible = 0.0;
+                        dataMaterial.Material(TotMaterials).Trans = 0.0;
+                        dataMaterial.Material(TotMaterials).TransVis = 0.0;
+                        dataMaterial.Material(TotMaterials).GlassTransDirtFactor = 0.0;
+                        dataMaterial.Material(TotMaterials).ReflectShade = 0.0;
+                        dataMaterial.Material(TotMaterials).ReflectShadeVis = 0.0;
+                        dataMaterial.Material(TotMaterials).AbsorpThermalBack = 0.0;
+                        dataMaterial.Material(TotMaterials).AbsorpThermalFront = 0.0;
+                        dataMaterial.Material(TotMaterials).ReflectSolBeamBack = 0.0;
+                        dataMaterial.Material(TotMaterials).ReflectSolBeamFront = 0.0;
+                        dataMaterial.Material(TotMaterials).ReflectSolDiffBack = 0.0;
+                        dataMaterial.Material(TotMaterials).ReflectSolDiffFront = 0.0;
+                        dataMaterial.Material(TotMaterials).ReflectVisBeamBack = 0.0;
+                        dataMaterial.Material(TotMaterials).ReflectVisBeamFront = 0.0;
+                        dataMaterial.Material(TotMaterials).ReflectVisDiffBack = 0.0;
+                        dataMaterial.Material(TotMaterials).ReflectVisDiffFront = 0.0;
+                        dataMaterial.Material(TotMaterials).TransSolBeam = 0.0;
+                        dataMaterial.Material(TotMaterials).TransThermal = 0.0;
+                        dataMaterial.Material(TotMaterials).TransVisBeam = 0.0;
+                        dataMaterial.Material(TotMaterials).BlindDataPtr = 0;
+                        dataMaterial.Material(TotMaterials).WinShadeToGlassDist = 0.0;
+                        dataMaterial.Material(TotMaterials).WinShadeTopOpeningMult = 0.0;
+                        dataMaterial.Material(TotMaterials).WinShadeBottomOpeningMult = 0.0;
+                        dataMaterial.Material(TotMaterials).WinShadeLeftOpeningMult = 0.0;
+                        dataMaterial.Material(TotMaterials).WinShadeRightOpeningMult = 0.0;
+                        dataMaterial.Material(TotMaterials).WinShadeAirFlowPermeability = 0.0;
                     } // End of check if new air layer material has to be created
                 }
 
@@ -11578,7 +11579,7 @@ namespace SurfaceGeometry {
                     dataConstruction.Construct(ConstrNew).InsideAbsorpSolar = 0.0;
                     dataConstruction.Construct(ConstrNew).OutsideAbsorpSolar = 0.0;
                     dataConstruction.Construct(ConstrNew).InsideAbsorpThermal = dataConstruction.Construct(ConstrOld).InsideAbsorpThermal;
-                    dataConstruction.Construct(ConstrNew).OutsideAbsorpThermal = Material(StormWinMatNum).AbsorpThermalFront;
+                    dataConstruction.Construct(ConstrNew).OutsideAbsorpThermal = dataMaterial.Material(StormWinMatNum).AbsorpThermalFront;
                     dataConstruction.Construct(ConstrNew).OutsideRoughness = VerySmooth;
                     dataConstruction.Construct(ConstrNew).DayltPropPtr = 0;
                     dataConstruction.Construct(ConstrNew).CTFCross = 0.0;
@@ -13314,8 +13315,8 @@ namespace SurfaceGeometry {
         for (int LayerNo = 1; LayerNo <= TotalLayers; ++LayerNo) {
             auto &thisConstLayer(dataConstruction.Construct(ConstrNum).LayerPoint(LayerNo));
             auto &revConstLayer(dataConstruction.Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
-            auto &thisMatLay(Material(thisConstLayer));
-            auto &revMatLay(Material(revConstLayer));
+            auto &thisMatLay(dataMaterial.Material(thisConstLayer));
+            auto &revMatLay(dataMaterial.Material(revConstLayer));
             if ((thisConstLayer != revConstLayer) ||    // Not pointing to the same layer
                 (thisMatLay.Group == WindowGlass) ||    // Not window glass or glass equivalent layer which have
                 (revMatLay.Group == WindowGlass) ||     // to have certain properties flipped from front to back

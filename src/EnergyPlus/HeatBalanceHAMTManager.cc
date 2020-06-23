@@ -67,6 +67,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceHAMTManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -376,7 +377,7 @@ namespace HeatBalanceHAMTManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            matid = UtilityRoutines::FindItemInList(AlphaArray(1), Material);
+            matid = UtilityRoutines::FindItemInList(AlphaArray(1), dataMaterial.Material);
 
             if (matid == 0) {
                 ShowSevereError(cHAMTObject1 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
@@ -384,13 +385,13 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (Material(matid).ROnly) {
+            if (dataMaterial.Material(matid).ROnly) {
                 ShowWarningError(cHAMTObject1 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
                 continue;
             }
 
-            Material(matid).Porosity = NumArray(1);
-            Material(matid).iwater = NumArray(2);
+            dataMaterial.Material(matid).Porosity = NumArray(1);
+            dataMaterial.Material(matid).iwater = NumArray(2);
         }
 
         HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject2); // MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
@@ -407,7 +408,7 @@ namespace HeatBalanceHAMTManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            matid = UtilityRoutines::FindItemInList(AlphaArray(1), Material);
+            matid = UtilityRoutines::FindItemInList(AlphaArray(1), dataMaterial.Material);
 
             if (matid == 0) {
                 ShowSevereError(cHAMTObject2 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
@@ -415,47 +416,47 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (Material(matid).ROnly) {
+            if (dataMaterial.Material(matid).ROnly) {
                 ShowWarningError(cHAMTObject2 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
                 continue;
             }
 
             Numid = 1;
 
-            Material(matid).niso = int(NumArray(Numid));
+            dataMaterial.Material(matid).niso = int(NumArray(Numid));
 
-            for (iso = 1; iso <= Material(matid).niso; ++iso) {
+            for (iso = 1; iso <= dataMaterial.Material(matid).niso; ++iso) {
                 ++Numid;
-                Material(matid).isorh(iso) = NumArray(Numid);
+                dataMaterial.Material(matid).isorh(iso) = NumArray(Numid);
                 ++Numid;
-                Material(matid).isodata(iso) = NumArray(Numid);
+                dataMaterial.Material(matid).isodata(iso) = NumArray(Numid);
             }
 
-            ++Material(matid).niso;
-            Material(matid).isorh(Material(matid).niso) = rhmax;
-            Material(matid).isodata(Material(matid).niso) = Material(matid).Porosity * wdensity;
+            ++dataMaterial.Material(matid).niso;
+            dataMaterial.Material(matid).isorh(dataMaterial.Material(matid).niso) = rhmax;
+            dataMaterial.Material(matid).isodata(dataMaterial.Material(matid).niso) = dataMaterial.Material(matid).Porosity * wdensity;
 
-            ++Material(matid).niso;
-            Material(matid).isorh(Material(matid).niso) = 0.0;
-            Material(matid).isodata(Material(matid).niso) = 0.0;
+            ++dataMaterial.Material(matid).niso;
+            dataMaterial.Material(matid).isorh(dataMaterial.Material(matid).niso) = 0.0;
+            dataMaterial.Material(matid).isodata(dataMaterial.Material(matid).niso) = 0.0;
         }
 
         // check the isotherm
         for (matid = 1; matid <= TotMaterials; ++matid) {
-            if (Material(matid).niso > 0) {
+            if (dataMaterial.Material(matid).niso > 0) {
                 // - First sort
-                for (jj = 1; jj <= Material(matid).niso - 1; ++jj) {
-                    for (ii = jj + 1; ii <= Material(matid).niso; ++ii) {
-                        if (Material(matid).isorh(jj) > Material(matid).isorh(ii)) {
+                for (jj = 1; jj <= dataMaterial.Material(matid).niso - 1; ++jj) {
+                    for (ii = jj + 1; ii <= dataMaterial.Material(matid).niso; ++ii) {
+                        if (dataMaterial.Material(matid).isorh(jj) > dataMaterial.Material(matid).isorh(ii)) {
 
-                            dumrh = Material(matid).isorh(jj);
-                            dumdata = Material(matid).isodata(jj);
+                            dumrh = dataMaterial.Material(matid).isorh(jj);
+                            dumdata = dataMaterial.Material(matid).isodata(jj);
 
-                            Material(matid).isorh(jj) = Material(matid).isorh(ii);
-                            Material(matid).isodata(jj) = Material(matid).isodata(ii);
+                            dataMaterial.Material(matid).isorh(jj) = dataMaterial.Material(matid).isorh(ii);
+                            dataMaterial.Material(matid).isodata(jj) = dataMaterial.Material(matid).isodata(ii);
 
-                            Material(matid).isorh(ii) = dumrh;
-                            Material(matid).isodata(ii) = dumdata;
+                            dataMaterial.Material(matid).isorh(ii) = dumrh;
+                            dataMaterial.Material(matid).isodata(ii) = dumdata;
                         }
                     }
                 }
@@ -463,19 +464,19 @@ namespace HeatBalanceHAMTManager {
                 isoerrrise = false;
                 for (ii = 1; ii <= 100; ++ii) {
                     avflag = true;
-                    for (jj = 1; jj <= Material(matid).niso - 1; ++jj) {
-                        if (Material(matid).isodata(jj) > Material(matid).isodata(jj + 1)) {
+                    for (jj = 1; jj <= dataMaterial.Material(matid).niso - 1; ++jj) {
+                        if (dataMaterial.Material(matid).isodata(jj) > dataMaterial.Material(matid).isodata(jj + 1)) {
                             isoerrrise = true;
-                            avdata = (Material(matid).isodata(jj) + Material(matid).isodata(jj + 1)) / 2.0;
-                            Material(matid).isodata(jj) = avdata;
-                            Material(matid).isodata(jj + 1) = avdata;
+                            avdata = (dataMaterial.Material(matid).isodata(jj) + dataMaterial.Material(matid).isodata(jj + 1)) / 2.0;
+                            dataMaterial.Material(matid).isodata(jj) = avdata;
+                            dataMaterial.Material(matid).isodata(jj + 1) = avdata;
                             avflag = false;
                         }
                     }
                     if (avflag) break;
                 }
                 if (isoerrrise) {
-                    ShowWarningError(cHAMTObject2 + " data not rising - Check material " + Material(matid).Name);
+                    ShowWarningError(cHAMTObject2 + " data not rising - Check material " + dataMaterial.Material(matid).Name);
                     ShowContinueError("Isotherm data has been fixed, and the simulation continues.");
                 }
             }
@@ -495,7 +496,7 @@ namespace HeatBalanceHAMTManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            matid = UtilityRoutines::FindItemInList(AlphaArray(1), Material);
+            matid = UtilityRoutines::FindItemInList(AlphaArray(1), dataMaterial.Material);
 
             if (matid == 0) {
                 ShowSevereError(cHAMTObject3 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
@@ -503,24 +504,24 @@ namespace HeatBalanceHAMTManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (Material(matid).ROnly) {
+            if (dataMaterial.Material(matid).ROnly) {
                 ShowWarningError(cHAMTObject3 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
                 continue;
             }
 
             Numid = 1;
 
-            Material(matid).nsuc = NumArray(Numid);
-            for (suc = 1; suc <= Material(matid).nsuc; ++suc) {
+            dataMaterial.Material(matid).nsuc = NumArray(Numid);
+            for (suc = 1; suc <= dataMaterial.Material(matid).nsuc; ++suc) {
                 ++Numid;
-                Material(matid).sucwater(suc) = NumArray(Numid);
+                dataMaterial.Material(matid).sucwater(suc) = NumArray(Numid);
                 ++Numid;
-                Material(matid).sucdata(suc) = NumArray(Numid);
+                dataMaterial.Material(matid).sucdata(suc) = NumArray(Numid);
             }
 
-            ++Material(matid).nsuc;
-            Material(matid).sucwater(Material(matid).nsuc) = Material(matid).isodata(Material(matid).niso);
-            Material(matid).sucdata(Material(matid).nsuc) = Material(matid).sucdata(Material(matid).nsuc - 1);
+            ++dataMaterial.Material(matid).nsuc;
+            dataMaterial.Material(matid).sucwater(dataMaterial.Material(matid).nsuc) = dataMaterial.Material(matid).isodata(dataMaterial.Material(matid).niso);
+            dataMaterial.Material(matid).sucdata(dataMaterial.Material(matid).nsuc) = dataMaterial.Material(matid).sucdata(dataMaterial.Material(matid).nsuc - 1);
         }
 
         HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject4); // MaterialProperty:HeatAndMoistureTransfer:Redistribution
@@ -537,30 +538,30 @@ namespace HeatBalanceHAMTManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            matid = UtilityRoutines::FindItemInList(AlphaArray(1), Material);
+            matid = UtilityRoutines::FindItemInList(AlphaArray(1), dataMaterial.Material);
             if (matid == 0) {
                 ShowSevereError(cHAMTObject4 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
                 ShowContinueError("The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
                 ErrorsFound = true;
                 continue;
             }
-            if (Material(matid).ROnly) {
+            if (dataMaterial.Material(matid).ROnly) {
                 ShowWarningError(cHAMTObject4 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
                 continue;
             }
             Numid = 1;
 
-            Material(matid).nred = NumArray(Numid);
-            for (red = 1; red <= Material(matid).nred; ++red) {
+            dataMaterial.Material(matid).nred = NumArray(Numid);
+            for (red = 1; red <= dataMaterial.Material(matid).nred; ++red) {
                 ++Numid;
-                Material(matid).redwater(red) = NumArray(Numid);
+                dataMaterial.Material(matid).redwater(red) = NumArray(Numid);
                 ++Numid;
-                Material(matid).reddata(red) = NumArray(Numid);
+                dataMaterial.Material(matid).reddata(red) = NumArray(Numid);
             }
 
-            ++Material(matid).nred;
-            Material(matid).redwater(Material(matid).nred) = Material(matid).isodata(Material(matid).niso);
-            Material(matid).reddata(Material(matid).nred) = Material(matid).reddata(Material(matid).nred - 1);
+            ++dataMaterial.Material(matid).nred;
+            dataMaterial.Material(matid).redwater(dataMaterial.Material(matid).nred) = dataMaterial.Material(matid).isodata(dataMaterial.Material(matid).niso);
+            dataMaterial.Material(matid).reddata(dataMaterial.Material(matid).nred) = dataMaterial.Material(matid).reddata(dataMaterial.Material(matid).nred - 1);
         }
 
         HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject5); // MaterialProperty:HeatAndMoistureTransfer:Diffusion
@@ -577,32 +578,32 @@ namespace HeatBalanceHAMTManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            matid = UtilityRoutines::FindItemInList(AlphaArray(1), Material);
+            matid = UtilityRoutines::FindItemInList(AlphaArray(1), dataMaterial.Material);
             if (matid == 0) {
                 ShowSevereError(cHAMTObject5 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
                 ShowContinueError("The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
                 ErrorsFound = true;
                 continue;
             }
-            if (Material(matid).ROnly) {
+            if (dataMaterial.Material(matid).ROnly) {
                 ShowWarningError(cHAMTObject5 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
                 continue;
             }
 
             Numid = 1;
 
-            Material(matid).nmu = NumArray(Numid);
-            if (Material(matid).nmu > 0) {
-                for (mu = 1; mu <= Material(matid).nmu; ++mu) {
+            dataMaterial.Material(matid).nmu = NumArray(Numid);
+            if (dataMaterial.Material(matid).nmu > 0) {
+                for (mu = 1; mu <= dataMaterial.Material(matid).nmu; ++mu) {
                     ++Numid;
-                    Material(matid).murh(mu) = NumArray(Numid);
+                    dataMaterial.Material(matid).murh(mu) = NumArray(Numid);
                     ++Numid;
-                    Material(matid).mudata(mu) = NumArray(Numid);
+                    dataMaterial.Material(matid).mudata(mu) = NumArray(Numid);
                 }
 
-                ++Material(matid).nmu;
-                Material(matid).murh(Material(matid).nmu) = Material(matid).isorh(Material(matid).niso);
-                Material(matid).mudata(Material(matid).nmu) = Material(matid).mudata(Material(matid).nmu - 1);
+                ++dataMaterial.Material(matid).nmu;
+                dataMaterial.Material(matid).murh(dataMaterial.Material(matid).nmu) = dataMaterial.Material(matid).isorh(dataMaterial.Material(matid).niso);
+                dataMaterial.Material(matid).mudata(dataMaterial.Material(matid).nmu) = dataMaterial.Material(matid).mudata(dataMaterial.Material(matid).nmu - 1);
             }
         }
 
@@ -620,31 +621,31 @@ namespace HeatBalanceHAMTManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            matid = UtilityRoutines::FindItemInList(AlphaArray(1), Material);
+            matid = UtilityRoutines::FindItemInList(AlphaArray(1), dataMaterial.Material);
             if (matid == 0) {
                 ShowSevereError(cHAMTObject6 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
                 ShowContinueError("The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
                 ErrorsFound = true;
                 continue;
             }
-            if (Material(matid).ROnly) {
+            if (dataMaterial.Material(matid).ROnly) {
                 ShowWarningError(cHAMTObject6 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is defined as an R-only value material.");
                 continue;
             }
             Numid = 1;
 
-            Material(matid).ntc = NumArray(Numid);
-            if (Material(matid).ntc > 0) {
-                for (tc = 1; tc <= Material(matid).ntc; ++tc) {
+            dataMaterial.Material(matid).ntc = NumArray(Numid);
+            if (dataMaterial.Material(matid).ntc > 0) {
+                for (tc = 1; tc <= dataMaterial.Material(matid).ntc; ++tc) {
                     ++Numid;
-                    Material(matid).tcwater(tc) = NumArray(Numid);
+                    dataMaterial.Material(matid).tcwater(tc) = NumArray(Numid);
                     ++Numid;
-                    Material(matid).tcdata(tc) = NumArray(Numid);
+                    dataMaterial.Material(matid).tcdata(tc) = NumArray(Numid);
                 }
 
-                ++Material(matid).ntc;
-                Material(matid).tcwater(Material(matid).ntc) = Material(matid).isodata(Material(matid).niso);
-                Material(matid).tcdata(Material(matid).ntc) = Material(matid).tcdata(Material(matid).ntc - 1);
+                ++dataMaterial.Material(matid).ntc;
+                dataMaterial.Material(matid).tcwater(dataMaterial.Material(matid).ntc) = dataMaterial.Material(matid).isodata(dataMaterial.Material(matid).niso);
+                dataMaterial.Material(matid).tcdata(dataMaterial.Material(matid).ntc) = dataMaterial.Material(matid).tcdata(dataMaterial.Material(matid).ntc - 1);
             }
         }
 
@@ -765,78 +766,78 @@ namespace HeatBalanceHAMTManager {
             if (conid == 0) continue;
             for (lid = 1; lid <= dataConstruction.Construct(conid).TotLayers; ++lid) {
                 matid = dataConstruction.Construct(conid).LayerPoint(lid);
-                if (Material(matid).ROnly) {
+                if (dataMaterial.Material(matid).ROnly) {
                     ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name + " cannot contain R-only value materials.");
-                    ShowContinueError("Reference Material=\"" + Material(matid).Name + "\".");
+                    ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name + "\".");
                     ++errorCount;
                     continue;
                 }
 
-                if (Material(matid).nmu < 0) {
+                if (dataMaterial.Material(matid).nmu < 0) {
                     ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
-                    ShowContinueError("Reference Material=\"" + Material(matid).Name +
+                    ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name +
                                       "\" does not have required Water Vapor Diffusion Resistance Factor (mu) data.");
                     ++errorCount;
                 }
 
-                if (Material(matid).niso < 0) {
+                if (dataMaterial.Material(matid).niso < 0) {
                     ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
-                    ShowContinueError("Reference Material=\"" + Material(matid).Name + "\" does not have required isotherm data.");
+                    ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name + "\" does not have required isotherm data.");
                     ++errorCount;
                 }
-                if (Material(matid).nsuc < 0) {
+                if (dataMaterial.Material(matid).nsuc < 0) {
                     ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
-                    ShowContinueError("Reference Material=\"" + Material(matid).Name +
+                    ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name +
                                       "\" does not have required liquid transport coefficient (suction) data.");
                     ++errorCount;
                 }
-                if (Material(matid).nred < 0) {
+                if (dataMaterial.Material(matid).nred < 0) {
                     ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
-                    ShowContinueError("Reference Material=\"" + Material(matid).Name +
+                    ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name +
                                       "\" does not have required liquid transport coefficient (redistribution) data.");
                     ++errorCount;
                 }
-                if (Material(matid).ntc < 0) {
-                    if (Material(matid).Conductivity > 0) {
+                if (dataMaterial.Material(matid).ntc < 0) {
+                    if (dataMaterial.Material(matid).Conductivity > 0) {
                         ShowWarningError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
-                        ShowContinueError("Reference Material=\"" + Material(matid).Name +
+                        ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name +
                                           "\" does not have thermal conductivity data. Using fixed value.");
-                        Material(matid).ntc = 2;
-                        Material(matid).tcwater(1) = 0.0;
-                        Material(matid).tcdata(1) = Material(matid).Conductivity;
-                        Material(matid).tcwater(2) = Material(matid).isodata(Material(matid).niso);
-                        Material(matid).tcdata(2) = Material(matid).Conductivity;
+                        dataMaterial.Material(matid).ntc = 2;
+                        dataMaterial.Material(matid).tcwater(1) = 0.0;
+                        dataMaterial.Material(matid).tcdata(1) = dataMaterial.Material(matid).Conductivity;
+                        dataMaterial.Material(matid).tcwater(2) = dataMaterial.Material(matid).isodata(dataMaterial.Material(matid).niso);
+                        dataMaterial.Material(matid).tcdata(2) = dataMaterial.Material(matid).Conductivity;
                     } else {
                         ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
-                        ShowContinueError("Reference Material=\"" + Material(matid).Name + "\" does not have required thermal conductivity data.");
+                        ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name + "\" does not have required thermal conductivity data.");
                         ++errorCount;
                     }
                 }
 
                 // convert material water content to RH
 
-                waterd = Material(matid).iwater * Material(matid).Density;
-                interp(Material(matid).niso, Material(matid).isodata, Material(matid).isorh, waterd, Material(matid).irh);
+                waterd = dataMaterial.Material(matid).iwater * dataMaterial.Material(matid).Density;
+                interp(dataMaterial.Material(matid).niso, dataMaterial.Material(matid).isodata, dataMaterial.Material(matid).isorh, waterd, dataMaterial.Material(matid).irh);
 
-                Material(matid).divs = int(Material(matid).Thickness / Material(matid).divsize) + Material(matid).divmin;
-                if (Material(matid).divs > Material(matid).divmax) {
-                    Material(matid).divs = Material(matid).divmax;
+                dataMaterial.Material(matid).divs = int(dataMaterial.Material(matid).Thickness / dataMaterial.Material(matid).divsize) + dataMaterial.Material(matid).divmin;
+                if (dataMaterial.Material(matid).divs > dataMaterial.Material(matid).divmax) {
+                    dataMaterial.Material(matid).divs = dataMaterial.Material(matid).divmax;
                 }
                 // Check length of cell - reduce number of divisions if necessary
                 Real64 const sin_negPIOvr2 = std::sin(-Pi / 2.0);
                 while (true) {
                     testlen =
-                        Material(matid).Thickness * ((std::sin(Pi * (-1.0 / double(Material(matid).divs)) - Pi / 2.0) / 2.0) - (sin_negPIOvr2 / 2.0));
+                        dataMaterial.Material(matid).Thickness * ((std::sin(Pi * (-1.0 / double(dataMaterial.Material(matid).divs)) - Pi / 2.0) / 2.0) - (sin_negPIOvr2 / 2.0));
                     if (testlen > adjdist) break;
-                    --Material(matid).divs;
-                    if (Material(matid).divs < 1) {
+                    --dataMaterial.Material(matid).divs;
+                    if (dataMaterial.Material(matid).divs < 1) {
                         ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
-                        ShowContinueError("Reference Material=\"" + Material(matid).Name + "\" is too thin.");
+                        ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name + "\" is too thin.");
                         ++errorCount;
                         break;
                     }
                 }
-                TotCellsMax += Material(matid).divs;
+                TotCellsMax += dataMaterial.Material(matid).divs;
             }
             TotCellsMax += 7;
         }
@@ -909,27 +910,27 @@ namespace HeatBalanceHAMTManager {
             for (lid = 1; lid <= dataConstruction.Construct(conid).TotLayers; ++lid) {
                 matid = dataConstruction.Construct(conid).LayerPoint(lid);
 
-                for (did = 1; did <= Material(matid).divs; ++did) {
+                for (did = 1; did <= dataMaterial.Material(matid).divs; ++did) {
                     ++cid;
 
                     cells(cid).matid = matid;
                     cells(cid).sid = sid;
 
-                    cells(cid).temp = Material(matid).itemp;
-                    cells(cid).tempp1 = Material(matid).itemp;
-                    cells(cid).tempp2 = Material(matid).itemp;
+                    cells(cid).temp = dataMaterial.Material(matid).itemp;
+                    cells(cid).tempp1 = dataMaterial.Material(matid).itemp;
+                    cells(cid).tempp2 = dataMaterial.Material(matid).itemp;
 
-                    cells(cid).rh = Material(matid).irh;
-                    cells(cid).rhp1 = Material(matid).irh;
-                    cells(cid).rhp2 = Material(matid).irh;
+                    cells(cid).rh = dataMaterial.Material(matid).irh;
+                    cells(cid).rhp1 = dataMaterial.Material(matid).irh;
+                    cells(cid).rhp2 = dataMaterial.Material(matid).irh;
 
-                    cells(cid).density = Material(matid).Density;
-                    cells(cid).spech = Material(matid).SpecHeat;
+                    cells(cid).density = dataMaterial.Material(matid).Density;
+                    cells(cid).spech = dataMaterial.Material(matid).SpecHeat;
 
                     // Make cells smaller near the surface
                     cells(cid).length(1) =
-                        Material(matid).Thickness * ((std::sin(Pi * (-double(did) / double(Material(matid).divs)) - Pi / 2.0) / 2.0) -
-                                                     (std::sin(Pi * (-double(did - 1) / double(Material(matid).divs)) - Pi / 2.0) / 2.0));
+                        dataMaterial.Material(matid).Thickness * ((std::sin(Pi * (-double(did) / double(dataMaterial.Material(matid).divs)) - Pi / 2.0) / 2.0) -
+                                                     (std::sin(Pi * (-double(did - 1) / double(dataMaterial.Material(matid).divs)) - Pi / 2.0) / 2.0));
 
                     cells(cid).origin(1) = runor + cells(cid).length(1) / 2.0;
                     runor += cells(cid).length(1);
@@ -1070,7 +1071,7 @@ namespace HeatBalanceHAMTManager {
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
 
                 static constexpr auto Format_111("Material Nominal Resistance,{},{:.4R}\n");
-                print(outputFiles.eio, Format_111, Material(MaterNum).Name, NominalR(MaterNum));
+                print(outputFiles.eio, Format_111, dataMaterial.Material(MaterNum).Name, NominalR(MaterNum));
             }
         }
     }
@@ -1169,13 +1170,13 @@ namespace HeatBalanceHAMTManager {
             for (cid = Extcell(sid) + 1; cid <= Intcell(sid) - 1; ++cid) {
                 matid = cells(cid).matid;
 
-                cells(cid).temp = Material(matid).itemp;
-                cells(cid).tempp1 = Material(matid).itemp;
-                cells(cid).tempp2 = Material(matid).itemp;
+                cells(cid).temp = dataMaterial.Material(matid).itemp;
+                cells(cid).tempp1 = dataMaterial.Material(matid).itemp;
+                cells(cid).tempp2 = dataMaterial.Material(matid).itemp;
 
-                cells(cid).rh = Material(matid).irh;
-                cells(cid).rhp1 = Material(matid).irh;
-                cells(cid).rhp2 = Material(matid).irh;
+                cells(cid).rh = dataMaterial.Material(matid).irh;
+                cells(cid).rhp1 = dataMaterial.Material(matid).irh;
+                cells(cid).rhp2 = dataMaterial.Material(matid).irh;
             }
             MyEnvrnFlag(sid) = false;
         }
@@ -1281,14 +1282,14 @@ namespace HeatBalanceHAMTManager {
                 cells(cid).vpsat = PsyPsatFnTemp(cells(cid).tempp1);
                 if (matid > 0) {
                     interp(
-                        Material(matid).niso, Material(matid).isorh, Material(matid).isodata, cells(cid).rhp1, cells(cid).water, cells(cid).dwdphi);
+                        dataMaterial.Material(matid).niso, dataMaterial.Material(matid).isorh, dataMaterial.Material(matid).isodata, cells(cid).rhp1, cells(cid).water, cells(cid).dwdphi);
                     if (IsRain && rainswitch) {
-                        interp(Material(matid).nsuc, Material(matid).sucwater, Material(matid).sucdata, cells(cid).water, cells(cid).dw);
+                        interp(dataMaterial.Material(matid).nsuc, dataMaterial.Material(matid).sucwater, dataMaterial.Material(matid).sucdata, cells(cid).water, cells(cid).dw);
                     } else {
-                        interp(Material(matid).nred, Material(matid).redwater, Material(matid).reddata, cells(cid).water, cells(cid).dw);
+                        interp(dataMaterial.Material(matid).nred, dataMaterial.Material(matid).redwater, dataMaterial.Material(matid).reddata, cells(cid).water, cells(cid).dw);
                     }
-                    interp(Material(matid).nmu, Material(matid).murh, Material(matid).mudata, cells(cid).rhp1, cells(cid).mu);
-                    interp(Material(matid).ntc, Material(matid).tcwater, Material(matid).tcdata, cells(cid).water, cells(cid).wthermalc);
+                    interp(dataMaterial.Material(matid).nmu, dataMaterial.Material(matid).murh, dataMaterial.Material(matid).mudata, cells(cid).rhp1, cells(cid).mu);
+                    interp(dataMaterial.Material(matid).ntc, dataMaterial.Material(matid).tcwater, dataMaterial.Material(matid).tcdata, cells(cid).water, cells(cid).wthermalc);
                 }
             }
 
@@ -1482,7 +1483,7 @@ namespace HeatBalanceHAMTManager {
                     cells(cid).rhp1 = (phiorsum + vporsum + (wcap * cells(cid).rh) / deltat) / denominator;
                 } else {
                     ShowSevereError("CalcHeatBalHAMT: demoninator in calculating RH is zero.  Check material properties for accuracy.");
-                    ShowContinueError("...Problem occurs in Material=\"" + Material(cells(cid).matid).Name + "\".");
+                    ShowContinueError("...Problem occurs in Material=\"" + dataMaterial.Material(cells(cid).matid).Name + "\".");
                     ShowFatalError("Program terminates due to preceding condition.");
                 }
 

@@ -48,6 +48,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/Material.hh>
 
 namespace EnergyPlus {
 
@@ -66,7 +67,7 @@ namespace Construction {
         // PURPOSE OF THIS SUBROUTINE:
         // Commonly used routine in several places in EnergyPlus which examines if current
         // construction is glazing construction
-        auto const MaterialGroup = DataHeatBalance::Material(LayerPoint(1)).Group;
+        auto const MaterialGroup = dataMaterial.Material(LayerPoint(1)).Group;
         return MaterialGroup == DataHeatBalance::WindowGlass ||
                MaterialGroup == DataHeatBalance::Shade ||
                MaterialGroup == DataHeatBalance::Screen ||

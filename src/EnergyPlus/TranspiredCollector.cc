@@ -70,6 +70,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -115,7 +116,6 @@ namespace TranspiredCollector {
     using DataGlobals::DegToRadians;
     using DataGlobals::KelvinConv;
     using DataGlobals::SecInHour;
-    using DataHeatBalance::Material;
     using DataHeatBalance::QRadSWOutIncident;
     using DataVectorTypes::Vector;
 
@@ -1078,7 +1078,7 @@ namespace TranspiredCollector {
             InitExteriorConvectionCoeff(
                 SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = Surface(SurfPtr).Construction;
-            AbsThermSurf = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+            AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
             TsoK = TH(1, 1, SurfPtr) + KelvinConv;
             TscollK = UTSC(UTSCNum).TcollLast + KelvinConv;
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);

@@ -81,6 +81,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -7932,8 +7933,8 @@ namespace SolarShading {
                                         if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
                                             HMovInsul = 0.0;
                                         } else { // Movable insulation present
-                                            HMovInsul = 1.0 / (MovInsulSchedVal * Material(Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
-                                            AbsInt = Material(Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
+                                            HMovInsul = 1.0 / (MovInsulSchedVal * dataMaterial.Material(Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
+                                            AbsInt = dataMaterial.Material(Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
                                         }
                                     }
                                     if (HMovInsul > 0.0) AbsIntSurf = AbsInt; // Movable inside insulation present
@@ -8003,8 +8004,8 @@ namespace SolarShading {
 
                                     if (ShadeFlagBack == ExtShadeOn) {
                                         RGlFront = dataConstruction.Construct(ConstrNumBack).ReflectSolDiffFront;
-                                        AbsSh = Material(dataConstruction.Construct(ConstrNumBackSh).LayerPoint(1)).AbsorpSolar;
-                                        RhoSh = 1.0 - AbsSh - Material(dataConstruction.Construct(ConstrNumBackSh).LayerPoint(1)).Trans;
+                                        AbsSh = dataMaterial.Material(dataConstruction.Construct(ConstrNumBackSh).LayerPoint(1)).AbsorpSolar;
+                                        RhoSh = 1.0 - AbsSh - dataMaterial.Material(dataConstruction.Construct(ConstrNumBackSh).LayerPoint(1)).Trans;
                                         AShBack = POLYF(CosIncBack, dataConstruction.Construct(ConstrNumBack).TransSolBeamCoef) * AbsSh / (1.0 - RGlFront * RhoSh);
                                         BABSZone += BOverlap * AShBack;
                                         IntBeamAbsByShadFac(BackSurfNum) =
@@ -8018,14 +8019,14 @@ namespace SolarShading {
                                         if (NBackGlass == 2) {
                                             t2k = POLYF(CosIncBack, dataConstruction.Construct(ConstrNumBack).tBareSolCoef({1, 6}, 2));
                                             rfd2k = dataConstruction.Construct(ConstrNumBack).rfBareSolDiff(2);
-                                            TrSh = Material(dataConstruction.Construct(ConstrNumBackSh).LayerPoint(3)).Trans;
-                                            RhoSh = Material(dataConstruction.Construct(ConstrNumBackSh).LayerPoint(3)).ReflectShade;
+                                            TrSh = dataMaterial.Material(dataConstruction.Construct(ConstrNumBackSh).LayerPoint(3)).Trans;
+                                            RhoSh = dataMaterial.Material(dataConstruction.Construct(ConstrNumBackSh).LayerPoint(3)).ReflectShade;
                                             AbsSh = min(1.0, max(0.0, 1 - TrSh - RhoSh));
                                             AShBack = t2k * (1 + RhoSh * rfd2k + TrSh * rbd1k) * AbsSh;
                                         } else { // NBackGlass = 3
                                             t3k = POLYF(CosIncBack, dataConstruction.Construct(ConstrNumBack).tBareSolCoef({1, 6}, 3));
-                                            TrSh = Material(dataConstruction.Construct(ConstrNumBackSh).LayerPoint(5)).Trans;
-                                            RhoSh = Material(dataConstruction.Construct(ConstrNumBackSh).LayerPoint(5)).ReflectShade;
+                                            TrSh = dataMaterial.Material(dataConstruction.Construct(ConstrNumBackSh).LayerPoint(5)).Trans;
+                                            RhoSh = dataMaterial.Material(dataConstruction.Construct(ConstrNumBackSh).LayerPoint(5)).ReflectShade;
                                             AbsSh = min(1.0, max(0.0, 1 - TrSh - RhoSh));
                                             AShBack = t3k * (1 + RhoSh * rfd3k + TrSh * (rbd2k + td2k * rbd1k * td2k)) * AbsSh;
                                         }
@@ -8490,8 +8491,8 @@ namespace SolarShading {
                                         if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
                                             HMovInsul = 0.0;
                                         } else { // Movable insulation present
-                                            HMovInsul = 1.0 / (MovInsulSchedVal * Material(Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
-                                            AbsInt = Material(Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
+                                            HMovInsul = 1.0 / (MovInsulSchedVal * dataMaterial.Material(Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
+                                            AbsInt = dataMaterial.Material(Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
                                         }
                                     }
                                     if (HMovInsul > 0.0) AbsIntSurf = AbsInt; // Movable inside insulation present
@@ -9080,8 +9081,8 @@ namespace SolarShading {
                                 if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
                                     HMovInsul = 0.0;
                                 } else { // Movable insulation present
-                                    HMovInsul = 1.0 / (MovInsulSchedVal * Material(Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
-                                    AbsInt = Material(Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
+                                    HMovInsul = 1.0 / (MovInsulSchedVal * dataMaterial.Material(Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
+                                    AbsInt = dataMaterial.Material(Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
                                 }
                             }
                             if (HMovInsul > 0.0) AbsIntSurf = AbsInt; // Movable inside insulation present
@@ -9956,7 +9957,7 @@ namespace SolarShading {
                 int TotLayers = construction.TotLayers;
                 for (auto Lay = 1; Lay <= TotLayers; ++Lay) {
                     const int LayPtr = construction.LayerPoint(Lay);
-                    auto &material(Material(LayPtr));
+                    auto &material(dataMaterial.Material(LayPtr));
                     const bool isShading = material.Group == ComplexWindowShade;
                     if (isShading && Lay == 1) surface_window.ShadingFlag = ExtShadeOn;
                     if (isShading && Lay == TotLayers) surface_window.ShadingFlag = IntShadeOn;
@@ -9965,14 +9966,14 @@ namespace SolarShading {
                     auto &construction(dataConstruction.Construct(Surface(ISurf).Construction));
                     const int TotLay = construction.TotLayers;
                     int ShadingLayerPtr = construction.LayerPoint(TotLay);
-                    ShadingLayerPtr = Material(ShadingLayerPtr).ComplexShadePtr;
+                    ShadingLayerPtr = dataMaterial.Material(ShadingLayerPtr).ComplexShadePtr;
                     auto &complexShade = ComplexShade(ShadingLayerPtr);
                     auto TauShadeIR = complexShade.IRTransmittance;
                     auto EpsShadeIR = complexShade.BackEmissivity;
                     auto RhoShadeIR = max(0.0, 1.0 - TauShadeIR - EpsShadeIR);
                     // Get properties of glass next to inside shading layer
                     int GlassLayPtr = construction.LayerPoint(TotLay - 2);
-                    auto EpsGlassIR = Material(GlassLayPtr).AbsorpThermalBack;
+                    auto EpsGlassIR = dataMaterial.Material(GlassLayPtr).AbsorpThermalBack;
                     auto RhoGlassIR = 1 - EpsGlassIR;
 
                     auto EffShBlEmiss = EpsShadeIR * (1.0 + RhoGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR));
@@ -11774,7 +11775,7 @@ namespace SolarShading {
                             MatNumSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(5); // Triple pane with between-glass shade
                         }
                     }
-                    AbsorpEff = Material(MatNumSh).AbsorpSolar / (Material(MatNumSh).AbsorpSolar + Material(MatNumSh).Trans + 0.0001);
+                    AbsorpEff = dataMaterial.Material(MatNumSh).AbsorpSolar / (dataMaterial.Material(MatNumSh).AbsorpSolar + dataMaterial.Material(MatNumSh).Trans + 0.0001);
                     AbsorpEff = min(max(AbsorpEff, 0.0001), 0.999); // Constrain to avoid problems with following log eval
                     SurfaceWindow(SurfNum).ShadeAbsFacFace(1) = (1.0 - std::exp(0.5 * std::log(1.0 - AbsorpEff))) / AbsorpEff;
                     SurfaceWindow(SurfNum).ShadeAbsFacFace(2) = 1.0 - SurfaceWindow(SurfNum).ShadeAbsFacFace(1);
@@ -11957,8 +11958,8 @@ namespace SolarShading {
                             if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
                                 HMovInsul = 0.0;
                             } else { // Movable insulation present
-                                HMovInsul = 1.0 / (MovInsulSchedVal * Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).Resistance);
-                                AbsInt = Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).AbsorpSolar;
+                                HMovInsul = 1.0 / (MovInsulSchedVal * dataMaterial.Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).Resistance);
+                                AbsInt = dataMaterial.Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).AbsorpSolar;
                             }
                         }
                         if (HMovInsul > 0.0) InsideDifAbsorptance = AbsInt; // Movable inside insulation present
@@ -12322,8 +12323,8 @@ namespace SolarShading {
                         //            DividerSolAbs = SurfaceWindow(HeatTransSurfNum)%DividerSolAbsorp
                         //            IF(SurfaceWindow(HeatTransSurfNum)%DividerType == Suspended) THEN ! Suspended divider; account for inside glass
                         //              MatNumGl = Construct(ConstrNum)%LayerPoint(Construct(ConstrNum)%TotLayers)
-                        //              TransGl = Material(MatNumGl)%Trans
-                        //              ReflGl = Material(MatNumGl)%ReflectSolDiffBack
+                        //              TransGl = dataMaterial.Material(MatNumGl)%Trans
+                        //              ReflGl = dataMaterial.Material(MatNumGl)%ReflectSolDiffBack
                         //              AbsGl = 1.0d0-TransGl-ReflGl
                         //              DividerSolRefl = 1.0d0-DividerSolAbs
                         //              DividerSolAbs = AbsGl + TransGl*(DividerSolAbs + DividerSolRefl*AbsGl)/(1.0d0-DividerSolRefl*ReflGl)
@@ -12331,7 +12332,7 @@ namespace SolarShading {
                         // Correct for interior shade transmittance
                         //            IF(ShadeFlag == IntShadeOn) THEN
                         //              MatNumSh = Construct(ConstrNumSh)%LayerPoint(Construct(ConstrNumSh)%TotLayers)
-                        //              DividerSolAbs = DividerSolAbs * Material(MatNumSh)%Trans
+                        //              DividerSolAbs = DividerSolAbs * dataMaterial.Material(MatNumSh)%Trans
                         //            ELSE IF(ShadeFlag == IntBlindOn) THEN
                         //              DividerSolAbs = DividerSolAbs * InterpSlatAng(SurfaceWindow(HeatTransSurfNum)%SlatAngThisTS, &
                         //                  SurfaceWindow(HeatTransSurfNum)%MovableSlats,Blind(BlNum)%SolBackDiffDiffTrans)
@@ -12498,8 +12499,8 @@ namespace SolarShading {
                     if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
                         HMovInsul = 0.0;
                     } else { // Movable insulation present
-                        HMovInsul = 1.0 / (MovInsulSchedVal * Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).Resistance);
-                        AbsInt = Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).AbsorpSolar;
+                        HMovInsul = 1.0 / (MovInsulSchedVal * dataMaterial.Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).Resistance);
+                        AbsInt = dataMaterial.Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).AbsorpSolar;
                     }
                 }
                 if (HMovInsul > 0.0) InsideDifAbsorptance = AbsInt; // Movable inside insulation present
@@ -12756,8 +12757,8 @@ namespace SolarShading {
                 //            DividerSolAbs = SurfaceWindow(HeatTransSurfNum)%DividerSolAbsorp
                 //            IF(SurfaceWindow(HeatTransSurfNum)%DividerType == Suspended) THEN ! Suspended divider; account for inside glass
                 //              MatNumGl = Construct(ConstrNum)%LayerPoint(Construct(ConstrNum)%TotLayers)
-                //              TransGl = Material(MatNumGl)%Trans
-                //              ReflGl = Material(MatNumGl)%ReflectSolDiffBack
+                //              TransGl = dataMaterial.Material(MatNumGl)%Trans
+                //              ReflGl = dataMaterial.Material(MatNumGl)%ReflectSolDiffBack
                 //              AbsGl = 1.0d0-TransGl-ReflGl
                 //              DividerSolRefl = 1.0d0-DividerSolAbs
                 //              DividerSolAbs = AbsGl + TransGl*(DividerSolAbs + DividerSolRefl*AbsGl)/(1.0d0-DividerSolRefl*ReflGl)
@@ -12765,7 +12766,7 @@ namespace SolarShading {
                 // Correct for interior shade transmittance
                 //            IF(ShadeFlag == IntShadeOn) THEN
                 //              MatNumSh = Construct(ConstrNumSh)%LayerPoint(Construct(ConstrNumSh)%TotLayers)
-                //              DividerSolAbs = DividerSolAbs * Material(MatNumSh)%Trans
+                //              DividerSolAbs = DividerSolAbs * dataMaterial.Material(MatNumSh)%Trans
                 //            ELSE IF(ShadeFlag == IntBlindOn) THEN
                 //              DividerSolAbs = DividerSolAbs * InterpSlatAng(SurfaceWindow(HeatTransSurfNum)%SlatAngThisTS, &
                 //                  SurfaceWindow(HeatTransSurfNum)%MovableSlats,Blind(BlNum)%SolBackDiffDiffTrans)
@@ -12808,7 +12809,6 @@ namespace SolarShading {
 
         // Using/Aliasing
         using namespace Vectors;
-        using DataHeatBalance::Material;
 
         // Locals
         Real64 XShadowProjection; // temporary buffer
@@ -12973,7 +12973,7 @@ namespace SolarShading {
                 if (SurfaceWindow(BackSurfaceNumber).WindowModelType == WindowBSDFModel) {
                     VisibleReflectance = dataConstruction.Construct(IConst).ReflectVisDiffBack;
                 } else {
-                    VisibleReflectance = (1.0 - Material(InsideConLay).AbsorpVisible);
+                    VisibleReflectance = (1.0 - dataMaterial.Material(InsideConLay).AbsorpVisible);
                 }
                 Geom.ARhoVisOverlap(KBkSurf, IRay) = Geom.AOverlap(KBkSurf, IRay) * VisibleReflectance;
                 TotAOverlap += Geom.AOverlap(KBkSurf, IRay);

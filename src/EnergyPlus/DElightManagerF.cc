@@ -70,6 +70,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -335,7 +336,7 @@ namespace DElightManagerF {
                                 iMatlLayer = dataConstruction.Construct(iconstruct).LayerPoint(1);
                                 // Get the outside visible reflectance of this material layer
                                 // (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
-                                rExtVisRefl = 1.0 - Material(iMatlLayer).AbsorpVisible;
+                                rExtVisRefl = 1.0 - dataMaterial.Material(iMatlLayer).AbsorpVisible;
                             } else {
                                 rExtVisRefl = 0.0;
                             }

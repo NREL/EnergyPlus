@@ -67,6 +67,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -458,7 +459,6 @@ namespace SurfaceGroundHeatExchanger {
         using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::Pi;
         using namespace DataEnvironment;
-        using DataHeatBalance::Material;
         using DataHeatBalance::TotConstructs;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
@@ -528,11 +528,11 @@ namespace SurfaceGroundHeatExchanger {
                     this->CTFTSourceQ = dataConstruction.Construct(Cons).CTFTSourceQ;     // w coefficents
                     this->ConstructionNum = Cons;
                     // surface properties
-                    this->BtmRoughness = Material(dataConstruction.Construct(Cons).LayerPoint(LayerNum)).Roughness;
-                    this->TopThermAbs = Material(dataConstruction.Construct(Cons).LayerPoint(LayerNum)).AbsorpThermal;
-                    this->TopRoughness = Material(dataConstruction.Construct(Cons).LayerPoint(1)).Roughness;
-                    this->TopThermAbs = Material(dataConstruction.Construct(Cons).LayerPoint(1)).AbsorpThermal;
-                    this->TopSolarAbs = Material(dataConstruction.Construct(Cons).LayerPoint(1)).AbsorpSolar;
+                    this->BtmRoughness = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(LayerNum)).Roughness;
+                    this->TopThermAbs = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(LayerNum)).AbsorpThermal;
+                    this->TopRoughness = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(1)).Roughness;
+                    this->TopThermAbs = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(1)).AbsorpThermal;
+                    this->TopSolarAbs = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(1)).AbsorpSolar;
                 }
             }
             // set one-time flag

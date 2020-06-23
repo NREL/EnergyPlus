@@ -138,7 +138,6 @@ namespace LowTempRadiantSystem {
     using DataGlobals::SysSizingCalc;
     using DataGlobals::WarmupFlag;
     using DataHeatBalance::Air;
-    using DataHeatBalance::Material;
     using DataHeatBalance::RegularMaterial;
     using DataHeatBalance::TotConstructs;
     using DataHeatBalance::TotMaterials;

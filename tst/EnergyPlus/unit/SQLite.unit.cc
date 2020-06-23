@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Material.hh>
 #include "Fixtures/SQLiteFixture.hh"
 #include <EnergyPlus/OutputProcessor.hh>
 
@@ -587,10 +588,10 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     zoneGroupData1->ZoneList = 2;
     zoneGroupData1->Multiplier = 99;
 
-    auto const &materialData0 = std::unique_ptr<DataHeatBalance::MaterialProperties>(new DataHeatBalance::MaterialProperties());
+    auto const &materialData0 = std::unique_ptr<Material::MaterialProperties>(new Material::MaterialProperties());
     materialData0->Name = "test material 1";
     materialData0->Group = 1;
-    auto const &materialData1 = std::unique_ptr<DataHeatBalance::MaterialProperties>(new DataHeatBalance::MaterialProperties());
+    auto const &materialData1 = std::unique_ptr<Material::MaterialProperties>(new Material::MaterialProperties());
     materialData1->Name = "test material 2";
     materialData1->Group = 2;
     materialData1->Roughness = 2;

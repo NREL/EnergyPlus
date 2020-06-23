@@ -71,6 +71,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -656,9 +657,9 @@ namespace WindowManager {
             TotLay = dataConstruction.Construct(ConstrNum).TotLayers;
 
             // First layer must be glass, shade, screen or blind to be a glazing construction
-            if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != WindowGlass && Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != Shade &&
-                Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != Screen && Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != WindowBlind &&
-                Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != WindowSimpleGlazing)
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != WindowGlass && dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != Shade &&
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != Screen && dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != WindowBlind &&
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != WindowSimpleGlazing)
                 continue;
 
             ShadeLayNum = 0;
@@ -672,11 +673,11 @@ namespace WindowManager {
             StormWinConst = false;
             lSimpleGlazingSystem = false;
 
-            if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowSimpleGlazing) {
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowSimpleGlazing) {
                 // what if outside layer is shade, blind, or screen?
                 lSimpleGlazingSystem = true;
-                SimpleGlazingSHGC = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SimpleWindowSHGC;
-                SimpleGlazingU = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
+                SimpleGlazingSHGC = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SimpleWindowSHGC;
+                SimpleGlazingU = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
             }
 
             if (has_prefix(dataConstruction.Construct(ConstrNum).Name, "BARECONSTRUCTIONWITHSTORMWIN") ||
@@ -684,49 +685,49 @@ namespace WindowManager {
                 StormWinConst = true;
 
             // Get layer number of shade/blind
-            if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == Shade) {
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == Shade) {
                 ExtShade = true;
                 ShadeLayNum = 1;
-            } else if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLay)).Group == Shade) {
+            } else if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLay)).Group == Shade) {
                 IntShade = true;
                 ShadeLayNum = TotLay;
             } else if (dataConstruction.Construct(ConstrNum).TotLayers == 5) {
-                if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(3)).Group == Shade) {
+                if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(3)).Group == Shade) {
                     BGShade = true;
                     ShadeLayNum = 3;
                 }
             } else if (dataConstruction.Construct(ConstrNum).TotLayers == 7) {
-                if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(5)).Group == Shade) {
+                if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(5)).Group == Shade) {
                     BGShade = true;
                     ShadeLayNum = 5;
                 }
             }
 
-            if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowBlind) {
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowBlind) {
                 ExtBlind = true;
                 ShadeLayNum = 1;
-                BlNum = Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).BlindDataPtr;
-            } else if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLay)).Group == WindowBlind) {
+                BlNum = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).BlindDataPtr;
+            } else if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLay)).Group == WindowBlind) {
                 IntBlind = true;
                 ShadeLayNum = TotLay;
-                BlNum = Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).BlindDataPtr;
+                BlNum = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).BlindDataPtr;
             } else if (dataConstruction.Construct(ConstrNum).TotLayers == 5) {
-                if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(3)).Group == WindowBlind) {
+                if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(3)).Group == WindowBlind) {
                     BGBlind = true;
                     ShadeLayNum = 3;
-                    BlNum = Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).BlindDataPtr;
+                    BlNum = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).BlindDataPtr;
                 }
             } else if (dataConstruction.Construct(ConstrNum).TotLayers == 7) {
-                if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(5)).Group == WindowBlind) {
+                if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(5)).Group == WindowBlind) {
                     BGBlind = true;
                     ShadeLayNum = 5;
-                    BlNum = Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).BlindDataPtr;
+                    BlNum = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).BlindDataPtr;
                 }
             }
 
-            if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == Screen) {
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == Screen) {
                 ShadeLayNum = 1;
-                ScNum = Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).ScreenDataPtr;
+                ScNum = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).ScreenDataPtr;
                 //   Disregard orphaned constructs with exterior screen
                 if (ScNum == 0) continue;
                 ExtScreen = true;
@@ -746,14 +747,14 @@ namespace WindowManager {
                 if (ExtScreen) {
                     TauShIR = SurfaceScreens(ScNum).DifDifTrans;
                 } else {
-                    TauShIR = Material(ShadeLayPtr).TransThermal;
+                    TauShIR = dataMaterial.Material(ShadeLayPtr).TransThermal;
                 }
-                EpsShIR = Material(ShadeLayPtr).AbsorpThermal;
+                EpsShIR = dataMaterial.Material(ShadeLayPtr).AbsorpThermal;
                 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                 if (ExtShade || ExtScreen) { // Exterior shade or screen
-                    EpsGlIR = Material(dataConstruction.Construct(ConstrNum).LayerPoint(2)).AbsorpThermalFront;
+                    EpsGlIR = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(2)).AbsorpThermalFront;
                 } else { // Interior shade
-                    EpsGlIR = Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLay - 1)).AbsorpThermalBack;
+                    EpsGlIR = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLay - 1)).AbsorpThermalBack;
                 }
                 RhoGlIR = max(0.0, 1.0 - EpsGlIR);
                 dataConstruction.Construct(ConstrNum).ShadeAbsorpThermal = EpsShIR * (1.0 + TauShIR * RhoGlIR / (1.0 - RhoShIR * RhoGlIR));
@@ -797,7 +798,7 @@ namespace WindowManager {
 
                 LayerNum(IGlass) = LayNum;
                 LayPtr = dataConstruction.Construct(ConstrNum).LayerPoint(LayNum);
-                SpecDataNum = Material(LayPtr).GlassSpectralDataPtr;
+                SpecDataNum = dataMaterial.Material(LayPtr).GlassSpectralDataPtr;
                 if (SpecDataNum != 0) {
                     if (!BGFlag) AllGlassIsSpectralAverage = false;
 
@@ -811,7 +812,7 @@ namespace WindowManager {
                     for (ILam = 1; ILam <= numptDAT; ++ILam) {
                         wlt(IGlass, ILam) = SpectralData(SpecDataNum).WaveLength(ILam);
                         t(IGlass, ILam) = SpectralData(SpecDataNum).Trans(ILam);
-                        if ((IGlass == 1 || (IGlass == 2 && StormWinConst)) && (!BGFlag)) t(IGlass, ILam) *= Material(LayPtr).GlassTransDirtFactor;
+                        if ((IGlass == 1 || (IGlass == 2 && StormWinConst)) && (!BGFlag)) t(IGlass, ILam) *= dataMaterial.Material(LayPtr).GlassTransDirtFactor;
                         rff(IGlass, ILam) = SpectralData(SpecDataNum).ReflFront(ILam);
                         rbb(IGlass, ILam) = SpectralData(SpecDataNum).ReflBack(ILam);
                     }
@@ -820,7 +821,7 @@ namespace WindowManager {
                     // If there is spectral data for between-glass shades or blinds, calc the average spectral properties for use.
                     if (BGFlag) {
                         // 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
-                        ShowWarningError("Window glazing material \"" + Material(LayPtr).Name +
+                        ShowWarningError("Window glazing material \"" + dataMaterial.Material(LayPtr).Name +
                                          "\" was defined with full spectral data and has been converted to average spectral data");
                         ShowContinueError("due to its use with between-glass shades or blinds of the window construction \"" +
                                           dataConstruction.Construct(ConstrNum).Name + "\".");
@@ -840,36 +841,36 @@ namespace WindowManager {
                         VisibleSprectrumAverage(rbb, tmpReflectVisBeamBack);
 
                         // set this material to average spectral data
-                        Material(LayPtr).GlassSpectralDataPtr = 0;
-                        Material(LayPtr).Trans = tmpTrans;
-                        Material(LayPtr).TransVis = tmpTransVis;
-                        Material(LayPtr).ReflectSolBeamFront = tmpReflectSolBeamFront;
-                        Material(LayPtr).ReflectSolBeamBack = tmpReflectSolBeamBack;
-                        Material(LayPtr).ReflectVisBeamFront = tmpReflectVisBeamFront;
-                        Material(LayPtr).ReflectVisBeamBack = tmpReflectVisBeamBack;
+                        dataMaterial.Material(LayPtr).GlassSpectralDataPtr = 0;
+                        dataMaterial.Material(LayPtr).Trans = tmpTrans;
+                        dataMaterial.Material(LayPtr).TransVis = tmpTransVis;
+                        dataMaterial.Material(LayPtr).ReflectSolBeamFront = tmpReflectSolBeamFront;
+                        dataMaterial.Material(LayPtr).ReflectSolBeamBack = tmpReflectSolBeamBack;
+                        dataMaterial.Material(LayPtr).ReflectVisBeamFront = tmpReflectVisBeamFront;
+                        dataMaterial.Material(LayPtr).ReflectVisBeamBack = tmpReflectVisBeamBack;
                         SpecDataNum = 0;
                     }
                 }
 
-                if (SpecDataNum == 0 && !Material(LayPtr).GlassSpectralAndAngle) { // No spectral data for this layer; use spectral average values
+                if (SpecDataNum == 0 && !dataMaterial.Material(LayPtr).GlassSpectralAndAngle) { // No spectral data for this layer; use spectral average values
                     lquasi = true;
                     numpt(IGlass) = 2;
-                    t(IGlass, 1) = Material(LayPtr).Trans;
-                    if (IGlass == 1 || (IGlass == 2 && StormWinConst)) t(IGlass, 1) *= Material(LayPtr).GlassTransDirtFactor;
-                    t(IGlass, 2) = Material(LayPtr).TransVis;
-                    if (IGlass == 1 || (IGlass == 2 && StormWinConst)) t(IGlass, 2) *= Material(LayPtr).GlassTransDirtFactor;
-                    rff(IGlass, 1) = Material(LayPtr).ReflectSolBeamFront;
-                    rbb(IGlass, 1) = Material(LayPtr).ReflectSolBeamBack;
-                    rff(IGlass, 2) = Material(LayPtr).ReflectVisBeamFront;
-                    rbb(IGlass, 2) = Material(LayPtr).ReflectVisBeamBack;
+                    t(IGlass, 1) = dataMaterial.Material(LayPtr).Trans;
+                    if (IGlass == 1 || (IGlass == 2 && StormWinConst)) t(IGlass, 1) *= dataMaterial.Material(LayPtr).GlassTransDirtFactor;
+                    t(IGlass, 2) = dataMaterial.Material(LayPtr).TransVis;
+                    if (IGlass == 1 || (IGlass == 2 && StormWinConst)) t(IGlass, 2) *= dataMaterial.Material(LayPtr).GlassTransDirtFactor;
+                    rff(IGlass, 1) = dataMaterial.Material(LayPtr).ReflectSolBeamFront;
+                    rbb(IGlass, 1) = dataMaterial.Material(LayPtr).ReflectSolBeamBack;
+                    rff(IGlass, 2) = dataMaterial.Material(LayPtr).ReflectVisBeamFront;
+                    rbb(IGlass, 2) = dataMaterial.Material(LayPtr).ReflectVisBeamBack;
                 }
-                if (Material(LayPtr).GlassSpectralAndAngle) {
+                if (dataMaterial.Material(LayPtr).GlassSpectralAndAngle) {
                     if (!BGFlag) AllGlassIsSpectralAverage = false;
                     numptDAT = wle.size();
                     numpt(IGlass) = numptDAT;
                     if (BGFlag) {
                         // 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
-                        ShowWarningError("Window glazing material \"" + Material(LayPtr).Name +
+                        ShowWarningError("Window glazing material \"" + dataMaterial.Material(LayPtr).Name +
                                          "\" was defined with full spectral and angular data and has been converted to average spectral data");
                         ShowContinueError("due to its use with between-glass shades or blinds of the window construction \"" +
                                           dataConstruction.Construct(ConstrNum).Name + "\".");
@@ -882,9 +883,9 @@ namespace WindowManager {
                         for (ILam = 1; ILam <= (int)wle.size(); ++ILam) {
                             auto lam = wle(ILam);
                             wlt(IGlass, ILam) = lam;
-                            t(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngTransDataPtr, 0.0, lam);
-                            rff(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngFRefleDataPtr, 0.0, lam);
-                            rbb(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngBRefleDataPtr, 0.0, lam);
+                            t(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, 0.0, lam);
+                            rff(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, 0.0, lam);
+                            rbb(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, 0.0, lam);
                         }
                         SolarSprectrumAverage(t, tmpTrans);
                         SolarSprectrumAverage(rff, tmpReflectSolBeamFront);
@@ -896,13 +897,13 @@ namespace WindowManager {
                         VisibleSprectrumAverage(rbb, tmpReflectVisBeamBack);
 
                         // set this material to average spectral data
-                        Material(LayPtr).GlassSpectralAndAngle = false;
-                        Material(LayPtr).Trans = tmpTrans;
-                        Material(LayPtr).TransVis = tmpTransVis;
-                        Material(LayPtr).ReflectSolBeamFront = tmpReflectSolBeamFront;
-                        Material(LayPtr).ReflectSolBeamBack = tmpReflectSolBeamBack;
-                        Material(LayPtr).ReflectVisBeamFront = tmpReflectVisBeamFront;
-                        Material(LayPtr).ReflectVisBeamBack = tmpReflectVisBeamBack;
+                        dataMaterial.Material(LayPtr).GlassSpectralAndAngle = false;
+                        dataMaterial.Material(LayPtr).Trans = tmpTrans;
+                        dataMaterial.Material(LayPtr).TransVis = tmpTransVis;
+                        dataMaterial.Material(LayPtr).ReflectSolBeamFront = tmpReflectSolBeamFront;
+                        dataMaterial.Material(LayPtr).ReflectSolBeamBack = tmpReflectSolBeamBack;
+                        dataMaterial.Material(LayPtr).ReflectVisBeamFront = tmpReflectVisBeamFront;
+                        dataMaterial.Material(LayPtr).ReflectVisBeamBack = tmpReflectVisBeamBack;
                         SpecDataNum = 0;
                     }
                 }
@@ -930,7 +931,7 @@ namespace WindowManager {
                 // from properties at normal incidence
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                     LayPtr = dataConstruction.Construct(ConstrNum).LayerPoint(LayerNum(IGlass));
-                    if (!Material(LayPtr).GlassSpectralAndAngle) {
+                    if (!dataMaterial.Material(LayPtr).GlassSpectralAndAngle) {
                         for (ILam = 1; ILam <= numpt(IGlass); ++ILam) {
                             TransAndReflAtPhi(CosPhi,
                                               t(IGlass, ILam),
@@ -947,9 +948,9 @@ namespace WindowManager {
                         for (ILam = 1; ILam <= (int)wle.size(); ++ILam) {
                             auto lam = wle(ILam);
                             wlt(IGlass, ILam) = lam;
-                            tPhi(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
-                            rfPhi(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
-                            rbPhi(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
+                            tPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
+                            rfPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
+                            rbPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
                         }
                     }
                     // For use with between-glass shade/blind, save angular properties of isolated glass
@@ -1069,7 +1070,7 @@ namespace WindowManager {
                 LayerNum(IGlass) = LayNum;
                 LayPtr = dataConstruction.Construct(ConstrNum).LayerPoint(LayNum);
 
-                SpecDataNum = Material(LayPtr).GlassSpectralDataPtr;
+                SpecDataNum = dataMaterial.Material(LayPtr).GlassSpectralDataPtr;
                 if (SpecDataNum != 0) {
 
                     // Get the spectral data for the transmittance, front reflectance and
@@ -1083,26 +1084,26 @@ namespace WindowManager {
                     for (ILam = 1; ILam <= numptDAT; ++ILam) {
                         wlt(IGlass, ILam) = SpectralData(SpecDataNum).WaveLength(ILam);
                         t(IGlass, ILam) = SpectralData(SpecDataNum).Trans(ILam);
-                        if (IGlass == NGlass || (IGlass == (NGlass - 1) && StormWinConst)) t(IGlass, ILam) *= Material(LayPtr).GlassTransDirtFactor;
+                        if (IGlass == NGlass || (IGlass == (NGlass - 1) && StormWinConst)) t(IGlass, ILam) *= dataMaterial.Material(LayPtr).GlassTransDirtFactor;
                         rff(IGlass, ILam) = SpectralData(SpecDataNum).ReflBack(ILam);
                         rbb(IGlass, ILam) = SpectralData(SpecDataNum).ReflFront(ILam);
                     }
 
                 } else { // No spectral data for this layer; use spectral average values
-                    if (!Material(LayPtr).GlassSpectralAndAngle) {
+                    if (!dataMaterial.Material(LayPtr).GlassSpectralAndAngle) {
                         lquasi = true;
                         numpt(IGlass) = 2;
-                        t(IGlass, 1) = Material(LayPtr).Trans;
-                        if (IGlass == NGlass || (IGlass == (NGlass - 1) && StormWinConst)) t(IGlass, 1) *= Material(LayPtr).GlassTransDirtFactor;
-                        t(IGlass, 2) = Material(LayPtr).TransVis;
-                        if (IGlass == NGlass || (IGlass == (NGlass - 1) && StormWinConst)) t(IGlass, 2) *= Material(LayPtr).GlassTransDirtFactor;
-                        rff(IGlass, 1) = Material(LayPtr).ReflectSolBeamBack;
-                        rbb(IGlass, 1) = Material(LayPtr).ReflectSolBeamFront;
-                        rff(IGlass, 2) = Material(LayPtr).ReflectVisBeamBack;
-                        rbb(IGlass, 2) = Material(LayPtr).ReflectVisBeamFront;
+                        t(IGlass, 1) = dataMaterial.Material(LayPtr).Trans;
+                        if (IGlass == NGlass || (IGlass == (NGlass - 1) && StormWinConst)) t(IGlass, 1) *= dataMaterial.Material(LayPtr).GlassTransDirtFactor;
+                        t(IGlass, 2) = dataMaterial.Material(LayPtr).TransVis;
+                        if (IGlass == NGlass || (IGlass == (NGlass - 1) && StormWinConst)) t(IGlass, 2) *= dataMaterial.Material(LayPtr).GlassTransDirtFactor;
+                        rff(IGlass, 1) = dataMaterial.Material(LayPtr).ReflectSolBeamBack;
+                        rbb(IGlass, 1) = dataMaterial.Material(LayPtr).ReflectSolBeamFront;
+                        rff(IGlass, 2) = dataMaterial.Material(LayPtr).ReflectVisBeamBack;
+                        rbb(IGlass, 2) = dataMaterial.Material(LayPtr).ReflectVisBeamFront;
                     }
                 }
-                if (Material(LayPtr).GlassSpectralAndAngle) {
+                if (dataMaterial.Material(LayPtr).GlassSpectralAndAngle) {
                     numptDAT = wle.size();
                     numpt(IGlass) = numptDAT;
                 }
@@ -1122,7 +1123,7 @@ namespace WindowManager {
                 // from properties at normal incidence
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                     LayPtr = dataConstruction.Construct(ConstrNum).LayerPoint(LayerNum(IGlass));
-                    if (!Material(LayPtr).GlassSpectralAndAngle) {
+                    if (!dataMaterial.Material(LayPtr).GlassSpectralAndAngle) {
                         for (ILam = 1; ILam <= numpt(IGlass); ++ILam) {
 
                             TransAndReflAtPhi(CosPhi,
@@ -1140,9 +1141,9 @@ namespace WindowManager {
                         for (ILam = 1; ILam <= (int)wle.size(); ++ILam) {
                             auto lam = wle(ILam);
                             wlt(IGlass, ILam) = lam;
-                            tPhi(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
-                            rfPhi(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
-                            rbPhi(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
+                            tPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
+                            rfPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
+                            rbPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
                         }
                     }
                 }
@@ -1187,11 +1188,11 @@ namespace WindowManager {
                 for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
 
                     if (ShadeOn) {
-                        ShadeAbs = Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).AbsorpSolar;
-                        ShadeTrans = Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).Trans;
-                        ShadeTransVis = Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).TransVis;
-                        ShadeRefl = Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).ReflectShade;
-                        ShadeReflVis = Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).ReflectShadeVis;
+                        ShadeAbs = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).AbsorpSolar;
+                        ShadeTrans = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).Trans;
+                        ShadeTransVis = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).TransVis;
+                        ShadeRefl = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).ReflectShade;
+                        ShadeReflVis = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(ShadeLayNum)).ReflectShadeVis;
                         rsh = ShadeRefl;
                         rshv = ShadeReflVis;
                         tsh = ShadeTrans;
@@ -1733,24 +1734,24 @@ namespace WindowManager {
             TotLay = dataConstruction.Construct(ConstrNumSh).TotLayers;
             IntShade = false;
             IntBlind = false;
-            if (Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay)).Group == Shade) {
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay)).Group == Shade) {
                 IntShade = true;
                 ShadeLayPtr = dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay);
             }
-            if (Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay)).Group == WindowBlind) {
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay)).Group == WindowBlind) {
                 IntBlind = true;
-                BlNum = Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay)).BlindDataPtr;
+                BlNum = dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay)).BlindDataPtr;
             }
 
             if (IntShade || IntBlind) {
                 for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
                     if (IntShade || IntBlind) {
-                        EpsGlIR = Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay - 1)).AbsorpThermalBack;
+                        EpsGlIR = dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay - 1)).AbsorpThermalBack;
                         RhoGlIR = 1 - EpsGlIR;
                     }
                     if (IntShade) {
-                        TauShIR = Material(ShadeLayPtr).TransThermal;
-                        EpsShIR = Material(ShadeLayPtr).AbsorpThermal;
+                        TauShIR = dataMaterial.Material(ShadeLayPtr).TransThermal;
+                        EpsShIR = dataMaterial.Material(ShadeLayPtr).AbsorpThermal;
                         RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                         SurfaceWindow(SurfNum).EffShBlindEmiss(1) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
                         SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
@@ -1778,7 +1779,7 @@ namespace WindowManager {
             // Total thickness of glazing system (used in calculation of inside reveal reflection/absorption
             SurfaceWindow(SurfNum).TotGlazingThickness = 0.0;
             for (LayNum = 1; LayNum <= dataConstruction.Construct(ConstrNum).TotLayers; ++LayNum) {
-                SurfaceWindow(SurfNum).TotGlazingThickness += Material(dataConstruction.Construct(ConstrNum).LayerPoint(LayNum)).Thickness;
+                SurfaceWindow(SurfNum).TotGlazingThickness += dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(LayNum)).Thickness;
             }
             // Sine and cosine of azimuth and tilt
             //    SurfaceWindow(SurfNum)%SinAzim = Surface(SurfNum)%SinAzim
@@ -1908,16 +1909,16 @@ namespace WindowManager {
                 ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;
                 //  IF(ShadingType == WSC_ST_ExteriorBlind) THEN
                 //    MatNum = Construct(ConstrNumSh)%LayerPoint(1)
-                //    SurfaceWindow(SurfNum)%BlindNumber = Material(MatNum)%BlindDataPtr
+                //    SurfaceWindow(SurfNum)%BlindNumber = dataMaterial.Material(MatNum)%BlindDataPtr
                 //  ELSE IF(ShadingType == WSC_ST_InteriorBlind) THEN
                 //    MatNum = Construct(ConstrNumSh)%LayerPoint(Construct(ConstrNumSh)%TotLayers)
-                //    SurfaceWindow(SurfNum)%BlindNumber = Material(MatNum)%BlindDataPtr
+                //    SurfaceWindow(SurfNum)%BlindNumber = dataMaterial.Material(MatNum)%BlindDataPtr
                 // Between glass blind is layer 3 for double glazing and layer 5 for triple glazing.
                 //  ELSE IF(ShadingType == WSC_ST_BetweenGlassBlind) THEN
                 //    IF(Construct(ConstrNumSh)%TotGlassLayers == 2) THEN
-                //      SurfaceWindow(SurfNum)%BlindNumber = Material(Construct(ConstrNumSh)%LayerPoint(3))%BlindDataPtr
+                //      SurfaceWindow(SurfNum)%BlindNumber = dataMaterial.Material(Construct(ConstrNumSh)%LayerPoint(3))%BlindDataPtr
                 //    ELSE
-                //      SurfaceWindow(SurfNum)%BlindNumber = Material(Construct(ConstrNumSh)%LayerPoint(5))%BlindDataPtr
+                //      SurfaceWindow(SurfNum)%BlindNumber = dataMaterial.Material(Construct(ConstrNumSh)%LayerPoint(5))%BlindDataPtr
                 //    END IF
                 //  ELSE IF(ShadingType == WSC_ST_ExteriorScreen) THEN
                 if (ShadingType == WSC_ST_ExteriorScreen) {
@@ -1984,7 +1985,7 @@ namespace WindowManager {
                 Surface(SurfNum).StormWinConstruction == 0) {
                 ConstrNum = Surface(SurfNum).Construction;
                 MatNum = dataConstruction.Construct(ConstrNum).LayerPoint(dataConstruction.Construct(ConstrNum).TotLayers);
-                if (Material(MatNum).SolarDiffusing) {
+                if (dataMaterial.Material(MatNum).SolarDiffusing) {
                     if (!Surface(SurfNum).HasShadeControl) {
                         SurfaceWindow(SurfNum).SolarDiffusing = true;
                     } else { // There is a shading control
@@ -2606,7 +2607,7 @@ namespace WindowManager {
             locTCFlag = (dataConstruction.Construct(ConstrNum).TCFlag == 1);
 
             if (locTCFlag) {
-                locTCSpecTemp = Material(dataConstruction.Construct(ConstrNum).TCLayer).SpecTemp;
+                locTCSpecTemp = dataMaterial.Material(dataConstruction.Construct(ConstrNum).TCLayer).SpecTemp;
                 window.SpecTemp = locTCSpecTemp;
                 // Check to see whether needs to switch to a new TC window construction
                 locTCLayerTemp = window.TCLayerTemp;
@@ -2618,7 +2619,7 @@ namespace WindowManager {
                     IDConst = 0;
                     for (k = 1; k <= TotConstructs; ++k) {
                         if (dataConstruction.Construct(k).TCMasterConst == dataConstruction.Construct(ConstrNum).TCMasterConst) {
-                            dT1 = std::abs(locTCLayerTemp - Material(dataConstruction.Construct(k).TCLayer).SpecTemp);
+                            dT1 = std::abs(locTCLayerTemp - dataMaterial.Material(dataConstruction.Construct(k).TCLayer).SpecTemp);
                             if (dT1 < dT0) {
                                 ++i;
                                 deltaTemp(i) = dT1;
@@ -2632,7 +2633,7 @@ namespace WindowManager {
                         // Use the new TC window construction
                         ConstrNum = IDConst(iMinDT(1));
                         surface.Construction = ConstrNum;
-                        window.SpecTemp = Material(dataConstruction.Construct(ConstrNum).TCLayer).SpecTemp;
+                        window.SpecTemp = dataMaterial.Material(dataConstruction.Construct(ConstrNum).TCLayer).SpecTemp;
                     }
                 }
             }
@@ -2769,17 +2770,17 @@ namespace WindowManager {
             for (Lay = 1; Lay <= TotLay; ++Lay) {
                 LayPtr = dataConstruction.Construct(IConst).LayerPoint(Lay);
 
-                if ((Material(LayPtr).Group == WindowGlass) || (Material(LayPtr).Group == WindowSimpleGlazing)) {
+                if ((dataMaterial.Material(LayPtr).Group == WindowGlass) || (dataMaterial.Material(LayPtr).Group == WindowSimpleGlazing)) {
                     ++IGlass;
-                    thick(IGlass) = Material(LayPtr).Thickness;
-                    scon(IGlass) = Material(LayPtr).Conductivity / Material(LayPtr).Thickness;
-                    emis(2 * IGlass - 1) = Material(LayPtr).AbsorpThermalFront;
-                    emis(2 * IGlass) = Material(LayPtr).AbsorpThermalBack;
-                    tir(2 * IGlass - 1) = Material(LayPtr).TransThermal;
-                    tir(2 * IGlass) = Material(LayPtr).TransThermal;
+                    thick(IGlass) = dataMaterial.Material(LayPtr).Thickness;
+                    scon(IGlass) = dataMaterial.Material(LayPtr).Conductivity / dataMaterial.Material(LayPtr).Thickness;
+                    emis(2 * IGlass - 1) = dataMaterial.Material(LayPtr).AbsorpThermalFront;
+                    emis(2 * IGlass) = dataMaterial.Material(LayPtr).AbsorpThermalBack;
+                    tir(2 * IGlass - 1) = dataMaterial.Material(LayPtr).TransThermal;
+                    tir(2 * IGlass) = dataMaterial.Material(LayPtr).TransThermal;
                 }
 
-                if (Material(LayPtr).Group == Shade || Material(LayPtr).Group == WindowBlind || Material(LayPtr).Group == Screen) {
+                if (dataMaterial.Material(LayPtr).Group == Shade || dataMaterial.Material(LayPtr).Group == WindowBlind || dataMaterial.Material(LayPtr).Group == Screen) {
                     if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) ShadeLayPtr = dataConstruction.Construct(IConst).LayerPoint(dataConstruction.Construct(IConst).TotLayers);
                     if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) ShadeLayPtr = dataConstruction.Construct(IConst).LayerPoint(1);
                     if (ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn) {
@@ -2789,30 +2790,30 @@ namespace WindowManager {
                     if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn) {
                         // Shade or screen on
                         if (AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
-                            if (Material(ShadeLayPtr).Group == WindowBlind) {
-                                ShowSevereError("CalcWindowHeatBalance: ShadeFlag indicates Shade but Blind=\"" + Material(ShadeLayPtr).Name +
+                            if (dataMaterial.Material(ShadeLayPtr).Group == WindowBlind) {
+                                ShowSevereError("CalcWindowHeatBalance: ShadeFlag indicates Shade but Blind=\"" + dataMaterial.Material(ShadeLayPtr).Name +
                                                 "\" is being used.");
                                 ShowContinueError("This is most likely a fault of the EMS values for shading control.");
                                 ShowFatalError("Preceding condition terminates program.");
                             }
                         }
-                        thick(TotGlassLay + 1) = Material(ShadeLayPtr).Thickness;
-                        scon(TotGlassLay + 1) = Material(ShadeLayPtr).Conductivity / Material(ShadeLayPtr).Thickness;
+                        thick(TotGlassLay + 1) = dataMaterial.Material(ShadeLayPtr).Thickness;
+                        scon(TotGlassLay + 1) = dataMaterial.Material(ShadeLayPtr).Conductivity / dataMaterial.Material(ShadeLayPtr).Thickness;
                         if (ShadeFlag == ExtScreenOn) {
-                            emis(nglface + 1) = Material(ShadeLayPtr).AbsorpThermalFront;
-                            tir(nglface + 1) = SurfaceScreens(Material(ShadeLayPtr).ScreenDataPtr).DifDifTrans;
-                            tir(nglface + 2) = SurfaceScreens(Material(ShadeLayPtr).ScreenDataPtr).DifDifTrans;
+                            emis(nglface + 1) = dataMaterial.Material(ShadeLayPtr).AbsorpThermalFront;
+                            tir(nglface + 1) = SurfaceScreens(dataMaterial.Material(ShadeLayPtr).ScreenDataPtr).DifDifTrans;
+                            tir(nglface + 2) = SurfaceScreens(dataMaterial.Material(ShadeLayPtr).ScreenDataPtr).DifDifTrans;
                         } else {
-                            emis(nglface + 1) = Material(ShadeLayPtr).AbsorpThermal;
-                            tir(nglface + 1) = Material(ShadeLayPtr).TransThermal;
-                            tir(nglface + 2) = Material(ShadeLayPtr).TransThermal;
+                            emis(nglface + 1) = dataMaterial.Material(ShadeLayPtr).AbsorpThermal;
+                            tir(nglface + 1) = dataMaterial.Material(ShadeLayPtr).TransThermal;
+                            tir(nglface + 2) = dataMaterial.Material(ShadeLayPtr).TransThermal;
                         }
-                        emis(nglface + 2) = Material(ShadeLayPtr).AbsorpThermal;
+                        emis(nglface + 2) = dataMaterial.Material(ShadeLayPtr).AbsorpThermal;
 
                     } else {
                         if (AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
-                            if (Material(ShadeLayPtr).Group == Shade || Material(ShadeLayPtr).Group == Screen) {
-                                ShowSevereError("CalcWindowHeatBalance: ShadeFlag indicates Blind but Shade/Screen=\"" + Material(ShadeLayPtr).Name +
+                            if (dataMaterial.Material(ShadeLayPtr).Group == Shade || dataMaterial.Material(ShadeLayPtr).Group == Screen) {
+                                ShowSevereError("CalcWindowHeatBalance: ShadeFlag indicates Blind but Shade/Screen=\"" + dataMaterial.Material(ShadeLayPtr).Name +
                                                 "\" is being used.");
                                 ShowContinueError("This is most likely a fault of the EMS values for shading control.");
                                 ShowFatalError("Preceding condition terminates program.");
@@ -2829,17 +2830,17 @@ namespace WindowManager {
                     }
                 }
 
-                if (Material(LayPtr).Group == WindowGas || Material(LayPtr).Group == WindowGasMixture) {
+                if (dataMaterial.Material(LayPtr).Group == WindowGas || dataMaterial.Material(LayPtr).Group == WindowGasMixture) {
                     ++IGap;
-                    gap(IGap) = Material(LayPtr).Thickness;
-                    gnmix(IGap) = Material(LayPtr).NumberOfGasesInMixture;
+                    gap(IGap) = dataMaterial.Material(LayPtr).Thickness;
+                    gnmix(IGap) = dataMaterial.Material(LayPtr).NumberOfGasesInMixture;
                     for (IMix = 1; IMix <= gnmix(IGap); ++IMix) {
-                        gwght(IMix, IGap) = Material(LayPtr).GasWght(IMix);
-                        gfract(IMix, IGap) = Material(LayPtr).GasFract(IMix);
+                        gwght(IMix, IGap) = dataMaterial.Material(LayPtr).GasWght(IMix);
+                        gfract(IMix, IGap) = dataMaterial.Material(LayPtr).GasFract(IMix);
                         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                            gcon(ICoeff, IMix, IGap) = Material(LayPtr).GasCon(ICoeff, IMix);
-                            gvis(ICoeff, IMix, IGap) = Material(LayPtr).GasVis(ICoeff, IMix);
-                            gcp(ICoeff, IMix, IGap) = Material(LayPtr).GasCp(ICoeff, IMix);
+                            gcon(ICoeff, IMix, IGap) = dataMaterial.Material(LayPtr).GasCon(ICoeff, IMix);
+                            gvis(ICoeff, IMix, IGap) = dataMaterial.Material(LayPtr).GasVis(ICoeff, IMix);
+                            gcp(ICoeff, IMix, IGap) = dataMaterial.Material(LayPtr).GasCp(ICoeff, IMix);
                         }
                     }
                 }
@@ -2852,7 +2853,7 @@ namespace WindowManager {
                 // Fill gap between blind/shade and adjacent glass with air properties.
                 ++IGap;
                 if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == ExtScreenOn) { // Interior or exterior shade
-                    gap(IGap) = Material(ShadeLayPtr).WinShadeToGlassDist;
+                    gap(IGap) = dataMaterial.Material(ShadeLayPtr).WinShadeToGlassDist;
                 } else { // Interior or exterior blind
                     gap(IGap) = Blind(window.BlindNumber).BlindToGlassDist;
                 }
@@ -3094,7 +3095,7 @@ namespace WindowManager {
 
         // Radiation emission to air rate
         DataHeatBalSurface::QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
-        DataHeatBalSurface::QHeatEmiReport(SurfNum) = surface.Area * hcout * (Tsout - tout) + DataHeatBalSurface::QAirExtReport(SurfNum);;
+        DataHeatBalSurface::QHeatEmiReport(SurfNum) = surface.Area * hcout * (Tsout - tout) + DataHeatBalSurface::QAirExtReport(SurfNum);
 
     }
 
@@ -4161,13 +4162,13 @@ namespace WindowManager {
 
         if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == ExtScreenOn) {
             // Shade or Screen on
-            GapDepth = Material(MatNumSh).WinShadeToGlassDist;
+            GapDepth = dataMaterial.Material(MatNumSh).WinShadeToGlassDist;
             AGap = GapDepth * Surface(SurfNum).Width;
-            ATopGap = Material(MatNumSh).WinShadeTopOpeningMult * AGap;
-            ABotGap = Material(MatNumSh).WinShadeBottomOpeningMult * AGap;
-            ALeftGap = Material(MatNumSh).WinShadeLeftOpeningMult * GapHeight * GapDepth;
-            ARightGap = Material(MatNumSh).WinShadeRightOpeningMult * GapHeight * GapDepth;
-            AHolesGap = Material(MatNumSh).WinShadeAirFlowPermeability * GapHeight * Surface(SurfNum).Width;
+            ATopGap = dataMaterial.Material(MatNumSh).WinShadeTopOpeningMult * AGap;
+            ABotGap = dataMaterial.Material(MatNumSh).WinShadeBottomOpeningMult * AGap;
+            ALeftGap = dataMaterial.Material(MatNumSh).WinShadeLeftOpeningMult * GapHeight * GapDepth;
+            ARightGap = dataMaterial.Material(MatNumSh).WinShadeRightOpeningMult * GapHeight * GapDepth;
+            AHolesGap = dataMaterial.Material(MatNumSh).WinShadeAirFlowPermeability * GapHeight * Surface(SurfNum).Width;
         } else {
             // Blind on
             BlNum = SurfaceWindow(SurfNum).BlindNumber;
@@ -4379,11 +4380,11 @@ namespace WindowManager {
 
         if (ShadeFlag == BGShadeOn) {
             // Shade on
-            ATopGap = Material(MatNumSh).WinShadeTopOpeningMult * AGap;
-            ABotGap = Material(MatNumSh).WinShadeBottomOpeningMult * AGap;
-            ALeftGap = Material(MatNumSh).WinShadeLeftOpeningMult * GapHeight * GapDepth;
-            ARightGap = Material(MatNumSh).WinShadeRightOpeningMult * GapHeight * GapDepth;
-            AHolesGap = Material(MatNumSh).WinShadeAirFlowPermeability * GapHeight * Surface(SurfNum).Width;
+            ATopGap = dataMaterial.Material(MatNumSh).WinShadeTopOpeningMult * AGap;
+            ABotGap = dataMaterial.Material(MatNumSh).WinShadeBottomOpeningMult * AGap;
+            ALeftGap = dataMaterial.Material(MatNumSh).WinShadeLeftOpeningMult * GapHeight * GapDepth;
+            ARightGap = dataMaterial.Material(MatNumSh).WinShadeRightOpeningMult * GapHeight * GapDepth;
+            AHolesGap = dataMaterial.Material(MatNumSh).WinShadeAirFlowPermeability * GapHeight * Surface(SurfNum).Width;
         } else {
             // Blind on
             BlNum = SurfaceWindow(SurfNum).BlindNumber;
@@ -4544,7 +4545,7 @@ namespace WindowManager {
         NusseltNumber(SurfNum, TGlassFace1, TGlassFace2, GapNum, gr, pr, nu);
         hGapStill = con / gap(GapNum) * nu;
         GapHeight = Surface(SurfNum).Height;
-        GapDepth = Material(dataConstruction.Construct(ConstrNum).LayerPoint(2 * NGlass - 2)).Thickness;
+        GapDepth = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(2 * NGlass - 2)).Thickness;
         AGap = GapDepth * Surface(SurfNum).Width;
         VGap = SurfaceWindow(SurfNum).AirflowThisTS / GapDepth;
         hcv = 2.0 * hGapStill + 4.0 * VGap;
@@ -6548,8 +6549,8 @@ namespace WindowManager {
         FrDivNum = Surface(SurfNum).FrameDivider;
         TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
         TotGlassLayers = dataConstruction.Construct(ConstrNum).TotSolidLayers;
-        EmisGlassOut = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
-        EmisGlassIn = Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).AbsorpThermalBack;
+        EmisGlassOut = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
+        EmisGlassIn = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).AbsorpThermalBack;
         FrameHeatGain = 0.0;
         DividerHeatGain = 0.0;
         SurfaceWindow(SurfNum).FrameHeatGain = 0.0;
@@ -6618,8 +6619,8 @@ namespace WindowManager {
                 DivEmisIn = SurfaceWindow(SurfNum).DividerEmis;
                 DivEmisOut = DivEmisIn;
             } else { // Suspended (between-glass) divider
-                DivEmisOut = Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
-                DivEmisIn = Material(dataConstruction.Construct(ConstrNum).LayerPoint(dataConstruction.Construct(ConstrNum).TotLayers)).AbsorpThermalBack;
+                DivEmisOut = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
+                DivEmisIn = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(dataConstruction.Construct(ConstrNum).TotLayers)).AbsorpThermalBack;
             }
 
             TOutRadDiv = TOutRad * root_4((1.0 + SurfaceWindow(SurfNum).ProjCorrDivOut) / (1.0 + 2.0 * SurfaceWindow(SurfNum).ProjCorrDivOut));
@@ -6902,35 +6903,35 @@ namespace WindowManager {
         ShadeRes = 0.0;
         MatOutside = dataConstruction.Construct(ConstrNum).LayerPoint(1);
         MatInside = dataConstruction.Construct(ConstrNum).LayerPoint(TotLay);
-        if (Material(MatOutside).Group == 2) { // Exterior shade present
+        if (dataMaterial.Material(MatOutside).Group == 2) { // Exterior shade present
             MatShade = MatOutside;
             ShadeFlag = ExtShadeOn;
             // Set glazing outside convection coefficient to Window 4 still-air value
             hcout = 12.25;
-        } else if (Material(MatOutside).Group == 7) { // Exterior screen present
+        } else if (dataMaterial.Material(MatOutside).Group == 7) { // Exterior screen present
             MatShade = MatOutside;
-            ScNum = Material(MatShade).ScreenDataPtr;
+            ScNum = dataMaterial.Material(MatShade).ScreenDataPtr;
             // Orphaned constructs with exterior screen are ignored
             if (ScNum > 0) ShadeFlag = ExtScreenOn;
             hcout = 12.25;
-        } else if (Material(MatOutside).Group == 5) { // Exterior blind present
+        } else if (dataMaterial.Material(MatOutside).Group == 5) { // Exterior blind present
             MatShade = MatOutside;
             ShadeFlag = ExtBlindOn;
-            BlNum = Material(MatShade).BlindDataPtr;
+            BlNum = dataMaterial.Material(MatShade).BlindDataPtr;
             hcout = 12.25;
-        } else if (Material(MatInside).Group == 2) { // Interior shade present
+        } else if (dataMaterial.Material(MatInside).Group == 2) { // Interior shade present
             MatShade = MatInside;
             ShadeFlag = IntShadeOn;
-        } else if (Material(MatInside).Group == 5) { // Interior blind present
+        } else if (dataMaterial.Material(MatInside).Group == 5) { // Interior blind present
             MatShade = MatInside;
-            BlNum = Material(MatShade).BlindDataPtr;
+            BlNum = dataMaterial.Material(MatShade).BlindDataPtr;
             ShadeFlag = IntBlindOn;
         } else if (TotGlassLay == 2) {
-            if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(3)).Group == 2) ShadeFlag = BGShadeOn;
-            if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(3)).Group == 5) ShadeFlag = BGBlindOn;
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(3)).Group == 2) ShadeFlag = BGShadeOn;
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(3)).Group == 5) ShadeFlag = BGBlindOn;
         } else if (TotGlassLay == 3) {
-            if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(5)).Group == 2) ShadeFlag = BGShadeOn;
-            if (Material(dataConstruction.Construct(ConstrNum).LayerPoint(5)).Group == 5) ShadeFlag = BGBlindOn;
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(5)).Group == 2) ShadeFlag = BGShadeOn;
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(5)).Group == 5) ShadeFlag = BGBlindOn;
         }
 
         if (ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn) {
@@ -7065,14 +7066,14 @@ namespace WindowManager {
 
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = dataConstruction.Construct(ConstrNum).LayerPoint(Lay);
-            if ((Material(LayPtr).Group == WindowGlass) || (Material(LayPtr).Group == WindowSimpleGlazing)) {
+            if ((dataMaterial.Material(LayPtr).Group == WindowGlass) || (dataMaterial.Material(LayPtr).Group == WindowSimpleGlazing)) {
                 ++IGlass;
-                thick(IGlass) = Material(LayPtr).Thickness;
-                scon(IGlass) = Material(LayPtr).Conductivity / Material(LayPtr).Thickness;
-                emis(2 * IGlass - 1) = Material(LayPtr).AbsorpThermalFront;
-                emis(2 * IGlass) = Material(LayPtr).AbsorpThermalBack;
-                tir(2 * IGlass - 1) = Material(LayPtr).TransThermal;
-                tir(2 * IGlass) = Material(LayPtr).TransThermal;
+                thick(IGlass) = dataMaterial.Material(LayPtr).Thickness;
+                scon(IGlass) = dataMaterial.Material(LayPtr).Conductivity / dataMaterial.Material(LayPtr).Thickness;
+                emis(2 * IGlass - 1) = dataMaterial.Material(LayPtr).AbsorpThermalFront;
+                emis(2 * IGlass) = dataMaterial.Material(LayPtr).AbsorpThermalBack;
+                tir(2 * IGlass - 1) = dataMaterial.Material(LayPtr).TransThermal;
+                tir(2 * IGlass) = dataMaterial.Material(LayPtr).TransThermal;
                 AbsBeamNorm(IGlass) = POLYF(1.0, dataConstruction.Construct(ConstrNum).AbsBeamCoef({1, 6}, IGlass));
                 if (ShadeFlag == IntBlindOn) { // Interior blind on
                     AbsBeamNorm(IGlass) = POLYF(1.0, dataConstruction.Construct(ConstrNumBare).AbsBeamCoef({1, 6}, IGlass));
@@ -7092,22 +7093,22 @@ namespace WindowManager {
                 AbsRadGlassFace(2 * IGlass - 1) = 0.5 * BeamSolarInc * AbsBeamNorm(IGlass);
                 AbsRadGlassFace(2 * IGlass) = 0.5 * BeamSolarInc * AbsBeamNorm(IGlass);
             }
-            if (Material(LayPtr).Group == WindowGas || Material(LayPtr).Group == WindowGasMixture ||
-                Material(LayPtr).Group == ComplexWindowGap) { // Gap layer
+            if (dataMaterial.Material(LayPtr).Group == WindowGas || dataMaterial.Material(LayPtr).Group == WindowGasMixture ||
+                dataMaterial.Material(LayPtr).Group == ComplexWindowGap) { // Gap layer
                 ++IGap;
                 // Simon: Need to re-reference gas data in casee of complex fenestration gap
-                if (Material(LayPtr).Group == ComplexWindowGap) {
-                    LayPtr = Material(LayPtr).GasPointer;
+                if (dataMaterial.Material(LayPtr).Group == ComplexWindowGap) {
+                    LayPtr = dataMaterial.Material(LayPtr).GasPointer;
                 }
-                gap(IGap) = Material(LayPtr).Thickness;
-                gnmix(IGap) = Material(LayPtr).NumberOfGasesInMixture;
+                gap(IGap) = dataMaterial.Material(LayPtr).Thickness;
+                gnmix(IGap) = dataMaterial.Material(LayPtr).NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= gnmix(IGap); ++IMix) {
-                    gwght(IMix, IGap) = Material(LayPtr).GasWght(IMix);
-                    gfract(IMix, IGap) = Material(LayPtr).GasFract(IMix);
+                    gwght(IMix, IGap) = dataMaterial.Material(LayPtr).GasWght(IMix);
+                    gfract(IMix, IGap) = dataMaterial.Material(LayPtr).GasFract(IMix);
                     for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                        gcon(ICoeff, IMix, IGap) = Material(LayPtr).GasCon(ICoeff, IMix);
-                        gvis(ICoeff, IMix, IGap) = Material(LayPtr).GasVis(ICoeff, IMix);
-                        gcp(ICoeff, IMix, IGap) = Material(LayPtr).GasCp(ICoeff, IMix);
+                        gcon(ICoeff, IMix, IGap) = dataMaterial.Material(LayPtr).GasCon(ICoeff, IMix);
+                        gvis(ICoeff, IMix, IGap) = dataMaterial.Material(LayPtr).GasVis(ICoeff, IMix);
+                        gcp(ICoeff, IMix, IGap) = dataMaterial.Material(LayPtr).GasCp(ICoeff, IMix);
                     }
                 }
             }
@@ -7828,14 +7829,14 @@ namespace WindowManager {
                     for (i = 1; i <= dataConstruction.Construct(ThisNum).TotLayers; ++i) {
                         Layer = dataConstruction.Construct(ThisNum).LayerPoint(i);
                         {
-                            auto const SELECT_CASE_var(Material(Layer).Group);
+                            auto const SELECT_CASE_var(dataMaterial.Material(Layer).Group);
                             if (SELECT_CASE_var == WindowGas) {
                                 static constexpr auto Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
                                 print(outputFiles.eio,
                                       Format_702,
-                                      Material(Layer).Name,
-                                      GasTypeName(Material(Layer).GasType(1)),
-                                      Material(Layer).Thickness);
+                                      dataMaterial.Material(Layer).Name,
+                                      GasTypeName(dataMaterial.Material(Layer).GasType(1)),
+                                      dataMaterial.Material(Layer).Thickness);
 
                                 //! fw CASE(WindowGasMixture)
 
@@ -7843,20 +7844,20 @@ namespace WindowManager {
                                 static constexpr auto Format_703(" WindowMaterial:Shade,,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                                 print(outputFiles.eio,
                                       Format_703,
-                                      Material(Layer).Name,
-                                      Material(Layer).Thickness,
-                                      Material(Layer).Conductivity,
-                                      Material(Layer).AbsorpThermal,
-                                      Material(Layer).Trans,
-                                      Material(Layer).TransVis,
-                                      Material(Layer).ReflectShade);
+                                      dataMaterial.Material(Layer).Name,
+                                      dataMaterial.Material(Layer).Thickness,
+                                      dataMaterial.Material(Layer).Conductivity,
+                                      dataMaterial.Material(Layer).AbsorpThermal,
+                                      dataMaterial.Material(Layer).Trans,
+                                      dataMaterial.Material(Layer).TransVis,
+                                      dataMaterial.Material(Layer).ReflectShade);
 
                             } else if (SELECT_CASE_var == WindowBlind) {
-                                BlNum = Material(Layer).BlindDataPtr;
+                                BlNum = dataMaterial.Material(Layer).BlindDataPtr;
                                 static constexpr auto Format_704(" WindowMaterial:Blind,{},{:.4R},{:.4R},{:.4R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                                 print(outputFiles.eio,
                                       Format_704,
-                                      Material(Layer).Name,
+                                      dataMaterial.Material(Layer).Name,
                                       Blind(BlNum).SlatWidth,
                                       Blind(BlNum).SlatSeparation,
                                       Blind(BlNum).SlatThickness,
@@ -7865,56 +7866,56 @@ namespace WindowManager {
                                       Blind(BlNum).SlatFrontReflSolBeamDiff,
                                       Blind(BlNum).BlindToGlassDist);
                             } else if (SELECT_CASE_var == Screen) {
-                                if (Material(Layer).ScreenDataPtr > 0) {
+                                if (dataMaterial.Material(Layer).ScreenDataPtr > 0) {
                                     static constexpr auto Format_706(" WindowMaterial:Screen,{},{:.5R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                                     print(outputFiles.eio,
                                           Format_706,
-                                          Material(Layer).Name,
-                                          Material(Layer).Thickness,
-                                          Material(Layer).Conductivity,
-                                          Material(Layer).AbsorpThermal,
-                                          SurfaceScreens(Material(Layer).ScreenDataPtr).BmBmTrans,
-                                          SurfaceScreens(Material(Layer).ScreenDataPtr).ReflectSolBeamFront,
-                                          SurfaceScreens(Material(Layer).ScreenDataPtr).ReflectVisBeamFront,
-                                          SurfaceScreens(Material(Layer).ScreenDataPtr).DifReflect,
-                                          SurfaceScreens(Material(Layer).ScreenDataPtr).DifReflectVis,
-                                          SurfaceScreens(Material(Layer).ScreenDataPtr).ScreenDiameterToSpacingRatio,
-                                          Material(Layer).WinShadeToGlassDist);
+                                          dataMaterial.Material(Layer).Name,
+                                          dataMaterial.Material(Layer).Thickness,
+                                          dataMaterial.Material(Layer).Conductivity,
+                                          dataMaterial.Material(Layer).AbsorpThermal,
+                                          SurfaceScreens(dataMaterial.Material(Layer).ScreenDataPtr).BmBmTrans,
+                                          SurfaceScreens(dataMaterial.Material(Layer).ScreenDataPtr).ReflectSolBeamFront,
+                                          SurfaceScreens(dataMaterial.Material(Layer).ScreenDataPtr).ReflectVisBeamFront,
+                                          SurfaceScreens(dataMaterial.Material(Layer).ScreenDataPtr).DifReflect,
+                                          SurfaceScreens(dataMaterial.Material(Layer).ScreenDataPtr).DifReflectVis,
+                                          SurfaceScreens(dataMaterial.Material(Layer).ScreenDataPtr).ScreenDiameterToSpacingRatio,
+                                          dataMaterial.Material(Layer).WinShadeToGlassDist);
                                 }
                             } else if ((SELECT_CASE_var == WindowGlass) || (SELECT_CASE_var == WindowSimpleGlazing)) {
                                 SolarDiffusing = "No";
-                                if (Material(Layer).SolarDiffusing) SolarDiffusing = "Yes";
+                                if (dataMaterial.Material(Layer).SolarDiffusing) SolarDiffusing = "Yes";
                                 OpticalDataType = "SpectralAverage";
                                 SpectralDataName = "";
-                                if (Material(Layer).GlassSpectralDataPtr > 0) {
+                                if (dataMaterial.Material(Layer).GlassSpectralDataPtr > 0) {
                                     OpticalDataType = "Spectral";
-                                    SpectralDataName = SpectralData(Material(Layer).GlassSpectralDataPtr).Name;
+                                    SpectralDataName = SpectralData(dataMaterial.Material(Layer).GlassSpectralDataPtr).Name;
                                 }
-                                if (Material(Layer).GlassSpectralAndAngle) {
+                                if (dataMaterial.Material(Layer).GlassSpectralAndAngle) {
                                     OpticalDataType = "SpectralAndAngle";
-                                    SpectralDataName = PerfCurve(Material(Layer).GlassSpecAngTransDataPtr).Name + ", " +
-                                                       PerfCurve(Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
-                                                       PerfCurve(Material(Layer).GlassSpecAngBRefleDataPtr).Name;
+                                    SpectralDataName = PerfCurve(dataMaterial.Material(Layer).GlassSpecAngTransDataPtr).Name + ", " +
+                                                       PerfCurve(dataMaterial.Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
+                                                       PerfCurve(dataMaterial.Material(Layer).GlassSpecAngBRefleDataPtr).Name;
                                 }
                                 static constexpr auto Format_707(" WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{"
                                                                  ":.5R},{:.5R},{:.5R},{:.5R},{:.5R},{}\n");
                                 print(outputFiles.eio,
                                       Format_707,
-                                      Material(Layer).Name,
+                                      dataMaterial.Material(Layer).Name,
                                       OpticalDataType,
                                       SpectralDataName,
-                                      Material(Layer).Thickness,
-                                      Material(Layer).Trans,
-                                      Material(Layer).ReflectSolBeamFront,
-                                      Material(Layer).ReflectSolBeamBack,
-                                      Material(Layer).TransVis,
-                                      Material(Layer).ReflectVisBeamFront,
-                                      Material(Layer).ReflectVisBeamBack,
-                                      Material(Layer).TransThermal,
-                                      Material(Layer).AbsorpThermalFront,
-                                      Material(Layer).AbsorpThermalBack,
-                                      Material(Layer).Conductivity,
-                                      Material(Layer).GlassTransDirtFactor,
+                                      dataMaterial.Material(Layer).Thickness,
+                                      dataMaterial.Material(Layer).Trans,
+                                      dataMaterial.Material(Layer).ReflectSolBeamFront,
+                                      dataMaterial.Material(Layer).ReflectSolBeamBack,
+                                      dataMaterial.Material(Layer).TransVis,
+                                      dataMaterial.Material(Layer).ReflectVisBeamFront,
+                                      dataMaterial.Material(Layer).ReflectVisBeamBack,
+                                      dataMaterial.Material(Layer).TransThermal,
+                                      dataMaterial.Material(Layer).AbsorpThermalFront,
+                                      dataMaterial.Material(Layer).AbsorpThermalBack,
+                                      dataMaterial.Material(Layer).Conductivity,
+                                      dataMaterial.Material(Layer).GlassTransDirtFactor,
                                       SolarDiffusing);
 
                             } else if (SELECT_CASE_var == GlassEquivalentLayer) {
@@ -7924,110 +7925,110 @@ namespace WindowManager {
                                                                  ",{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}\n");
                                 print(outputFiles.eio,
                                       Format_708,
-                                      Material(Layer).Name,
+                                      dataMaterial.Material(Layer).Name,
                                       OpticalDataType,
                                       SpectralDataName,
-                                      Material(Layer).TausFrontBeamBeam,
-                                      Material(Layer).TausBackBeamBeam,
-                                      Material(Layer).ReflFrontBeamBeam,
-                                      Material(Layer).ReflBackBeamBeam,
-                                      Material(Layer).TausFrontBeamDiff,
-                                      Material(Layer).TausBackBeamDiff,
-                                      Material(Layer).ReflFrontBeamDiff,
-                                      Material(Layer).ReflBackBeamDiff,
-                                      Material(Layer).TausDiffDiff,
-                                      Material(Layer).ReflFrontDiffDiff,
-                                      Material(Layer).ReflBackDiffDiff,
-                                      Material(Layer).TausThermal,
-                                      Material(Layer).EmissThermalFront,
-                                      Material(Layer).EmissThermalBack);
+                                      dataMaterial.Material(Layer).TausFrontBeamBeam,
+                                      dataMaterial.Material(Layer).TausBackBeamBeam,
+                                      dataMaterial.Material(Layer).ReflFrontBeamBeam,
+                                      dataMaterial.Material(Layer).ReflBackBeamBeam,
+                                      dataMaterial.Material(Layer).TausFrontBeamDiff,
+                                      dataMaterial.Material(Layer).TausBackBeamDiff,
+                                      dataMaterial.Material(Layer).ReflFrontBeamDiff,
+                                      dataMaterial.Material(Layer).ReflBackBeamDiff,
+                                      dataMaterial.Material(Layer).TausDiffDiff,
+                                      dataMaterial.Material(Layer).ReflFrontDiffDiff,
+                                      dataMaterial.Material(Layer).ReflBackDiffDiff,
+                                      dataMaterial.Material(Layer).TausThermal,
+                                      dataMaterial.Material(Layer).EmissThermalFront,
+                                      dataMaterial.Material(Layer).EmissThermalBack);
 
                             } else if (SELECT_CASE_var == ShadeEquivalentLayer) {
                                 static constexpr auto Format_709(" WindowMaterial:Shade:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}\n");
                                 print(outputFiles.eio,
                                       Format_709,
-                                      Material(Layer).Name,
-                                      Material(Layer).TausFrontBeamBeam,
-                                      Material(Layer).TausBackBeamBeam,
-                                      Material(Layer).TausFrontBeamDiff,
-                                      Material(Layer).TausBackBeamDiff,
-                                      Material(Layer).ReflFrontBeamDiff,
-                                      Material(Layer).ReflBackBeamDiff,
-                                      Material(Layer).TausThermal,
-                                      Material(Layer).EmissThermalFront,
-                                      Material(Layer).EmissThermalBack);
+                                      dataMaterial.Material(Layer).Name,
+                                      dataMaterial.Material(Layer).TausFrontBeamBeam,
+                                      dataMaterial.Material(Layer).TausBackBeamBeam,
+                                      dataMaterial.Material(Layer).TausFrontBeamDiff,
+                                      dataMaterial.Material(Layer).TausBackBeamDiff,
+                                      dataMaterial.Material(Layer).ReflFrontBeamDiff,
+                                      dataMaterial.Material(Layer).ReflBackBeamDiff,
+                                      dataMaterial.Material(Layer).TausThermal,
+                                      dataMaterial.Material(Layer).EmissThermalFront,
+                                      dataMaterial.Material(Layer).EmissThermalBack);
 
                             } else if (SELECT_CASE_var == DrapeEquivalentLayer) {
                                 static constexpr auto Format_710(" WindowMaterial:Drape:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.5R},{:.5R}\n");
                                 print(outputFiles.eio,
                                       Format_710,
-                                      Material(Layer).Name,
-                                      Material(Layer).TausFrontBeamBeam,
-                                      Material(Layer).TausFrontBeamDiff,
-                                      Material(Layer).TausBackBeamDiff,
-                                      Material(Layer).ReflFrontBeamDiff,
-                                      Material(Layer).ReflBackBeamDiff,
-                                      Material(Layer).TausThermal,
-                                      Material(Layer).EmissThermalFront,
-                                      Material(Layer).EmissThermalBack,
-                                      Material(Layer).PleatedDrapeWidth,
-                                      Material(Layer).PleatedDrapeLength);
+                                      dataMaterial.Material(Layer).Name,
+                                      dataMaterial.Material(Layer).TausFrontBeamBeam,
+                                      dataMaterial.Material(Layer).TausFrontBeamDiff,
+                                      dataMaterial.Material(Layer).TausBackBeamDiff,
+                                      dataMaterial.Material(Layer).ReflFrontBeamDiff,
+                                      dataMaterial.Material(Layer).ReflBackBeamDiff,
+                                      dataMaterial.Material(Layer).TausThermal,
+                                      dataMaterial.Material(Layer).EmissThermalFront,
+                                      dataMaterial.Material(Layer).EmissThermalBack,
+                                      dataMaterial.Material(Layer).PleatedDrapeWidth,
+                                      dataMaterial.Material(Layer).PleatedDrapeLength);
 
                             } else if (SELECT_CASE_var == ScreenEquivalentLayer) {
                                 static constexpr auto Format_711(" WindowMaterial:Screen:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.5R},{:.5R}\n");
                                 print(outputFiles.eio,
                                       Format_711,
-                                      Material(Layer).Name,
-                                      Material(Layer).TausFrontBeamBeam,
-                                      Material(Layer).TausFrontBeamDiff,
-                                      Material(Layer).TausBackBeamDiff,
-                                      Material(Layer).ReflFrontBeamDiff,
-                                      Material(Layer).ReflBackBeamDiff,
-                                      Material(Layer).TausThermal,
-                                      Material(Layer).EmissThermalFront,
-                                      Material(Layer).EmissThermalBack,
-                                      Material(Layer).ScreenWireSpacing,
-                                      Material(Layer).ScreenWireDiameter);
+                                      dataMaterial.Material(Layer).Name,
+                                      dataMaterial.Material(Layer).TausFrontBeamBeam,
+                                      dataMaterial.Material(Layer).TausFrontBeamDiff,
+                                      dataMaterial.Material(Layer).TausBackBeamDiff,
+                                      dataMaterial.Material(Layer).ReflFrontBeamDiff,
+                                      dataMaterial.Material(Layer).ReflBackBeamDiff,
+                                      dataMaterial.Material(Layer).TausThermal,
+                                      dataMaterial.Material(Layer).EmissThermalFront,
+                                      dataMaterial.Material(Layer).EmissThermalBack,
+                                      dataMaterial.Material(Layer).ScreenWireSpacing,
+                                      dataMaterial.Material(Layer).ScreenWireDiameter);
 
                             } else if (SELECT_CASE_var == BlindEquivalentLayer) {
                                 SlateOrientation = "Horizontal";
-                                if (Material(Layer).SlatOrientation == Vertical) {
+                                if (dataMaterial.Material(Layer).SlatOrientation == Vertical) {
                                     SlateOrientation = "Vertical";
                                 }
                                 // Formats
                                 static constexpr auto Format_712(" WindowMaterial:Blind:EquivalentLayer,{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}");
                                 print(outputFiles.eio,
                                       Format_712,
-                                      Material(Layer).Name,
+                                      dataMaterial.Material(Layer).Name,
                                       SlateOrientation,
-                                      Material(Layer).SlatWidth,
-                                      Material(Layer).SlatSeparation,
-                                      Material(Layer).SlatCrown,
-                                      Material(Layer).SlatAngle,
-                                      Material(Layer).TausFrontBeamDiff,
-                                      Material(Layer).TausBackBeamDiff,
-                                      Material(Layer).ReflFrontBeamDiff,
-                                      Material(Layer).ReflBackBeamDiff,
-                                      Material(Layer).TausDiffDiff,
-                                      Material(Layer).ReflFrontDiffDiff,
-                                      Material(Layer).ReflBackDiffDiff,
-                                      Material(Layer).TausThermal,
-                                      Material(Layer).EmissThermalFront,
-                                      Material(Layer).EmissThermalBack);
+                                      dataMaterial.Material(Layer).SlatWidth,
+                                      dataMaterial.Material(Layer).SlatSeparation,
+                                      dataMaterial.Material(Layer).SlatCrown,
+                                      dataMaterial.Material(Layer).SlatAngle,
+                                      dataMaterial.Material(Layer).TausFrontBeamDiff,
+                                      dataMaterial.Material(Layer).TausBackBeamDiff,
+                                      dataMaterial.Material(Layer).ReflFrontBeamDiff,
+                                      dataMaterial.Material(Layer).ReflBackBeamDiff,
+                                      dataMaterial.Material(Layer).TausDiffDiff,
+                                      dataMaterial.Material(Layer).ReflFrontDiffDiff,
+                                      dataMaterial.Material(Layer).ReflBackDiffDiff,
+                                      dataMaterial.Material(Layer).TausThermal,
+                                      dataMaterial.Material(Layer).EmissThermalFront,
+                                      dataMaterial.Material(Layer).EmissThermalBack);
 
                             } else if (SELECT_CASE_var == GapEquivalentLayer) {
                                 GapVentType = "Sealed";
-                                if (Material(Layer).GapVentType == 2) {
+                                if (dataMaterial.Material(Layer).GapVentType == 2) {
                                     GapVentType = "VentedIndoor";
-                                } else if (Material(Layer).GapVentType == 3) {
+                                } else if (dataMaterial.Material(Layer).GapVentType == 3) {
                                     GapVentType = "VentedOutdoor";
                                 }
                                 static constexpr auto Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
                                 print(outputFiles.eio,
                                       Format_713,
-                                      Material(Layer).Name,
-                                      GasTypeName(Material(Layer).GasType(1)),
-                                      Material(Layer).Thickness,
+                                      dataMaterial.Material(Layer).Name,
+                                      GasTypeName(dataMaterial.Material(Layer).GasType(1)),
+                                      dataMaterial.Material(Layer).Thickness,
                                       GapVentType);
                             }
                         }
@@ -8362,30 +8363,30 @@ namespace WindowManager {
                 ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;
                 if (ShadingType == WSC_ST_ExteriorScreen) {
 
-                    if (Material(MatNum).ScreenMapResolution > 0) PrintTransMap = true;
+                    if (dataMaterial.Material(MatNum).ScreenMapResolution > 0) PrintTransMap = true;
                     ++ScreenNum;
                     SurfaceWindow(SurfNum).ScreenNumber = ScreenNum;
                     //     If a screen material is used more than once, the Material structure's screen data pointer holds the screen number
                     //     of the last window surface. Use this method to access the screen parameter's only for static variables such as
                     //     diffuse properties (InitGlassOpticalCalculations). For all cases where the screen properties are a function of
                     //     sun azimuth and altitude angles, use the SurfaceScreens structure.
-                    Material(MatNum).ScreenDataPtr = ScreenNum;
+                    dataMaterial.Material(MatNum).ScreenDataPtr = ScreenNum;
                     SurfaceScreens(ScreenNum).MaterialNumber = MatNum;
                     //     Invert calculation done in GetMaterialInput to find Diameter to Spacing ratio (Props(7)/Props(6))
-                    //     Material(MaterNum)%Trans = (1 - MaterialProps(7)/MaterialProps(6))**2.0
-                    SurfaceScreens(ScreenNum).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt(Material(MatNum).Trans);
+                    //     dataMaterial.Material(MaterNum)%Trans = (1 - MaterialProps(7)/MaterialProps(6))**2.0
+                    SurfaceScreens(ScreenNum).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt(dataMaterial.Material(MatNum).Trans);
 
-                    if (UtilityRoutines::SameString(Material(MatNum).ReflectanceModeling, "DoNotModel")) {
+                    if (UtilityRoutines::SameString(dataMaterial.Material(MatNum).ReflectanceModeling, "DoNotModel")) {
                         SurfaceScreens(ScreenNum).ScreenBeamReflectanceAccounting = DoNotModel;
-                    } else if (UtilityRoutines::SameString(Material(MatNum).ReflectanceModeling, "ModelAsDirectBeam")) {
+                    } else if (UtilityRoutines::SameString(dataMaterial.Material(MatNum).ReflectanceModeling, "ModelAsDirectBeam")) {
                         SurfaceScreens(ScreenNum).ScreenBeamReflectanceAccounting = ModelAsDirectBeam;
-                    } else if (UtilityRoutines::SameString(Material(MatNum).ReflectanceModeling, "ModelAsDiffuse")) {
+                    } else if (UtilityRoutines::SameString(dataMaterial.Material(MatNum).ReflectanceModeling, "ModelAsDiffuse")) {
                         SurfaceScreens(ScreenNum).ScreenBeamReflectanceAccounting = ModelAsDiffuse;
                     }
 
                     // Reflectance of screen material only
-                    SurfaceScreens(ScreenNum).ReflectCylinder = Material(MatNum).ReflectShade / (1 - Material(MatNum).Trans);
-                    SurfaceScreens(ScreenNum).ReflectCylinderVis = Material(MatNum).ReflectShadeVis / (1 - Material(MatNum).Trans);
+                    SurfaceScreens(ScreenNum).ReflectCylinder = dataMaterial.Material(MatNum).ReflectShade / (1 - dataMaterial.Material(MatNum).Trans);
+                    SurfaceScreens(ScreenNum).ReflectCylinderVis = dataMaterial.Material(MatNum).ReflectShadeVis / (1 - dataMaterial.Material(MatNum).Trans);
 
                     //     Integrate the transmittance over a quarter hemisphere for use in diffuse calculations
                     SumTrans = 0.0;
@@ -8425,10 +8426,10 @@ namespace WindowManager {
                     SurfaceScreens(ScreenNum).DifScreenAbsorp =
                         max(0.0, (1.0 - SurfaceScreens(ScreenNum).DifDifTrans - SurfaceScreens(ScreenNum).DifReflect));
 
-                    Material(MatNum).AbsorpThermalBack = SurfaceScreens(ScreenNum).DifScreenAbsorp;
-                    Material(MatNum).AbsorpThermalFront = SurfaceScreens(ScreenNum).DifScreenAbsorp;
-                    Material(MatNum).ReflectSolBeamFront = SurfaceScreens(ScreenNum).DifReflect;
-                    Material(MatNum).ReflectSolBeamBack = SurfaceScreens(ScreenNum).DifReflect;
+                    dataMaterial.Material(MatNum).AbsorpThermalBack = SurfaceScreens(ScreenNum).DifScreenAbsorp;
+                    dataMaterial.Material(MatNum).AbsorpThermalFront = SurfaceScreens(ScreenNum).DifScreenAbsorp;
+                    dataMaterial.Material(MatNum).ReflectSolBeamFront = SurfaceScreens(ScreenNum).DifReflect;
+                    dataMaterial.Material(MatNum).ReflectSolBeamBack = SurfaceScreens(ScreenNum).DifReflect;
 
                 } // (ShadingType == 'EXTERIORSCREEN')
             }     //(Surface(SurfNum)%WindowShadingControlPtr /= 0)
@@ -8446,7 +8447,7 @@ namespace WindowManager {
             for (ScreenNum = 1; ScreenNum <= NumSurfaceScreens; ++ScreenNum) {
                 MatNum = SurfaceScreens(ScreenNum).MaterialNumber;
                 //   Do not print transmittance map if angle increment is equal to 0
-                if (Material(MatNum).ScreenMapResolution == 0) continue;
+                if (dataMaterial.Material(MatNum).ScreenMapResolution == 0) continue;
                 FoundMaterial = false;
                 for (i = ScreenNum + 1; i <= NumSurfaceScreens; ++i) {
                     //     Write out transmittance data once for each Material:WindowScreen object
@@ -8454,53 +8455,53 @@ namespace WindowManager {
                 }
                 if (FoundMaterial) continue;
                 //   Store transmittance at direct normal angle
-                if (Material(MatNum).ScreenMapResolution != 0) {
-                    ScreenTrans(ScreenNum).Trans.allocate(90 / Material(MatNum).ScreenMapResolution + 1,
-                                                          90 / Material(MatNum).ScreenMapResolution + 1);
-                    ScreenTrans(ScreenNum).Scatt.allocate(90 / Material(MatNum).ScreenMapResolution + 1,
-                                                          90 / Material(MatNum).ScreenMapResolution + 1);
+                if (dataMaterial.Material(MatNum).ScreenMapResolution != 0) {
+                    ScreenTrans(ScreenNum).Trans.allocate(90 / dataMaterial.Material(MatNum).ScreenMapResolution + 1,
+                                                          90 / dataMaterial.Material(MatNum).ScreenMapResolution + 1);
+                    ScreenTrans(ScreenNum).Scatt.allocate(90 / dataMaterial.Material(MatNum).ScreenMapResolution + 1,
+                                                          90 / dataMaterial.Material(MatNum).ScreenMapResolution + 1);
                     ScreenTrans(ScreenNum).Trans = 0.0;
                     ScreenTrans(ScreenNum).Scatt = 0.0;
-                    for (j = 90 / Material(MatNum).ScreenMapResolution + 1; j >= 1; --j) {
-                        for (i = 90 / Material(MatNum).ScreenMapResolution + 1; i >= 1; --i) {
-                            Real64 SunAzimuth = Material(MatNum).ScreenMapResolution * (j - 1) * DegToRadians;
-                            Real64 SunAltitude = Material(MatNum).ScreenMapResolution * (i - 1) * DegToRadians;
+                    for (j = 90 / dataMaterial.Material(MatNum).ScreenMapResolution + 1; j >= 1; --j) {
+                        for (i = 90 / dataMaterial.Material(MatNum).ScreenMapResolution + 1; i >= 1; --i) {
+                            Real64 SunAzimuth = dataMaterial.Material(MatNum).ScreenMapResolution * (j - 1) * DegToRadians;
+                            Real64 SunAltitude = dataMaterial.Material(MatNum).ScreenMapResolution * (i - 1) * DegToRadians;
                             CalcScreenTransmittance(0, SunAltitude, SunAzimuth, ScreenNum);
                             ScreenTrans(ScreenNum).Trans(i, j) = SurfaceScreens(ScreenNum).BmBmTrans;
                             ScreenTrans(ScreenNum).Scatt(i, j) = SurfaceScreens(ScreenNum).BmDifTrans;
                         }
                     }
 
-                    print(screenCsvFile, "MATERIAL:WINDOWSCREEN:{}\n", Material(SurfaceScreens(ScreenNum).MaterialNumber).Name);
+                    print(screenCsvFile, "MATERIAL:WINDOWSCREEN:{}\n", dataMaterial.Material(SurfaceScreens(ScreenNum).MaterialNumber).Name);
                     print(screenCsvFile, "Tabular data for beam solar transmittance at varying \"relative\" azimuth (row) and "
                            "altitude (column) angles (deg) [relative to surface normal].\n");
                     print(screenCsvFile, ",90");
-                    for (i = 90 / Material(MatNum).ScreenMapResolution; i >= 2; --i) {
-                        print(screenCsvFile, ",{}", (i - 1) * Material(MatNum).ScreenMapResolution);
+                    for (i = 90 / dataMaterial.Material(MatNum).ScreenMapResolution; i >= 2; --i) {
+                        print(screenCsvFile, ",{}", (i - 1) * dataMaterial.Material(MatNum).ScreenMapResolution);
                     }
                     print(screenCsvFile, ",0\n");
 
-                    for (j = 1; j <= 90 / Material(MatNum).ScreenMapResolution + 1; ++j) {
-                        print(screenCsvFile, "{}",  (j - 1) * Material(MatNum).ScreenMapResolution);
-                        for (i = 90 / Material(MatNum).ScreenMapResolution + 1; i >= 2; --i) {
+                    for (j = 1; j <= 90 / dataMaterial.Material(MatNum).ScreenMapResolution + 1; ++j) {
+                        print(screenCsvFile, "{}",  (j - 1) * dataMaterial.Material(MatNum).ScreenMapResolution);
+                        for (i = 90 / dataMaterial.Material(MatNum).ScreenMapResolution + 1; i >= 2; --i) {
                             print(screenCsvFile, ",{:.6R}", ScreenTrans(ScreenNum).Trans(i, j));
                         }
                         print(screenCsvFile, ",{:.6R}\n", ScreenTrans(ScreenNum).Trans(i, j));
                     }
                     print(screenCsvFile, "\n\n");
 
-                    print(screenCsvFile, "MATERIAL:WINDOWSCREEN:{}\n", Material(SurfaceScreens(ScreenNum).MaterialNumber).Name);
+                    print(screenCsvFile, "MATERIAL:WINDOWSCREEN:{}\n", dataMaterial.Material(SurfaceScreens(ScreenNum).MaterialNumber).Name);
                     print(screenCsvFile, "Tabular data for scattered solar transmittance at varying \"relative\" azimuth (row) and "
                            "altitude (column) angles (deg) [relative to surface normal].\n");
 
-                    for (i = 1; i <= 90 / Material(MatNum).ScreenMapResolution; ++i) {
-                        print(screenCsvFile, ",{}", (i - 1) * Material(MatNum).ScreenMapResolution);
+                    for (i = 1; i <= 90 / dataMaterial.Material(MatNum).ScreenMapResolution; ++i) {
+                        print(screenCsvFile, ",{}", (i - 1) * dataMaterial.Material(MatNum).ScreenMapResolution);
                     }
-                    print(screenCsvFile, ",{}\n", (i - 1) * Material(MatNum).ScreenMapResolution);
+                    print(screenCsvFile, ",{}\n", (i - 1) * dataMaterial.Material(MatNum).ScreenMapResolution);
 
-                    for (j = 1; j <= 90 / Material(MatNum).ScreenMapResolution + 1; ++j) {
-                        print(screenCsvFile, "{}", (j - 1) * Material(MatNum).ScreenMapResolution);
-                        for (i = 1; i <= 90 / Material(MatNum).ScreenMapResolution; ++i) {
+                    for (j = 1; j <= 90 / dataMaterial.Material(MatNum).ScreenMapResolution + 1; ++j) {
+                        print(screenCsvFile, "{}", (j - 1) * dataMaterial.Material(MatNum).ScreenMapResolution);
+                        for (i = 1; i <= 90 / dataMaterial.Material(MatNum).ScreenMapResolution; ++i) {
                             print(screenCsvFile, ",{:.6R}", ScreenTrans(ScreenNum).Scatt(i, j));
                         }
                         print(screenCsvFile, ",{:.6R}\n", ScreenTrans(ScreenNum).Scatt(i, j));

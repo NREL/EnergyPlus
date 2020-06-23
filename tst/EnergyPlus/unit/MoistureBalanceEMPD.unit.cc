@@ -62,8 +62,9 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -124,7 +125,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     dataConstruction.Construct.allocate(1);
     Construction::ConstructionProps &construction = dataConstruction.Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", DataHeatBalance::Material);
+    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", dataMaterial.Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD();
@@ -191,7 +192,7 @@ TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
     MoistureBalanceEMPDManager::GetMoistureBalanceEMPDInput();
 
-    const DataHeatBalance::MaterialProperties &material = DataHeatBalance::Material(1);
+    const Material::MaterialProperties &material = dataMaterial.Material(1);
     ASSERT_NEAR(material.EMPDSurfaceDepth, 0.014143, 0.000001);
     ASSERT_NEAR(material.EMPDDeepDepth, 0.064810, 0.000001);
 }
@@ -250,7 +251,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     dataConstruction.Construct.allocate(1);
     Construction::ConstructionProps &construction = dataConstruction.Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", DataHeatBalance::Material);
+    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", dataMaterial.Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD();
@@ -342,7 +343,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     dataConstruction.Construct.allocate( constNum );
     Construction::ConstructionProps &construction = dataConstruction.Construct( constNum );
     construction.TotLayers = constNum;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("WOOD", DataHeatBalance::Material);
+    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("WOOD", dataMaterial.Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD();
@@ -359,11 +360,10 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     DataMoistureBalanceEMPD::RVdeepOld(surfNum) = 0.0051402944814058216;
     DataMoistureBalanceEMPD::RVSurfLayerOld(surfNum) = 0.0070277983586713262;
 
-    using DataHeatBalance::Material;
     using DataHeatBalSurface::TempSurfIn;
     using Psychrometrics::PsyRhFnTdbRhov;
 
-    auto const &material(Material(1));
+    auto const &material(dataMaterial.Material(1));
 
     Real64 Tsat(0.0);
     Real64 const KelvinConv(273.15);
