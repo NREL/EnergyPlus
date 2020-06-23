@@ -104,7 +104,7 @@ namespace ZoneAirLoopEquipmentManager {
         bool InitAirDistUnitsFlag(true); // If TRUE, not all Air Distribution Units have been initialized
         Array1D_bool EachOnceFlag;       // If TRUE, Air Distribution unit has not been initialized yet
         int numADUInitialized(0);        // Count of ADUs that have been initialized
-    } 
+    }
 
     // Functions
     void clear_state()
@@ -745,7 +745,8 @@ namespace ZoneAirLoopEquipmentManager {
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuctConstVolCooledBeam) {
-                    SimCoolBeam(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimCoolBeam(state.dataBranchInputManager,
+                                AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                 FirstHVACIteration,
                                 ActualZoneNum,
                                 ZoneEquipConfig(ControlledZoneNum).ZoneNode,
@@ -753,10 +754,11 @@ namespace ZoneAirLoopEquipmentManager {
                                 NonAirSysOutput);
 
                 } else if (SELECT_CASE_var == SingleDuctConstVolFourPipeBeam) {
-                    AirDistUnit(AirDistUnitNum).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
+                    AirDistUnit(AirDistUnitNum).airTerminalPtr->simulate(state, FirstHVACIteration, NonAirSysOutput);
 
                 } else if (SELECT_CASE_var == SingleDuctUserDefined) {
-                    SimAirTerminalUserDefined(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimAirTerminalUserDefined(state.dataBranchInputManager,
+                                              AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                               FirstHVACIteration,
                                               ActualZoneNum,
                                               ZoneEquipConfig(ControlledZoneNum).ZoneNode,

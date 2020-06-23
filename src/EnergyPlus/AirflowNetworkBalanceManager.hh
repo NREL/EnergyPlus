@@ -58,6 +58,9 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include "AirflowNetwork/Solver.hpp"
+#include "AirflowNetwork/Elements.hpp"
 
 namespace EnergyPlus {
 
@@ -97,6 +100,8 @@ namespace AirflowNetworkBalanceManager {
         }
     };
 
+    // Functions
+
     void ManageAirflowNetworkBalance(EnergyPlusData &state,
                                      Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
                                      Optional_int_const Iter = _,                // Iteration number
@@ -105,13 +110,9 @@ namespace AirflowNetworkBalanceManager {
 
     void GetAirflowNetworkInput(EnergyPlusData &state);
 
-    void InitAirflowNetwork();
-
     void AllocateAndInitData();
 
     void CalcAirflowNetworkAirBalance();
-
-    void CalcWindPressureCoeffs();
 
     Real64 CalcDuctInsideConvResist(Real64 Tair, // Average air temperature
                                     Real64 mdot, // Mass flow rate
@@ -155,6 +156,8 @@ namespace AirflowNetworkBalanceManager {
     void AirflowNetworkVentingControl(int i,       // AirflowNetwork surface number
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     );
+
+    void AssignFanAirLoopNum();
 
     void ValidateDistributionSystem(EnergyPlusData &state);
 
@@ -217,6 +220,9 @@ namespace AirflowNetworkBalanceManager {
 
     struct AirflowNetworkBalanceManagerData : BaseGlobalStruct {
 
+        void initialize();
+        void calculateWindPressureCoeffs();
+
         Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;
         int AirflowNetworkNumOfExtSurfaces;
@@ -262,6 +268,7 @@ namespace AirflowNetworkBalanceManager {
         int NumOfOAFans = 0;                            // number of OutdoorAir fans
         int NumOfReliefFans = 0;                        // number of OutdoorAir relief fans
         bool AirflowNetworkGetInputFlag = true;
+        bool AssignFanAirLoopNumFlag = true;
         bool ValidateDistributionSystemFlag = true;
         Array1D<Real64> FacadeAng = Array1D<Real64>(5);  // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
         Array1D<Real64> LoopPartLoadRatio;
@@ -271,6 +278,15 @@ namespace AirflowNetworkBalanceManager {
         // Object Data
         Array1D<AirflowNetworkBalanceManager::AirflowNetworkReportVars> AirflowNetworkZnRpt;
         std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
+
+        //AirflowNetwork::Solver solver;
+
+        // Output and reporting
+        Array1D<AirflowNetwork::AirflowNetworkExchangeProp> exchangeData;
+        Array1D<AirflowNetwork::AirflowNetworkExchangeProp> multiExchangeData;
+        Array1D<AirflowNetwork::AirflowNetworkLinkReportData> linkReport;
+        Array1D<AirflowNetwork::AirflowNetworkNodeReportData> nodeReport;
+        Array1D<AirflowNetwork::AirflowNetworkLinkReportData> linkReport1;
 
         void clear_state() override {
             OccupantVentilationControl.deallocate();
@@ -317,6 +333,7 @@ namespace AirflowNetworkBalanceManager {
             NumOfOAFans = 0;
             NumOfReliefFans = 0;
             AirflowNetworkGetInputFlag = true;
+            AssignFanAirLoopNumFlag = true;
             ValidateDistributionSystemFlag = true;
             FacadeAng = Array1D<Real64>(5);
             AirflowNetworkZnRpt.deallocate();
@@ -324,6 +341,14 @@ namespace AirflowNetworkBalanceManager {
             LoopOnOffFanRunTimeFraction.deallocate();
             LoopOnOffFlag.deallocate();
             UniqueAirflowNetworkSurfaceName.clear();
+
+            exchangeData.deallocate();
+            multiExchangeData.deallocate();
+            linkReport.deallocate();
+            nodeReport.deallocate();
+            linkReport1.deallocate();
+
+            solver.clear();
         }
     };
 

@@ -3975,7 +3975,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     SurfaceGeometry::GetSurfaceData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    ZoneEquipmentManager::GetZoneEquipment(state);
+    ZoneEquipmentManager::GetZoneEquipment(state, state.dataZoneEquipmentManager);
     SimAirServingZones::GetAirPathData(state);
     // OA inlet node
     DataLoopNode::Node(2).MassFlowRate = 0.1;
@@ -4000,7 +4000,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     DataLoopNode::Node(65).HumRat = 0.001;
     DataLoopNode::Node(66).HumRat = 0.001;
 
-    auto &thisAirLoopDOASObjec = AirLoopHVACDOAS::airloopDOAS[0];
+    auto &thisAirLoopDOASObjec = state.dataAirLoopHVACDOAS.airloopDOAS[0];
 
     int index = 0;
     thisAirLoopDOASObjec.SizingOnceFlag = false;

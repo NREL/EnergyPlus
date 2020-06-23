@@ -159,11 +159,11 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
 
     Psychrometrics::InitializePsychRoutines();
     auto &thisChiller = state.dataPlantChillers.ElectricChiller(1);
-    thisChiller.initialize(RunFlag, MyLoad);
+    thisChiller.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
     thisChiller.size();
     // run init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;
-    thisChiller.initialize(RunFlag, MyLoad);
+    thisChiller.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
     // check hardsized chiller nominal capacity
     EXPECT_DOUBLE_EQ(state.dataPlantChillers.ElectricChiller(1).NomCap, 100000.00);
     // check hardsized chiller evap water vol flow rate
@@ -181,7 +181,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     state.dataPlantChillers.ElectricChiller(1).CondVolFlowRateWasAutoSized = true;
 
     // do autosizing calc
-    thisChiller.initialize(RunFlag, MyLoad);
+    thisChiller.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
     thisChiller.size();
     // check autocalculate chiller nominal capacity
     EXPECT_DOUBLE_EQ(state.dataPlantChillers.ElectricChiller(1).NomCap, 20987.509055700004);
@@ -286,11 +286,11 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
 
     Psychrometrics::InitializePsychRoutines();
     auto &thisChiller = state.dataPlantChillers.ElectricChiller(1);
-    thisChiller.initialize(RunFlag, MyLoad);
+    thisChiller.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
     thisChiller.size();
     // run init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;
-    thisChiller.initialize(RunFlag, MyLoad);
+    thisChiller.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
     // check hardsized chiller nominal capacity
     EXPECT_DOUBLE_EQ(state.dataPlantChillers.ElectricChiller(1).NomCap, 100000.00);
     // check hardsized chiller evap water vol flow rate
@@ -308,7 +308,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     state.dataPlantChillers.ElectricChiller(1).CondVolFlowRateWasAutoSized = true;
 
     // Do autosizing calcs
-    thisChiller.initialize(RunFlag, MyLoad);
+    thisChiller.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
     thisChiller.size();
 
     // simulate
