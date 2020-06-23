@@ -14100,7 +14100,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     ScheduleManager::Schedule(6).CurrentValue = 1.0; // Enable schedule without calling schedule manager
     ScheduleManager::Schedule(7).CurrentValue = 4.0; // Enable schedule without calling schedule manager
 
-    ZoneEquipmentManager::GetZoneEquipment(state);
+    ZoneEquipmentManager::GetZoneEquipment(state, state.dataZoneEquipmentManager);
     SimAirServingZones::GetAirPathData(state);
     ScheduleManager::Schedule(7).MinValue = 4.0; // Enable schedule without calling schedule manager
     ScheduleManager::Schedule(7).MaxValue = 4.0; // Enable schedule without calling schedule manager

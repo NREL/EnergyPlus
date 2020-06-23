@@ -796,7 +796,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
     SimAirServingZones::GetAirPathData(state);
     // Expect warnings about no controllers, clear err_stream
     EXPECT_TRUE(has_err_output(true));
-    SimAirServingZones::InitAirLoops(state, true);
+    SimAirServingZones::InitAirLoops(state, state.dataZonePlenum, true);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
@@ -1028,7 +1028,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
     SimAirServingZones::GetAirPathData(state);
     // Expect warnings about no controllers, clear err_stream
     EXPECT_TRUE(has_err_output(true));
-    SimAirServingZones::InitAirLoops(state, true);
+    SimAirServingZones::InitAirLoops(state, state.dataZonePlenum, true);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
@@ -1293,7 +1293,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
     SimAirServingZones::GetAirPathData(state);
     // Expect warnings about no controllers, clear err_stream
     EXPECT_TRUE(has_err_output(true));
-    SimAirServingZones::InitAirLoops(state, true);
+    SimAirServingZones::InitAirLoops(state, state.dataZonePlenum, true);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
@@ -1559,7 +1559,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
     SimAirServingZones::GetAirPathData(state);
     // Expect warnings about no controllers, clear err_stream
     EXPECT_TRUE(has_err_output(true));
-    SimAirServingZones::InitAirLoops(state, true);
+    SimAirServingZones::InitAirLoops(state, state.dataZonePlenum, true);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
