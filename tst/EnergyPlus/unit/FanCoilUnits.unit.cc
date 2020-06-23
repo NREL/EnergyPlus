@@ -3597,7 +3597,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanCyclingFanMode)
     Real64 expectedAirFlowRate = thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
     // expect fan speed 1 and fan and coil cycling to meet load
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
-    EXPECT_EQ( thisFanCoil.SpeedRatio, 0.0);
+    EXPECT_EQ(thisFanCoil.SpeedRatio, 0.0);
     EXPECT_NEAR(thisFanCoil.PLR, 0.662, 0.001);
     EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
     EXPECT_NEAR(Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
@@ -3962,8 +3962,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
     Real64 expectedAirFlowRate = thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
     // expect fan speed 1, fan runs continuously and only heating coil cycle on/off to meet load
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
-    EXPECT_EQ( thisFanCoil.SpeedRatio, 0.0);
-    EXPECT_NEAR(thisFanCoil.PLR, 0.662, 0.001);
+    EXPECT_EQ(thisFanCoil.SpeedRatio, 0.0);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.659, 0.001);
     EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
     EXPECT_NEAR(Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
 
@@ -3981,7 +3981,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
     // expect fan speed 2 and fan and fancoil cycling b/n speed 1 and 2
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 2);
     EXPECT_NEAR(thisFanCoil.PLR, 1.0, 0.001);
-    EXPECT_NEAR( thisFanCoil.SpeedRatio, 0.323, 0.001 );
+    EXPECT_NEAR(thisFanCoil.SpeedRatio, 0.323, 0.001);
     EXPECT_NEAR(QZnReq, QUnitOut, 1.0);
     EXPECT_NEAR(Node(1).MassFlowRate, expectedAirFlowRate, 0.000001);
 

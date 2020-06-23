@@ -4388,7 +4388,7 @@ namespace FanCoilUnits {
                                                        FanCoil(FanCoilNum).MaxIterIndexH);
                     }
                 } else {
-                    Real64 eHeatCoilCyclingR = PLR;
+                    Real64 eHeatCoilPLR = PLR;
                     // electric heating coil
                     if (QUnitOutMax > QZnReq) {
                         // heating coil output is larger than required, mudulate the electric heating coil output to meet the load
@@ -4398,42 +4398,47 @@ namespace FanCoilUnits {
                         if (FirstHVACIteration) Par(2) = 1.0;
                         Par(3) = ZoneNum;
                         Par(4) = QZnReq;
-                        Par(5) = double(FanCoil(FanCoilNum).HeatCoilFluidInletNode);
-                        TempSolveRoot::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, eHeatCoilCyclingR, CalcFanCoilHeatCoilPLRResidual, 0.0, 1.0, Par);
+                        if (FanCoil( FanCoilNum ).FanOpMode == ContFanCycCoil ) {
+                            TempSolveRoot::SolveRoot(
+                                state, 0.001, MaxIterCycl, SolFlag, eHeatCoilPLR, CalcFanCoilHeatCoilPLRResidual, 0.0, 1.0, Par);
+                        } else {
+                            TempSolveRoot::SolveRoot(
+                                state, 0.001, MaxIterCycl, SolFlag, eHeatCoilPLR, CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                        }
                         if (SolFlag == -1) {
                             ++FanCoil(FanCoilNum).ConvgErrCountH;
                             if (FanCoil(FanCoilNum).ConvgErrCountH < 2) {
                                 ShowWarningError("Electric heating coil control failed in fan coil unit " + FanCoil(FanCoilNum).Name);
                                 ShowContinueError("  Iteration limit exceeded in calculating electric heating coil capacity modulation ");
-                                Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, _, eHeatCoilCyclingR);
+                                Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, _, eHeatCoilPLR);
                                 ShowContinueErrorTimeStamp("Load Request = " + TrimSigDigits(QZnReq) +
-                                                           ", Final Capacity = " + TrimSigDigits(QUnitOut));
+                                    ", Final Capacity = " + TrimSigDigits(QUnitOut));
                                 ShowContinueErrorTimeStamp("Electric heating coil part load ratio used during last iterations = " +
-                                                           TrimSigDigits(eHeatCoilCyclingR));
+                                    TrimSigDigits(eHeatCoilPLR));
                             } else {
                                 ShowRecurringWarningErrorAtEnd("Electric heating coil Iteration limit exceeded in fan coil unit " +
-                                                                   FanCoil(FanCoilNum).Name,
-                                                               FanCoil(FanCoilNum).MaxIterIndexH);
+                                    FanCoil(FanCoilNum).Name,
+                                    FanCoil(FanCoilNum).MaxIterIndexH);
                             }
                         } else if (SolFlag == -2) {
                             ++FanCoil(FanCoilNum).LimitErrCountH;
                             if (FanCoil(FanCoilNum).LimitErrCountH < 2) {
-                                ShowWarningError("Cycling ratio heating control failed in fan coil unit " + FanCoil(FanCoilNum).Name);
-                                ShowContinueError("  Bad cycling ratio limits");
-                                ShowContinueErrorTimeStamp("..Cycling ratio set to 0");
+                                ShowWarningError("Part load ratio electric heating coil control failed in fan coil unit " + FanCoil(FanCoilNum).Name);
+                                ShowContinueError("  Bad par load ratio limits");
+                                ShowContinueErrorTimeStamp("..Par load ratio set to 0");
                             } else {
-                                ShowRecurringWarningErrorAtEnd("Cycling ratio heating control failed in fan coil unit " +
+                                ShowRecurringWarningErrorAtEnd("Part load ratio electric heating coil control failed in fan coil unit " +
                                     FanCoil(FanCoilNum).Name,
                                     FanCoil(FanCoilNum).BadMassFlowLimIndexH);
                             }
                         }
-
                     } else {
-                        eHeatCoilCyclingR = 1.0;
+                        eHeatCoilPLR = 1.0;
                     }
+                    PLR = eHeatCoilPLR;
                     // at the end calculate output
                     if (FanCoil(FanCoilNum).FanOpMode == ContFanCycCoil) {
-                        Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, _, eHeatCoilCyclingR);
+                        Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, _, eHeatCoilPLR);
                     } else {
                         Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR);
                     }
