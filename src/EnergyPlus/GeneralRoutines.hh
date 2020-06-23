@@ -58,7 +58,7 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
-    struct OutputFiles;
+    class OutputFiles;
 
 void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,               // the component Name
                        std::string const &CompType,               // Type of component

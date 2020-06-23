@@ -65,7 +65,7 @@ namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
     struct ZoneTempPredictorCorrectorData;
-    struct OutputFiles;
+    class OutputFiles;
 
 namespace SurfaceGeometry {
 
