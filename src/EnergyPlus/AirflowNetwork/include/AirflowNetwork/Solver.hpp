@@ -48,6 +48,7 @@
 #ifndef SOLVER_HPP
 #define SOLVER_HPP
 
+#include <unordered_map>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array2D.hh>
 
