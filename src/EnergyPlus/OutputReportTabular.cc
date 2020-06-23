@@ -5719,7 +5719,7 @@ namespace OutputReportTabular {
 
 
         FillWeatherPredefinedEntries();
-        FillRemainingPredefinedEntries(state);
+        FillRemainingPredefinedEntries(state, state.dataZonePlenum);
 
         if (WriteTabularFiles) {
             // call each type of report in turn
@@ -6460,7 +6460,7 @@ namespace OutputReportTabular {
         return inString.substr(startPos, endPos - startPos);
     }
 
-    void FillRemainingPredefinedEntries(EnergyPlusData &state)
+    void FillRemainingPredefinedEntries(EnergyPlusData &state, ZonePlenumData &dataZonePlenum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -6497,8 +6497,8 @@ namespace OutputReportTabular {
         using General::RoundSigDigits;
         using ScheduleManager::GetScheduleName;
         using ScheduleManager::ScheduleAverageHoursPerWeek;
-        using ZonePlenum::NumZoneReturnPlenums;
-        using ZonePlenum::NumZoneSupplyPlenums;
+        //using ZonePlenum::NumZoneReturnPlenums;
+        //using ZonePlenum::NumZoneSupplyPlenums;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6687,8 +6687,8 @@ namespace OutputReportTabular {
         PreDefTableEntry(pdchHVACcntVal, "Conditioned Zones", numCondZones);
         PreDefTableEntry(pdchHVACcntVal, "Unconditioned Zones", numUncondZones);
         // add the number of plenums to the count report
-        PreDefTableEntry(pdchHVACcntVal, "Supply Plenums", NumZoneSupplyPlenums);
-        PreDefTableEntry(pdchHVACcntVal, "Return Plenums", NumZoneReturnPlenums);
+        PreDefTableEntry(pdchHVACcntVal, "Supply Plenums", dataZonePlenum.NumZoneSupplyPlenums);
+        PreDefTableEntry(pdchHVACcntVal, "Return Plenums", dataZonePlenum.NumZoneReturnPlenums);
 
         // Started to create a total row but did not fully implement
         // CALL PreDefTableEntry(pdchOaoZoneVol1,'Total OA Avg', totalVolume)
@@ -15427,8 +15427,8 @@ namespace OutputReportTabular {
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
-        using ZonePlenum::NumZoneReturnPlenums;
-        using ZonePlenum::NumZoneSupplyPlenums;
+        //using ZonePlenum::NumZoneReturnPlenums;
+        //using ZonePlenum::NumZoneSupplyPlenums;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

@@ -288,7 +288,7 @@ namespace ZoneTempPredictorCorrector {
 
     void RevertZoneTimestepHistories();
 
-    void CorrectZoneHumRat(int const ZoneNum);
+    void CorrectZoneHumRat(ZonePlenumData &dataZonePlenum, int const ZoneNum);
 
     void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
                                        Real64 const NewTimeStep,
@@ -326,7 +326,7 @@ namespace ZoneTempPredictorCorrector {
                               Real64 &RhoAir                  // Air density
     );
 
-    void CalcZoneSums(int const ZoneNum,  // Zone number
+    void CalcZoneSums(ZonePlenumData &dataZonePlenum, int const ZoneNum,  // Zone number
                       Real64 &SumIntGain, // Zone sum of convective internal gains
                       Real64 &SumHA,      // Zone sum of Hc*Area
                       Real64 &SumHATsurf, // Zone sum of Hc*Area*Tsurf
@@ -337,7 +337,7 @@ namespace ZoneTempPredictorCorrector {
                       Real64 &SumSysMCpT  // Zone sum of air system MassFlowRate*Cp*T
     );
 
-    void CalcZoneComponentLoadSums(int const ZoneNum,        // Zone number
+    void CalcZoneComponentLoadSums(ZonePlenumData &dataZonePlenum, int const ZoneNum,        // Zone number
                                    Real64 const TempDepCoef, // Dependent coefficient
                                    Real64 const TempIndCoef, // Independent coefficient
                                    Real64 &SumIntGains,      // Zone sum of convective internal gains

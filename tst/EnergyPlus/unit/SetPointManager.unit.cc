@@ -1210,7 +1210,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
 
     DataGlobals::SysSizingCalc = true;
     SimAirServingZones::GetAirPathData(state);
-    SimAirServingZones::InitAirLoops(state, true);
+    SimAirServingZones::InitAirLoops(state, state.dataZonePlenum, true);
     // check the number of zones served by single duct or dual duct system
     EXPECT_EQ(1, DataAirLoop::AirToZoneNodeInfo(1).NumZonesCooled); // cooled and heated zone (served by single-duct)
     EXPECT_EQ(0, DataAirLoop::AirToZoneNodeInfo(1).NumZonesHeated); // no heated only zone (served by dual-duct)

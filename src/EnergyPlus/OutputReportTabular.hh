@@ -796,7 +796,7 @@ namespace OutputReportTabular {
                                    int const colNum             // Column number
     );
 
-    void FillRemainingPredefinedEntries(EnergyPlus::EnergyPlusData &state);
+    void FillRemainingPredefinedEntries(EnergyPlus::EnergyPlusData &state, ZonePlenumData &dataZonePlenum);
 
     void WriteMonthlyTables();
 
