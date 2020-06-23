@@ -247,6 +247,10 @@ namespace DataHeatBalFanSys {
     Array1D<std::vector<Real64>> ZoneHumidexHourBins;
     Array1D<std::vector<Real64>> ZoneHeatIndexOccuHourBins;
     Array1D<std::vector<Real64>> ZoneHumidexOccuHourBins;
+    Array1D<std::vector<Real64>> ZoneCO2LevelHourBins;
+    Array1D<std::vector<Real64>> ZoneCO2LevelOccuHourBins;
+    Array1D<std::vector<Real64>> ZoneLightingLevelHourBins;
+    Array1D<std::vector<Real64>> ZoneLightingLevelOccuHourBins;
 
     Array1D<Real64> ZoneOccPierceSET;
     Array1D<Real64> ZoneOccPierceSETLastStep;
@@ -384,6 +388,10 @@ namespace DataHeatBalFanSys {
         ZoneOccPierceSETLastStep.deallocate();
         ZoneLowSETHours.deallocate();
         ZoneHighSETHours.deallocate();
+        ZoneCO2LevelHourBins.deallocate();
+        ZoneCO2LevelOccuHourBins.deallocate();
+        ZoneLightingLevelHourBins.deallocate();
+        ZoneLightingLevelOccuHourBins.deallocate();
         ZoneComfortControlsFanger.deallocate();
     }
 

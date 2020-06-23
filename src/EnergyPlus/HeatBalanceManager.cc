@@ -5512,6 +5512,10 @@ namespace HeatBalanceManager {
         ZoneHumidexHourBins.allocate(NumOfZones);
         ZoneHeatIndexOccuHourBins.allocate(NumOfZones);
         ZoneHumidexOccuHourBins.allocate(NumOfZones);
+        ZoneCO2LevelHourBins.allocate(NumOfZones);
+        ZoneCO2LevelOccuHourBins.allocate(NumOfZones);
+        ZoneLightingLevelHourBins.allocate(NumOfZones);
+        ZoneLightingLevelOccuHourBins.allocate(NumOfZones);
 
         ZoneOccPierceSET.dimension(NumOfZones, 0);
         ZoneOccPierceSETLastStep.dimension(NumOfZones, 0);

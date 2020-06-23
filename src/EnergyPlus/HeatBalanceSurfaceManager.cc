@@ -64,6 +64,7 @@
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DElightManagerF.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDElight.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDaylightingDevices.hh>
@@ -276,6 +277,14 @@ namespace HeatBalanceSurfaceManager {
 
         if (OutputReportTabular::displayThermalResilienceSummary) {
             ReportThermalResilience();
+        }
+
+        if (OutputReportTabular::displayCO2ResilienceSummary) {
+            ReportCO2Resilience();
+        }
+
+        if (OutputReportTabular::displayVisualResilienceSummary) {
+            ReportVisualResilience();
         }
 
         ManageSurfaceHeatBalancefirstTime = false;
@@ -4950,13 +4959,13 @@ namespace HeatBalanceSurfaceManager {
             } else {
                 HI = c1 + c2 * ZoneTF + c3 * ZoneRH + c4 * ZoneTF * ZoneRH + c5 * ZoneTF * ZoneTF + c6 * ZoneRH * ZoneRH +
                      c7 * ZoneTF * ZoneTF * ZoneRH + c8 * ZoneTF * ZoneRH * ZoneRH + c9 * ZoneTF * ZoneTF * ZoneRH * ZoneRH;
+                if (ZoneRH < 13 && ZoneTF < 112) {
+                    HI -= (13 - ZoneRH) / 4 * std::sqrt((17 - abs(ZoneTF - 95)) / 17);
+                } else if (ZoneRH > 85 && ZoneTF < 87) {
+                    HI += (ZoneRH - 85) / 10 * (87 - ZoneTF) / 5;
+                }
             }
 
-            if (ZoneRH < 13 && ZoneTF < 112) {
-                HI -= (13 - ZoneRH) / 4 * std::sqrt((17 - abs(ZoneTF - 95)) / 17);
-            } else if (ZoneRH > 85 && ZoneTF < 87) {
-                HI += (ZoneRH - 85) / 10 * (87 - ZoneTF) / 5;
-            }
             HI = (HI - 32.0) * (5.0 / 9.0);
 
             double TDewPointK = Psychrometrics::PsyTdpFnWPb(ZoneW, OutBaroPress) + KelvinConv;
@@ -4968,7 +4977,7 @@ namespace HeatBalanceSurfaceManager {
             ZoneHumidex(ZoneNum) = Humidex;
         }
 
-        if (ksRunPeriodWeather == KindOfSim) {
+        if (ksRunPeriodWeather == KindOfSim && !WarmupFlag) {
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 int ZoneNum = People(iPeople).ZonePtr;
                 ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(People(iPeople).NumberOfPeoplePtr);
@@ -5078,6 +5087,115 @@ namespace HeatBalanceSurfaceManager {
         } // loop over zones
     }
 
+    void ReportCO2Resilience() {
+        int NoBins = 3;
+        static bool oneTimeFlag = true;
+        if (oneTimeFlag) {
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                ZoneCO2LevelHourBins(ZoneNum).assign(NoBins, 0.0);
+                ZoneCO2LevelOccuHourBins(ZoneNum).assign(NoBins, 0.0);
+            }
+            oneTimeFlag = false;
+            if (!DataContaminantBalance::Contaminant.CO2Simulation) {
+                ShowWarningError( "Writing Annual CO2 Resilience Summary - CO2 Level Hours reports: "
+                                  "Zone Air CO2 Concentration output is required, "
+                                  "but no ZoneAirContaminantBalance object is defined.");
+                OutputReportTabular::displayCO2ResilienceSummary = false;
+                return;
+            }
+        }
+
+        if (ksRunPeriodWeather == KindOfSim && !WarmupFlag) {
+            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+                int ZoneNum = People(iPeople).ZonePtr;
+                ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(People(iPeople).NumberOfPeoplePtr);
+            }
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                double ZoneAirCO2 = DataContaminantBalance::ZoneAirCO2Avg(ZoneNum);
+
+                int NumOcc = ZoneNumOcc(ZoneNum);
+                if (ZoneAirCO2 <= 1000) {
+                    ZoneCO2LevelHourBins(ZoneNum)[0] += TimeStepZone;
+                    ZoneCO2LevelOccuHourBins(ZoneNum)[0] += NumOcc * TimeStepZone;
+                } else if (ZoneAirCO2 > 1000 && ZoneAirCO2 <= 5000) {
+                    ZoneCO2LevelHourBins(ZoneNum)[1] += TimeStepZone;
+                    ZoneCO2LevelOccuHourBins(ZoneNum)[1] += NumOcc * TimeStepZone;
+                } else {
+                    ZoneCO2LevelHourBins(ZoneNum)[2] += TimeStepZone;
+                    ZoneCO2LevelOccuHourBins(ZoneNum)[2] += NumOcc * TimeStepZone;
+                }
+            }
+        } // loop over zones
+    }
+
+    void ReportVisualResilience() {
+        int NoBins = 4;
+        static bool oneTimeFlag = true;
+        if (oneTimeFlag) {
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                ZoneLightingLevelHourBins(ZoneNum).assign(NoBins, 0.0);
+                ZoneLightingLevelOccuHourBins(ZoneNum).assign(NoBins, 0.0);
+            }
+            oneTimeFlag = false;
+            bool hasDayLighting = false;
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::NoDaylighting) {
+                    hasDayLighting = true;
+                    break;
+                }
+            }
+            if (!hasDayLighting) {
+                ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
+                                 "Zone Average Daylighting Reference Point Illuminance output is required, "
+                                 "but no Daylighting Control Object is defined.");
+                OutputReportTabular::displayVisualResilienceSummary = false;
+                return;
+            }
+        }
+
+        if (ksRunPeriodWeather == KindOfSim && !WarmupFlag) {
+            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+                int ZoneNum = People(iPeople).ZonePtr;
+                ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(People(iPeople).NumberOfPeoplePtr);
+            }
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                // Place holder
+                if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::NoDaylighting)
+                    continue;
+
+                Array1D<double> ZoneIllumRef = DataDaylighting::ZoneDaylight(ZoneNum).DaylIllumAtRefPt;
+                double ZoneIllum = 0.0;
+                for (size_t i = 1; i <= ZoneIllumRef.size(); i++) {
+                    ZoneIllum += ZoneIllumRef(i);
+                }
+                ZoneIllum /= ZoneIllumRef.size();
+
+                if (DataDaylighting::ZoneDaylight(ZoneNum).ZonePowerReductionFactor > 0) {
+                    Array1D<double> ZoneIllumSetpoint = DataDaylighting::ZoneDaylight(ZoneNum).IllumSetPoint;
+                    ZoneIllum = 0.0;
+                    for (size_t i = 1; i <= ZoneIllumSetpoint.size(); i++) {
+                        ZoneIllum += ZoneIllumSetpoint(i);
+                    }
+                    ZoneIllum /= ZoneIllumSetpoint.size();
+                }
+
+                int NumOcc = ZoneNumOcc(ZoneNum);
+                if (ZoneIllum <= 100) {
+                    ZoneLightingLevelHourBins(ZoneNum)[0] += TimeStepZone;
+                    ZoneLightingLevelOccuHourBins(ZoneNum)[0] += NumOcc * TimeStepZone;
+                } else if (ZoneIllum > 100 && ZoneIllum <= 200) {
+                    ZoneLightingLevelHourBins(ZoneNum)[1] += TimeStepZone;
+                    ZoneLightingLevelOccuHourBins(ZoneNum)[1] += NumOcc * TimeStepZone;
+                } else if (ZoneIllum > 300 && ZoneIllum <= 500) {
+                    ZoneLightingLevelHourBins(ZoneNum)[2] += TimeStepZone;
+                    ZoneLightingLevelOccuHourBins(ZoneNum)[2] += NumOcc * TimeStepZone;
+                } else {
+                    ZoneLightingLevelHourBins(ZoneNum)[3] += TimeStepZone;
+                    ZoneLightingLevelOccuHourBins(ZoneNum)[3] += NumOcc * TimeStepZone;
+                }
+            }
+        } // loop over zones
+    }
     void ReportSurfaceHeatBalance()
     {
 

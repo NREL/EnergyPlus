@@ -320,7 +320,7 @@ For: **Entire Facility**
 
 **Illuminance Level Hours**
 
-|          |A bit Dark (<= 100 lux) [Hours] |Dim (100, 300 lux] [Hours] |Adequate (300, 500 lux][Hours] |Bright (>500 lux) [Hours] |
+|          |A Bit Dark (<= 100 lux) [Hours] |Dim (100, 300 lux] [Hours] |Adequate (300, 500 lux] [Hours] |Bright (>500 lux) [Hours] |
 |----------|------|------|------|------|
 |Space_1   |      |      |      |      |
 |…         |      |      |      |      |
@@ -332,7 +332,7 @@ For: **Entire Facility**
 
 **Illuminance Level OccupantHours**
 
-|          |A bit Dark (<= 100 lux) (≤ 29) [OccupantHours] |Dim (100, 300 lux] [OccupantHours] |Adequate (300, 500 lux] [OccupantHours] |Bright (>500 lux) [OccupantHours] |
+|          |A Bit Dark (<= 100 lux) [OccupantHours] |Dim (100, 300 lux] [OccupantHours] |Adequate (300, 500 lux] [OccupantHours] |Bright (>500 lux) [OccupantHours] |
 |----------|------|------|------|------|
 |Space_1   |      |      |      |      |
 |…         |      |      |      |      |

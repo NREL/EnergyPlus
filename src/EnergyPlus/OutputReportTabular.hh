@@ -214,6 +214,8 @@ namespace OutputReportTabular {
     extern bool displayHeatEmissionsSummary;
     extern bool displayEioSummary;
     extern bool displayThermalResilienceSummary;
+    extern bool displayCO2ResilienceSummary;
+    extern bool displayVisualResilienceSummary;
 
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS

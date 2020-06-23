@@ -73,7 +73,9 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataCostEstimate.hh>
+#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -2104,9 +2106,9 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
-                    displayThermalResilienceSummary = true;
-                    displayCO2ResilienceSummary = true;
-                    displayVisualResilienceSummary = true;
+//                    displayThermalResilienceSummary = true;
+//                    displayCO2ResilienceSummary = true;
+//                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2127,9 +2129,9 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
-                    displayThermalResilienceSummary = true;
-                    displayCO2ResilienceSummary = true;
-                    displayVisualResilienceSummary = true;
+//                    displayThermalResilienceSummary = true;
+//                    displayCO2ResilienceSummary = true;
+//                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2160,9 +2162,9 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
-                    displayThermalResilienceSummary = true;
-                    displayCO2ResilienceSummary = true;
-                    displayVisualResilienceSummary = true;
+//                    displayThermalResilienceSummary = true;
+//                    displayCO2ResilienceSummary = true;
+//                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2186,9 +2188,9 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
-                    displayThermalResilienceSummary = true;
-                    displayCO2ResilienceSummary = true;
-                    displayVisualResilienceSummary = true;
+//                    displayThermalResilienceSummary = true;
+//                    displayCO2ResilienceSummary = true;
+//                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -3766,6 +3768,8 @@ namespace OutputReportTabular {
         static std::string const Initialization_Summary("Initialization Summary");
         static std::string const Annual_Heat_Emissions_Summary("Annual Heat Emissions Summary");
         static std::string const Annual_Thermal_Resilience_Summary("Annual Thermal Resilience Summary");
+        static std::string const Annual_CO2_Resilience_Summary("Annual CO2 Resilience Summary");
+        static std::string const Annual_Visual_Resilience_Summary("Annual Visual Resilience Summary");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -3840,6 +3844,14 @@ namespace OutputReportTabular {
                 if (displayThermalResilienceSummary) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Thermal_Resilience_Summary, Entire_Facility)
                                << "\">Annual Thermal Resilience Summary</a>\n";
+                }
+                if (displayCO2ResilienceSummary) {
+                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_CO2_Resilience_Summary, Entire_Facility)
+                               << "\">Annual CO2 Resilience Summary</a>\n";
+                }
+                if (displayVisualResilienceSummary) {
+                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Visual_Resilience_Summary, Entire_Facility)
+                               << "\">Annual Visual Resilience Summary</a>\n";
                 }
                 for (kReport = 1; kReport <= numReportName; ++kReport) {
                     if (reportName(kReport).show) {
@@ -5725,6 +5737,8 @@ namespace OutputReportTabular {
             WriteHeatEmissionTable();
 
             if (displayThermalResilienceSummary) WriteThermalResilienceTables();
+            if (displayCO2ResilienceSummary) WriteCO2ResilienceTables();
+            if (displayVisualResilienceSummary) WriteVisualResilienceTables();
 
             coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
             WritePredefinedTables();                                // moved to come after zone load components is finished
@@ -11474,6 +11488,70 @@ namespace OutputReportTabular {
                 WriteSETHoursTable(columnNum, subTitle, columnHeadNames, ZoneHighSETHours);
             }
 
+        }
+    }
+
+    void WriteCO2ResilienceTables()
+    {
+
+        // Using/Aliasing
+        using DataHeatBalFanSys::ZoneCO2LevelHourBins;
+        using DataHeatBalFanSys::ZoneCO2LevelOccuHourBins;
+
+        if (NumOfZones > 0) {
+            std::string tblTitle = "Annual CO2 Resilience Summary";
+            std::string sqlTitle = "AnnualCO2ResilienceSummary";
+            WriteReportHeaders(tblTitle, "Entire Facility", OutputProcessor::StoreType::Averaged);
+
+            int columnNum = 3;
+            std::string subTitle = "CO2 Level Hours";
+            std::vector<std::string> columnHeadNames = { "Safe (<= 1000 ppm) [Hours]",
+                                                         "Caution (1000, 5000 ppm] [Hours]",
+                                                         "Hazard (> 5000 ppm) [Hours]" };
+            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneCO2LevelHourBins);
+
+            subTitle = "CO2 Level OccupantHours";
+            columnHeadNames = { "Safe (<= 1000 ppm) [OccupantHours]",
+                                "Caution (1000, 5000 ppm] [OccupantHours]",
+                                "Hazard (> 5000 ppm) [OccupantHours]" };
+            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneCO2LevelOccuHourBins);
+        }
+    }
+
+    void WriteVisualResilienceTables()
+    {
+
+        // Using/Aliasing
+        using DataHeatBalFanSys::ZoneLightingLevelHourBins;
+        using DataHeatBalFanSys::ZoneLightingLevelOccuHourBins;
+
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::NoDaylighting) {
+                ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
+                                 "Zone Average Daylighting Reference Point Illuminance output is required, "
+                                 "but no Daylight Method is defined in Zone:" + Zone(ZoneNum).Name);
+            }
+        }
+
+        if (NumOfZones > 0) {
+            std::string tblTitle = "Annual Visual Resilience Summary";
+            std::string sqlTitle = "AnnualVisualResilienceSummary";
+            WriteReportHeaders(tblTitle, "Entire Facility", OutputProcessor::StoreType::Averaged);
+
+            int columnNum = 4;
+            std::string subTitle = "Illuminance Level Hours";
+            std::vector<std::string> columnHeadNames = { "A Bit Dark (<= 100 lux) [Hours]",
+                                                         "Dim (100, 300 lux] [Hours]",
+                                                         "Adequate (300, 500 lux] [Hours]",
+                                                         "Bright (>500 lux) [Hours]" };
+            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneLightingLevelHourBins);
+
+            subTitle = "Illuminance Level OccupantHours";
+            columnHeadNames = { "A Bit Dark (<= 100 lux) [OccupantHours]",
+                                "Dim (100, 300 lux] [OccupantHours]",
+                                "Adequate (300, 500 lux] [OccupantHours]",
+                                "Bright (>500 lux) [OccupantHours]" };
+            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneLightingLevelOccuHourBins);
         }
     }
 
