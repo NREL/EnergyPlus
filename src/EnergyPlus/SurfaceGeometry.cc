@@ -2006,7 +2006,7 @@ namespace SurfaceGeometry {
 
         // Check for IRT surfaces in invalid places.
         iTmp1 = 0;
-        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::Construction const &e) { return e.TypeIsIRT; })) {
+        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.TypeIsIRT; })) {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (!Surface(SurfNum).HeatTransSurf) continue;                                               // ignore shading surfaces
                 if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum) continue; // interzone, not adiabatic surface
@@ -12664,7 +12664,7 @@ namespace SurfaceGeometry {
         } else {
             ShowFatalError(RoutineName + ": Illegal call to this function. Second argument must be 'RadiantEnclosures' or 'SolarEnclosures'");
         }
-        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::Construction const &e) { return e.TypeIsAirBoundary; })) {
+        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.TypeIsAirBoundary; })) {
             int errorCount = 0;
             for (int surfNum = 1; surfNum <= DataSurfaces::TotSurfaces; ++surfNum) {
                 auto &surf(Surface(surfNum));

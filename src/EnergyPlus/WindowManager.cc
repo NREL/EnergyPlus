@@ -7656,10 +7656,10 @@ namespace WindowManager {
         //    EXIT
         //  ENDDO
 
-        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::Construction const &e) { return e.TypeIsWindow; })) HasWindows = true;
-        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::Construction const &e) { return e.WindowTypeBSDF; }))
+        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.TypeIsWindow; })) HasWindows = true;
+        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.WindowTypeBSDF; }))
             HasComplexWindows = true; // Yes, this is a bit different than actually using them.
-        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::Construction const &e) { return e.WindowTypeEQL; }))
+        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.WindowTypeEQL; }))
             HasEQLWindows = true; // for reporting purpose only
 
         //  DO ThisNum=1,TotSurfaces

@@ -62,7 +62,7 @@ namespace Construction {
     //    each window model should validate layers individually
     int constexpr MaxSpectralDataElements(800);     // Maximum number in Spectral Data arrays.
 
-    bool Construction::isGlazingConstruction()
+    bool ConstructionProps::isGlazingConstruction()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic

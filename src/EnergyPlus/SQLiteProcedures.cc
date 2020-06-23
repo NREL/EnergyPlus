@@ -2100,7 +2100,7 @@ void SQLite::addMaterialData(int const number, DataHeatBalance::MaterialProperti
 {
     materials.push_back(std::unique_ptr<Material>(new Material(m_errorStream, m_db, number, materialData)));
 }
-void SQLite::addConstructionData(int const number, EnergyPlus::Construction::Construction const &constructionData, double const &constructionUValue)
+void SQLite::addConstructionData(int const number, EnergyPlus::Construction::ConstructionProps const &constructionData, double const &constructionUValue)
 {
     constructions.push_back(std::unique_ptr<Construction>(new Construction(m_errorStream, m_db, number, constructionData, constructionUValue)));
 }

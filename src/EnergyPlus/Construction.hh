@@ -71,7 +71,7 @@ namespace Construction {
     extern int const MaxCTFTerms;             // Maximum number of CTF terms allowed to still allow stability
     extern int const MaxSpectralDataElements; // Maximum number in Spectral Data arrays.
 
-    struct Construction
+    struct ConstructionProps
     {
         // Members
         std::string Name; // Name of construction
@@ -249,7 +249,7 @@ namespace Construction {
         int AirBoundaryMixingSched;           // Air boundary simple mixing schedule index
 
         // Default Constructor
-        Construction()
+        ConstructionProps()
             : TotLayers(0), TotSolidLayers(0), TotGlassLayers(0), LayerPoint(MaxLayersInConstruct, 0), IsUsed(false), IsUsedCTF(false),
               InsideAbsorpVis(0.0), OutsideAbsorpVis(0.0), InsideAbsorpSolar(0.0), OutsideAbsorpSolar(0.0), InsideAbsorpThermal(0.0),
               OutsideAbsorpThermal(0.0), OutsideRoughness(0), DayltPropPtr(0), W5FrameDivider(0), CTFCross({0, MaxCTFTerms - 1}, 0.0),
@@ -288,7 +288,7 @@ namespace Construction {
 }   // namespace Construction
 
 struct ConstructionData : BaseGlobalStruct {
-    Array1D<Construction::Construction> Construct;
+    Array1D<Construction::ConstructionProps> Construct;
 
     void clear_state() override
     {

@@ -115,7 +115,7 @@ public:
     void addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string const &surfaceClass);
     void addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData const &zoneGroupData);
     void addMaterialData(int const number, DataHeatBalance::MaterialProperties const &materialData);
-    void addConstructionData(int const number, Construction::Construction const &constructionData, double const &constructionUValue);
+    void addConstructionData(int const number, Construction::ConstructionProps const &constructionData, double const &constructionUValue);
     void addNominalLightingData(int const number, DataHeatBalance::LightsData const &nominalLightingData);
     void addNominalPeopleData(int const number, DataHeatBalance::PeopleData const &nominalPeopleData);
     void addNominalElectricEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalElectricEquipmentData);
@@ -588,7 +588,7 @@ private:
         Construction(std::shared_ptr<std::ostream> const &errorStream,
                      std::shared_ptr<sqlite3> const &db,
                      int const constructionNumber,
-                     EnergyPlus::Construction::Construction const &constructionData,
+                     EnergyPlus::Construction::ConstructionProps const &constructionData,
                      double const &constructionUValue)
             : SQLiteData(errorStream, db), number(constructionNumber), name(constructionData.Name), totLayers(constructionData.TotLayers),
               totSolidLayers(constructionData.TotSolidLayers), totGlassLayers(constructionData.TotGlassLayers),
