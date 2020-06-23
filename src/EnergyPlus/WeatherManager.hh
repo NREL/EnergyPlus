@@ -66,10 +66,13 @@ namespace EnergyPlus {
 namespace WeatherManager {
 
     // Following are Date Types read in from EPW file or IDF
-    extern int const InvalidDate;
-    extern int const MonthDay;
-    extern int const NthDayInMonth;
-    extern int const LastDayInMonth;
+    enum class DateType
+    {
+        InvalidDate = -1,
+        MonthDay = 1,
+        NthDayInMonth = 2,
+        LastDayInMonth = 3
+    };
 
     extern int const ScheduleMethod;                   // Constant for water mains temperatures calculation methods
     extern int const CorrelationMethod;                // Constant for water mains temperatures calculation methods
@@ -331,7 +334,7 @@ namespace WeatherManager {
     {
         // Members
         std::string Name; // Name
-        int DateType;     // Date type as read in from IDF
+        DateType DateType;     // Date type as read in from IDF
         int Month;        // Start Month
         int Day;          // Start Day of month or Count for DateTypes=NthDayOfMonth
         int WeekDay;      // For Date types=NthDayOfMonth and LastDayOfMonth
@@ -345,7 +348,7 @@ namespace WeatherManager {
 
         // Default Constructor
         SpecialDayData()
-            : DateType(0), Month(0), Day(0), WeekDay(0), CompDate(0), WthrFile(false), Duration(0), DayType(0), ActStMon(0), ActStDay(0), Used(false)
+            : DateType(DateType::InvalidDate), Month(0), Day(0), WeekDay(0), CompDate(0), WthrFile(false), Duration(0), DayType(0), ActStMon(0), ActStDay(0), Used(false)
         {
         }
     };
@@ -380,17 +383,17 @@ namespace WeatherManager {
     struct DaylightSavingPeriodData
     {
         // Members
-        int StDateType; // Start Date type as from EPW or IDF
+        DateType StDateType; // Start Date type as from EPW or IDF
         int StWeekDay;  // For DateTypes=NthDayOfMonth or LastDayOfMonth
         int StMon;      // DaylightSavingTime (DST) Start Month
         int StDay;      // DaylightSavingTime (DST) Start Day
-        int EnDateType; // End Date type as from EPW or IDF
+        DateType EnDateType; // End Date type as from EPW or IDF
         int EnMon;      // DaylightSavingTime (DST) End Month
         int EnDay;      // DaylightSavingTime (DST) End Day
         int EnWeekDay;  // For DateTypes=NthDayOfMonth or LastDayOfMonth
 
         // Default Constructor
-        DaylightSavingPeriodData() : StDateType(0), StWeekDay(0), StMon(0), StDay(0), EnDateType(0), EnMon(0), EnDay(0), EnWeekDay(0)
+        DaylightSavingPeriodData() : StDateType(DateType::InvalidDate), StWeekDay(0), StMon(0), StDay(0), EnDateType(DateType::InvalidDate), EnMon(0), EnDay(0), EnWeekDay(0)
         {
         }
     };

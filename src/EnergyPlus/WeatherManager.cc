@@ -127,12 +127,6 @@ namespace WeatherManager {
     using namespace Psychrometrics;
 
     // Data
-    // Following are Date Types read in from EPW file or IDF
-    int const InvalidDate(-1);
-    int const MonthDay(1);
-    int const NthDayInMonth(2);
-    int const LastDayInMonth(3);
-
     int const ScheduleMethod(1);                   // Constant for water mains temperatures calculation methods
     int const CorrelationMethod(2);                // Constant for water mains temperatures calculation methods
     int const CorrelationFromWeatherFileMethod(3); // Constant for water mains temperatures calculation methods
@@ -499,29 +493,29 @@ namespace WeatherManager {
         RunPeriodDesignInputUniqueNames.clear();
         TypicalExtremePeriods.deallocate();
 
-        EPWDST.StDateType = 0;
+        EPWDST.StDateType = DateType::InvalidDate;
         EPWDST.StWeekDay = 0;
         EPWDST.StMon = 0;
         EPWDST.StDay = 0;
-        EPWDST.EnDateType = 0;
+        EPWDST.EnDateType = DateType::InvalidDate;
         EPWDST.EnMon = 0;
         EPWDST.EnDay = 0;
         EPWDST.EnWeekDay = 0;
 
-        IDFDST.StDateType = 0;
+        IDFDST.StDateType = DateType::InvalidDate;
         IDFDST.StWeekDay = 0;
         IDFDST.StMon = 0;
         IDFDST.StDay = 0;
-        IDFDST.EnDateType = 0;
+        IDFDST.EnDateType = DateType::InvalidDate;
         IDFDST.EnMon = 0;
         IDFDST.EnDay = 0;
         IDFDST.EnWeekDay = 0;
 
-        DST.StDateType = 0;
+        DST.StDateType = DateType::InvalidDate;
         DST.StWeekDay = 0;
         DST.StMon = 0;
         DST.StDay = 0;
-        DST.EnDateType = 0;
+        DST.EnDateType = DateType::InvalidDate;
         DST.EnMon = 0;
         DST.EnDay = 0;
         DST.EnWeekDay = 0;
@@ -1745,10 +1739,10 @@ namespace WeatherManager {
         ErrorsFound = false;
         ActEndDayOfMonth = EndDayOfMonth;
         ActEndDayOfMonth(2) = EndDayOfMonth(2) + LeapYearAdd;
-        if (DST.StDateType == MonthDay) {
+        if (DST.StDateType == DateType::MonthDay) {
             ActStartMonth = DST.StMon;
             ActStartDay = DST.StDay;
-        } else if (DST.StDateType == NthDayInMonth) {
+        } else if (DST.StDateType == DateType::NthDayInMonth) {
             ThisDay = DST.StWeekDay - MonWeekDay(DST.StMon) + 1;
             while (ThisDay <= 0) {
                 ThisDay += 7;
@@ -1770,10 +1764,10 @@ namespace WeatherManager {
             ActStartDay = ThisDay;
         }
 
-        if (DST.EnDateType == MonthDay) {
+        if (DST.EnDateType == DateType::MonthDay) {
             ActEndMonth = DST.EnMon;
             ActEndDay = DST.EnDay;
-        } else if (DST.EnDateType == NthDayInMonth) {
+        } else if (DST.EnDateType == DateType::NthDayInMonth) {
             ThisDay = DST.EnWeekDay - MonWeekDay(DST.EnMon) + 1;
             while (ThisDay <= 0) {
                 ThisDay += 7;
@@ -1849,7 +1843,7 @@ namespace WeatherManager {
         SpecialDayTypes = 0;
         for (Loop = 1; Loop <= NumSpecialDays; ++Loop) {
             if (SpecialDays(Loop).WthrFile && !UseSpecialDays) continue;
-            if (SpecialDays(Loop).DateType <= MonthDay) {
+            if (SpecialDays(Loop).DateType <= DateType::MonthDay) {
                 JDay = General::OrdinalDay(SpecialDays(Loop).Month, SpecialDays(Loop).Day, LeapYearAdd);
                 if (SpecialDays(Loop).Duration == 1 && Environment(Envrn).ApplyWeekendRule) {
                     if (WeekDayTypes(JDay) == 1) {
@@ -1864,7 +1858,7 @@ namespace WeatherManager {
                     }
                 }
                 General::InvOrdinalDay(JDay, SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay, LeapYearAdd);
-            } else if (SpecialDays(Loop).DateType == NthDayInMonth) {
+            } else if (SpecialDays(Loop).DateType == DateType::NthDayInMonth) {
                 if (SpecialDays(Loop).WeekDay >= MonWeekDay(SpecialDays(Loop).Month)) {
                     ThisDay = SpecialDays(Loop).WeekDay - MonWeekDay(SpecialDays(Loop).Month) + 1;
                 } else {
@@ -5997,7 +5991,7 @@ namespace WeatherManager {
         int PMonth;
         int PDay;
         int PWeekDay;
-        int DateType;
+        DateType dateType;
         int IOStat;
         int DayType;
 
@@ -6017,22 +6011,22 @@ namespace WeatherManager {
             UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
             SpecialDays(Count).Name = AlphArray(1);
 
-            ProcessDateString(AlphArray(2), PMonth, PDay, PWeekDay, DateType, ErrorsFound);
-            if (DateType == MonthDay) {
-                SpecialDays(Count).DateType = DateType;
+            ProcessDateString(AlphArray(2), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+            if (dateType == DateType::MonthDay) {
+                SpecialDays(Count).DateType = dateType;
                 SpecialDays(Count).Month = PMonth;
                 SpecialDays(Count).Day = PDay;
                 SpecialDays(Count).WeekDay = 0;
                 SpecialDays(Count).CompDate = PMonth * 32 + PDay;
                 SpecialDays(Count).WthrFile = false;
-            } else if (DateType != InvalidDate) {
-                SpecialDays(Count).DateType = DateType;
+            } else if (dateType != DateType::InvalidDate) {
+                SpecialDays(Count).DateType = dateType;
                 SpecialDays(Count).Month = PMonth;
                 SpecialDays(Count).Day = PDay;
                 SpecialDays(Count).WeekDay = PWeekDay;
                 SpecialDays(Count).CompDate = 0;
                 SpecialDays(Count).WthrFile = false;
-            } else if (DateType == InvalidDate) {
+            } else if (dateType == DateType::InvalidDate) {
                 ShowSevereError(cCurrentModuleObject + ": " + AlphArray(1) + " Invalid " + cAlphaFieldNames(2) + '=' + AlphArray(2));
                 ErrorsFound = true;
             }
@@ -6164,12 +6158,12 @@ namespace WeatherManager {
                 ErrorsFound = true;
             } else { // Correct number of arguments
                 ProcessDateString(cAlphaArgs(1), IDFDST.StMon, IDFDST.StDay, IDFDST.StWeekDay, IDFDST.StDateType, ErrorsFound);
-                if (IDFDST.StDateType == InvalidDate) {
+                if (IDFDST.StDateType == DateType::InvalidDate) {
                     ShowSevereError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
                 ProcessDateString(cAlphaArgs(2), IDFDST.EnMon, IDFDST.EnDay, IDFDST.EnWeekDay, IDFDST.EnDateType, ErrorsFound);
-                if (IDFDST.EnDateType == InvalidDate) {
+                if (IDFDST.EnDateType == DateType::InvalidDate) {
                     ShowSevereError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                     ErrorsFound = true;
                 }
@@ -7954,7 +7948,7 @@ namespace WeatherManager {
         int PDay;
         int PWeekDay;
         int PYear;
-        int DateType;
+        WeatherManager::DateType dateType;
         int NumHdArgs;
         bool errFlag;
         std::string ErrNum;
@@ -8155,8 +8149,8 @@ namespace WeatherManager {
                     }
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
-                        ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, DateType, ErrorsFound);
-                        if (DateType != InvalidDate) {
+                        ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                        if (dateType != DateType::InvalidDate) {
                             if (PMonth != 0 && PDay != 0) {
                                 TypicalExtremePeriods(Count).StartMonth = PMonth;
                                 TypicalExtremePeriods(Count).StartDay = PDay;
@@ -8170,8 +8164,8 @@ namespace WeatherManager {
                     }
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
-                        ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, DateType, ErrorsFound);
-                        if (DateType != InvalidDate) {
+                        ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                        if (dateType != DateType::InvalidDate) {
                             if (PMonth != 0 && PDay != 0) {
                                 TypicalExtremePeriods(Count).EndMonth = PMonth;
                                 TypicalExtremePeriods(Count).EndDay = PDay;
@@ -8183,8 +8177,8 @@ namespace WeatherManager {
                         }
                         Line.erase(0, Pos + 1);
                     } else { // Pos=0, probably last one
-                        ProcessDateString(Line, PMonth, PDay, PWeekDay, DateType, ErrorsFound);
-                        if (DateType != InvalidDate) {
+                        ProcessDateString(Line, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                        if (dateType != DateType::InvalidDate) {
                             if (PMonth != 0 && PDay != 0) {
                                 TypicalExtremePeriods(Count).EndMonth = PMonth;
                                 TypicalExtremePeriods(Count).EndDay = PDay;
@@ -8365,14 +8359,14 @@ namespace WeatherManager {
                             // by setting DST to false, so we don't affect ErrorsFound
 
                             // call ProcessDateString with local bool (unused)
-                            ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, DateType, errflag1);
-                            if (DateType != InvalidDate) {
+                            ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, errflag1);
+                            if (dateType != DateType::InvalidDate) {
                                 // ErrorsFound is still false after ProcessDateString
                                 if (PMonth == 0 && PDay == 0) {
                                     EPWDaylightSaving = false;
                                 } else {
                                     EPWDaylightSaving = true;
-                                    EPWDST.StDateType = DateType;
+                                    EPWDST.StDateType = dateType;
                                     EPWDST.StMon = PMonth;
                                     EPWDST.StDay = PDay;
                                     EPWDST.StWeekDay = PWeekDay;
@@ -8387,10 +8381,10 @@ namespace WeatherManager {
                             }
 
                         } else if (SELECT_CASE_var1 == 3) {
-                            ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, DateType, ErrorsFound);
+                            ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                             if (EPWDaylightSaving) {
-                                if (DateType != InvalidDate) {
-                                    EPWDST.EnDateType = DateType;
+                                if (dateType != DateType::InvalidDate) {
+                                    EPWDST.EnDateType = dateType;
                                     EPWDST.EnMon = PMonth;
                                     EPWDST.EnDay = PDay;
                                     EPWDST.EnWeekDay = PWeekDay;
@@ -8423,9 +8417,9 @@ namespace WeatherManager {
                             } else {
                                 if (CurCount <= NumSpecialDays) {
                                     // Process date
-                                    ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, DateType, ErrorsFound);
-                                    if (DateType == MonthDay) {
-                                        SpecialDays(CurCount).DateType = DateType;
+                                    ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                                    if (dateType == DateType::MonthDay) {
+                                        SpecialDays(CurCount).DateType = dateType;
                                         SpecialDays(CurCount).Month = PMonth;
                                         SpecialDays(CurCount).Day = PDay;
                                         SpecialDays(CurCount).WeekDay = 0;
@@ -8433,8 +8427,8 @@ namespace WeatherManager {
                                         SpecialDays(CurCount).Duration = 1;
                                         SpecialDays(CurCount).DayType = 1;
                                         SpecialDays(CurCount).WthrFile = true;
-                                    } else if (DateType != InvalidDate) {
-                                        SpecialDays(CurCount).DateType = DateType;
+                                    } else if (dateType != DateType::InvalidDate) {
+                                        SpecialDays(CurCount).DateType = dateType;
                                         SpecialDays(CurCount).Month = PMonth;
                                         SpecialDays(CurCount).Day = PDay;
                                         SpecialDays(CurCount).WeekDay = PWeekDay;
@@ -8442,7 +8436,7 @@ namespace WeatherManager {
                                         SpecialDays(CurCount).Duration = 1;
                                         SpecialDays(CurCount).DayType = 1;
                                         SpecialDays(CurCount).WthrFile = true;
-                                    } else if (DateType == InvalidDate) {
+                                    } else if (dateType == DateType::InvalidDate) {
                                         ShowSevereError("Invalid SpecialDay Date Field(WeatherFile)=" + Line.substr(0, Pos));
                                         ErrorsFound = true;
                                     }
@@ -8552,8 +8546,8 @@ namespace WeatherManager {
                                 } else if (SELECT_CASE_var2 == 2) {
                                     // DataPeriod Start Day
                                     if (CurCount <= NumDataPeriods) {
-                                        ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, DateType, ErrorsFound, PYear);
-                                        if (DateType == MonthDay) {
+                                        ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
+                                        if (dateType == DateType::MonthDay) {
                                             DataPeriods(CurCount).StMon = PMonth;
                                             DataPeriods(CurCount).StDay = PDay;
                                             DataPeriods(CurCount).StYear = PYear;
@@ -8567,8 +8561,8 @@ namespace WeatherManager {
 
                                 } else if (SELECT_CASE_var2 == 3) {
                                     if (CurCount <= NumDataPeriods) {
-                                        ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, DateType, ErrorsFound, PYear);
-                                        if (DateType == MonthDay) {
+                                        ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
+                                        if (dateType == DateType::MonthDay) {
                                             DataPeriods(CurCount).EnMon = PMonth;
                                             DataPeriods(CurCount).EnDay = PDay;
                                             DataPeriods(CurCount).EnYear = PYear;

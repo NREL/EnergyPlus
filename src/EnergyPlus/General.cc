@@ -67,6 +67,7 @@
 #include <EnergyPlus/OutputFiles.hh>
 // TODO: move DetermineMinuteForReporting to avoid bringing this one in
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 #if defined(_WIN32) && _MSC_VER < 1900
 #define snprintf _snprintf
@@ -1761,7 +1762,7 @@ namespace General {
                            int &PMonth,
                            int &PDay,
                            int &PWeekDay,
-                           int &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                           WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                            bool &ErrorsFound,
                            Optional_int PYear)
     {
@@ -1787,19 +1788,19 @@ namespace General {
         int TokenWeekday;
 
         FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
-        DateType = -1;
+        DateType = WeatherManager::DateType::InvalidDate;
         if (!errFlag) {
             // Entered single number, do inverse JDay
             if (FstNum == 0) {
                 PMonth = 0;
                 PDay = 0;
-                DateType = 1;
+                DateType = WeatherManager::DateType::MonthDay;
             } else if (FstNum < 0 || FstNum > 366) {
                 ShowSevereError("Invalid Julian date Entered=" + String);
                 ErrorsFound = true;
             } else {
                 InvOrdinalDay(FstNum, PMonth, PDay, 0);
-                DateType = 1;
+                DateType = WeatherManager::DateType::LastDayInMonth;
             }
         } else {
             // Error when processing as number, try x/x
@@ -1810,10 +1811,10 @@ namespace General {
                 DetermineDateTokens(String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
                 PYear = TokenYear;
             }
-            if (DateType == 1) {
+            if (DateType == WeatherManager::DateType::MonthDay) {
                 PDay = TokenDay;
                 PMonth = TokenMonth;
-            } else if (DateType == 2 || DateType == 3) {
+            } else if (DateType == WeatherManager::DateType::NthDayInMonth || DateType == WeatherManager::DateType::LastDayInMonth) {
                 // interpret as TokenDay TokenWeekday in TokenMonth
                 PDay = TokenDay;
                 PMonth = TokenMonth;
@@ -1827,7 +1828,7 @@ namespace General {
                              int &TokenDay,         // Value of numeric field found
                              int &TokenMonth,       // Value of Month field found (1=Jan, 2=Feb, etc)
                              int &TokenWeekday,     // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
-                             int &DateType,         // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                             WeatherManager::DateType &DateType,         // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                              bool &ErrorsFound,     // Set to true if cannot process this string as a date
                              Optional_int TokenYear // Value of Year if one appears to be present and this argument is present
     )
@@ -1874,7 +1875,7 @@ namespace General {
         TokenDay = 0;
         TokenMonth = 0;
         TokenWeekday = 0;
-        DateType = -1;
+        DateType = WeatherManager::DateType::InvalidDate;
         InternalError = false;
         WkDayInMonth = false;
         if (present(TokenYear)) TokenYear = 0;
@@ -1931,7 +1932,7 @@ namespace General {
                     TokenMonth = UtilityRoutines::FindItemInList(Fields(1).substr(0, 3), Months, 12);
                     ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
                     if (!InternalError) {
-                        DateType = 1;
+                        DateType = WeatherManager::DateType::MonthDay;
                     } else {
                         ErrorsFound = true;
                     }
@@ -1943,7 +1944,7 @@ namespace General {
                         TokenDay = NumField2;
                         ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
-                            DateType = 1;
+                            DateType = WeatherManager::DateType::MonthDay;
                         } else {
                             ErrorsFound = true;
                         }
@@ -1952,7 +1953,7 @@ namespace General {
                         TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months, 12);
                         ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
-                            DateType = 1;
+                            DateType = WeatherManager::DateType::MonthDay;
                             NumTokens = 2;
                         } else {
                             ErrorsFound = true;
@@ -1974,12 +1975,12 @@ namespace General {
                             TokenMonth = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Months, 12);
                             if (TokenMonth == 0) InternalError = true;
                         }
-                        DateType = 2;
+                        DateType = WeatherManager::DateType::NthDayInMonth;
                         NumTokens = 3;
                         if (TokenDay < 0 || TokenDay > 5) InternalError = true;
                     } else { // first field was not numeric....
                         if (Fields(1) == "LA") {
-                            DateType = 3;
+                            DateType = WeatherManager::DateType::LastDayInMonth;
                             NumTokens = 3;
                             TokenWeekday = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Weekdays, 7);
                             if (TokenWeekday == 0) {
@@ -1998,7 +1999,7 @@ namespace General {
                     NumField1 = int(UtilityRoutines::ProcessNumber(Fields(1), errFlag));
                     NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
                     NumField3 = int(UtilityRoutines::ProcessNumber(Fields(3), errFlag));
-                    DateType = 1;
+                    DateType = WeatherManager::DateType::MonthDay;
                     // error detection later..
                     if (NumField1 > 100) {
                         if (present(TokenYear)) {
@@ -2022,7 +2023,7 @@ namespace General {
         }
 
         if (InternalError) {
-            DateType = -1;
+            DateType = WeatherManager::DateType::InvalidDate;
             ErrorsFound = true;
         }
     }
