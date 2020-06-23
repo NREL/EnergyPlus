@@ -108,6 +108,8 @@ namespace DataHeatBalance {
     // Parameters to indicate material group type for use with the Material
     // derived type (see below):
 
+    int MaxSolidWinLayers(0);                // Maximum number of solid layers in a window construction
+
     int const RegularMaterial(0);
     int const Air(1);
     int const Shade(2);
@@ -845,6 +847,7 @@ namespace DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
+        MaxSolidWinLayers = 0;
         LowHConvLimit = 0.1;
         HighHConvLimit = 1000.0;
         MaxAllowedDelTempCondFD = 0.002;

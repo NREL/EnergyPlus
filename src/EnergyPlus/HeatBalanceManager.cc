@@ -624,11 +624,11 @@ namespace HeatBalanceManager {
 
         // start by setting this to 5; it will satisfy the regular window constructions (Construction) and the Window5 files
         // (Construction:WindowDataFile)
-        Construction::MaxSolidWinLayers = 7;
+        DataHeatBalance::MaxSolidWinLayers = 7;
 
         // Construction:ComplexFenestrationState have a limit of 10 layers, so set it up to 10 if they are present
         if (inputProcessor->getNumObjectsFound("Construction:ComplexFenestrationState") > 0) {
-            Construction::MaxSolidWinLayers = max(Construction::MaxSolidWinLayers, 10);
+            DataHeatBalance::MaxSolidWinLayers = max(DataHeatBalance::MaxSolidWinLayers, 10);
         }
 
         // then process the rest of the relevant constructions
@@ -647,7 +647,7 @@ namespace HeatBalanceManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             int numLayersInThisConstruct(NumAlpha - 1);
-            Construction::MaxSolidWinLayers = max(Construction::MaxSolidWinLayers, numLayersInThisConstruct);
+            DataHeatBalance::MaxSolidWinLayers = max(DataHeatBalance::MaxSolidWinLayers, numLayersInThisConstruct);
         }
 
         // construction types being ignored as they are opaque: Construction:CfactorUndergroundWall, Construction:FfactorGroundFloor,

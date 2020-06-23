@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
@@ -68,7 +69,6 @@ namespace Construction {
 
     extern int const MaxLayersInConstruct;    // Maximum number of layers allowed in a single construction
     extern int const MaxCTFTerms;             // Maximum number of CTF terms allowed to still allow stability
-    extern int MaxSolidWinLayers;             // Maximum number of solid layers in a window construction
     extern int const MaxSpectralDataElements; // Maximum number in Spectral Data arrays.
 
     struct Construction
@@ -258,11 +258,11 @@ namespace Construction {
               CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0), CTFTUserOut({0, MaxCTFTerms - 1}, 0.0),
               CTFTUserIn({0, MaxCTFTerms - 1}, 0.0), CTFTUserSource({0, MaxCTFTerms - 1}, 0.0), NumHistories(0), NumCTFTerms(0), UValue(0.0),
               SolutionDimensions(0), SourceAfterLayer(0), TempAfterLayer(0), ThicknessPerpend(0.0), AbsDiffIn(0.0), AbsDiffOut(0.0),
-              AbsDiff(MaxSolidWinLayers, 0.0), BlAbsDiff(MaxSlatAngs, MaxSolidWinLayers, 0.0), BlAbsDiffGnd(MaxSlatAngs, MaxSolidWinLayers, 0.0),
-              BlAbsDiffSky(MaxSlatAngs, MaxSolidWinLayers, 0.0), AbsDiffBack(MaxSolidWinLayers, 0.0),
-              BlAbsDiffBack(MaxSlatAngs, MaxSolidWinLayers, 0.0), AbsDiffShade(0.0), AbsDiffBlind(MaxSlatAngs, 0.0),
+              AbsDiff( DataHeatBalance::MaxSolidWinLayers, 0.0), BlAbsDiff(MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), BlAbsDiffGnd(MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0),
+              BlAbsDiffSky(MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffBack(DataHeatBalance::MaxSolidWinLayers, 0.0),
+              BlAbsDiffBack(MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffShade(0.0), AbsDiffBlind(MaxSlatAngs, 0.0),
               AbsDiffBlindGnd(MaxSlatAngs, 0.0), AbsDiffBlindSky(MaxSlatAngs, 0.0), AbsDiffBackShade(0.0), AbsDiffBackBlind(MaxSlatAngs, 0.0),
-              ShadeAbsorpThermal(0.0), AbsBeamCoef(6, MaxSolidWinLayers, 0.0), AbsBeamBackCoef(6, MaxSolidWinLayers, 0.0), AbsBeamShadeCoef(6, 0.0),
+              ShadeAbsorpThermal(0.0), AbsBeamCoef(6, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsBeamBackCoef(6, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsBeamShadeCoef(6, 0.0),
               TransDiff(0.0), BlTransDiff(MaxSlatAngs, 0.0), BlTransDiffGnd(MaxSlatAngs, 0.0), BlTransDiffSky(MaxSlatAngs, 0.0), TransDiffVis(0.0),
               BlTransDiffVis(MaxSlatAngs, 0.0), ReflectSolDiffBack(0.0), BlReflectSolDiffBack(MaxSlatAngs, 0.0), ReflectSolDiffFront(0.0),
               BlReflectSolDiffFront(MaxSlatAngs, 0.0), ReflectVisDiffBack(0.0), BlReflectVisDiffBack(MaxSlatAngs, 0.0), ReflectVisDiffFront(0.0),
@@ -290,7 +290,8 @@ namespace Construction {
 struct ConstructionData : BaseGlobalStruct {
     Array1D<Construction::Construction> Construct;
 
-    void clear_state() override {
+    void clear_state() override
+    {
         Construct.deallocate();
     }
 };

@@ -774,7 +774,7 @@ namespace SurfaceGeometry {
         AWinSurf.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
         AWinSurfDiffFront.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
         AWinSurfDiffBack.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
-        AWinCFOverlap.dimension(Construction::MaxSolidWinLayers, TotSurfaces, 0.0);
+        AWinCFOverlap.dimension(DataHeatBalance::MaxSolidWinLayers, TotSurfaces, 0.0);
     }
 
     void GetSurfaceData(OutputFiles &outputFiles, bool &ErrorsFound) // If errors found in input

@@ -69,6 +69,8 @@ namespace EnergyPlus {
 
 namespace DataHeatBalance {
 
+    extern int MaxSolidWinLayers;                // Maximum number of solid layers in a window construction
+
     // Using/Aliasing
     using namespace DataComplexFenestration;
     using DataComplexFenestration::GapDeflectionState;
@@ -1032,9 +1034,9 @@ namespace DataHeatBalance {
 
         void SetOutBulbTempAt();
 
-        void SetWindSpeedAt(Real64 const fac);
+        void SetWindSpeedAt(Real64 fac);
 
-        void SetWindDirAt(Real64 const fac);
+        void SetWindDirAt(Real64 fac);
     };
 
     struct ZoneListData
@@ -2434,27 +2436,27 @@ namespace DataHeatBalance {
 
     void SetZoneWindDirAt();
 
-    void CheckAndSetConstructionProperties(int const ConstrNum, // Construction number to be set/checked
+    void CheckAndSetConstructionProperties(int ConstrNum, // Construction number to be set/checked
                                            bool &ErrorsFound    // error flag that is set when certain errors have occurred
     );
 
-    int AssignReverseConstructionNumber(int const ConstrNum, // Existing Construction number of first surface
+    int AssignReverseConstructionNumber(int ConstrNum, // Existing Construction number of first surface
                                         bool &ErrorsFound);
 
-    void AddVariableSlatBlind(int const inBlindNumber, // current Blind Number/pointer to name
+    void AddVariableSlatBlind(int inBlindNumber, // current Blind Number/pointer to name
                               int &outBlindNumber,     // resultant Blind Number to pass back
                               bool &errFlag            // error flag should one be needed
     );
 
-    void CalcScreenTransmittance(int const SurfaceNum,
+    void CalcScreenTransmittance(int SurfaceNum,
                                  Optional<Real64 const> Phi = _,     // Optional sun altitude relative to surface outward normal (radians)
                                  Optional<Real64 const> Theta = _,   // Optional sun azimuth relative to surface outward normal (radians)
                                  Optional_int_const ScreenNumber = _ // Optional screen number
     );
 
-    std::string DisplayMaterialRoughness(int const Roughness); // Roughness String
+    std::string DisplayMaterialRoughness(int Roughness); // Roughness String
 
-    Real64 ComputeNominalUwithConvCoeffs(int const numSurf, // index for Surface array.
+    Real64 ComputeNominalUwithConvCoeffs(int numSurf, // index for Surface array.
                                          bool &isValid      // returns true if result is valid
     );
 
