@@ -3972,10 +3972,10 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     SurfaceGeometry::SinZoneRelNorth = 0.0;
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    ZoneEquipmentManager::GetZoneEquipment(state, state.dataZoneEquipmentManager);
+    ZoneEquipmentManager::GetZoneEquipment(state);
     SimAirServingZones::GetAirPathData(state);
     // OA inlet node
     DataLoopNode::Node(2).MassFlowRate = 0.1;
