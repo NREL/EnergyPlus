@@ -79,7 +79,6 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(OutputF
     using DataEnvironment::GroundTemp_DeepObjInput;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
-    using namespace ObjexxFCL::gio;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

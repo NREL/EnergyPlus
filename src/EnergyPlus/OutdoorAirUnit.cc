@@ -856,7 +856,7 @@ namespace OutdoorAirUnit {
                             } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = UnitarySystemModel;
                                 UnitarySystems::UnitarySys thisSys;
-                                OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer = thisSys.factory(state, 
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer = thisSys.factory(state,
                                     DataHVACGlobals::UnitarySys_AnyCoilType, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, false, OAUnitNum);
                                 UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
                                                                                              OAUnitNum);
@@ -1185,7 +1185,8 @@ namespace OutdoorAirUnit {
                     (OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum == TypeOf_CoilSteamAirHeating)) {
 
                     errFlag = false;
-                    ScanPlantLoopsForObject(OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName,
+                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
@@ -1613,19 +1614,19 @@ namespace OutdoorAirUnit {
             if ((OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilPlantTypeOfNum == TypeOf_CoilWaterCooling) ||
                 (OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilPlantTypeOfNum == TypeOf_CoilWaterDetailedFlatCooling)) {
                 if (OutAirUnit(OAUnitNum).OAEquip(CompNum).MaxVolWaterFlow == AutoSize) {
-                    SimulateWaterCoilComponents(state, 
+                    SimulateWaterCoilComponents(state,
                         OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, true, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex, _, 1, 0.0);
                 }
             }
             if (OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilPlantTypeOfNum == TypeOf_CoilWaterSimpleHeating) {
                 if (OutAirUnit(OAUnitNum).OAEquip(CompNum).MaxVolWaterFlow == AutoSize) {
-                    SimulateWaterCoilComponents(state, 
+                    SimulateWaterCoilComponents(state,
                         OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, true, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex, _, 1, 0.0);
                 }
             }
             if (OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilPlantTypeOfNum == TypeOf_CoilSteamAirHeating) {
                 if (OutAirUnit(OAUnitNum).OAEquip(CompNum).MaxVolWaterFlow == AutoSize) {
-                    SimulateSteamCoilComponents(state, 
+                    SimulateSteamCoilComponents(state,
                         OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, true, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex);
                 }
             }

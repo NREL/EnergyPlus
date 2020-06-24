@@ -1141,7 +1141,8 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_EQ(LowTempRadiantSystem::HydronicSystem, RadSysTypes(RadSysNum).SystemType);
 
     ErrorsFound = false;
-    PlantUtilities::ScanPlantLoopsForObject(HydrRadSys(RadSysNum).Name,
+    PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                            HydrRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_VarFlow,
                                             HydrRadSys(RadSysNum).HWLoopNum,
                                             HydrRadSys(RadSysNum).HWLoopSide,
@@ -1156,7 +1157,8 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    PlantUtilities::ScanPlantLoopsForObject(HydrRadSys(RadSysNum).Name,
+    PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                            HydrRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_VarFlow,
                                             HydrRadSys(RadSysNum).CWLoopNum,
                                             HydrRadSys(RadSysNum).CWLoopSide,
@@ -1557,14 +1559,14 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     CFloRadSys(RadSysNum).CoolingSystem = true;
     CFloRadSys(RadSysNum).HeatingSystem = false;
     Load = 1000.0;
-    CFloRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(Load);
+    CFloRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(state.dataZoneTempPredictorCorrector, Load);
     EXPECT_EQ(NotOperating, OperatingMode);
 
     // Cooling
     CFloRadSys(RadSysNum).CoolingSystem = false;
     CFloRadSys(RadSysNum).HeatingSystem = true;
     DataHeatBalFanSys::MAT(1) = 26.0;
-    CFloRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(Load);
+    CFloRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(state.dataZoneTempPredictorCorrector, Load);
     EXPECT_EQ(NotOperating, OperatingMode);
 
     CFloRadSys.deallocate();
@@ -1612,14 +1614,14 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     HydrRadSys(RadSysNum).CoolingSystem = true;
     HydrRadSys(RadSysNum).HeatingSystem = false;
     Load = 1000.0;
-    HydrRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(Load);
+    HydrRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(state.dataZoneTempPredictorCorrector, Load);
     EXPECT_EQ(0, LowTempRadiantSystem::OperatingMode);
 
     // Cooling
     HydrRadSys(RadSysNum).CoolingSystem = false;
     HydrRadSys(RadSysNum).HeatingSystem = true;
     DataHeatBalFanSys::MAT(1) = 26.0;
-    HydrRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(Load);
+    HydrRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(state.dataZoneTempPredictorCorrector, Load);
     EXPECT_EQ(NotOperating, OperatingMode);
 
     HydrRadSys.deallocate();
@@ -1836,7 +1838,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     HydrRadSys(RadSysNum).HWLoopNum = 1;
     HXEffectFuncResult = HydrRadSys(RadSysNum).calculateHXEffectivenessTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
-    
+
     // Test 2: Cooling for Hydronic System
     HXEffectFuncResult = 0.0;
     OperatingMode = CoolingMode;
@@ -1845,7 +1847,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     HydrRadSys(RadSysNum).CWLoopNum = 1;
     HXEffectFuncResult = HydrRadSys(RadSysNum).calculateHXEffectivenessTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
-    
+
     // Test 3: Heating for Constant Flow System
     HXEffectFuncResult = 0.0;
     OperatingMode = HeatingMode;
@@ -1854,7 +1856,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     CFloRadSys(RadSysNum).HWLoopNum = 1;
     HXEffectFuncResult = CFloRadSys(RadSysNum).calculateHXEffectivenessTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
-    
+
     // Test 4: Cooling for Constant Flow System
     HXEffectFuncResult = 0.0;
     OperatingMode = CoolingMode;
@@ -1987,7 +1989,7 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     Real64 expectedResult;
     Real64 actualResult;
     Real64 acceptibleError = 0.001;
-    
+
     DataHeatBalFanSys::MAT.allocate(1);
     MRT.allocate(1);
     Zone.allocate(1);
@@ -2064,7 +2066,7 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     actualResult = 0.0; // reset
     actualResult = ElecRadSys(1).setRadiantSystemControlTemperature();
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
-    
+
     // Test 4: ODB Temperature Control
     HydrRadSys(1).ControlType = LowTempRadiantControlTypes::ODBControl;
     expectedResult = Zone(1).OutDryBulbTemp;
@@ -2115,7 +2117,7 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     actualResult = 0.0; // reset
     actualResult = ElecRadSys(1).setRadiantSystemControlTemperature();
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
-    
+
     // Test 7: Surface Inside (within the slab) Temperature Control
     HydrRadSys(1).ControlType = LowTempRadiantControlTypes::SurfIntTempControl;
     expectedResult = DataHeatBalSurface::TempUserLoc(1);

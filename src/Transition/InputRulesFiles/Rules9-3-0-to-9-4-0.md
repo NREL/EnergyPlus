@@ -14,6 +14,19 @@ NEW Field F6 (N5): Two-Dimensional Position of Interior Temperature Calculation 
 
 Old Fields 6-15 remain the same, just shifted back one field to Fields 7-16.
 
+# Object Change: 'ZoneHVAC:HybridUnitaryHVAC'
 
+Fields 1-14 remain the same.
 
-# Object Change: XXX
+Insert field 15, Fan Heat Included in Lookup Tables.
+
+Insert field 16, Fan Heat Gain Location.
+
+Insert field 17, Fan Heat Gain In Airstream Fraction.
+
+Field 18, previous field 15. No other changes.
+
+Field 19, previous field 17. No other changes.
+
+Remaining fields 20 onward are the same as previous fields 18 onwards. No other changes.
+

@@ -51,7 +51,7 @@ This field is the name of the hot water outlet node for the baseboard heater.
 
 This field is the rated average water temperature for the baseboard heater which is published in the manufacturer's literature in degree Celsius. It typically ranges from 65.56°C to 115.36°C in the I = B = R rating document while the lowest allowable temperature is 32.22°C. The default value is 87.78°C. If the user does not enter this field, the default value is assumed.
 
-\paragraph{Field: Rated Water Mass Flow Rate}\label{field-rated-water-mass-flow-rate}
+\paragraph{Field: Rated Water Mass Flow Rate}
 
 This field is the rated standard water flow rate in kg/s which is published as part of the manufacturer's literature. It is used by the manufacturers when determining the rated capacity (see next field). The default value is 0.063kg/s. If it is blank or zero, the default values is assumed.
 
@@ -561,7 +561,7 @@ The name of the water inlet node for the radiant cooling panel.
 
 The name of the water outlet node for the radiant cooling panel.
 
-\paragraph{Field: Rated Inlet Water Temperature}\label{field-rated-inlet-water-temperature}
+\paragraph{Field: Rated Inlet Water Temperature}
 
 This field is the inlet temperature to the panel under conditions used to rate the capacity of the panel.  This value along with the other rating condition parameters is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the zone.  The default value is 5°C (41°F).
 
@@ -593,7 +593,7 @@ This field is used to enter the cooling capacity as a fraction of the autosized 
 
 This field specifies the maximum chilled water volumetric flow rate in m3/sec.  This field can also be autosized.
 
-\paragraph{Field: Control Type}\label{field-control-type}
+\paragraph{Field: Control Type}
 
 This field specifies two different types of control categories: temperature or zone load.  For one of the temperature based controls, this field along with the throttling range and setpoint schedules determines how the user wishes to control the radiant cooling panel.  The temperature denoted in the setpoint schedule can refer to one of five different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, or the outdoor wet-bulb temperature.  The current field controls the choice of temperature.  For controls that are based more on zone load, the user can make one of two choices based on whether the zone load is met by only the convective output of the unit or the total output of the unit.  These zone load controls will not perform as precisely as air-based systems.  The convective zone load control will come close to meeting the current setpoint temperature (defined by the typical zone thermostat input by the user) since the convective output of the unit will be set to match the remaining zone load.  However, in the long run, this will likely overcool the space since radiant energy is being absorbed by surfaces and this will impact the zone conditions at later time steps.  The total zone load control will likely undercool the space in the short term since the total output (radiant and convective) of the unit will be set to meet the remaining zone load.  However, this will not fully impact the zone air temperature immediately since some of the energy is being absorbed from surfaces rather than the zone air.  The user must select from the following options:
 
@@ -617,15 +617,15 @@ This field specifies two different types of control categories: temperature or z
 
 Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature. If the user does not select a control type, MeanAirTemperature control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information.
 
-\paragraph{Field: Cooling Control Throttling Range}\label{field-cooling-control-throttling-range}
+\paragraph{Field: Cooling Control Throttling Range}
 
 This field specifies the range of temperature in degrees Celsuis over which the radiant cooling panel throttles from zero flow rate up to the maximum defined by the maximum chilled water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature to define the response of the system to various zone conditions. The cooling control temperature schedule specifies the “setpoint” temperature where the flow rate to the system is at half of the maximum flow rate. For example, if the cooling control temperature setpoint is currently 25 C and the cooling throttling range is 2 C, the water flow rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, ODB, or OWB; see control type field above) is at or below 24 C and the maximum flow rate when the controlling temperature is at or above 26 C. This represents a throttling range of 2 C around the setpoint of 25 C. In between 24 C and 26 C, the flow rate to the radiant system is varied linearly.  Note that this field is ignored when the control type is either ZoneLoadConvective or ZoneLoadTotal.  For the two zone load controls, the user must use a typical zone thermostat and the system output will be dependent on the remaining zone load.
 
-\paragraph{Field: Cooling Control Temperature Schedule Name}\label{field-cooling-control-temperature-schedule-name}
+\paragraph{Field: Cooling Control Temperature Schedule Name}
 
 This field specifies the cooling setpoint or control temperature for the radiant cooling panel in degrees Celsius. Used in conjunction with the previous field (cooling control throttling range), it will define whether or not the system is running and the current flow rate. Water flow rate to the system is varied linearly around the setpoint temperature based on the throttling range and the maximum cooling flow rate parameters (see above). It should be noted that this control schedule will allow different setpoint temperatures throughout the year for cooling. The control of the radiant cooling panel is based solely on the cooling control throttling range listed above, the cooling control temperature schedule, and the control temperature type listed above. The radiant cooling panel will not use any zone thermostat that might be used by other systems serving the zone in which this radiant cooling panel resides.  Note that this field is ignored when the control type is either ZoneLoadConvective or ZoneLoadTotal.  For the two zone load controls, the user must use a typical zone thermostat and the system output will be dependent on the remaining zone load.
 
-\paragraph{Field: Condensation Control Type}\label{field-condensation-control-type}
+\paragraph{Field: Condensation Control Type}
 
 Since radiant cooling panels provide a cold surface in what could be a humid zone, there is the possibility that condensation will occur on the surface of the panel. This is due to the fact that the surface temperature may drop below the dew-point temperature of the space. When this occurs, condensation on the surface will occur. Since there is no direct calculation of the surface temperature of the radiant cooling panel, the condensation check will be made at the inlet water temperature to the panel. Since the user can utilize the next parameter to adjust the differential between the dewpoint temperature and the inlet water temperature, this will allow some flexibility in controlling when the panel will shutdown to avoid condensation. There are three options for handling potential condensation: Off, SimpleOff, and VariableOff. This parameter is optional and will default to SimpleOff.
 
@@ -638,7 +638,7 @@ Since radiant cooling panels provide a cold surface in what could be a humid zon
   VariableOff - the program will attempt to reduce the inlet temperature to the panel by locally recirculating some of the water leaving the panel and mixing it with water from the overall demand side flow.  This also means that some of the demand side water will bypass the panel. In reality, this would require a pump to achieve such mixing and recirculation, but due to the simple nature of this model, no pump definition will be required. Like the SimpleOff option, the VariableOff option uses the condensation dewpoint offset parameter to adjust when the system will try to adjust for the possibility of condensation.
 \end{itemize}
 
-\paragraph{Field: Condensation Control Dewpoint Offset}\label{field-condensation-control-dewpoint-offset}
+\paragraph{Field: Condensation Control Dewpoint Offset}
 
 This optional parameter is only valid with the SimpleOff and VariableOff condensation handling algorithm (see previous input parameter). It establishes the difference between the calculated dew-point temperature of the space and the allowed inlet water temperature to the radiant cooling panel before the system shuts down in degrees Celsius. This parameter can be any positive, negative, or zero value. When this parameter is zero, the radiant system will shut down or recirculate water (depending on whether SimpleOff or VariableOff is used) when the inlet temperature drops to the dew-point temperature or below. When this parameter is positive, the radiant system will shut down or recirculate water when the inlet water temperature is the number of degrees Celsius above the dew-point temperature. This allows some extra safety to avoid condensation. When this parameter is negative, the radiant system will shut down or recirculate water when the inlet water temperature is the number of degrees Celsius below the dew-point temperature. This strategy allows the user to simulate a situation where small amounts of condensation are tolerable or the resistance of the panel from the water loop to the panel surface is being taken into account as condensation would likely happen at the panel surface. The default value for this parameter is 1°C.
 
@@ -2024,7 +2024,7 @@ This field is a node name used to identify the node that serves as the inlet of 
 
 This field is a node name used to identify the node that serves as the outlet from the ventilated slab system to the zone when using the ``SlabAndZone'' configuration. It is the node exiting the slab section of the system. This node will typically be the same node as a zone inlet node. In the case of ``SlabOnly'' or ``SeriesSlabs'' configuration, this field will be ignored and it should be left BLANK.
 
-\paragraph{Field: Outdoor Air Node Name}\label{field-outdoor-air-node-name}
+\paragraph{Field: Outdoor Air Node Name}
 
 This field is a node name used to identify the node associated with fresh outdoor air brought into the ventilated slab system outdoor air mixer.~ This node should also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} or \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object.
 
