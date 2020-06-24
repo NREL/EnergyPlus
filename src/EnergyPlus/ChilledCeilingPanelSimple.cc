@@ -184,7 +184,6 @@ namespace CoolingPanelSimple {
 
             {
                 auto const SELECT_CASE_var(ThisCP.EquipType);
-
                 if (SELECT_CASE_var == TypeOf_CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
                     ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
                 } else {
