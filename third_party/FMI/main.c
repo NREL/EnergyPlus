@@ -46,11 +46,10 @@
 #define BIN_WIN "\\binaries\\winxx\\"
 #define BIN_WIN32 "\\binaries\\win32\\"
 #define BIN_WIN64 "\\binaries\\win64\\"
-#if defined(_WIN32)
-#define OperSys 1
-#endif
 #if defined(_WIN64)
 #define OperSys 2
+#elif defined(_WIN32)
+#define OperSys 1
 #endif
 #elif __linux__
 #include <sys/types.h>
@@ -89,10 +88,6 @@
 #endif
 #endif
 
-static int insNum = 0;
-static int arrsize = 0;
-static int fmuLocCoun = 0;
-static int fmuLocDecoun = 0;
 // FIXME: Dynamic allocation for FMU instances in addfmuInstances() not working.
 // A large array will be instead created. If the number of FMU or FMU instances
 // is larger than DELTA, the code will not work.
@@ -118,6 +113,11 @@ fmiInteger checkOperatingSystem(char* errorMessage){
 }
 
 #if defined _MSC_VER || defined __linux__
+
+static int insNum = 0;
+static int arrsize = 0;
+static int fmuLocCoun = 0;
+static int fmuLocDecoun = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Check if string \c name is in the string array \c array[]. This function is
@@ -346,9 +346,9 @@ static ScalarVariable* getSV(FMU* fmu, char type, fmiValueReference vr) {
 ///\param fmu FMU The FMU instance
 ///////////////////////////////////////////////////////////////////////////////
 static void replaceRefsInMessage(const char* msg, char* buffer, int nBuffer, FMU* fmu){
-	int i=0; // position in msg
-	int k=0; // position in buffer
-	int n;
+	size_t i=0; // position in msg
+	size_t k=0; // position in buffer
+	size_t n;
 	char c = msg[i];
 	while (c!='\0' && k < nBuffer) {
 		if (c!='#') {
@@ -385,7 +385,7 @@ static void replaceRefsInMessage(const char* msg, char* buffer, int nBuffer, FMU
 				}
 				else {
 					// could not parse the number
-					printf("illegal value reference at position %d in '%s'\n", i+2, msg);
+					printf("illegal value reference at position %d in '%s'\n", (int)i+2, msg);
 					buffer[k++]='#';
 					break;
 				}
@@ -491,8 +491,8 @@ fmiInteger getfmiEPlusVersion(char* fmuWorkingFolder,
 fmiComponent fmiEPlusInstantiateSlave(char* fmuResFolder,
 	fmiInteger *sizefmuResFolder,
 	fmiReal *timeOut, fmiInteger *visible,
-	fmiInteger *interactive, 
-	fmiInteger *loggingOn, 
+	fmiInteger *interactive,
+	fmiInteger *loggingOn,
 	fmiInteger *index) {
 
 		char* trimfmuResFolder;
@@ -510,7 +510,7 @@ fmiComponent fmiEPlusInstantiateSlave(char* fmuResFolder,
 
 		// allocate memory for fmu resources folder
 		trimfmuResFolder = (char*)calloc(sizeof(char),*sizefmuResFolder + 1);
-		
+
 		// write fmuResFolder without blanks
 		strncpy(trimfmuResFolder, fmuResFolder, *sizefmuResFolder);
 
@@ -906,8 +906,8 @@ fmiInteger addLibPathCurrentWorkingFolder(
 		_c->index = *index;
 
 #ifdef _MSC_VER
-		len_LibPath = strlen(trimfmuWorkingFolder) + strlen(BIN_WIN) + strlen (fmuInstances[_c->index]->modelID)
-			+ strlen (LIB_EXT);
+		len_LibPath = (fmiInteger)(strlen(trimfmuWorkingFolder) + strlen(BIN_WIN) + strlen (fmuInstances[_c->index]->modelID)
+			+ strlen (LIB_EXT));
 		librPath_w32 = (char*)calloc(sizeof(char), len_LibPath + 1);
 
 		// write the path to the binaries for Windows 32 bit
@@ -1177,18 +1177,35 @@ fmiComponent fmiEPlusInstantiateSlave(char* fmuResFolder,
 	fmiInteger *sizefmuResFolder,
 	fmiReal *timeOut, fmiInteger *visible,
 	fmiInteger *interactive, fmiInteger *loggingOn, fmiInteger *index) {
+                (void)fmuResFolder;
+                (void)sizefmuResFolder;
+                (void)timeOut;
+                (void)visible;
+                (void)interactive;
+                (void)loggingOn;
+                (void)index;
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 		exit(EXIT_FAILURE);
 }
 
 fmiStatus fmiEPlusInitializeSlave(fmiComponent *fmuInstance,
 	fmiReal *tStart, fmiInteger *newStep, fmiReal *tStop, fmiInteger *index){
+                (void)fmuInstance;
+                (void)tStart;
+                (void)newStep;
+                (void)tStop;
+                (void)index;
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 		exit(EXIT_FAILURE);
 }
 
 fmiStatus fmiEPlusGetReal(fmiComponent *fmuInstance, const fmiValueReference valRef [],
 	fmiReal outValue[], fmiInteger *numOutputs, fmiInteger *index){
+                (void)fmuInstance;
+                (void)valRef;
+                (void)outValue;
+                (void)numOutputs;
+                (void)index;
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 		exit(EXIT_FAILURE);
 }
@@ -1196,40 +1213,65 @@ fmiStatus fmiEPlusGetReal(fmiComponent *fmuInstance, const fmiValueReference val
 
 fmiStatus fmiEPlusSetReal(fmiComponent *fmuInstance, const fmiValueReference valRef[],
 	fmiReal inpVal[], fmiInteger *numInputs, fmiInteger *index){
+                (void)fmuInstance;
+                (void)valRef;
+                (void)inpVal;
+                (void)numInputs;
+                (void)index;
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 		exit(EXIT_FAILURE);
 }
 
 fmiStatus fmiEPlusDoStep(fmiComponent *fmuInstance, fmiReal *curCommPoint,
 	fmiReal *commStepSize, fmiInteger *newStep, fmiInteger *index){
+                (void)fmuInstance;
+                (void)curCommPoint;
+                (void)commStepSize;
+                (void)newStep;
+                (void)index;
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 		exit(EXIT_FAILURE);
 }
 
 fmiStatus fmiEPlusFreeSlave(fmiComponent *fmuInstance, fmiInteger *index, fmiInteger *fmiEndSimulation){
+        (void)fmuInstance;
+        (void)index;
+        (void)fmiEndSimulation;
 	printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 	exit(EXIT_FAILURE);
 }
 
 fmiStatus fmiEPlusResetSlave(fmiComponent *fmuInstance, fmiInteger *index){
+        (void)fmuInstance;
+        (void)index;
 	printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 	exit(EXIT_FAILURE);
 }
 
 fmiInteger fmiEPlusUnpack(char* fmuName, char* fmuOutputWorkingFolder,
 	fmiInteger *sizefmuName, fmiInteger *sizefmuOutputWorkingFolder){
+                (void)fmuName;
+                (void)fmuOutputWorkingFolder;
+                (void)sizefmuName;
+                (void)sizefmuOutputWorkingFolder;
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 		exit(EXIT_FAILURE);
 }
 
 fmiValueReference getValueReferenceByNameFMUInputVariables(char* variableName,
 	fmiInteger *sizeVariableName, fmiInteger *index){
+                (void)variableName;
+                (void)sizeVariableName;
+                (void)index;
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 		exit(EXIT_FAILURE);
 }
 
 fmiValueReference getValueReferenceByNameFMUOutputVariables(char* variableName,
 	fmiInteger *sizeVariableName, fmiInteger *index){
+                (void)variableName;
+                (void)sizeVariableName;
+                (void)index;
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 		exit(EXIT_FAILURE);
 }
@@ -1237,18 +1279,30 @@ fmiValueReference getValueReferenceByNameFMUOutputVariables(char* variableName,
 fmiInteger model_ID_GUID(char* fmuInstanceName, char* fmuWorkingFolder,
 	fmiInteger *sizefmuWorkingFolder, fmiInteger *numInputs,
 	fmiInteger *numOutputs){
+                (void)fmuInstanceName;
+                (void)fmuWorkingFolder;
+                (void)sizefmuWorkingFolder;
+                (void)numInputs;
+                (void)numOutputs;
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 		exit(EXIT_FAILURE);
 }
 
 fmiInteger addFMURootFolderName(char* fmuOutputWorkingFolder,
 	char* fmuWorkingFolder, fmiInteger *sizefmuWorkingFolder){
+                (void)fmuOutputWorkingFolder;
+                (void)fmuWorkingFolder;
+                (void)sizefmuWorkingFolder;
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 		exit(EXIT_FAILURE);
 }
 
 fmiInteger getfmiEPlusVersion(char* fmuWorkingFolder,
 	fmiInteger *sizefmuWorkingFolder, char *fmiVersionNumber, fmiInteger *index){
+                (void)fmuWorkingFolder;
+                (void)sizefmuWorkingFolder;
+                (void)fmiVersionNumber;
+                (void)index;
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 		exit(EXIT_FAILURE);
 }
@@ -1256,6 +1310,10 @@ fmiInteger getfmiEPlusVersion(char* fmuWorkingFolder,
 fmiInteger addLibPathCurrentWorkingFolder(char* trimfmuOutputWorkingFolder_wLiB,
 	char* fmuWorkingFolder, fmiInteger *sizefmuWorkingFolder,
 	fmiInteger *index){
+                (void)trimfmuOutputWorkingFolder_wLiB;
+                (void)fmuWorkingFolder;
+                (void)sizefmuWorkingFolder;
+                (void)index;
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 		exit(EXIT_FAILURE);
 }

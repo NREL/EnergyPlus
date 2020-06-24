@@ -20,7 +20,7 @@ Example:
 
 USE InputProcessor, ONLY: GetNumObjectsFound
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 NumVAVSys = \textbf{GetNumObjectsFound}(`SINGLE DUCT:VAV:REHEAT')
 
@@ -34,11 +34,11 @@ Example:
 
 ~~~ USE InputProcessor
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 ~~~ INTEGER :: SysNum = 0~~~~ ! The Sys that you are currently loading input into
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 ~~~ CHARACTER(Len = MaxNameLength)~ :: CurrentModuleObject
 
@@ -60,7 +60,7 @@ Example:
 
 ~~~ INTEGER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :: TotalArgs = 0
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 ~~~ CALL \textbf{GetObjectDefMaxArgs} \&
 
@@ -70,7 +70,7 @@ Example:
 
 ~~~ MaxAlphas = MAX(MaxAlphas,NumAlphas)
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 ~~~~~ !Start Loading the System Input
 
@@ -94,7 +94,7 @@ Example:
 
 ~~~ ~~~~Sys(SysNum)\%SysType\_Num = SingleDuctVAVReheat
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 ~~~~~ END DO
 
@@ -130,7 +130,7 @@ Example:
 
 USE InputProcessor, ONLY: GetObjectDefMaxArgs
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 CHARACTER(len = MaxNameLength), ALLOCATABLE, DIMENSION(:) :: Alphas
 
@@ -156,7 +156,7 @@ Example:
 
 USE InputProcessor, ONLY: GetObjectItemNum
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 ListNum = \textbf{GetObjectItemNum}(`CONTROLLER LIST',ControllerListName)
 
@@ -170,7 +170,7 @@ Example:
 
 USE InputProcessor, ONLY: FindItemInList
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 SysNum = \textbf{FindItemInList}(CompName,Sys\%SysName,NumSys)
 
@@ -184,7 +184,7 @@ Example:
 
 USE InputProcessor, ONLY: FindItem
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 SysNum = \textbf{FindItem}(CompName,Sys\%SysName,NumSys)
 
@@ -198,7 +198,7 @@ Example:
 
 USE InputProcessor, ONLY: FindItemInSortedList
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 SysNum = \textbf{FindItemInSortedList}(CompName,Sys\%SysName,NumSys)
 
@@ -212,7 +212,7 @@ Example:
 
 USE InputProcessor, ONLY: SameString
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 IF (\textbf{SameString}(InputRoughness,`VeryRough')) THEN
 
@@ -228,7 +228,7 @@ Example:
 
 USE InputProcessor, ONLY: VerifyName
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 CALL \textbf{VerifyName}(AlphArray(1),Fan\%FanName, \&
 
@@ -248,7 +248,7 @@ It can be used in a variety of places when the \textbackslash{}minimum and \text
 
 USE InputProcessor, ONLY: RangeCheck
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 ErrorsFound = .false.
 
@@ -302,6 +302,6 @@ This function can be used to make sure an upper case string is being used.~ (Not
 
 USE InputProcessor, ONLY: MakeUPPERCase
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 UCString = \textbf{MakeUPPERCase}(`lower string')

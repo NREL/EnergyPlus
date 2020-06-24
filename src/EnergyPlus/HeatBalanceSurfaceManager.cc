@@ -242,7 +242,7 @@ namespace HeatBalanceSurfaceManager {
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Outside Surface Heat Balance");
         CalcHeatBalanceOutsideSurf();
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Inside Surface Heat Balance");
-        CalcHeatBalanceInsideSurf();
+        CalcHeatBalanceInsideSurf(state.dataZoneTempPredictorCorrector);
 
         // The air heat balance must be called before the temperature history
         // updates because there may be a radiant system in the building
@@ -252,7 +252,7 @@ namespace HeatBalanceSurfaceManager {
         // IF NECESSARY, do one final "average" heat balance pass.  This is only
         // necessary if a radiant system is present and it was actually on for
         // part or all of the time step.
-        UpdateFinalSurfaceHeatBalance();
+        UpdateFinalSurfaceHeatBalance(state.dataChilledCeilingPanelSimple, state.dataZoneTempPredictorCorrector);
 
         // Before we leave the Surface Manager the thermal histories need to be updated
         if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
@@ -269,7 +269,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        ManageThermalComfort(false); // "Record keeping" for the zone
+        ManageThermalComfort(state.dataZoneTempPredictorCorrector, false); // "Record keeping" for the zone
 
         ReportSurfaceHeatBalance();
         if (ZoneSizingCalc) GatherComponentLoadsSurface();
@@ -517,9 +517,12 @@ namespace HeatBalanceSurfaceManager {
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Diffuse Solar Absorption Factors");
         ComputeIntSWAbsorpFactors();
 
-        // Calculate factors for exchange of diffuse solar between zones through interzone windows
-        if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Diffuse Solar Exchange through Interzone Windows");
-        ComputeDifSolExcZonesWIZWindows(NumOfZones);
+        if (InterZoneWindow) {
+            if (InitSurfaceHeatBalancefirstTime)  {
+                DisplayString("Computing Interior Diffuse Solar Exchange through Interzone Windows");
+            }
+            ComputeDifSolExcZonesWIZWindows(NumOfZones);
+        }
 
         // For daylit zones, calculate interior daylight illuminance at reference points and
         // simulate lighting control system to get overhead electric lighting reduction
@@ -2609,7 +2612,8 @@ namespace HeatBalanceSurfaceManager {
             }
 
             for (int enclNum = 1; enclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclNum) {
-                QSDifSol(enclNum) *= FractDifShortZtoZ(enclNum, enclNum) * VMULT(enclNum);
+                if (InterZoneWindow) QSDifSol(enclNum) *= FractDifShortZtoZ(enclNum, enclNum) * VMULT(enclNum);
+                else QSDifSol(enclNum) *= VMULT(enclNum);
             }
 
             //    RJH - 09-12-07 commented out report varariable calcs here since they refer to old distribution method
@@ -3307,9 +3311,15 @@ namespace HeatBalanceSurfaceManager {
 
         // COMPUTE CONVECTIVE GAINS AND ZONE FLUX DENSITY.
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
-            QS(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * VMULT(enclosureNum);
-            // CR 8695, VMULT not based on visible
-            QSLights(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * VMULT(enclosureNum);
+            if (InterZoneWindow) {
+                QS(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * VMULT(enclosureNum);
+                // CR 8695, VMULT not based on visible
+                QSLights(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * VMULT(enclosureNum);
+            } else {
+                QS(enclosureNum) *= VMULT(enclosureNum);
+                QSLights(enclosureNum) *= VMULT(enclosureNum);
+            }
+
         }
 
         // COMPUTE RADIANT GAINS ON SURFACES
@@ -4378,7 +4388,8 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void UpdateFinalSurfaceHeatBalance()
+    void UpdateFinalSurfaceHeatBalance(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
+                                       ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4441,7 +4452,7 @@ namespace HeatBalanceSurfaceManager {
         UpdateBBRadSourceValAvg(HWBaseboardSysOn);
         UpdateBBSteamRadSourceValAvg(SteamBaseboardSysOn);
         UpdateBBElecRadSourceValAvg(ElecBaseboardSysOn);
-        UpdateCoolingPanelSourceValAvg(CoolingPanelSysOn);
+        UpdateCoolingPanelSourceValAvg(dataChilledCeilingPanelSimple, CoolingPanelSysOn);
         UpdatePoolSourceValAvg(SwimmingPoolOn);
 
         if (LowTempRadSysOn || HighTempRadSysOn || HWBaseboardSysOn || SteamBaseboardSysOn || ElecBaseboardSysOn || CoolingPanelSysOn ||
@@ -4449,7 +4460,7 @@ namespace HeatBalanceSurfaceManager {
             // Solve the zone heat balance 'Detailed' solution
             // Call the outside and inside surface heat balances
             CalcHeatBalanceOutsideSurf();
-            CalcHeatBalanceInsideSurf();
+            CalcHeatBalanceInsideSurf(dataZoneTempPredictorCorrector);
         }
     }
 
@@ -5739,7 +5750,7 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void CalcHeatBalanceInsideSurf(Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
+    void CalcHeatBalanceInsideSurf(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
     {
         // Pass correct list of surfaces to CalcHeatBalanceInsideSurf2
         bool const PartialResimulate(present(ZoneToResimulate));
@@ -5752,7 +5763,7 @@ namespace HeatBalanceSurfaceManager {
             ZoneWinHeatLossRep = 0.0;
             ZoneWinHeatLossRepEnergy = 0.0;
 
-            CalcHeatBalanceInsideSurf2(DataSurfaces::AllHTSurfaceList,
+            CalcHeatBalanceInsideSurf2(dataZoneTempPredictorCorrector, DataSurfaces::AllHTSurfaceList,
                                        DataSurfaces::AllIZSurfaceList,
                                        DataSurfaces::AllHTNonWindowSurfaceList,
                                        DataSurfaces::AllHTWindowSurfaceList);
@@ -5779,7 +5790,7 @@ namespace HeatBalanceSurfaceManager {
             auto const &zoneIZSurfList(Zone(ZoneToResimulate).ZoneIZSurfaceList);
             auto const &zoneHTNonWindowSurfList(Zone(ZoneToResimulate).ZoneHTNonWindowSurfaceList);
             auto const &zoneHTWindowSurfList(Zone(ZoneToResimulate).ZoneHTWindowSurfaceList);
-            CalcHeatBalanceInsideSurf2(zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
+            CalcHeatBalanceInsideSurf2(dataZoneTempPredictorCorrector, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
 
             // Sort window heat gain/loss
             if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
@@ -5792,7 +5803,7 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void CalcHeatBalanceInsideSurf2(const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
+    void CalcHeatBalanceInsideSurf2(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                     const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
                                     const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
@@ -5923,7 +5934,7 @@ namespace HeatBalanceSurfaceManager {
 
             // Initialize Kiva instances ground temperatures
             if (DataHeatBalance::AnyKiva) {
-                SurfaceGeometry::kivaManager.initKivaInstances();
+                SurfaceGeometry::kivaManager.initKivaInstances(dataZoneTempPredictorCorrector);
             }
         }
         if (!BeginEnvrnFlag) {

@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -62,6 +63,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 struct ChillerAbsorberData;
+struct BranchInputManagerData;
 
 namespace ChillerAbsorption {
 
@@ -205,7 +207,7 @@ namespace ChillerAbsorption {
 
         void getSizingFactor(Real64 &sizFac) override;
 
-        void initialize(bool RunFlag, Real64 MyLoad);
+        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad);
 
         void setupOutputVars();
 
@@ -219,6 +221,18 @@ namespace ChillerAbsorption {
     void GetBLASTAbsorberInput(ChillerAbsorberData &chillers);
 
 } // namespace ChillerAbsorption
+
+    struct ChillerAbsorberData : BaseGlobalStruct {
+        int numAbsorbers = 0;
+        bool getInput = true;
+        Array1D<ChillerAbsorption::BLASTAbsorberSpecs> absorptionChillers;
+        void clear_state() override
+        {
+            numAbsorbers = 0;
+            getInput = true;
+            absorptionChillers.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

@@ -123,9 +123,9 @@ namespace PlantValves {
         TemperValve.deallocate();
     }
 
-    void TemperValveData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad),
+    void TemperValveData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad),
                                    bool EP_UNUSED(RunFlag)) {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
         this->calculate();
         PlantUtilities::SafeCopyPlantNode(this->PltInletNodeNum, this->PltOutletNodeNum);
         Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
@@ -226,7 +226,7 @@ namespace PlantValves {
         }
     }
 
-    void TemperValveData::initialize()
+    void TemperValveData::initialize(BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -264,7 +264,8 @@ namespace PlantValves {
                 // Search thru PlantLoop Data Structure to check some things.
                 // Locate the component on the plant loops for later usage
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         DataPlant::TypeOf_ValveTempering,
                                                         this->LoopNum,
                                                         this->LoopSideNum,

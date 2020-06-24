@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -61,6 +62,7 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+struct BranchInputManagerData;
 struct ChillerExhaustAbsorptionData;
 
 namespace ChillerExhaustAbsorption {
@@ -226,7 +228,7 @@ namespace ChillerExhaustAbsorption {
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
-        void initialize();
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void setupOutputVariables();
 
@@ -244,6 +246,16 @@ namespace ChillerExhaustAbsorption {
     void GetExhaustAbsorberInput(ChillerExhaustAbsorptionData &chillers);
 
 } // namespace ChillerExhaustAbsorption
+
+    struct ChillerExhaustAbsorptionData : BaseGlobalStruct {
+        bool Sim_GetInput = true;
+        Array1D<ChillerExhaustAbsorption::ExhaustAbsorberSpecs> ExhaustAbsorber;
+        void clear_state() override
+        {
+            Sim_GetInput = true;
+            ExhaustAbsorber.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 
