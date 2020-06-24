@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -163,12 +164,6 @@ namespace ConvectionCoefficients {
     int constexpr RefWindAtZ{2};
     int constexpr RefWindParallComp{3};
     int constexpr RefWindParallCompAtZ{4};
-
-
-    extern bool GetUserSuppliedConvectionCoeffs; // Get user input first call for Init
-
-    extern Real64 CubeRootOfOverallBuildingVolume; // building meta data. cube root of the volume of all the zones
-    extern Real64 RoofLongAxisOutwardAzimuth;      // roof surfaces meta data. outward normal azimuth for longest roof edge
 
     struct HcInsideFaceUserCurveStruct
     {
@@ -417,13 +412,6 @@ namespace ConvectionCoefficients {
         {
         }
     };
-
-    // Object Data
-    extern InsideFaceAdaptiveConvAlgoStruct InsideFaceAdaptiveConvectionAlgo; // stores rules for Hc model equations
-    extern OutsideFaceAdpativeConvAlgoStruct OutsideFaceAdaptiveConvectionAlgo;
-    extern Array1D<HcInsideFaceUserCurveStruct> HcInsideUserCurve;
-    extern Array1D<HcOutsideFaceUserCurveStruct> HcOutsideUserCurve;
-    extern RoofGeoCharactisticsStruct RoofGeo;
 
     // Functions
 
@@ -843,9 +831,94 @@ namespace ConvectionCoefficients {
                          Real64 RoofArea,
                          Real64 RoofPerimeter);
 
-    void clear_state();
-
 } // namespace ConvectionCoefficients
+
+struct ConvectionCoefficientsData : BaseGlobalStruct {
+
+    bool GetUserSuppliedConvectionCoeffs = true;    // Get user input first call for Init
+    Real64 CubeRootOfOverallBuildingVolume = 0.0;   // building meta data. cube root of the volume of all the zones
+    Real64 RoofLongAxisOutwardAzimuth = 0.0;        // roof surfaces meta data. outward normal azimuth for longest roof edge
+
+    int BMMixedAssistedWallErrorIDX1 = 0;
+    int BMMixedAssistedWallErrorIDX2 = 0;
+    int BMMixedOpposingWallErrorIDX1 = 0;
+    int BMMixedOpposingWallErrorIDX2 = 0;
+    int BMMixedStableFloorErrorIDX1 = 0;
+    int BMMixedStableFloorErrorIDX2 = 0;
+    int BMMixedUnstableFloorErrorIDX1 = 0;
+    int BMMixedUnstableFloorErrorIDX2 = 0;
+    int BMMixedStableCeilingErrorIDX1 = 0;
+    int BMMixedStableCeilingErrorIDX2 = 0;
+    int BMMixedUnstableCeilingErrorIDX1 = 0;
+    int BMMixedUnstableCeilingErrorIDX2 = 0;
+    int AHUnstableHorizontalErrorIDX = 0;
+    int AHStableHorizontalErrorIDX = 0;
+    int AHVerticalWallErrorIDX = 0;
+
+    // move random statics so they can be reset for unit tests
+    bool NodeCheck = true;
+    bool ActiveSurfaceCheck = true;
+    bool MyEnvirnFlag = true;
+    bool FirstRoofSurf = true;
+    int ActiveWallCount = 0;
+    Real64 ActiveWallArea = 0.0;
+    int ActiveCeilingCount = 0;
+    Real64 ActiveCeilingArea = 0.0;
+    int ActiveFloorCount = 0;
+    Real64 ActiveFloorArea = 0.0;
+
+    // Object Data
+    ConvectionCoefficients::InsideFaceAdaptiveConvAlgoStruct InsideFaceAdaptiveConvectionAlgo; // stores rules for Hc model equations
+    ConvectionCoefficients::OutsideFaceAdpativeConvAlgoStruct OutsideFaceAdaptiveConvectionAlgo;
+    Array1D<ConvectionCoefficients::HcInsideFaceUserCurveStruct> HcInsideUserCurve;
+    Array1D<ConvectionCoefficients::HcOutsideFaceUserCurveStruct> HcOutsideUserCurve;
+    ConvectionCoefficients::RoofGeoCharactisticsStruct RoofGeo;
+
+    void clear_state() override
+    {
+        GetUserSuppliedConvectionCoeffs = true;
+        CubeRootOfOverallBuildingVolume = 0.0;
+        RoofLongAxisOutwardAzimuth = 0.0;
+
+        // error indices
+        BMMixedAssistedWallErrorIDX1 = 0;
+        BMMixedAssistedWallErrorIDX2 = 0;
+        BMMixedOpposingWallErrorIDX1 = 0;
+        BMMixedOpposingWallErrorIDX2 = 0;
+        BMMixedStableFloorErrorIDX1 = 0;
+        BMMixedStableFloorErrorIDX2 = 0;
+        BMMixedUnstableFloorErrorIDX1 = 0;
+        BMMixedUnstableFloorErrorIDX2 = 0;
+        BMMixedStableCeilingErrorIDX1 = 0;
+        BMMixedStableCeilingErrorIDX2 = 0;
+        BMMixedUnstableCeilingErrorIDX1 = 0;
+        BMMixedUnstableCeilingErrorIDX2 = 0;
+        AHUnstableHorizontalErrorIDX = 0;
+        AHStableHorizontalErrorIDX = 0;
+        AHVerticalWallErrorIDX = 0;
+
+        // move random statics so they can be reset for unit tests
+        NodeCheck = true;
+        ActiveSurfaceCheck = true;
+        MyEnvirnFlag = true;
+        FirstRoofSurf = true;
+        ActiveWallCount = 0;
+        ActiveWallArea = 0.0;
+        ActiveCeilingCount = 0;
+        ActiveCeilingArea = 0.0;
+        ActiveFloorCount = 0;
+        ActiveFloorArea = 0.0;
+
+        // Object Data
+        InsideFaceAdaptiveConvectionAlgo = {}; // stores rules for Hc model equations
+        OutsideFaceAdaptiveConvectionAlgo = {};
+        HcInsideUserCurve.deallocate();
+        HcOutsideUserCurve.deallocate();
+        RoofGeo = {};
+    }
+};
+
+extern ConvectionCoefficientsData dataConvectionCoefficients;
 
 } // namespace EnergyPlus
 
