@@ -2450,7 +2450,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     bool FoundError = false;
 
     HeatBalanceManager::GetProjectControlData(state, state.outputFiles, FoundError); // read project control data
