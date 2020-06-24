@@ -62,6 +62,7 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 struct ChilledCeilingPanelSimpleData;
 struct ConvectionCoefficientsData;
+struct ZoneTempPredictorCorrectorData;
 
 namespace CoolingPanelSimple {
 
@@ -157,6 +158,7 @@ namespace CoolingPanelSimple {
 
         void CalcCoolingPanel(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
                               ConvectionCoefficientsData &dataConvectionCoefficients,
+                              ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
                               int CoolingPanelNum);
 
         void SetCoolingPanelControlTemp(Real64 &ControlTemp, int ZoneNum);

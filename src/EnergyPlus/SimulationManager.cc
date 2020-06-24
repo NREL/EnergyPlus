@@ -333,7 +333,7 @@ namespace SimulationManager {
         AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state.outputFiles);
-        GetProjectData(state.outputFiles);
+        GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
         CheckForMisMatchedEnvironmentSpecifications();
         CheckForRequestedReporting();
         SetPredefinedTables();
@@ -711,7 +711,7 @@ namespace SimulationManager {
         }
     }
 
-    void GetProjectData(OutputFiles &outputFiles)
+    void GetProjectData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1195,7 +1195,7 @@ namespace SimulationManager {
                 bool overrideMinNumWarmupDays(false);
                 bool overrideBeginEnvResetSuppress(false);
                 bool overrideMaxZoneTempDiff(false);
-                ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
+                dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
                     if (overrideModeValue == "NORMAL") {
@@ -3118,7 +3118,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
         // Surface simulation
         InitSurfaceHeatBalance(state);
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
-        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state.dataConvectionCoefficients);
+        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state.dataConvectionCoefficients, state.dataZoneTempPredictorCorrector);
 
         // Air simulation
         InitAirHeatBalance();

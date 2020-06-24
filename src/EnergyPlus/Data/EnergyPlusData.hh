@@ -77,6 +77,7 @@
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 #include <unordered_map>
 #include <string>
 
@@ -115,6 +116,7 @@ namespace EnergyPlus {
 
         ZoneEquipmentManagerData dataZoneEquipmentManager;
         ZonePlenumData dataZonePlenum;
+        ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
 
         EnergyPlusData() {
             OutputFiles::setSingleton(&outputFiles);
@@ -149,6 +151,7 @@ namespace EnergyPlus {
             dataPlantChillers.clear_state();
             dataZoneEquipmentManager.clear_state();
             dataZonePlenum.clear_state();
+            dataZoneTempPredictorCorrector.clear_state();
         };
     };
 

@@ -242,7 +242,7 @@ namespace HeatBalanceSurfaceManager {
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Outside Surface Heat Balance");
         CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Inside Surface Heat Balance");
-        CalcHeatBalanceInsideSurf(state.dataConvectionCoefficients);
+        CalcHeatBalanceInsideSurf(state.dataConvectionCoefficients, state.dataZoneTempPredictorCorrector);
 
         // The air heat balance must be called before the temperature history
         // updates because there may be a radiant system in the building
@@ -253,7 +253,8 @@ namespace HeatBalanceSurfaceManager {
         // necessary if a radiant system is present and it was actually on for
         // part or all of the time step.
         UpdateFinalSurfaceHeatBalance(state.dataChilledCeilingPanelSimple,
-                                      state.dataConvectionCoefficients);
+                                      state.dataConvectionCoefficients,
+                                      state.dataZoneTempPredictorCorrector);
 
         // Before we leave the Surface Manager the thermal histories need to be updated
         if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
@@ -270,7 +271,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        ManageThermalComfort(false); // "Record keeping" for the zone
+        ManageThermalComfort(state.dataZoneTempPredictorCorrector, false); // "Record keeping" for the zone
 
         ReportSurfaceHeatBalance();
         if (ZoneSizingCalc) GatherComponentLoadsSurface();
@@ -4390,7 +4391,8 @@ namespace HeatBalanceSurfaceManager {
     // *****************************************************************************
 
     void UpdateFinalSurfaceHeatBalance(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
-                                       ConvectionCoefficientsData &dataConvectionCoefficients)
+                                       ConvectionCoefficientsData &dataConvectionCoefficients,
+                                       ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4461,7 +4463,7 @@ namespace HeatBalanceSurfaceManager {
             // Solve the zone heat balance 'Detailed' solution
             // Call the outside and inside surface heat balances
             CalcHeatBalanceOutsideSurf(dataConvectionCoefficients);
-            CalcHeatBalanceInsideSurf(dataConvectionCoefficients);
+            CalcHeatBalanceInsideSurf(dataConvectionCoefficients, dataZoneTempPredictorCorrector);
         }
     }
 
@@ -5754,7 +5756,9 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void CalcHeatBalanceInsideSurf(ConvectionCoefficientsData &dataConvectionCoefficients, Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
+    void CalcHeatBalanceInsideSurf(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                   ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
+                                   Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
     {
         // Pass correct list of surfaces to CalcHeatBalanceInsideSurf2
         bool const PartialResimulate(present(ZoneToResimulate));
@@ -5768,6 +5772,7 @@ namespace HeatBalanceSurfaceManager {
             ZoneWinHeatLossRepEnergy = 0.0;
 
             CalcHeatBalanceInsideSurf2(dataConvectionCoefficients,
+                                       dataZoneTempPredictorCorrector,
                                        DataSurfaces::AllHTSurfaceList,
                                        DataSurfaces::AllIZSurfaceList,
                                        DataSurfaces::AllHTNonWindowSurfaceList,
@@ -5795,7 +5800,7 @@ namespace HeatBalanceSurfaceManager {
             auto const &zoneIZSurfList(Zone(ZoneToResimulate).ZoneIZSurfaceList);
             auto const &zoneHTNonWindowSurfList(Zone(ZoneToResimulate).ZoneHTNonWindowSurfaceList);
             auto const &zoneHTWindowSurfList(Zone(ZoneToResimulate).ZoneHTWindowSurfaceList);
-            CalcHeatBalanceInsideSurf2(dataConvectionCoefficients, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
+            CalcHeatBalanceInsideSurf2(dataConvectionCoefficients, dataZoneTempPredictorCorrector, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
 
             // Sort window heat gain/loss
             if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
@@ -5809,6 +5814,7 @@ namespace HeatBalanceSurfaceManager {
     }
 
     void CalcHeatBalanceInsideSurf2(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                    ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
                                     const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                     const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
@@ -5940,7 +5946,7 @@ namespace HeatBalanceSurfaceManager {
 
             // Initialize Kiva instances ground temperatures
             if (DataHeatBalance::AnyKiva) {
-                SurfaceGeometry::kivaManager.initKivaInstances();
+                SurfaceGeometry::kivaManager.initKivaInstances(dataZoneTempPredictorCorrector);
             }
         }
         if (!BeginEnvrnFlag) {

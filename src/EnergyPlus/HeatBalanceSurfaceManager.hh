@@ -55,6 +55,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZoneTempPredictorCorrectorData;
 
 // Forward declarations
 struct ChilledCeilingPanelSimpleData;
@@ -119,7 +122,8 @@ namespace HeatBalanceSurfaceManager {
     // *****************************************************************************
 
     void UpdateFinalSurfaceHeatBalance(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
-                                       ConvectionCoefficientsData &dataConvectionCoefficients);
+                                       ConvectionCoefficientsData &dataConvectionCoefficients,
+                                       ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
 
     void UpdateThermalHistories();
 
@@ -143,9 +147,12 @@ namespace HeatBalanceSurfaceManager {
 
     Real64 GetQdotConvOutRepPerArea(int SurfNum);
 
-    void CalcHeatBalanceInsideSurf(ConvectionCoefficientsData &dataConvectionCoefficients, Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+    void CalcHeatBalanceInsideSurf(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                   ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
+                                   Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
     void CalcHeatBalanceInsideSurf2(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                    ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
                                     const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                     const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate

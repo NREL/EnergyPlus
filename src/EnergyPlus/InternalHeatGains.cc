@@ -177,7 +177,7 @@ namespace InternalHeatGains {
             if (InitOnly) return;
         }
 
-        InitInternalHeatGains(state, state.dataZonePlenum);
+        InitInternalHeatGains(state);
 
         ReportInternalHeatGains();
 
@@ -5123,7 +5123,7 @@ namespace InternalHeatGains {
         }
     }
 
-    void InitInternalHeatGains(EnergyPlusData &state, ZonePlenumData &dataZonePlenum)
+    void InitInternalHeatGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5345,7 +5345,7 @@ namespace InternalHeatGains {
                     int retNum = Lights(Loop).ZoneReturnNum;
                     int ReturnZonePlenumCondNum = ZoneEquipConfig(NZ).ReturnNodePlenumNum(retNum);
                     if (ReturnZonePlenumCondNum > 0) {
-                        ReturnPlenumTemp = dataZonePlenum.ZoneRetPlenCond(ReturnZonePlenumCondNum).ZoneTemp;
+                        ReturnPlenumTemp = state.dataZonePlenum.ZoneRetPlenCond(ReturnZonePlenumCondNum).ZoneTemp;
                         FractionReturnAir =
                             Lights(Loop).FractionReturnAirPlenTempCoeff1 - Lights(Loop).FractionReturnAirPlenTempCoeff2 * ReturnPlenumTemp;
                         FractionReturnAir = max(0.0, min(1.0, FractionReturnAir));

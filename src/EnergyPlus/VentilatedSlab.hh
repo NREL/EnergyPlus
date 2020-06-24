@@ -54,9 +54,10 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace VentilatedSlab {
 
@@ -377,6 +378,7 @@ namespace VentilatedSlab {
     );
 
     void CalcVentilatedSlabRadComps(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                    ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
                                     int const Item,               // System index in ventilated slab array
                                     bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
     );
