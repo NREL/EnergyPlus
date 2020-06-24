@@ -175,7 +175,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     SNLoadCoolRate.allocate(1);
     SNLoadHeatEnergy.allocate(1);
     SNLoadCoolEnergy.allocate(1);
-    ZoneAirRelHum.allocate(1);
+    state.dataZoneTempPredictorCorrector.ZoneAirRelHum.allocate(1);
     IsZoneDV.dimension(1, false);
     IsZoneCV.dimension(1, false);
     IsZoneUI.dimension(1, false);
@@ -594,7 +594,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     SNLoadCoolRate.deallocate();
     SNLoadHeatEnergy.deallocate();
     SNLoadCoolEnergy.deallocate();
-    ZoneAirRelHum.deallocate();
+    state.dataZoneTempPredictorCorrector.ZoneAirRelHum.deallocate();
     IsZoneDV.deallocate();
     IsZoneCV.deallocate();
     IsZoneUI.deallocate();
@@ -681,7 +681,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     SurfaceWindow.allocate(1);
     Surface.allocate(2);
     HConvIn.allocate(1);
-    ZoneAirRelHum.allocate(1);
+    state.dataZoneTempPredictorCorrector.ZoneAirRelHum.allocate(1);
     IsZoneDV.dimension(1, false);
     IsZoneCV.dimension(1, false);
     IsZoneUI.dimension(1, false);
@@ -922,7 +922,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     SurfaceWindow.deallocate();
     Surface.deallocate();
     HConvIn.deallocate();
-    ZoneAirRelHum.deallocate();
+    state.dataZoneTempPredictorCorrector.ZoneAirRelHum.deallocate();
     IsZoneDV.deallocate();
     IsZoneCV.deallocate();
     IsZoneUI.deallocate();
