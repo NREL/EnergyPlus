@@ -50,7 +50,7 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include <EnergyPlus/DataHeatBalance.hh>`
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
