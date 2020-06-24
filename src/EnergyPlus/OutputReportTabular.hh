@@ -68,7 +68,7 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
-    struct ZonePlenumData;
+    struct ZoneTempPredictorCorrectorData;
 
 namespace OutputReportTabular {
 
@@ -801,7 +801,7 @@ namespace OutputReportTabular {
 
     void WriteTimeBinTables();
 
-    void WriteBEPSTable();
+    void WriteBEPSTable(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
 
     std::string ResourceWarningMessage(std::string resource);
 

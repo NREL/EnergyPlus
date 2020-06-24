@@ -440,7 +440,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
 

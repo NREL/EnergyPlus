@@ -52,7 +52,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
+    //forward declarations
     struct ZonePlenumData;
 
 namespace ZoneContaminantPredictorCorrector {

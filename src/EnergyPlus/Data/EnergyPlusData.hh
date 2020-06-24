@@ -76,6 +76,7 @@
 #include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 #include <unordered_map>
 #include <string>
 
@@ -112,6 +113,7 @@ namespace EnergyPlus {
         ZoneDehumidifierData dataZoneDehumidifier;
         ZoneEquipmentManagerData dataZoneEquipmentManager;
         ZonePlenumData dataZonePlenum;
+        ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
 
         EnergyPlusData() {
             OutputFiles::setSingleton(&outputFiles);
@@ -145,6 +147,7 @@ namespace EnergyPlus {
             dataZoneDehumidifier.clear_state();
             dataZoneEquipmentManager.clear_state();
             dataZonePlenum.clear_state();
+            dataZoneTempPredictorCorrector.clear_state();
         };
     };
 

@@ -54,9 +54,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZoneTempPredictorCorrectorData;
 
 namespace CoolingPanelSimple {
 
@@ -172,7 +174,7 @@ namespace CoolingPanelSimple {
         {
         }
 
-        void CalcCoolingPanel(int const CoolingPanelNum);
+        void CalcCoolingPanel(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const CoolingPanelNum);
 
         void SetCoolingPanelControlTemp(Real64 &ControlTemp, int const ZoneNum);
 

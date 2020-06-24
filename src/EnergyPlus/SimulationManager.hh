@@ -54,6 +54,7 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
+    struct ZoneTempPredictorCorrectorData;
     class OutputFiles;
 
 namespace SimulationManager {
@@ -79,7 +80,7 @@ namespace SimulationManager {
 
     void ManageSimulation(EnergyPlusData &state);
 
-    void GetProjectData(OutputFiles &outputFiles);
+    void GetProjectData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles);
 
     void writeIntialPerfLogValues(std::string const &currentOverrideModeValue);
 

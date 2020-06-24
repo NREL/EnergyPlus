@@ -5675,7 +5675,7 @@ namespace OutputReportTabular {
 
         if (WriteTabularFiles) {
             // call each type of report in turn
-            WriteBEPSTable();
+            WriteBEPSTable(state.dataZoneTempPredictorCorrector);
             WriteTableOfContents();
             WriteVeriSumTable(state.outputFiles);
             WriteDemandEndUseSummary();
@@ -6804,7 +6804,7 @@ namespace OutputReportTabular {
             }
         }
         // fill the LEED setpoint table
-        ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints();
+        ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints(state.dataZoneTempPredictorCorrector);
     }
 
     void WriteMonthlyTables()
@@ -7442,7 +7442,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteBEPSTable()
+    void WriteBEPSTable(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -7616,11 +7616,11 @@ namespace OutputReportTabular {
                 UtilityRoutines::appendPerfLog("Water ABUPS Total [m3]", General::RoundSigDigits(collapsedTotal(13), 3));
                 UtilityRoutines::appendPerfLog("Values Gathered Over [hours]", General::RoundSigDigits(gatherElapsedTimeBEPS, 2));
                 UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures Time [hours]",
-                                               General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillate, 2));
+                                               General::RoundSigDigits(dataZoneTempPredictorCorrector.AnnualAnyZoneTempOscillate, 2));
                 UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
-                                               General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillateDuringOccupancy, 2));
+                                               General::RoundSigDigits(dataZoneTempPredictorCorrector.AnnualAnyZoneTempOscillateDuringOccupancy, 2));
                 UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
-                                               General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillateInDeadband, 2));
+                                               General::RoundSigDigits(dataZoneTempPredictorCorrector.AnnualAnyZoneTempOscillateInDeadband, 2));
             }
             for (jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse) {
                 for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {

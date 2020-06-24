@@ -539,14 +539,14 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
 
         case BBSteamRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
             // Simulate baseboard
-            CalcSteamBaseboard(CompNum, LoadMet);
+            CalcSteamBaseboard(state.dataZoneTempPredictorCorrector, CompNum, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
         case BBWaterRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
             // Simulate baseboard
-            CalcHWBaseboard(CompNum, LoadMet);
+            CalcHWBaseboard(state.dataZoneTempPredictorCorrector, CompNum, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
@@ -1698,7 +1698,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles,
     }
     if (state.dataZonePlenum.NumZoneSupplyPlenums == 0 && state.dataZonePlenum.NumZoneReturnPlenums == 0) {
         if (inputProcessor->getNumObjectsFound("AirLoopHVAC:SupplyPlenum") > 0) {
-            ZonePlenum::GetZonePlenumInput(state, state.dataZonePlenum);
+            ZonePlenum::GetZonePlenumInput(state);
         }
     }
 
@@ -2048,7 +2048,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles,
     }
     if (state.dataZonePlenum.NumZoneSupplyPlenums == 0 && state.dataZonePlenum.NumZoneReturnPlenums == 0) {
         if (inputProcessor->getNumObjectsFound("AirLoopHVAC:ReturnPlenum") > 0) {
-            GetZonePlenumInput(state, state.dataZonePlenum);
+            GetZonePlenumInput(state);
         }
     }
 
