@@ -53,6 +53,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    //forward declarations
+    struct ZonePlenumData;
 
     // Forward Declarations
     struct EnergyPlusData;

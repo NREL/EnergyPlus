@@ -1117,7 +1117,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData(state.outputFiles);
+    GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
 
@@ -2462,7 +2462,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     bool SimAirLoops = true;
     bool FirstHVACIteration = false;
     // re-simulate the zone HVAC equipment per the priority order
-    ZoneEquipmentManager::ManageZoneEquipment(state, state.dataZoneEquipmentManager, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+    ZoneEquipmentManager::ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
     // check the reheat coil nominal capacity
     EXPECT_NEAR(HeatingCoils::HeatingCoil(1).NominalCapacity, 17542.3, 1.0);
     // check the reheat coil outputis the full capacity

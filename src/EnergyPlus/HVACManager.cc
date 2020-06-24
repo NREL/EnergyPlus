@@ -58,6 +58,7 @@
 #include <EnergyPlus/HVACManager.hh>
 //#include <CoolTower.hh>
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -69,7 +70,6 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
@@ -78,10 +78,11 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
@@ -90,6 +91,7 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
@@ -103,8 +105,6 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/SystemReports.hh>
-#include <EnergyPlus/ElectricPowerServiceManager.hh>
-#include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
@@ -292,7 +292,7 @@ namespace HVACManager {
         using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
         using ZoneEquipmentManager::CalcAirFlowSimple;
         using ZoneEquipmentManager::UpdateZoneSizing;
-        using ZoneTempPredictorCorrector::NumOnOffCtrZone;
+        //using ZoneTempPredictorCorrector::NumOnOffCtrZone;
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -495,13 +495,13 @@ namespace HVACManager {
                 ZoneAirHumRatAvg(ZoneNum) += ZoneAirHumRat(ZoneNum) * FracTimeStepZone;
                 if (Contaminant.CO2Simulation) ZoneAirCO2Avg(ZoneNum) += ZoneAirCO2(ZoneNum) * FracTimeStepZone;
                 if (Contaminant.GenericContamSimulation) ZoneAirGCAvg(ZoneNum) += ZoneAirGC(ZoneNum) * FracTimeStepZone;
-                if (NumOnOffCtrZone > 0) {
+                if (state.dataZoneTempPredictorCorrector.NumOnOffCtrZone > 0) {
                     ZoneThermostatSetPointHiAver(ZoneNum) += ZoneThermostatSetPointHi(ZoneNum) * FracTimeStepZone;
                     ZoneThermostatSetPointLoAver(ZoneNum) += ZoneThermostatSetPointLo(ZoneNum) * FracTimeStepZone;
                 }
             }
 
-            DetectOscillatingZoneTemp();
+            DetectOscillatingZoneTemp(state.dataZoneTempPredictorCorrector);
             UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
             UpdateIceFractions();          // Update fraction of ice stored in TES
             ManageWater();
@@ -539,7 +539,7 @@ namespace HVACManager {
                     UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 }
                 if (ZoneSizingCalc) {
-                    UpdateZoneSizing(state, state.dataZoneEquipmentManager, DuringDay);
+                    UpdateZoneSizing(state, DuringDay);
                     UpdateFacilitySizing(state.dataGlobals, DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
@@ -855,7 +855,7 @@ namespace HVACManager {
         }
 
         if (ZoneSizingCalc) {
-            ManageZoneEquipment(state, state.dataZoneEquipmentManager, FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
+            ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
             // need to call non zone equipment so water use zone gains can be included in sizing calcs
             ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipmentFlag);
             facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
@@ -1838,7 +1838,7 @@ namespace HVACManager {
             // determination of which zones are connected to which air loops.
             // This call of ManageZoneEquipment does nothing except force the
             // zone equipment data to be read in.
-            ManageZoneEquipment(state, state.dataZoneEquipmentManager, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+            ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
             MyEnvrnFlag = false;
         }
         if (!BeginEnvrnFlag) {
@@ -1857,7 +1857,7 @@ namespace HVACManager {
             AirLoopsSimOnce = true;     // air loops simulated once for this environment
             ResetTerminalUnitFlowLimits();
             FlowMaxAvailAlreadyReset = true;
-            ManageZoneEquipment(state, state.dataZoneEquipmentManager, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+            ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
             SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
             ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
             facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
@@ -1892,7 +1892,7 @@ namespace HVACManager {
                         ResolveAirLoopFlowLimits();
                         FlowResolutionNeeded = false;
                     }
-                    ManageZoneEquipment(state, state.dataZoneEquipmentManager, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+                    ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
                     SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
                 }
                 FlowMaxAvailAlreadyReset = false;

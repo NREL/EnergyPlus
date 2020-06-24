@@ -50,9 +50,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace RoomAirModelAirflowNetwork {
 
@@ -79,7 +80,7 @@ namespace RoomAirModelAirflowNetwork {
         void CalcRoomAirModelAirflowNetwork(int const ThisRoomAirNode); // index number for the specified zone and room air node
 
         //*****************************************************************************************
-        void UpdateRoomAirModelAirflowNetwork(); // index number for the specified zone
+        void UpdateRoomAirModelAirflowNetwork(ZoneDehumidifierData &dataZoneDehumidifier); // index number for the specified zone
 
         //*****************************************************************************************
         void CalcNodeSums(ZonePlenumData &dataZonePlenum, int const RoomAirNode); // index number for the specified zone and room air node
@@ -87,7 +88,7 @@ namespace RoomAirModelAirflowNetwork {
         //*****************************************************************************************
         void SumNonAirSystemResponseForNode(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
         //*****************************************************************************************
-        void SumSystemDepResponseForNode(); // index number for the specified zone and room air node
+        void SumSystemDepResponseForNode(ZoneDehumidifierData &dataZoneDehumidifier); // index number for the specified zone and room air node
 
         //*****************************************************************************************
 
