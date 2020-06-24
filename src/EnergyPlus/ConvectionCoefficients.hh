@@ -854,6 +854,18 @@ struct ConvectionCoefficientsData : BaseGlobalStruct {
     int AHUnstableHorizontalErrorIDX = 0;
     int AHStableHorizontalErrorIDX = 0;
     int AHVerticalWallErrorIDX = 0;
+    int CalcFohannoPolidoriVerticalWallErrorIDX = 0;
+    int CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 = 0;
+    int CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2 = 0;
+    int CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 = 0;
+    int CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2 = 0;
+    int CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX = 0;
+    int CalcSparrowWindwardErrorIDX = 0;
+    int CalcSparrowLeewardErrorIDX = 0;
+    int CalcEmmelVerticalErrorIDX = 0;
+    int CalcEmmelRoofErrorIDX = 0;
+    int CalcClearRoofErrorIDX = 0;
+    int CalcMitchellErrorIDX = 0;
 
     // move random statics so they can be reset for unit tests
     bool NodeCheck = true;
@@ -896,6 +908,18 @@ struct ConvectionCoefficientsData : BaseGlobalStruct {
         AHUnstableHorizontalErrorIDX = 0;
         AHStableHorizontalErrorIDX = 0;
         AHVerticalWallErrorIDX = 0;
+        CalcFohannoPolidoriVerticalWallErrorIDX = 0;
+        CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 = 0;
+        CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2 = 0;
+        CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 = 0;
+        CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2 = 0;
+        CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX = 0;
+        CalcSparrowWindwardErrorIDX = 0;
+        CalcSparrowLeewardErrorIDX = 0;
+        CalcEmmelVerticalErrorIDX = 0;
+        CalcEmmelRoofErrorIDX = 0;
+        CalcClearRoofErrorIDX = 0;
+        CalcMitchellErrorIDX = 0;
 
         // move random statics so they can be reset for unit tests
         NodeCheck = true;

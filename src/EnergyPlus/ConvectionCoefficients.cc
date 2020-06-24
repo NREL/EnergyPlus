@@ -5024,25 +5024,24 @@ namespace ConvectionCoefficients {
         Real64 const ActiveDelTempThreshold(1.5); // deg C, temperature difference for surfaces to be considered "active"
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int ZoneNum(0);
-        static int PriorityEquipOn(0);
-        static Array1D_int HeatingPriorityStack({0, 10}, 0);
-        static Array1D_int CoolingPriorityStack({0, 10}, 0);
-        static Array1D_int FlowRegimeStack({0, 10}, 0);
-        static int EquipNum(0);
-        static int ZoneNode(0);
-        static int EquipOnCount(0);
-        static int EquipOnLoop(0);
-        static int thisZoneInletNode(0);
-        //  INTEGER :: thisZnEqInletNode = 0
-        static int FinalFlowRegime(0);
-        static Real64 Tmin(0.0);       // temporary min surf temp
-        static Real64 Tmax(0.0);       // temporary max surf temp
-        static Real64 GrH(0.0);        // Grashof number for zone height H
-        static Real64 Re(0.0);         // Reynolds number for zone air system flow
-        static Real64 Ri(0.0);         // Richardson Number, Gr/Re**2 for determining mixed regime
-        static Real64 AirDensity(0.0); // temporary zone air density
-        static Real64 DeltaTemp(0.0);  // temporary temperature difference (Tsurf - Tair)
+        int ZoneNum(0);
+        int PriorityEquipOn(0);
+        Array1D_int HeatingPriorityStack({0, 10}, 0);
+        Array1D_int CoolingPriorityStack({0, 10}, 0);
+        Array1D_int FlowRegimeStack({0, 10}, 0);
+        int EquipNum(0);
+        int ZoneNode(0);
+        int EquipOnCount(0);
+        int EquipOnLoop(0);
+        int thisZoneInletNode(0);
+        int FinalFlowRegime(0);
+        Real64 Tmin(0.0);       // temporary min surf temp
+        Real64 Tmax(0.0);       // temporary max surf temp
+        Real64 GrH(0.0);        // Grashof number for zone height H
+        Real64 Re(0.0);         // Reynolds number for zone air system flow
+        Real64 Ri(0.0);         // Richardson Number, Gr/Re**2 for determining mixed regime
+        Real64 AirDensity(0.0); // temporary zone air density
+        Real64 DeltaTemp(0.0);  // temporary temperature difference (Tsurf - Tair)
         int SurfLoop;                  // local for separate looping across surfaces in the zone that has SurfNum
 
         EquipOnCount = 0;
@@ -6704,7 +6703,7 @@ namespace ConvectionCoefficients {
         // Return value
         Real64 Hc; // function result
 
-        static Real64 const pow_fac(2.175 / std::pow(1.0, 0.076));
+        Real64 const pow_fac(2.175 / std::pow(1.0, 0.076));
 
         if (HydraulicDiameter > 1.0) {
             Hc = 2.175 * std::pow(std::abs(DeltaTemp), 0.308) / std::pow(HydraulicDiameter, 0.076);
@@ -7250,8 +7249,8 @@ namespace ConvectionCoefficients {
         Real64 const Pr(0.71);    // Prandtl number for air at ?
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static Real64 RaH(0.0);
-        static Real64 BetaFilm(0.0);
+        Real64 RaH(0.0);
+        Real64 BetaFilm(0.0);
 
         BetaFilm = 1.0 / (KelvinConv + SurfTemp + 0.5 * DeltaTemp); // TODO check sign on DeltaTemp
         RaH = (g * BetaFilm * QdotConv * pow_4(Height) * Pr) / (k * pow_2(v));
@@ -7270,19 +7269,18 @@ namespace ConvectionCoefficients {
                                            int const SurfNum       // for messages
     )
     {
-        static int ErrorIndex(0);
 
         if (Height > 0.0) {
             return CalcFohannoPolidoriVerticalWall(DeltaTemp, Height, SurfTemp, QdotConv);
         } else {
             // bad value for Height, but we have little info to identify calling culprit
-            if (ErrorIndex == 0) {
+            if (dataConvectionCoefficients.CalcFohannoPolidoriVerticalWallErrorIDX == 0) {
                 ShowSevereMessage("CalcFohannoPolidoriVerticalWall: Convection model not evaluated (would divide by zero)");
                 ShowContinueError("Effective surface height is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
                 ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(
-                "CalcFohannoPolidoriVerticalWall: Convection model not evaluated because zero height and set to 9.999 [W/m2-K]", ErrorIndex);
+                "CalcFohannoPolidoriVerticalWall: Convection model not evaluated because zero height and set to 9.999 [W/m2-K]", dataConvectionCoefficients.CalcFohannoPolidoriVerticalWallErrorIDX);
             return 9.999;
         }
     }
@@ -7369,10 +7367,6 @@ namespace ConvectionCoefficients {
                                                        int const ZoneNum                // for messages
     )
     {
-
-        static int ErrorIndex(0);
-        static int ErrorIndex2(0);
-
         Real64 AirSystemFlowRate = CalcZoneSystemVolFlowRate(ZoneNum);
 
         if (ZoneExtPerimLength > 0.0) {
@@ -7380,7 +7374,7 @@ namespace ConvectionCoefficients {
 
                 if (WindowLocationType != InConvWinLoc_UpperPartOfExteriorWall && WindowLocationType != InConvWinLoc_LowerPartOfExteriorWall &&
                     WindowLocationType != InConvWinLoc_LargePartOfExteriorWall && WindowLocationType != InConvWinLoc_NotSet) {
-                    if (ErrorIndex == 0) {
+                    if (dataConvectionCoefficients.CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 == 0) {
                         ShowSevereMessage(
                             "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated (bad relative window location)");
                         ShowContinueError("Value for window location = " + RoundSigDigits(WindowLocationType));
@@ -7389,11 +7383,11 @@ namespace ConvectionCoefficients {
                     }
                     ShowRecurringSevereErrorAtEnd("CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad window "
                                                   "location and set to 9.999 [W/m2-K]",
-                                                  ErrorIndex);
+                                                  dataConvectionCoefficients.CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1);
                 }
             }
         } else {
-            if (ErrorIndex2 == 0) {
+            if (dataConvectionCoefficients.CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2 == 0) {
                 ShowSevereMessage(
                     "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated (zero zone exterior perimeter length)");
                 ShowContinueError("Value for zone exterior perimeter length = " + RoundSigDigits(ZoneExtPerimLength, 5));
@@ -7402,7 +7396,7 @@ namespace ConvectionCoefficients {
             }
             ShowRecurringSevereErrorAtEnd(
                 "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
-                ErrorIndex2);
+                dataConvectionCoefficients.CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2);
         }
         return CalcGoldsteinNovoselacCeilingDiffuserWindow(AirSystemFlowRate, ZoneExtPerimLength, WindWallRatio, WindowLocationType);
     }
@@ -7450,16 +7444,12 @@ namespace ConvectionCoefficients {
                                                      int const ZoneNum                // for messages
     )
     {
-
-        static int ErrorIndex(0);
-        static int ErrorIndex2(0);
-
         Real64 AirSystemFlowRate = CalcZoneSystemVolFlowRate(ZoneNum);
 
         if (ZoneExtPerimLength > 0.0) {
             if (WindowLocationType != InConvWinLoc_WindowAboveThis && WindowLocationType != InConvWinLoc_WindowBelowThis &&
                 WindowLocationType != InConvWinLoc_NotSet) {
-                if (ErrorIndex == 0) {
+                if (dataConvectionCoefficients.CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 == 0) {
                     ShowSevereMessage("CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated (bad relative window location)");
                     ShowContinueError("Value for window location = " + RoundSigDigits(WindowLocationType));
                     ShowContinueError("Occurs for zone named = " + Zone(ZoneNum).Name);
@@ -7467,10 +7457,10 @@ namespace ConvectionCoefficients {
                 }
                 ShowRecurringSevereErrorAtEnd(
                     "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because bad window location and set to 9.999 [W/m2-K]",
-                    ErrorIndex);
+                    dataConvectionCoefficients.CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1);
             }
         } else {
-            if (ErrorIndex2 == 0) {
+            if (dataConvectionCoefficients.CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2 == 0) {
                 ShowSevereMessage("CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated (zero zone exterior perimeter length)");
                 ShowContinueError("Value for zone exterior perimeter length = " + RoundSigDigits(ZoneExtPerimLength, 5));
                 ShowContinueError("Occurs for zone named = " + Zone(ZoneNum).Name);
@@ -7478,7 +7468,7 @@ namespace ConvectionCoefficients {
             }
             ShowRecurringSevereErrorAtEnd(
                 "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
-                ErrorIndex2);
+                dataConvectionCoefficients.CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2);
         }
         return CalcGoldsteinNovoselacCeilingDiffuserWall(AirSystemFlowRate, ZoneExtPerimLength, WindowLocationType);
     }
@@ -7517,12 +7507,10 @@ namespace ConvectionCoefficients {
     )
     {
 
-        static int ErrorIndex(0);
-
         Real64 AirSystemFlowRate = CalcZoneSystemVolFlowRate(ZoneNum);
 
         if (ZoneExtPerimLength <= 0.0) {
-            if (ErrorIndex == 0) {
+            if (dataConvectionCoefficients.CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX == 0) {
                 ShowSevereMessage("CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated (zero zone exterior perimeter length)");
                 ShowContinueError("Value for zone exterior perimeter length = " + RoundSigDigits(ZoneExtPerimLength, 5));
                 ShowContinueError("Occurs for zone named = " + Zone(ZoneNum).Name);
@@ -7530,7 +7518,7 @@ namespace ConvectionCoefficients {
             }
             ShowRecurringSevereErrorAtEnd(
                 "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
-                ErrorIndex);
+                dataConvectionCoefficients.CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX);
         }
         return CalcGoldsteinNovoselacCeilingDiffuserFloor(AirSystemFlowRate, ZoneExtPerimLength);
     }
@@ -7595,39 +7583,35 @@ namespace ConvectionCoefficients {
 
     Real64 CalcSparrowWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum)
     {
-        static int ErrorIndex(0);
-
         if (FaceArea > 0.0) {
             return CalcSparrowWindward(RoughnessIndex, FacePerimeter, FaceArea, WindAtZ);
 
         } else {
-            if (ErrorIndex == 0) {
+            if (dataConvectionCoefficients.CalcSparrowWindwardErrorIDX == 0) {
                 ShowSevereMessage("CalcSparrowWindward: Convection model not evaluated (bad face area)");
                 ShowContinueError("Value for effective face area = " + RoundSigDigits(FaceArea, 5));
                 ShowContinueError("Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd("CalcSparrowWindward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]",
-                                          ErrorIndex);
+                                          dataConvectionCoefficients.CalcSparrowWindwardErrorIDX);
             return 9.999; // safe but noticeable
         }
     }
 
     Real64 CalcSparrowLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum)
     {
-        static int ErrorIndex(0);
-
         if (FaceArea > 0.0) {
             return CalcSparrowLeeward(RoughnessIndex, FacePerimeter, FaceArea, WindAtZ);
         } else {
-            if (ErrorIndex == 0) {
+            if (dataConvectionCoefficients.CalcSparrowLeewardErrorIDX == 0) {
                 ShowSevereMessage("CalcSparrowLeeward: Convection model not evaluated (bad face area)");
                 ShowContinueError("Value for effective face area = " + RoundSigDigits(FaceArea, 5));
                 ShowContinueError("Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd("CalcSparrowLeeward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]",
-                                          ErrorIndex);
+                                          dataConvectionCoefficients.CalcSparrowLeewardErrorIDX);
 
             return 9.999; // safe but noticeable
         }
@@ -7635,21 +7619,21 @@ namespace ConvectionCoefficients {
 
     Real64 CalcMoWITTNatural(Real64 DeltaTemp)
     {
-        static Real64 const temp_fac(0.84);
+        Real64 constexpr temp_fac(0.84);
         return temp_fac * std::pow(std::abs(DeltaTemp), 1.0 / 3.0);
     }
 
     Real64 CalcMoWITTForcedWindward(Real64 const WindAtZ)
     {
-        static Real64 const wind_fac(3.26); // = a, Constant, W/(m2K(m/s)^b)
-        static Real64 const wind_exp(0.89); // = b
+        Real64 constexpr wind_fac(3.26); // = a, Constant, W/(m2K(m/s)^b)
+        Real64 constexpr wind_exp(0.89); // = b
         return wind_fac * std::pow(WindAtZ, wind_exp);
     }
 
     Real64 CalcMoWITTForcedLeeward(Real64 const WindAtZ)
     {
-        static Real64 const wind_fac(3.55);  // = a, Constant, W/(m2K(m/s)^b)
-        static Real64 const wind_exp(0.617); // = b
+        Real64 constexpr wind_fac(3.55);  // = a, Constant, W/(m2K(m/s)^b)
+        Real64 constexpr wind_exp(0.617); // = b
         return wind_fac * std::pow(WindAtZ, wind_exp);
     }
 
@@ -7848,20 +7832,17 @@ namespace ConvectionCoefficients {
 
     Real64 CalcMitchell(Real64 const WindAtZ, Real64 const LengthScale, int const SurfNum)
     {
-
-        static int ErrorIndex(0);
-
         if (LengthScale > 0.0) {
             return CalcMitchell(WindAtZ, LengthScale);
         } else {
-            if (ErrorIndex == 0) {
+            if (dataConvectionCoefficients.CalcMitchellErrorIDX == 0) {
                 ShowSevereMessage("CalcMitchell: Convection model not evaluated (bad length scale)");
                 ShowContinueError("Value for effective length scale = " + RoundSigDigits(LengthScale, 5));
                 ShowContinueError("Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd("CalcMitchell: Convection model not evaluated because bad length scale and set to 9.999 [W/m2-k]",
-                                          ErrorIndex);
+                                          dataConvectionCoefficients.CalcMitchellErrorIDX);
             return 9.999; // safe but noticeable
         }
     }
@@ -7941,7 +7922,6 @@ namespace ConvectionCoefficients {
         Real64 Hf;
 
         Real64 Theta; // angle between wind and surface azimuth
-        static int ErrorIndex(0);
 
         Theta = WindDir - SurfAzimuth - 90.0; // TODO double check theta
         if (Theta > 180.0) Theta -= 360.0;
@@ -7958,14 +7938,14 @@ namespace ConvectionCoefficients {
             Hf = 3.54 * std::pow(WindAt10m, 0.76);
 
         } else {
-            if (ErrorIndex == 0) {
+            if (dataConvectionCoefficients.CalcEmmelVerticalErrorIDX == 0) {
                 ShowSevereMessage("CalcEmmelVertical: Convection model wind angle calculation suspect (developer issue)");
                 ShowContinueError("Value for theta angle = " + RoundSigDigits(Theta, 5));
                 ShowContinueError("Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError("Convection model uses high theta correlation and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd("CalcEmmelVertical: Convection model wind angle calculation suspect and high theta correlation",
-                                          ErrorIndex);
+                                          dataConvectionCoefficients.CalcEmmelVerticalErrorIDX);
             Hf = 3.54 * std::pow(WindAt10m, 0.76);
         }
         return Hf;
@@ -7999,7 +7979,6 @@ namespace ConvectionCoefficients {
         Real64 Hf;
 
         Real64 Theta; // angle between wind and surface azimuth
-        static int ErrorIndex(0);
 
         Theta = WindDir - LongAxisOutwardAzimuth - 90.0; // TODO double check theta
         if (Theta > 180.0) Theta -= 360.0;
@@ -8016,13 +7995,14 @@ namespace ConvectionCoefficients {
             Hf = 3.54 * std::pow(WindAt10m, 0.76);
 
         } else {
-            if (ErrorIndex == 0) {
+            if (dataConvectionCoefficients.CalcEmmelRoofErrorIDX == 0) {
                 ShowSevereMessage("CalcEmmelRoof: Convection model wind angle calculation suspect (developer issue)");
                 ShowContinueError("Value for theta angle = " + RoundSigDigits(Theta, 5));
                 ShowContinueError("Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError("Convection model uses high theta correlation and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd("CalcEmmelRoof: Convection model wind angle calculation suspect and high theta correlation", ErrorIndex);
+            ShowRecurringSevereErrorAtEnd("CalcEmmelRoof: Convection model wind angle calculation suspect and high theta correlation",
+                                          dataConvectionCoefficients.CalcEmmelRoofErrorIDX);
 
             Hf = 3.54 * std::pow(WindAt10m, 0.76);
         }
@@ -8098,8 +8078,6 @@ namespace ConvectionCoefficients {
 
         Real64 x; // distance to roof edge toward wind direction
 
-        static int ErrorIndex(0);
-
         int const RoughnessIndex = Material(Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
         // find x, don't know x. avoid time consuming geometry algorithm
         x = std::sqrt(RoofArea) / 2.0; // quick simplification, geometry routines to develop
@@ -8107,14 +8085,15 @@ namespace ConvectionCoefficients {
         if (x > 0.0) {
             return CalcClearRoof(SurfTemp, AirTemp, WindAtZ, RoofArea, RoofPerimeter, RoughnessIndex);
         } else {
-            if (ErrorIndex == 0) {
+            if (dataConvectionCoefficients.CalcClearRoofErrorIDX == 0) {
                 ShowSevereMessage("CalcClearRoof: Convection model not evaluated (bad value for distance to roof edge)");
                 ShowContinueError("Value for distance to roof edge =" + RoundSigDigits(x, 3));
                 ShowContinueError("Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(
-                "CalcClearRoof: Convection model not evaluated because bad value for distance to roof edge and set to 9.999 [W/m2-k]", ErrorIndex);
+                "CalcClearRoof: Convection model not evaluated because bad value for distance to roof edge and set to 9.999 [W/m2-k]",
+                dataConvectionCoefficients.CalcClearRoofErrorIDX);
             return 9.9999; // safe but noticeable
         }
     }
