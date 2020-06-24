@@ -62,11 +62,10 @@
 
 namespace EnergyPlus {
 
-    // Forward Declarations
+    // Forward declarations
     struct EnergyPlusData;
-
-class OutputFile;
-class OutputFiles;
+    class OutputFile;
+    class OutputFiles;
 
 int AbortEnergyPlus(EnergyPlusData &state);
 

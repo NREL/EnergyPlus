@@ -56,6 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
     // Forward Declarations
     struct EnergyPlusData;
@@ -160,7 +162,7 @@ namespace LowTempRadiantSystem {
         
         Real64 setRadiantSystemControlTemperature();
         
-        virtual void calculateLowTemperatureRadiantSystem(WindowManagerData &dataWindowManager, Real64 &LoadMet) = 0;
+        virtual void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet) = 0;
         
         void updateLowTemperatureRadiantSystemSurfaces();
         
@@ -262,9 +264,9 @@ namespace LowTempRadiantSystem {
             {
             }
         
-        void calculateLowTemperatureRadiantSystem(WindowManagerData &dataWindowManager, Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet);
         
-        void calculateLowTemperatureRadiantSystemComponents(WindowManagerData &dataWindowManager, Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystemComponents(EnergyPlusData &state, Real64 &LoadMet);
         
         void updateLowTemperatureRadiantSystem();
         
@@ -332,9 +334,9 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        void calculateLowTemperatureRadiantSystem(WindowManagerData &dataWindowManager, Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet);
         
-        void calculateLowTemperatureRadiantSystemComponents(WindowManagerData &dataWindowManager, int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
+        void calculateLowTemperatureRadiantSystemComponents(EnergyPlusData &state, int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
                                                             bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
                                                             Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
         );
@@ -368,7 +370,7 @@ namespace LowTempRadiantSystem {
         {
         }
         
-        void calculateLowTemperatureRadiantSystem(WindowManagerData &dataWindowManager, Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet);
 
         void updateLowTemperatureRadiantSystem();
         

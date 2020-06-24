@@ -56,6 +56,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZoneTempPredictorCorrectorData;
 
     // Forward Declarations
     struct EnergyPlusData;
@@ -159,7 +162,7 @@ namespace ElectricBaseboardRadiator {
 
     void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    void CalcElectricBaseboard(WindowManagerData &dataWindowManager, int const BaseboardNum, int const ControlledZoneNum);
+    void CalcElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum);
 
     void UpdateElectricBaseboardOff(Real64 &LoadMet,
                                     Real64 &QBBCap,

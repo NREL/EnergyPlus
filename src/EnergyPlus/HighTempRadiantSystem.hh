@@ -56,6 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
     // Forward Declarations
     struct EnergyPlusData;
@@ -185,11 +187,11 @@ namespace HighTempRadiantSystem {
 
     void CalcHighTempRadiantSystem(int const RadSysNum); // name of the low temperature radiant system
 
-    void CalcHighTempRadiantSystemSP(WindowManagerData &dataWindowManager, bool const FirstHVACIteration, // true if this is the first HVAC iteration at this system time step !unused1208
+    void CalcHighTempRadiantSystemSP(EnergyPlusData &state, bool const FirstHVACIteration, // true if this is the first HVAC iteration at this system time step !unused1208
                                      int const RadSysNum            // name of the low temperature radiant system
     );
 
-    void UpdateHighTempRadiantSystem(WindowManagerData &dataWindowManager, int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
+    void UpdateHighTempRadiantSystem(EnergyPlusData &state, int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
                                      Real64 &LoadMet      // load met by the radiant system, in Watts
     );
 

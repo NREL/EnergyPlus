@@ -56,6 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+    // Forward declarations
     struct EnergyPlusData;
 
 namespace VentilatedSlab {
@@ -376,7 +378,7 @@ namespace VentilatedSlab {
                                       Real64 &LatOutputProvided // latent capacity supplied (kg/s)
     );
 
-    void CalcVentilatedSlabRadComps(WindowManagerData &dataWindowManager, int const Item,               // System index in ventilated slab array
+    void CalcVentilatedSlabRadComps(EnergyPlusData &state, int const Item,               // System index in ventilated slab array
                                     bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
     );
 

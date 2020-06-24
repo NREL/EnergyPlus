@@ -68,7 +68,7 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
-    struct ZonePlenumData;
+    struct ZoneTempPredictorCorrectorData;
 
 namespace OutputReportTabular {
 
@@ -795,13 +795,13 @@ namespace OutputReportTabular {
                                    int const colNum             // Column number
     );
 
-    void FillRemainingPredefinedEntries(EnergyPlus::EnergyPlusData &state, ZonePlenumData &dataZonePlenum);
+    void FillRemainingPredefinedEntries(EnergyPlusData &state);
 
     void WriteMonthlyTables();
 
     void WriteTimeBinTables();
 
-    void WriteBEPSTable();
+    void WriteBEPSTable(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
 
     std::string ResourceWarningMessage(std::string resource);
 

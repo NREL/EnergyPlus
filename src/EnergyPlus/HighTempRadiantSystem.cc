@@ -244,11 +244,11 @@ namespace HighTempRadiantSystem {
             if ((SELECT_CASE_var == MATControl) || (SELECT_CASE_var == MRTControl) || (SELECT_CASE_var == OperativeControl)) {
                 CalcHighTempRadiantSystem(RadSysNum);
             } else if ((SELECT_CASE_var == MATSPControl) || (SELECT_CASE_var == MRTSPControl) || (SELECT_CASE_var == OperativeSPControl)) {
-                CalcHighTempRadiantSystemSP(state.dataWindowManager, FirstHVACIteration, RadSysNum);
+                CalcHighTempRadiantSystemSP(state, FirstHVACIteration, RadSysNum);
             }
         }
 
-        UpdateHighTempRadiantSystem(state.dataWindowManager, RadSysNum, LoadMet);
+        UpdateHighTempRadiantSystem(state, RadSysNum, LoadMet);
 
         ReportHighTempRadiantSystem(RadSysNum);
     }
@@ -975,9 +975,9 @@ namespace HighTempRadiantSystem {
         }
     }
 
-    void CalcHighTempRadiantSystemSP(WindowManagerData &dataWindowManager,
-        bool const EP_UNUSED(FirstHVACIteration), // true if this is the first HVAC iteration at this system time step !unused1208
-        int const RadSysNum                       // name of the low temperature radiant system
+    void CalcHighTempRadiantSystemSP(EnergyPlusData &state,
+                                     bool const EP_UNUSED(FirstHVACIteration), // true if this is the first HVAC iteration at this system time step !unused1208
+                                     int const RadSysNum                       // name of the low temperature radiant system
     )
     {
 
@@ -1058,7 +1058,7 @@ namespace HighTempRadiantSystem {
 
             // Now "simulate" the system by recalculating the heat balances
             HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-            HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataWindowManager, ZoneNum);
+            HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
             // First determine whether or not the unit should be on
             // Determine the proper temperature on which to control
@@ -1101,7 +1101,7 @@ namespace HighTempRadiantSystem {
 
                     // Now "simulate" the system by recalculating the heat balances
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataWindowManager, ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                     // Redetermine the current value of the controlling temperature
                     {
@@ -1137,7 +1137,7 @@ namespace HighTempRadiantSystem {
         }
     }
 
-    void UpdateHighTempRadiantSystem(WindowManagerData &dataWindowManager, int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
+    void UpdateHighTempRadiantSystem(EnergyPlusData &state, int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
                                      Real64 &LoadMet      // load met by the radiant system, in Watts
     )
     {
@@ -1228,7 +1228,7 @@ namespace HighTempRadiantSystem {
                 // Now "simulate" the system by recalculating the heat balances
                 ZoneNum = HighTempRadSys(RadSysNum).ZonePtr;
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataWindowManager, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
             }
         }
 
