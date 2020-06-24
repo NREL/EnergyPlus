@@ -104,7 +104,7 @@ The Humidex effects on human health are categorized at five levels: Little to no
 
 ![Diagram](Humidex_Chart.jpg)
 
-**Table 4. Definition of four levels of Humidex**
+**Table 4. Definition of five levels of Humidex**
 |Humidex Value  |Humidex Level  |
 |---------------|---------------|
 |Below 29       |Little to no discomfort|

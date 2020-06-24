@@ -2106,9 +2106,9 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
-//                    displayThermalResilienceSummary = true;
-//                    displayCO2ResilienceSummary = true;
-//                    displayVisualResilienceSummary = true;
+                    displayThermalResilienceSummary = true;
+                    displayCO2ResilienceSummary = true;
+                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2129,9 +2129,9 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
-//                    displayThermalResilienceSummary = true;
-//                    displayCO2ResilienceSummary = true;
-//                    displayVisualResilienceSummary = true;
+                    displayThermalResilienceSummary = true;
+                    displayCO2ResilienceSummary = true;
+                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2162,9 +2162,9 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
-//                    displayThermalResilienceSummary = true;
-//                    displayCO2ResilienceSummary = true;
-//                    displayVisualResilienceSummary = true;
+                    displayThermalResilienceSummary = true;
+                    displayCO2ResilienceSummary = true;
+                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2188,9 +2188,9 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
-//                    displayThermalResilienceSummary = true;
-//                    displayCO2ResilienceSummary = true;
-//                    displayVisualResilienceSummary = true;
+                    displayThermalResilienceSummary = true;
+                    displayCO2ResilienceSummary = true;
+                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
