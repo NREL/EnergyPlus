@@ -3938,6 +3938,8 @@ namespace LowTempRadiantSystem {
                              (this->WaterInletTemp - this->WaterOutletTemp) /
                              (SysWaterInTemp - this->WaterOutletTemp)) -
                             (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                    } else {
+                        this->WaterInjectionRate = this->WaterMassFlowRate;
                     }
                     this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
 
@@ -3983,10 +3985,14 @@ namespace LowTempRadiantSystem {
                     // If Mdotloop from this equation is greater that the loop flow rate (Node%MassFlowRate),
                     // then we cannot meet the inlet temperature and we have to "iterate" through the
                     // alternate solution.
-                    InjectFlowRate =
-                        (this->WaterMassFlowRate * (this->WaterInletTemp - this->WaterOutletTemp) /
-                         (SysWaterInTemp - this->WaterOutletTemp)) -
-                        (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                    if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect divide by zero
+                        InjectFlowRate =
+                            (this->WaterMassFlowRate * (this->WaterInletTemp - this->WaterOutletTemp) /
+                             (SysWaterInTemp - this->WaterOutletTemp)) -
+                            (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                    } else {
+                        InjectFlowRate = this->WaterMassFlowRate;
+                    }
                     if (InjectFlowRate > Node(LoopInNode).MassFlowRateMaxAvail) {
                         // We didn't have enough flow from the loop to meet our inlet temperature request.
                         // So, set the injection rate to the loop flow and calculate the recirculation flow.
@@ -4049,11 +4055,15 @@ namespace LowTempRadiantSystem {
                         this->calculateLowTemperatureRadiantSystemComponents(dataZoneTempPredictorCorrector, LoopInNode, Iteration, LoadMet);
 
                         // We now have inlet and outlet temperatures--we still need to set the flow rates
-                        this->WaterInjectionRate =
-                            (this->WaterMassFlowRate *
-                             (this->WaterInletTemp - this->WaterOutletTemp) /
-                             (SysWaterInTemp - this->WaterOutletTemp)) -
-                            (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                        if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect div by zero
+                            this->WaterInjectionRate =
+                                (this->WaterMassFlowRate *
+                                 (this->WaterInletTemp - this->WaterOutletTemp) /
+                                 (SysWaterInTemp - this->WaterOutletTemp)) -
+                                (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                        } else {
+                            this->WaterInjectionRate = this->WaterMassFlowRate;
+                        }
                         this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
 
                     } else if ((SysWaterInTemp > LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
@@ -4103,11 +4113,15 @@ namespace LowTempRadiantSystem {
                         // If Mdotloop from this equation is greater that the loop flow rate (Node%MassFlowRate),
                         // then we cannot meet the inlet temperature and we have to "iterate" through the
                         // alternate solution.
-                        InjectFlowRate =
-                            (this->WaterMassFlowRate *
-                             (this->WaterInletTemp - this->WaterOutletTemp) /
-                             (SysWaterInTemp - this->WaterOutletTemp)) -
-                            (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                        if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect div by zero
+                            InjectFlowRate =
+                                (this->WaterMassFlowRate *
+                                 (this->WaterInletTemp - this->WaterOutletTemp) /
+                                 (SysWaterInTemp - this->WaterOutletTemp)) -
+                                (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                        } else {
+                            InjectFlowRate = this->WaterMassFlowRate;
+                        }
                         if (InjectFlowRate > Node(LoopInNode).MassFlowRateMaxAvail) {
                             // We didn't have enough flow from the loop to meet our inlet temperature request.
                             // So, set the injection rate to the loop flow and calculate the recirculation flow.
