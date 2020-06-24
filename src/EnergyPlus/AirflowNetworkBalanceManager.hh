@@ -58,7 +58,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "AirflowNetwork/Solver.hpp"
 #include "AirflowNetwork/Elements.hpp"
 

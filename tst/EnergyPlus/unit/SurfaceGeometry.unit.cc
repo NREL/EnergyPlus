@@ -487,7 +487,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(state.outputFiles, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     // compare_err_stream( "" ); // just for debugging
@@ -928,7 +928,7 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
     SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
-    GetSurfaceData(state.outputFiles, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     // Run the test
@@ -3597,7 +3597,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(state.outputFiles, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", DataSurfaces::Surface);

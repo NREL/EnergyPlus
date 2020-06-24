@@ -83,24 +83,24 @@ namespace ZoneEquipmentManager {
 
     // Functions
 
-    void ManageZoneEquipment(EnergyPlusData &state, ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration,
+    void ManageZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration,
                              bool &SimZone,                     // Set to false at the end of the routine
                              bool &SimAir                       // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
     );
 
-    void GetZoneEquipment(EnergyPlusData &state, ZoneEquipmentManagerData &dataZoneEquipmentManager);
+    void GetZoneEquipment(EnergyPlusData &state);
 
     void InitZoneEquipment(ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration); // unused 1208
 
-    void SizeZoneEquipment(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles);
+    void SizeZoneEquipment(EnergyPlusData &state, OutputFiles &outputFiles);
 
-    void SetUpZoneSizingArrays(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles);
+    void SetUpZoneSizingArrays(EnergyPlusData &state, OutputFiles &outputFiles);
 
     void RezeroZoneSizingArrays();
 
-    void UpdateZoneSizing(EnergyPlusData &state, ZoneEquipmentManagerData &dataZoneEquipmentManager, int const CallIndicator);
+    void UpdateZoneSizing(EnergyPlusData &state, int const CallIndicator);
 
-    void SimZoneEquipment(EnergyPlusData &state, ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration, bool &SimAir);
+    void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool &SimAir);
 
     void SetZoneEquipSimOrder(ZoneEquipmentManagerData &dataZoneEquipmentManager, int const ControlledZoneNum, int const ActualZoneNum);
 

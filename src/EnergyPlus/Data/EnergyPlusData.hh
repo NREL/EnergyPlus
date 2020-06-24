@@ -62,6 +62,7 @@
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
@@ -75,6 +76,7 @@
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 #include <unordered_map>
 #include <string>
 
@@ -89,6 +91,7 @@ namespace EnergyPlus {
         BoilersData dataBoilers;
         BoilerSteamData dataSteamBoilers;
         BranchInputManagerData dataBranchInputManager;
+        ChilledCeilingPanelSimpleData dataChilledCeilingPanelSimple;
         ChillerAbsorberData dataChillerAbsorbers;
         ChillerElectricEIRData dataChillerElectricEIR;
         ChillerExhaustAbsorptionData dataChillerExhaustAbsorption;
@@ -110,6 +113,7 @@ namespace EnergyPlus {
 
         ZoneEquipmentManagerData dataZoneEquipmentManager;
         ZonePlenumData dataZonePlenum;
+        ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
 
         EnergyPlusData() {
             OutputFiles::setSingleton(&outputFiles);
@@ -128,6 +132,7 @@ namespace EnergyPlus {
             dataBoilers.clear_state();
             dataBranchInputManager.clear_state();
             dataSteamBoilers.clear_state();
+            dataChilledCeilingPanelSimple.clear_state();
             dataChillerAbsorbers.clear_state();
             dataChillerElectricEIR.clear_state();
             dataChillerExhaustAbsorption.clear_state();
@@ -142,6 +147,7 @@ namespace EnergyPlus {
             dataPlantChillers.clear_state();
             dataZoneEquipmentManager.clear_state();
             dataZonePlenum.clear_state();
+            dataZoneTempPredictorCorrector.clear_state();
         };
     };
 

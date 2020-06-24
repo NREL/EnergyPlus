@@ -76,12 +76,6 @@ namespace BranchNodeConnections {
     using namespace DataLoopNode;
     using namespace DataBranchNodeConnections;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
-
-    // Functions
-
     void RegisterNodeConnection(int const NodeNumber,                // Number for this Node
                                 std::string const &NodeName,         // Name of this Node
                                 std::string const &ObjectType,       // Type of object this Node is connected to (e.g. Chiller:Electric)
@@ -252,29 +246,8 @@ namespace BranchNodeConnections {
         // PURPOSE OF THIS FUNCTION:
         // This function determines if a connection type is valid.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool IsValid;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Count;
@@ -422,28 +395,6 @@ namespace BranchNodeConnections {
         }
 
         // Check 2a -- setpoint node must also be an inlet or an outlet (CR8212)
-        //  DO Loop1=1,NumOfNodeConnections
-        //    IF (NodeConnections(Loop1)%ConnectionType /= ValidConnectionTypes(NodeConnectionType_SetPoint)) CYCLE
-        //    IsValid=.FALSE.
-        //    IsInlet=.FALSE.
-        //    IsOutlet=.FALSE.
-        //    DO Loop2=1, NumOfNodeConnections
-        //      IF (Loop1 == Loop2) CYCLE
-        //      IF (NodeConnections(Loop1)%NodeNumber /= NodeConnections(Loop2)%NodeNumber) CYCLE
-        //      IF (NodeConnections(Loop2)%ConnectionType == ValidConnectionTypes(NodeConnectionType_Inlet)) IsInlet=.TRUE.
-        //      IF (NodeConnections(Loop2)%ConnectionType == ValidConnectionTypes(NodeConnectionType_Outlet)) IsOutlet=.TRUE.
-        //      IF (IsInlet .or. IsOutlet) EXIT
-        //    ENDDO
-        //    IF (.not. IsInlet .and. .not. IsOutlet) THEN
-        //      CALL ShowSevereError('Node Connection Error, Node="'//TRIM(NodeConnections(Loop1)%NodeName)//  &
-        //            '", Setpoint node did not find a matching node of type Inlet or Outlet.')
-        //      CALL ShowContinueError('It appears this node is not part of the HVAC system.')
-        //      CALL ShowContinueError('Reference Object='//TRIM(NodeConnections(Loop1)%ObjectType)//  &
-        //             ', Name='//TRIM(NodeConnections(Loop1)%ObjectName))
-        //      ErrorCounter=ErrorCounter+1
-        //      ErrorsFound=.TRUE.
-        //    ENDIF
-        //  ENDDO
 
         // Check 3 -- zone inlet nodes -- must be an outlet somewhere
         for (Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1) {
@@ -716,26 +667,8 @@ namespace BranchNodeConnections {
         // METHODOLOGY EMPLOYED:
         // Traverses CompSet structure.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool IsParent; // True if this combination is a parent
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -769,29 +702,8 @@ namespace BranchNodeConnections {
         // This routine determines which parent node list (number) for a given component name
         // and type.
 
-        // METHODOLOGY EMPLOYED:
-        // Traverses CompSet structure.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int WhichOne;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -829,13 +741,12 @@ namespace BranchNodeConnections {
         // Traverses CompSet structure.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  INTEGER Loop
         bool ErrInObject;
         int Which;
 
-        InletNodeName = BlankString;
+        InletNodeName = std::string();
         InletNodeNum = 0;
-        OutletNodeName = BlankString;
+        OutletNodeName = std::string();
         OutletNodeNum = 0;
         ErrInObject = false;
 
@@ -846,18 +757,6 @@ namespace BranchNodeConnections {
             // Get Node Numbers
             InletNodeNum = UtilityRoutines::FindItemInList(InletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
             OutletNodeNum = UtilityRoutines::FindItemInList(OutletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
-            //    IF (InletNodeNum == 0 .and. ComponentType /= 'ZONEHVAC:AIRDISTRIBUTIONUNIT') THEN
-            //      CALL ShowWarningError('GetParentData: Component Type='//TRIM(ComponentType)//  &
-            //        ', Component Name='//TRIM(ComponentName))
-            //      CALL ShowContinueError('..Inlet Node Name, not found='//TRIM(InletNodeName))
-            //!      ErrInObject=.TRUE.
-            //    ENDIF
-            //    IF (OutletNodeNum == 0) THEN
-            //      CALL ShowWarningError('GetParentData: Component Type='//TRIM(ComponentType)//  &
-            //        ', Component Name='//TRIM(ComponentName))
-            //      CALL ShowContinueError('..Outlet Node Name, not found='//TRIM(OutletNodeName))
-            //!      ErrInObject=.TRUE.
-            //    ENDIF
         } else if (IsParentObjectCompSet(ComponentType, ComponentName)) {
             Which = WhichCompSet(ComponentType, ComponentName);
             if (Which != 0) {
@@ -865,18 +764,6 @@ namespace BranchNodeConnections {
                 OutletNodeName = CompSets(Which).OutletNodeName;
                 InletNodeNum = UtilityRoutines::FindItemInList(InletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
                 OutletNodeNum = UtilityRoutines::FindItemInList(OutletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
-                //      IF (InletNodeNum == 0 .and. ComponentType /= 'ZONEHVAC:AIRDISTRIBUTIONUNIT') THEN
-                //        CALL ShowWarningError('GetParentData: Component Type='//TRIM(ComponentType)//  &
-                //          ', Component Name='//TRIM(ComponentName))
-                //        CALL ShowContinueError('..Inlet Node Name, not found='//TRIM(InletNodeName))
-                //  !      ErrInObject=.TRUE.
-                //      ENDIF
-                //      IF (OutletNodeNum == 0) THEN
-                //        CALL ShowWarningError('GetParentData: Component Type='//TRIM(ComponentType)//  &
-                //          ', Component Name='//TRIM(ComponentName))
-                //        CALL ShowContinueError('..Outlet Node Name, not found='//TRIM(OutletNodeName))
-                //  !      ErrInObject=.TRUE.
-                //      ENDIF
             } else {
                 ErrInObject = true;
                 ShowWarningError("GetParentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
@@ -904,26 +791,8 @@ namespace BranchNodeConnections {
         // METHODOLOGY EMPLOYED:
         // Traverses CompSet structure.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool IsParent; // True if this combination is a parent
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -955,26 +824,8 @@ namespace BranchNodeConnections {
         // METHODOLOGY EMPLOYED:
         // Traverses CompSet structure.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int WhichOne;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -982,57 +833,6 @@ namespace BranchNodeConnections {
         WhichOne = 0;
         for (Loop = 1; Loop <= NumCompSets; ++Loop) {
             if (CompSets(Loop).CType == ComponentType && CompSets(Loop).CName == ComponentName) {
-                WhichOne = Loop;
-                break;
-            }
-        }
-
-        return WhichOne;
-    }
-
-    int WhichParentCompSet(std::string const &ComponentType, std::string const &ComponentName)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   May 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This routine determines which comp set (number) for a given component name
-        // and type.
-
-        // METHODOLOGY EMPLOYED:
-        // Traverses CompSet structure.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        int WhichOne;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Loop;
-
-        WhichOne = 0;
-        for (Loop = 1; Loop <= NumCompSets; ++Loop) {
-            if (CompSets(Loop).ParentCType == ComponentType && CompSets(Loop).ParentCName == ComponentName) {
                 WhichOne = Loop;
                 break;
             }
@@ -1056,26 +856,8 @@ namespace BranchNodeConnections {
         // METHODOLOGY EMPLOYED:
         // Traverses CompSet structure.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int NumChildren;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -1120,10 +902,8 @@ namespace BranchNodeConnections {
         // Traverses CompSet structure.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  INTEGER Loop
         bool ErrInObject;
         int Which;
-        // unused1109  LOGICAL FoundObject
 
         if (allocated(InletNodeNames)) InletNodeNames.deallocate();
         if (allocated(InletNodeNums)) InletNodeNums.deallocate();
@@ -1152,10 +932,10 @@ namespace BranchNodeConnections {
         OutletNodeNums.allocate(NumOutlets);
         OutletFluidStreams.allocate(NumOutlets);
 
-        InletNodeNames = BlankString;
+        InletNodeNames = std::string();
         InletNodeNums = 0;
         InletFluidStreams = 0;
-        OutletNodeNames = BlankString;
+        OutletNodeNames = std::string();
         OutletNodeNums = 0;
         OutletFluidStreams = 0;
         NumInlets = 0;
@@ -1230,11 +1010,11 @@ namespace BranchNodeConnections {
         // unused1109  LOGICAL Matched
         int CountMatchLoop;
 
-        ChildrenCType = BlankString;
-        ChildrenCName = BlankString;
-        InletNodeName = BlankString;
+        ChildrenCType = std::string();
+        ChildrenCName = std::string();
+        InletNodeName = std::string();
         InletNodeNum = 0;
-        OutletNodeName = BlankString;
+        OutletNodeName = std::string();
         OutletNodeNum = 0;
         ErrInObject = false;
 
@@ -1251,10 +1031,10 @@ namespace BranchNodeConnections {
                 ChildOutNodeName.allocate(NumChildren);
                 ChildInNodeNum.allocate(NumChildren);
                 ChildOutNodeNum.allocate(NumChildren);
-                ChildCType = BlankString;
-                ChildCName = BlankString;
-                ChildInNodeName = BlankString;
-                ChildOutNodeName = BlankString;
+                ChildCType = std::string();
+                ChildCName = std::string();
+                ChildInNodeName = std::string();
+                ChildOutNodeName = std::string();
                 ChildInNodeNum = 0;
                 ChildOutNodeNum = 0;
                 CountNum = 0;
@@ -1267,21 +1047,7 @@ namespace BranchNodeConnections {
                         ChildOutNodeName(CountNum) = CompSets(Loop).OutletNodeName;
                         // Get Node Numbers
                         ChildInNodeNum(CountNum) = UtilityRoutines::FindItemInList(ChildInNodeName(CountNum), NodeID({1, NumOfNodes}), NumOfNodes);
-                        //          IF (ChildInNodeNum(CountNum) == 0) THEN
-                        //            CALL ShowSevereError('GetChildrenData: Inlet Node not previously assigned, Node='//  &
-                        //                    TRIM(ChildInNodeName(CountNum)))
-                        //            CALL ShowContinueError('..Component='//TRIM(ChildCType(CountNum))//':'//TRIM(ChildCName(CountNum)))
-                        //            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
-                        //            ErrInObject=.TRUE.
-                        //          ENDIF
                         ChildOutNodeNum(CountNum) = UtilityRoutines::FindItemInList(ChildOutNodeName(CountNum), NodeID({1, NumOfNodes}), NumOfNodes);
-                        //          IF (ChildOutNodeNum(CountNum) == 0) THEN
-                        //            CALL ShowSevereError('GetChildrenData: Outlet Node not previously assigned, Node='//  &
-                        //                    TRIM(ChildOutNodeName(CountNum)))
-                        //            CALL ShowContinueError('..Component='//TRIM(ChildCType(CountNum))//':'//TRIM(ChildCName(CountNum)))
-                        //            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
-                        //            ErrInObject=.TRUE.
-                        //          ENDIF
                     }
                 }
                 if (CountNum != NumChildren) {
@@ -1310,31 +1076,12 @@ namespace BranchNodeConnections {
                                 break;
                             }
                         }
-                        //          IF (.not. Matched .and. MatchNodeName /= blank) THEN
-                        //            IF (CountMatchLoop > 1) THEN
-                        //              CALL ShowSevereError('GetChildrenData: Sorting for flow connection order..'//  &
-                        //                                 'Required Child Node, not matched.  Expected Inlet Node='//  &
-                        //                                 TRIM(MatchNodeName))
-                        //            ELSE
-                        //              CALL ShowSevereError('GetChildrenData: Sorting for 1st node in flow connection order..'//  &
-                        //                                 'Required Child Node, not matched.  Expected Inlet Node='//  &
-                        //                                 TRIM(MatchNodeName))
-                        //            ENDIF
-                        //            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
-                        //            ErrInObject=.TRUE.
-                        //          ENDIF
                     }
                     if (MatchNodeName != ParentOutletNodeName) {
                         for (Loop = 1; Loop <= NumChildren; ++Loop) {
                             if (ChildInNodeName(Loop).empty()) continue;
                             if (ChildOutNodeName(Loop) == ParentOutletNodeName) break;
-                            //            CALL ShowSevereError('GetChildrenData: Sorting for flow connection order..'//  &
-                            //                                 'Required Child Node, not matched.  Expected (Last) Outlet Node='//  &
-                            //                                 TRIM(MatchNodeName))
-                            //            CALL ShowContinueError('..does not match Parent Outlet Node='//TRIM(ParentOutletNodeName))
-                            //            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
                             break;
-                            //          ErrInObject=.TRUE.
                         }
                     }
                     for (Loop = 1; Loop <= NumChildren; ++Loop) {
@@ -1403,7 +1150,6 @@ namespace BranchNodeConnections {
         // See if Component-Nodes set is already there - should be unique
         // Try to fill in blanks (passed in as undefined
         for (Count = 1; Count <= NumCompSets; ++Count) {
-            //    IF (CompTypeUC /= CompSets(Count)%CType .or. CompName /= CompSets(Count)%CName) CYCLE
             if (CompName != CompSets(Count).CName) continue;
             if (CompTypeUC != "UNDEFINED") {
                 if (CompTypeUC != CompSets(Count).CType) continue;
@@ -1537,27 +1283,6 @@ namespace BranchNodeConnections {
         // This subroutine tests the branches to see if a duplicate inlet node
         // exists under a different name in the sequence; likewise for outlet.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;
         int Other;
@@ -1685,27 +1410,6 @@ namespace BranchNodeConnections {
         // This subroutine tests the comp sets to see if a duplicate comp name
         // exists under a different set of inlet/outlet nodes.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;
         int Other;
@@ -1734,52 +1438,6 @@ namespace BranchNodeConnections {
                 ErrorsFound = true;
             }
         }
-
-        //  AlreadyNoted=.FALSE.
-        //  DO Count=1,NumCompSets
-        //    DO Other=1,NumCompSets
-        //      IF (Count == Other) CYCLE
-        //      IF (CompSets(Count)%InletNodeName /= CompSets(Other)%InletNodeName) CYCLE
-        //      IF (AlreadyNoted(Count)) CYCLE
-        //      !  All other values must match
-        //      IF (CompSets(Count)%ParentCType == 'BRANCH' .or. CompSets(Other)%ParentCType == 'BRANCH') CYCLE
-        //      IF (CompSets(Count)%Description /= CompSets(Other)%Description) CYCLE
-        //      IF (CompSets(Count)%CType == CompSets(Other)%CType) THEN
-        //        AlreadyNoted(Other)=.TRUE.
-        //        CALL ShowWarningError('Node used as an inlet more than once: '//TRIM(CompSets(Count)%InletNodeName))
-        //        CALL ShowContinueError('  Used by     : '//TRIM(CompSets(Count)%ParentCType)//  &
-        //                                                         ', name='//TRIM(CompSets(Count)%ParentCName))
-        //        CALL ShowContinueError('  as inlet for: '//TRIM(CompSets(Count)%CType)//', name='//TRIM(CompSets(Count)%CName))
-        //        CALL ShowContinueError('  and  by     : '//TRIM(CompSets(Other)%ParentCType)//  &
-        //                                                         ', name='//TRIM(CompSets(Other)%ParentCName))
-        //        CALL ShowContinueError('  as inlet for: '//TRIM(CompSets(Other)%CType)//', name='//TRIM(CompSets(Other)%CName))
-        //        ErrorsFound=.TRUE.
-        //      ENDIF
-        //    ENDDO
-        //  ENDDO
-
-        //  AlreadyNoted=.FALSE.
-        //  DO Count=1,NumCompSets
-        //    DO Other=1,NumCompSets
-        //      IF (Count == Other) CYCLE
-        //      IF (CompSets(Count)%OutletNodeName /= CompSets(Other)%OutletNodeName) CYCLE
-        //      IF (AlreadyNoted(Count)) CYCLE
-        //      !  All other values must match
-        //      IF (CompSets(Count)%ParentCType == 'BRANCH' .or. CompSets(Other)%ParentCType == 'BRANCH') CYCLE
-        //      IF (CompSets(Count)%Description /= CompSets(Other)%Description) CYCLE
-        //      IF (CompSets(Count)%CType /= CompSets(Other)%CType) THEN
-        //        AlreadyNoted(Other)=.TRUE.
-        //        CALL ShowWarningError('Node used as an outlet more than once: '//TRIM(CompSets(Count)%OutletNodeName))
-        //        CALL ShowContinueError('  Used by      : '//TRIM(CompSets(Count)%ParentCType)//  &
-        //                                ', name='//TRIM(CompSets(Count)%ParentCName))
-        //        CALL ShowContinueError('  as outlet for: '//TRIM(CompSets(Count)%CType)//', name='//TRIM(CompSets(Count)%CName))
-        //        CALL ShowContinueError('  and  by      : '//TRIM(CompSets(Other)%ParentCType)//  &
-        //                                ', name='//TRIM(CompSets(Other)%ParentCName))
-        //        CALL ShowContinueError('  as outlet for: '//TRIM(CompSets(Other)%CType)//', name='//TRIM(CompSets(Other)%CName))
-        //        ErrorsFound=.TRUE.
-        //      ENDIF
-        //    ENDDO
-        //  ENDDO
 
         AlreadyNoted.deallocate();
     }
@@ -1840,27 +1498,6 @@ namespace BranchNodeConnections {
         // This function looks up a number(integer) in a similar list of
         // items and returns the index of the item in the list, if
         // found.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count; // Counter for DO loops
