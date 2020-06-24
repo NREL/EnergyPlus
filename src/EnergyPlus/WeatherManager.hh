@@ -335,7 +335,7 @@ namespace WeatherManager {
     {
         // Members
         std::string Name; // Name
-        DateType DateType;     // Date type as read in from IDF
+        WeatherManager::DateType DateType;     // Date type as read in from IDF
         int Month;        // Start Month
         int Day;          // Start Day of month or Count for DateTypes=NthDayOfMonth
         int WeekDay;      // For Date types=NthDayOfMonth and LastDayOfMonth
