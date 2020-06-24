@@ -7,7 +7,7 @@
 !                          Regular roof.  One Window.
 !
 ! Highlights:              Reporting thermal, CO2 and visual resilience metrics. Heat Index, Humidex, 
-                           Standard Effective Temperature, Daylighting levels and Zone CO2 levels are calculated.
+!                          Standard Effective Temperature, Daylighting levels and Zone CO2 levels are calculated.
 !
 !
 ! Simulation Location/Run: Denver Centennial  Golden CO USA WMO=724666, 2 design days, 1 run period,

@@ -5145,9 +5145,9 @@ namespace HeatBalanceSurfaceManager {
                 }
             }
             if (!hasDayLighting) {
-                ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
-                                 "Zone Average Daylighting Reference Point Illuminance output is required, "
-                                 "but no Daylighting Control Object is defined.");
+//                ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
+//                                 "Zone Average Daylighting Reference Point Illuminance output is required, "
+//                                 "but no Daylighting Control Object is defined.");
                 OutputReportTabular::displayVisualResilienceSummary = false;
                 return;
             }
