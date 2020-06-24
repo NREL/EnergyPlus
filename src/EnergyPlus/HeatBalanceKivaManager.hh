@@ -58,7 +58,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
     
 namespace HeatBalanceKivaManager {
 
@@ -126,8 +126,8 @@ namespace HeatBalanceKivaManager {
     public:
         KivaManager();
         virtual ~KivaManager();
-        void readWeatherData();
-        bool setupKivaInstances(OutputFiles &outputFiles);
+        void readWeatherData(IOFiles &ioFiles);
+        bool setupKivaInstances(IOFiles &ioFiles);
         void initKivaInstances();
         void calcKivaInstances();
         void defineDefaultFoundation();

@@ -58,7 +58,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 namespace WindowManager {
 
@@ -200,9 +200,9 @@ namespace WindowManager {
 
     void clear_state();
 
-    void InitWindowOpticalCalculations(OutputFiles &outputFiles);
+    void InitWindowOpticalCalculations(IOFiles &ioFiles);
 
-    void InitGlassOpticalCalculations(OutputFiles &outputFiles);
+    void InitGlassOpticalCalculations(IOFiles &ioFiles);
 
     //*****************************************************************************************
 
@@ -457,7 +457,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void ReportGlass(OutputFiles &outputFiles);
+    void ReportGlass(IOFiles &ioFiles);
 
     //*************************************************************************************
 
@@ -465,7 +465,7 @@ namespace WindowManager {
 
     //*************************************************************************************
 
-    void CalcWindowScreenProperties(OutputFiles &outputFiles);
+    void CalcWindowScreenProperties(IOFiles &ioFiles);
 
     void BlindOpticsDiffuse(int const BlindNum,      // Blind number
                             int const ISolVis,       // 1 = solar and IR calculation; 2 = visible calculation

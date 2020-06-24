@@ -748,7 +748,7 @@ namespace Psychrometrics {
         }
 
 #ifdef generatetestdata
-        print(OutputFiles::getSingleton().debug, "{}{}{}{}", TDB, dW, Patm, Twb);
+        print(IOFiles::getSingleton().debug, "{}{}{}{}", TDB, dW, Patm, Twb);
 #endif
 
         return TWB;

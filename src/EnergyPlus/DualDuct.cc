@@ -75,9 +75,9 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -2124,7 +2124,7 @@ namespace DualDuct {
         // Still needs to report the Damper power from this component
     }
 
-    void ReportDualDuctConnections(OutputFiles &outputFiles)
+    void ReportDualDuctConnections(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2171,10 +2171,10 @@ namespace DualDuct {
                     // uninitialized
 
         // Report Dual Duct Dampers to BND File
-        print(outputFiles.bnd, "{}\n", "! ===============================================================");
-        print(outputFiles.bnd, "{}\n", Format_100);
-        print(outputFiles.bnd, " #Dual Duct Damper Connections,{}\n", NumDDAirTerminal * 2);
-        print(outputFiles.bnd, "{}\n", Format_102);
+        print(ioFiles.bnd, "{}\n", "! ===============================================================");
+        print(ioFiles.bnd, "{}\n", Format_100);
+        print(ioFiles.bnd, " #Dual Duct Damper Connections,{}\n", NumDDAirTerminal * 2);
+        print(ioFiles.bnd, "{}\n", Format_102);
 
         for (int Count1 = 1; Count1 <= NumDDAirTerminal; ++Count1) {
 
@@ -2226,7 +2226,7 @@ namespace DualDuct {
             }
 
             if ((dd_airterminal(Count1).DamperType == DualDuct_ConstantVolume) || (dd_airterminal(Count1).DamperType == DualDuct_VariableVolume)) {
-                print(outputFiles.bnd,
+                print(ioFiles.bnd,
                       " Dual Duct Damper,{},{},{},{},{},Hot Air,{}\n",
                       Count1,
                       DamperType,
@@ -2235,7 +2235,7 @@ namespace DualDuct {
                       NodeID(dd_airterminal(Count1).OutletNodeNum),
                       ChrName);
 
-                print(outputFiles.bnd,
+                print(ioFiles.bnd,
                       " Dual Duct Damper,{},{},{},{},{},Cold Air,{}\n",
                       Count1,
                       DamperType,
@@ -2245,7 +2245,7 @@ namespace DualDuct {
                       ChrName);
 
             } else if (dd_airterminal(Count1).DamperType == DualDuct_OutdoorAir) {
-                print(outputFiles.bnd,
+                print(ioFiles.bnd,
                       "Dual Duct Damper, {},{},{},{},{},Outdoor Air,{}\n",
                       Count1,
                       DamperType,
@@ -2253,7 +2253,7 @@ namespace DualDuct {
                       NodeID(dd_airterminal(Count1).OAInletNodeNum),
                       NodeID(dd_airterminal(Count1).OutletNodeNum),
                       ChrName);
-                print(outputFiles.bnd,
+                print(ioFiles.bnd,
                       "Dual Duct Damper, {},{},{},{},{},Recirculated Air,{}\n",
                       Count1,
                       DamperType,

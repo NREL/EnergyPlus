@@ -57,7 +57,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 namespace ConductionTransferFunctionCalc {
 
@@ -104,7 +104,7 @@ namespace ConductionTransferFunctionCalc {
 
     // Functions
 
-    void InitConductionTransferFunctions(OutputFiles &outputFiles);
+    void InitConductionTransferFunctions(IOFiles &ioFiles);
 
     void CalculateExponentialMatrix(Real64 &delt); // Time step of the resulting CTFs
 
@@ -118,7 +118,7 @@ namespace ConductionTransferFunctionCalc {
                        int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
     );
 
-    void ReportCTFs(EnergyPlus::OutputFiles &outputFiles, bool const DoReportBecauseError);
+    void ReportCTFs(EnergyPlus::IOFiles &ioFiles, bool const DoReportBecauseError);
 
 } // namespace ConductionTransferFunctionCalc
 

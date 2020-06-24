@@ -56,6 +56,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include "IOFiles.hh"
 #include <EnergyPlus/ConductionTransferFunctionCalc.hh>
 #include <EnergyPlus/DataConversions.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -64,7 +65,6 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include "OutputFiles.hh"
 
 namespace EnergyPlus {
 
@@ -154,7 +154,7 @@ namespace ConductionTransferFunctionCalc {
 
     // Functions
 
-    void InitConductionTransferFunctions(OutputFiles &outputFiles)
+    void InitConductionTransferFunctions(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1236,7 +1236,7 @@ namespace ConductionTransferFunctionCalc {
 
         } // ... end of construction loop.
 
-        ReportCTFs(outputFiles, DoCTFErrorReport);
+        ReportCTFs(ioFiles, DoCTFErrorReport);
 
         if (ErrorsFound) {
             ShowFatalError("Program terminated for reasons listed (InitConductionTransferFunctions)");
@@ -2115,7 +2115,7 @@ namespace ConductionTransferFunctionCalc {
                 // transfer functions for this construction.
     }
 
-    void ReportCTFs(OutputFiles &outputFiles, bool const DoReportBecauseError)
+    void ReportCTFs(IOFiles &ioFiles, bool const DoReportBecauseError)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2163,21 +2163,21 @@ namespace ConductionTransferFunctionCalc {
 
         if (DoReport || DoReportBecauseError) {
             //                                      Write Descriptions
-            print(outputFiles.eio,
+            print(ioFiles.eio,
                   "! <Construction CTF>,Construction Name,Index,#Layers,#CTFs,Time Step {{hours}},ThermalConductance "
                   "{{w/m2-K}},OuterThermalAbsorptance,InnerThermalAbsorptance,OuterSolarAbsorptance,InnerSolarAbsorptance,Roughness\n");
-            print(outputFiles.eio,
+            print(ioFiles.eio,
                   "! <Material CTF Summary>,Material Name,Thickness {{m}},Conductivity {{w/m-K}},Density {{kg/m3}},Specific Heat "
                   "{{J/kg-K}},ThermalResistance {{m2-K/w}}\n");
-            print(outputFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
-            print(outputFiles.eio, "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\n");
+            print(ioFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
+            print(ioFiles.eio, "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\n");
 
             for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
 
                 if (!Construct(ThisNum).IsUsedCTF) continue;
 
                 static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_700,
                       Construct(ThisNum).Name,
                       ThisNum,
@@ -2197,10 +2197,10 @@ namespace ConductionTransferFunctionCalc {
                         auto const SELECT_CASE_var(Material(Layer).Group);
                         if (SELECT_CASE_var == Air) {
                             static constexpr auto Format_702(" Material:Air,{},{:12.4N}\n");
-                            print(outputFiles.eio, Format_702, Material(Layer).Name, Material(Layer).Resistance);
+                            print(ioFiles.eio, Format_702, Material(Layer).Name, Material(Layer).Resistance);
                         } else {
                             static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
-                            print(outputFiles.eio,
+                            print(ioFiles.eio,
                                   Format_701,
                                   Material(Layer).Name,
                                   Material(Layer).Thickness,
@@ -2215,7 +2215,7 @@ namespace ConductionTransferFunctionCalc {
                 for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
                     if (I != 0) {
                         static constexpr auto Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               Format_703,
                               I,
                               Construct(ThisNum).CTFOutside(I),
@@ -2224,7 +2224,7 @@ namespace ConductionTransferFunctionCalc {
                               Construct(ThisNum).CTFFlux(I));
                     } else {
                         static constexpr auto Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               Format_704,
                               I,
                               Construct(ThisNum).CTFOutside(I),
@@ -2237,12 +2237,12 @@ namespace ConductionTransferFunctionCalc {
                     // QTFs...
                     for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
                         static constexpr auto Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
-                        print(outputFiles.eio, Format_705, I, Construct(ThisNum).CTFSourceOut(I), Construct(ThisNum).CTFSourceIn(I));
+                        print(ioFiles.eio, Format_705, I, Construct(ThisNum).CTFSourceOut(I), Construct(ThisNum).CTFSourceIn(I));
                     }
                     // QTFs for source/sink location temperature calculation...
                     for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
                         static constexpr auto Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               Format_706,
                               I,
                               Construct(ThisNum).CTFTSourceOut(I),
@@ -2253,7 +2253,7 @@ namespace ConductionTransferFunctionCalc {
                         // QTFs for user specified interior temperature calculation...
                         for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
                             static constexpr auto Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-                            print(outputFiles.eio,
+                            print(ioFiles.eio,
                                   Format_707,
                                   I,
                                   Construct(ThisNum).CTFTUserOut(I),

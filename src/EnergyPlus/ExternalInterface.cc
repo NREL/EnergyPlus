@@ -61,7 +61,7 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include "IOFiles.hh"
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
@@ -1118,7 +1118,7 @@ namespace ExternalInterface {
                                               cNumericFieldNames);
                 // Get the FMU name
                 FMU(Loop).Name = cAlphaArgs(1);
-                CheckForActualFileName(OutputFiles::getSingleton(), cAlphaArgs(1), fileExist, tempFullFileName);
+                CheckForActualFileName(IOFiles::getSingleton(), cAlphaArgs(1), fileExist, tempFullFileName);
                 if (fileExist) {
                     pos = index(FMU(Loop).Name, pathChar, true); // look backwards
                     if (pos != std::string::npos) {

@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 #include "DataStringGlobals.hh"
 #include "UtilityRoutines.hh"
@@ -61,12 +61,12 @@ InputFile &InputFile::ensure_open(const std::string &caller)
         open();
     }
     if (!good()) {
-        ShowFatalError(fmt::format("{}: Could not open file {} for input (write).", caller, fileName));
+        ShowFatalError(fmt::format("{}: Could not open file {} for input (read).", caller, fileName));
     }
     return *this;
 }
 
-bool InputFile::good() const
+bool InputFile::good() const noexcept
 {
     if (is) {
         return is->good();
@@ -85,9 +85,9 @@ InputFile::ReadResult<std::string> InputFile::readLine() noexcept
     if (is) {
         std::string line;
         std::getline(*is, line);
-        return {std::move(line), is->eof()};
+        return {std::move(line), is->eof(), is->good()};
     } else {
-        return {"", true};
+        return {"", true, false};
     }
 }
 
@@ -105,8 +105,61 @@ void InputFile::open()
     is = std::unique_ptr<std::istream>(new std::fstream(fileName.c_str(), std::ios_base::in));
 }
 
+std::string InputFile::error_state_to_string() const
+{
+    const auto state = rdstate();
 
+    if (!is_open()) {
+        return "file not opened'";
+    }
 
+    if (state == std::ios_base::failbit) {
+        return "io operation failed";
+    } else if (state == std::ios_base::badbit) {
+        return "irrecoverable stream error";
+    } else if (state == std::ios_base::eofbit) {
+        return "end of file reached";
+    } else {
+        return "no error";
+    }
+}
+
+std::istream::iostate InputFile::rdstate() const noexcept
+{
+    if (is) {
+        return is->rdstate();
+    } else {
+        return std::ios_base::badbit;
+    }
+}
+
+bool InputFile::is_open() const noexcept
+{
+    if (is) {
+        return is->good() || is->eof();
+    } else {
+        return false;
+    }
+}
+
+void InputFile::backspace() noexcept
+{
+    if (is) {
+        is->clear();
+        std::streamoff g1(is->tellg()); // Current position
+        is->seekg(0, std::ios::beg);    // Beginning of file
+        std::streampos const g0(is->tellg());
+        is->seekg(g1, std::ios::beg); // Restore position
+        if (g1 > g0) --g1;
+        while (g1 > g0) {
+            is->seekg(--g1, std::ios::beg); // Backup by 1
+            if (is->peek() == '\n') {       // Found end of previous record
+                is->seekg(++g1, std::ios::beg);
+                break;
+            }
+        }
+    }
+}
 
 InputOutputFile &InputOutputFile::ensure_open(const std::string &caller)
 {
@@ -207,7 +260,7 @@ std::vector<std::string> InputOutputFile::getLines()
     return std::vector<std::string>();
 }
 
-OutputFiles &OutputFiles::getSingleton()
+IOFiles &IOFiles::getSingleton()
 {
     assert(getSingletonInternal() != nullptr);
 
@@ -217,14 +270,14 @@ OutputFiles &OutputFiles::getSingleton()
     return *getSingletonInternal();
 }
 
-void OutputFiles::setSingleton(OutputFiles *newSingleton) noexcept
+void IOFiles::setSingleton(IOFiles *newSingleton) noexcept
 {
     getSingletonInternal() = newSingleton;
 }
 
-OutputFiles *&OutputFiles::getSingletonInternal()
+IOFiles *&IOFiles::getSingletonInternal()
 {
-    static OutputFiles *singleton{nullptr};
+    static IOFiles *singleton{nullptr};
     return singleton;
 }
 

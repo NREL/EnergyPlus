@@ -56,6 +56,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -64,17 +65,16 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneratorFuelSupply.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -369,7 +369,7 @@ namespace FuelCellElectricGenerator {
         GeneratorFuelSupply::GetGeneratorFuelSupplyInput();
 
         for (int FuelSupNum = 1; FuelSupNum <= DataGenerators::NumGeneratorFuelSups; ++FuelSupNum) {
-            GeneratorFuelSupply::SetupFuelConstituentData(OutputFiles::getSingleton(), FuelSupNum, ErrorsFound);
+            GeneratorFuelSupply::SetupFuelConstituentData(IOFiles::getSingleton(), FuelSupNum, ErrorsFound);
         }
 
         // set fuel supply ID in Fuel cell structure

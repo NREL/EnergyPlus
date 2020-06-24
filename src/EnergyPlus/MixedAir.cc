@@ -57,6 +57,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -79,7 +80,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
@@ -89,15 +89,15 @@
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -2012,51 +2012,51 @@ namespace MixedAir {
                 "!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
                 "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
                 "Name,DSZAD Name");
-            print(state.outputFiles.eio, "{}\n", Format_700);
+            print(state.files.eio, "{}\n", Format_700);
             for (VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum) {
-                print(state.outputFiles.eio,
+                print(state.files.eio,
                       " Controller:MechanicalVentilation,{},{},",
                       VentilationMechanical(VentMechNum).Name,
                       VentilationMechanical(VentMechNum).SchName);
 
                 if (VentilationMechanical(VentMechNum).DCVFlag) {
-                    print(state.outputFiles.eio, "Yes,");
+                    print(state.files.eio, "Yes,");
                 } else {
-                    print(state.outputFiles.eio, "No,");
+                    print(state.files.eio, "No,");
                 }
 
                 if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ZoneSum) {
-                    print(state.outputFiles.eio, "ZoneSum,");
+                    print(state.files.eio, "ZoneSum,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRP) {
-                    print(state.outputFiles.eio, "VentilationRateProcedure,");
+                    print(state.files.eio, "VentilationRateProcedure,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQP) {
-                    print(state.outputFiles.eio, "IndoorAirQualityProcedure,");
+                    print(state.files.eio, "IndoorAirQualityProcedure,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlSchOcc) {
-                    print(state.outputFiles.eio, "ProportionalControlBasedonOccupancySchedule,");
+                    print(state.files.eio, "ProportionalControlBasedonOccupancySchedule,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOcc) {
-                    print(state.outputFiles.eio, "ProportionalControlBasedOnDesignOccupancy,");
+                    print(state.files.eio, "ProportionalControlBasedOnDesignOccupancy,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOARate) {
-                    print(state.outputFiles.eio, "ProportionalControlBasedOnDesignOARate,");
+                    print(state.files.eio, "ProportionalControlBasedOnDesignOARate,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPGC) {
-                    print(state.outputFiles.eio, "IndoorAirQualityGenericContaminant,");
+                    print(state.files.eio, "IndoorAirQualityGenericContaminant,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPCOM) {
-                    print(state.outputFiles.eio, "IndoorAirQualityProcedureCombined,");
+                    print(state.files.eio, "IndoorAirQualityProcedureCombined,");
                 } else {
-                    print(state.outputFiles.eio, "Invalid/Unknown,");
+                    print(state.files.eio, "Invalid/Unknown,");
                 }
 
-                print(state.outputFiles.eio, "{:.2R},", VentilationMechanical(VentMechNum).ZoneMaxOAFraction);
-                print(state.outputFiles.eio, "{},", VentilationMechanical(VentMechNum).NumofVentMechZones);
+                print(state.files.eio, "{:.2R},", VentilationMechanical(VentMechNum).ZoneMaxOAFraction);
+                print(state.files.eio, "{},", VentilationMechanical(VentMechNum).NumofVentMechZones);
 
                 for (jZone = 1; jZone <= VentilationMechanical(VentMechNum).NumofVentMechZones; ++jZone) {
                     if (jZone < VentilationMechanical(VentMechNum).NumofVentMechZones) {
-                        print(state.outputFiles.eio,
+                        print(state.files.eio,
                               "{},{},{},",
                               Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
                               VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),
                               VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone));
                     } else {
-                        print(state.outputFiles.eio,
+                        print(state.files.eio,
                               "{},{},{}\n",
                               Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
                               VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),

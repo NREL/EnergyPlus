@@ -52,9 +52,9 @@
 #include <ObjexxFCL/numeric.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
@@ -261,7 +261,7 @@ namespace DataGlobals {
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state(OutputFiles &outputFiles)
+    void clear_state(IOFiles &ioFiles)
     {
         runReadVars = false;
         DDOnlySimulation = false;
@@ -294,15 +294,15 @@ namespace DataGlobals {
         TimeStep = 0;
         TimeStepZone = 0.0;
         WarmupFlag = false;
-        outputFiles.eso.close();
+        ioFiles.eso.close();
         OutputStandardError = 0;
         StdOutputRecordCount = 0;
-        outputFiles.debug.close();
-        outputFiles.zsz.close();
-        outputFiles.ssz.close();
-        outputFiles.mtr.close();
+        ioFiles.debug.close();
+        ioFiles.zsz.close();
+        ioFiles.ssz.close();
+        ioFiles.mtr.close();
         OutputFilePerfLog = 0;
-        outputFiles.shade.close();
+        ioFiles.shade.close();
         StdMeterRecordCount = 0;
         ZoneSizingCalc = false;
         SysSizingCalc = false;
@@ -355,7 +355,7 @@ namespace DataGlobals {
         progressCallback = nullptr;
         messageCallback = nullptr;
         errorCallback = nullptr;
-        outputFiles.mtr.close();
+        ioFiles.mtr.close();
         err_stream = nullptr;
         eplusRunningViaAPI = false;
     }

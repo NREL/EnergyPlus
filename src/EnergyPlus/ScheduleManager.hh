@@ -61,7 +61,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
     
 namespace ScheduleManager {
 
@@ -191,9 +191,9 @@ namespace ScheduleManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ProcessScheduleInput(OutputFiles &outputFiles);
+    void ProcessScheduleInput(IOFiles &ioFiles);
 
-    void ReportScheduleDetails(OutputFiles &outputFiles, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    void ReportScheduleDetails(IOFiles &ioFiles, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
 
     Real64 GetCurrentScheduleValue(int const ScheduleIndex);
 

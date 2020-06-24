@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include "IOFiles.hh"
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -72,7 +73,6 @@
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include "OutputFiles.hh"
 
 namespace EnergyPlus {
 
@@ -129,7 +129,7 @@ namespace EMSManager {
         FinishProcessingUserInput = true;
     }
 
-    void CheckIfAnyEMS(OutputFiles &outputFiles)
+    void CheckIfAnyEMS(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -231,7 +231,7 @@ namespace EMSManager {
             ScanForReports("EnergyManagementSystem", OutputEDDFile);
             if (OutputEDDFile) {
                 // open up output file for EMS EDD file  EMS Data and Debug
-                outputFiles.edd.ensure_open("CheckIFAnyEMS");
+                ioFiles.edd.ensure_open("CheckIFAnyEMS");
             }
         } else {
             ScanForReports("EnergyManagementSystem", OutputEDDFile);
@@ -314,13 +314,13 @@ namespace EMSManager {
 
         // Run the Erl programs depending on calling point.
 
-        auto &outputFiles = OutputFiles::getSingleton();
+        auto &ioFiles = IOFiles::getSingleton();
         if (iCalledFrom != emsCallFromUserDefinedComponentModel) {
             for (ProgramManagerNum = 1; ProgramManagerNum <= NumProgramCallManagers; ++ProgramManagerNum) {
 
                 if (EMSProgramCallManager(ProgramManagerNum).CallingPoint == iCalledFrom) {
                     for (ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager(ProgramManagerNum).NumErlPrograms; ++ErlProgramNum) {
-                        EvaluateStack(outputFiles, EMSProgramCallManager(ProgramManagerNum).ErlProgramARR(ErlProgramNum));
+                        EvaluateStack(ioFiles, EMSProgramCallManager(ProgramManagerNum).ErlProgramARR(ErlProgramNum));
                         anyProgramRan = true;
                     }
                 }
@@ -328,7 +328,7 @@ namespace EMSManager {
         } else { // call specific program manager
             if (present(ProgramManagerToRun)) {
                 for (ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager(ProgramManagerToRun).NumErlPrograms; ++ErlProgramNum) {
-                    EvaluateStack(outputFiles, EMSProgramCallManager(ProgramManagerToRun).ErlProgramARR(ErlProgramNum));
+                    EvaluateStack(ioFiles, EMSProgramCallManager(ProgramManagerToRun).ErlProgramARR(ErlProgramNum));
                     anyProgramRan = true;
                 }
             }
@@ -1270,9 +1270,9 @@ namespace EMSManager {
             }
         }
         if (reportErrors) {
-            auto &outputFiles = OutputFiles::getSingleton();
-            EchoOutActuatorKeyChoices(outputFiles);
-            EchoOutInternalVariableChoices(outputFiles);
+            auto &ioFiles = IOFiles::getSingleton();
+            EchoOutActuatorKeyChoices(ioFiles);
+            EchoOutInternalVariableChoices(ioFiles);
         }
 
         if (ErrorsFound) {
@@ -1348,7 +1348,7 @@ namespace EMSManager {
         }
     }
 
-    void EchoOutActuatorKeyChoices(OutputFiles &outputFiles)
+    void EchoOutActuatorKeyChoices(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1370,9 +1370,9 @@ namespace EMSManager {
 
         if (OutputEMSActuatorAvailFull) {
 
-            print(outputFiles.edd, "! <EnergyManagementSystem:Actuator Available>, Component Unique Name, Component Type,  Control Type, Units\n");
+            print(ioFiles.edd, "! <EnergyManagementSystem:Actuator Available>, Component Unique Name, Component Type,  Control Type, Units\n");
             for (int ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop) {
-                print(outputFiles.edd,
+                print(ioFiles.edd,
                       "EnergyManagementSystem:Actuator Available,{},{},{},{}\n",
                       EMSActuatorAvailable(ActuatorLoop).UniqueIDName,
                       EMSActuatorAvailable(ActuatorLoop).ComponentTypeName,
@@ -1380,7 +1380,7 @@ namespace EMSManager {
                       EMSActuatorAvailable(ActuatorLoop).Units);
             }
         } else if (OutputEMSActuatorAvailSmall) {
-            print(outputFiles.edd, "! <EnergyManagementSystem:Actuator Available>, *, Component Type, Control Type, Units\n");
+            print(ioFiles.edd, "! <EnergyManagementSystem:Actuator Available>, *, Component Type, Control Type, Units\n");
             int FoundTypeName;
             int FoundControlType;
             for (int ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop) {
@@ -1398,7 +1398,7 @@ namespace EMSManager {
                     FoundControlType = 1;
                 }
                 if ((FoundTypeName == 0) || (FoundControlType == 0)) {
-                    print(outputFiles.edd,
+                    print(ioFiles.edd,
                           "EnergyManagementSystem:Actuator Available, *,{},{},{}\n",
                           EMSActuatorAvailable(ActuatorLoop).ComponentTypeName,
                           EMSActuatorAvailable(ActuatorLoop).ControlTypeName,
@@ -1408,7 +1408,7 @@ namespace EMSManager {
         }
     }
 
-    void EchoOutInternalVariableChoices(OutputFiles &outputFiles)
+    void EchoOutInternalVariableChoices(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1429,9 +1429,9 @@ namespace EMSManager {
 
         if (OutputEMSInternalVarsFull) {
 
-            print(outputFiles.edd, "! <EnergyManagementSystem:InternalVariable Available>, Unique Name, Internal Data Type, Units \n");
+            print(ioFiles.edd, "! <EnergyManagementSystem:InternalVariable Available>, Unique Name, Internal Data Type, Units \n");
             for (int InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop) {
-                print(outputFiles.edd,
+                print(ioFiles.edd,
                       "EnergyManagementSystem:InternalVariable Available,{},{},{}\n",
                       EMSInternalVarsAvailable(InternalDataLoop).UniqueIDName,
                       EMSInternalVarsAvailable(InternalDataLoop).DataTypeName,
@@ -1439,7 +1439,7 @@ namespace EMSManager {
             }
 
         } else if (OutputEMSInternalVarsSmall) {
-            print(outputFiles.edd, "! <EnergyManagementSystem:InternalVariable Available>, *, Internal Data Type\n");
+            print(ioFiles.edd, "! <EnergyManagementSystem:InternalVariable Available>, *, Internal Data Type\n");
             for (int InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop) {
                 int Found(0);
                 if (InternalDataLoop + 1 <= numEMSInternalVarsAvailable) {
@@ -1449,7 +1449,7 @@ namespace EMSManager {
                                                             numEMSInternalVarsAvailable - (InternalDataLoop + 1));
                 }
                 if (Found == 0) {
-                    print(outputFiles.edd,
+                    print(ioFiles.edd,
                           "EnergyManagementSystem:InternalVariable Available, *,{},{}\n",
                           EMSInternalVarsAvailable(InternalDataLoop).DataTypeName,
                           EMSInternalVarsAvailable(InternalDataLoop).Units);

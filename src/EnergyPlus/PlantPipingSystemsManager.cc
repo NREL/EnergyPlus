@@ -391,12 +391,12 @@ namespace EnergyPlus {
                 // Write eio header
                 static constexpr auto DomainCellsToEIOHeader(
                     "! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells\n");
-                print(state.outputFiles.eio, DomainCellsToEIOHeader);
+                print(state.files.eio, DomainCellsToEIOHeader);
 
                 // Write eio data
                 for (auto &thisDomain : domains) {
                     static constexpr auto DomainCellsToEIO("{},{:5},{:5},{:5}\n");
-                    print(state.outputFiles.eio,
+                    print(state.files.eio,
                           DomainCellsToEIO,
                           thisDomain.Name,
                           thisDomain.NumDomainCells,

@@ -49,7 +49,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/SimulationManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -90,7 +90,7 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.files);
 
     // no error message from PerformancePrecisionTradeoffs objects
     EXPECT_TRUE(compare_err_stream("", true));
@@ -108,7 +108,7 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Mess
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.files);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.",

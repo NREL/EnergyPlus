@@ -60,9 +60,9 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
@@ -158,7 +158,7 @@ TEST_F(EnergyPlusFixture, Dual_NodeTempSetpoints)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(state.files);
 
     EMSManager::FinishProcessingUserInput = true;
 
@@ -231,7 +231,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     ASSERT_TRUE(process_idf(idf_objects));
 
     // sets number of EMS objects
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(state.files);
 
     // allows NodeSetpoint and AvailabilityManagers actuators to be setup
     EMSManager::FinishProcessingUserInput = true;
@@ -395,7 +395,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     ASSERT_TRUE(process_idf(idf_objects));
 
     // sets number of EMS objects
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(state.files);
 
     // allows NodeSetpoint and AvailabilityManagers actuators to be setup
     EMSManager::FinishProcessingUserInput = true;
@@ -702,7 +702,7 @@ TEST_F(EnergyPlusFixture, Test_EMSLogic)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(state.files);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
@@ -770,7 +770,7 @@ TEST_F(EnergyPlusFixture, Debug_EMSLogic)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(state.files);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
@@ -807,8 +807,8 @@ TEST_F(EnergyPlusFixture, TestAnyRanArgument)
     ASSERT_TRUE(process_idf(idf_objects));
 
     OutAirNodeManager::SetOutAirNodes();
-    NodeInputManager::SetupNodeVarsForReporting(state.outputFiles);
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    NodeInputManager::SetupNodeVarsForReporting(state.files);
+    EMSManager::CheckIfAnyEMS(state.files);
 
     EMSManager::FinishProcessingUserInput = true;
 
@@ -845,7 +845,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(state.files);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
@@ -900,7 +900,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(state.files);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
@@ -937,7 +937,7 @@ TEST_F(EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    CheckIfAnyEMS(state.outputFiles);
+    CheckIfAnyEMS(state.files);
     EXPECT_TRUE(AnyEnergyManagementSystemInModel);
 }
 
@@ -1079,7 +1079,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
 
     DataGlobals::TimeStepZone = 0.25;
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles); // get EMS input
+    EMSManager::CheckIfAnyEMS(state.files); // get EMS input
     EMSManager::FinishProcessingUserInput = true;
     bool ErrorsFound(false);
     CurveManager::GetCurveInputData(ErrorsFound); // process curve for use with EMS

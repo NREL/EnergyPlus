@@ -56,7 +56,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 namespace ReportSizingManager {
 

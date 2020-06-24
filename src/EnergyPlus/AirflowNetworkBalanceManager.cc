@@ -64,6 +64,7 @@
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
@@ -83,15 +84,14 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -1652,8 +1652,8 @@ namespace AirflowNetworkBalanceManager {
         dataAirflowNetworkBalanceManager.NumAirflowNetwork = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (dataAirflowNetworkBalanceManager.NumAirflowNetwork == 0) {
             SimulateAirflowNetwork = AirflowNetworkControlSimple;
-            print(state.outputFiles.eio, Format_110);
-            print(state.outputFiles.eio, Format_120, "NoMultizoneOrDistribution");
+            print(state.files.eio, Format_110);
+            print(state.files.eio, Format_120, "NoMultizoneOrDistribution");
             return;
         }
         if (dataAirflowNetworkBalanceManager.NumAirflowNetwork > 1) {
@@ -1717,8 +1717,8 @@ namespace AirflowNetworkBalanceManager {
                 dataAirflowNetworkBalanceManager.LoopOnOffFlag = false;
             }
         }
-        print(state.outputFiles.eio, Format_110);
-        print(state.outputFiles.eio, Format_120, SimAirNetworkKey);
+        print(state.files.eio, Format_110);
+        print(state.files.eio, Format_120, SimAirNetworkKey);
 
         // Check whether there are any objects from infiltration, ventilation, mixing and cross mixing
         if (SimulateAirflowNetwork == AirflowNetworkControlSimple || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
@@ -2619,13 +2619,13 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
             if (MultizoneSurfaceData(i).NonRectangular) {
                 if (found) {
-                    print(state.outputFiles.eio,
+                    print(state.files.eio,
                           "! <AirflowNetwork Model:Equivalent Rectangle Surface>, Name, Equivalent Height {{m}}, Equivalent Width {{m}} "
                           "AirflowNetwork "
                           "Model:Equivalent Rectangle\n");
                     found = false;
                 }
-                print(state.outputFiles.eio,
+                print(state.files.eio,
                       "AirflowNetwork Model:Equivalent Rectangle Surface, {}, {:.2R},{:.2R}\n",
                       MultizoneSurfaceData(i).SurfName,
                       MultizoneSurfaceData(i).Height,
@@ -2894,8 +2894,8 @@ namespace AirflowNetworkBalanceManager {
         if (ErrorsFound) ShowFatalError(RoutineName + "Errors found getting inputs. Previous error(s) cause program termination.");
 
         // Write wind pressure coefficients in the EIO file
-        print(state.outputFiles.eio, "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)\n");
-        print(state.outputFiles.eio, "AirflowNetwork Model:Wind Direction, ");
+        print(state.files.eio, "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)\n");
+        print(state.files.eio, "AirflowNetwork Model:Wind Direction, ");
 
         int numWinDirs = 11;
         Real64 angleDelta = 30.0;
@@ -2905,11 +2905,11 @@ namespace AirflowNetworkBalanceManager {
         }
 
         for (i = 0; i < numWinDirs; ++i) {
-            print(state.outputFiles.eio, "{:.1R},", i * angleDelta);
+            print(state.files.eio, "{:.1R},", i * angleDelta);
         }
-        print(state.outputFiles.eio, "{:.1R}\n", numWinDirs * angleDelta);
+        print(state.files.eio, "{:.1R}\n", numWinDirs * angleDelta);
 
-        print(state.outputFiles.eio, "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, Wind Pressure Coefficients #1 to n (dimensionless)\n");
+        print(state.files.eio, "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, Wind Pressure Coefficients #1 to n (dimensionless)\n");
 
         // The old version used to write info with single-sided natural ventilation specific labeling, this version no longer does that.
         std::set<int> curves;
@@ -2917,24 +2917,24 @@ namespace AirflowNetworkBalanceManager {
             curves.insert(MultizoneExternalNodeData(i).curve);
         }
         for (auto index : curves) {
-            print(state.outputFiles.eio, "AirflowNetwork Model:Wind Pressure Coefficients, {}, ", CurveManager::GetCurveName(index));
+            print(state.files.eio, "AirflowNetwork Model:Wind Pressure Coefficients, {}, ", CurveManager::GetCurveName(index));
 
             for (j = 0; j < numWinDirs; ++j) {
-                print(state.outputFiles.eio, "{:.2R},", CurveManager::CurveValue(index, j * angleDelta));
+                print(state.files.eio, "{:.2R},", CurveManager::CurveValue(index, j * angleDelta));
             }
-            print(state.outputFiles.eio, "{:.2R}\n", CurveManager::CurveValue(index, numWinDirs * angleDelta));
+            print(state.files.eio, "{:.2R}\n", CurveManager::CurveValue(index, numWinDirs * angleDelta));
         }
 
         if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSingleSideZones > 0) {
             for (i = 1; i <= AirflowNetworkNumOfZones; ++i) {
                 if (MultizoneZoneData(i).SingleSidedCpType == "ADVANCED") {
-                    print(state.outputFiles.eio,
+                    print(state.files.eio,
                           "AirflowNetwork: Advanced Single-Sided Model: Difference in Opening Wind Pressure Coefficients (DeltaCP), ");
-                    print(state.outputFiles.eio, "{}, ", MultizoneZoneData(i).ZoneName);
+                    print(state.files.eio, "{}, ", MultizoneZoneData(i).ZoneName);
                     for (unsigned j = 1; j <= EPDeltaCP(i).WindDir.size() - 1; ++j) {
-                        print(state.outputFiles.eio, "{:.2R},", EPDeltaCP(i).WindDir(j));
+                        print(state.files.eio, "{:.2R},", EPDeltaCP(i).WindDir(j));
                     }
-                    print(state.outputFiles.eio, "{:.2R}\n", EPDeltaCP(i).WindDir(EPDeltaCP(i).WindDir.size()));
+                    print(state.files.eio, "{:.2R}\n", EPDeltaCP(i).WindDir(EPDeltaCP(i).WindDir.size()));
                 }
             }
         }

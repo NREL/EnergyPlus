@@ -53,7 +53,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 namespace SimulationManager {
 
@@ -78,33 +78,33 @@ namespace SimulationManager {
 
     void ManageSimulation(EnergyPlusData &state);
 
-    void GetProjectData(OutputFiles &outputFiles);
+    void GetProjectData(IOFiles &ioFiles);
 
     void writeIntialPerfLogValues(std::string const &currentOverrideModeValue);
 
     std::string bool_to_string(bool logical);
 
-    void CheckForMisMatchedEnvironmentSpecifications();
+    void CheckForMisMatchedEnvironmentSpecifications(IOFiles &ioFiles);
 
     void CheckForRequestedReporting();
 
     void OpenStreamFile(const std::string &fileName, int &unitNumber, std::ostream *&out_stream);
 
-    void OpenOutputFiles(OutputFiles &outputFiles);
+    void OpenOutputFiles(IOFiles &ioFiles);
 
     void OpenOutputJsonFiles();
 
-    void CloseOutputFiles(OutputFiles &outputFiles);
+    void CloseOutputFiles(IOFiles &ioFiles);
 
     void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound);
 
-    void ReportNodeConnections(OutputFiles &outputFiles);
+    void ReportNodeConnections(IOFiles &ioFiles);
 
-    void ReportLoopConnections(OutputFiles &outputFiles);
+    void ReportLoopConnections(IOFiles &ioFiles);
 
-    void ReportParentChildren(OutputFiles &outputFiles);
+    void ReportParentChildren(IOFiles &ioFiles);
 
-    void ReportCompSetMeterVariables(OutputFiles &outputFiles);
+    void ReportCompSetMeterVariables(IOFiles &ioFiles);
 
     void PostIPProcessing();
 

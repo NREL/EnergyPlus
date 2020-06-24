@@ -191,26 +191,26 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/api/EnergyPlusPgm.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/DataStorage.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/api/EnergyPlusPgm.hh>
 
 #ifdef _WIN32
 #include <direct.h>
@@ -298,7 +298,7 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
         EnergyPlus::inputProcessor->processInput();
         if (DataGlobals::outputEpJSONConversionOnly) {
             DisplayString("Converted input file format. Exiting.");
-            return EndEnergyPlus(state.outputFiles);
+            return EndEnergyPlus(state.files);
         }
         ResultsFramework::OutputSchema->setupOutputOptions();
     } catch (const FatalError &e) {
@@ -378,14 +378,14 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
 
         GenOutputVariablesAuditReport();
 
-        Psychrometrics::ShowPsychrometricSummary(state.outputFiles.audit);
+        Psychrometrics::ShowPsychrometricSummary(state.files.audit);
 
         EnergyPlus::inputProcessor->reportOrphanRecordObjects();
         FluidProperties::ReportOrphanFluids();
         ScheduleManager::ReportOrphanSchedules();
 
         if (DataGlobals::runReadVars) {
-            int status = CommandLineInterface::runReadVarsESO(state.outputFiles);
+            int status = CommandLineInterface::runReadVarsESO(state.files);
             if (status) {
                 return status;
             }
@@ -397,7 +397,7 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         return AbortEnergyPlus(state);
     }
 
-    return EndEnergyPlus(state.outputFiles);
+    return EndEnergyPlus(state.files);
 }
 
 int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath)

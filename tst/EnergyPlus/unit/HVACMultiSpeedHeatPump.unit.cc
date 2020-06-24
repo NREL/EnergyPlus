@@ -55,8 +55,9 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
 
-
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -65,14 +66,12 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
-#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SingleDuct.hh>
@@ -1252,7 +1251,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     ASSERT_TRUE(process_idf(idf_objects));
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
 
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet
@@ -1273,7 +1272,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     SimAirServingZones::GetAirPathData(state);
     SimAirServingZones::InitAirLoops(state, FirstHVACIteration);
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.outputFiles);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.files);
 
     CurDeadBandOrSetback.allocate(2);
     CurDeadBandOrSetback(1) = false;

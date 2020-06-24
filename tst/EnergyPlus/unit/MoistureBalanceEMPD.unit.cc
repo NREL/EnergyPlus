@@ -55,14 +55,14 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
@@ -96,7 +96,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(state.outputFiles, errors_found);
+    HeatBalanceManager::GetMaterialData(state.files, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
@@ -185,7 +185,7 @@ TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(state.outputFiles, errors_found);
+    HeatBalanceManager::GetMaterialData(state.files, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
     MoistureBalanceEMPDManager::GetMoistureBalanceEMPDInput();
 
@@ -222,7 +222,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(state.outputFiles, errors_found);
+    HeatBalanceManager::GetMaterialData(state.files, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
@@ -311,7 +311,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(state.outputFiles, errors_found);
+    HeatBalanceManager::GetMaterialData(state.files, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface

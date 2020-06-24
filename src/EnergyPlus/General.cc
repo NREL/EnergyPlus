@@ -62,9 +62,9 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/OutputFiles.hh>
 // TODO: move DetermineMinuteForReporting to avoid bringing this one in
 #include <EnergyPlus/OutputProcessor.hh>
 
@@ -2469,7 +2469,7 @@ namespace General {
                       A(1, 2) * A(2, 1) * A(3, 3) - A(1, 3) * A(2, 2) * A(3, 1);
 
         if (std::abs(Determinant) < .1E-12) {
-            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{OutputFiles::getSingleton().eso});
+            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{IOFiles::getSingleton().eso});
         }
 
         // Compute Inverse

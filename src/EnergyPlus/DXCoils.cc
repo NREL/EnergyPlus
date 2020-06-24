@@ -57,6 +57,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
@@ -75,14 +76,13 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -7852,7 +7852,7 @@ namespace DXCoils {
         // Call routine that computes AHRI certified rating for single-speed DX Coils
         if ((DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingSingleSpeed && DXCoil(DXCoilNum).CondenserType(1) == AirCooled) ||
             DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical) {
-            CalcDXCoilStandardRating(state.outputFiles,
+            CalcDXCoilStandardRating(state.files,
                                      DXCoil(DXCoilNum).Name,
                                      DXCoil(DXCoilNum).DXCoilType,
                                      DXCoil(DXCoilNum).DXCoilType_Num,
@@ -7875,7 +7875,7 @@ namespace DXCoils {
         }
         // Call routine that computes AHRI certified rating for multi-speed DX cooling Coils
         if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling || DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating) {
-            CalcDXCoilStandardRating(state.outputFiles,
+            CalcDXCoilStandardRating(state.files,
                                      DXCoil(DXCoilNum).Name,
                                      DXCoil(DXCoilNum).DXCoilType,
                                      DXCoil(DXCoilNum).DXCoilType_Num,
@@ -13765,7 +13765,7 @@ namespace DXCoils {
 
         // begin output
         if (OneTimeEIOHeaderWrite) {
-            print(state.outputFiles.eio, Header);
+            print(state.files.eio, Header);
             OneTimeEIOHeaderWrite = false;
             pdstVAVDXCoolCoil = newPreDefSubTable(pdrEquip, "VAV DX Cooling Standard Rating Details");
             pdchVAVDXCoolCoilType = newPreDefColumn(pdstVAVDXCoolCoil, "DX Cooling Coil Type");
@@ -13815,7 +13815,7 @@ namespace DXCoils {
           }
         }();
 
-        print(state.outputFiles.eio, Format_891
+        print(state.files.eio, Format_891
             , "Coil:Cooling:DX:TwoSpeed" , DXCoil(DXCoilNum).Name , fan_type_name.first, fan_type_name.second
             , NetCoolingCapRated , (NetCoolingCapRated * ConvFromSIToIP) , IEER
             , EER_TestPoint_SI(1) , EER_TestPoint_SI(2) , EER_TestPoint_SI(3)

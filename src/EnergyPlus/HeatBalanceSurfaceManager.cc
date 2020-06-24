@@ -64,6 +64,7 @@
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DElightManagerF.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDElight.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDaylightingDevices.hh>
@@ -93,7 +94,6 @@
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
@@ -103,11 +103,11 @@
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -269,7 +269,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        ManageThermalComfort(false); // "Record keeping" for the zone
+        ManageThermalComfort(state.files, false); // "Record keeping" for the zone
 
         ReportSurfaceHeatBalance();
         if (ZoneSizingCalc) GatherComponentLoadsSurface();
@@ -510,7 +510,7 @@ namespace HeatBalanceSurfaceManager {
         // Calculate factors that are used to determine how much long-wave radiation from internal
         // gains is absorbed by interior surfaces
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Absorption Factors");
-        if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange(state.outputFiles);
+        if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange(state.files);
         ComputeIntThermalAbsorpFactors();
 
         // Calculate factors for diffuse solar absorbed by room surfaces and interior shades
@@ -723,12 +723,12 @@ namespace HeatBalanceSurfaceManager {
                         DayltgInterReflIllFrIntWins(NZ);
                         DayltgGlareWithIntWins(ZoneDaylight(NZ).GlareIndexAtRefPt, NZ);
                     }
-                    DayltgElecLightingControl(state.outputFiles, NZ);
+                    DayltgElecLightingControl(state.files, NZ);
                 }
             }
         } else if (mapResultsToReport && TimeStep == NumOfTimeStepInHour) {
             for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
-                ReportIllumMap(state.outputFiles, MapNum);
+                ReportIllumMap(state.files, MapNum);
             }
             mapResultsToReport = false;
         }

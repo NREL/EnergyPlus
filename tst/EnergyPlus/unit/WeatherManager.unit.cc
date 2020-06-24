@@ -328,7 +328,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(state.outputFiles, errorsFound);
+    SurfaceGeometry::GetOSCMData(state.files, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -352,7 +352,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(state.outputFiles, errorsFound);
+    SurfaceGeometry::GetOSCMData(state.files, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -755,7 +755,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::OpenOutputFiles(state.outputFiles);
+    SimulationManager::OpenOutputFiles(state.files);
     // reset eio stream
     has_eio_output(true);
 
@@ -778,7 +778,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     WeatherManager::GetDesignDayData(DataEnvironment::TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    WeatherManager::SetUpDesignDay(state.outputFiles, 1);
+    WeatherManager::SetUpDesignDay(state.files, 1);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndType, DDHumIndType_Enthalpy);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndValue, 90500.0);
 
@@ -805,11 +805,11 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, false));
 
-    OutputReportTabular::WriteEioTables(state.outputFiles);
+    OutputReportTabular::WriteEioTables(state.files);
 
 
     // Close output files *after* the EIO has been written to
-    SimulationManager::CloseOutputFiles(state.outputFiles);
+    SimulationManager::CloseOutputFiles(state.files);
 
     EnergyPlus::sqlite->sqliteCommit();
 
@@ -953,8 +953,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherZeroIRHoriz) {
 
 TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
-    DataStringGlobals::inputWeatherFileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/WeatherManagerIROutputTest.epw";
-
+    state.files.inputWeatherFileName.fileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/WeatherManagerIROutputTest.epw";
     std::string const idf_objects = delimited_string({
                                                          "  Version,9.3;",
 
@@ -1033,7 +1032,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
     Environment(1).SkyTempModel = WP_ClarkAllenModel;
 
     AllocateWeatherData();
-    OpenWeatherFile(ErrorsFound);
+    OpenWeatherFile(state, ErrorsFound);
     ReadWeatherForDay(0, 1, false);
 
     Real64 expected_IRHorizSky = 345.73838855245953;

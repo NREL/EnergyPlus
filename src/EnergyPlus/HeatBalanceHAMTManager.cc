@@ -65,8 +65,8 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceHAMTManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -230,7 +230,7 @@ namespace HeatBalanceHAMTManager {
             OneTimeFlag = false;
             DisplayString("Initialising Heat and Moisture Transfer Model");
             GetHeatBalHAMTInput();
-            InitHeatBalHAMT(OutputFiles::getSingleton());
+            InitHeatBalHAMT(IOFiles::getSingleton());
         }
 
         CalcHeatBalHAMT(SurfNum, TempSurfInTmp, TempSurfOutTmp);
@@ -693,7 +693,7 @@ namespace HeatBalanceHAMTManager {
         }
     }
 
-    void InitHeatBalHAMT(OutputFiles &outputFiles)
+    void InitHeatBalHAMT(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Phillip Biddulph
@@ -991,9 +991,9 @@ namespace HeatBalanceHAMTManager {
 
         // Reset surface virtual cell origins and volumes. Initialize report variables.
         static constexpr auto Format_1966("! <HAMT cells>, Surface Name, Construction Name, Cell Numbers\n");
-        print(outputFiles.eio, Format_1966);
+        print(ioFiles.eio, Format_1966);
         static constexpr auto Format_1965("! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) \n");
-        print(outputFiles.eio, Format_1965);
+        print(ioFiles.eio, Format_1965);
         // cCurrentModuleObject='MaterialProperty:HeatAndMoistureTransfer:*'
         for (sid = 1; sid <= TotSurfaces; ++sid) {
             if (!Surface(sid).HeatTransSurf) continue;
@@ -1023,16 +1023,16 @@ namespace HeatBalanceHAMTManager {
 
             // write cell origins to initialization output file
             conid = Surface(sid).Construction;
-            print(outputFiles.eio, "HAMT cells, {},{}", Surface(sid).Name, Construct(conid).Name);
+            print(ioFiles.eio, "HAMT cells, {},{}", Surface(sid).Name, Construct(conid).Name);
             for (int concell = 1, concell_end = Intcell(sid) - Extcell(sid) + 1; concell <= concell_end; ++concell) {
-                print(outputFiles.eio, ",{:4}", concell);
+                print(ioFiles.eio, ",{:4}", concell);
             }
-            print(outputFiles.eio, "\n");
-            print(outputFiles.eio, "HAMT origins,{},{}", Surface(sid).Name, Construct(conid).Name);
+            print(ioFiles.eio, "\n");
+            print(ioFiles.eio, "HAMT origins,{},{}", Surface(sid).Name, Construct(conid).Name);
             for (int cellid = Extcell(sid); cellid <= Intcell(sid); ++cellid) {
-                print(outputFiles.eio, ",{:10.7F}", cells(cellid).origin(1));
+                print(ioFiles.eio, ",{:10.7F}", cells(cellid).origin(1));
             }
-            print(outputFiles.eio, "\n");
+            print(ioFiles.eio, "\n");
 
             for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
                 SetupOutputVariable("HAMT Surface Temperature Cell " + TrimSigDigits(concell) + "",
@@ -1064,12 +1064,12 @@ namespace HeatBalanceHAMTManager {
         if (DoReport) {
 
             static constexpr auto Format_108("! <Material Nominal Resistance>, Material Name,  Nominal R\n");
-            print(outputFiles.eio, Format_108);
+            print(ioFiles.eio, Format_108);
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
 
                 static constexpr auto Format_111("Material Nominal Resistance,{},{:.4R}\n");
-                print(outputFiles.eio, Format_111, Material(MaterNum).Name, NominalR(MaterNum));
+                print(ioFiles.eio, Format_111, Material(MaterNum).Name, NominalR(MaterNum));
             }
         }
     }

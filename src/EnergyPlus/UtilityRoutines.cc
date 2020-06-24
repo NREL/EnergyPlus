@@ -66,7 +66,7 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include "IOFiles.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -691,13 +691,13 @@ namespace UtilityRoutines {
             AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
 
             ShowMessage("Fatal error -- final processing.  More error messages may appear.");
-            SetupNodeVarsForReporting(state.outputFiles);
+            SetupNodeVarsForReporting(state.files);
 
             ErrFound = false;
             TerminalError = false;
-            TestBranchIntegrity(state.dataBranchInputManager, state.outputFiles, ErrFound);
+            TestBranchIntegrity(state.dataBranchInputManager, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
-            TestAirPathIntegrity(state, state.outputFiles, ErrFound);
+            TestAirPathIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
             CheckMarkedNodes(ErrFound);
             if (ErrFound) TerminalError = true;
@@ -707,8 +707,8 @@ namespace UtilityRoutines {
             if (ErrFound) TerminalError = true;
 
             if (!TerminalError) {
-                ReportAirLoopConnections(state.outputFiles);
-                ReportLoopConnections(state.outputFiles);
+                ReportAirLoopConnections(state.files);
+                ReportLoopConnections(state.files);
             }
 
         } else if (!ExitDuringSimulations) {
@@ -717,14 +717,14 @@ namespace UtilityRoutines {
         }
 
         if (AskForSurfacesReport) {
-            ReportSurfaces(state.outputFiles);
+            ReportSurfaces(state.files);
         }
 
         ReportSurfaceErrors();
         CheckPlantOnAbort();
         ShowRecurringErrors();
         SummarizeErrors();
-        CloseMiscOpenFiles(state.outputFiles);
+        CloseMiscOpenFiles(state.files);
         NumWarnings = fmt::to_string(TotalWarningErrors);
         NumSevere = fmt::to_string(TotalSevereErrors);
         NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
@@ -762,7 +762,7 @@ namespace UtilityRoutines {
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
-            auto tempfl = state.outputFiles.endFile.try_open();
+            auto tempfl = state.files.endFile.try_open();
 
             if (!tempfl.good()) {
                 DisplayString("AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
@@ -786,7 +786,7 @@ namespace UtilityRoutines {
         }
 
 #ifdef EP_Detailed_Timings
-        epSummaryTimes(state.outputFiles.audit, Time_Finish - Time_Start);
+        epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
 #endif
         std::cerr << "Program terminated: "
                   << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
@@ -797,7 +797,7 @@ namespace UtilityRoutines {
         return EXIT_FAILURE;
     }
 
-    void CloseMiscOpenFiles(OutputFiles &outputFiles)
+    void CloseMiscOpenFiles(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -837,13 +837,13 @@ namespace UtilityRoutines {
         //      INTEGER :: UnitNumber
         //      INTEGER :: ios
 
-        CloseReportIllumMaps(outputFiles);
-        CloseDFSFile(outputFiles);
+        CloseReportIllumMaps(ioFiles);
+        CloseDFSFile(ioFiles);
 
-        if (DebugOutput || outputFiles.debug.position() > 0) {
-            outputFiles.debug.close();
+        if (DebugOutput || ioFiles.debug.position() > 0) {
+            ioFiles.debug.close();
         } else {
-            outputFiles.debug.del();
+            ioFiles.debug.del();
         }
     }
 
@@ -912,7 +912,7 @@ namespace UtilityRoutines {
         }
     }
 
-    int EndEnergyPlus(OutputFiles &outputFiles)
+    int EndEnergyPlus(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -972,7 +972,7 @@ namespace UtilityRoutines {
         ReportSurfaceErrors();
         ShowRecurringErrors();
         SummarizeErrors();
-        CloseMiscOpenFiles(outputFiles);
+        CloseMiscOpenFiles(ioFiles);
         NumWarnings = RoundSigDigits(TotalWarningErrors);
         strip(NumWarnings);
         NumSevere = RoundSigDigits(TotalSevereErrors);
@@ -1021,7 +1021,7 @@ namespace UtilityRoutines {
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
-            auto tempfl = outputFiles.endFile.try_open();
+            auto tempfl = ioFiles.endFile.try_open();
             if (!tempfl.good()) {
                 DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }

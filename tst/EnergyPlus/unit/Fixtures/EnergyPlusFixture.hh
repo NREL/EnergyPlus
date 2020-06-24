@@ -52,17 +52,17 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
 #include <ostream>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 // This is a helper struct to redirect std::cout. This makes sure std::cout is redirected back and
 // everything is cleaned up properly
@@ -269,7 +269,7 @@ protected:
                      std::vector<bool> const &numbers_blank);
 
     // Opens output files as stringstreams
-    void openOutputFiles(OutputFiles &outputFiles);
+    void openOutputFiles(IOFiles &ioFiles);
 
 public:
     EnergyPlusData state;

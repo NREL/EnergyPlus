@@ -55,17 +55,13 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -360,7 +356,8 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
 
 }
 
-void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, OutputFiles &outputFiles) {
+void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex,
+                                                           IOFiles &ioFiles) {
 
     using General::SolveRoot;
     using TempSolveRoot::SolveRoot;
@@ -377,7 +374,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
             "Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity "
             "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
             "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')\n");
-    print(outputFiles.eio, Format_890);
+    print(ioFiles.eio, Format_890);
 
     std::string const RoutineName = "CoilCoolingDXCurveFitPerformance::calcStandardRatings";
 
@@ -684,7 +681,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
 
     // begin output
     if (this->oneTimeEIOHeaderWrite) {
-        print(outputFiles.eio, Format_890); // TODO: Verify this works
+        print(ioFiles.eio, Format_890); // TODO: Verify this works
         this->oneTimeEIOHeaderWrite = false;
         OutputReportPredefined::pdstVAVDXCoolCoil =
             OutputReportPredefined::newPreDefSubTable(OutputReportPredefined::pdrEquip, "VAV DX Cooling Standard Rating Details");
@@ -748,12 +745,12 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
 
     static constexpr auto fmt = " VAV DX Cooling Coil Standard Rating Information, {},{},{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.4R},{:.4R},{:.4R},{:.4R}\n";
     if (this->unitStatic > 0) {
-        print(outputFiles.eio, fmt,"Coil:Cooling:DX", this->name,"Fan:VariableVolume",
+        print(ioFiles.eio, fmt,"Coil:Cooling:DX", this->name,"Fan:VariableVolume",
               supplyFanName, NetCoolingCapRated,(NetCoolingCapRated * ConvFromSIToIP), IEER,EER_TestPoint_SI[0],EER_TestPoint_SI[1],
               EER_TestPoint_SI[2],EER_TestPoint_SI[3],EER_TestPoint_IP[0],EER_TestPoint_IP[1],EER_TestPoint_IP[2],
               EER_TestPoint_IP[3],SupAirMdot_TestPoint[0],SupAirMdot_TestPoint[1],SupAirMdot_TestPoint[2],SupAirMdot_TestPoint[3]);
     } else {
-        print(outputFiles.eio, fmt,"Coil:Cooling:DX", "N/A","Fan:VariableVolume",
+        print(ioFiles.eio, fmt,"Coil:Cooling:DX", "N/A","Fan:VariableVolume",
               "N/A", NetCoolingCapRated,(NetCoolingCapRated * ConvFromSIToIP), IEER,EER_TestPoint_SI[0],EER_TestPoint_SI[1],
               EER_TestPoint_SI[2],EER_TestPoint_SI[3],EER_TestPoint_IP[0],EER_TestPoint_IP[1],EER_TestPoint_IP[2],
               EER_TestPoint_IP[3],SupAirMdot_TestPoint[0],SupAirMdot_TestPoint[1],SupAirMdot_TestPoint[2],SupAirMdot_TestPoint[3]);

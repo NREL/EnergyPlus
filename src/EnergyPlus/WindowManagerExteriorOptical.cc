@@ -166,7 +166,7 @@ namespace WindowManager {
     // 	}
     // }
 
-    void InitWCE_SimplifiedOpticalData(OutputFiles &outputFiles)
+    void InitWCE_SimplifiedOpticalData(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -184,7 +184,7 @@ namespace WindowManager {
 
         // Initialize SurfaceScreen structure
         NumSurfaceScreens = TotScreens;
-        if (NumSurfaceScreens > 0) CalcWindowScreenProperties(outputFiles);
+        if (NumSurfaceScreens > 0) CalcWindowScreenProperties(ioFiles);
 
         auto & aWinConstSimp = CWindowConstructionsSimplified::instance();
         for (auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {

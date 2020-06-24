@@ -49,6 +49,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -57,9 +58,8 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -67,7 +67,6 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <EnergyPlus/General.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -248,7 +247,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetSysInput(state);
@@ -428,7 +427,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetSysInput(state);
@@ -607,7 +606,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetSysInput(state);
@@ -788,7 +787,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     // GetZoneAirDistribution(); // get zone air distribution objects
     // GetZoneSizingInput();
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetSysInput(state);
@@ -938,7 +937,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetSysInput(state);

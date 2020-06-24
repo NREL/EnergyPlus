@@ -350,7 +350,7 @@ namespace ThermalComfort {
         AngleFactorList.deallocate();
     }
 
-    void ManageThermalComfort(bool const InitializeOnly) // when called from ZTPC and calculations aren't needed
+    void ManageThermalComfort(IOFiles &ioFiles, bool const InitializeOnly) // when called from ZTPC and calculations aren't needed
     {
 
         // SUBROUTINE INFORMATION:
@@ -398,8 +398,8 @@ namespace ThermalComfort {
             CalcThermalComfortKSU();
             CalcThermalComfortSimpleASH55();
             CalcIfSetPointMet();
-            if (ASH55Flag) CalcThermalComfortAdaptiveASH55(false);
-            if (CEN15251Flag) CalcThermalComfortAdaptiveCEN15251(false);
+            if (ASH55Flag) CalcThermalComfortAdaptiveASH55(ioFiles, false);
+            if (CEN15251Flag) CalcThermalComfortAdaptiveCEN15251(ioFiles, false);
         }
     }
 
@@ -2576,6 +2576,7 @@ namespace ThermalComfort {
     }
 
     void CalcThermalComfortAdaptiveASH55(
+        IOFiles &ioFiles,
         bool const initiate,              // true if supposed to initiate
         Optional_bool_const wthrsim,      // true if this is a weather simulation
         Optional<Real64 const> avgdrybulb // approximate avg drybulb for design day.  will be used as previous period in design day
@@ -2619,7 +2620,6 @@ namespace ThermalComfort {
         Real64 tComf;
         Real64 numOccupants;
         int statFile;
-        int epwFile;
         bool statFileExists;
         bool epwFileExists;
         static bool useStatData(false);
@@ -2655,7 +2655,7 @@ namespace ThermalComfort {
             }
             {
                 IOFlags flags;
-                ObjexxFCL::gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
+                ObjexxFCL::gio::inquire(ioFiles.inputWeatherFileName.fileName, flags);
                 epwFileExists = flags.exists();
             }
             readStat = 0;
@@ -2707,43 +2707,22 @@ namespace ThermalComfort {
                     DaysInYear = 365;
                 }
                 DailyAveOutTemp = 0.0;
-                epwFile = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("READ");
-                    ObjexxFCL::gio::open(epwFile, DataStringGlobals::inputWeatherFileName, flags);
-                    readStat = flags.ios();
-                }
-                if (readStat != 0) {
-                    ShowFatalError("CalcThermalComfortAdaptiveASH55: Could not open file " + DataStringGlobals::inputWeatherFileName +
-                                   " for input (read).");
-                }
+
+                auto epwFile = ioFiles.inputWeatherFileName.open("CalcThermalComfortAdaptiveASH55");
                 for (i = 1; i <= 8; ++i) { // Headers
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
-                        readStat = flags.ios();
-                    }
+                    epwLine = epwFile.readLine().data;
                 }
                 jStartDay = DayOfYear - 1;
                 calcStartDay = jStartDay - 30;
                 if (calcStartDay >= 0) {
                     calcStartHr = 24 * calcStartDay + 1;
                     for (i = 1; i <= calcStartHr - 1; ++i) {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(epwFile, fmtA, flags);
-                            readStat = flags.ios();
-                        }
+                        epwFile.readLine();
                     }
                     for (i = 1; i <= 30; ++i) {
                         avgDryBulbASH = 0.0;
                         for (j = 1; j <= 24; ++j) {
-                            {
-                                IOFlags flags;
-                                ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
-                                readStat = flags.ios();
-                            }
+                            epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
                                 pos = index(epwLine, ',');
                                 epwLine.erase(0, pos + 1);
@@ -2762,11 +2741,7 @@ namespace ThermalComfort {
                     for (i = 1; i <= calcEndDay; ++i) {
                         avgDryBulbASH = 0.0;
                         for (j = 1; j <= 24; ++j) {
-                            {
-                                IOFlags flags;
-                                ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
-                                readStat = flags.ios();
-                            }
+                            epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
                                 pos = index(epwLine, ',');
                                 epwLine.erase(0, pos + 1);
@@ -2778,20 +2753,12 @@ namespace ThermalComfort {
                         DailyAveOutTemp(i + 30 - calcEndDay) = avgDryBulbASH;
                     }
                     for (i = calcEndHr + 1; i <= calcStartHr - 1; ++i) {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
-                            readStat = flags.ios();
-                        }
+                        epwLine = epwFile.readLine().data;
                     }
                     for (i = 1; i <= 30 - calcEndDay; ++i) {
                         avgDryBulbASH = 0.0;
                         for (j = 1; j <= 24; ++j) {
-                            {
-                                IOFlags flags;
-                                ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
-                                readStat = flags.ios();
-                            }
+                            epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
                                 pos = index(epwLine, ',');
                                 epwLine.erase(0, pos + 1);
@@ -2803,7 +2770,6 @@ namespace ThermalComfort {
                         DailyAveOutTemp(i) = avgDryBulbASH;
                     }
                 }
-                ObjexxFCL::gio::close(epwFile);
                 useEpwData = true;
             }
         } else if (initiate && !weathersimulation) {
@@ -2890,6 +2856,7 @@ namespace ThermalComfort {
     }
 
     void CalcThermalComfortAdaptiveCEN15251(
+        IOFiles &ioFiles,
         bool const initiate,              // true if supposed to initiate
         Optional_bool_const wthrsim,      // true if this is a weather simulation
         Optional<Real64 const> avgdrybulb // approximate avg drybulb for design day.  will be used as previous period in design day
@@ -2927,7 +2894,6 @@ namespace ThermalComfort {
         Real64 tComfLow;
         static Real64 runningAverageCEN(0.0);
         Real64 numOccupants;
-        int epwFile;
         bool epwFileExists;
         static bool useEpwData(false);
         static bool firstDaySet(false); // first day is set with initiate -- so do not update
@@ -2957,49 +2923,27 @@ namespace ThermalComfort {
         if (initiate && weathersimulation) {
             {
                 IOFlags flags;
-                ObjexxFCL::gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
+                ObjexxFCL::gio::inquire(ioFiles.inputWeatherFileName.fileName, flags);
                 epwFileExists = flags.exists();
             }
             readStat = 0;
             if (epwFileExists) {
-                epwFile = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("READ");
-                    ObjexxFCL::gio::open(epwFile, DataStringGlobals::inputWeatherFileName, flags);
-                    readStat = flags.ios();
-                }
-                if (readStat != 0) {
-                    ShowFatalError("CalcThermalComfortAdaptiveCEN15251: Could not open file " + DataStringGlobals::inputWeatherFileName +
-                                   " for input (read).");
-                }
+                auto epwFile = ioFiles.inputWeatherFileName.open("CalcThermalComfortAdaptiveCEN15251");
                 for (i = 1; i <= 9; ++i) { // Headers
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(epwFile, fmtA, flags);
-                        readStat = flags.ios();
-                    }
+                    epwFile.readLine();
                 }
                 jStartDay = DayOfYear - 1;
                 calcStartDay = jStartDay - 7;
                 if (calcStartDay > 0) {
                     calcStartHr = 24 * (calcStartDay - 1) + 1;
                     for (i = 1; i <= calcStartHr - 1; ++i) {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(epwFile, fmtA, flags);
-                            readStat = flags.ios();
-                        }
+                        epwFile.readLine();
                     }
                     runningAverageCEN = 0.0;
                     for (i = 1; i <= 7; ++i) {
                         avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
-                            {
-                                IOFlags flags;
-                                ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
-                                readStat = flags.ios();
-                            }
+                            epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
                                 pos = index(epwLine, ',');
                                 epwLine.erase(0, pos + 1);
@@ -3018,11 +2962,7 @@ namespace ThermalComfort {
                     for (i = 1; i <= calcEndDay; ++i) {
                         avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
-                            {
-                                IOFlags flags;
-                                ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
-                                readStat = flags.ios();
-                            }
+                            epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
                                 pos = index(epwLine, ',');
                                 epwLine.erase(0, pos + 1);
@@ -3034,20 +2974,12 @@ namespace ThermalComfort {
                         runningAverageCEN += std::pow(alpha, calcEndDay - i) * avgDryBulbCEN;
                     }
                     for (i = calcEndHr + 1; i <= calcStartHr - 1; ++i) {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(epwFile, fmtA, flags);
-                            readStat = flags.ios();
-                        }
+                        epwFile.readLine();
                     }
                     for (i = 1; i <= 7 - calcEndDay; ++i) {
                         avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
-                            {
-                                IOFlags flags;
-                                ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
-                                readStat = flags.ios();
-                            }
+                            epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
                                 pos = index(epwLine, ',');
                                 epwLine.erase(0, pos + 1);
@@ -3061,7 +2993,6 @@ namespace ThermalComfort {
                 }
                 runningAverageCEN *= (1.0 - alpha);
                 avgDryBulbCEN = 0.0;
-                ObjexxFCL::gio::close(epwFile);
                 useEpwData = true;
                 firstDaySet = true;
             }

@@ -58,9 +58,10 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include "IOFiles.hh"
 #include <EnergyPlus/ConductionTransferFunctionCalc.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -87,18 +88,17 @@
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MatrixDataManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
@@ -337,7 +337,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(state); // Obtains heat balance related parameters from input file
-            HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
+            HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -358,7 +358,7 @@ namespace HeatBalanceManager {
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(state.outputFiles);                                                                // Initialize all heat balance related parameters
+        InitHeatBalance(state.files);                                                                // Initialize all heat balance related parameters
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -370,13 +370,13 @@ namespace HeatBalanceManager {
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance(state);
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
-        RecKeepHeatBalance(state.outputFiles);                                             // Do any heat balance related record keeping
+        RecKeepHeatBalance(state.files);                                             // Do any heat balance related record keeping
 
         // This call has been moved to the FanSystemModule and does effect the output file
         //   You do get a shift in the Air Handling System Summary for the building electric loads
         // IF ((.NOT.WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
 
-        ReportHeatBalance(state, state.outputFiles); // Manage heat balance reporting until the new reporting is in place
+        ReportHeatBalance(state, state.files); // Manage heat balance reporting until the new reporting is in place
 
         ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
 
@@ -395,7 +395,7 @@ namespace HeatBalanceManager {
         }
 
         if (!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing) {
-            ReportWarmupConvergence(state.outputFiles);
+            ReportWarmupConvergence(state.files);
         }
     }
 
@@ -444,13 +444,13 @@ namespace HeatBalanceManager {
 
         // FLOW:
 
-        GetProjectControlData(state.outputFiles, ErrorsFound);
+        GetProjectControlData(state.files, ErrorsFound);
 
-        GetSiteAtmosphereData(state.outputFiles, ErrorsFound);
+        GetSiteAtmosphereData(state.files, ErrorsFound);
 
         GetWindowGlassSpectralData(ErrorsFound);
 
-        GetMaterialData(state.outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
+        GetMaterialData(state.files, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
         GetFrameAndDividerData(ErrorsFound);
 
@@ -653,7 +653,7 @@ namespace HeatBalanceManager {
         // Construction:InternalSource
     }
 
-    void GetProjectControlData(OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors detected during getting data
+    void GetProjectControlData(IOFiles &ioFiles, bool &ErrorsFound) // Set to true if errors detected during getting data
     {
 
         // SUBROUTINE INFORMATION:
@@ -855,8 +855,8 @@ namespace HeatBalanceManager {
             "Value,Temperature Convergence Tolerance Value,  Solar Distribution,Maximum Number of Warmup Days,Minimum "
             "Number of Warmup Days\n");
         // Write Building Information to the initialization output file
-        print(outputFiles.eio, Format_721);
-        print(outputFiles.eio, Format_720,
+        print(ioFiles.eio, Format_721);
+        print(ioFiles.eio, Format_720,
             BuildingName , BuildingAzimuth , AlphaName(2) , LoadsConvergTol
             , TempConvergTol , AlphaName(3) , MaxNumberOfWarmupDays , MinNumberOfWarmupDays);
         // Above should be validated...
@@ -915,7 +915,7 @@ namespace HeatBalanceManager {
         }
         static constexpr auto Format_722("! <Inside Convection Algorithm>, Algorithm {{Simple | TARP | CeilingDiffuser | "
                                               "AdaptiveConvectionAlgorithm}}\nInside Convection Algorithm,{}\n");
-        print(outputFiles.eio, Format_722, AlphaName(1));
+        print(ioFiles.eio, Format_722, AlphaName(1));
 
         // Get only the first (if more were input)
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside";
@@ -970,7 +970,7 @@ namespace HeatBalanceManager {
 
         static constexpr auto Format_723("! <Outside Convection Algorithm>, Algorithm {{SimpleCombined | TARP | MoWitt | DOE-2 | "
                                               "AdaptiveConvectionAlgorithm}}\nOutside Convection Algorithm,{}\n");
-        print(outputFiles.eio, Format_723, AlphaName(1));
+        print(ioFiles.eio, Format_723, AlphaName(1));
 
         CurrentModuleObject = "HeatBalanceAlgorithm";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -1055,7 +1055,7 @@ namespace HeatBalanceManager {
         //  moved to SurfaceGeometry.cc routine GetSurfaceHeatTransferAlgorithmOverrides
 
         static constexpr auto Format_724("! <Sky Radiance Distribution>, Value {{Anisotropic}}\nSky Radiance Distribution,Anisotropic\n");
-        print(outputFiles.eio, Format_724);
+        print(ioFiles.eio, Format_724);
 
         CurrentModuleObject = "Compliance:Building";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -1125,9 +1125,9 @@ namespace HeatBalanceManager {
         // Write Solution Algorithm to the initialization output file for User Verification
         static constexpr auto Format_726(
             "! <Zone Air Solution Algorithm>, Value {{ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}}\n");
-        print(outputFiles.eio, Format_726);
+        print(ioFiles.eio, Format_726);
         static constexpr auto Format_727(" Zone Air Solution Algorithm, {}\n");
-        print(outputFiles.eio, Format_727, AlphaName(1));
+        print(ioFiles.eio, Format_727, AlphaName(1));
 
         // A new object is added by L. Gu, 06/10
         CurrentModuleObject = "ZoneAirContaminantBalance";
@@ -1210,22 +1210,22 @@ namespace HeatBalanceManager {
 
         static constexpr auto Format_728(
             "! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
-        print(outputFiles.eio, Format_728);
+        print(ioFiles.eio, Format_728);
         static constexpr auto Format_730(" Zone Air Carbon Dioxide Balance Simulation, {},{}\n");
         if (Contaminant.SimulateContaminants && Contaminant.CO2Simulation) {
-            print(outputFiles.eio, Format_730, "Yes", AlphaName(1));
+            print(ioFiles.eio, Format_730, "Yes", AlphaName(1));
         } else {
-            print(outputFiles.eio, Format_730, "No", "N/A");
+            print(ioFiles.eio, Format_730, "No", "N/A");
         }
 
         static constexpr auto Format_729(
             "! <Zone Air Generic Contaminant Balance Simulation>, Simulation {{Yes/No}}, Generic Contaminant Concentration\n");
         static constexpr auto Format_731(" Zone Air Generic Contaminant Balance Simulation, {},{}\n");
-        print(outputFiles.eio, Format_729);
+        print(ioFiles.eio, Format_729);
         if (Contaminant.SimulateContaminants && Contaminant.GenericContamSimulation) {
-            print(outputFiles.eio, Format_731, "Yes", AlphaName(3));
+            print(ioFiles.eio, Format_731, "Yes", AlphaName(3));
         } else {
-            print(outputFiles.eio, Format_731, "No", "N/A");
+            print(ioFiles.eio, Format_731, "No", "N/A");
         }
 
         // A new object is added by B. Nigusse, 02/14
@@ -1324,11 +1324,11 @@ namespace HeatBalanceManager {
             "{{AddInfiltration | AdjustInfiltration | None}}, Infiltration Zones {{MixingSourceZonesOnly | AllZones}}\n");
         static constexpr auto Format_733(" Zone Air Mass Flow Balance Simulation, {},{},{},{}\n");
 
-        print(outputFiles.eio, Format_732);
+        print(ioFiles.eio, Format_732);
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-            print(outputFiles.eio, Format_733, "Yes", AlphaName(1), AlphaName(2), AlphaName(3));
+            print(ioFiles.eio, Format_733, "Yes", AlphaName(1), AlphaName(2), AlphaName(3));
         } else {
-            print(outputFiles.eio, Format_733, "No", "N/A", "N/A", "N/A");
+            print(ioFiles.eio, Format_733, "No", "N/A", "N/A", "N/A");
         }
 
         // A new object is added by L. Gu, 4/17
@@ -1381,11 +1381,11 @@ namespace HeatBalanceManager {
         static constexpr auto Format_734(
             "! <HVACSystemRootFindingAlgorithm>, Value {{RegulaFalsi | Bisection | BisectionThenRegulaFalsi | RegulaFalsiThenBisection}}\n");
         static constexpr auto Format_735(" HVACSystemRootFindingAlgorithm, {}\n");
-        print(outputFiles.eio, Format_734);
-        print(outputFiles.eio, Format_735, HVACSystemRootFinding.Algorithm);
+        print(ioFiles.eio, Format_734);
+        print(ioFiles.eio, Format_735, HVACSystemRootFinding.Algorithm);
     }
 
-    void GetSiteAtmosphereData(OutputFiles &outputFiles, bool &ErrorsFound)
+    void GetSiteAtmosphereData(IOFiles &ioFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1445,14 +1445,14 @@ namespace HeatBalanceManager {
         }
 
         // Write to the initialization output file
-        print(outputFiles.eio,
+        print(ioFiles.eio,
             "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {{}},Wind Speed Profile Boundary "
             "Layer Thickness {{m}},Air Temperature Gradient Coefficient {{K/m}}\n");
 
-        print(outputFiles.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
+        print(ioFiles.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
     }
 
-    void GetMaterialData(OutputFiles &outputFiles, bool &ErrorsFound) // set to true if errors found in input
+    void GetMaterialData(IOFiles &ioFiles, bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -3839,12 +3839,12 @@ namespace HeatBalanceManager {
 
         if (DoReport) {
 
-            print(outputFiles.eio,
+            print(ioFiles.eio,
                   "! <Material Details>,Material Name,ThermalResistance {{m2-K/w}},Roughness,Thickness {{m}},Conductivity "
                   "{{w/m-K}},Density {{kg/m3}},Specific Heat "
                   "{{J/kg-K}},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible\n");
 
-            print(outputFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
+            print(ioFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
 
             // Formats
             static constexpr auto Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}\n");
@@ -3855,9 +3855,9 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(Material(MaterNum).Group);
                     if (SELECT_CASE_var == Air) {
-                        print(outputFiles.eio, Format_702, Material(MaterNum).Name, Material(MaterNum).Resistance);
+                        print(ioFiles.eio, Format_702, Material(MaterNum).Name, Material(MaterNum).Resistance);
                     } else {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               Format_701,
                               Material(MaterNum).Name,
                               Material(MaterNum).Resistance,
@@ -5154,7 +5154,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(OutputFiles &outputFiles)
+    void InitHeatBalance(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5212,14 +5212,14 @@ namespace HeatBalanceManager {
             AllocateHeatBalArrays(); // Allocate the Module Arrays
             if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
                 DisplayString("Initializing Response Factors");
-                InitConductionTransferFunctions(outputFiles); // Initialize the response factors
+                InitConductionTransferFunctions(ioFiles); // Initialize the response factors
             }
 
             DisplayString("Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
-            InitWindowOpticalCalculations(outputFiles);
-            InitDaylightingDevices(OutputFiles::getSingleton()); // Initialize any daylighting devices
+            InitWindowOpticalCalculations(ioFiles);
+            InitDaylightingDevices(IOFiles::getSingleton()); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(); // Initialize the shadowing calculations
         }
@@ -5273,7 +5273,7 @@ namespace HeatBalanceManager {
         }
 
         if (BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
-            OpenShadingFile(outputFiles);
+            OpenShadingFile(ioFiles);
         }
 
         if (BeginDayFlag) {
@@ -5299,15 +5299,15 @@ namespace HeatBalanceManager {
                 for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
                         if (TS == NumOfTimeStepInHour) {
-                            print(outputFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
+                            print(ioFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
                         } else {
-                            print(outputFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / NumOfTimeStepInHour) * TS);
+                            print(ioFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / NumOfTimeStepInHour) * TS);
                         }
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         static constexpr auto ShdFracFmt2("{:10.8F},");
-                        print(outputFiles.shade, ShdFracFmt2, SunlitFrac(TS, iHour, SurfNum));
+                        print(ioFiles.shade, ShdFracFmt2, SunlitFrac(TS, iHour, SurfNum));
                     }
-                    print(outputFiles.shade, "\n");
+                    print(ioFiles.shade, "\n");
                 }
             }
         }
@@ -5514,7 +5514,7 @@ namespace HeatBalanceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void RecKeepHeatBalance(OutputFiles &outputFiles)
+    void RecKeepHeatBalance(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5575,11 +5575,11 @@ namespace HeatBalanceManager {
                     // Write Warmup Convergence Information to the initialization output file
                     if (FirstWarmupWrite) {
                         static constexpr auto Format_732{"! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference {{deltaC}},Warmup Load Difference {{W}}\n"};
-                        print(outputFiles.eio, Format_732);
+                        print(ioFiles.eio, Format_732);
                         FirstWarmupWrite = false;
                     }
                     static constexpr auto Format_731{" Warmup Convergence Information, {},{},{},{:.10R},{:.10R}\n"};
-                    print(outputFiles.eio, Format_731, Zone(ZoneNum).Name, TimeStep, HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
+                    print(ioFiles.eio, Format_731, Zone(ZoneNum).Name, TimeStep, HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
                 }
             }
         }
@@ -5768,7 +5768,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void ReportWarmupConvergence(OutputFiles &outputFiles)
+    void ReportWarmupConvergence(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5822,7 +5822,7 @@ namespace HeatBalanceManager {
         if (!WarmupFlag) { // Report out average/std dev
             // Write Warmup Convervence Information to the initialization output file
             if (FirstWarmupWrite && NumOfZones > 0) {
-                print(outputFiles.eio, Format_730);
+                print(ioFiles.eio, Format_730);
                 FirstWarmupWrite = false;
             }
 
@@ -5855,7 +5855,7 @@ namespace HeatBalanceManager {
                 StdDevZoneLoad = std::sqrt(sum(LoadZoneRptStdDev({1, CountWarmupDayPoints})) / double(CountWarmupDayPoints));
 
                 static constexpr auto Format_731(" Warmup Convergence Information,{},{},{:.10R},{:.10R},{},{},{:.10R},{:.10R},{},{}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_731,
                       Zone(ZoneNum).Name,
                       EnvHeader + ' ' + EnvironmentName,
@@ -5894,7 +5894,7 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance(EnergyPlusData &state, OutputFiles &outputFiles)
+    void ReportHeatBalance(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5944,13 +5944,13 @@ namespace HeatBalanceManager {
             if (PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && DoOutputReporting) {
                     static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
-                    print(outputFiles.eso, "{}\n", EndOfHeaderString);
-                    print(outputFiles.mtr, "{}\n", EndOfHeaderString);
+                    print(ioFiles.eso, "{}\n", EndOfHeaderString);
+                    print(ioFiles.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
                 if (DoOutputReporting) {
                     static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
-                    print(outputFiles.eso,
+                    print(ioFiles.eso,
                           EnvironmentStampFormatStr,
                           "1",
                           "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -5959,7 +5959,7 @@ namespace HeatBalanceManager {
                           TimeZoneNumber,
                           Elevation);
 
-                    print(outputFiles.mtr,
+                    print(ioFiles.mtr,
                           EnvironmentStampFormatStr,
                           "1",
                           "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -5991,7 +5991,7 @@ namespace HeatBalanceManager {
 
     //        End of Reporting subroutines for the HB Module
 
-    void OpenShadingFile(OutputFiles &outputFiles)
+    void OpenShadingFile(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6009,12 +6009,12 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;
 
-        outputFiles.shade.ensure_open("OpenOutputFiles");
-        print(outputFiles.shade, "Surface Name,");
+        ioFiles.shade.ensure_open("OpenOutputFiles");
+        print(ioFiles.shade, "Surface Name,");
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            print(outputFiles.shade, "{},", Surface(SurfNum).Name);
+            print(ioFiles.shade, "{},", Surface(SurfNum).Name);
         }
-        print(outputFiles.shade, "()\n");
+        print(ioFiles.shade, "()\n");
     }
     void GetFrameAndDividerData(bool &ErrorsFound) // set to true if errors found in input
     {
@@ -6272,7 +6272,7 @@ namespace HeatBalanceManager {
         // ErrorsFound = .FALSE.
         EOFonFile = false;
 
-        CheckForActualFileName(OutputFiles::getSingleton(), DesiredFileName, exists, TempFullFileName);
+        CheckForActualFileName(IOFiles::getSingleton(), DesiredFileName, exists, TempFullFileName);
         // INQUIRE(FILE=TRIM(DesiredFileName), EXIST=exists)
         if (!exists) {
             ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Could not locate Window5 Data File, expecting it as file name=" +

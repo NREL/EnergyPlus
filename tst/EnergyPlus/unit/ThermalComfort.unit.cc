@@ -62,8 +62,8 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -886,7 +886,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveASH55Test)
 
     DataGlobals::BeginDayFlag = true;
 
-    CalcThermalComfortAdaptiveASH55(false);
+    CalcThermalComfortAdaptiveASH55(state.files, false);
     EXPECT_NEAR(ThermalComfort::runningAverageASH, 9.29236111, 0.001);
     useEpwData = false;
     DataGlobals::BeginDayFlag = false;

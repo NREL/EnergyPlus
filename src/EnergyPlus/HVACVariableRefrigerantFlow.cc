@@ -80,11 +80,11 @@
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -8115,11 +8115,11 @@ namespace HVACVariableRefrigerantFlow {
                         "! <VRF System Information>, VRF System Type, VRF System Name, VRF System Cooling Combination Ratio, VRF "
                         "System Heating Combination Ratio, VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
                         "Correction Factor\n");
-                    print(state.outputFiles.eio, Format_990);
+                    print(state.files.eio, Format_990);
                     MyOneTimeEIOFlag = false;
                 }
                 static constexpr auto Format_991(" VRF System Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
-                print(state.outputFiles.eio,
+                print(state.files.eio,
                       Format_991,
                       cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                       VRF(VRFCond).Name,

@@ -81,9 +81,9 @@
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PierceSurface.hh>
@@ -451,7 +451,7 @@ namespace DaylightingManager {
         }
     }
 
-    void CalcDayltgCoefficients(OutputFiles &outputFiles)
+    void CalcDayltgCoefficients(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -559,7 +559,7 @@ namespace DaylightingManager {
 
         // FLOW:
         if (CalcDayltghCoefficients_firstTime) {
-            GetDaylightingParametersInput(outputFiles);
+            GetDaylightingParametersInput(ioFiles);
             CheckTDDsAndLightShelvesInDaylitZones();
             AssociateWindowShadingControlWithDaylighting();
             CalcDayltghCoefficients_firstTime = false;
@@ -714,7 +714,7 @@ namespace DaylightingManager {
                     // due to change in ground reflectance from month to month, or change in storm window status.
                     static constexpr auto Format_700(
                         "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor\n");
-                    print(outputFiles.eio, Format_700);
+                    print(ioFiles.eio, Format_700);
                     for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                         if (ZoneDaylight(ZoneNum).NumOfDayltgExtWins == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
                         for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
@@ -740,7 +740,7 @@ namespace DaylightingManager {
 
                                     for (int refPtNum = 1; refPtNum <= ZoneDaylight(ZoneNum).TotalDaylRefPoints; ++refPtNum) {
                                         DaylFac = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, static_cast<int>(skyType), refPtNum, loop);
-                                        print(outputFiles.eio,
+                                        print(ioFiles.eio,
                                               " Sky Daylight Factors,{},{},{},{},{},{:.4R}\n",
                                               skyTypeString,
                                               CurMnDy,
@@ -784,7 +784,7 @@ namespace DaylightingManager {
 
         // open a new file eplusout.dfs for saving the daylight factors
         if (CreateDFSReportFile) {
-            InputOutputFile &dfs = outputFiles.dfs.ensure_open("CalcDayltgCoefficients");
+            InputOutputFile &dfs = ioFiles.dfs.ensure_open("CalcDayltgCoefficients");
             print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
             print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
             print(dfs, "{}\n",
@@ -818,14 +818,14 @@ namespace DaylightingManager {
                     for (ISlatAngle = 1; ISlatAngle <= ISA; ++ISlatAngle) {
                         if (ISlatAngle == 1) {
                             // base window without shades, screens, or blinds
-                            print(outputFiles.dfs, "{},{},{},Base Window\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
+                            print(ioFiles.dfs, "{},{},{},Base Window\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
                         } else if (ISlatAngle == 2 && ISA == 2) {
                             // window shade or blind with fixed slat angle
-                            print(outputFiles.dfs, "{},{},{},Blind or Slat Applied\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
+                            print(ioFiles.dfs, "{},{},{},Blind or Slat Applied\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
                         } else {
                             // blind with variable slat angle
                             SlatAngle = 180.0 / double(MaxSlatAngs - 1) * double(ISlatAngle - 2);
-                            print(outputFiles.dfs, "{},{},{},{:.1R}\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name, SlatAngle);
+                            print(ioFiles.dfs, "{},{},{},{:.1R}\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name, SlatAngle);
                         }
 
                         for (IHR = 1; IHR <= 24; ++IHR) {
@@ -837,7 +837,7 @@ namespace DaylightingManager {
                                 DFOcSky = ZoneDaylight(ZoneNum).DaylIllFacSky(IHR, ISlatAngle, static_cast<int>(SkyType::Overcast), refPtNum, loop);
 
                                 // write daylight factors - 4 sky types for each daylight ref point
-                                print(outputFiles.dfs,
+                                print(ioFiles.dfs,
                                       "{},{},{:.5R},{:.5R},{:.5R},{:.5R}\n",
                                       IHR,
                                       DaylRefPt(ZoneDaylight(ZoneNum).DaylRefPtNum(refPtNum)).Name,
@@ -4359,7 +4359,7 @@ namespace DaylightingManager {
         } // End of sky type loop, ISky
     }
 
-    void GetDaylightingParametersInput(OutputFiles &outputFiles)
+    void GetDaylightingParametersInput(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4399,10 +4399,10 @@ namespace DaylightingManager {
             GetInputDayliteRefPt(ErrorsFound);
             GetDaylightingControls(TotDaylightingControls, ErrorsFound);
             GeometryTransformForDaylighting();
-            GetInputIlluminanceMap(outputFiles, ErrorsFound);
+            GetInputIlluminanceMap(ioFiles, ErrorsFound);
             GetLightWellData(ErrorsFound);
             if (ErrorsFound) ShowFatalError("Program terminated for above reasons, related to DAYLIGHTING");
-            DayltgSetupAdjZoneListsAndPointers(outputFiles);
+            DayltgSetupAdjZoneListsAndPointers(ioFiles);
         }
 
         maxNumRefPtInAnyZone = 0;
@@ -4591,7 +4591,7 @@ namespace DaylightingManager {
         if (doesDayLightingUseDElight()) {
             dLatitude = Latitude;
             DisplayString("Calculating DElight Daylighting Factors");
-            DElightInputGenerator(outputFiles);
+            DElightInputGenerator(ioFiles);
             // Init Error Flag to 0 (no Warnings or Errors)
             DisplayString("ReturnFrom DElightInputGenerator");
             iErrorFlag = 0;
@@ -4699,7 +4699,7 @@ namespace DaylightingManager {
         if (ErrorsFound) ShowFatalError("Program terminated for above reasons");
     }
 
-    void GetInputIlluminanceMap(OutputFiles &outputFiles, bool &ErrorsFound)
+    void GetInputIlluminanceMap(IOFiles &ioFiles, bool &ErrorsFound)
     {
         // Perform the GetInput function for the Output:IlluminanceMap
         // Glazer - June 2016 (moved from GetDaylightingControls)
@@ -4858,11 +4858,11 @@ namespace DaylightingManager {
                     cAlphaArgs(1) = "COMMA";
                 }
             }
-            print(outputFiles.eio, "! <Daylighting:Illuminance Maps>,#Maps,Style\n");
+            print(ioFiles.eio, "! <Daylighting:Illuminance Maps>,#Maps,Style\n");
             ConvertCaseToLower(cAlphaArgs(1), cAlphaArgs(2));
             cAlphaArgs(1).erase(1);
             cAlphaArgs(1) += cAlphaArgs(2).substr(1);
-            print(outputFiles.eio, "Daylighting:Illuminance Maps,{},{}\n", TotIllumMaps, cAlphaArgs(1));
+            print(ioFiles.eio, "Daylighting:Illuminance Maps,{},{}\n", TotIllumMaps, cAlphaArgs(1));
         }
         for (Loop1 = 1; Loop1 <= NumOfZones; ++Loop1) {
             ZoneDaylight(Loop1).ZoneToMap.allocate(ZoneMapCount(Loop1));
@@ -5058,11 +5058,11 @@ namespace DaylightingManager {
         ZoneMsgDone.deallocate();
 
         if (TotIllumMaps > 0) {
-            print(outputFiles.eio, "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {{m}},XMax {{m}},Xinc {{m}},#X Points,YMin "
+            print(ioFiles.eio, "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {{m}},XMax {{m}},Xinc {{m}},#X Points,YMin "
                                                  "{{m}},YMax {{m}},Yinc {{m}},#Y Points,Z {{m}}\n");
         }
         for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
-            print(outputFiles.eio,
+            print(ioFiles.eio,
                   "Daylighting:Illuminance Maps:Detail,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{},{:.2R}\n",
                   IllumMap(MapNum).Name,
                   Zone(IllumMap(MapNum).Zone).Name,
@@ -7323,7 +7323,7 @@ namespace DaylightingManager {
         } // PipeNum
     }
 
-    void DayltgElecLightingControl(OutputFiles &outputFiles, int &ZoneNum) // Zone number
+    void DayltgElecLightingControl(IOFiles &ioFiles, int &ZoneNum) // Zone number
     {
 
         // SUBROUTINE INFORMATION:
@@ -7474,7 +7474,7 @@ namespace DaylightingManager {
                         mapResultsReported = true;
                     }
                 }
-                ReportIllumMap(outputFiles, MapNum);
+                ReportIllumMap(ioFiles, MapNum);
                 if (TimeStep == NumOfTimeStepInHour) {
                     IllumMapCalc(MapNum).DaylIllumAtMapPtHr = 0.0;
                     IllumMapCalc(MapNum).DaylIllumAtMapPt = 0.0;
@@ -9949,7 +9949,7 @@ namespace DaylightingManager {
         }
     }
 
-    void ReportIllumMap(OutputFiles &outputFiles, int const MapNum)
+    void ReportIllumMap(IOFiles &ioFiles, int const MapNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10034,13 +10034,13 @@ namespace DaylightingManager {
                 return outputFile;
             };
             if (MapColSep == CharTab) {
-                if (!openMapFile(outputFiles.outputMapTabFileName).good()) return;
+                if (!openMapFile(ioFiles.outputMapTabFileName).good()) return;
                 //				CommaDelimited = false; //Unused Set but never used
             } else if (MapColSep == CharComma) {
-                if (!openMapFile(outputFiles.outputMapCsvFileName).good()) return;
+                if (!openMapFile(ioFiles.outputMapCsvFileName).good()) return;
                 //				CommaDelimited = true; //Unused Set but never used
             } else {
-                if (!openMapFile(outputFiles.outputMapTxtFileName).good()) return;
+                if (!openMapFile(ioFiles.outputMapTxtFileName).good()) return;
                 //				CommaDelimited = false; //Unused Set but never used
             }
 
@@ -10159,7 +10159,7 @@ namespace DaylightingManager {
         }         // not Warmup
     }
 
-    void CloseReportIllumMaps(OutputFiles &outputFiles)
+    void CloseReportIllumMaps(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10202,14 +10202,14 @@ namespace DaylightingManager {
         if (TotIllumMaps > 0) {
             // Write map header
             if (MapColSep == CharTab) {
-                outputFiles.map.fileName = outputFiles.outputMapTabFileName;
+                ioFiles.map.fileName = ioFiles.outputMapTabFileName;
             } else if (MapColSep == CharComma) {
-                outputFiles.map.fileName = outputFiles.outputMapCsvFileName;
+                ioFiles.map.fileName = ioFiles.outputMapCsvFileName;
             } else {
-                outputFiles.map.fileName = outputFiles.outputMapTxtFileName;
+                ioFiles.map.fileName = ioFiles.outputMapTxtFileName;
             }
 
-            outputFiles.map.ensure_open("CloseReportIllumMaps");
+            ioFiles.map.ensure_open("CloseReportIllumMaps");
 
             for (int MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
                 if (!IllumMap(MapNum).mapFile->good()) continue; // fatal error processing
@@ -10220,7 +10220,7 @@ namespace DaylightingManager {
                     break;
                 }
                 for(const auto &mapLine : mapLines) {
-                    print(outputFiles.map, "{}\n", mapLine);
+                    print(ioFiles.map, "{}\n", mapLine);
                 }
                 IllumMap(MapNum).mapFile->del();
             }
@@ -10229,13 +10229,13 @@ namespace DaylightingManager {
                 const auto message =
                     "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.";
                 ShowSevereError(message);
-                print(outputFiles.map, "{}\n", message);
+                print(ioFiles.map, "{}\n", message);
             }
 
         }
     }
 
-    void CloseDFSFile(OutputFiles &outputFiles)
+    void CloseDFSFile(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10272,10 +10272,10 @@ namespace DaylightingManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        outputFiles.dfs.close();
+        ioFiles.dfs.close();
     }
 
-    void DayltgSetupAdjZoneListsAndPointers(OutputFiles &outputFiles)
+    void DayltgSetupAdjZoneListsAndPointers(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10593,24 +10593,24 @@ namespace DaylightingManager {
 
         } // End of primary zone loop
         static constexpr auto Format_700("! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones\n");
-        print(outputFiles.eio, Format_700);
+        print(ioFiles.eio, Format_700);
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
             static constexpr auto Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
-            print(outputFiles.eio, Format_701, Zone(ZoneNum).Name, ZoneDaylight(ZoneNum).TotalExtWindows,
+            print(ioFiles.eio, Format_701, Zone(ZoneNum).Name, ZoneDaylight(ZoneNum).TotalExtWindows,
                   (ZoneDaylight(ZoneNum).NumOfDayltgExtWins - ZoneDaylight(ZoneNum).TotalExtWindows));
         }
         static constexpr auto Format_702("! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent "
                                               "Zone Names - 1st 100 (max)\n");
-        print(outputFiles.eio, Format_702);
+        print(ioFiles.eio, Format_702);
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
             static constexpr auto Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
-            print(outputFiles.eio, Format_703, Zone(ZoneNum).Name, ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
+            print(ioFiles.eio, Format_703, Zone(ZoneNum).Name, ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
             for (int loop = 1, loop_end = min(ZoneDaylight(ZoneNum).NumOfIntWinAdjZones, 100); loop <= loop_end; ++loop) {
-                print(outputFiles.eio, ",{}", Zone(ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).Name);
+                print(ioFiles.eio, ",{}", Zone(ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).Name);
             }
-            print(outputFiles.eio, "\n");
+            print(ioFiles.eio, "\n");
         }
 
         ZoneExtWin.deallocate();

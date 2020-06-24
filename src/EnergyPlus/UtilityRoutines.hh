@@ -66,11 +66,11 @@ class InputOutputFile;
 
 int AbortEnergyPlus(EnergyPlusData &state);
 
-void CloseMiscOpenFiles(OutputFiles &outputFiles);
+void CloseMiscOpenFiles(IOFiles &ioFiles);
 
 void CloseOutOpenFiles();
 
-int EndEnergyPlus(OutputFiles &outputFiles);
+int EndEnergyPlus(IOFiles &ioFiles);
 
 int GetNewUnitNumber();
 

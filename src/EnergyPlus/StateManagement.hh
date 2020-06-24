@@ -50,5 +50,5 @@
 
 namespace EnergyPlus {
     void clearThisState(EnergyPlusData &state);
-    void clearAllStates(OutputFiles &outputFiles);
+    void clearAllStates(IOFiles &ioFiles);
 }

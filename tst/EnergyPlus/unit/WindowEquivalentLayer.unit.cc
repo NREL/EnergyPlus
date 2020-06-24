@@ -75,7 +75,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.files, ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
 
     int VBMatNum(0);
@@ -930,7 +930,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotMaterials);
     EXPECT_EQ(DataHeatBalance::Material(1).Group, DataHeatBalance::WindowSimpleGlazing);

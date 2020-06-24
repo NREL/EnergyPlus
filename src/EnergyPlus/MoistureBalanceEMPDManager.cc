@@ -53,7 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include "IOFiles.hh"
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -338,7 +338,7 @@ namespace MoistureBalanceEMPDManager {
 
         EMPDzone.deallocate();
 
-        ReportMoistureBalanceEMPD(OutputFiles::getSingleton());
+        ReportMoistureBalanceEMPD(IOFiles::getSingleton());
 
         if (ErrorsFound) {
             ShowFatalError("GetMoistureBalanceEMPDInput: Errors found getting EMPD material properties, program terminated.");
@@ -744,7 +744,7 @@ namespace MoistureBalanceEMPDManager {
         RVSurfLayerOld(SurfNum) = RVSurfLayer(SurfNum);
     }
 
-    void ReportMoistureBalanceEMPD(OutputFiles &outputFiles)
+    void ReportMoistureBalanceEMPD(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -788,7 +788,7 @@ namespace MoistureBalanceEMPDManager {
 
         if (!DoReport) return;
         //   Write Descriptions
-        print(outputFiles.eio,
+        print(ioFiles.eio,
               "{}",
               "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Vapor Resistance Factor, a, b, "
               "c, d, Surface Penetration Depth {m}, Deep Penetration Depth {m}, Coating Vapor Resistance Factor, "
@@ -800,7 +800,7 @@ namespace MoistureBalanceEMPDManager {
             if (Material(MatNum).EMPDMaterialProps) {
                 static constexpr auto Format_700(
                     " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_700,
                       Construct(ConstrNum).Name,
                       Material(MatNum).Name,

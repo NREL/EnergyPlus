@@ -52,6 +52,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -59,14 +60,13 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
@@ -74,8 +74,8 @@
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridEvapCoolingModel.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -180,7 +180,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     // Setup performance tables
     using namespace EnergyPlus::DataEnvironment;
     // process schedules
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     UpdateScheduleValues();
     // Get Unitary system
     GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
@@ -428,7 +428,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     // Setup performance tables
     using namespace EnergyPlus::DataEnvironment;
     // process schedules
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     UpdateScheduleValues();
     // Get Unitary system
     GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);

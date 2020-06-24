@@ -55,7 +55,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 // note there are routines that lie outside of the Module at the end of this file
 
@@ -87,7 +87,7 @@ namespace EMSManager {
     // Functions
     void clear_state();
 
-    void CheckIfAnyEMS(OutputFiles &outputFiles);
+    void CheckIfAnyEMS(IOFiles &ioFiles);
 
     // MODULE SUBROUTINES:
 
@@ -106,9 +106,9 @@ namespace EMSManager {
 
     void GetVariableTypeAndIndex(std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
 
-    void EchoOutActuatorKeyChoices(OutputFiles &outputFiles);
+    void EchoOutActuatorKeyChoices(IOFiles &ioFiles);
 
-    void EchoOutInternalVariableChoices(OutputFiles &outputFiles);
+    void EchoOutInternalVariableChoices(IOFiles &ioFiles);
 
     void SetupNodeSetPointsAsActuators();
 

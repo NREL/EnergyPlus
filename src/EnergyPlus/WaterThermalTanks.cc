@@ -56,6 +56,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -63,7 +64,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
@@ -71,16 +71,16 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -238,7 +238,7 @@ namespace WaterThermalTanks {
             if (!this->IsChilledWaterTank) {
                 this->CalcStandardRatings(state);
             } else {
-                this->ReportCWTankInits(state.outputFiles);
+                this->ReportCWTankInits(state.files);
             }
         }
     }
@@ -4084,11 +4084,11 @@ namespace WaterThermalTanks {
                     "Inlets,Number Of Outlets\n");
 
                 // Write water heater header for EIO
-                if ((numWaterHeaterMixed > 0) || (numWaterHeaterStratified > 0)) print(state.outputFiles.eio, Format_720);
-                if (numHeatPumpWaterHeater > 0) print(state.outputFiles.eio, Format_721);
-                if (numWaterHeaterStratified > 0) print(state.outputFiles.eio, Format_722);
-                if (numChilledWaterMixed > 0) print(state.outputFiles.eio, Format_725);
-                if (numChilledWaterStratified > 0) print(state.outputFiles.eio, Format_726);
+                if ((numWaterHeaterMixed > 0) || (numWaterHeaterStratified > 0)) print(state.files.eio, Format_720);
+                if (numHeatPumpWaterHeater > 0) print(state.files.eio, Format_721);
+                if (numWaterHeaterStratified > 0) print(state.files.eio, Format_722);
+                if (numChilledWaterMixed > 0) print(state.files.eio, Format_725);
+                if (numChilledWaterStratified > 0) print(state.files.eio, Format_726);
             }
 
             if (numWaterThermalTank > 0) {
@@ -4786,16 +4786,16 @@ namespace WaterThermalTanks {
     void WaterThermalTankData::setupOutputVars()
     {
         if ((this->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed) || (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-            this->setupChilledWaterTankOutputVars(OutputFiles::getSingleton());
+            this->setupChilledWaterTankOutputVars(IOFiles::getSingleton());
         } else {
             // moving setupWaterHeaterOutputVars to here causes big table diffs...
-            this->setupWaterHeaterOutputVars(OutputFiles::getSingleton());
+            this->setupWaterHeaterOutputVars(IOFiles::getSingleton());
         }
         // moving setupZoneInternalGains to here causes math and table diffs...
         // this->setupZoneInternalGains();
     }
 
-    void WaterThermalTankData::setupChilledWaterTankOutputVars(OutputFiles &outputFiles)
+    void WaterThermalTankData::setupChilledWaterTankOutputVars(IOFiles &ioFiles)
     {
 
         // CurrentModuleObject='ThermalStorage:ChilledWater:Mixed/ThermalStorage:ChilledWater:Stratified'
@@ -4896,7 +4896,7 @@ namespace WaterThermalTanks {
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
                 static constexpr auto Format_724("Chilled Water Tank Stratified Node Information,{},{:.4T},{:.4T},{:.4T},{},{}\n");
 
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_724,
                       NodeNum,
                       this->Node(NodeNum).Height,
@@ -4944,7 +4944,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::setupWaterHeaterOutputVars(OutputFiles &outputFiles)
+    void WaterThermalTankData::setupWaterHeaterOutputVars(IOFiles &ioFiles)
     {
 
         // Setup report variables for WaterHeater:Mixed
@@ -5300,7 +5300,7 @@ namespace WaterThermalTanks {
 
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
                 static constexpr auto Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:.4T},{},{}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_723,
                       NodeNum,
                       this->Node(NodeNum).Height,
@@ -11859,7 +11859,7 @@ namespace WaterThermalTanks {
             }
 
             static constexpr auto Format_720("Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T}\n");
-            print(state.outputFiles.eio,
+            print(state.files.eio,
                   Format_720,
                   this->Type,
                   this->Name,
@@ -11869,7 +11869,7 @@ namespace WaterThermalTanks {
                   EnergyFactor);
         } else {
             static constexpr auto Format_721("Heat Pump Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T},{:.0T}\n");
-            print(state.outputFiles.eio,
+            print(state.files.eio,
                   Format_721,
                   HPWaterHeater(this->HeatPumpNum).Type,
                   HPWaterHeater(this->HeatPumpNum).Name,
@@ -11883,7 +11883,7 @@ namespace WaterThermalTanks {
         this->AlreadyRated = true;
     }
 
-    void WaterThermalTankData::ReportCWTankInits(OutputFiles &outputFiles)
+    void WaterThermalTankData::ReportCWTankInits(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11906,7 +11906,7 @@ namespace WaterThermalTanks {
         }
 
         static constexpr auto Format_728("Chilled Water Tank Information,{},{},{:.4T},{:.4T},{:.4T}\n");
-        print(outputFiles.eio,
+        print(ioFiles.eio,
               Format_728,
               this->Type,
               this->Name,

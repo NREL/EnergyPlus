@@ -56,21 +56,21 @@
 #include "Fixtures/SQLiteFixture.hh"
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -1078,7 +1078,7 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetCurveInput();
     GetDXCoils();
 
@@ -1460,7 +1460,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetCurveInput();
     GetDXCoils();
     SetPredefinedTables();
@@ -1790,7 +1790,7 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetCurveInput();
     GetDXCoils();
 
@@ -1857,7 +1857,7 @@ TEST_F(EnergyPlusFixture, CurveOutputLimitWarning)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetCurveInput();
     GetDXCoils();
 
@@ -1962,7 +1962,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetDXCoils();
 
     ASSERT_EQ("HEATING COIL SINGLESPEED", DXCoil(1).Name); // Heating Coil Single Speed
@@ -2071,7 +2071,7 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetDXCoils();
 
     ASSERT_EQ("MAIN COOLING COIL 1", DXCoil(1).Name); // Cooling Coil Two Speed
@@ -2192,7 +2192,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state.files);
     DXCoils::GetDXCoils();
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 
@@ -2412,7 +2412,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state.files);
     DXCoils::GetDXCoils();
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 

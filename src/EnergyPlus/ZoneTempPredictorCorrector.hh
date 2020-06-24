@@ -61,7 +61,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 namespace ZoneTempPredictorCorrector {
 
@@ -233,7 +233,7 @@ namespace ZoneTempPredictorCorrector {
                               Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void GetZoneAirSetPoints(OutputFiles &outputFiles);
+    void GetZoneAirSetPoints(IOFiles &ioFiles);
 
     void InitZoneAirSetPoints();
 
@@ -242,9 +242,9 @@ namespace ZoneTempPredictorCorrector {
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void CalcZoneAirTempSetPoints();
+    void CalcZoneAirTempSetPoints(IOFiles &ioFiles);
 
-    void CalculateMonthlyRunningAverageDryBulb(Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN);
+    void CalculateMonthlyRunningAverageDryBulb(IOFiles &ioFiles, Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN);
 
     void CalculateAdaptiveComfortSetPointSchl(Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
 
@@ -362,7 +362,7 @@ namespace ZoneTempPredictorCorrector {
 
     void AdjustOperativeSetPointsforAdapComfort(int const TempControlledZoneID, Real64 &ZoneAirSetPoint);
 
-    void CalcZoneAirComfortSetPoints();
+    void CalcZoneAirComfortSetPoints(IOFiles &ioFiles);
 
     void GetComfortSetPoints(int const PeopleNum,
                              int const ComfortControlNum,

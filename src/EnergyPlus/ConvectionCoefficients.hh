@@ -59,7 +59,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 namespace ConvectionCoefficients {
 
@@ -456,7 +456,7 @@ namespace ConvectionCoefficients {
                   Real64 WindDirection // Wind direction measured clockwise from geographhic North
     );
 
-    void GetUserConvectionCoefficients(OutputFiles &outputFiles);
+    void GetUserConvectionCoefficients(IOFiles &ioFiles);
 
     void ApplyConvectionValue(std::string const &SurfaceTypes, std::string const &ConvectionType, int Value);
 
@@ -539,7 +539,7 @@ namespace ConvectionCoefficients {
                                         Real64 AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
     );
 
-    void SetupAdaptiveConvectionStaticMetaData(EnergyPlus::OutputFiles &outputFiles);
+    void SetupAdaptiveConvectionStaticMetaData(EnergyPlus::IOFiles &ioFiles);
 
     void SetupAdaptiveConvectionRadiantSurfaceData();
 

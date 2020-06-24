@@ -62,30 +62,29 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -2256,7 +2255,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
 
     // Read in IDF
-    ProcessScheduleInput(state.outputFiles);                    // read schedules
+    ProcessScheduleInput(state.files);                    // read schedules
     CurveManager::GetCurveInput();             // read curves
     FluidProperties::GetFluidPropertiesData(); // read refrigerant properties
 
@@ -3722,7 +3721,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput(state.outputFiles);   // read schedules
+    ProcessScheduleInput(state.files);   // read schedules
     GetCurveInput();          // read curves
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
@@ -4703,7 +4702,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 
     ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput(state.outputFiles);   // read schedules
+    ProcessScheduleInput(state.files);   // read schedules
     GetCurveInput();          // read curves
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
@@ -11147,7 +11146,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     ZoneSysEnergyDemand.allocate(1);
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetCurveInput();
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -12876,7 +12875,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     ZoneSysEnergyDemand.allocate(1);
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetCurveInput();
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -13619,7 +13618,7 @@ TEST_F(EnergyPlusFixture, VRF_BlowthroughFanPlacement_InputTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetCurveInput();
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -14208,7 +14207,7 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     Real64 minEIRfLowPLRXInput(0.0);
     Real64 maxEIRfLowPLRXInput(0.0);
     bool ErrorsFound(false);
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetCurveInput();
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);

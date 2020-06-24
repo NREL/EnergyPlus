@@ -56,8 +56,8 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 
 using namespace EnergyPlus;
@@ -97,9 +97,9 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    NodeInputManager::SetupNodeVarsForReporting(state.outputFiles);
+    NodeInputManager::SetupNodeVarsForReporting(state.files);
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(state.files);
 
     EMSManager::FinishProcessingUserInput = true;
 

@@ -58,7 +58,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 namespace HeatBalFiniteDiffManager {
 
@@ -204,7 +204,7 @@ namespace HeatBalFiniteDiffManager {
                                Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
     );
 
-    void ReportFiniteDiffInits(OutputFiles &outputFiles);
+    void ReportFiniteDiffInits(IOFiles &ioFiles);
 
     void CalcNodeHeatFlux(int const Surf,    // surface number
                           int const TotNodes // number of nodes in surface

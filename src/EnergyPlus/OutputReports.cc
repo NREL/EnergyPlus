@@ -63,14 +63,14 @@
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
-void ReportSurfaces(OutputFiles &outputFiles)
+void ReportSurfaces(IOFiles &ioFiles)
 {
 
     // SUBROUTINE INFORMATION:
@@ -165,7 +165,7 @@ void ReportSurfaces(OutputFiles &outputFiles)
             if (Option2 != "") {
                 SetUpSchemeColors(Option2, "DXF");
             }
-            DXFOut(outputFiles, Option1, Option2);
+            DXFOut(ioFiles, Option1, Option2);
             DXFDone = true;
         } else {
             ShowWarningError("ReportSurfaces: DXF output already generated.  DXF with option=[" + Option1 + "] will not be generated.");
@@ -178,7 +178,7 @@ void ReportSurfaces(OutputFiles &outputFiles)
             if (Option2 != "") {
                 SetUpSchemeColors(Option2, "DXF");
             }
-            DXFOutWireFrame(outputFiles, Option2);
+            DXFOutWireFrame(ioFiles, Option2);
             DXFDone = true;
         } else {
             ShowWarningError("ReportSurfaces: DXF output already generated.  DXF:WireFrame will not be generated.");
@@ -188,7 +188,7 @@ void ReportSurfaces(OutputFiles &outputFiles)
     ScanForReports("Surfaces", DoReport, "VRML", Option1, Option2);
     if (DoReport) {
         if (!VRMLDone) {
-            VRMLOut(outputFiles, Option1, Option2);
+            VRMLOut(ioFiles, Option1, Option2);
             VRMLDone = true;
         } else {
             ShowWarningError("ReportSurfaces: VRML output already generated.  VRML with option=[" + Option1 + "] will not be generated.");
@@ -197,7 +197,7 @@ void ReportSurfaces(OutputFiles &outputFiles)
 
     ScanForReports("Surfaces", DoReport, "CostInfo");
     if (DoReport) {
-        CostInfoOut(outputFiles);
+        CostInfoOut(ioFiles);
     }
 
     if (SurfDet || SurfVert) {
@@ -259,7 +259,7 @@ void LinesOut(std::string const &option)
     lastoption = option;
     optiondone = true;
 
-    auto slnfile = OutputFiles::getSingleton().sln.open("LinesOut");
+    auto slnfile = IOFiles::getSingleton().sln.open("LinesOut");
 
     if (option != "IDF") {
         for (int surf = 1; surf <= TotSurfaces; ++surf) {
@@ -480,7 +480,7 @@ static void DXFDaylightingReferencePoints(InputOutputFile &of, bool const DELigh
     }
 }
 
-void DXFOut(OutputFiles &outputFiles,
+void DXFOut(IOFiles &ioFiles,
             std::string const &PolygonAction,
             std::string const &ColorScheme // Name from user for color scheme or blank
 )
@@ -579,7 +579,7 @@ void DXFOut(OutputFiles &outputFiles,
         return;
     }
 
-    auto dxffile = outputFiles.dxf.open("DXFOut");
+    auto dxffile = ioFiles.dxf.open("DXFOut");
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -918,7 +918,7 @@ void DXFOutLines(std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = OutputFiles::getSingleton().dxf.open("DXFOutLines");
+    auto dxffile = IOFiles::getSingleton().dxf.open("DXFOutLines");
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1069,7 +1069,7 @@ void DXFOutLines(std::string const &ColorScheme)
     print(dxffile, Format_706);
 }
 
-void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
+void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1130,7 +1130,7 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = outputFiles.dxf.open("DXFOutWireFrame");
+    auto dxffile = ioFiles.dxf.open("DXFOutWireFrame");
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1723,10 +1723,10 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
         } // surfaces
     }     // zones
 
-    print(OutputFiles::getSingleton().eio, "{}", eiostream->str());
+    print(IOFiles::getSingleton().eio, "{}", eiostream->str());
 }
 
-void CostInfoOut(OutputFiles &outputFiles)
+void CostInfoOut(IOFiles &ioFiles)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1785,7 +1785,7 @@ void CostInfoOut(OutputFiles &outputFiles)
         }
     }
 
-    auto scifile = outputFiles.sci.open("CostInfoOut");
+    auto scifile = ioFiles.sci.open("CostInfoOut");
 
     print(scifile, "{:12}{:12}\n", TotSurfaces, count(uniqueSurf));
     print(scifile, "{}\n", " data for surfaces useful for cost information");
@@ -1812,7 +1812,7 @@ void CostInfoOut(OutputFiles &outputFiles)
     uniqueSurf.deallocate();
 }
 
-void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const std::string &ColorScheme)
+void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::string &ColorScheme)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1888,7 +1888,7 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
         return;
     }
 
-    auto wrlfile = outputFiles.wrl.open("VRMLOut");
+    auto wrlfile = ioFiles.wrl.open("VRMLOut");
 
     print(wrlfile, Format_702);
 

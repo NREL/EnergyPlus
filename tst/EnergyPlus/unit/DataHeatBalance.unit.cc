@@ -51,15 +51,15 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -800,14 +800,14 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     // OutputProcessor::TimeValue.allocate(2);
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // read project control data
+    GetProjectControlData(state.files, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
@@ -825,7 +825,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     ErrorsFound = false;
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;

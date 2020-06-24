@@ -215,7 +215,7 @@ namespace HVACManager {
         ReportAirHeatBalanceFirstTimeFlag = true;
     }
 
-    void ManageHVAC(EnergyPlusData &state, OutputFiles &outputFiles)
+    void ManageHVAC(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -523,7 +523,7 @@ namespace HVACManager {
                 if (DoOutputReporting) {
                     CalcMoreNodeInfo();
                     CalculatePollution();
-                    InitEnergyReports(outputFiles);
+                    InitEnergyReports(ioFiles);
                     ReportSystemEnergyUse();
                 }
                 if (DoOutputReporting || (ZoneSizingCalc && CompLoadReportIsReq)) {
@@ -551,13 +551,13 @@ namespace HVACManager {
                 if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
-                        print(outputFiles.eso, "{}\n", EndOfHeaderString);
-                        print(outputFiles.mtr, "{}\n", EndOfHeaderString);
+                        print(ioFiles.eso, "{}\n", EndOfHeaderString);
+                        print(ioFiles.mtr, "{}\n", EndOfHeaderString);
                         PrintEndDataDictionary = false;
                     }
                     if (DoOutputReporting && !PrintedWarmup) {
 
-                        print(outputFiles.eso,
+                        print(ioFiles.eso,
                               EnvironmentStampFormatStr,
                               "1",
                               "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -565,7 +565,7 @@ namespace HVACManager {
                               Longitude,
                               TimeZoneNumber,
                               Elevation);
-                        print(outputFiles.mtr,
+                        print(ioFiles.mtr,
                               EnvironmentStampFormatStr,
                               "1",
                               "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -590,12 +590,12 @@ namespace HVACManager {
                 if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
-                        print(outputFiles.eso, "{}\n", EndOfHeaderString);
-                        print(outputFiles.mtr, "{}\n", EndOfHeaderString);
+                        print(ioFiles.eso, "{}\n", EndOfHeaderString);
+                        print(ioFiles.mtr, "{}\n", EndOfHeaderString);
                         PrintEndDataDictionary = false;
                     }
                     if (DoOutputReporting && !PrintedWarmup) {
-                        print(outputFiles.eso,
+                        print(ioFiles.eso,
                               EnvironmentStampFormatStr,
                               "1",
                               "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -603,7 +603,7 @@ namespace HVACManager {
                               Longitude,
                               TimeZoneNumber,
                               Elevation);
-                        print(outputFiles.mtr,
+                        print(ioFiles.mtr,
                               EnvironmentStampFormatStr,
                               "1",
                               "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -642,16 +642,16 @@ namespace HVACManager {
             }
             if ((ReportDebug) && (DayOfSim > 0)) { // Report the node data
                 if (size(Node) > 0 && !DebugNamesReported) {
-                    print(outputFiles.debug, "{}\n", "node #   Name");
+                    print(ioFiles.debug, "{}\n", "node #   Name");
                     for (NodeNum = 1; NodeNum <= isize(Node); ++NodeNum) {
-                        print(outputFiles.debug, " {:3}     {}\n", NodeNum, NodeID(NodeNum));
+                        print(ioFiles.debug, " {:3}     {}\n", NodeNum, NodeID(NodeNum));
                     }
                     DebugNamesReported = true;
                 }
                 if (size(Node) > 0) {
-                    print(outputFiles.debug, "\n\n Day of Sim     Hour of Day    Time\n");
-                    print(outputFiles.debug, "{:12}{:12} {:22.15N} \n", DayOfSim, HourOfDay, TimeStep * TimeStepZone);
-                    print(outputFiles.debug,
+                    print(ioFiles.debug, "\n\n Day of Sim     Hour of Day    Time\n");
+                    print(ioFiles.debug, "{:12}{:12} {:22.15N} \n", DayOfSim, HourOfDay, TimeStep * TimeStepZone);
+                    print(ioFiles.debug,
                           "{}\n",
                           "node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       MassMax        MassSP    Press        "
                           "Enthal     HumRat Fluid Type");
@@ -660,7 +660,7 @@ namespace HVACManager {
                     static constexpr auto Format_20{
                         " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#8.0F}  {:11.2F}  {:9.5F}  {}\n"};
 
-                    print(outputFiles.debug,
+                    print(ioFiles.debug,
                           Format_20,
                           NodeNum,
                           Node(NodeNum).Temp,

@@ -62,18 +62,38 @@ class InputFile
 public:
     template<typename Type>
     struct ReadResult {
-        ReadResult(Type data_, bool eof_) : data{std::move(data_)}, eof{eof_} {}
+        ReadResult(Type data_, bool eof_, bool good_) : data{std::move(data_)}, eof{eof_}, good{good_} {}
+
+        // Update the current eof/good state from the incoming value
+        // but only update the `data` member if the state is good
+        // The idea is to keep consistency with the operator>> that was used
+        // from gio
+        void update(ReadResult &&other) {
+            eof = other.eof;
+            good = other.good;
+            if (good) {
+                data = std::move(other.data);
+            }
+        }
 
         Type data;
-        bool eof = false;
+        bool eof;
+        bool good;
     };
 
     void close();
-    bool good() const;
+    bool good() const noexcept;
+
+    bool is_open() const noexcept;
+
+    void backspace () noexcept;
+
+    std::string error_state_to_string() const;
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
     InputFile &ensure_open(const std::string &caller);
+    std::istream::iostate rdstate() const noexcept;
 
     std::string fileName;
     void open();
@@ -87,7 +107,7 @@ public:
 
 private:
     std::unique_ptr<std::istream> is;
-    friend class OutputFiles;
+    friend class IOFiles;
 };
 
 class InputOutputFile
@@ -113,7 +133,7 @@ public:
 private:
     std::unique_ptr<std::iostream> os;
     template <typename... Args> friend void print(InputOutputFile &of, fmt::string_view format_str, const Args &... args);
-    friend class OutputFiles;
+    friend class IOFiles;
 };
 
 template <typename FileType> struct IOFileName
@@ -136,13 +156,9 @@ template <typename FileType> struct IOFileName
 using OutputFileName = IOFileName<InputOutputFile>;
 using InputFileName = IOFileName<InputFile>;
 
-class InputFiles
-{
-public:
-    InputFileName iniFile{"EnergyPlus.ini"};
-};
 
-class OutputFiles
+
+class IOFiles
 {
 public:
 
@@ -187,13 +203,22 @@ public:
     OutputFileName screenCsv{"eplusscreen.csv"};
     OutputFileName endFile{"eplusout.end"};
 
+    InputFileName iniFile{"EnergyPlus.ini"};
 
-    static OutputFiles &getSingleton();
-    static void setSingleton(OutputFiles *newSingleton) noexcept;
+    // for transient uses of weather files
+    // also, keeper of the currently set input weather file name
+    InputFileName inputWeatherFileName{""};
+
+    // for the persistent weather simulation, using the EPW
+    // uses the file name set in `inputWeatherFileName`
+    InputFile inputWeatherFile{""};
+    static IOFiles &getSingleton();
+    static void setSingleton(IOFiles *newSingleton) noexcept;
 
 private:
-    static OutputFiles *&getSingletonInternal();
+    static IOFiles *&getSingletonInternal();
 };
+
 
 class SharedFileHandle
 {

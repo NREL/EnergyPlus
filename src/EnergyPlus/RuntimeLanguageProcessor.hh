@@ -178,7 +178,7 @@ namespace RuntimeLanguageProcessor {
 
     void BeginEnvrnInitializeRuntimeLanguage();
 
-    void ParseStack(OutputFiles &outputFiles, int const StackNum);
+    void ParseStack(IOFiles &ioFiles, int const StackNum);
 
     int AddInstruction(int const StackNum,
                        int const LineNum,
@@ -191,10 +191,10 @@ namespace RuntimeLanguageProcessor {
                   std::string const &Error // error message to be added to ErlStack
     );
 
-    ErlValueType EvaluateStack(OutputFiles &outputFiles, int const StackNum);
+    ErlValueType EvaluateStack(IOFiles &ioFiles, int const StackNum);
 
     void
-    WriteTrace(OutputFiles &outputFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
+    WriteTrace(IOFiles &ioFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
 
     //******************************************************************************************
 
@@ -202,7 +202,7 @@ namespace RuntimeLanguageProcessor {
 
     //******************************************************************************************
 
-    void ParseExpression(OutputFiles &outputFiles,
+    void ParseExpression(IOFiles &ioFiles,
                          std::string const &InString, // String of expression text written in the Runtime Language
                          int const StackNum,          // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure

@@ -54,7 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataRootFinder.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 

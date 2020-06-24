@@ -180,7 +180,6 @@ namespace DataStringGlobals {
     std::string inputFileName;
     std::string inputIddFileName;
     std::string inputEpJSONSchemaFileName;
-    std::string inputWeatherFileName;
     std::string FullName;
     std::string weatherFileNameOnly;
     std::string ProgramPath;          // Path for Program from INI file
@@ -211,7 +210,6 @@ namespace DataStringGlobals {
         inputFileName.clear();
         inputIddFileName.clear();
         inputEpJSONSchemaFileName.clear();
-        inputWeatherFileName.clear();
         FullName.clear();
         weatherFileNameOnly.clear();
         ProgramPath.clear();

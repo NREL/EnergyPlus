@@ -68,8 +68,8 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -1001,7 +1001,7 @@ namespace HeatBalFiniteDiffManager {
 
         } // End of the Surface Loop for Report Variable Setup
 
-        ReportFiniteDiffInits(OutputFiles::getSingleton()); // Report the results from the Finite Diff Inits
+        ReportFiniteDiffInits(IOFiles::getSingleton()); // Report the results from the Finite Diff Inits
     }
 
     void relax_array(Array1D<Real64> &a,       // Array to relax
@@ -1194,7 +1194,7 @@ namespace HeatBalFiniteDiffManager {
         EnthOld = EnthNew;
     }
 
-    void ReportFiniteDiffInits(OutputFiles &outputFiles)
+    void ReportFiniteDiffInits(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1228,10 +1228,10 @@ namespace HeatBalFiniteDiffManager {
         // Formats
         static constexpr auto Format_702(" ConductionFiniteDifference Node,{},{:.8R},{},{},{}\n");
 
-        print(outputFiles.eio,
+        print(ioFiles.eio,
               "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant,Relaxation Factor,Inside Face Surface "
               "Temperature Convergence Criteria\n");
-        print(outputFiles.eio,
+        print(ioFiles.eio,
               " ConductionFiniteDifference HeatBalanceSettings,{},{:.2R},{:.2R},{:.4R}\n",
               cCondFDSchemeType(CondFDSchemeType),
               SpaceDescritConstant,
@@ -1243,15 +1243,15 @@ namespace HeatBalFiniteDiffManager {
         if (DoReport) {
 
             //                                      Write Descriptions
-            print(outputFiles.eio, "{}\n", "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}");
-            print(outputFiles.eio,
+            print(ioFiles.eio, "{}\n", "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}");
+            print(ioFiles.eio,
                   "{}\n",
                   "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X,Layer Alpha*Delt/Delx**2,Layer Moisture "
                   "Stability");
 
             // HT Algo issue
             if (DataHeatBalance::AnyCondFD) {
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       "{}\n",
                       "! <ConductionFiniteDifference Node>,Node Identifier, Node Distance From Outside Face {m}, Construction Name, Outward Material "
                       "Name (or Face), Inward Material Name (or Face)");
@@ -1264,7 +1264,7 @@ namespace HeatBalFiniteDiffManager {
                 if (Construct(ThisNum).TypeIsAirBoundaryIRTSurface) continue;
 
                 static constexpr auto Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_700,
                       Construct(ThisNum).Name,
                       ThisNum,
@@ -1274,7 +1274,7 @@ namespace HeatBalFiniteDiffManager {
 
                 for (Layer = 1; Layer <= Construct(ThisNum).TotLayers; ++Layer) {
                     static constexpr auto Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                           Format_701,
                           ConstructFD(ThisNum).Name(Layer),
                           ConstructFD(ThisNum).Thickness(Layer),
@@ -1292,7 +1292,7 @@ namespace HeatBalFiniteDiffManager {
                     for (LayerNode = 1; LayerNode <= ConstructFD(ThisNum).NodeNumPoint(Layer); ++LayerNode) {
                         ++Inodes;
                         if (Inodes == 1) {
-                            print(outputFiles.eio,
+                            print(ioFiles.eio,
                                   Format_702,
                                   format("Node #{}", Inodes),
                                   ConstructFD(ThisNum).NodeXlocation(Inodes),
@@ -1303,7 +1303,7 @@ namespace HeatBalFiniteDiffManager {
                         } else if (LayerNode == 1) {
 
                             if (OutwardMatLayerNum > 0 && OutwardMatLayerNum <= Construct(ThisNum).TotLayers) {
-                                print(outputFiles.eio,
+                                print(ioFiles.eio,
                                       Format_702,
                                       format("Node #{}", Inodes),
                                       ConstructFD(ThisNum).NodeXlocation(Inodes),
@@ -1313,7 +1313,7 @@ namespace HeatBalFiniteDiffManager {
                             }
                         } else if (LayerNode > 1) {
                             OutwardMatLayerNum = Layer;
-                            print(outputFiles.eio,
+                            print(ioFiles.eio,
                                   Format_702,
                                   format("Node #{}", Inodes),
                                   ConstructFD(ThisNum).NodeXlocation(Inodes),
@@ -1326,7 +1326,7 @@ namespace HeatBalFiniteDiffManager {
 
                 Layer = Construct(ThisNum).TotLayers;
                 ++Inodes;
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_702,
                       format("Node #{}", Inodes),
                       ConstructFD(ThisNum).NodeXlocation(Inodes),

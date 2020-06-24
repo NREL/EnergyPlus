@@ -106,7 +106,7 @@ namespace MoistureBalanceEMPDManager {
 
     void UpdateMoistureBalanceEMPD(int const SurfNum); // Surface number
 
-    void ReportMoistureBalanceEMPD(OutputFiles &outputFiles);
+    void ReportMoistureBalanceEMPD(IOFiles &ioFiles);
 
 } // namespace MoistureBalanceEMPDManager
 

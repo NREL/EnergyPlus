@@ -168,7 +168,7 @@ namespace DataSystemVariables {
 
     // Functions
 
-    void CheckForActualFileName(OutputFiles &outputFiles,
+    void CheckForActualFileName(IOFiles &ioFiles,
                                 std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
                                 std::string &CheckedFileName              // Blank if not found.
