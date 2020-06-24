@@ -74,12 +74,13 @@ namespace WeatherManager {
         LastDayInMonth = 3
     };
 
-    extern int const ScheduleMethod;                   // Constant for water mains temperatures calculation methods
-    extern int const CorrelationMethod;                // Constant for water mains temperatures calculation methods
-    extern int const CorrelationFromWeatherFileMethod; // Constant for water mains temperatures calculation methods
-
-    extern int const InvalidWeatherFile;
-    extern int const EPlusWeatherFile;
+    // Water mains temperatures calculation methods
+    enum class WaterMainsTempCalcMethod
+    {
+        Schedule = 1,
+        Correlation = 2,
+        CorrelationFromWeatherFile = 3
+    };
 
     extern int const ASHRAE_ClearSky;     // Design Day solar model ASHRAE ClearSky (default)
     extern int const Zhang_Huang;         // Design Day solar model Zhang Huang
@@ -124,7 +125,7 @@ namespace WeatherManager {
     extern Real64 WeatherFileElevation;
     extern int WeatherFileUnitNumber;                  // File unit number for the weather file
     extern Array1D<Real64> GroundTempsFCFromEPWHeader; // F or C factor method
-    extern int WaterMainsTempsMethod;                  // Water mains temperature calculation method
+    extern WaterMainsTempCalcMethod WaterMainsTempsMethod;                  // Water mains temperature calculation method
     extern Real64 WaterMainsTempsAnnualAvgAirTemp;     // Annual average outdoor air temperature (C)
     extern Real64 WaterMainsTempsMaxDiffAirTemp;       // Maximum difference in monthly average outdoor air temperatures (deltaC)
     extern bool wthFCGroundTemps;

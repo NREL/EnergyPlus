@@ -183,7 +183,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
     using DataEnvironment::Latitude;
     using DataEnvironment::WaterMainsTemp;
 
-    WaterMainsTempsMethod = WeatherManager::CorrelationMethod;
+    WaterMainsTempsMethod = WeatherManager::WaterMainsTempCalcMethod::Correlation;
     WaterMainsTempsAnnualAvgAirTemp = 9.69;
     WaterMainsTempsMaxDiffAirTemp = 28.1;
     DayOfYear = 50;
@@ -395,7 +395,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::CorrelationFromWeatherFileMethod);
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -442,7 +442,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::CorrelationFromWeatherFileMethod);
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -497,7 +497,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::CorrelationFromWeatherFileMethod);
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these two parameters are ignored
     EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);

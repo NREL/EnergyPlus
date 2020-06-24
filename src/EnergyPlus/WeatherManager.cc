@@ -50,6 +50,7 @@
 #include <cmath>
 #include <cstdio>
 #include <memory>
+#include <map>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -127,13 +128,6 @@ namespace WeatherManager {
     using namespace Psychrometrics;
 
     // Data
-    int const ScheduleMethod(1);                   // Constant for water mains temperatures calculation methods
-    int const CorrelationMethod(2);                // Constant for water mains temperatures calculation methods
-    int const CorrelationFromWeatherFileMethod(3); // Constant for water mains temperatures calculation methods
-
-    int const InvalidWeatherFile(0);
-    int const EPlusWeatherFile(1);
-
     int const ASHRAE_ClearSky(0);     // Design Day solar model ASHRAE ClearSky (default)
     int const Zhang_Huang(1);         // Design Day solar model Zhang Huang
     int const SolarModel_Schedule(2); // Design Day solar model (beam and diffuse) from user entered schedule
@@ -208,7 +202,7 @@ namespace WeatherManager {
     Array1D<Real64> GroundReflectances(12, 0.2);         // User Specified Ground Reflectances !EPTeam: Using DP causes big diffs
     Real64 SnowGndRefModifier(1.0);                           // Modifier to ground reflectance during snow
     Real64 SnowGndRefModifierForDayltg(1.0);                  // Modifier to ground reflectance during snow for daylighting
-    int WaterMainsTempsMethod(0);                             // Water mains temperature calculation method
+    WaterMainsTempCalcMethod WaterMainsTempsMethod;                             // Water mains temperature calculation method
     int WaterMainsTempsSchedule(0);                           // Water mains temperature schedule
     Real64 WaterMainsTempsAnnualAvgAirTemp(0.0);              // Annual average outdoor air temperature (C)
     Real64 WaterMainsTempsMaxDiffAirTemp(0.0);                // Maximum difference in monthly average outdoor air temperatures (deltaC)
@@ -383,7 +377,6 @@ namespace WeatherManager {
 
         SnowGndRefModifier = 1.0;              // Modifier to ground reflectance during snow
         SnowGndRefModifierForDayltg = 1.0;     // Modifier to ground reflectance during snow for daylighting
-        WaterMainsTempsMethod = 0;             // Water mains temperature calculation method
         WaterMainsTempsSchedule = 0;           // Water mains temperature schedule
         WaterMainsTempsAnnualAvgAirTemp = 0.0; // Annual average outdoor air temperature (C)
         WaterMainsTempsMaxDiffAirTemp = 0.0;   // Maximum difference in monthly average outdoor air temperatures (deltaC)
@@ -2187,7 +2180,7 @@ namespace WeatherManager {
 
         if (WaterMainsParameterReport) {
             // this is done only once
-            if (WaterMainsTempsMethod == CorrelationFromWeatherFileMethod) {
+            if (WaterMainsTempsMethod == WaterMainsTempCalcMethod::CorrelationFromWeatherFile) {
                 if (!OADryBulbAverage.OADryBulbWeatherDataProcessed) {
                     OADryBulbAverage.CalcAnnualAndMonthlyDryBulbTemp();
                 }
@@ -7526,7 +7519,7 @@ namespace WeatherManager {
                                           cNumericFieldNames);
 
             if (UtilityRoutines::SameString(AlphArray(1), "Schedule")) {
-                WaterMainsTempsMethod = ScheduleMethod;
+                WaterMainsTempsMethod = WaterMainsTempCalcMethod::Schedule;
                 WaterMainsTempsScheduleName = AlphArray(2);
                 WaterMainsTempsSchedule = GetScheduleIndex(AlphArray(2));
                 if (WaterMainsTempsSchedule == 0) {
@@ -7535,7 +7528,7 @@ namespace WeatherManager {
                 }
 
             } else if (UtilityRoutines::SameString(AlphArray(1), "Correlation")) {
-                WaterMainsTempsMethod = CorrelationMethod;
+                WaterMainsTempsMethod = WaterMainsTempCalcMethod::Correlation;
 
                 if (NumNums == 0) {
                     ShowSevereError(cCurrentModuleObject + ": Missing Annual Average and Maximum Difference fields.");
@@ -7548,7 +7541,7 @@ namespace WeatherManager {
                     WaterMainsTempsMaxDiffAirTemp = NumArray(2);
                 }
             } else if (UtilityRoutines::SameString(AlphArray(1), "CorrelationFromWeatherFile")) {
-                WaterMainsTempsMethod = CorrelationFromWeatherFileMethod;
+                WaterMainsTempsMethod = WaterMainsTempCalcMethod::CorrelationFromWeatherFile;
             } else {
                 ShowSevereError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + '=' + AlphArray(1));
                 ErrorsFound = true;
@@ -7582,11 +7575,11 @@ namespace WeatherManager {
         {
             auto const SELECT_CASE_var(WaterMainsTempsMethod);
 
-            if (SELECT_CASE_var == ScheduleMethod) {
+            if (SELECT_CASE_var == WaterMainsTempCalcMethod::Schedule) {
                 WaterMainsTemp = GetCurrentScheduleValue(WaterMainsTempsSchedule);
-            } else if (SELECT_CASE_var == CorrelationMethod) {
+            } else if (SELECT_CASE_var == WaterMainsTempCalcMethod::Correlation) {
                 WaterMainsTemp = WaterMainsTempFromCorrelation(WaterMainsTempsAnnualAvgAirTemp, WaterMainsTempsMaxDiffAirTemp);
-            } else if (SELECT_CASE_var == CorrelationFromWeatherFileMethod) {
+            } else if (SELECT_CASE_var == WaterMainsTempCalcMethod::CorrelationFromWeatherFile) {
                 if (OADryBulbAverage.OADryBulbWeatherDataProcessed) {
                     WaterMainsTemp =
                         WaterMainsTempFromCorrelation(OADryBulbAverage.AnnualAvgOADryBulbTemp, OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff);
@@ -9590,7 +9583,11 @@ namespace WeatherManager {
         using WeatherManager::OADryBulbAverage;
         using namespace ObjexxFCL::gio;
 
-        Array1D_string const cCalculationMethod({1, 3}, {"Schedule", "Correlation", "CorrelationFromWeatherFile"});
+        std::map<WeatherManager::WaterMainsTempCalcMethod, std::string> const calcMethodMap {
+            {WeatherManager::WaterMainsTempCalcMethod::Schedule, "Schedule"},
+            {WeatherManager::WaterMainsTempCalcMethod::Correlation, "Correlation"},
+            {WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile, "CorrelationFromWeatherFile"}
+        };
 
         if (!OutputFiles::getSingleton().eio.good()) {
             return;
@@ -9609,22 +9606,22 @@ namespace WeatherManager {
 
         {
             auto const SELECT_CASE_var(WaterMainsTempsMethod);
-            if (SELECT_CASE_var == ScheduleMethod) {
+            if (SELECT_CASE_var == WaterMainsTempCalcMethod::Schedule) {
                 *eiostream << "Site Water Mains Temperature Information,";
-                *eiostream << cCalculationMethod(WaterMainsTempsMethod) << "," << WaterMainsTempsScheduleName << ",";
+                *eiostream << calcMethodMap.at(WaterMainsTempsMethod) << "," << WaterMainsTempsScheduleName << ",";
                 *eiostream << RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2) << ",";
                 *eiostream << "NA\n";
-            } else if (SELECT_CASE_var == CorrelationMethod) {
+            } else if (SELECT_CASE_var == WaterMainsTempCalcMethod::Correlation) {
                 *eiostream << "Site Water Mains Temperature Information,";
-                *eiostream << cCalculationMethod(WaterMainsTempsMethod) << ","
+                *eiostream << calcMethodMap.at(WaterMainsTempsMethod) << ","
                            << "NA"
                            << ",";
                 *eiostream << RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2) << ",";
                 *eiostream << "NA\n";
-            } else if (SELECT_CASE_var == CorrelationFromWeatherFileMethod) {
+            } else if (SELECT_CASE_var == WaterMainsTempCalcMethod::CorrelationFromWeatherFile) {
                 if (OADryBulbAverage.OADryBulbWeatherDataProcessed) {
                     *eiostream << "Site Water Mains Temperature Information,";
-                    *eiostream << cCalculationMethod(WaterMainsTempsMethod) << ","
+                    *eiostream << calcMethodMap.at(WaterMainsTempsMethod) << ","
                                << "NA"
                                << ",";
                     *eiostream << RoundSigDigits(OADryBulbAverage.AnnualAvgOADryBulbTemp, 2) << ","
