@@ -64,38 +64,24 @@ namespace DataBranchNodeConnections {
 
 namespace BranchNodeConnections {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Functions
-
-    void RegisterNodeConnection(int const NodeNumber,                    // Number for this Node
+    void RegisterNodeConnection(int NodeNumber,                    // Number for this Node
                                 std::string const &NodeName,             // Name of this Node
                                 std::string const &ObjectType,           // Type of object this Node is connected to (e.g. Chiller:Electric)
                                 std::string const &ObjectName,           // Name of object this Node is connected to (e.g. MyChiller)
                                 std::string const &ConnectionType,       // Connection Type for this Node (must be valid)
-                                int const FluidStream,                   // Count on Fluid Streams
-                                bool const IsParent,                     // True when node is a parent node
+                                int FluidStream,                   // Count on Fluid Streams
+                                bool IsParent,                     // True when node is a parent node
                                 bool &errFlag,                           // Will be True if errors already detected or if errors found here
                                 Optional_string_const InputFieldName = _ // Input Field Name
     );
 
-    void OverrideNodeConnectionType(int const NodeNumber,              // Number for this Node
+    void OverrideNodeConnectionType(int NodeNumber,              // Number for this Node
                                     std::string const &NodeName,       // Name of this Node
                                     std::string const &ObjectType,     // Type of object this Node is connected to (e.g. Chiller:Electric)
                                     std::string const &ObjectName,     // Name of object this Node is connected to (e.g. MyChiller)
                                     std::string const &ConnectionType, // Connection Type for this Node (must be valid)
-                                    int const FluidStream,             // Count on Fluid Streams
-                                    bool const IsParent,               // True when node is a parent node
+                                    int FluidStream,             // Count on Fluid Streams
+                                    bool IsParent,               // True when node is a parent node
                                     bool &errFlag                      // Will be True if errors already detected or if errors found here
     );
 
@@ -118,8 +104,6 @@ namespace BranchNodeConnections {
     bool IsParentObjectCompSet(std::string const &ComponentType, std::string const &ComponentName);
 
     int WhichCompSet(std::string const &ComponentType, std::string const &ComponentName);
-
-    int WhichParentCompSet(std::string const &ComponentType, std::string const &ComponentName);
 
     int GetNumChildren(std::string const &ComponentType, std::string const &ComponentName);
 
@@ -168,11 +152,11 @@ namespace BranchNodeConnections {
 
     void TestCompSetInletOutletNodes(bool &ErrorsFound);
 
-    void GetNodeConnectionType(int const NodeNumber, Array1D_int &NodeConnectType, bool &errFlag);
+    void GetNodeConnectionType(int NodeNumber, Array1D_int &NodeConnectType, bool &errFlag);
 
-    void FindAllNodeNumbersInList(int const WhichNumber,
+    void FindAllNodeNumbersInList(int WhichNumber,
                                   Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
-                                  int const NumItems,
+                                  int NumItems,
                                   int &CountOfItems,            // Number of items found
                                   Array1D_int &AllNumbersInList // Index array to all numbers found
     );

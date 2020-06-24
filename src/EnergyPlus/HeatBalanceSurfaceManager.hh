@@ -53,9 +53,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct ChilledCeilingPanelSimpleData;
 
 namespace DataSurfaces {
     struct SurfaceData;
@@ -65,18 +67,6 @@ namespace DataHeatBalance {
 }
 
 namespace HeatBalanceSurfaceManager {
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // Subroutine Specifications for the Heat Balance Module
-    // Driver Routines
 
     // Initialization routines for module
 
@@ -113,7 +103,7 @@ namespace HeatBalanceSurfaceManager {
 
     void ComputeIntSWAbsorpFactors();
 
-    void ComputeDifSolExcZonesWIZWindows(int const NumberOfEnclosures); // Number of solar enclosures
+    void ComputeDifSolExcZonesWIZWindows(int NumberOfEnclosures); // Number of solar enclosures
 
     void InitEMSControlledSurfaceProperties();
 
@@ -128,7 +118,8 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void UpdateFinalSurfaceHeatBalance(ConvectionCoefficientsData &dataConvectionCoefficients);
+    void UpdateFinalSurfaceHeatBalance(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
+                                       ConvectionCoefficientsData &dataConvectionCoefficients);
 
     void UpdateThermalHistories();
 
@@ -145,12 +136,6 @@ namespace HeatBalanceSurfaceManager {
     void ReportIntMovInsInsideSurfTemp();
 
     // End of Reporting subroutines for the HB Module
-    // *****************************************************************************
-
-    // *****************************************************************************
-    // *****************************************************************************
-    // *****************************************************************************
-    // *****************************************************************************
 
     // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
 
@@ -182,10 +167,6 @@ namespace HeatBalanceSurfaceManager {
     void GatherComponentLoadsSurfAbsFact();
 
 } // namespace HeatBalanceSurfaceManager
-// *****************************************************************************
-// *****************************************************************************
-// *****************************************************************************
-// *****************************************************************************
 
 } // namespace EnergyPlus
 
