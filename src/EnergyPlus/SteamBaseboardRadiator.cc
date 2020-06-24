@@ -284,7 +284,7 @@ namespace SteamBaseboardRadiator {
                                      SteamBaseboard(BaseboardNum).LoopSideNum,
                                      SteamBaseboard(BaseboardNum).BranchNum,
                                      SteamBaseboard(BaseboardNum).CompNum);
-                CalcSteamBaseboard(BaseboardNum, PowerMet);
+                CalcSteamBaseboard(state.dataConvectionCoefficients, BaseboardNum, PowerMet);
             }
 
             UpdateSteamBaseboard(BaseboardNum);
@@ -1091,7 +1091,7 @@ namespace SteamBaseboardRadiator {
         }
     }
 
-    void CalcSteamBaseboard(int &BaseboardNum, Real64 &LoadMet)
+    void CalcSteamBaseboard(ConvectionCoefficientsData &dataConvectionCoefficients, int &BaseboardNum, Real64 &LoadMet)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -1168,8 +1168,8 @@ namespace SteamBaseboardRadiator {
             // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
             DistributeBBSteamRadGains();
             // Now "simulate" the system by recalculating the heat balances
-            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-            HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(dataConvectionCoefficients, ZoneNum);
+            HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataConvectionCoefficients, ZoneNum);
 
             // Here an assumption is made regarding radiant heat transfer to people.
             // While the radiant heat transfer to people array will be used by the thermal comfort

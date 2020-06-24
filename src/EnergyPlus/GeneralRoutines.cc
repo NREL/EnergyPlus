@@ -539,14 +539,14 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
 
         case BBSteamRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
             // Simulate baseboard
-            CalcSteamBaseboard(CompNum, LoadMet);
+            CalcSteamBaseboard(state.dataConvectionCoefficients, CompNum, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
         case BBWaterRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
             // Simulate baseboard
-            CalcHWBaseboard(CompNum, LoadMet);
+            CalcHWBaseboard(state.dataConvectionCoefficients, CompNum, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
@@ -981,7 +981,8 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
     }
 }
 
-void CalcPassiveExteriorBaffleGap(const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
+void CalcPassiveExteriorBaffleGap(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                  const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,         // Area available for venting the gap [m2]
                                   Real64 const Cv,               // Oriface coefficient for volume-based discharge, wind-driven [--]
                                   Real64 const Cd,               // oriface coefficient for discharge,  bouyancy-driven [--]
@@ -1145,7 +1146,7 @@ void CalcPassiveExteriorBaffleGap(const Array1D_int &SurfPtrARR, // Array of ind
         // Initializations for this surface
         HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
-        InitExteriorConvectionCoeff(
+        InitExteriorConvectionCoeff(dataConvectionCoefficients,
             SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = Surface(SurfPtr).Construction;
         AbsThermSurf = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;

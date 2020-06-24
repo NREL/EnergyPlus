@@ -3243,7 +3243,7 @@ namespace VentilatedSlab {
 
             } // ...end of HEATING/COOLING IF-THEN block
 
-            CalcVentilatedSlabRadComps(Item, FirstHVACIteration);
+            CalcVentilatedSlabRadComps(state.dataConvectionCoefficients, Item, FirstHVACIteration);
 
         } // ...end of system ON/OFF IF-THEN block
 
@@ -3458,7 +3458,8 @@ namespace VentilatedSlab {
         PowerMet = QUnitOut;
     }
 
-    void CalcVentilatedSlabRadComps(int const Item,                          // System index in ventilated slab array
+    void CalcVentilatedSlabRadComps(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                    int const Item,                          // System index in ventilated slab array
                                     bool const EP_UNUSED(FirstHVACIteration) // flag for 1st HVAV iteration in the time step !unused1208
     )
     {
@@ -3896,8 +3897,8 @@ namespace VentilatedSlab {
                 // the new SumHATsurf value for the zone.  Note that the difference between the new
                 // SumHATsurf and the value originally calculated by the heat balance with a zero
                 // source for all radiant systems in the zone is the load met by the system (approximately).
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(dataConvectionCoefficients, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataConvectionCoefficients, ZoneNum);
 
             } // SYSCONFIG. SLABONLY&SLABANDZONE
 
@@ -4136,8 +4137,8 @@ namespace VentilatedSlab {
                 // SumHATsurf and the value originally calculated by the heat balance with a zero
                 // source for all radiant systems in the zone is the load met by the system (approximately).
 
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(dataConvectionCoefficients);
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataConvectionCoefficients);
 
             } // SeriesSlabs
 

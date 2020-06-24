@@ -157,7 +157,7 @@ namespace ElectricBaseboardRadiator {
 
     void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    void CalcElectricBaseboard(int const BaseboardNum, int const ControlledZoneNum);
+    void CalcElectricBaseboard(ConvectionCoefficientsData &dataConvectionCoefficients, int const BaseboardNum, int const ControlledZoneNum);
 
     void UpdateElectricBaseboardOff(Real64 &LoadMet,
                                     Real64 &QBBCap,

@@ -148,7 +148,8 @@ namespace TranspiredCollector {
         UTSC.deallocate();
     }
 
-    void SimTranspiredCollector(std::string const &CompName, // component name
+    void SimTranspiredCollector(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                std::string const &CompName, // component name
                                 int &CompIndex               // component index (to reduce string compares during simulation)
     )
     {
@@ -227,9 +228,9 @@ namespace TranspiredCollector {
         }
 
         if (UTSC(UTSCNum).IsOn) {
-            CalcActiveTranspiredCollector(UTSCNum);
+            CalcActiveTranspiredCollector(dataConvectionCoefficients, UTSCNum);
         } else {
-            CalcPassiveTranspiredCollector(UTSCNum);
+            CalcPassiveTranspiredCollector(dataConvectionCoefficients, UTSCNum);
         }
 
         UpdateTranspiredCollector(UTSCNum);
@@ -870,7 +871,7 @@ namespace TranspiredCollector {
         UTSC(UTSCNum).UTSCCollEff = 0.0;
     }
 
-    void CalcActiveTranspiredCollector(int const UTSCNum)
+    void CalcActiveTranspiredCollector(ConvectionCoefficientsData &dataConvectionCoefficients, int const UTSCNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1075,7 +1076,7 @@ namespace TranspiredCollector {
             HMovInsul = 0.0;
             HExt = 0.0;
             LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
-            InitExteriorConvectionCoeff(
+            InitExteriorConvectionCoeff(dataConvectionCoefficients,
                 SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = Surface(SurfPtr).Construction;
             AbsThermSurf = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
@@ -1216,7 +1217,7 @@ namespace TranspiredCollector {
         }
     }
 
-    void CalcPassiveTranspiredCollector(int const UTSCNum)
+    void CalcPassiveTranspiredCollector(ConvectionCoefficientsData &dataConvectionCoefficients, int const UTSCNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1290,7 +1291,8 @@ namespace TranspiredCollector {
 
         // all the work is done in this routine located in GeneralRoutines.cc
 
-        CalcPassiveExteriorBaffleGap(UTSC(UTSCNum).SurfPtrs,
+        CalcPassiveExteriorBaffleGap(dataConvectionCoefficients,
+                                     UTSC(UTSCNum).SurfPtrs,
                                      holeArea,
                                      UTSC(UTSCNum).Cv,
                                      UTSC(UTSCNum).Cd,

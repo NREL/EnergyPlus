@@ -376,7 +376,8 @@ namespace VentilatedSlab {
                                       Real64 &LatOutputProvided // latent capacity supplied (kg/s)
     );
 
-    void CalcVentilatedSlabRadComps(int const Item,               // System index in ventilated slab array
+    void CalcVentilatedSlabRadComps(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                    int const Item,               // System index in ventilated slab array
                                     bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
     );
 

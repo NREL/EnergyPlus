@@ -1244,7 +1244,7 @@ namespace HWBaseboardRadiator {
         }
     }
 
-    void CalcHWBaseboard(int &BaseboardNum, Real64 &LoadMet)
+    void CalcHWBaseboard(ConvectionCoefficientsData &dataConvectionCoefficients, int &BaseboardNum, Real64 &LoadMet)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -1365,9 +1365,9 @@ namespace HWBaseboardRadiator {
                 // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
                 DistributeBBRadGains();
                 // Now "simulate" the system by recalculating the heat balances
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(dataConvectionCoefficients, ZoneNum);
 
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataConvectionCoefficients, ZoneNum);
 
                 // Here an assumption is made regarding radiant heat transfer to people.
                 // While the radiant heat transfer to people array will be used by the thermal comfort

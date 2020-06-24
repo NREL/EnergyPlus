@@ -172,7 +172,7 @@ namespace CoolingPanelSimple {
         {
         }
 
-        void CalcCoolingPanel(int const CoolingPanelNum);
+        void CalcCoolingPanel(ConvectionCoefficientsData &dataConvectionCoefficients, int const CoolingPanelNum);
 
         void SetCoolingPanelControlTemp(Real64 &ControlTemp, int const ZoneNum);
 

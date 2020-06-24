@@ -130,7 +130,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     QRadSWOutIncident.allocate(1);
     QRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
-    dataConvectionCoefficients.GetUserSuppliedConvectionCoeffs = false;
+    state.dataConvectionCoefficients.GetUserSuppliedConvectionCoeffs = false;
 
     // SurfPtr( 1 ); // Array of indexes pointing to Surface structure in DataSurfaces
     Real64 const VentArea(0.1);  // Area available for venting the gap [m2]
@@ -154,8 +154,9 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 VdotBouyRpt;          // gap bouyancy driven volume flow rate [m3/s]
 
     // call to test fix to resolve crash
-    CalcPassiveExteriorBaffleGap(ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs, AbsExt, Tilt, AspRat, GapThick, Roughness,
-                                 QdotSource, TsBaffle, TaGap, HcGapRpt, HrGapRpt, IscRpt, MdotVentRpt, VdotWindRpt, VdotBouyRpt);
+    CalcPassiveExteriorBaffleGap(state.dataConvectionCoefficients, ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
+                                 AbsExt, Tilt, AspRat, GapThick, Roughness, QdotSource, TsBaffle, TaGap, HcGapRpt, HrGapRpt, IscRpt,
+                                 MdotVentRpt, VdotWindRpt, VdotBouyRpt);
 
     EXPECT_NEAR(21.862, TsBaffle, 0.001);
     EXPECT_NEAR(1.692, HcGapRpt, 0.001);
