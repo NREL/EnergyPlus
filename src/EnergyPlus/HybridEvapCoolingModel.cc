@@ -361,7 +361,7 @@ namespace HybridEvapCoolingModel {
         }
     }
 
-    bool CMode::GenerateSolutionSpace(Real64 ResolutionMsa, Real64 ResolutionOSA)
+    void CMode::GenerateSolutionSpace()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Spencer Maxwell Dutton
@@ -385,23 +385,24 @@ namespace HybridEvapCoolingModel {
         // na
 
         // Using/Aliasing
-        Real64 deltaMsa = Max_Msa - Min_Msa;
-        Real64 deltaOAF = Max_OAF - Min_OAF;
-        if (deltaMsa < ResolutionMsa) {
-            deltaMsa = ResolutionMsa;
-        }
-        if (deltaOAF < ResolutionOSA) {
-            deltaOAF = ResolutionOSA;
-        }
-        Real64 Msastep_size = (deltaMsa * ResolutionMsa);
-        Real64 OAFsteps_size = (deltaOAF * ResolutionOSA);
 
-        for (Real64 Msa_val = Max_Msa; Msa_val >= Min_Msa; Msa_val = Msa_val - Msastep_size) {
-            for (Real64 OAF_val = Max_OAF; OAF_val >= Min_OAF; OAF_val = OAF_val - OAFsteps_size) {
-                sol.AddItem(Msa_val, OAF_val);
+        if (Min_Msa == Max_Msa){
+            sol.MassFlowRatio.push_back(Max_Msa);
+        } else {
+            Real64 ResolutionMsa = (Max_Msa-Min_Msa)*0.2;
+            for (Real64 Msa_val = Max_Msa; Msa_val >= Min_Msa; Msa_val -= ResolutionMsa) {
+                sol.MassFlowRatio.push_back(Msa_val);
             }
         }
-        return true;
+
+        if (Min_OAF == Max_OAF){
+            sol.OutdoorAirFraction.push_back(Max_OAF);
+        } else {
+            Real64 ResolutionOSA = (Max_OAF-Min_OAF)*0.2;
+            for (Real64 OAF_val = Max_OAF; OAF_val >= Min_OAF; OAF_val -= ResolutionOSA) {
+                sol.OutdoorAirFraction.push_back(OAF_val);
+            }
+        }
     }
 
     bool Model::ParseMode(Array1D_string Alphas,
@@ -922,13 +923,10 @@ namespace HybridEvapCoolingModel {
             return;
         }
         Initialized = true;
-        // this variable, at this point hard coded, sets the fidelity of the matrix of possible OSAF and Msa combinations.
-        ResolutionMsa = 0.2; // msa/msaRATED
-        ResolutionOSA = 0.2; // OSAF as absolute fraction (not %)
 
         // Iterate through modes of operation generating a matrix of OSAF and Msa to test in the algorithm.
         for (auto &thisOperatingMode : OperatingModes) {
-            thisOperatingMode.GenerateSolutionSpace(ResolutionMsa, ResolutionOSA);
+            thisOperatingMode.GenerateSolutionSpace();
         }
 
         Initialized = true;
@@ -1261,7 +1259,6 @@ namespace HybridEvapCoolingModel {
         bool DidWeMeetLoad = false;
         bool DidWeMeetHumidificaiton = false;
         bool DidWePartlyMeetLoad = false;
-        int modenumber = 0;
         Real64 OptimalSetting_RunFractionTotalFuel = IMPLAUSIBLE_POWER;
         Real64 Tma;
         Real64 Wma;
@@ -1294,11 +1291,7 @@ namespace HybridEvapCoolingModel {
 
         MinOA_Msa = StepIns.MinimumOA; // Set object version of minimum VR Kg/s
 
-        std::vector<CMode>::const_iterator iterator;
-        iterator = OperatingModes.begin();
-        // skip the first one because that is standby
-        ++iterator;
-        for (; iterator != OperatingModes.end(); ++iterator) // iterate though the modes.
+        for (std::vector<CMode>::const_iterator iterator = OperatingModes.begin()+1; iterator != OperatingModes.end(); ++iterator) // iterate though the modes.
         {
             CMode Mode = *iterator;
             bool SAHR_OC_MetinMode = false;
@@ -1306,10 +1299,6 @@ namespace HybridEvapCoolingModel {
             int solution_map_sizeX = Mode.sol.MassFlowRatio.size();
             int solution_map_sizeY = Mode.sol.OutdoorAirFraction.size();
 
-            if (solution_map_sizeX != solution_map_sizeY) {
-                ShowWarningError("Error in solution space mapping, suggest adjusting operating constraints.");
-                return -2;
-            }
             // Check that in this mode the //Outdoor Air Relative Humidity(0 - 100 % )	//Outdoor Air Humidity Ratio(g / g)//Outdoor Air
             // Temperature(degC)
             if (Mode.MeetsOAEnvConstraints(StepIns.Tosa, Wosa, 100 * StepIns.RHosa)) {
@@ -1319,101 +1308,101 @@ namespace HybridEvapCoolingModel {
             }
 
             if (EnvironmentConditionsMet) {
-                for (int point_number = 0; point_number < solution_map_sizeX;
-                     point_number++) // within each mode go though all the combinations of solution spaces.
+                for (int indexMassFlowRatio = 0; indexMassFlowRatio < solution_map_sizeX; indexMassFlowRatio++) // within each mode go though all the combinations of solution spaces.
                 {
-                    // Supply Air Mass Flow Rate(kg / s)
-                    // Outdoor Air Fraction(0 - 1)
+                    for (int indexOutdoorAirFraction = 0; indexOutdoorAirFraction < solution_map_sizeY; indexOutdoorAirFraction++) {
+                        // Supply Air Mass Flow Rate(kg / s)
+                        // Outdoor Air Fraction(0 - 1)
 
-                    Real64 MsaRatio =
-                        Mode.sol.MassFlowRatio[point_number]; // fractions of rated mass flow rate, so for some modes this might be low but others hi
-                    Real64 OSAF = Mode.sol.OutdoorAirFraction[point_number];
-                    Real64 ScaledMsa = ScaledSystemMaximumSupplyAirMassFlowRate * MsaRatio;
-                    Real64 UnscaledMsa = ScaledSystemMaximumSupplyAirMassFlowRate / ScalingFactor;
-                    Real64 Supply_Air_Ventilation_Volume = 0;
-                    // Calculate the ventilation mass flow rate
-                    Real64 Mvent = ScaledMsa * OSAF;
+                        Real64 MsaRatio = Mode.sol.MassFlowRatio[indexMassFlowRatio]; // fractions of rated mass flow rate, so for some modes this might be low but others hi
+                        Real64 OSAF = Mode.sol.OutdoorAirFraction[indexOutdoorAirFraction];
+                        Real64 ScaledMsa = ScaledSystemMaximumSupplyAirMassFlowRate * MsaRatio;
+                        Real64 UnscaledMsa = ScaledSystemMaximumSupplyAirMassFlowRate / ScalingFactor;
+                        Real64 Supply_Air_Ventilation_Volume = 0;
+                        // Calculate the ventilation mass flow rate
+                        Real64 Mvent = ScaledMsa * OSAF;
 
-                    if (StdRhoAir > 1) {
-                        Supply_Air_Ventilation_Volume = Mvent / StdRhoAir;
-                    } else {
-                        Supply_Air_Ventilation_Volume = Mvent / 1.225; // stored as volumetric flow for reporting
-                    }
-
-                    if (Mvent - MinOA_Msa > -0.000001) {
-                        MinVRMet = true;
-                    } else {
-                        MinVRMet = false;
-                    }
-
-                    if (MinVRMet) {
-                        // reset outside air temp and return air temp before calculating curve values for each mode
-                        StepIns.Tosa = SecInletTemp;
-                        StepIns.Tra = InletTemp;
-                        Real64 FanPower = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, SUPPLY_FAN_POWER) * ScalingFactor;
-
-                        // calculate power loss to air if in mixed air stream and divide fan heat between outside air stream and return air stream
-                        if (FanHeatGain && FanHeatGainLocation == "MIXEDAIRSTREAM") {
-                            PowerLossToAir = FanPower * FanHeatInAirFrac;
+                        if (StdRhoAir > 1) {
+                            Supply_Air_Ventilation_Volume = Mvent / StdRhoAir;
                         } else {
-                            PowerLossToAir = 0.0;
-                        }
-                        Real64 FanHeatTempOA = PowerLossToAir / (PsyCpAirFnW(Wosa) * (ScaledMsa * OSAF));
-                        StepIns.Tosa = StepIns.Tosa + FanHeatTempOA;
-                        if (OSAF < 1.0) {
-                            Real64 FanHeatTempRA = PowerLossToAir / (PsyCpAirFnW(Wra) * (ScaledMsa * (1 - OSAF)));
-                            StepIns.Tra = StepIns.Tra + FanHeatTempRA;
+                            Supply_Air_Ventilation_Volume = Mvent / 1.225; // stored as volumetric flow for reporting
                         }
 
-                        // Calculate prospective supply air temperature
-                        Tsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, TEMP_CURVE);
-                        // Calculate prospective supply air Humidity Ratio
-                        Wsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, W_CURVE);
-
-                        // calculate power loss to supply air stream from fan power determined by curve value and fraction of fan heat in air stream
-                        if (FanHeatGain && FanHeatGainLocation == "SUPPLYAIRSTREAM") {
-                            PowerLossToAir = FanPower * FanHeatInAirFrac;
+                        if (Mvent - MinOA_Msa > -0.000001) {
+                            MinVRMet = true;
                         } else {
-                            PowerLossToAir = 0.0;
-                        }
-                        FanHeatTemp = PowerLossToAir / (PsyCpAirFnW(Wsa) * ScaledMsa);
-                        Tsa = Tsa + FanHeatTemp;
-
-                        // Check it meets constraints
-                        if (MeetsSupplyAirTOC(Tsa)) {
-                            SAT_OC_Met = SAT_OC_MetOnce = SAT_OC_MetinMode = true;
-                        } else {
-                            SAT_OC_Met = false;
-                        }
-                        // Return Air Relative Humidity(0 - 100 % ) //Return Air Humidity Ratio(g / g)
-                        if (MeetsSupplyAirRHOC(Wsa)) {
-                            SARH_OC_Met = SAHR_OC_MetOnce = SAHR_OC_MetinMode = true;
-                        } else {
-                            SARH_OC_Met = false;
+                            MinVRMet = false;
                         }
 
-                        if (SARH_OC_Met && SAT_OC_Met) {
-                            CSetting CandidateSetting;
-                            CandidateSetting.Supply_Air_Ventilation_Volume = Supply_Air_Ventilation_Volume;
-                            CandidateSetting.Mode = Mode.ModeID;
-                            CandidateSetting.Outdoor_Air_Fraction = OSAF;
-                            CandidateSetting.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
-                            CandidateSetting.Unscaled_Supply_Air_Mass_Flow_Rate = UnscaledMsa;
-                            CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = ScaledMsa;
+                        if (MinVRMet) {
+                            // reset outside air temp and return air temp before calculating curve values for each mode
+                            StepIns.Tosa = SecInletTemp;
+                            StepIns.Tra = InletTemp;
+                            Real64 FanPower = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, SUPPLY_FAN_POWER) * ScalingFactor;
 
-                            // If no load is requested but ventilation is required, set the supply air mass flow rate to the minimum of the required ventilation flow rate and the maximum supply air flow rate
-                            if (!CoolingRequested && !HeatingRequested && !DehumidificationRequested && !HumidificationRequested) {
-                                CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = min(MinOA_Msa, CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate);
-                                // add fan heat if not included in lookup tables for supply air stream
-                                Tsa = StepIns.Tosa + FanHeatTemp;
+                            // calculate power loss to air if in mixed air stream and divide fan heat between outside air stream and return air stream
+                            if (FanHeatGain && FanHeatGainLocation == "MIXEDAIRSTREAM") {
+                                PowerLossToAir = FanPower * FanHeatInAirFrac;
+                            } else {
+                                PowerLossToAir = 0.0;
+                            }
+                            Real64 FanHeatTempOA = PowerLossToAir / (PsyCpAirFnW(Wosa) * (ScaledMsa * OSAF));
+                            StepIns.Tosa = StepIns.Tosa + FanHeatTempOA;
+                            if (OSAF < 1.0) {
+                                Real64 FanHeatTempRA = PowerLossToAir / (PsyCpAirFnW(Wra) * (ScaledMsa * (1 - OSAF)));
+                                StepIns.Tra = StepIns.Tra + FanHeatTempRA;
                             }
 
-                            CandidateSetting.ScaledSupply_Air_Ventilation_Volume = CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate / StdRhoAir;
-                            CandidateSetting.oMode = Mode;
-                            CandidateSetting.SupplyAirTemperature = Tsa;
-                            CandidateSetting.SupplyAirW = CheckVal_W(Wsa, Tsa, OutletPressure);
-                            CandidateSetting.Mode = Mode.ModeID;
-                            Settings.push_back(CandidateSetting);
+                            // Calculate prospective supply air temperature
+                            Tsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, TEMP_CURVE);
+                            // Calculate prospective supply air Humidity Ratio
+                            Wsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, W_CURVE);
+
+                            // calculate power loss to supply air stream from fan power determined by curve value and fraction of fan heat in air stream
+                            if (FanHeatGain && FanHeatGainLocation == "SUPPLYAIRSTREAM") {
+                                PowerLossToAir = FanPower * FanHeatInAirFrac;
+                            } else {
+                                PowerLossToAir = 0.0;
+                            }
+                            FanHeatTemp = PowerLossToAir / (PsyCpAirFnW(Wsa) * ScaledMsa);
+                            Tsa = Tsa + FanHeatTemp;
+
+                            // Check it meets constraints
+                            if (MeetsSupplyAirTOC(Tsa)) {
+                                SAT_OC_Met = SAT_OC_MetOnce = SAT_OC_MetinMode = true;
+                            } else {
+                                SAT_OC_Met = false;
+                            }
+                            // Return Air Relative Humidity(0 - 100 % ) //Return Air Humidity Ratio(g / g)
+                            if (MeetsSupplyAirRHOC(Wsa)) {
+                                SARH_OC_Met = SAHR_OC_MetOnce = SAHR_OC_MetinMode = true;
+                            } else {
+                                SARH_OC_Met = false;
+                            }
+
+                            if (SARH_OC_Met && SAT_OC_Met) {
+                                CSetting CandidateSetting;
+                                CandidateSetting.Supply_Air_Ventilation_Volume = Supply_Air_Ventilation_Volume;
+                                CandidateSetting.Mode = Mode.ModeID;
+                                CandidateSetting.Outdoor_Air_Fraction = OSAF;
+                                CandidateSetting.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
+                                CandidateSetting.Unscaled_Supply_Air_Mass_Flow_Rate = UnscaledMsa;
+                                CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = ScaledMsa;
+
+                                // If no load is requested but ventilation is required, set the supply air mass flow rate to the minimum of the required ventilation flow rate and the maximum supply air flow rate
+                                if (!CoolingRequested && !HeatingRequested && !DehumidificationRequested && !HumidificationRequested) {
+                                    CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = min(MinOA_Msa, CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate);
+                                    // add fan heat if not included in lookup tables for supply air stream
+                                    Tsa = StepIns.Tosa + FanHeatTemp;
+                                }
+
+                                CandidateSetting.ScaledSupply_Air_Ventilation_Volume = CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate / StdRhoAir;
+                                CandidateSetting.oMode = Mode;
+                                CandidateSetting.SupplyAirTemperature = Tsa;
+                                CandidateSetting.SupplyAirW = CheckVal_W(Wsa, Tsa, OutletPressure);
+                                CandidateSetting.Mode = Mode.ModeID;
+                                Settings.push_back(CandidateSetting);
+                            }
                         }
                     }
                 }
@@ -1428,7 +1417,6 @@ namespace HybridEvapCoolingModel {
                     SAHR_OC_MetinMode_v[Mode.ModeID] = SAHR_OC_MetinMode_v[Mode.ModeID] + 1;
                 }
             }
-            modenumber++;
         }
 
         for (auto &thisSetting : Settings) {

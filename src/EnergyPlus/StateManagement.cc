@@ -49,7 +49,6 @@
 
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
@@ -232,7 +231,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
 {
     using namespace EnergyPlus;
     // A to Z order
-    CoolingPanelSimple::clear_state();
     CoilCoolingDX::clear_state();
     CoolTower::clear_state();
     CrossVentMgr::clear_state();
@@ -287,7 +285,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     EMSManager::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
-    //ExteriorEnergyUse::clear_state();
     FanCoilUnits::clear_state();
     Fans::clear_state();
     FaultsManager::clear_state();
@@ -402,8 +399,5 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     ZoneAirLoopEquipmentManager::clear_state();
     ZoneContaminantPredictorCorrector::clear_state();
     ZoneDehumidifier::clear_state();
-    ZoneEquipmentManager::clear_state();
-    ZonePlenum::clear_state();
-    ZoneTempPredictorCorrector::clear_state();
     ResultsFramework::clear_state();
 }

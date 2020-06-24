@@ -1109,7 +1109,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.outputFiles, localErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
     ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleManager::ScheduleInputProcessed = true;
