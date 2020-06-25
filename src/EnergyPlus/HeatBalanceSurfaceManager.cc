@@ -65,6 +65,7 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDElight.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDaylightingDevices.hh>
@@ -94,7 +95,6 @@
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
@@ -4275,6 +4275,11 @@ namespace HeatBalanceSurfaceManager {
 
             if (Surface(SurfNum).EMSConstructionOverrideON && (Surface(SurfNum).EMSConstructionOverrideValue > 0)) {
 
+                if (Construct(Surface(SurfNum).EMSConstructionOverrideValue).TypeIsWindow) { // okay, allways allow windows
+                    EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                    EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                }
+
                 if ((EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) &&
                     (EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum))) {
 
@@ -4285,11 +4290,7 @@ namespace HeatBalanceSurfaceManager {
                     if (!EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) {
                         // check if constructions appear compatible
 
-                        if (Construct(Surface(SurfNum).EMSConstructionOverrideValue).TypeIsWindow) { // okay, allways allow windows
-                            EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
-                            EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
-
-                        } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
+                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
                                    Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
                             // compare old construction to new construction and see if terms match
                             // set as okay and turn false if find a big problem

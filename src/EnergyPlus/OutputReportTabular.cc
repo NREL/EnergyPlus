@@ -12836,8 +12836,18 @@ namespace OutputReportTabular {
 
                 zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
                     ((ZnAirRpt(iZone).VentilHeatGain - ZnAirRpt(iZone).VentilHeatLoss) / (TimeStepSys * SecInHour)); // zone ventilation
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                    zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
+                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentSenGainW -
+                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentSenLossW); // air flow network
+                }
                 zoneVentLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) =
                     ((ZnAirRpt(iZone).VentilLatentGain - ZnAirRpt(iZone).VentilLatentLoss) / (TimeStepSys * SecInHour)); // zone ventilation
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                    zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
+                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentLatGainW -
+                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentLatLossW); // air flow network
+                }
 
                 interZoneMixInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
                     ((ZnAirRpt(iZone).MixHeatGain - ZnAirRpt(iZone).MixHeatLoss) / (TimeStepSys * SecInHour)); // zone mixing
