@@ -58,10 +58,10 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct EnergyPlusData;
-struct ChilledCeilingPanelSimpleData;
-struct ZoneTempPredictorCorrectorData;
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZoneTempPredictorCorrectorData;
+    struct ChilledCeilingPanelSimpleData;
 
 namespace CoolingPanelSimple {
 
@@ -155,9 +155,7 @@ namespace CoolingPanelSimple {
         {
         }
 
-        void CalcCoolingPanel(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
-                              ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
-                              int CoolingPanelNum);
+        void CalcCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum);
 
         void SetCoolingPanelControlTemp(Real64 &ControlTemp, int ZoneNum);
 

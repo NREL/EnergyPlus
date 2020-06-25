@@ -6367,22 +6367,8 @@ namespace OutputReportTabular {
         //   separation between columns. Returns the string that appears
         //   in the column specified.
 
-        // METHODOLOGY EMPLOYED:
-        //   na
-
-        // Return value
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static char const tb('\t'); // tab character
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string::size_type startPos = 0;
@@ -6418,9 +6404,6 @@ namespace OutputReportTabular {
         //   Just before writing the output reports, will gather up
         //   any additional report entries for the predefined reports.
 
-        // METHODOLOGY EMPLOYED:
-        //   na
-
         // Using/Aliasing
         using DataEnvironment::CurrentYearIsLeapYear;
         using DataEnvironment::EnvironmentName;
@@ -6444,7 +6427,6 @@ namespace OutputReportTabular {
         using ScheduleManager::GetScheduleName;
         using ScheduleManager::ScheduleAverageHoursPerWeek;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iLight;
         int zonePt;
         int iZone;
