@@ -117,12 +117,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
 
     ASSERT_EQ(DataHeatBalance::ZoneOtherEq.size(), 2u);
 
@@ -166,12 +166,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles()), std::runtime_error);
+    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(state), std::runtime_error);
 
     std::string const error_string = delimited_string(
         {"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
@@ -218,12 +218,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles()), std::runtime_error);
+    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(state), std::runtime_error);
 
     error_string = delimited_string(
         {"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
@@ -286,7 +286,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
 
     bool ErrorsFound1(false);
 
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
     HeatBalanceManager::GetZoneData(ErrorsFound1);
     ASSERT_FALSE(ErrorsFound1);
 
@@ -303,7 +303,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
     ScheduleManager::Schedule(2).MinValue = 131.8;
     ScheduleManager::Schedule(2).MaxValue = 131.8;
     ScheduleManager::Schedule(2).MaxMinSet = true;
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
 
     EXPECT_FALSE(InternalHeatGains::ErrorsFound);
 }
@@ -478,7 +478,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
     InternalHeatGains::CalcZoneITEq();
     Real64 InitialPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
 
@@ -654,7 +654,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     bool ErrorsFound(false);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
 
     // Set up a simple convective gain for each gain type
     int zoneNum = 1;
@@ -892,7 +892,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
 
     DataLoopNode::Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq();
@@ -1045,7 +1045,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
     InternalHeatGains::CalcZoneITEq();
 
     // If Electric Power Supply Efficiency Function of Part Load Ratio Curve Name is blank => always 1, so UPSPower is calculated as such
@@ -1298,7 +1298,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     DataGlobals::NumOfTimeStepInHour = 1;                 // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;                 // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
     DataEnvironment::DayOfYear_Schedule = 1;
     DataEnvironment::DayOfMonth = 1;
     DataEnvironment::DayOfWeek = 1;
@@ -1310,7 +1310,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     ASSERT_FALSE(ErrorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
 
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
 
     EXPECT_EQ(DataHeatBalance::TotPeople, 1);
     EXPECT_EQ(DataHeatBalance::TotLights, 1);
@@ -1567,7 +1567,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
     ASSERT_FALSE(ErrorsFound);
 }
 
@@ -1790,7 +1790,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyBadInletNode)
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    EXPECT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles()));
+    EXPECT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(state));
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesGoodInletNode)
@@ -2016,7 +2016,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesG
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
     ASSERT_FALSE(ErrorsFound);
 }
 
@@ -2243,7 +2243,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesB
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    ASSERT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles()));
+    ASSERT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(state));
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
@@ -2469,6 +2469,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
     ASSERT_FALSE(ErrorsFound);
 }

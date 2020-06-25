@@ -1,5 +1,9 @@
 project(Transition Fortran)
 
+cmake_minimum_required(VERSION 3.5.1)
+
+cmake_policy(SET CMP0012 NEW) # if() recognizes boolean constants
+
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
@@ -125,6 +129,7 @@ foreach( i RANGE 1 ${end} )
 
   set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${LAST_NAME} )
   add_executable( "${LAST_NAME}" ${SRC} )
+  set_target_properties("${LAST_NAME}" PROPERTIES FOLDER Auxiliary)
   target_link_libraries( "${LAST_NAME}" TransitionLib )
 
   if( "${i}" GREATER "22" )

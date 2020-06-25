@@ -65,7 +65,7 @@ int delete(char* tmpPat){
 	    return -1;
 	  }
 
-  if (WINDOWS)
+  if (IS_WINDOWS)
   	sprintf(cmd, "rd \"%s\" /S/Q", tmpPat); // Command in windows
   else
   	sprintf(cmd, "rm -r \"%s\"", tmpPat); // Command in Linux
@@ -90,7 +90,7 @@ int delete(char* tmpPat){
 ///\param length Number of characters to be copied from \c nam.
 ///\return Point of tmpPat if there is no error occurred.
 /////////////////////////////////////////////////////////////////////////////
-char *getTmpPath(const char *nam, int length)
+char *getTmpPath(const char *nam, size_t length)
 {
   char *tmpPat;
 
@@ -102,7 +102,7 @@ char *getTmpPath(const char *nam, int length)
     free(tmpPat);
     return NULL;
   }
-  if(WINDOWS) strcat(tmpPat, "\\");
+  if(IS_WINDOWS) strcat(tmpPat, "\\");
   else strcat(tmpPat, "/");
   printfDebug("tmpPat=\"%s\"\n",tmpPat);
   return tmpPat;

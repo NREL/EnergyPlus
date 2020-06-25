@@ -51,9 +51,10 @@
 #include <string>
 #include <vector>
 #include <EnergyPlus/DataHVACSystems.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace UnitarySystems {
 

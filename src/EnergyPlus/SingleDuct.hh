@@ -55,9 +55,10 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace SingleDuct {
 
@@ -285,6 +286,8 @@ namespace SingleDuct {
         static Real64 VAVVSHCFanOnResidual(EnergyPlusData &state, Real64 const HeatingFrac, Array1D<Real64> const &Par);
 
         void SimConstVolNoReheat(int const ZoneNodeNum);
+
+        void CalcOutdoorAirVolumeFlowRate();
 
         void UpdateSys();
 

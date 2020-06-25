@@ -132,7 +132,7 @@ namespace ChillerGasAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GasAbsorberSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void GasAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
 
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
@@ -144,14 +144,14 @@ namespace ChillerGasAbsorption {
             // Calculate Node Values
             // Calculate Equipment and Update Variables
             this->InCoolingMode = RunFlag != 0;
-            this->initialize();
+            this->initialize(state.dataBranchInputManager);
             this->calculateChiller(CurLoad);
             this->updateCoolRecords(CurLoad, RunFlag);
         } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
             // Calculate Node Values
             // Calculate Equipment and Update Variables
             this->InHeatingMode = RunFlag != 0;
-            this->initialize();
+            this->initialize(state.dataBranchInputManager);
             this->calculateHeater(CurLoad, RunFlag);
             this->updateHeatRecords(CurLoad, RunFlag);
         } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
@@ -205,9 +205,9 @@ namespace ChillerGasAbsorption {
         _SizFac = this->SizFac;
     }
 
-    void GasAbsorberSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
+    void GasAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
 
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
@@ -451,40 +451,16 @@ namespace ChillerGasAbsorption {
             thisChiller.FuelHeatingValue = rNumericArgs(16);
             thisChiller.SizFac = rNumericArgs(17);
 
-            // Fuel Type Case Statement
-            {
-                auto const SELECT_CASE_var(cAlphaArgs(17));
-                if (SELECT_CASE_var == "NATURALGAS") {
-                    thisChiller.FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "DIESEL") {
-                    thisChiller.FuelType = "Diesel";
-
-                } else if (SELECT_CASE_var == "GASOLINE") {
-                    thisChiller.FuelType = "Gasoline";
-
-                } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    thisChiller.FuelType = "FuelOil#1";
-
-                } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    thisChiller.FuelType = "FuelOil#2";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    thisChiller.FuelType = "Propane";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    thisChiller.FuelType = "OtherFuel1";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    thisChiller.FuelType = "OtherFuel2";
-
-                } else {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(17) + '=' + cAlphaArgs(17));
-                    ShowContinueError(
-                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
-                    Get_ErrorsFound = true;
-                }
+            // Validate fuel type input
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(cAlphaArgs(17), thisChiller.FuelType, FuelTypeError);
+            if (FuelTypeError) {
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value");
+                ShowContinueError("Invalid " + cAlphaFieldNames(17) + '=' + cAlphaArgs(17));
+                ShowContinueError(
+                    "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
+                Get_ErrorsFound = true;
+                FuelTypeError = false;
             }
         }
 
@@ -641,7 +617,7 @@ namespace ChillerGasAbsorption {
             "Chiller Heater Runtime Fraction", OutputProcessor::Unit::None, this->FractionOfPeriodRunning, "System", "Average", ChillerName);
     }
 
-    void GasAbsorberSpecs::initialize()
+    void GasAbsorberSpecs::initialize(BranchInputManagerData &dataBranchInputManager)
     {
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 2003
@@ -671,7 +647,8 @@ namespace ChillerGasAbsorption {
 
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_Chiller_DFAbsorption,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
@@ -687,7 +664,8 @@ namespace ChillerGasAbsorption {
                 ShowFatalError("InitGasAbsorber: Program terminated due to previous condition(s).");
             }
 
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_Chiller_DFAbsorption,
                                                     this->HWLoopNum,
                                                     this->HWLoopSideNum,
@@ -704,7 +682,8 @@ namespace ChillerGasAbsorption {
             }
 
             if (this->isWaterCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         DataPlant::TypeOf_Chiller_DFAbsorption,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,

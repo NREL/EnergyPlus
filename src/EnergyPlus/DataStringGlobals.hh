@@ -62,7 +62,6 @@ namespace DataStringGlobals {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-    extern std::string outputEndFileName;
     extern std::string outputErrFileName;
 
     extern std::string outputJsonFileName;
@@ -93,7 +92,6 @@ namespace DataStringGlobals {
     extern std::string outputHRMsgPackFileName;
     extern std::string outputSMMsgPackFileName;
 
-    extern std::string outputMtdFileName;
     extern std::string outputMddFileName;
     extern std::string outputRddFileName;
     extern std::string outputShdFileName;
@@ -109,27 +107,19 @@ namespace DataStringGlobals {
     extern std::string inputWeatherFileName;
     extern std::string outputAdsFileName;
     extern std::string outputGLHEFileName;
-    extern std::string outputDelightInFileName;
     extern std::string outputDelightOutFileName;
     extern std::string outputDelightEldmpFileName;
     extern std::string outputDelightDfdmpFileName;
-    extern std::string outputMapTabFileName;
-    extern std::string outputMapCsvFileName;
-    extern std::string outputMapTxtFileName;
-    extern std::string outputEddFileName;
     extern std::string outputIperrFileName;
     extern std::string outputPerfLogFileName;
-    extern std::string outputScreenCsvFileName;
     extern std::string outputSqlFileName;
     extern std::string outputSqliteErrFileName;
     extern std::string EnergyPlusIniFileName;
     extern std::string inStatFileName;
-    extern std::string TarcogIterationsFileName;
     extern std::string eplusADSFileName;
     extern std::string outputCsvFileName;
     extern std::string outputMtrCsvFileName;
     extern std::string outputRvauditFileName;
-    extern std::string outputExtShdFracFileName;
 
     extern std::string weatherFileNameOnly;
     extern std::string idfDirPathName;

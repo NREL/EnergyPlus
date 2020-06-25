@@ -284,7 +284,7 @@ namespace HeatBalanceManager {
         UniqueConstructNames.clear();
     }
 
-    void ManageHeatBalance(EnergyPlusData &state, OutputFiles &outputFiles)
+    void ManageHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -337,7 +337,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(state); // Obtains heat balance related parameters from input file
-            HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles);
+            HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -358,7 +358,7 @@ namespace HeatBalanceManager {
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance();                                                                // Initialize all heat balance related parameters
+        InitHeatBalance(state.outputFiles);                                                                // Initialize all heat balance related parameters
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -370,18 +370,18 @@ namespace HeatBalanceManager {
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance(state);
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
-        RecKeepHeatBalance(outputFiles);                                             // Do any heat balance related record keeping
+        RecKeepHeatBalance(state.outputFiles);                                             // Do any heat balance related record keeping
 
         // This call has been moved to the FanSystemModule and does effect the output file
         //   You do get a shift in the Air Handling System Summary for the building electric loads
         // IF ((.NOT.WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
 
-        ReportHeatBalance(state, outputFiles); // Manage heat balance reporting until the new reporting is in place
+        ReportHeatBalance(state, state.outputFiles); // Manage heat balance reporting until the new reporting is in place
 
         ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
 
         UpdateEMSTrendVariables();
-        EnergyPlus::PluginManagement::pluginManager->updatePluginValues();
+        EnergyPlus::PluginManagement::PluginManager::updatePluginValues();
 
         if (WarmupFlag && EndDayFlag) {
 
@@ -395,7 +395,7 @@ namespace HeatBalanceManager {
         }
 
         if (!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing) {
-            ReportWarmupConvergence(outputFiles);
+            ReportWarmupConvergence(state.outputFiles);
         }
     }
 
@@ -444,14 +444,13 @@ namespace HeatBalanceManager {
 
         // FLOW:
 
-        auto &outputFiles = OutputFiles::getSingleton();
-        GetProjectControlData(outputFiles, ErrorsFound);
+        GetProjectControlData(state.outputFiles, ErrorsFound);
 
-        GetSiteAtmosphereData(outputFiles, ErrorsFound);
+        GetSiteAtmosphereData(state.outputFiles, ErrorsFound);
 
         GetWindowGlassSpectralData(ErrorsFound);
 
-        GetMaterialData(outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
+        GetMaterialData(state.outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
         GetFrameAndDividerData(ErrorsFound);
 
@@ -4163,7 +4162,7 @@ namespace HeatBalanceManager {
         int DummyNumProp;                                          // dummy variable for properties being passed
         int IOStat;                                                // IO Status when calling get input subroutine
         Array1D_string ConstructAlphas({0, MaxLayersInConstruct}); // Construction Alpha names defined
-        Array1D<Real64> DummyProps(4);                             // Temporary array to transfer construction properties
+        Array1D<Real64> DummyProps(5);                             // Temporary array to transfer construction properties
         int Loop;
         int TotRegConstructs; // Number of "regular" constructions (no embedded sources or sinks and
 
@@ -4370,45 +4369,48 @@ namespace HeatBalanceManager {
             }
 
             ++ConstrNum;
+            auto &thisConstruct (Construct(TotRegConstructs + ConstrNum));
+
             // Assign Construction name to the Derived Type using the zeroth position of the array
-            Construct(TotRegConstructs + ConstrNum).Name = ConstructAlphas(0);
+            thisConstruct.Name = ConstructAlphas(0);
 
             // Obtain the source/sink data
-            if (DummyNumProp != 4) {
+            if (DummyNumProp != 5) {
                 ShowSevereError(CurrentModuleObject + ": Wrong number of numerical inputs for " + Construct(ConstrNum).Name);
                 ErrorsFound = true;
             }
-            Construct(TotRegConstructs + ConstrNum).SourceSinkPresent = true;
-            Construct(TotRegConstructs + ConstrNum).SourceAfterLayer = int(DummyProps(1));
-            Construct(TotRegConstructs + ConstrNum).TempAfterLayer = int(DummyProps(2));
-            Construct(TotRegConstructs + ConstrNum).SolutionDimensions = int(DummyProps(3));
-            if ((Construct(TotRegConstructs + ConstrNum).SolutionDimensions < 1) ||
-                (Construct(TotRegConstructs + ConstrNum).SolutionDimensions > 2)) {
+            thisConstruct.SourceSinkPresent = true;
+            thisConstruct.SourceAfterLayer = int(DummyProps(1));
+            thisConstruct.TempAfterLayer = int(DummyProps(2));
+            thisConstruct.SolutionDimensions = int(DummyProps(3));
+            if ((thisConstruct.SolutionDimensions < 1) ||
+                (thisConstruct.SolutionDimensions > 2)) {
                 ShowWarningError("Construction:InternalSource must be either 1- or 2-D.  Reset to 1-D solution.");
-                ShowContinueError("Construction=" + Construct(TotRegConstructs + ConstrNum).Name + " is affected.");
-                Construct(TotRegConstructs + ConstrNum).SolutionDimensions = 1;
+                ShowContinueError("Construction=" + thisConstruct.Name + " is affected.");
+                thisConstruct.SolutionDimensions = 1;
             }
-            Construct(TotRegConstructs + ConstrNum).ThicknessPerpend = DummyProps(4) / 2.0;
-
+            thisConstruct.ThicknessPerpend = DummyProps(4) / 2.0;
+            thisConstruct.userTemperatureLocationPerpendicular = thisConstruct.setUserTemperatureLocationPerpendicular(DummyProps(5));
+            
             // Set the total number of layers for the construction
-            Construct(TotRegConstructs + ConstrNum).TotLayers = ConstructNumAlpha - 1;
-            if (Construct(TotRegConstructs + ConstrNum).TotLayers <= 1) {
-                ShowSevereError("Construction " + Construct(TotRegConstructs + ConstrNum).Name +
+            thisConstruct.TotLayers = ConstructNumAlpha - 1;
+            if (thisConstruct.TotLayers <= 1) {
+                ShowSevereError("Construction " + thisConstruct.Name +
                                 " has an internal source or sink and thus must have more than a single layer");
                 ErrorsFound = true;
             }
-            if ((Construct(TotRegConstructs + ConstrNum).SourceAfterLayer >= Construct(TotRegConstructs + ConstrNum).TotLayers) ||
-                (Construct(TotRegConstructs + ConstrNum).SourceAfterLayer <= 0)) {
-                ShowWarningError("Construction " + Construct(TotRegConstructs + ConstrNum).Name + " must have a source that is between two layers");
+            if ((thisConstruct.SourceAfterLayer >= thisConstruct.TotLayers) ||
+                (thisConstruct.SourceAfterLayer <= 0)) {
+                ShowWarningError("Construction " + thisConstruct.Name + " must have a source that is between two layers");
                 ShowContinueError("The source after layer parameter has been set to one less than the number of layers.");
-                Construct(TotRegConstructs + ConstrNum).SourceAfterLayer = Construct(TotRegConstructs + ConstrNum).TotLayers - 1;
+                thisConstruct.SourceAfterLayer = thisConstruct.TotLayers - 1;
             }
-            if ((Construct(TotRegConstructs + ConstrNum).TempAfterLayer >= Construct(TotRegConstructs + ConstrNum).TotLayers) ||
-                (Construct(TotRegConstructs + ConstrNum).TempAfterLayer <= 0)) {
-                ShowWarningError("Construction " + Construct(TotRegConstructs + ConstrNum).Name +
+            if ((thisConstruct.TempAfterLayer >= thisConstruct.TotLayers) ||
+                (thisConstruct.TempAfterLayer <= 0)) {
+                ShowWarningError("Construction " + thisConstruct.Name +
                                  " must have a temperature calculation that is between two layers");
                 ShowContinueError("The temperature calculation after layer parameter has been set to one less than the number of layers.");
-                Construct(TotRegConstructs + ConstrNum).TempAfterLayer = Construct(TotRegConstructs + ConstrNum).TotLayers - 1;
+                thisConstruct.TempAfterLayer = thisConstruct.TotLayers - 1;
             }
 
             // Loop through all of the layers of the construct to match the material names.
@@ -4417,17 +4419,17 @@ namespace HeatBalanceManager {
 
                 // Find the material in the list of materials
 
-                Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), Material);
+                thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), Material);
 
-                if (Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) == 0) {
+                if (thisConstruct.LayerPoint(Layer) == 0) {
                     ShowSevereError("Did not find matching material for " + CurrentModuleObject + ' ' + Construct(ConstrNum).Name +
                                     ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
                     NominalRforNominalUCalculation(TotRegConstructs + ConstrNum) +=
-                        NominalR(Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer));
-                    if (Material(Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer)).Group == RegularMaterial &&
-                        !Material(Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer)).ROnly) {
+                        NominalR(thisConstruct.LayerPoint(Layer));
+                    if (Material(thisConstruct.LayerPoint(Layer)).Group == RegularMaterial &&
+                        !Material(thisConstruct.LayerPoint(Layer)).ROnly) {
                         NoRegularMaterialsUsed = false;
                     }
                 }
@@ -4636,7 +4638,7 @@ namespace HeatBalanceManager {
 
         GetZoneData(ErrorsFound); // Read Zone data from input file
 
-        SetupZoneGeometry(state, OutputFiles::getSingleton(), ErrorsFound);
+        SetupZoneGeometry(state, ErrorsFound);
     }
 
     void GetZoneData(bool &ErrorsFound) // If errors found in input
@@ -5155,7 +5157,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance()
+    void InitHeatBalance(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5206,8 +5208,6 @@ namespace HeatBalanceManager {
         int SurfNum;     // Surface number
         int ZoneNum;
         static bool ChangeSet(true); // Toggle for checking storm windows
-        static ObjexxFCL::gio::Fmt ShdFracFmt1("(' ',I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
-        static ObjexxFCL::gio::Fmt ShdFracFmt2("(f10.8,',')");
 
         // FLOW:
 
@@ -5215,13 +5215,13 @@ namespace HeatBalanceManager {
             AllocateHeatBalArrays(); // Allocate the Module Arrays
             if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
                 DisplayString("Initializing Response Factors");
-                InitConductionTransferFunctions(); // Initialize the response factors
+                InitConductionTransferFunctions(outputFiles); // Initialize the response factors
             }
 
             DisplayString("Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
-            InitWindowOpticalCalculations();
+            InitWindowOpticalCalculations(outputFiles);
             InitDaylightingDevices(OutputFiles::getSingleton()); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(); // Initialize the shadowing calculations
@@ -5276,7 +5276,7 @@ namespace HeatBalanceManager {
         }
 
         if (BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
-            OpenShadingFile();
+            OpenShadingFile(outputFiles);
         }
 
         if (BeginDayFlag) {
@@ -5300,26 +5300,17 @@ namespace HeatBalanceManager {
         if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
+                    static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
                         if (TS == NumOfTimeStepInHour) {
-                            ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt1, flags) << Month << DayOfMonth << iHour << 0;
+                            print(outputFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
                         } else {
-                            ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt1, flags)
-                                << Month << DayOfMonth << iHour - 1 << (60 / NumOfTimeStepInHour) * TS;
+                            print(outputFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / NumOfTimeStepInHour) * TS);
                         }
-                    }
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
-                        ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt2, flags) << SunlitFrac(TS, iHour, SurfNum);
+                        static constexpr auto ShdFracFmt2("{:10.8F},");
+                        print(outputFiles.shade, ShdFracFmt2, SunlitFrac(TS, iHour, SurfNum));
                     }
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("YES");
-                        ObjexxFCL::gio::write(OutputFileShadingFrac, "()", flags);
-                    }
+                    print(outputFiles.shade, "\n");
                 }
             }
         }
@@ -5940,7 +5931,7 @@ namespace HeatBalanceManager {
 
         if (!WarmupFlag && DoOutputReporting) {
             CalcMoreNodeInfo();
-            UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
@@ -5983,13 +5974,13 @@ namespace HeatBalanceManager {
                 }
             }
             CalcMoreNodeInfo();
-            UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
 
         } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
-            UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
@@ -6003,7 +5994,7 @@ namespace HeatBalanceManager {
 
     //        End of Reporting subroutines for the HB Module
 
-    void OpenShadingFile()
+    void OpenShadingFile(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6019,38 +6010,14 @@ namespace HeatBalanceManager {
         using DataSurfaces::Surface;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int write_stat;
         int SurfNum;
-        static ObjexxFCL::gio::Fmt ShdFracFmtName("(A, A)");
 
-        OutputFileShadingFrac = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            flags.STATUS("UNKNOWN");
-            ObjexxFCL::gio::open(OutputFileShadingFrac, DataStringGlobals::outputExtShdFracFileName, flags);
-            write_stat = flags.ios();
-        }
-        if (write_stat != 0) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputExtShdFracFileName + " for output (write).");
-        }
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(OutputFileShadingFrac, fmtA, flags) << "Surface Name,";
-        }
+        outputFiles.shade.ensure_open("OpenOutputFiles");
+        print(outputFiles.shade, "Surface Name,");
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmtName, flags) << Surface(SurfNum).Name << ",";
-            }
+            print(outputFiles.shade, "{},", Surface(SurfNum).Name);
         }
-        {
-            IOFlags flags;
-            flags.ADVANCE("YES");
-            ObjexxFCL::gio::write(OutputFileShadingFrac, "()", flags);
-        }
+        print(outputFiles.shade, "()\n");
     }
     void GetFrameAndDividerData(bool &ErrorsFound) // set to true if errors found in input
     {
@@ -6308,7 +6275,7 @@ namespace HeatBalanceManager {
         // ErrorsFound = .FALSE.
         EOFonFile = false;
 
-        CheckForActualFileName(DesiredFileName, exists, TempFullFileName);
+        CheckForActualFileName(OutputFiles::getSingleton(), DesiredFileName, exists, TempFullFileName);
         // INQUIRE(FILE=TRIM(DesiredFileName), EXIST=exists)
         if (!exists) {
             ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Could not locate Window5 Data File, expecting it as file name=" +
