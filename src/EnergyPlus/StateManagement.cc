@@ -54,7 +54,6 @@
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>
@@ -247,7 +246,6 @@ void EnergyPlus::clearAllStates(IOFiles &ioFiles)
 {
     using namespace EnergyPlus;
     // A to Z order
-    CoolingPanelSimple::clear_state();
     CoilCoolingDX::clear_state();
     CondenserLoopTowers::clear_state();
     CoolTower::clear_state();
@@ -303,7 +301,6 @@ void EnergyPlus::clearAllStates(IOFiles &ioFiles)
     EMSManager::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
-    //ExteriorEnergyUse::clear_state();
     FanCoilUnits::clear_state();
     Fans::clear_state();
     FaultsManager::clear_state();
@@ -418,8 +415,5 @@ void EnergyPlus::clearAllStates(IOFiles &ioFiles)
     ZoneAirLoopEquipmentManager::clear_state();
     ZoneContaminantPredictorCorrector::clear_state();
     ZoneDehumidifier::clear_state();
-    ZoneEquipmentManager::clear_state();
-    ZonePlenum::clear_state();
-    ZoneTempPredictorCorrector::clear_state();
     ResultsFramework::clear_state();
 }

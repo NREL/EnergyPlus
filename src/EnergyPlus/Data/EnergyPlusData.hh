@@ -62,6 +62,7 @@
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
@@ -73,8 +74,11 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
-#include <string>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 #include <unordered_map>
+#include <string>
 
 namespace EnergyPlus {
 
@@ -87,6 +91,7 @@ namespace EnergyPlus {
         BoilersData dataBoilers;
         BoilerSteamData dataSteamBoilers;
         BranchInputManagerData dataBranchInputManager;
+        ChilledCeilingPanelSimpleData dataChilledCeilingPanelSimple;
         ChillerAbsorberData dataChillerAbsorbers;
         ChillerElectricEIRData dataChillerElectricEIR;
         ChillerExhaustAbsorptionData dataChillerExhaustAbsorption;
@@ -102,6 +107,10 @@ namespace EnergyPlus {
         //OutputReportTabular outputReportTabular;
 
         IOFiles files;
+
+        ZoneEquipmentManagerData dataZoneEquipmentManager;
+        ZonePlenumData dataZonePlenum;
+        ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
 
         EnergyPlusData() {
             // todo, try to eliminate the need for the singleton
@@ -121,6 +130,7 @@ namespace EnergyPlus {
             dataBoilers.clear_state();
             dataBranchInputManager.clear_state();
             dataSteamBoilers.clear_state();
+            dataChilledCeilingPanelSimple.clear_state();
             dataChillerAbsorbers.clear_state();
             dataChillerElectricEIR.clear_state();
             dataChillerExhaustAbsorption.clear_state();
@@ -133,6 +143,9 @@ namespace EnergyPlus {
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataZoneEquipmentManager.clear_state();
+            dataZonePlenum.clear_state();
+            dataZoneTempPredictorCorrector.clear_state();
         };
     };
 

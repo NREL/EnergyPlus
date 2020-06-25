@@ -285,7 +285,7 @@ namespace SurfaceGeometry {
             CosZoneRelNorth(ZoneNum) = std::cos(-Zone(ZoneNum).RelNorth * DegToRadians);
             SinZoneRelNorth(ZoneNum) = std::sin(-Zone(ZoneNum).RelNorth * DegToRadians);
         }
-        GetSurfaceData(state.files, ErrorsFound);
+        GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound);
 
         if (ErrorsFound) {
             CosZoneRelNorth.deallocate();
@@ -776,7 +776,7 @@ namespace SurfaceGeometry {
         AWinCFOverlap.dimension(MaxSolidWinLayers, TotSurfaces, 0.0);
     }
 
-    void GetSurfaceData(IOFiles &ioFiles, bool &ErrorsFound) // If errors found in input
+    void GetSurfaceData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -2073,7 +2073,7 @@ namespace SurfaceGeometry {
 
         exposedFoundationPerimeter.getData(ErrorsFound);
 
-        GetSurfaceHeatTransferAlgorithmOverrides(ioFiles, ErrorsFound);
+        GetSurfaceHeatTransferAlgorithmOverrides(dataZoneTempPredictorCorrector, ioFiles, ErrorsFound);
 
         // Set up enclosures, process Air Boundaries if any
         SetupEnclosuresAndAirBoundaries(DataViewFactorInformation::ZoneRadiantInfo, SurfaceGeometry::enclosureType::RadiantEnclosures, ErrorsFound);
@@ -6636,7 +6636,7 @@ namespace SurfaceGeometry {
         }
     }
 
-    void GetSurfaceHeatTransferAlgorithmOverrides(IOFiles &ioFiles, bool &ErrorsFound)
+    void GetSurfaceHeatTransferAlgorithmOverrides(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7063,7 +7063,7 @@ namespace SurfaceGeometry {
 
         // Setup Kiva instances
         if (DataHeatBalance::AnyKiva) {
-            if (!ErrorsFound) ErrorsFound = kivaManager.setupKivaInstances(ioFiles);
+            if (!ErrorsFound) ErrorsFound = kivaManager.setupKivaInstances(dataZoneTempPredictorCorrector, ioFiles);
         }
 
         // test for missing materials for algorithms selected

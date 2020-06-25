@@ -56,13 +56,16 @@
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
 
 // C++ Headers
 #include <map>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZoneTempPredictorCorrectorData;
+    class IOFiles;
 
 namespace SurfaceGeometry {
 
@@ -125,7 +128,7 @@ namespace SurfaceGeometry {
 
     void AllocateModuleArrays();
 
-    void GetSurfaceData(IOFiles &ioFiles, bool &ErrorsFound); // If errors found in input
+    void GetSurfaceData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, bool &ErrorsFound); // If errors found in input
 
     void checkSubSurfAzTiltNorm(SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
@@ -258,7 +261,7 @@ namespace SurfaceGeometry {
 
     void GetHTSurfExtVentedCavityData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
-    void GetSurfaceHeatTransferAlgorithmOverrides(IOFiles &ioFiles, bool &ErrorsFound);
+    void GetSurfaceHeatTransferAlgorithmOverrides(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, bool &ErrorsFound);
 
     class ExposedFoundationPerimeter
     {

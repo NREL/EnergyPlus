@@ -53,11 +53,12 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    class IOFiles;
 
 void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,               // the component Name
                        std::string const &CompType,               // Type of component
@@ -148,7 +149,7 @@ void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity pe
 
 void TestAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound);
 
-void TestSupplyAirPathIntegrity(EnergyPlusData &state, EnergyPlus::IOFiles &ioFiles, bool &ErrFound);
+void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound);
 
 void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound, Array2S_int ValRetAPaths);
 

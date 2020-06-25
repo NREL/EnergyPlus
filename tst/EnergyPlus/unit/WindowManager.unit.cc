@@ -2450,7 +2450,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.files);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.files);
     bool FoundError = false;
 
     HeatBalanceManager::GetProjectControlData(state.files, FoundError); // read project control data
@@ -2495,7 +2495,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.files, FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
     WindowManager::InitGlassOpticalCalculations(state.files);

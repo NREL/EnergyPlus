@@ -643,7 +643,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     bool ErrorsFound = false;
     bool firstHVACIteration = true;
     // Read objects
-    SimulationManager::GetProjectData(state.files);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.files);
     HeatBalanceManager::GetProjectControlData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
@@ -657,7 +657,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
-    ZoneTempPredictorCorrector::InitZoneAirSetPoints();
+    ZoneTempPredictorCorrector::InitZoneAirSetPoints(state.dataZoneTempPredictorCorrector);
     bool simZone = false;
     bool simAir = false;
     DataHeatBalance::MassConservation.allocate(DataGlobals::NumOfZones);

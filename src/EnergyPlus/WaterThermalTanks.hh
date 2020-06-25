@@ -54,13 +54,13 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
     class IOFiles;
+    struct EnergyPlusData;
 
 namespace WaterThermalTanks {
 

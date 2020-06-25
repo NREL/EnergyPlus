@@ -613,7 +613,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.files);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.files);
     bool FoundError = false;
 
     HeatBalanceManager::GetProjectControlData(state.files, FoundError); // read project control data
@@ -645,7 +645,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.files, FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
     //	compare_err_stream( "" ); // just for debugging
@@ -1012,7 +1012,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     SolarShading::clear_state();
 
-    SimulationManager::GetProjectData(state.files);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.files);
     bool FoundError = false;
 
     HeatBalanceManager::GetProjectControlData(state.files, FoundError); // read project control data
@@ -1420,7 +1420,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     SolarShading::clear_state();
 
-    SimulationManager::GetProjectData(state.files);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.files);
     bool FoundError = false;
 
     HeatBalanceManager::GetProjectControlData(state.files, FoundError); // read project control data
@@ -1790,7 +1790,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.files);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.files);
     bool FoundError = false;
 
     HeatBalanceManager::GetProjectControlData(state.files, FoundError); // read project control data
@@ -1822,7 +1822,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.files, FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                                                 // expect no errors
 
     //	compare_err_stream( "" ); // just for debugging

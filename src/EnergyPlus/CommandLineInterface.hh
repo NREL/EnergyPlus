@@ -49,10 +49,14 @@
 #define CommandLineInterface_hh_INCLUDED
 
 #include <EnergyPlus/api/EnergyPlusAPI.h>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+//#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <string>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    class IOFiles;
+    class InputFile;
 
 namespace CommandLineInterface {
 

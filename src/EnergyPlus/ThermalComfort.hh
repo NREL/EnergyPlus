@@ -56,6 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    //forward declarations
+    struct ZoneTempPredictorCorrectorData;
 
 namespace ThermalComfort {
 
@@ -283,7 +285,8 @@ namespace ThermalComfort {
 
     void clear_state();
 
-    void ManageThermalComfort(IOFiles &ioFiles,
+    void ManageThermalComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
+                              IOFiles &ioFiles,
                               bool const InitializeOnly); // when called from ZTPC and calculations aren't needed
 
     void InitThermalComfort();
@@ -318,7 +321,7 @@ namespace ThermalComfort {
 
     void ResetThermalComfortSimpleASH55();
 
-    void CalcIfSetPointMet();
+    void CalcIfSetPointMet(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
 
     void ResetSetPointMet();
 

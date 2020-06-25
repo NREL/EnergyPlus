@@ -7344,7 +7344,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
     SizingManager::GetOARequirements();
     SizingManager::GetZoneSizingInput();
     GetZoneEquipmentData1(state);
-    ZoneEquipmentManager::SetUpZoneSizingArrays(state.files);
+    ZoneEquipmentManager::SetUpZoneSizingArrays(state);
     GetZoneAirLoopEquipment();
     GetATMixers();
 

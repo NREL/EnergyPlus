@@ -1115,7 +1115,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData(state.files);
+    GetProjectData(state.dataZoneTempPredictorCorrector, state.files);
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
     createFacilityElectricPowerServiceObject();
@@ -2123,7 +2123,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData(state.files);
+    GetProjectData(state.dataZoneTempPredictorCorrector, state.files);
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
     createFacilityElectricPowerServiceObject();

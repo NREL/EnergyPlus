@@ -54,10 +54,11 @@
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-class IOFiles;
+    // Forward declarations
+    struct EnergyPlusData;
+    class IOFiles;
 
 struct CoilCoolingDXCurveFitPerformanceInputSpecification
 {

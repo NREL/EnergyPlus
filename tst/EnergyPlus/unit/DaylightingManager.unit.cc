@@ -826,7 +826,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.files, foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()
@@ -2100,7 +2100,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.files, foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()

@@ -291,7 +291,7 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.files, errorsFound);
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
@@ -585,7 +585,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.files, errorsFound);
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);

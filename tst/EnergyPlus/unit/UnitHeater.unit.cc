@@ -1117,7 +1117,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData(state.files);
+    GetProjectData(state.dataZoneTempPredictorCorrector, state.files);
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
 
@@ -2432,12 +2432,12 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
 
     EXPECT_EQ(ZoneEquipList(1).NumOfEquipTypes, 2);
     // first priority zone equipment is zone ADU
-    EXPECT_EQ(ZoneEquipmentManager::PrioritySimOrder(1).EquipType, "ZONEHVAC:AIRDISTRIBUTIONUNIT");
-    EXPECT_EQ(ZoneEquipmentManager::PrioritySimOrder(1).EquipName, "MAIN ZONE ATU");
+    EXPECT_EQ(state.dataZoneEquipmentManager.PrioritySimOrder(1).EquipType, "ZONEHVAC:AIRDISTRIBUTIONUNIT");
+    EXPECT_EQ(state.dataZoneEquipmentManager.PrioritySimOrder(1).EquipName, "MAIN ZONE ATU");
     EXPECT_EQ(HeatingCoils::HeatingCoil(1).Name, "MAIN ZONE REHEAT COIL");
     // second priority zone equipment is unit heater
-    EXPECT_EQ(ZoneEquipmentManager::PrioritySimOrder(2).EquipType, "ZONEHVAC:UNITHEATER");
-    EXPECT_EQ(ZoneEquipmentManager::PrioritySimOrder(2).EquipName, "UNITHEATER");
+    EXPECT_EQ(state.dataZoneEquipmentManager.PrioritySimOrder(2).EquipType, "ZONEHVAC:UNITHEATER");
+    EXPECT_EQ(state.dataZoneEquipmentManager.PrioritySimOrder(2).EquipName, "UNITHEATER");
     EXPECT_EQ(HeatingCoils::HeatingCoil(2).Name, "UNITHEATER_ELECTRICHEATER");
     // check the reheat coil output
     EXPECT_NEAR(HeatingCoils::HeatingCoil(1).HeatingCoilRate, 7028.9, 1.0);

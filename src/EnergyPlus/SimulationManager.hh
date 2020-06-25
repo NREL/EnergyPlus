@@ -50,10 +50,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
     class IOFiles;
+    struct EnergyPlusData;
+    struct ZoneTempPredictorCorrectorData;
 
 namespace SimulationManager {
 
@@ -78,7 +79,7 @@ namespace SimulationManager {
 
     void ManageSimulation(EnergyPlusData &state);
 
-    void GetProjectData(IOFiles &ioFiles);
+    void GetProjectData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles);
 
     void writeIntialPerfLogValues(std::string const &currentOverrideModeValue);
 

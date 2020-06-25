@@ -59,10 +59,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
     class IOFiles;
+    struct EnergyPlusData;
+
 namespace WeatherManager {
 
     // Using/Aliasing

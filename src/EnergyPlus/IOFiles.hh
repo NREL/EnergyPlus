@@ -45,8 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef OutputFiles_hh_INCLUDED
-#define OutputFiles_hh_INCLUDED
+#ifndef IOFiles_hh_INCLUDED
+#define IOFiles_hh_INCLUDED
 
 #include <fstream>
 #include <fmt/format.h>

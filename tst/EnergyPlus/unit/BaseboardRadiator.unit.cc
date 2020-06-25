@@ -356,7 +356,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.files, errorsFound);
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     ZoneSizingInput.allocate(3);

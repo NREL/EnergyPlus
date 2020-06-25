@@ -57,12 +57,14 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include <functional>
 
 namespace EnergyPlus {
-class InputOutputFile;
+    // Forward declarations
+    struct EnergyPlusData;
+    class InputOutputFile;
+    class IOFiles;
 
 int AbortEnergyPlus(EnergyPlusData &state);
 

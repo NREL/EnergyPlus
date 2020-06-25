@@ -350,7 +350,7 @@ namespace ThermalComfort {
         AngleFactorList.deallocate();
     }
 
-    void ManageThermalComfort(IOFiles &ioFiles, bool const InitializeOnly) // when called from ZTPC and calculations aren't needed
+    void ManageThermalComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, bool const InitializeOnly) // when called from ZTPC and calculations aren't needed
     {
 
         // SUBROUTINE INFORMATION:
@@ -397,7 +397,7 @@ namespace ThermalComfort {
             CalcThermalComfortPierce();
             CalcThermalComfortKSU();
             CalcThermalComfortSimpleASH55();
-            CalcIfSetPointMet();
+            CalcIfSetPointMet(dataZoneTempPredictorCorrector);
             if (ASH55Flag) CalcThermalComfortAdaptiveASH55(ioFiles, false);
             if (CEN15251Flag) CalcThermalComfortAdaptiveCEN15251(ioFiles, false);
         }
@@ -2391,7 +2391,7 @@ namespace ThermalComfort {
         TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
     }
 
-    void CalcIfSetPointMet()
+    void CalcIfSetPointMet(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -2419,7 +2419,7 @@ namespace ThermalComfort {
         using DataHVACGlobals::SingleHeatingSetPoint;
         using DataRoomAirModel::AirModel;
         using DataRoomAirModel::RoomAirModel_Mixing;
-        using ZoneTempPredictorCorrector::NumOnOffCtrZone;
+        //using ZoneTempPredictorCorrector::NumOnOffCtrZone;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SensibleLoadPredictedNoAdj;
@@ -2464,7 +2464,7 @@ namespace ThermalComfort {
                 if (AirModel(iZone).AirModelType != RoomAirModel_Mixing) {
                     deltaT = TempTstatAir(iZone) - ZoneThermostatSetPointLo(iZone);
                 } else {
-                    if (NumOnOffCtrZone > 0) {
+                    if (dataZoneTempPredictorCorrector.NumOnOffCtrZone > 0) {
                         deltaT = ZTAV(iZone) - ZoneThermostatSetPointLoAver(iZone);
                     } else {
                         deltaT = ZTAV(iZone) - ZoneThermostatSetPointLo(iZone);
@@ -2485,7 +2485,7 @@ namespace ThermalComfort {
                 if (AirModel(iZone).AirModelType != RoomAirModel_Mixing) {
                     deltaT = TempTstatAir(iZone) - ZoneThermostatSetPointHi(iZone);
                 } else {
-                    if (NumOnOffCtrZone > 0) {
+                    if (dataZoneTempPredictorCorrector.NumOnOffCtrZone > 0) {
                         deltaT = ZTAV(iZone) - ZoneThermostatSetPointHiAver(iZone);
                     } else {
                         deltaT = ZTAV(iZone) - ZoneThermostatSetPointHi(iZone);
