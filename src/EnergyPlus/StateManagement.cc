@@ -48,20 +48,9 @@
 #include <EnergyPlus/StateManagement.hh>
 
 #include <AirflowNetwork/Elements.hpp>
-#include <AirflowNetwork/Properties.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <EnergyPlus/AirLoopHVACDOAS.hh>
-#include <EnergyPlus/BaseboardElectric.hh>
-#include <EnergyPlus/BaseboardRadiator.hh>
-#include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/ChillerExhaustAbsorption.hh>
-#include <EnergyPlus/ChillerGasAbsorption.hh>
-#include <EnergyPlus/ChillerIndirectAbsorption.hh>
-#include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
@@ -106,7 +95,6 @@
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EarthTube.hh>
@@ -119,7 +107,6 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
-#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Furnaces.hh>
@@ -178,7 +165,6 @@
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
-#include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
@@ -207,7 +193,6 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SolarShading.hh>
-#include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -248,7 +233,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     using namespace EnergyPlus;
     // A to Z order
     CoilCoolingDX::clear_state();
-    CondenserLoopTowers::clear_state();
     CoolTower::clear_state();
     CrossVentMgr::clear_state();
     CTElectricGenerator::clear_state();

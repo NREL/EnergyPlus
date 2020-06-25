@@ -1457,9 +1457,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // OutputProcessor::TimeValue.allocate(2);
-    EnergyPlusData state;
-
     ManageSimulation(state); // run the design day over the warmup period (24 hrs, 25 days)
 
     EXPECT_EQ(10.0, (Zone(2).Volume * Zone(2).Multiplier * Zone(2).ListMultiplier) / (Zone(1).Volume * Zone(1).Multiplier * Zone(1).ListMultiplier));
@@ -2494,10 +2491,6 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-
-    // OutputProcessor::TimeValue.allocate(2);
-    // DataGlobals::DDOnlySimulation = true;
-    EnergyPlusData state;
 
     ManageSimulation(state); // run the design day over the warmup period (24 hrs, 25 days)
 
@@ -3762,16 +3755,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     MixedAir::OAController.allocate(2);
     MixedAir::OAController(1).RelTotalLossRate = 1.0;
     MixedAir::OAController(2).RelTotalLossRate = 1.0;
-    CondenserLoopTowers::NumSimpleTowers = 1;
-    CondenserLoopTowers::towers.allocate(1);
-    CondenserLoopTowers::towers(1).Qactual = 1.0;
-    CondenserLoopTowers::towers(1).FanEnergy = 50.0;
+    state.dataCondenserLoopTowers.NumSimpleTowers = 1;
+    state.dataCondenserLoopTowers.towers.allocate(1);
+    state.dataCondenserLoopTowers.towers(1).Qactual = 1.0;
+    state.dataCondenserLoopTowers.towers(1).FanEnergy = 50.0;
 
     Real64 TimeStepSysSec = DataHVACGlobals::TimeStepSys * SecInHour;
     Real64 reliefEnergy = 2.0 * TimeStepSysSec;
     Real64 condenserReject = 1.0 * TimeStepSysSec + 50.0;
 
-    EnergyPlusData state;
     GatherHeatEmissionReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
     EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
@@ -3802,10 +3794,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     EXPECT_EQ(2 * reliefEnergy * DataGlobals::convertJtoGJ, BuildingPreDefRep.emiHVACRelief);
     EXPECT_EQ(condenserReject + coilReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
     EXPECT_EQ(2 * condenserReject * DataGlobals::convertJtoGJ + coilReject * DataGlobals::convertJtoGJ, BuildingPreDefRep.emiHVACReject);
-
-    MixedAir::clear_state();
-    DXCoils::clear_state();
-    CondenserLoopTowers::clear_state();
 }
 
 TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
