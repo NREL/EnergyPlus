@@ -200,6 +200,10 @@ namespace HeatBalanceSurfaceManager {
         bool hasPierceSET(true);
         bool reportCO2ResilienceFirstTime(true);
         bool reportVisualResilienceFirstTime(true);
+        std::vector<Real64> lowSETLongestHours;
+        std::vector<Real64> highSETLongestHours;
+        std::vector<int> lowSETLongestStart;
+        std::vector<int> highSETLongestStart;
     } // namespace
 
     // These are now external subroutines
@@ -218,6 +222,10 @@ namespace HeatBalanceSurfaceManager {
         hasPierceSET = true;
         reportCO2ResilienceFirstTime = true;
         reportVisualResilienceFirstTime = true;
+        lowSETLongestHours.clear();
+        highSETLongestHours.clear();
+        lowSETLongestStart.clear();
+        highSETLongestStart.clear();
     }
 
     void ManageSurfaceHeatBalance(EnergyPlusData &state)
@@ -4913,10 +4921,6 @@ namespace HeatBalanceSurfaceManager {
         int HINoBins = 5; // Heat Index range - number of bins
         int HumidexNoBins = 5; // Humidex range - number of bins
         int SETNoBins = 4; // SET report column numbers
-        static std::vector<Real64> lowSETLongestHours;
-        static std::vector<Real64> highSETLongestHours;
-        static std::vector<int> lowSETLongestStart;
-        static std::vector<int> highSETLongestStart;
 
         if (reportThermalResilienceFirstTime) {
             if (TotPeople == 0) hasPierceSET = false;
@@ -4988,7 +4992,10 @@ namespace HeatBalanceSurfaceManager {
             ZoneHumidex(ZoneNum) = Humidex;
         }
 
+        // Count hours only during weather simulation periods
         if (ksRunPeriodWeather == KindOfSim && !WarmupFlag) {
+            // Trace current time step Zone Pierce SET; NaN if no occupant or SET not calculated
+            // Record last time step SET to trace SET unmet duration;
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 int ZoneNum = People(iPeople).ZonePtr;
                 ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(People(iPeople).NumberOfPeoplePtr);
@@ -5070,7 +5077,6 @@ namespace HeatBalanceSurfaceManager {
                             if (isnan(PierceSETLast) || PierceSETLast <= 30) {
                                 General::EncodeMonDayHrMin(encodedMonDayHrMin, Month, DayOfMonth, HourOfDay,
                                                            TimeStepZone * (TimeStep - 1) * 60);
-//                                std::string startDateTime = OutputReportTabular::DateToString(int(encodedMonDayHrMin));
                                 highSETLongestHours[ZoneNum - 1] = 0;
                                 highSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
                             }
@@ -5192,7 +5198,7 @@ namespace HeatBalanceSurfaceManager {
                 if (ZoneIllum <= 100) {
                     ZoneLightingLevelHourBins(ZoneNum)[0] += TimeStepZone;
                     ZoneLightingLevelOccuHourBins(ZoneNum)[0] += NumOcc * TimeStepZone;
-                } else if (ZoneIllum > 100 && ZoneIllum <= 200) {
+                } else if (ZoneIllum > 100 && ZoneIllum <= 300) {
                     ZoneLightingLevelHourBins(ZoneNum)[1] += TimeStepZone;
                     ZoneLightingLevelOccuHourBins(ZoneNum)[1] += NumOcc * TimeStepZone;
                 } else if (ZoneIllum > 300 && ZoneIllum <= 500) {

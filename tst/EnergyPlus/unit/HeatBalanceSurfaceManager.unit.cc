@@ -53,6 +53,8 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -2751,6 +2753,33 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_EQ(6, DataHeatBalFanSys::ZoneHighSETHours(1)[0]); // SET Hours = SET Hours = (32 - 30) * 3 Hours
     EXPECT_EQ(6, DataHeatBalFanSys::ZoneLowSETHours(1)[2]); // Longest Heating SET Unmet Duration
     EXPECT_EQ(3, DataHeatBalFanSys::ZoneHighSETHours(1)[2]); //  Longest Cooling SET Unmet Duration
+
+    DataHeatBalFanSys::ZoneCO2LevelHourBins.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneCO2LevelOccuHourBins.allocate(NumOfZones);
+    DataContaminantBalance::ZoneAirCO2Avg.allocate(NumOfZones);
+    DataContaminantBalance::Contaminant.CO2Simulation = true;
+    ScheduleManager::Schedule(1).CurrentValue = 1;
+    OutputReportTabular::displayCO2ResilienceSummary = true;
+    DataContaminantBalance::ZoneAirCO2Avg(1) = 1100;
+    ReportCO2Resilience();
+    EXPECT_EQ(1, DataHeatBalFanSys::ZoneCO2LevelHourBins(1)[1]);
+    EXPECT_EQ(2, DataHeatBalFanSys::ZoneCO2LevelOccuHourBins(1)[1]);
+
+    DataHeatBalFanSys::ZoneLightingLevelHourBins.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneLightingLevelOccuHourBins.allocate(NumOfZones);
+    DataDaylighting::ZoneDaylight.allocate(NumOfZones);
+    DataDaylighting::ZoneDaylight(1).DaylightMethod = DataDaylighting::SplitFluxDaylighting;
+    DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt.allocate(1);
+    DataDaylighting::ZoneDaylight(1).IllumSetPoint.allocate(1);
+    DataDaylighting::ZoneDaylight(1).ZonePowerReductionFactor = 0.5;
+    DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1) = 300;
+    DataDaylighting::ZoneDaylight(1).IllumSetPoint(1) = 400;
+    OutputReportTabular::displayVisualResilienceSummary = true;
+
+    ReportVisualResilience();
+    EXPECT_EQ(1, DataHeatBalFanSys::ZoneLightingLevelHourBins(1)[2]);
+    EXPECT_EQ(2, DataHeatBalFanSys::ZoneLightingLevelOccuHourBins(1)[2]);
+
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow) {
