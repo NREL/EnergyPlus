@@ -11462,16 +11462,16 @@ namespace OutputReportTabular {
             bool hasPierceSET = true;
             if (TotPeople == 0) {
                 hasPierceSET = false;
-//                ShowWarningError( "Writing Annual Thermal Resilience Summary - SET Hours reports: "
-//                                  "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
-//                                  "but no People object is defined.");
+                ShowWarningError( "Writing Annual Thermal Resilience Summary - SET Hours reports: "
+                                  "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
+                                  "but no People object is defined.");
             }
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 if (!People(iPeople).Pierce) {
                     hasPierceSET = false;
-//                    ShowWarningError( "Writing Annual Thermal Resilience Summary - SET Hours reports: "
-//                                      "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
-//                                      "but no Pierce model is defined in " + People(iPeople).Name + " object.");
+                    ShowWarningError( "Writing Annual Thermal Resilience Summary - SET Hours reports: "
+                                      "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
+                                      "but no Pierce model is defined in " + People(iPeople).Name + " object.");
                 }
             }
 
@@ -11527,9 +11527,9 @@ namespace OutputReportTabular {
 
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::NoDaylighting) {
-//                ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
-//                                 "Zone Average Daylighting Reference Point Illuminance output is required, "
-//                                 "but no Daylight Method is defined in Zone:" + Zone(ZoneNum).Name);
+                ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
+                                 "Zone Average Daylighting Reference Point Illuminance output is required, "
+                                 "but no Daylight Method is defined in Zone:" + Zone(ZoneNum).Name);
             }
         }
 

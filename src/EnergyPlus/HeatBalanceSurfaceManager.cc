@@ -196,6 +196,10 @@ namespace HeatBalanceSurfaceManager {
         bool UpdateThermalHistoriesFirstTimeFlag(true);
         bool CalculateZoneMRTfirstTime(true); // Flag for first time calculations
         bool calcHeatBalanceInsideSurfFirstTime(true);
+        bool reportThermalResilienceFirstTime(true);
+        bool hasPierceSET(true);
+        bool reportCO2ResilienceFirstTime(true);
+        bool reportVisualResilienceFirstTime(true);
     } // namespace
 
     // These are now external subroutines
@@ -210,6 +214,10 @@ namespace HeatBalanceSurfaceManager {
         UpdateThermalHistoriesFirstTimeFlag = true;
         CalculateZoneMRTfirstTime = true;
         calcHeatBalanceInsideSurfFirstTime = true;
+        reportThermalResilienceFirstTime = true;
+        hasPierceSET = true;
+        reportCO2ResilienceFirstTime = true;
+        reportVisualResilienceFirstTime = true;
     }
 
     void ManageSurfaceHeatBalance(EnergyPlusData &state)
@@ -4891,27 +4899,25 @@ namespace HeatBalanceSurfaceManager {
 
     void ReportThermalResilience() {
 
-        double c1 = -42.379;
-        double c2 = 2.04901523;
-        double c3 = 10.14333127;
-        double c4 = -.22475541;
-        double c5 = -.00683783;
-        double c6 = -.05481717;
-        double c7 = .00122874;
-        double c8 = .00085282;
-        double c9 = -.00000199;
+        Real64 c1 = -42.379;
+        Real64 c2 = 2.04901523;
+        Real64 c3 = 10.14333127;
+        Real64 c4 = -.22475541;
+        Real64 c5 = -.00683783;
+        Real64 c6 = -.05481717;
+        Real64 c7 = .00122874;
+        Real64 c8 = .00085282;
+        Real64 c9 = -.00000199;
 
         int HINoBins = 5; // Heat Index range - number of bins
         int HumidexNoBins = 5; // Humidex range - number of bins
         int SETNoBins = 4; // SET report column numbers
-        static std::vector<double> lowSETLongestHours(NumOfZones, 0.0);
-        static std::vector<double> highSETLongestHours(NumOfZones, 0.0);
-        static std::vector<int> lowSETLongestStart(NumOfZones, 0.0);
-        static std::vector<int> highSETLongestStart(NumOfZones, 0.0);
-        static bool hasPierceSET = true;
-        static bool oneTimeFlag = true;
+        static std::vector<Real64> lowSETLongestHours;
+        static std::vector<Real64> highSETLongestHours;
+        static std::vector<int> lowSETLongestStart;
+        static std::vector<int> highSETLongestStart;
 
-        if (oneTimeFlag) {
+        if (reportThermalResilienceFirstTime) {
             if (TotPeople == 0) hasPierceSET = false;
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 if (!People(iPeople).Pierce) {
@@ -4941,18 +4947,22 @@ namespace HeatBalanceSurfaceManager {
                                     "State",
                                     Zone(ZoneNum).Name);
             }
-            oneTimeFlag = false;
+            lowSETLongestHours.assign(NumOfZones, 0.0);
+            highSETLongestHours.assign(NumOfZones, 0.0);
+            lowSETLongestStart.assign(NumOfZones, 0.0);
+            highSETLongestStart.assign(NumOfZones, 0.0);
+            reportThermalResilienceFirstTime = false;
         }
 
         // Calculate Heat Index and Humidex.
         // The heat index equation set is fit to Fahrenheit units, so the zone air temperature values are first convert to F,
         // then heat index is calculated and converted back to C.
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
-            double ZoneT = ZTAV(ZoneNum);
-            double ZoneW = ZoneAirHumRatAvg(ZoneNum);
-            double ZoneRH = Psychrometrics::PsyRhFnTdbWPb(ZoneT, ZoneW, OutBaroPress) * 100.0;
-            double ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
-            double HI;
+            Real64 ZoneT = ZTAV(ZoneNum);
+            Real64 ZoneW = ZoneAirHumRatAvg(ZoneNum);
+            Real64 ZoneRH = Psychrometrics::PsyRhFnTdbWPb(ZoneT, ZoneW, OutBaroPress) * 100.0;
+            Real64 ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
+            Real64 HI;
 
             if (ZoneTF < 80) {
                 HI = 0.5 * (ZoneTF + 61.0 + (ZoneTF - 68.0) * 1.2 + (ZoneRH * 0.094));
@@ -4968,10 +4978,10 @@ namespace HeatBalanceSurfaceManager {
 
             HI = (HI - 32.0) * (5.0 / 9.0);
 
-            double TDewPointK = Psychrometrics::PsyTdpFnWPb(ZoneW, OutBaroPress) + KelvinConv;
-            double e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
-            double h = 5.0 / 9.0 * (e - 10.0);
-            double Humidex = ZoneT + h;
+            Real64 TDewPointK = Psychrometrics::PsyTdpFnWPb(ZoneW, OutBaroPress) + KelvinConv;
+            Real64 e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
+            Real64 h = 5.0 / 9.0 * (e - 10.0);
+            Real64 Humidex = ZoneT + h;
 
             ZoneHeatIndex(ZoneNum) = HI;
             ZoneHumidex(ZoneNum) = Humidex;
@@ -4993,8 +5003,8 @@ namespace HeatBalanceSurfaceManager {
                 }
             }
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
-                double HI = ZoneHeatIndex(ZoneNum);
-                double Humidex = ZoneHumidex(ZoneNum);
+                Real64 HI = ZoneHeatIndex(ZoneNum);
+                Real64 Humidex = ZoneHumidex(ZoneNum);
 
                 int NumOcc = ZoneNumOcc(ZoneNum);
                 if (HI <= 26.7) {
@@ -5034,8 +5044,8 @@ namespace HeatBalanceSurfaceManager {
                 if (hasPierceSET) {
                     int encodedMonDayHrMin;
                     if (NumOcc > 0) {
-                        double PierceSET = ZoneOccPierceSET(ZoneNum);
-                        double PierceSETLast = ZoneOccPierceSETLastStep(ZoneNum);
+                        Real64 PierceSET = ZoneOccPierceSET(ZoneNum);
+                        Real64 PierceSETLast = ZoneOccPierceSETLastStep(ZoneNum);
 
                         if (PierceSET <= 12.2) {
                             ZoneLowSETHours(ZoneNum)[0] += (12.2 - PierceSET) * TimeStepZone;
@@ -5089,13 +5099,12 @@ namespace HeatBalanceSurfaceManager {
 
     void ReportCO2Resilience() {
         int NoBins = 3;
-        static bool oneTimeFlag = true;
-        if (oneTimeFlag) {
+        if (reportCO2ResilienceFirstTime) {
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 ZoneCO2LevelHourBins(ZoneNum).assign(NoBins, 0.0);
                 ZoneCO2LevelOccuHourBins(ZoneNum).assign(NoBins, 0.0);
             }
-            oneTimeFlag = false;
+            reportCO2ResilienceFirstTime = false;
             if (!DataContaminantBalance::Contaminant.CO2Simulation) {
                 ShowWarningError( "Writing Annual CO2 Resilience Summary - CO2 Level Hours reports: "
                                   "Zone Air CO2 Concentration output is required, "
@@ -5111,7 +5120,7 @@ namespace HeatBalanceSurfaceManager {
                 ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(People(iPeople).NumberOfPeoplePtr);
             }
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
-                double ZoneAirCO2 = DataContaminantBalance::ZoneAirCO2Avg(ZoneNum);
+                Real64 ZoneAirCO2 = DataContaminantBalance::ZoneAirCO2Avg(ZoneNum);
 
                 int NumOcc = ZoneNumOcc(ZoneNum);
                 if (ZoneAirCO2 <= 1000) {
@@ -5130,13 +5139,12 @@ namespace HeatBalanceSurfaceManager {
 
     void ReportVisualResilience() {
         int NoBins = 4;
-        static bool oneTimeFlag = true;
-        if (oneTimeFlag) {
+        if (reportVisualResilienceFirstTime) {
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 ZoneLightingLevelHourBins(ZoneNum).assign(NoBins, 0.0);
                 ZoneLightingLevelOccuHourBins(ZoneNum).assign(NoBins, 0.0);
             }
-            oneTimeFlag = false;
+            reportVisualResilienceFirstTime = false;
             bool hasDayLighting = false;
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::NoDaylighting) {
@@ -5145,9 +5153,9 @@ namespace HeatBalanceSurfaceManager {
                 }
             }
             if (!hasDayLighting) {
-//                ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
-//                                 "Zone Average Daylighting Reference Point Illuminance output is required, "
-//                                 "but no Daylighting Control Object is defined.");
+                ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
+                                 "Zone Average Daylighting Reference Point Illuminance output is required, "
+                                 "but no Daylighting Control Object is defined.");
                 OutputReportTabular::displayVisualResilienceSummary = false;
                 return;
             }
@@ -5163,15 +5171,15 @@ namespace HeatBalanceSurfaceManager {
                 if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::NoDaylighting)
                     continue;
 
-                Array1D<double> ZoneIllumRef = DataDaylighting::ZoneDaylight(ZoneNum).DaylIllumAtRefPt;
-                double ZoneIllum = 0.0;
+                Array1D<Real64> ZoneIllumRef = DataDaylighting::ZoneDaylight(ZoneNum).DaylIllumAtRefPt;
+                Real64 ZoneIllum = 0.0;
                 for (size_t i = 1; i <= ZoneIllumRef.size(); i++) {
                     ZoneIllum += ZoneIllumRef(i);
                 }
                 ZoneIllum /= ZoneIllumRef.size();
 
                 if (DataDaylighting::ZoneDaylight(ZoneNum).ZonePowerReductionFactor > 0) {
-                    Array1D<double> ZoneIllumSetpoint = DataDaylighting::ZoneDaylight(ZoneNum).IllumSetPoint;
+                    Array1D<Real64> ZoneIllumSetpoint = DataDaylighting::ZoneDaylight(ZoneNum).IllumSetPoint;
                     ZoneIllum = 0.0;
                     for (size_t i = 1; i <= ZoneIllumSetpoint.size(); i++) {
                         ZoneIllum += ZoneIllumSetpoint(i);
