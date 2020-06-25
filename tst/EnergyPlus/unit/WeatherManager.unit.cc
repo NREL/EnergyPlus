@@ -603,7 +603,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     Real64 TauB = DesDayInput(EnvrnNum).TauB;
     Real64 TauD = DesDayInput(EnvrnNum).TauD;
     // check tau values
-    EXPECT_EQ(4, DesDayInput(EnvrnNum).SolarModel);
+    EXPECT_EQ(DesignDaySolarModel::ASHRAE_Tau2017, DesDayInput(EnvrnNum).SolarModel);
     EXPECT_EQ(0.325, TauB);
     EXPECT_EQ(2.461, TauD);
     // calc expected values for environment 1

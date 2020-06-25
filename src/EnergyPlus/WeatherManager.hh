@@ -84,11 +84,14 @@ namespace WeatherManager {
         CorrelationFromWeatherFile = 3
     };
 
-    extern int const ASHRAE_ClearSky;     // Design Day solar model ASHRAE ClearSky (default)
-    extern int const Zhang_Huang;         // Design Day solar model Zhang Huang
-    extern int const SolarModel_Schedule; // Design Day solar model (beam and diffuse) from user entered schedule
-    extern int const ASHRAE_Tau;          // Design Day solar model ASHRAE tau (per 2009 HOF)
-    extern int const ASHRAE_Tau2017;      // Design Day solar model ASHRAE tau (per 2013 and 2017 HOF)
+    enum class DesignDaySolarModel
+    {
+        ASHRAE_ClearSky = 0,      // Design Day solar model ASHRAE ClearSky (default)
+        Zhang_Huang = 1,          // Design Day solar model Zhang Huang
+        SolarModel_Schedule = 2,  // Design Day solar model (beam and diffuse) from user entered schedule
+        ASHRAE_Tau = 3,           // Design Day solar model ASHRAE tau (per 2009 HOF)
+        ASHRAE_Tau2017 = 4        // Design Day solar model ASHRAE tau (per 2013 and 2017 HOF)
+    };
 
     extern int const DDHumIndType_WetBulb;   // Design Day Humidity Indicating Type = Wetbulb (default)
     extern int const DDHumIndType_DewPoint;  // Design Day Humidity Indicating Type = Dewpoint
@@ -246,7 +249,7 @@ namespace WeatherManager {
         int Month;           // Month of Year ( 1 - 12 )
         int DayType;         // Day Type Sunday = 1 - Saturday = 7
         int DSTIndicator;    // Daylight Saving Time Period Indicator (1=yes, 0=no) for this DesignDay
-        int SolarModel;      // Solar Model for creating solar values for design day.
+        DesignDaySolarModel SolarModel;      // Solar Model for creating solar values for design day.
         int DBTempRangeType; // Drybulb Range Type (see Parameters)
         int TempRangeSchPtr; // Schedule pointer to a day schedule for dry-bulb temperature range multipliers
         int HumIndSchPtr;    // Schedule pointer to a day schedule that specifies
@@ -264,7 +267,7 @@ namespace WeatherManager {
         // Default Constructor
         DesignDayData()
             : MaxDryBulb(0.0), DailyDBRange(0.0), HumIndValue(0.0), HumIndType(0), PressBarom(0.0), WindSpeed(0.0), WindDir(0.0), SkyClear(0.0),
-              RainInd(0), SnowInd(0), DayOfMonth(0), Month(0), DayType(0), DSTIndicator(0), SolarModel(0), DBTempRangeType(0), TempRangeSchPtr(0),
+              RainInd(0), SnowInd(0), DayOfMonth(0), Month(0), DayType(0), DSTIndicator(0), SolarModel(DesignDaySolarModel::ASHRAE_ClearSky), DBTempRangeType(0), TempRangeSchPtr(0),
               HumIndSchPtr(0), BeamSolarSchPtr(0), DiffuseSolarSchPtr(0), TauB(0.0), TauD(0.0), DailyWBRange(0.0), PressureEntered(false),
               DewPointNeedsSet(false),                       //**Trane:BEG: Sizing Speed Up
               maxWarmupDays(-1), suppressBegEnvReset(false) //**Trane:END: Sizing Speed Up
@@ -681,7 +684,7 @@ namespace WeatherManager {
     // Calculate sky temperature from weather data
     Real64 CalcSkyEmissivity(int Envrn, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
 
-    void ASHRAETauModel(int const TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
+    void ASHRAETauModel(DesignDaySolarModel const TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
                         Real64 const ETR,       // extraterrestrial normal irradiance, W/m2
                         Real64 const CosZen,    // COS( solar zenith angle), 0 - 1
                         Real64 const TauB,      // beam tau factor

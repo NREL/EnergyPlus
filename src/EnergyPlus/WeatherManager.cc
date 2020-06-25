@@ -126,12 +126,6 @@ namespace WeatherManager {
     using namespace Psychrometrics;
 
     // Data
-    int const ASHRAE_ClearSky(0);     // Design Day solar model ASHRAE ClearSky (default)
-    int const Zhang_Huang(1);         // Design Day solar model Zhang Huang
-    int const SolarModel_Schedule(2); // Design Day solar model (beam and diffuse) from user entered schedule
-    int const ASHRAE_Tau(3);          // Design Day solar model ASHRAE tau (per 2009 HOF)
-    int const ASHRAE_Tau2017(4);      // Design Day solar model ASHRAE tau (per 2013 and 2017 HOF)
-
     int const DDHumIndType_WetBulb(0);   // Design Day Humidity Indicating Type = Wetbulb (default)
     int const DDHumIndType_DewPoint(1);  // Design Day Humidity Indicating Type = Dewpoint
     int const DDHumIndType_Enthalpy(2);  // Design Day Humidity Indicating Type = Enthalpy
@@ -2373,7 +2367,7 @@ namespace WeatherManager {
             } else if (humIndType == DDHumIndType_RelHumSch) {
                 SPSiteHumidityConditionScheduleValue(envrnDayNum) = DDHumIndModifier(TimeStep, HourOfDay, envrnDayNum);
             }
-            if (DesDayInput(envrnDayNum).SolarModel == SolarModel_Schedule) {
+            if (DesDayInput(envrnDayNum).SolarModel == DesignDaySolarModel::SolarModel_Schedule) {
                 SPSiteBeamSolarScheduleValue(envrnDayNum) = DDBeamSolarValues(TimeStep, HourOfDay, envrnDayNum);
                 SPSiteDiffuseSolarScheduleValue(envrnDayNum) = DDDiffuseSolarValues(TimeStep, HourOfDay, envrnDayNum);
             }
@@ -4046,15 +4040,15 @@ namespace WeatherManager {
             print(outputFiles.eio, "{:.2R},", DesignDay(EnvrnNum).EquationOfTime * 60.0);
             print(outputFiles.eio, "{:.1R},", std::asin(DesignDay(EnvrnNum).SinSolarDeclinAngle) / DegToRadians);
 
-            if (DesDayInput(EnvrnNum).SolarModel == ASHRAE_ClearSky) {
+            if (DesDayInput(EnvrnNum).SolarModel == DesignDaySolarModel::ASHRAE_ClearSky) {
                 StringOut = "ASHRAEClearSky";
-            } else if (DesDayInput(EnvrnNum).SolarModel == Zhang_Huang) {
+            } else if (DesDayInput(EnvrnNum).SolarModel == DesignDaySolarModel::Zhang_Huang) {
                 StringOut = "ZhangHuang";
-            } else if (DesDayInput(EnvrnNum).SolarModel == SolarModel_Schedule) {
+            } else if (DesDayInput(EnvrnNum).SolarModel == DesignDaySolarModel::SolarModel_Schedule) {
                 StringOut = "User supplied beam/diffuse from schedules";
-            } else if (DesDayInput(EnvrnNum).SolarModel == ASHRAE_Tau) {
+            } else if (DesDayInput(EnvrnNum).SolarModel == DesignDaySolarModel::ASHRAE_Tau) {
                 StringOut = "ASHRAETau";
-            } else if (DesDayInput(EnvrnNum).SolarModel == ASHRAE_Tau2017) {
+            } else if (DesDayInput(EnvrnNum).SolarModel == DesignDaySolarModel::ASHRAE_Tau2017) {
                 StringOut = "ASHRAETau2017";
             } else {
                 StringOut = "unknown";
@@ -4198,7 +4192,7 @@ namespace WeatherManager {
                 // Generate solar values for timestep
                 //    working results = BeamRad and DiffRad
                 //    stored to program globals at end of loop
-                if (DesDayInput(EnvrnNum).SolarModel == SolarModel_Schedule) {
+                if (DesDayInput(EnvrnNum).SolarModel == DesignDaySolarModel::SolarModel_Schedule) {
                     // scheduled: set value unconditionally (whether sun up or not)
                     BeamRad = DDBeamSolarValues(TS, Hour, EnvrnNum);
                     DiffRad = DDDiffuseSolarValues(TS, Hour, EnvrnNum);
@@ -4226,7 +4220,7 @@ namespace WeatherManager {
                         {
                             auto const SELECT_CASE_var(DesDayInput(EnvrnNum).SolarModel);
 
-                            if (SELECT_CASE_var == ASHRAE_ClearSky) {
+                            if (SELECT_CASE_var == DesignDaySolarModel::ASHRAE_ClearSky) {
                                 Real64 Exponent = B / CosZenith;
                                 if (Exponent > 700.0) {
                                     TotHoriz = 0.0;
@@ -4242,7 +4236,7 @@ namespace WeatherManager {
                                 DiffRad = max(0.0, DiffRad);
                                 BeamRad = max(0.0, BeamRad);
 
-                            } else if (SELECT_CASE_var == ASHRAE_Tau || SELECT_CASE_var == ASHRAE_Tau2017) {
+                            } else if (SELECT_CASE_var == DesignDaySolarModel::ASHRAE_Tau || SELECT_CASE_var == DesignDaySolarModel::ASHRAE_Tau2017) {
                                 ETR = GlobalSolarConstant * AVSC; // extraterrestrial normal irrad, W/m2
                                 ASHRAETauModel(DesDayInput(EnvrnNum).SolarModel,
                                                ETR,
@@ -4253,7 +4247,7 @@ namespace WeatherManager {
                                                DiffRad,
                                                GloHorzRad);
 
-                            } else if (SELECT_CASE_var == Zhang_Huang) {
+                            } else if (SELECT_CASE_var == DesignDaySolarModel::Zhang_Huang) {
                                 Hour3Ago = mod(Hour + 20, 24) + 1; // hour 3 hours before
                                 TotSkyCover = max(1.0 - DesDayInput(EnvrnNum).SkyClear, 0.0);
                                 GloHorzRad =
@@ -4384,7 +4378,7 @@ namespace WeatherManager {
 
     //------------------------------------------------------------------------------
 
-    void ASHRAETauModel(int const TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
+    void ASHRAETauModel(DesignDaySolarModel const TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
                         Real64 const ETR,       // extraterrestrial normal irradiance, W/m2
                         Real64 const CosZen,    // COS( solar zenith angle), 0 - 1
                         Real64 const TauB,      // beam tau factor
@@ -4420,7 +4414,7 @@ namespace WeatherManager {
             IDifH = 0.0;
             IGlbH = 0.0;
         } else {
-            if (TauModelType == ASHRAE_Tau) {
+            if (TauModelType == DesignDaySolarModel::ASHRAE_Tau) {
                 AB = 1.219 - 0.043 * TauB - 0.151 * TauD - 0.204 * TauB * TauD;
                 AD = 0.202 + 0.852 * TauB - 0.007 * TauD - 0.357 * TauB * TauD;
             } else {
@@ -6812,25 +6806,25 @@ namespace WeatherManager {
 
             //   A10, \field Solar Model Indicator
             if (lAlphaFieldBlanks(10)) {
-                DesDayInput(EnvrnNum).SolarModel = ASHRAE_ClearSky;
+                DesDayInput(EnvrnNum).SolarModel = DesignDaySolarModel::ASHRAE_ClearSky;
             } else if (UtilityRoutines::SameString(cAlphaArgs(10), "ASHRAEClearSky") || UtilityRoutines::SameString(cAlphaArgs(10), "CLEARSKY")) {
-                DesDayInput(EnvrnNum).SolarModel = ASHRAE_ClearSky;
+                DesDayInput(EnvrnNum).SolarModel = DesignDaySolarModel::ASHRAE_ClearSky;
             } else if (UtilityRoutines::SameString(cAlphaArgs(10), "ZhangHuang")) {
-                DesDayInput(EnvrnNum).SolarModel = Zhang_Huang;
+                DesDayInput(EnvrnNum).SolarModel = DesignDaySolarModel::Zhang_Huang;
             } else if (UtilityRoutines::SameString(cAlphaArgs(10), "ASHRAETau")) {
-                DesDayInput(EnvrnNum).SolarModel = ASHRAE_Tau;
+                DesDayInput(EnvrnNum).SolarModel = DesignDaySolarModel::ASHRAE_Tau;
             } else if (UtilityRoutines::SameString(cAlphaArgs(10), "ASHRAETau2017")) {
-                DesDayInput(EnvrnNum).SolarModel = ASHRAE_Tau2017;
+                DesDayInput(EnvrnNum).SolarModel = DesignDaySolarModel::ASHRAE_Tau2017;
             } else if (UtilityRoutines::SameString(cAlphaArgs(10), "Schedule")) {
-                DesDayInput(EnvrnNum).SolarModel = SolarModel_Schedule;
+                DesDayInput(EnvrnNum).SolarModel = DesignDaySolarModel::SolarModel_Schedule;
             } else {
                 ShowWarningError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid data.");
                 ShowContinueError("..invalid field: " + cAlphaFieldNames(10) + "=\"" + cAlphaArgs(10) + "\".");
                 ShowContinueError("Model used will be ASHRAE ClearSky");
-                DesDayInput(EnvrnNum).SolarModel = ASHRAE_ClearSky;
+                DesDayInput(EnvrnNum).SolarModel = DesignDaySolarModel::ASHRAE_ClearSky;
             }
 
-            if (DesDayInput(EnvrnNum).SolarModel == SolarModel_Schedule) {
+            if (DesDayInput(EnvrnNum).SolarModel == DesignDaySolarModel::SolarModel_Schedule) {
                 //   A11, \field Beam Solar Day Schedule Name
                 if (!lAlphaFieldBlanks(11)) {
                     DesDayInput(EnvrnNum).BeamSolarSchPtr = GetDayScheduleIndex(cAlphaArgs(11));
@@ -6925,7 +6919,7 @@ namespace WeatherManager {
                 }
             }
 
-            if (DesDayInput(EnvrnNum).SolarModel == ASHRAE_ClearSky) {
+            if (DesDayInput(EnvrnNum).SolarModel == DesignDaySolarModel::ASHRAE_ClearSky) {
                 if (lNumericFieldBlanks(14)) {
                     ShowWarningError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid data.");
                     ShowContinueError("..invalid field: " + cNumericFieldNames(14) + " is blank.");
