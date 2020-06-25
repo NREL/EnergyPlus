@@ -1286,7 +1286,7 @@ void InputProcessor::reportIDFRecordsStats()
     DataOutputs::iTotalFieldsWithDefaults = 0;     // Total number of fields that could be defaulted
     DataOutputs::iNumberOfAutoSizedFields = 0;     // Number of autosized fields in IDF
     DataOutputs::iTotalAutoSizableFields = 0;      // Total number of autosizeable fields
-    DataOutputs::iNumberOfAutoCalcedFields = 0;    // Total number of autocalculate fields
+    DataOutputs::iNumberOfAutoCalcedFields = 0;    // Number of autocalculated fields
     DataOutputs::iTotalAutoCalculatableFields = 0; // Total number of autocalculatable fields
 
     auto const &schema_properties = schema.at("properties");
@@ -1332,12 +1332,13 @@ void InputProcessor::reportIDFRecordsStats()
 
         // Locate the field in the ep_object
         auto it = epJSONObj.find(field);
-        if (it != epJSONObj.end()) {
+        if (it != epJSONObj.end()) { // && !it.value().empty()) {
             // Found it: check if Autosized or Autocalculated
             auto const &field_value = it.value();
             if (field_value.is_string()) {
+                std::string const val = field_value.get<std::string>();
                 // In the IDF, casing is an issue and Autosize/Autocalculate are accepted as synonyms (in schema it's not)
-                if (icompare(field_value, "Autosize") || icompare(field_value, "Autocalculate")) {
+                if (icompare(val, "Autosize") || icompare(val, "Autocalculate")) {
                     if (canBeAutosized) {
                         ++DataOutputs::iNumberOfAutoSizedFields;
                     } else if (canBeAutocalculated) {
@@ -1345,7 +1346,6 @@ void InputProcessor::reportIDFRecordsStats()
                     }
                 }
             }
-
         } else if (hasDefault) {
             // Not found: was defaulted
             ++DataOutputs::iNumberOfDefaultedFields;
@@ -1431,28 +1431,8 @@ void InputProcessor::reportIDFRecordsStats()
                 }
             } // End extensible fields
 
-
         } // End loop on each object of a given objectType
-
-    }
-
-    //for ( iRecord = 1; iRecord <= NumIDFRecords; ++iRecord ) {
-        //if ( IDFRecords( iRecord ).ObjectDefPtr <= 0 || IDFRecords( iRecord ).ObjectDefPtr > NumObjectDefs ) continue;
-        //iObjectDef = IDFRecords( iRecord ).ObjectDefPtr;
-        //for ( iField = 1; iField <= IDFRecords( iRecord ).NumAlphas; ++iField ) {
-            //if ( ! ObjectDef( iObjectDef ).AlphFieldDefs( iField ).empty() ) ++iTotalFieldsWithDefaults;
-            //if ( ! ObjectDef( iObjectDef ).AlphFieldDefs( iField ).empty() && IDFRecords( iRecord ).AlphBlank( iField ) ) ++iNumberOfDefaultedFields;
-        //}
-        //for ( iField = 1; iField <= IDFRecords( iRecord ).NumNumbers; ++iField ) {
-            //if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).DefaultChk ) ++iTotalFieldsWithDefaults;
-            //if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).DefaultChk && IDFRecords( iRecord ).NumBlank( iField ) ) ++iNumberOfDefaultedFields;
-            //if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).AutoSizable ) ++iTotalAutoSizableFields;
-            //if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).AutoSizable && IDFRecords( iRecord ).Numbers( iField ) == ObjectDef( iObjectDef ).NumRangeChks( iField ).AutoSizeValue ) ++iNumberOfAutoSizedFields;
-            //if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).AutoCalculatable ) ++iTotalAutoCalculatableFields;
-            //if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).AutoCalculatable && IDFRecords( iRecord ).Numbers( iField ) == ObjectDef( iObjectDef ).NumRangeChks( iField ).AutoCalculateValue ) ++iNumberOfAutoCalcedFields;
-        //}
-    //}
-
+    } // End loop on all objectTypes
 }
 
 void InputProcessor::reportOrphanRecordObjects()

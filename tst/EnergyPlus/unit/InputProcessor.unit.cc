@@ -4112,13 +4112,14 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
     // 11 fields defaulted    , 4 Autosized  , 2 Autocalculated
 
     EXPECT_EQ(4,  DataOutputs::iNumberOfRecords);             // Number of IDF Records (=Objects)
+
     EXPECT_EQ(34, DataOutputs::iTotalFieldsWithDefaults);     // Total number of fields that could be defaulted
     EXPECT_EQ(6,  DataOutputs::iTotalAutoSizableFields);      // Total number of autosizeable fields
     EXPECT_EQ(3,  DataOutputs::iTotalAutoCalculatableFields); // Total number of autocalculatable fields
 
     EXPECT_EQ(11, DataOutputs::iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
     EXPECT_EQ(4,  DataOutputs::iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
-    EXPECT_EQ(2,  DataOutputs::iNumberOfAutoCalcedFields);    // Total number of autocalculate fields
+    EXPECT_EQ(2,  DataOutputs::iNumberOfAutoCalcedFields);    // Number of autocalculated fields
 }
 
 TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
@@ -4186,13 +4187,14 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
     // 2  fields defaulted    , 0 Autosized  , 0 Autocalculated
 
     EXPECT_EQ(4,  DataOutputs::iNumberOfRecords);             // Number of IDF Records (=Objects)
+
     EXPECT_EQ(15, DataOutputs::iTotalFieldsWithDefaults);     // Total number of fields that could be defaulted
     EXPECT_EQ(0,  DataOutputs::iTotalAutoSizableFields);      // Total number of autosizeable fields
     EXPECT_EQ(0,  DataOutputs::iTotalAutoCalculatableFields); // Total number of autocalculatable fields
 
-    EXPECT_EQ(2, DataOutputs::iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
+    EXPECT_EQ(2,  DataOutputs::iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
     EXPECT_EQ(0,  DataOutputs::iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
-    EXPECT_EQ(0,  DataOutputs::iNumberOfAutoCalcedFields);    // Total number of autocalculate fields
+    EXPECT_EQ(0,  DataOutputs::iNumberOfAutoCalcedFields);    // Number of autocalculated fields
 
 }
 
