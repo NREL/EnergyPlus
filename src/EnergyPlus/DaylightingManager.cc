@@ -236,8 +236,6 @@ namespace DaylightingManager {
 
     Array1D_bool CheckTDDZone;
 
-    std::string mapLine; // character variable to hold map outputs
-
     // SUBROUTINE SPECIFICATIONS FOR MODULE DaylightingModule
 
     // MODULE SUBROUTINES:
@@ -282,7 +280,6 @@ namespace DaylightingManager {
         MapErrIndex.deallocate();
         RefErrIndex.deallocate();
         CheckTDDZone.deallocate();
-        mapLine = "";
         doSkyReporting = true;
         CreateDFSReportFile = true;
     }
@@ -10029,34 +10026,21 @@ namespace DaylightingManager {
         if (FirstTimeMaps(MapNum)) {
 
             FirstTimeMaps(MapNum) = false;
-            IllumMap(MapNum).UnitNo = GetNewUnitNumber();
-            MapNoString = RoundSigDigits(MapNum);
+
+            auto openMapFile = [&](const std::string &fileName) -> OutputFile & {
+                auto &outputFile = *IllumMap(MapNum).mapFile;
+                outputFile.fileName = fileName + fmt::to_string(MapNum);
+                outputFile.ensure_open("ReportIllumMap");
+                return outputFile;
+            };
             if (MapColSep == CharTab) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("readwrite");
-                    flags.STATUS("UNKNOWN");
-                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, outputFiles.outputMapTabFileName + MapNoString, flags);
-                    if (flags.err()) goto Label901;
-                }
+                if (!openMapFile(outputFiles.outputMapTabFileName).good()) return;
                 //				CommaDelimited = false; //Unused Set but never used
             } else if (MapColSep == CharComma) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("readwrite");
-                    flags.STATUS("UNKNOWN");
-                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, outputFiles.outputMapCsvFileName + MapNoString, flags);
-                    if (flags.err()) goto Label902;
-                }
+                if (!openMapFile(outputFiles.outputMapCsvFileName).good()) return;
                 //				CommaDelimited = true; //Unused Set but never used
             } else {
-                {
-                    IOFlags flags;
-                    flags.ACTION("readwrite");
-                    flags.STATUS("UNKNOWN");
-                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, outputFiles.outputMapTxtFileName + MapNoString, flags);
-                    if (flags.err()) goto Label903;
-                }
+                if (!openMapFile(outputFiles.outputMapTxtFileName).good()) return;
                 //				CommaDelimited = false; //Unused Set but never used
             }
 
@@ -10065,14 +10049,10 @@ namespace DaylightingManager {
             IllumMap(MapNum).Name = IllumMap(MapNum).Name + " at " + RoundSigDigits(IllumMap(MapNum).Z, 2) + 'm';
 
             for (R = 1; R <= ZoneDaylight(IllumMap(MapNum).Zone).TotalDaylRefPoints; ++R) {
-                String = RoundSigDigits(R);
-                RefPts(IllumMap(MapNum).Zone, R) = "RefPt" + String + "=(";
-                String = RoundSigDigits(ZoneDaylight(IllumMap(MapNum).Zone).DaylRefPtAbsCoord(1, R), 2);
-                RefPts(IllumMap(MapNum).Zone, R) = RefPts(IllumMap(MapNum).Zone, R) + String + ':';
-                String = RoundSigDigits(ZoneDaylight(IllumMap(MapNum).Zone).DaylRefPtAbsCoord(2, R), 2);
-                RefPts(IllumMap(MapNum).Zone, R) = RefPts(IllumMap(MapNum).Zone, R) + String + ':';
-                String = RoundSigDigits(ZoneDaylight(IllumMap(MapNum).Zone).DaylRefPtAbsCoord(3, R), 2);
-                RefPts(IllumMap(MapNum).Zone, R) = RefPts(IllumMap(MapNum).Zone, R) + String + ')';
+                RefPts(IllumMap(MapNum).Zone, R) = format("RefPt{}=({:.2R}:{:.2R}:{:.2R})", R,
+                                              ZoneDaylight(IllumMap(MapNum).Zone).DaylRefPtAbsCoord(1, R),
+                                              ZoneDaylight(IllumMap(MapNum).Zone).DaylRefPtAbsCoord(2, R) ,
+                                              ZoneDaylight(IllumMap(MapNum).Zone).DaylRefPtAbsCoord(3, R) );
             }
         }
         if (SavedMnDy(MapNum) != CurMnDyHr.substr(0, 5)) {
@@ -10081,7 +10061,7 @@ namespace DaylightingManager {
         }
         if (EnvrnPrint(MapNum)) {
             WriteDaylightMapTitle(MapNum,
-                                  IllumMap(MapNum).UnitNo,
+                                  *IllumMap(MapNum).mapFile,
                                   IllumMap(MapNum).Name,
                                   EnvironmentName,
                                   IllumMap(MapNum).Zone,
@@ -10095,7 +10075,7 @@ namespace DaylightingManager {
             if (TimeStep == NumOfTimeStepInHour) { // Report only hourly
 
                 // Write X scale column header
-                mapLine = format(" {} {:02}:00", SavedMnDy(MapNum), HourOfDay);
+                auto mapLine = format(" {} {:02}:00", SavedMnDy(MapNum), HourOfDay);
                 if (IllumMap(MapNum).HeaderXLineLengthNeeded) linelen = int(len(mapLine));
                 RefPt = 1;
                 for (X = 1; X <= IllumMap(MapNum).Xnum; ++X) {
@@ -10120,7 +10100,7 @@ namespace DaylightingManager {
                     IllumMap(MapNum).HeaderXLineLengthNeeded = false;
                 }
 
-                ObjexxFCL::gio::write(IllumMap(MapNum).UnitNo, FmtA) << mapLine;
+                print(*IllumMap(MapNum).mapFile, "{}\n", mapLine);
 
                 // Write Y scale prefix and illuminance values
                 RefPt = 1;
@@ -10138,7 +10118,7 @@ namespace DaylightingManager {
                         mapLine += MapColSep + String;
                     }
 
-                    ObjexxFCL::gio::write(IllumMap(MapNum).UnitNo, FmtA) << mapLine;
+                    print(*IllumMap(MapNum).mapFile, "{}\n", mapLine);
 
                     RefPt += IllumMap(MapNum).Xnum;
                 } // X
@@ -10177,19 +10157,6 @@ namespace DaylightingManager {
                 } // WriteOutputToSQLite
             }     // end time step
         }         // not Warmup
-
-        return;
-
-    Label901:;
-        ShowFatalError("ReportIllumMap: Could not open file " + outputFiles.outputMapTabFileName + MapNoString + "\" for output (write).");
-        return;
-
-    Label902:;
-        ShowFatalError("ReportIllumMap: Could not open file " + outputFiles.outputMapCsvFileName + MapNoString + "\" for output (write).");
-        return;
-
-    Label903:;
-        ShowFatalError("ReportIllumMap: Could not open file " + outputFiles.outputMapTxtFileName + MapNoString + "\" for output (write).");
     }
 
     void CloseReportIllumMaps(OutputFiles &outputFiles)
@@ -10232,10 +10199,6 @@ namespace DaylightingManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int MapNum;
-        static int ios(0);
-        int NumLines;
-
         if (TotIllumMaps > 0) {
             // Write map header
             if (MapColSep == CharTab) {
@@ -10248,33 +10211,18 @@ namespace DaylightingManager {
 
             outputFiles.map.ensure_open("CloseReportIllumMaps");
 
-            for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
-                if (IllumMap(MapNum).UnitNo == 0) continue; // fatal error processing
-                NumLines = 0;
-                ObjexxFCL::gio::rewind(IllumMap(MapNum).UnitNo);
-                ios = 0;
-                while (ios == 0) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(IllumMap(MapNum).UnitNo, FmtA, flags) >> mapLine;
-                        ios = flags.ios();
-                    }
-                    if (ios > 0) { // usually a read error
-                        ShowFatalError("CloseReportIllumMaps: Failed to read map. IOError=" + TrimSigDigits(ios));
-                    } else if (ios != 0) {
-                        if (NumLines == 0) {
-                            ShowSevereError("CloseReportIllumMaps: IllumMap=\"" + IllumMap(MapNum).Name + "\" is empty.");
-                        }
-                        break;
-                    }
-                    ++NumLines;
+            for (int MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
+                if (!IllumMap(MapNum).mapFile->good()) continue; // fatal error processing
+
+                const auto mapLines = IllumMap(MapNum).mapFile->getLines();
+                if (mapLines.empty()) {
+                    ShowSevereError("CloseReportIllumMaps: IllumMap=\"" + IllumMap(MapNum).Name + "\" is empty.");
+                    break;
+                }
+                for(const auto &mapLine : mapLines) {
                     print(outputFiles.map, "{}\n", mapLine);
                 }
-                {
-                    IOFlags flags;
-                    flags.DISPOSE("DELETE");
-                    ObjexxFCL::gio::close(IllumMap(MapNum).UnitNo, flags);
-                }
+                IllumMap(MapNum).mapFile->del();
             }
 
             if (!mapResultsReported && !AbortProcessing) {
@@ -10992,7 +10940,7 @@ namespace DaylightingManager {
     }
 
     void WriteDaylightMapTitle(int const mapNum,
-                               int const unitNo,
+                               OutputFile &mapFile,
                                std::string const &mapName,
                                std::string const &environmentName,
                                int const ZoneNum,
@@ -11009,15 +10957,14 @@ namespace DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // The purpose of the routine is to allow the daylighting map data to be written in various formats
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt FmtA("(A)");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string fullmapName; // for output to map units as well as SQL
-
         // must add correct number of commas at end
-        fullmapName = Zone(ZoneNum).Name + ':' + environmentName + ':' + mapName + " Illuminance [lux] (Hourly)";
-        ObjexxFCL::gio::write(unitNo, FmtA) << "Date/Time," + fullmapName + MapColSep + refPt1 + MapColSep + refPt2 + MapColSep + MapColSep;
+        const auto fullmapName = fmt::format("{}:{}:{} Illuminance [lux] (Hourly)", Zone(ZoneNum).Name, environmentName, mapName);
+        print(mapFile,
+              "Date/Time{Sep}{FullMapName}{Sep}{RefPt1}{Sep}{RefPt2}{Sep}{Sep}\n",
+              fmt::arg("Sep", MapColSep),
+              fmt::arg("FullMapName", fullmapName),
+              fmt::arg("RefPt1", refPt1),
+              fmt::arg("RefPt2", refPt2));
 
         if (sqlite) {
             sqlite->createSQLiteDaylightMapTitle(mapNum, fullmapName, environmentName, ZoneNum, refPt1, refPt2, zcoord);
