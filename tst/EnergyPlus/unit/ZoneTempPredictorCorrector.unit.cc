@@ -1061,11 +1061,11 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
 
     Node(1).MassFlowRate = 0.1;
     Node(2).MassFlowRate = 0.2;
-    CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
+    CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
     EXPECT_NEAR(302.00968500, SumSysMCp, 0.0001);
     EXPECT_NEAR(6040.1937, SumSysMCpT,0.0001);
 
-    CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, false);
+    CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, false);
     EXPECT_EQ(0.0, SumSysMCp);
     EXPECT_EQ(0.0, SumSysMCpT);
 }

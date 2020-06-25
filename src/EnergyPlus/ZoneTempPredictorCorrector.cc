@@ -6230,7 +6230,7 @@ namespace ZoneTempPredictorCorrector {
 
             } else if (ZoneRetPlenumAirFlag) {
                 ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
-                auto const &zrpc(ZoneRetPlenCond(ZoneRetPlenumNum));
+                auto const &zrpc(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum));
                 for (int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
                     // Get node conditions
                     auto const &node(Node(zrpc.InletNode(NodeNum)));
@@ -6242,9 +6242,10 @@ namespace ZoneTempPredictorCorrector {
                     SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
                 } // NodeNum
                 // add in the leaks
-                for (int ADUListIndex = 1, ADUListIndex_end = ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ADUListIndex <= ADUListIndex_end;
+                for (int ADUListIndex = 1, ADUListIndex_end = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs;
+                     ADUListIndex <= ADUListIndex_end;
                      ++ADUListIndex) {
-                    ADUNum = ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
+                    ADUNum = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
                     if (AirDistUnit(ADUNum).UpStreamLeak) {
                         ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                         NodeTemp = Node(ADUInNode).Temp;
@@ -6266,8 +6267,8 @@ namespace ZoneTempPredictorCorrector {
             } else if (ZoneSupPlenumAirFlag) {
                 ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
                 // Get node conditions
-                NodeTemp = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
-                MassFlowRate = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
+                NodeTemp = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
+                MassFlowRate = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
 
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
