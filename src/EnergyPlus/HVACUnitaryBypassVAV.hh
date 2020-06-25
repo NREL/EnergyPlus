@@ -59,6 +59,9 @@ namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
 
+    // Forward declarations
+    struct EnergyPlusData;
+
 namespace HVACUnitaryBypassVAV {
 
     // Using/Aliasing
