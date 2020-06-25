@@ -358,7 +358,7 @@ namespace HeatBalanceManager {
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(state.dataWindowManager, state.outputFiles);                                                                // Initialize all heat balance related parameters
+        InitHeatBalance(state.dataWindowEquivalentLayer, state.dataWindowManager, state.outputFiles);                                                                // Initialize all heat balance related parameters
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -450,7 +450,7 @@ namespace HeatBalanceManager {
 
         GetWindowGlassSpectralData(state.dataWindowManager, ErrorsFound);
 
-        GetMaterialData(state.outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
+        GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
         GetFrameAndDividerData(ErrorsFound);
 
@@ -1452,7 +1452,7 @@ namespace HeatBalanceManager {
         print(outputFiles.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
     }
 
-    void GetMaterialData(OutputFiles &outputFiles, bool &ErrorsFound) // set to true if errors found in input
+    void GetMaterialData(WindowEquivalentLayerData &dataWindowEquivalentLayer, OutputFiles &outputFiles, bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -1480,28 +1480,16 @@ namespace HeatBalanceManager {
         // material definition.  There are now 10 flavors of materials.  Definitions from
         // the IDD appear below before their counterpart "gets".
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveMinMaxValues;
         using General::RoundSigDigits;
         using General::ScanForReports;
         using General::TrimSigDigits;
-        using WindowEquivalentLayer::lscNONE;
-        using WindowEquivalentLayer::lscVBNOBM;
-        using WindowEquivalentLayer::lscVBPROF;
 
         // if this has a size, then input has already been gotten
         if (UniqueMaterialNames.size()) {
             return;
         }
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int IOStat;                        // IO Status when calling get input subroutine
         Array1D_string MaterialNames(7);   // Number of Material Alpha names defined
@@ -1544,8 +1532,6 @@ namespace HeatBalanceManager {
         int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
         int TotCfactorConstructs; // Number of underground wall constructions defined with C factors
 
-
-        // FLOW:
         std::string RoutineName("GetMaterialData: ");
 
         RegMat = inputProcessor->getNumObjectsFound("Material");
@@ -3566,11 +3552,11 @@ namespace HeatBalanceManager {
             //  they are used with window shading controls that adjust slat angles like MaximizeSolar or BlockBeamSolar
             if (!lAlphaFieldBlanks(3)) {
                 if (UtilityRoutines::SameString(MaterialNames(3), "FixedSlatAngle")) {
-                    Material(MaterNum).SlatAngleType = lscNONE;
+                    Material(MaterNum).SlatAngleType = dataWindowEquivalentLayer.lscNONE;
                 } else if (UtilityRoutines::SameString(MaterialNames(3), "MaximizeSolar")) {
-                    Material(MaterNum).SlatAngleType = lscVBPROF;
+                    Material(MaterNum).SlatAngleType = dataWindowEquivalentLayer.lscVBPROF;
                 } else if (UtilityRoutines::SameString(MaterialNames(3), "BlockBeamSolar")) {
-                    Material(MaterNum).SlatAngleType = lscVBNOBM;
+                    Material(MaterNum).SlatAngleType = dataWindowEquivalentLayer.lscVBNOBM;
                 } else {
                     Material(MaterNum).SlatAngleType = 0;
                 }
@@ -5154,7 +5140,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(WindowManagerData &dataWindowManager, OutputFiles &outputFiles)
+    void InitHeatBalance(WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5216,7 +5202,7 @@ namespace HeatBalanceManager {
             }
 
             DisplayString("Initializing Window Optical Properties");
-            InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
+            InitEquivalentLayerWindowCalculations(dataWindowEquivalentLayer); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
             InitWindowOpticalCalculations(dataWindowManager, outputFiles);
             InitDaylightingDevices(OutputFiles::getSingleton()); // Initialize any daylighting devices

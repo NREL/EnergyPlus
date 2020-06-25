@@ -74,6 +74,7 @@
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
@@ -116,6 +117,7 @@ namespace EnergyPlus {
         // after we've plumbed enough of the functions to allow
         OutputFiles outputFiles;
 
+        WindowEquivalentLayerData dataWindowEquivalentLayer;
         WindowManagerData dataWindowManager;
         ZoneAirLoopEquipmentManagerData dataZoneAirLoopEquipmentManager;
         ZoneContaminantPredictorCorrectorData dataZoneContaminantPredictorCorrector;
@@ -154,6 +156,7 @@ namespace EnergyPlus {
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataWindowEquivalentLayer.clear_state();
             dataWindowManager.clear_state();
             dataZoneAirLoopEquipmentManager.clear_state();
             dataZoneContaminantPredictorCorrector.clear_state();

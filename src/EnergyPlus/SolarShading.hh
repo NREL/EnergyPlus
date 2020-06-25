@@ -64,11 +64,13 @@
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
 
 namespace EnergyPlus {
 
     // Forward Declarations
     struct EnergyPlusData;
+    struct WindowEquivalentLayerData;
 
 namespace SolarShading {
 
@@ -334,7 +336,7 @@ namespace SolarShading {
                                    int const TS     // Time step Index
     );
 
-    void CalcInteriorSolarDistribution();
+    void CalcInteriorSolarDistribution(WindowEquivalentLayerData &dataWindowEquivalentLayer);
 
     void CalcAborbedOnExteriorOpaqueSurfaces();
 
@@ -376,7 +378,7 @@ namespace SolarShading {
               Real64 const CosSolarDeclin  // Cosine of the Solar declination (current day)
     );
 
-    void WindowShadingManager();
+    void WindowShadingManager(WindowEquivalentLayerData &dataWindowEquivalentLayer);
 
     void WindowGapAirflowControl();
 
@@ -397,7 +399,7 @@ namespace SolarShading {
 
     void ComputeWinShadeAbsorpFactors();
 
-    void CalcWinTransDifSolInitialDistribution();
+    void CalcWinTransDifSolInitialDistribution(WindowEquivalentLayerData &dataWindowEquivalentLayer);
 
     void CalcInteriorWinTransDifSolInitialDistribution(
         int const IntWinEnclosureNum,     // Interior Window Enclosure index number

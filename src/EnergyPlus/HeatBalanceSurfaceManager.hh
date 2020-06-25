@@ -97,7 +97,7 @@ namespace HeatBalanceSurfaceManager {
 
     void InitThermalAndFluxHistories();
 
-    void InitSolarHeatGains(WindowManagerData &dataWindowManager);
+    void InitSolarHeatGains(WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager);
 
     void InitIntSolarDistribution();
 

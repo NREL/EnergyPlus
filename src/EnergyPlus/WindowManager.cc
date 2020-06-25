@@ -2019,7 +2019,7 @@ namespace WindowManager {
     // Window Thermal Calculation Subroutines
     //***********************************************************************************
 
-    void CalcWindowHeatBalance(WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalance(WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
@@ -2038,11 +2038,11 @@ namespace WindowManager {
         if (dataWindowManager.inExtWindowModel->isExternalLibraryModel()) {
             CalcWindowHeatBalanceExternalRoutines(dataWindowManager, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp);
         } else {
-            CalcWindowHeatBalanceInternalRoutines(dataWindowManager, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp);
+            CalcWindowHeatBalanceInternalRoutines(dataWindowEquivalentLayer, dataWindowManager, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp);
         }
     }
 
-    void CalcWindowHeatBalanceInternalRoutines(WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalanceInternalRoutines(WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
                                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
@@ -2210,7 +2210,7 @@ namespace WindowManager {
 
         } else if (window.WindowModelType == WindowEQLModel) {
 
-            EQLWindowSurfaceHeatBalance(SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, noCondition);
+            EQLWindowSurfaceHeatBalance(dataWindowEquivalentLayer, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, noCondition);
             dataWindowManager.hcout = HextConvCoeff;
             // Required for report variables calculations.
             if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)

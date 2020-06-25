@@ -505,7 +505,7 @@ namespace HeatBalanceSurfaceManager {
         // Set shading flag for exterior windows (except flags related to daylighting) and
         // window construction (unshaded or shaded) to be used in heat balance calculation
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Window Shading");
-        WindowShadingManager();
+        WindowShadingManager(state.dataWindowEquivalentLayer);
 
         // Calculate factors that are used to determine how much long-wave radiation from internal
         // gains is absorbed by interior surfaces
@@ -715,7 +715,7 @@ namespace HeatBalanceSurfaceManager {
         // The order of these initializations is important currently.  Over time we hope to
         //  take the appropriate parts of these inits to the other heat balance managers
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Solar Heat Gains");
-        InitSolarHeatGains(state.dataWindowManager);
+        InitSolarHeatGains(state.dataWindowEquivalentLayer, state.dataWindowManager);
         if (SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0)) {
             for (NZ = 1; NZ <= NumOfZones; ++NZ) {
                 if (ZoneDaylight(NZ).TotalDaylRefPoints > 0) {
@@ -2191,7 +2191,7 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void InitSolarHeatGains(WindowManagerData &dataWindowManager)
+    void InitSolarHeatGains(WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2553,7 +2553,7 @@ namespace HeatBalanceSurfaceManager {
             if (dataWindowManager.inExtWindowModel->isExternalLibraryModel() && dataWindowManager.winOpticalModel->isSimplifiedModel()) {
                 CalcInteriorSolarDistributionWCE(dataWindowManager);
             } else {
-                CalcInteriorSolarDistribution();
+                CalcInteriorSolarDistribution(dataWindowEquivalentLayer);
             }
 
             for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
@@ -6487,7 +6487,7 @@ namespace HeatBalanceSurfaceManager {
 
                         // Following call determines inside surface temperature of glazing, and of
                         // frame and/or divider, if present
-                        CalcWindowHeatBalance(state.dataWindowManager, SurfNum, HcExtSurf(SurfNum), TempSurfInTmp(SurfNum), TH11);
+                        CalcWindowHeatBalance(state.dataWindowEquivalentLayer, state.dataWindowManager, SurfNum, HcExtSurf(SurfNum), TempSurfInTmp(SurfNum), TH11);
 
                         TempSurfIn(SurfNum) = TempSurfInTmp(SurfNum);
                     }

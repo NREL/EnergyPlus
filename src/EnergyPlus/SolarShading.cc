@@ -6452,7 +6452,7 @@ namespace SolarShading {
         } // End of check that sunlit area > 0.
     }
 
-    void CalcInteriorSolarDistribution()
+    void CalcInteriorSolarDistribution(WindowEquivalentLayerData &dataWindowEquivalentLayer)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6490,8 +6490,6 @@ namespace SolarShading {
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace DataDaylightingDevices;
         using DaylightingDevices::TransTDD;
-        using WindowEquivalentLayer::CalcEQLOpticalProperty;
-        using WindowEquivalentLayer::CFSDiffAbsTrans;
         using namespace DataWindowEquivalentLayer;
 
         int SurfNum2;                                       // Secondary surface number for tubular daylighting device diffuser (TDD:DIFFUSER)
@@ -7280,15 +7278,15 @@ namespace SolarShading {
                         // call the ASHWAT fenestration model for optical properties
                         // determine the beam radiation absorptance and tranmittance of the
                         // the equivalent layer window model
-                        CalcEQLOpticalProperty(SurfNum, isBEAM, AbsSolBeamEQL);
+                        WindowEquivalentLayer::CalcEQLOpticalProperty(dataWindowEquivalentLayer, SurfNum, isBEAM, AbsSolBeamEQL);
 
                         // recalcuate the diffuse absorptance and transmittance of the
                         // the equivalent layer window model if there is shade control
                         EQLNum = Construct(Surface(SurfNum).Construction).EQLConsPtr;
                         if (CFS(EQLNum).ISControlled) {
-                            CalcEQLOpticalProperty(SurfNum, isDIFF, AbsSolDiffEQL);
+                            WindowEquivalentLayer::CalcEQLOpticalProperty(dataWindowEquivalentLayer, SurfNum, isDIFF, AbsSolDiffEQL);
                         } else {
-                            AbsSolDiffEQL(_, {1, CFS(EQLNum).NL + 1}) = CFSDiffAbsTrans(_, {1, CFS(EQLNum).NL + 1}, EQLNum);
+                            AbsSolDiffEQL(_, {1, CFS(EQLNum).NL + 1}) = dataWindowEquivalentLayer.CFSDiffAbsTrans(_, {1, CFS(EQLNum).NL + 1}, EQLNum);
                         }
                         Construct(ConstrNum).TransDiff = AbsSolDiffEQL(1, CFS(EQLNum).NL + 1);
 
@@ -8521,7 +8519,7 @@ namespace SolarShading {
                                     // or interior window (treates windows with/without shades as defined) for this timestep
 
                                     // call the ASHWAT fenestration model for beam radiation here
-                                    CalcEQLOpticalProperty(BackSurfNum, isBEAM, AbsSolBeamBackEQL);
+                                    WindowEquivalentLayer::CalcEQLOpticalProperty(dataWindowEquivalentLayer, BackSurfNum, isBEAM, AbsSolBeamBackEQL);
 
                                     EQLNum = Construct(ConstrNumBack).EQLConsPtr;
                                     AbsBeamWinEQL({ 1, CFS(EQLNum).NL }) = AbsSolBeamBackEQL(1, { 1, CFS(EQLNum).NL });
@@ -8813,7 +8811,7 @@ namespace SolarShading {
         // RJH - Calculate initial distribution of diffuse solar transmitted by exterior windows into each zone
         //       to all interior surfaces in the zone
         //       Includes subsequent transmittance of diffuse solar to adjacent zones through interior windows
-        CalcWinTransDifSolInitialDistribution();
+        CalcWinTransDifSolInitialDistribution(dataWindowEquivalentLayer);
     }
 
     void CalcAborbedOnExteriorOpaqueSurfaces()
@@ -9819,7 +9817,7 @@ namespace SolarShading {
         SUNCOS(1) = CosSolarDeclin * std::sin(H);
     }
 
-    void WindowShadingManager()
+    void WindowShadingManager(WindowEquivalentLayerData &dataWindowEquivalentLayer)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9885,7 +9883,6 @@ namespace SolarShading {
         using DataWindowEquivalentLayer::CFS;
         using General::POLYF;
         using ScheduleManager::GetCurrentScheduleValue;
-        using WindowEquivalentLayer::lscNONE;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -9946,7 +9943,7 @@ namespace SolarShading {
             if (SurfaceWindow(ISurf).WindowModelType == WindowEQLModel) {
                 int EQLNum = Construct(Surface(ISurf).Construction).EQLConsPtr;
                 if (CFS(EQLNum).VBLayerPtr > 0) {
-                    if (CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL == lscNONE) {
+                    if (CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL == dataWindowEquivalentLayer.lscNONE) {
                         SurfaceWindow(ISurf).SlatAngThisTSDeg = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
                     } else {
                         SurfaceWindow(ISurf).SlatAngThisTSDeg = 0.0;
@@ -11788,7 +11785,7 @@ namespace SolarShading {
         }
     }
 
-    void CalcWinTransDifSolInitialDistribution()
+    void CalcWinTransDifSolInitialDistribution(WindowEquivalentLayerData &dataWindowEquivalentLayer)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11823,7 +11820,6 @@ namespace SolarShading {
         using DataHeatBalance::InitialZoneDifSolReflW;
         using DataHeatBalSurface::InitialDifSolInAbs;
         using DataHeatBalSurface::InitialDifSolInTrans;
-        using WindowEquivalentLayer::CalcEQLOpticalProperty;
         using namespace DataWindowEquivalentLayer;
 
         Real64 AbsInt;               // Tmp var for Inside surface short-wave absorptance
@@ -12235,7 +12231,7 @@ namespace SolarShading {
                             // SurfaceWindow(HeatTransSurfNum)%WindowModelType == WindowEQLModel
                             // ConstrNum=Surface(HeatTransSurfNum)%Construction
                             // call the ASHWAT fenestration model for diffuse radiation here
-                            CalcEQLOpticalProperty(HeatTransSurfNum, isDIFF, AbsSolDiffBackEQL);
+                            WindowEquivalentLayer::CalcEQLOpticalProperty(dataWindowEquivalentLayer, HeatTransSurfNum, isDIFF, AbsSolDiffBackEQL);
 
                             EQLNum = Construct(ConstrNum).EQLConsPtr;
                             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
