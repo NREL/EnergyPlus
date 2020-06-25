@@ -106,10 +106,14 @@ namespace WeatherManager {
         WBProfMul = 7  // Wetbulb multiplier profile
     };
 
-    extern int const DDDBRangeType_Default;    // Design Day DryBulb Range Type = Default Multipliers
-    extern int const DDDBRangeType_Multiplier; // Design Day DryBulb Range Type = Multiplier Schedule
-    extern int const DDDBRangeType_Difference; // Design Day DryBulb Range Type = Difference Schedule
-    extern int const DDDBRangeType_Profile;    // Design Day DryBulb Range Type = Temperature Profile
+    // Design Day DryBulb Range Type
+    enum class DDDBRangeType
+    {
+        Default = 0,    // Default Multipliers
+        Multiplier = 1, // Multiplier Schedule
+        Difference = 2, // Difference Schedule
+        Profile = 3,    // Temperature Profile
+    };
 
     extern int const WP_ClarkAllenModel;  // Use Clark and Allen model for sky emissivity calculation
     extern int const WP_ScheduleValue;  // User entered Schedule value for Weather Property
@@ -253,7 +257,7 @@ namespace WeatherManager {
         int DayType;         // Day Type Sunday = 1 - Saturday = 7
         int DSTIndicator;    // Daylight Saving Time Period Indicator (1=yes, 0=no) for this DesignDay
         DesignDaySolarModel SolarModel;      // Solar Model for creating solar values for design day.
-        int DBTempRangeType; // Drybulb Range Type (see Parameters)
+        DDDBRangeType DBTempRangeType; // Drybulb Range Type (see Parameters)
         int TempRangeSchPtr; // Schedule pointer to a day schedule for dry-bulb temperature range multipliers
         int HumIndSchPtr;    // Schedule pointer to a day schedule that specifies
         //    relative humidity (%) or wet-bulb range multipliers per HumIndType
@@ -270,7 +274,7 @@ namespace WeatherManager {
         // Default Constructor
         DesignDayData()
             : MaxDryBulb(0.0), DailyDBRange(0.0), HumIndValue(0.0), HumIndType(DDHumIndType::WetBulb), PressBarom(0.0), WindSpeed(0.0), WindDir(0.0), SkyClear(0.0),
-              RainInd(0), SnowInd(0), DayOfMonth(0), Month(0), DayType(0), DSTIndicator(0), SolarModel(DesignDaySolarModel::ASHRAE_ClearSky), DBTempRangeType(0), TempRangeSchPtr(0),
+              RainInd(0), SnowInd(0), DayOfMonth(0), Month(0), DayType(0), DSTIndicator(0), SolarModel(DesignDaySolarModel::ASHRAE_ClearSky), DBTempRangeType(DDDBRangeType::Default), TempRangeSchPtr(0),
               HumIndSchPtr(0), BeamSolarSchPtr(0), DiffuseSolarSchPtr(0), TauB(0.0), TauD(0.0), DailyWBRange(0.0), PressureEntered(false),
               DewPointNeedsSet(false),                       //**Trane:BEG: Sizing Speed Up
               maxWarmupDays(-1), suppressBegEnvReset(false) //**Trane:END: Sizing Speed Up

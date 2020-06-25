@@ -126,11 +126,6 @@ namespace WeatherManager {
     using namespace Psychrometrics;
 
     // Data
-    int const DDDBRangeType_Default(0);    // Design Day DryBulb Range Type = Default Multipliers
-    int const DDDBRangeType_Multiplier(1); // Design Day DryBulb Range Type = Multiplier Schedule
-    int const DDDBRangeType_Difference(2); // Design Day DryBulb Range Type = Difference Schedule
-    int const DDDBRangeType_Profile(3);    // Design Day DryBulb Range Type = Temperature Profile
-
     int const WP_ClarkAllenModel(0);     // Use Clark & Allen model for sky emissivity calculation
     int const WP_ScheduleValue(1);  // User entered Schedule value for Weather Property
     int const WP_DryBulbDelta(2);   // User entered DryBulb difference Schedule value for Weather Property
@@ -2348,7 +2343,7 @@ namespace WeatherManager {
             SPSiteSkyTemperatureScheduleValue = -999.0;    // N/A SkyTemperature Modifier Schedule Value
 
             int const envrnDayNum(Environment(Envrn).DesignDayNum);
-            if (DesDayInput(envrnDayNum).DBTempRangeType != DDDBRangeType_Default) {
+            if (DesDayInput(envrnDayNum).DBTempRangeType != DDDBRangeType::Default) {
                 SPSiteDryBulbRangeModScheduleValue(envrnDayNum) = DDDBRngModifier(TimeStep, HourOfDay, envrnDayNum);
             }
             DDHumIndType const &humIndType{DesDayInput(envrnDayNum).HumIndType};
@@ -3983,13 +3978,13 @@ namespace WeatherManager {
             print(outputFiles.eio, "{:.2R},", DesDayInput(EnvrnNum).DailyDBRange);
 
             StringOut = ",";
-            if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Default) {
+            if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType::Default) {
                 StringOut = "DefaultMultipliers,";
-            } else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Multiplier) {
+            } else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType::Multiplier) {
                 StringOut = "MultiplierSchedule,";
-            } else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Profile) {
+            } else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType::Profile) {
                 StringOut = "TemperatureProfile,";
-            } else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Difference) {
+            } else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType::Difference) {
                 StringOut = "DifferenceSchedule,";
             }
             print(outputFiles.eio, "{}", StringOut);
@@ -4115,9 +4110,9 @@ namespace WeatherManager {
         TomorrowAlbedo = 0.0;
 
         // resolve daily ranges
-        if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Difference) {
+        if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType::Difference) {
             DBRange = 1.0; // use unscaled multiplier values if difference
-        } else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Profile) {
+        } else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType::Profile) {
             DBRange = 0.0;
         } else {
             DBRange = DesDayInput(EnvrnNum).DailyDBRange;
@@ -4131,10 +4126,10 @@ namespace WeatherManager {
         for (Hour = 1; Hour <= 24; ++Hour) {
             for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
 
-                if (DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType_Profile) {
+                if (DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType::Profile) {
                     // dry-bulb profile
                     TomorrowOutDryBulbTemp(TS, Hour) = DesDayInput(EnvrnNum).MaxDryBulb - DDDBRngModifier(TS, Hour, EnvrnNum) * DBRange;
-                } else { // DesDayInput(EnvrnNum)%DBTempRangeType == DDDBRangeType_Profile
+                } else { // DesDayInput(EnvrnNum)%DBTempRangeType == DDDBRangeType::Profile
                     TomorrowOutDryBulbTemp(TS, Hour) = DDDBRngModifier(TS, Hour, EnvrnNum);
                 }
 
@@ -6382,26 +6377,26 @@ namespace WeatherManager {
             // check DB profile input
             if (lAlphaFieldBlanks(3)) {
                 cAlphaArgs(3) = "DefaultMultipliers";
-                DesDayInput(EnvrnNum).DBTempRangeType = DDDBRangeType_Default;
+                DesDayInput(EnvrnNum).DBTempRangeType = DDDBRangeType::Default;
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "Multiplier") || UtilityRoutines::SameString(cAlphaArgs(3), "MultiplierSchedule")) {
                 cAlphaArgs(3) = "MultiplierSchedule";
-                DesDayInput(EnvrnNum).DBTempRangeType = DDDBRangeType_Multiplier;
+                DesDayInput(EnvrnNum).DBTempRangeType = DDDBRangeType::Multiplier;
                 units = "[]";
                 unitType = OutputProcessor::Unit::None;
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "Difference") || UtilityRoutines::SameString(cAlphaArgs(3), "Delta") ||
                        UtilityRoutines::SameString(cAlphaArgs(3), "DifferenceSchedule") ||
                        UtilityRoutines::SameString(cAlphaArgs(3), "DeltaSchedule")) {
                 cAlphaArgs(3) = "DifferenceSchedule";
-                DesDayInput(EnvrnNum).DBTempRangeType = DDDBRangeType_Difference;
+                DesDayInput(EnvrnNum).DBTempRangeType = DDDBRangeType::Difference;
                 units = "[deltaC]";
                 unitType = OutputProcessor::Unit::deltaC;
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "DefaultMultipliers")) {
                 cAlphaArgs(3) = "DefaultMultipliers";
-                DesDayInput(EnvrnNum).DBTempRangeType = DDDBRangeType_Default;
+                DesDayInput(EnvrnNum).DBTempRangeType = DDDBRangeType::Default;
                 // Validate Temperature - Daily range
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "TemperatureProfileSchedule")) {
                 cAlphaArgs(3) = "TemperatureProfileSchedule";
-                DesDayInput(EnvrnNum).DBTempRangeType = DDDBRangeType_Profile;
+                DesDayInput(EnvrnNum).DBTempRangeType = DDDBRangeType::Profile;
                 units = "[C]";
                 unitType = OutputProcessor::Unit::C;
             } else {
@@ -6409,10 +6404,10 @@ namespace WeatherManager {
                 ShowContinueError("..invalid field: " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                 ErrorsFound = true;
                 cAlphaArgs(3) = "invalid field";
-                DesDayInput(EnvrnNum).DBTempRangeType = DDDBRangeType_Default;
+                DesDayInput(EnvrnNum).DBTempRangeType = DDDBRangeType::Default;
             }
 
-            if (DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType_Profile && !MaxDryBulbEntered && cAlphaArgs(3) != "invalid field") {
+            if (DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType::Profile && !MaxDryBulbEntered && cAlphaArgs(3) != "invalid field") {
                 ShowSevereError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid data.");
                 ShowContinueError("..invalid blank field: " + cNumericFieldNames(3));
                 ShowContinueError("..this field is required when " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
@@ -6420,7 +6415,7 @@ namespace WeatherManager {
             }
 
             // Assume either "multiplier" option will make full use of range...
-            if (DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType_Difference && DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType_Profile) {
+            if (DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType::Difference && DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType::Profile) {
                 testval = DesDayInput(EnvrnNum).MaxDryBulb - DesDayInput(EnvrnNum).DailyDBRange;
                 errFlag = false;
                 inputProcessor->rangeCheck(errFlag,
@@ -6439,7 +6434,7 @@ namespace WeatherManager {
             }
 
             //   A4,  \field Dry-Bulb Temperature Range Modifier Day Schedule Name
-            if (DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType_Default) {
+            if (DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType::Default) {
                 if (!lAlphaFieldBlanks(4)) {
                     DesDayInput(EnvrnNum).TempRangeSchPtr = GetDayScheduleIndex(cAlphaArgs(4));
                     if (DesDayInput(EnvrnNum).TempRangeSchPtr == 0) {
