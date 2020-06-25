@@ -54,9 +54,10 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace HVACSingleDuctInduc {
 
@@ -169,7 +170,8 @@ namespace HVACSingleDuctInduc {
 
     void GetIndUnits();
 
-    void InitIndUnit(int const IUNum,              // number of the current induction unit being simulated
+    void InitIndUnit(BranchInputManagerData &dataBranchInputManager,
+                     int const IUNum,              // number of the current induction unit being simulated
                      bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     );
 
