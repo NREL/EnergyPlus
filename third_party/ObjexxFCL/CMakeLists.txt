@@ -225,9 +225,6 @@ set(src
   src/ObjexxFCL/Vector4.fwd.hh
   src/ObjexxFCL/Vector4.hh
   src/ObjexxFCL/vectorize.hh
-  src/ObjexxFCL/Write.cc
-  src/ObjexxFCL/Write.fwd.hh
-  src/ObjexxFCL/Write.hh
 )
 
 set( test_src
@@ -294,7 +291,6 @@ set( test_src
   tst/unit/Vector2.unit.cc
   tst/unit/Vector3.unit.cc
   tst/unit/Vector4.unit.cc
-  tst/unit/Write.unit.cc
 )
 
 add_library( ${target_name} ${src} )

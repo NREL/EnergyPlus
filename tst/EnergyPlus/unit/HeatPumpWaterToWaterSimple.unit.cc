@@ -710,7 +710,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -721,7 +721,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     OutputProcessor::GetReportVariableInput(state.outputFiles);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(); // just gets input and
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
@@ -1460,7 +1460,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -1471,7 +1471,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     OutputProcessor::GetReportVariableInput(state.outputFiles);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(); // just gets input and
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and
     SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;

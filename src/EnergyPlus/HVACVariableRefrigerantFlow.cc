@@ -320,7 +320,8 @@ namespace HVACVariableRefrigerantFlow {
         if ((VRF(VRFCondenser).CondenserType == DataHVACGlobals::WaterCooled) && (VRF(VRFCondenser).checkPlantCondTypeOneTime)) {
             // scan for loop connection data
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(VRF(VRFCondenser).Name,
+            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                    VRF(VRFCondenser).Name,
                                                     VRF(VRFCondenser).VRFPlantTypeOfNum,
                                                     VRF(VRFCondenser).SourceLoopNum,
                                                     VRF(VRFCondenser).SourceLoopSideNum,
@@ -5217,7 +5218,8 @@ namespace HVACVariableRefrigerantFlow {
             if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                 // hot water supplemental heating coil
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(VRFTU(VRFTUNum).SuppHeatCoilName,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        VRFTU(VRFTUNum).SuppHeatCoilName,
                                                         TypeOf_CoilWaterSimpleHeating,
                                                         VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
                                                         VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
@@ -5260,7 +5262,8 @@ namespace HVACVariableRefrigerantFlow {
             } else if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
                 // steam supplemental heating coil
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(VRFTU(VRFTUNum).SuppHeatCoilName,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        VRFTU(VRFTUNum).SuppHeatCoilName,
                                                         TypeOf_CoilSteamAirHeating,
                                                         VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
                                                         VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
