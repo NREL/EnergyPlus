@@ -1552,7 +1552,7 @@ namespace SolarShading {
                     // Added TH 5/26/2009 for switchable windows to report switching factor (tinted level)
                     // CurrentModuleObject='Switchable Windows'
                     if (Surface(SurfLoop).HasShadeControl) {
-                        if (WindowShadingControl(Surface(SurfLoop).WindowShadingControlPtr).ShadingType == WSC_ST_SwitchableGlazing) {
+                        if (WindowShadingControl(Surface(SurfLoop).windowShadingControlList.front()).ShadingType == WSC_ST_SwitchableGlazing) {
                             // IF (SurfaceWindow(SurfLoop)%ShadingFlag == SwitchableGlazing) THEN  !ShadingFlag is not set to SwitchableGlazing yet!
                             SetupOutputVariable("Surface Window Switchable Glazing Switching Factor",
                                                 OutputProcessor::Unit::None,
@@ -9998,7 +9998,11 @@ namespace SolarShading {
             if (IConst > 0) SurfaceWindow(ISurf).VisTransSelected = POLYF(1.0, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(ISurf).GlazedFrac;
 
             // Window has shading control
-            IShadingCtrl = Surface(ISurf).WindowShadingControlPtr;
+
+            //GLAZER DEV NOTE SHOULD PROBABLY CHOOSE HERE INSTEAD OF THIS HACK FOR DEBUGGING
+            Surface(ISurf).activeWindowShadingControl = Surface(ISurf).windowShadingControlList.front();
+
+            IShadingCtrl = Surface(ISurf).activeWindowShadingControl;
             ShadingType = WindowShadingControl(IShadingCtrl).ShadingType;
             SurfaceWindow(ISurf).ShadingFlag = ShadeOff; // Initialize shading flag to off
             IZone = Surface(ISurf).Zone;
@@ -11761,7 +11765,7 @@ namespace SolarShading {
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).HasShadeControl) {
-                 WinShadeCtrlNum = Surface(SurfNum).WindowShadingControlPtr;
+                WinShadeCtrlNum = Surface(SurfNum).windowShadingControlList.front();
                 if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade ||
                     WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade ||
                     WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {

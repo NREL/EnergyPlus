@@ -1875,7 +1875,7 @@ namespace DaylightingManager {
             IConst = Construct(IConst).TCMasterConst;
         }
 
-        ICtrl = Surface(IWin).activeWindowShadingControl;
+        ICtrl = Surface(IWin).windowShadingControlList.front();
         ShType = WSC_ST_NoShade; // 'NOSHADE'
         BlNum = 0;
         //		ScNum = 0; //Unused Set but never used
@@ -4471,10 +4471,10 @@ namespace DaylightingManager {
 
             if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
 
-                int activeWindowShadingControl = Surface(SurfNum).activeWindowShadingControl;
+                int firstWindowShadingControl = Surface(SurfNum).windowShadingControlList.front();
                 if (Surface(SurfNum).HasShadeControl) {
                     auto & thisSurfEnclosure(DataViewFactorInformation::ZoneSolarInfo(Surface(SurfNum).SolarEnclIndex));
-                    if (WindowShadingControl(activeWindowShadingControl).GlareControlIsActive) {
+                    if (WindowShadingControl(firstWindowShadingControl).GlareControlIsActive) {
                         // Error if GlareControlIsActive but window is not in a Daylighting:Detailed zone
                         if (thisSurfEnclosure.TotalEnclosureDaylRefPoints == 0) {
                             ShowSevereError("Window=" + Surface(SurfNum).Name + " has Window Shading Control with");
@@ -4501,7 +4501,7 @@ namespace DaylightingManager {
                         }
                     }
 
-                    if (WindowShadingControl(activeWindowShadingControl).ShadingControlType == WSCT_MeetDaylIlumSetp) {
+                    if (WindowShadingControl(firstWindowShadingControl).ShadingControlType == WSCT_MeetDaylIlumSetp) {
                         // Error if window has ShadingControlType = MeetDaylightingIlluminanceSetpoint &
                         // but is not in a Daylighting:Detailed zone
                         if (thisSurfEnclosure.TotalEnclosureDaylRefPoints == 0) {
