@@ -4163,7 +4163,7 @@ namespace HeatBalanceManager {
         int DummyNumProp;                                          // dummy variable for properties being passed
         int IOStat;                                                // IO Status when calling get input subroutine
         Array1D_string ConstructAlphas({0, Construction::MaxLayersInConstruct}); // Construction Alpha names defined
-        Array1D<Real64> DummyProps(4);                             // Temporary array to transfer construction properties
+        Array1D<Real64> DummyProps(5);                             // Temporary array to transfer construction properties
         int Loop;
         int TotRegConstructs; // Number of "regular" constructions (no embedded sources or sinks and
 
@@ -4370,45 +4370,48 @@ namespace HeatBalanceManager {
             }
 
             ++ConstrNum;
+            auto &thisConstruct (dataConstruction.Construct(TotRegConstructs + ConstrNum));
+
             // Assign Construction name to the Derived Type using the zeroth position of the array
-            dataConstruction.Construct(TotRegConstructs + ConstrNum).Name = ConstructAlphas(0);
+            thisConstruct.Name = ConstructAlphas(0);
 
             // Obtain the source/sink data
-            if (DummyNumProp != 4) {
+            if (DummyNumProp != 5) {
                 ShowSevereError(CurrentModuleObject + ": Wrong number of numerical inputs for " + dataConstruction.Construct(ConstrNum).Name);
                 ErrorsFound = true;
             }
-            dataConstruction.Construct(TotRegConstructs + ConstrNum).SourceSinkPresent = true;
-            dataConstruction.Construct(TotRegConstructs + ConstrNum).SourceAfterLayer = int(DummyProps(1));
-            dataConstruction.Construct(TotRegConstructs + ConstrNum).TempAfterLayer = int(DummyProps(2));
-            dataConstruction.Construct(TotRegConstructs + ConstrNum).SolutionDimensions = int(DummyProps(3));
-            if ((dataConstruction.Construct(TotRegConstructs + ConstrNum).SolutionDimensions < 1) ||
-                (dataConstruction.Construct(TotRegConstructs + ConstrNum).SolutionDimensions > 2)) {
+            thisConstruct.SourceSinkPresent = true;
+            thisConstruct.SourceAfterLayer = int(DummyProps(1));
+            thisConstruct.TempAfterLayer = int(DummyProps(2));
+            thisConstruct.SolutionDimensions = int(DummyProps(3));
+            if ((thisConstruct.SolutionDimensions < 1) ||
+                (thisConstruct.SolutionDimensions > 2)) {
                 ShowWarningError("Construction:InternalSource must be either 1- or 2-D.  Reset to 1-D solution.");
-                ShowContinueError("Construction=" + dataConstruction.Construct(TotRegConstructs + ConstrNum).Name + " is affected.");
-                dataConstruction.Construct(TotRegConstructs + ConstrNum).SolutionDimensions = 1;
+                ShowContinueError("Construction=" + thisConstruct.Name + " is affected.");
+                thisConstruct.SolutionDimensions = 1;
             }
-            dataConstruction.Construct(TotRegConstructs + ConstrNum).ThicknessPerpend = DummyProps(4) / 2.0;
+            thisConstruct.ThicknessPerpend = DummyProps(4) / 2.0;
+            thisConstruct.userTemperatureLocationPerpendicular = thisConstruct.setUserTemperatureLocationPerpendicular(DummyProps(5));
 
             // Set the total number of layers for the construction
-            dataConstruction.Construct(TotRegConstructs + ConstrNum).TotLayers = ConstructNumAlpha - 1;
-            if (dataConstruction.Construct(TotRegConstructs + ConstrNum).TotLayers <= 1) {
-                ShowSevereError("Construction " + dataConstruction.Construct(TotRegConstructs + ConstrNum).Name +
+            thisConstruct.TotLayers = ConstructNumAlpha - 1;
+            if (thisConstruct.TotLayers <= 1) {
+                ShowSevereError("Construction " + thisConstruct.Name +
                                 " has an internal source or sink and thus must have more than a single layer");
                 ErrorsFound = true;
             }
-            if ((dataConstruction.Construct(TotRegConstructs + ConstrNum).SourceAfterLayer >= dataConstruction.Construct(TotRegConstructs + ConstrNum).TotLayers) ||
-                (dataConstruction.Construct(TotRegConstructs + ConstrNum).SourceAfterLayer <= 0)) {
-                ShowWarningError("Construction " + dataConstruction.Construct(TotRegConstructs + ConstrNum).Name + " must have a source that is between two layers");
+            if ((thisConstruct.SourceAfterLayer >= thisConstruct.TotLayers) ||
+                (thisConstruct.SourceAfterLayer <= 0)) {
+                ShowWarningError("Construction " + thisConstruct.Name + " must have a source that is between two layers");
                 ShowContinueError("The source after layer parameter has been set to one less than the number of layers.");
-                dataConstruction.Construct(TotRegConstructs + ConstrNum).SourceAfterLayer = dataConstruction.Construct(TotRegConstructs + ConstrNum).TotLayers - 1;
+                thisConstruct.SourceAfterLayer = thisConstruct.TotLayers - 1;
             }
-            if ((dataConstruction.Construct(TotRegConstructs + ConstrNum).TempAfterLayer >= dataConstruction.Construct(TotRegConstructs + ConstrNum).TotLayers) ||
-                (dataConstruction.Construct(TotRegConstructs + ConstrNum).TempAfterLayer <= 0)) {
-                ShowWarningError("Construction " + dataConstruction.Construct(TotRegConstructs + ConstrNum).Name +
+            if ((thisConstruct.TempAfterLayer >= thisConstruct.TotLayers) ||
+                (thisConstruct.TempAfterLayer <= 0)) {
+                ShowWarningError("Construction " + thisConstruct.Name +
                                  " must have a temperature calculation that is between two layers");
                 ShowContinueError("The temperature calculation after layer parameter has been set to one less than the number of layers.");
-                dataConstruction.Construct(TotRegConstructs + ConstrNum).TempAfterLayer = dataConstruction.Construct(TotRegConstructs + ConstrNum).TotLayers - 1;
+                thisConstruct.TempAfterLayer = thisConstruct.TotLayers - 1;
             }
 
             // Loop through all of the layers of the construct to match the material names.
@@ -4417,17 +4420,17 @@ namespace HeatBalanceManager {
 
                 // Find the material in the list of materials
 
-                dataConstruction.Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), dataMaterial.Material);
+                thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), dataMaterial.Material);
 
-                if (dataConstruction.Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) == 0) {
+                if (thisConstruct.LayerPoint(Layer) == 0) {
                     ShowSevereError("Did not find matching material for " + CurrentModuleObject + ' ' + dataConstruction.Construct(ConstrNum).Name +
                                     ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
                     NominalRforNominalUCalculation(TotRegConstructs + ConstrNum) +=
-                        NominalR(dataConstruction.Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer));
-                    if (dataMaterial.Material(dataConstruction.Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer)).Group == RegularMaterial &&
-                        !dataMaterial.Material(dataConstruction.Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer)).ROnly) {
+                        NominalR(thisConstruct.LayerPoint(Layer));
+                    if (dataMaterial.Material(thisConstruct.LayerPoint(Layer)).Group == RegularMaterial &&
+                        !dataMaterial.Material(thisConstruct.LayerPoint(Layer)).ROnly) {
                         NoRegularMaterialsUsed = false;
                     }
                 }

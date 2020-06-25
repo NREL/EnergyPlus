@@ -1505,6 +1505,10 @@ namespace AirflowNetwork {
         Real64 MultiZoneInfiSenGainJ;
         Real64 MultiZoneInfiSenLossW;
         Real64 MultiZoneInfiSenLossJ;
+        Real64 MultiZoneVentSenGainW;
+        Real64 MultiZoneVentSenGainJ;
+        Real64 MultiZoneVentSenLossW;
+        Real64 MultiZoneVentSenLossJ;
         Real64 MultiZoneMixSenGainW;
         Real64 MultiZoneMixSenGainJ;
         Real64 MultiZoneMixSenLossW;
@@ -1513,6 +1517,10 @@ namespace AirflowNetwork {
         Real64 MultiZoneInfiLatGainJ;
         Real64 MultiZoneInfiLatLossW;
         Real64 MultiZoneInfiLatLossJ;
+        Real64 MultiZoneVentLatGainW;
+        Real64 MultiZoneVentLatGainJ;
+        Real64 MultiZoneVentLatLossW;
+        Real64 MultiZoneVentLatLossJ;
         Real64 MultiZoneMixLatGainW;
         Real64 MultiZoneMixLatGainJ;
         Real64 MultiZoneMixLatLossW;
@@ -1550,8 +1558,10 @@ namespace AirflowNetwork {
         // Default Constructor
         AiflowNetworkReportProp()
             : MultiZoneInfiSenGainW(0.0), MultiZoneInfiSenGainJ(0.0), MultiZoneInfiSenLossW(0.0), MultiZoneInfiSenLossJ(0.0),
-              MultiZoneMixSenGainW(0.0), MultiZoneMixSenGainJ(0.0), MultiZoneMixSenLossW(0.0), MultiZoneMixSenLossJ(0.0), MultiZoneInfiLatGainW(0.0),
-              MultiZoneInfiLatGainJ(0.0), MultiZoneInfiLatLossW(0.0), MultiZoneInfiLatLossJ(0.0), MultiZoneMixLatGainW(0.0),
+              MultiZoneVentSenGainW(0.0), MultiZoneVentSenGainJ(0.0), MultiZoneVentSenLossW(0.0), MultiZoneVentSenLossJ(0.0),
+              MultiZoneMixSenGainW(0.0), MultiZoneMixSenGainJ(0.0), MultiZoneMixSenLossW(0.0), MultiZoneMixSenLossJ(0.0),
+              MultiZoneInfiLatGainW(0.0), MultiZoneInfiLatGainJ(0.0), MultiZoneInfiLatLossW(0.0), MultiZoneInfiLatLossJ(0.0), MultiZoneVentLatGainW(0.0),
+              MultiZoneVentLatGainJ(0.0), MultiZoneVentLatLossW(0.0), MultiZoneVentLatLossJ(0.0), MultiZoneMixLatGainW(0.0),
               MultiZoneMixLatGainJ(0.0), MultiZoneMixLatLossW(0.0), MultiZoneMixLatLossJ(0.0), LeakSenGainW(0.0), LeakSenGainJ(0.0),
               LeakSenLossW(0.0), LeakSenLossJ(0.0), LeakLatGainW(0.0), LeakLatGainJ(0.0), LeakLatLossW(0.0), LeakLatLossJ(0.0), CondSenGainW(0.0),
               CondSenGainJ(0.0), CondSenLossW(0.0), CondSenLossJ(0.0), DiffLatGainW(0.0), DiffLatGainJ(0.0), DiffLatLossW(0.0), DiffLatLossJ(0.0),

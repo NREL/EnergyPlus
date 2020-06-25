@@ -714,22 +714,7 @@ namespace ConductionTransferFunctionCalc {
                     // For constructions that have sources or sinks present, determine which
                     // node the source/sink is applied at and also where the temperature
                     // calculation has been requested.
-                    NodeSource = 0;
-                    NodeUserTemp = 0;
-                    if (dataConstruction.Construct(ConstrNum).SourceSinkPresent) {
-
-                        for (Layer = 1; Layer <= dataConstruction.Construct(ConstrNum).SourceAfterLayer; ++Layer) {
-                            NodeSource += Nodes(Layer);
-                        }
-                        if ((NodeSource > 0) && (dataConstruction.Construct(ConstrNum).SolutionDimensions > 1))
-                            NodeSource = ((NodeSource - 1) * NumOfPerpendNodes) + 1;
-
-                        for (Layer = 1; Layer <= dataConstruction.Construct(ConstrNum).TempAfterLayer; ++Layer) {
-                            NodeUserTemp += Nodes(Layer);
-                        }
-                        if ((NodeUserTemp > 0) && (dataConstruction.Construct(ConstrNum).SolutionDimensions > 1))
-                            NodeUserTemp = ((NodeUserTemp - 1) * NumOfPerpendNodes) + 1;
-                    }
+                    dataConstruction.Construct(ConstrNum).setNodeSourceAndUserTemp(NodeSource, NodeUserTemp, Nodes, NumOfPerpendNodes);
 
                     // "Adjust time step to ensure stability."  If the time step is too
                     // small, it will result in too many history terms which can lead to

@@ -55,13 +55,14 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 
 #include <EnergyPlus/DataAirSystems.hh>
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -70,10 +71,9 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -4747,49 +4747,111 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWPCValue)
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
 {
     std::string const idf_objects = delimited_string(
-        {"Material,", "  A1 - 1 IN STUCCO,        !- Name", "  Smooth,                  !- Roughness",
-         "  2.5389841E-02,           !- Thickness {m}", "  0.6918309,               !- Conductivity {W/m-K}",
-         "  1858.142,                !- Density {kg/m3}", "  836.8000,                !- Specific Heat {J/kg-K}",
-         "  0.9000000,               !- Thermal Absorptance", "  0.9200000,               !- Solar Absorptance",
-         "  0.9200000;               !- Visible Absorptance", "Material,", "  C4 - 4 IN COMMON BRICK,  !- Name",
-         "  Rough,                   !- Roughness", "  0.1014984,               !- Thickness {m}",
-         "  0.7264224,               !- Conductivity {W/m-K}", "  1922.216,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.7600000,               !- Solar Absorptance", "  0.7600000;               !- Visible Absorptance", "Material,",
-         "  E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name", "  Smooth,                  !- Roughness", "  1.905E-02,               !- Thickness {m}",
-         "  0.7264224,               !- Conductivity {W/m-K}", "  1601.846,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.9200000,               !- Solar Absorptance", "  0.9200000;               !- Visible Absorptance", "Material,",
-         "  C6 - 8 IN CLAY TILE,     !- Name", "  Smooth,                  !- Roughness", "  0.2033016,               !- Thickness {m}",
-         "  0.5707605,               !- Conductivity {W/m-K}", "  1121.292,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.8200000,               !- Solar Absorptance", "  0.8200000;               !- Visible Absorptance", "Material,",
-         "  C10 - 8 IN HW CONCRETE,  !- Name", "  MediumRough,             !- Roughness", "  0.2033016,               !- Thickness {m}",
-         "  1.729577,                !- Conductivity {W/m-K}", "  2242.585,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.6500000,               !- Solar Absorptance", "  0.6500000;               !- Visible Absorptance", "Material,",
-         "  E2 - 1 / 2 IN SLAG OR STONE,  !- Name", "  Rough,                   !- Roughness", "  1.2710161E-02,           !- Thickness {m}",
-         "  1.435549,                !- Conductivity {W/m-K}", "  881.0155,                !- Density {kg/m3}",
-         "  1673.600,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.5500000,               !- Solar Absorptance", "  0.5500000;               !- Visible Absorptance", "Material,",
-         "  E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name", "  Rough,                   !- Roughness", "  9.5402403E-03,           !- Thickness {m}",
-         "  0.1902535,               !- Conductivity {W/m-K}", "  1121.292,                !- Density {kg/m3}",
-         "  1673.600,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.7500000,               !- Solar Absorptance", "  0.7500000;               !- Visible Absorptance", "Material,",
-         "  B5 - 1 IN DENSE INSULATION,  !- Name", "  VeryRough,               !- Roughness", "  2.5389841E-02,           !- Thickness {m}",
-         "  4.3239430E-02,           !- Conductivity {W/m-K}", "  91.30524,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.5000000,               !- Solar Absorptance", "  0.5000000;               !- Visible Absorptance", "Material,",
-         "  C12 - 2 IN HW CONCRETE,  !- Name", "  MediumRough,             !- Roughness", "  5.0901599E-02,           !- Thickness {m}",
-         "  1.729577,                !- Conductivity {W/m-K}", "  2242.585,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.6500000,               !- Solar Absorptance", "  0.6500000;               !- Visible Absorptance", "Material,",
-         "  1.375in-Solid-Core,      !- Name", "  Smooth,                  !- Roughness", "  3.4925E-02,              !- Thickness {m}",
-         "  0.1525000,               !- Conductivity {W/m-K}", "  614.5000,                !- Density {kg/m3}",
-         "  1630.0000,               !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.9200000,               !- Solar Absorptance", "  0.9200000;               !- Visible Absorptance", "WindowMaterial:Glazing,",
-         "  WIN-LAY-GLASS-LIGHT,     !- Name", "  SpectralAverage,         !- Optical Data Type",
-         "  ,                        !- Window Glass Spectral Data Set Name", "  0.0025,                  !- Thickness {m}",
+        {"Material,",
+         "  A1 - 1 IN STUCCO,        !- Name",
+         "  Smooth,                  !- Roughness",
+         "  2.5389841E-02,           !- Thickness {m}",
+         "  0.6918309,               !- Conductivity {W/m-K}",
+         "  1858.142,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.9200000,               !- Solar Absorptance",
+         "  0.9200000;               !- Visible Absorptance",
+         "Material,",
+         "  C4 - 4 IN COMMON BRICK,  !- Name",
+         "  Rough,                   !- Roughness",
+         "  0.1014984,               !- Thickness {m}",
+         "  0.7264224,               !- Conductivity {W/m-K}",
+         "  1922.216,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.7600000,               !- Solar Absorptance",
+         "  0.7600000;               !- Visible Absorptance",
+         "Material,",
+         "  E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name",
+         "  Smooth,                  !- Roughness",
+         "  1.905E-02,               !- Thickness {m}",
+         "  0.7264224,               !- Conductivity {W/m-K}",
+         "  1601.846,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.9200000,               !- Solar Absorptance",
+         "  0.9200000;               !- Visible Absorptance",
+         "Material,",
+         "  C6 - 8 IN CLAY TILE,     !- Name",
+         "  Smooth,                  !- Roughness",
+         "  0.2033016,               !- Thickness {m}",
+         "  0.5707605,               !- Conductivity {W/m-K}",
+         "  1121.292,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.8200000,               !- Solar Absorptance",
+         "  0.8200000;               !- Visible Absorptance",
+         "Material,",
+         "  C10 - 8 IN HW CONCRETE,  !- Name",
+         "  MediumRough,             !- Roughness",
+         "  0.2033016,               !- Thickness {m}",
+         "  1.729577,                !- Conductivity {W/m-K}",
+         "  2242.585,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.6500000,               !- Solar Absorptance",
+         "  0.6500000;               !- Visible Absorptance",
+         "Material,",
+         "  E2 - 1 / 2 IN SLAG OR STONE,  !- Name",
+         "  Rough,                   !- Roughness",
+         "  1.2710161E-02,           !- Thickness {m}",
+         "  1.435549,                !- Conductivity {W/m-K}",
+         "  881.0155,                !- Density {kg/m3}",
+         "  1673.600,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.5500000,               !- Solar Absorptance",
+         "  0.5500000;               !- Visible Absorptance",
+         "Material,",
+         "  E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name",
+         "  Rough,                   !- Roughness",
+         "  9.5402403E-03,           !- Thickness {m}",
+         "  0.1902535,               !- Conductivity {W/m-K}",
+         "  1121.292,                !- Density {kg/m3}",
+         "  1673.600,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.7500000,               !- Solar Absorptance",
+         "  0.7500000;               !- Visible Absorptance",
+         "Material,",
+         "  B5 - 1 IN DENSE INSULATION,  !- Name",
+         "  VeryRough,               !- Roughness",
+         "  2.5389841E-02,           !- Thickness {m}",
+         "  4.3239430E-02,           !- Conductivity {W/m-K}",
+         "  91.30524,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.5000000,               !- Solar Absorptance",
+         "  0.5000000;               !- Visible Absorptance",
+         "Material,",
+         "  C12 - 2 IN HW CONCRETE,  !- Name",
+         "  MediumRough,             !- Roughness",
+         "  5.0901599E-02,           !- Thickness {m}",
+         "  1.729577,                !- Conductivity {W/m-K}",
+         "  2242.585,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.6500000,               !- Solar Absorptance",
+         "  0.6500000;               !- Visible Absorptance",
+         "Material,",
+         "  1.375in-Solid-Core,      !- Name",
+         "  Smooth,                  !- Roughness",
+         "  3.4925E-02,              !- Thickness {m}",
+         "  0.1525000,               !- Conductivity {W/m-K}",
+         "  614.5000,                !- Density {kg/m3}",
+         "  1630.0000,               !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.9200000,               !- Solar Absorptance",
+         "  0.9200000;               !- Visible Absorptance",
+         "WindowMaterial:Glazing,",
+         "  WIN-LAY-GLASS-LIGHT,     !- Name",
+         "  SpectralAverage,         !- Optical Data Type",
+         "  ,                        !- Window Glass Spectral Data Set Name",
+         "  0.0025,                  !- Thickness {m}",
          "  0.850,                   !- Solar Transmittance at Normal Incidence",
          "  0.075,                   !- Front Side Solar Reflectance at Normal Incidence",
          "  0.075,                   !- Back Side Solar Reflectance at Normal Incidence",
@@ -5702,49 +5764,111 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
 {
     std::string const idf_objects = delimited_string(
-        {"Material,", "  A1 - 1 IN STUCCO,        !- Name", "  Smooth,                  !- Roughness",
-         "  2.5389841E-02,           !- Thickness {m}", "  0.6918309,               !- Conductivity {W/m-K}",
-         "  1858.142,                !- Density {kg/m3}", "  836.8000,                !- Specific Heat {J/kg-K}",
-         "  0.9000000,               !- Thermal Absorptance", "  0.9200000,               !- Solar Absorptance",
-         "  0.9200000;               !- Visible Absorptance", "Material,", "  C4 - 4 IN COMMON BRICK,  !- Name",
-         "  Rough,                   !- Roughness", "  0.1014984,               !- Thickness {m}",
-         "  0.7264224,               !- Conductivity {W/m-K}", "  1922.216,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.7600000,               !- Solar Absorptance", "  0.7600000;               !- Visible Absorptance", "Material,",
-         "  E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name", "  Smooth,                  !- Roughness", "  1.905E-02,               !- Thickness {m}",
-         "  0.7264224,               !- Conductivity {W/m-K}", "  1601.846,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.9200000,               !- Solar Absorptance", "  0.9200000;               !- Visible Absorptance", "Material,",
-         "  C6 - 8 IN CLAY TILE,     !- Name", "  Smooth,                  !- Roughness", "  0.2033016,               !- Thickness {m}",
-         "  0.5707605,               !- Conductivity {W/m-K}", "  1121.292,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.8200000,               !- Solar Absorptance", "  0.8200000;               !- Visible Absorptance", "Material,",
-         "  C10 - 8 IN HW CONCRETE,  !- Name", "  MediumRough,             !- Roughness", "  0.2033016,               !- Thickness {m}",
-         "  1.729577,                !- Conductivity {W/m-K}", "  2242.585,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.6500000,               !- Solar Absorptance", "  0.6500000;               !- Visible Absorptance", "Material,",
-         "  E2 - 1 / 2 IN SLAG OR STONE,  !- Name", "  Rough,                   !- Roughness", "  1.2710161E-02,           !- Thickness {m}",
-         "  1.435549,                !- Conductivity {W/m-K}", "  881.0155,                !- Density {kg/m3}",
-         "  1673.600,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.5500000,               !- Solar Absorptance", "  0.5500000;               !- Visible Absorptance", "Material,",
-         "  E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name", "  Rough,                   !- Roughness", "  9.5402403E-03,           !- Thickness {m}",
-         "  0.1902535,               !- Conductivity {W/m-K}", "  1121.292,                !- Density {kg/m3}",
-         "  1673.600,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.7500000,               !- Solar Absorptance", "  0.7500000;               !- Visible Absorptance", "Material,",
-         "  B5 - 1 IN DENSE INSULATION,  !- Name", "  VeryRough,               !- Roughness", "  2.5389841E-02,           !- Thickness {m}",
-         "  4.3239430E-02,           !- Conductivity {W/m-K}", "  91.30524,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.5000000,               !- Solar Absorptance", "  0.5000000;               !- Visible Absorptance", "Material,",
-         "  C12 - 2 IN HW CONCRETE,  !- Name", "  MediumRough,             !- Roughness", "  5.0901599E-02,           !- Thickness {m}",
-         "  1.729577,                !- Conductivity {W/m-K}", "  2242.585,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.6500000,               !- Solar Absorptance", "  0.6500000;               !- Visible Absorptance", "Material,",
-         "  1.375in-Solid-Core,      !- Name", "  Smooth,                  !- Roughness", "  3.4925E-02,              !- Thickness {m}",
-         "  0.1525000,               !- Conductivity {W/m-K}", "  614.5000,                !- Density {kg/m3}",
-         "  1630.0000,               !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.9200000,               !- Solar Absorptance", "  0.9200000;               !- Visible Absorptance", "WindowMaterial:Glazing,",
-         "  WIN-LAY-GLASS-LIGHT,     !- Name", "  SpectralAverage,         !- Optical Data Type",
-         "  ,                        !- Window Glass Spectral Data Set Name", "  0.0025,                  !- Thickness {m}",
+        {"Material,",
+         "  A1 - 1 IN STUCCO,        !- Name",
+         "  Smooth,                  !- Roughness",
+         "  2.5389841E-02,           !- Thickness {m}",
+         "  0.6918309,               !- Conductivity {W/m-K}",
+         "  1858.142,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.9200000,               !- Solar Absorptance",
+         "  0.9200000;               !- Visible Absorptance",
+         "Material,",
+         "  C4 - 4 IN COMMON BRICK,  !- Name",
+         "  Rough,                   !- Roughness",
+         "  0.1014984,               !- Thickness {m}",
+         "  0.7264224,               !- Conductivity {W/m-K}",
+         "  1922.216,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.7600000,               !- Solar Absorptance",
+         "  0.7600000;               !- Visible Absorptance",
+         "Material,",
+         "  E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name",
+         "  Smooth,                  !- Roughness",
+         "  1.905E-02,               !- Thickness {m}",
+         "  0.7264224,               !- Conductivity {W/m-K}",
+         "  1601.846,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.9200000,               !- Solar Absorptance",
+         "  0.9200000;               !- Visible Absorptance",
+         "Material,",
+         "  C6 - 8 IN CLAY TILE,     !- Name",
+         "  Smooth,                  !- Roughness",
+         "  0.2033016,               !- Thickness {m}",
+         "  0.5707605,               !- Conductivity {W/m-K}",
+         "  1121.292,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.8200000,               !- Solar Absorptance",
+         "  0.8200000;               !- Visible Absorptance",
+         "Material,",
+         "  C10 - 8 IN HW CONCRETE,  !- Name",
+         "  MediumRough,             !- Roughness",
+         "  0.2033016,               !- Thickness {m}",
+         "  1.729577,                !- Conductivity {W/m-K}",
+         "  2242.585,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.6500000,               !- Solar Absorptance",
+         "  0.6500000;               !- Visible Absorptance",
+         "Material,",
+         "  E2 - 1 / 2 IN SLAG OR STONE,  !- Name",
+         "  Rough,                   !- Roughness",
+         "  1.2710161E-02,           !- Thickness {m}",
+         "  1.435549,                !- Conductivity {W/m-K}",
+         "  881.0155,                !- Density {kg/m3}",
+         "  1673.600,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.5500000,               !- Solar Absorptance",
+         "  0.5500000;               !- Visible Absorptance",
+         "Material,",
+         "  E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name",
+         "  Rough,                   !- Roughness",
+         "  9.5402403E-03,           !- Thickness {m}",
+         "  0.1902535,               !- Conductivity {W/m-K}",
+         "  1121.292,                !- Density {kg/m3}",
+         "  1673.600,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.7500000,               !- Solar Absorptance",
+         "  0.7500000;               !- Visible Absorptance",
+         "Material,",
+         "  B5 - 1 IN DENSE INSULATION,  !- Name",
+         "  VeryRough,               !- Roughness",
+         "  2.5389841E-02,           !- Thickness {m}",
+         "  4.3239430E-02,           !- Conductivity {W/m-K}",
+         "  91.30524,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.5000000,               !- Solar Absorptance",
+         "  0.5000000;               !- Visible Absorptance",
+         "Material,",
+         "  C12 - 2 IN HW CONCRETE,  !- Name",
+         "  MediumRough,             !- Roughness",
+         "  5.0901599E-02,           !- Thickness {m}",
+         "  1.729577,                !- Conductivity {W/m-K}",
+         "  2242.585,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.6500000,               !- Solar Absorptance",
+         "  0.6500000;               !- Visible Absorptance",
+         "Material,",
+         "  1.375in-Solid-Core,      !- Name",
+         "  Smooth,                  !- Roughness",
+         "  3.4925E-02,              !- Thickness {m}",
+         "  0.1525000,               !- Conductivity {W/m-K}",
+         "  614.5000,                !- Density {kg/m3}",
+         "  1630.0000,               !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.9200000,               !- Solar Absorptance",
+         "  0.9200000;               !- Visible Absorptance",
+         "WindowMaterial:Glazing,",
+         "  WIN-LAY-GLASS-LIGHT,     !- Name",
+         "  SpectralAverage,         !- Optical Data Type",
+         "  ,                        !- Window Glass Spectral Data Set Name",
+         "  0.0025,                  !- Thickness {m}",
          "  0.850,                   !- Solar Transmittance at Normal Incidence",
          "  0.075,                   !- Front Side Solar Reflectance at Normal Incidence",
          "  0.075,                   !- Back Side Solar Reflectance at Normal Incidence",
@@ -6908,7 +7032,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
 
     SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
-
+  
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
@@ -6988,49 +7112,111 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
 {
     std::string const idf_objects = delimited_string(
-        {"Material,", "  A1 - 1 IN STUCCO,        !- Name", "  Smooth,                  !- Roughness",
-         "  2.5389841E-02,           !- Thickness {m}", "  0.6918309,               !- Conductivity {W/m-K}",
-         "  1858.142,                !- Density {kg/m3}", "  836.8000,                !- Specific Heat {J/kg-K}",
-         "  0.9000000,               !- Thermal Absorptance", "  0.9200000,               !- Solar Absorptance",
-         "  0.9200000;               !- Visible Absorptance", "Material,", "  C4 - 4 IN COMMON BRICK,  !- Name",
-         "  Rough,                   !- Roughness", "  0.1014984,               !- Thickness {m}",
-         "  0.7264224,               !- Conductivity {W/m-K}", "  1922.216,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.7600000,               !- Solar Absorptance", "  0.7600000;               !- Visible Absorptance", "Material,",
-         "  E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name", "  Smooth,                  !- Roughness", "  1.905E-02,               !- Thickness {m}",
-         "  0.7264224,               !- Conductivity {W/m-K}", "  1601.846,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.9200000,               !- Solar Absorptance", "  0.9200000;               !- Visible Absorptance", "Material,",
-         "  C6 - 8 IN CLAY TILE,     !- Name", "  Smooth,                  !- Roughness", "  0.2033016,               !- Thickness {m}",
-         "  0.5707605,               !- Conductivity {W/m-K}", "  1121.292,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.8200000,               !- Solar Absorptance", "  0.8200000;               !- Visible Absorptance", "Material,",
-         "  C10 - 8 IN HW CONCRETE,  !- Name", "  MediumRough,             !- Roughness", "  0.2033016,               !- Thickness {m}",
-         "  1.729577,                !- Conductivity {W/m-K}", "  2242.585,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.6500000,               !- Solar Absorptance", "  0.6500000;               !- Visible Absorptance", "Material,",
-         "  E2 - 1 / 2 IN SLAG OR STONE,  !- Name", "  Rough,                   !- Roughness", "  1.2710161E-02,           !- Thickness {m}",
-         "  1.435549,                !- Conductivity {W/m-K}", "  881.0155,                !- Density {kg/m3}",
-         "  1673.600,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.5500000,               !- Solar Absorptance", "  0.5500000;               !- Visible Absorptance", "Material,",
-         "  E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name", "  Rough,                   !- Roughness", "  9.5402403E-03,           !- Thickness {m}",
-         "  0.1902535,               !- Conductivity {W/m-K}", "  1121.292,                !- Density {kg/m3}",
-         "  1673.600,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.7500000,               !- Solar Absorptance", "  0.7500000;               !- Visible Absorptance", "Material,",
-         "  B5 - 1 IN DENSE INSULATION,  !- Name", "  VeryRough,               !- Roughness", "  2.5389841E-02,           !- Thickness {m}",
-         "  4.3239430E-02,           !- Conductivity {W/m-K}", "  91.30524,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.5000000,               !- Solar Absorptance", "  0.5000000;               !- Visible Absorptance", "Material,",
-         "  C12 - 2 IN HW CONCRETE,  !- Name", "  MediumRough,             !- Roughness", "  5.0901599E-02,           !- Thickness {m}",
-         "  1.729577,                !- Conductivity {W/m-K}", "  2242.585,                !- Density {kg/m3}",
-         "  836.8000,                !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.6500000,               !- Solar Absorptance", "  0.6500000;               !- Visible Absorptance", "Material,",
-         "  1.375in-Solid-Core,      !- Name", "  Smooth,                  !- Roughness", "  3.4925E-02,              !- Thickness {m}",
-         "  0.1525000,               !- Conductivity {W/m-K}", "  614.5000,                !- Density {kg/m3}",
-         "  1630.0000,               !- Specific Heat {J/kg-K}", "  0.9000000,               !- Thermal Absorptance",
-         "  0.9200000,               !- Solar Absorptance", "  0.9200000;               !- Visible Absorptance", "WindowMaterial:Glazing,",
-         "  WIN-LAY-GLASS-LIGHT,     !- Name", "  SpectralAverage,         !- Optical Data Type",
-         "  ,                        !- Window Glass Spectral Data Set Name", "  0.0025,                  !- Thickness {m}",
+        {"Material,",
+         "  A1 - 1 IN STUCCO,        !- Name",
+         "  Smooth,                  !- Roughness",
+         "  2.5389841E-02,           !- Thickness {m}",
+         "  0.6918309,               !- Conductivity {W/m-K}",
+         "  1858.142,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.9200000,               !- Solar Absorptance",
+         "  0.9200000;               !- Visible Absorptance",
+         "Material,",
+         "  C4 - 4 IN COMMON BRICK,  !- Name",
+         "  Rough,                   !- Roughness",
+         "  0.1014984,               !- Thickness {m}",
+         "  0.7264224,               !- Conductivity {W/m-K}",
+         "  1922.216,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.7600000,               !- Solar Absorptance",
+         "  0.7600000;               !- Visible Absorptance",
+         "Material,",
+         "  E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name",
+         "  Smooth,                  !- Roughness",
+         "  1.905E-02,               !- Thickness {m}",
+         "  0.7264224,               !- Conductivity {W/m-K}",
+         "  1601.846,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.9200000,               !- Solar Absorptance",
+         "  0.9200000;               !- Visible Absorptance",
+         "Material,",
+         "  C6 - 8 IN CLAY TILE,     !- Name",
+         "  Smooth,                  !- Roughness",
+         "  0.2033016,               !- Thickness {m}",
+         "  0.5707605,               !- Conductivity {W/m-K}",
+         "  1121.292,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.8200000,               !- Solar Absorptance",
+         "  0.8200000;               !- Visible Absorptance",
+         "Material,",
+         "  C10 - 8 IN HW CONCRETE,  !- Name",
+         "  MediumRough,             !- Roughness",
+         "  0.2033016,               !- Thickness {m}",
+         "  1.729577,                !- Conductivity {W/m-K}",
+         "  2242.585,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.6500000,               !- Solar Absorptance",
+         "  0.6500000;               !- Visible Absorptance",
+         "Material,",
+         "  E2 - 1 / 2 IN SLAG OR STONE,  !- Name",
+         "  Rough,                   !- Roughness",
+         "  1.2710161E-02,           !- Thickness {m}",
+         "  1.435549,                !- Conductivity {W/m-K}",
+         "  881.0155,                !- Density {kg/m3}",
+         "  1673.600,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.5500000,               !- Solar Absorptance",
+         "  0.5500000;               !- Visible Absorptance",
+         "Material,",
+         "  E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name",
+         "  Rough,                   !- Roughness",
+         "  9.5402403E-03,           !- Thickness {m}",
+         "  0.1902535,               !- Conductivity {W/m-K}",
+         "  1121.292,                !- Density {kg/m3}",
+         "  1673.600,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.7500000,               !- Solar Absorptance",
+         "  0.7500000;               !- Visible Absorptance",
+         "Material,",
+         "  B5 - 1 IN DENSE INSULATION,  !- Name",
+         "  VeryRough,               !- Roughness",
+         "  2.5389841E-02,           !- Thickness {m}",
+         "  4.3239430E-02,           !- Conductivity {W/m-K}",
+         "  91.30524,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.5000000,               !- Solar Absorptance",
+         "  0.5000000;               !- Visible Absorptance",
+         "Material,",
+         "  C12 - 2 IN HW CONCRETE,  !- Name",
+         "  MediumRough,             !- Roughness",
+         "  5.0901599E-02,           !- Thickness {m}",
+         "  1.729577,                !- Conductivity {W/m-K}",
+         "  2242.585,                !- Density {kg/m3}",
+         "  836.8000,                !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.6500000,               !- Solar Absorptance",
+         "  0.6500000;               !- Visible Absorptance",
+         "Material,",
+         "  1.375in-Solid-Core,      !- Name",
+         "  Smooth,                  !- Roughness",
+         "  3.4925E-02,              !- Thickness {m}",
+         "  0.1525000,               !- Conductivity {W/m-K}",
+         "  614.5000,                !- Density {kg/m3}",
+         "  1630.0000,               !- Specific Heat {J/kg-K}",
+         "  0.9000000,               !- Thermal Absorptance",
+         "  0.9200000,               !- Solar Absorptance",
+         "  0.9200000;               !- Visible Absorptance",
+         "WindowMaterial:Glazing,",
+         "  WIN-LAY-GLASS-LIGHT,     !- Name",
+         "  SpectralAverage,         !- Optical Data Type",
+         "  ,                        !- Window Glass Spectral Data Set Name",
+         "  0.0025,                  !- Thickness {m}",
          "  0.850,                   !- Solar Transmittance at Normal Incidence",
          "  0.075,                   !- Front Side Solar Reflectance at Normal Incidence",
          "  0.075,                   !- Back Side Solar Reflectance at Normal Incidence",
@@ -8236,8 +8422,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
 {
-    std::string const idf_objects = delimited_string({
-         "Material,",
+    std::string const idf_objects = delimited_string(
+        {"Material,",
          "  A1 - 1 IN STUCCO,        !- Name",
          "  Smooth,                  !- Roughness",
          "  2.5389841E-02,           !- Thickness {m}",
@@ -8967,8 +9153,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
 {
-    std::string const idf_objects = delimited_string({
-         "SimulationControl,",
+    std::string const idf_objects = delimited_string(
+        {"SimulationControl,",
          "  No,                      !- Do Zone Sizing Calculation",
          "  No,                      !- Do System Sizing Calculation",
          "  No,                      !- Do Plant Sizing Calculation",
@@ -9399,14 +9585,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
 
     // Check the curve values for the left window, taken from v8.6.0 on Windows
     for (unsigned i = 0; i <= 36; i++) {
-        Real64 angle = i*10.0;
+        Real64 angle = i * 10.0;
         Real64 value = CurveManager::CurveValue(7, angle);
         EXPECT_NEAR(valsForLeftWindow[i], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
     }
 
     // Check the curve values for the left window, taken from v8.6.0 on Windows
     for (unsigned i = 0; i <= 36; i++) {
-        Real64 angle = i*10.0;
+        Real64 angle = i * 10.0;
         Real64 value = CurveManager::CurveValue(6, angle);
         EXPECT_NEAR(valsForRightWindow[i], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
     }
@@ -12996,6 +13182,37 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_NEAR(0.1005046, AirflowNetwork::AirflowNetworkLinkSimu(15).FLOW, 0.0001);
 
     AirflowNetwork::AirflowNetworkFanActivated = false;
+    // #7977
+    CalcAirflowNetworkAirBalance();
+    DataHeatBalFanSys::ZoneAirHumRat.allocate(5);
+    DataHeatBalFanSys::MAT.allocate(5);
+    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(5);
+    DataZoneEquipment::ZoneEquipConfig.allocate(5);
+    DataHeatBalFanSys::MAT = 23.0;
+    DataHeatBalFanSys::ZoneAirHumRat = 0.001;
+    DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
+    Zone(1).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+    Zone(2).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+    Zone(3).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+    Zone(4).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+    Zone(5).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = false;
+    DataZoneEquipment::ZoneEquipConfig(2).IsControlled = false;
+    DataZoneEquipment::ZoneEquipConfig(3).IsControlled = false;
+    DataZoneEquipment::ZoneEquipConfig(4).IsControlled = false;
+    DataZoneEquipment::ZoneEquipConfig(5).IsControlled = false;
+    dataAirflowNetworkBalanceManager.exchangeData.allocate(5);
+    AirflowNetwork::AirflowNetworkLinkSimu(3).FLOW2 = 0.002364988;
+    ReportAirflowNetwork();
+
+    EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW, 95.89575, 0.001);
+    EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatLossW, 0.954879, 0.001);
+
+    AirflowNetwork::AirflowNetworkCompData(AirflowNetwork::AirflowNetworkLinkageData(2).CompNum).CompTypeNum = 1;
+    ReportAirflowNetwork();
+
+    EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneVentSenLossW, 95.89575, 0.001);
+    EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneVentLatLossW, 0.954879, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
@@ -13004,7 +13221,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
     DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
     DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
     DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 3;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(3);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(3); 
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(2).TypeOf = "Fan:VariableVolume";
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "CVF";
@@ -13027,34 +13244,34 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
 {
-    std::string const idf_objects = delimited_string({
-        "SimulationControl,",
-        "  No,                      !- Do Zone Sizing Calculation",
-        "  No,                      !- Do System Sizing Calculation",
-        "  No,                      !- Do Plant Sizing Calculation",
-        "  No,                      !- Run Simulation for Sizing Periods",
-        "  Yes;                     !- Run Simulation for Weather File Run Periods",
-        "Building,",
-        "  Single Sided Demo Building,  !- Name",
-        "  0.0,                     !- North Axis {deg}",
-        "  Suburbs,                 !- Terrain",
-        "  0.04,                    !- Loads Convergence Tolerance Value",
-        "  0.4,                     !- Temperature Convergence Tolerance Value {deltaC}",
-        "  FullInteriorAndExterior, !- Solar Distribution",
-        "  25,                      !- Maximum Number of Warmup Days",
-        "  ;                        !- Minimum Number of Warmup Days",
-        "Timestep,4;",
-        "Site:Location,",
-        "  San Francisco Intl Ap_CA_USA Design_Conditions,  !- Name",
-        "  37.62,                   !- Latitude {deg}",
-        "  -122.40,                 !- Longitude {deg}",
-        "  -8.00,                   !- Time Zone {hr}",
-        "  2.00;                    !- Elevation {m}",
-        "Site:GroundTemperature:BuildingSurface,19.905,19.922,19.910,19.932,19.949,20.038,20.327,20.062,20.443,20.088,19.986,19.948;",
-        "RunPeriod,",
-        "  RunPeriod1,              !- Name",
-        "  1,                       !- Begin Month",
-        "  1,                       !- Begin Day of Month",
+    std::string const idf_objects = delimited_string(
+        {"SimulationControl,",
+         "  No,                      !- Do Zone Sizing Calculation",
+         "  No,                      !- Do System Sizing Calculation",
+         "  No,                      !- Do Plant Sizing Calculation",
+         "  No,                      !- Run Simulation for Sizing Periods",
+         "  Yes;                     !- Run Simulation for Weather File Run Periods",
+         "Building,",
+         "  Single Sided Demo Building,  !- Name",
+         "  0.0,                     !- North Axis {deg}",
+         "  Suburbs,                 !- Terrain",
+         "  0.04,                    !- Loads Convergence Tolerance Value",
+         "  0.4,                     !- Temperature Convergence Tolerance Value {deltaC}",
+         "  FullInteriorAndExterior, !- Solar Distribution",
+         "  25,                      !- Maximum Number of Warmup Days",
+         "  ;                        !- Minimum Number of Warmup Days",
+         "Timestep,4;",
+         "Site:Location,",
+         "  San Francisco Intl Ap_CA_USA Design_Conditions,  !- Name",
+         "  37.62,                   !- Latitude {deg}",
+         "  -122.40,                 !- Longitude {deg}",
+         "  -8.00,                   !- Time Zone {hr}",
+         "  2.00;                    !- Elevation {m}",
+         "Site:GroundTemperature:BuildingSurface,19.905,19.922,19.910,19.932,19.949,20.038,20.327,20.062,20.443,20.088,19.986,19.948;",
+         "RunPeriod,",
+         "  RunPeriod1,              !- Name",
+         "  1,                       !- Begin Month",
+         "  1,                       !- Begin Day of Month",
          " ,                        !- Begin Year",
          "  12,                      !- End Month",
          "  31,                      !- End Day of Month",
@@ -13534,7 +13751,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    -6.00,                   !- Time Zone {hr}",
         "    190.00;                  !- Elevation {m}",
 
-
         "  SizingPeriod:DesignDay,",
         "    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
         "    1,                       !- Month",
@@ -13562,7 +13778,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
         "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
         "    0.0;                     !- Sky Clearness",
-
 
         "  SizingPeriod:DesignDay,",
         "    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
@@ -13605,7 +13820,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    0.9200000,               !- Solar Absorptance",
         "    0.9200000;               !- Visible Absorptance",
 
-
         "  Material,",
         "    CB11,                    !- Name",
         "    MediumRough,             !- Roughness",
@@ -13616,7 +13830,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    0.9000000,               !- Thermal Absorptance",
         "    0.2000000,               !- Solar Absorptance",
         "    0.2000000;               !- Visible Absorptance",
-
 
         "  Material,",
         "    GP01,                    !- Name",
@@ -13629,7 +13842,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    0.7500000,               !- Solar Absorptance",
         "    0.7500000;               !- Visible Absorptance",
 
-
         "  Material,",
         "    IN02,                    !- Name",
         "    Rough,                   !- Roughness",
@@ -13640,7 +13852,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    0.9000000,               !- Thermal Absorptance",
         "    0.7500000,               !- Solar Absorptance",
         "    0.7500000;               !- Visible Absorptance",
-
 
         "  Material,",
         "    IN05,                    !- Name",
@@ -13653,7 +13864,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    0.7500000,               !- Solar Absorptance",
         "    0.7500000;               !- Visible Absorptance",
 
-
         "  Material,",
         "    PW03,                    !- Name",
         "    MediumSmooth,            !- Roughness",
@@ -13664,7 +13874,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    0.9000000,               !- Thermal Absorptance",
         "    0.7800000,               !- Solar Absorptance",
         "    0.7800000;               !- Visible Absorptance",
-
 
         "  Material,",
         "    CC03,                    !- Name",
@@ -13677,7 +13886,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    0.6500000,               !- Solar Absorptance",
         "    0.6500000;               !- Visible Absorptance",
 
-
         "  Material,",
         "    HF-A3,                   !- Name",
         "    Smooth,                  !- Roughness",
@@ -13689,7 +13897,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    0.2000000,               !- Solar Absorptance",
         "    0.2000000;               !- Visible Absorptance",
 
-
         "  Material:NoMass,",
         "    AR02,                    !- Name",
         "    VeryRough,               !- Roughness",
@@ -13698,7 +13905,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    0.7000000,               !- Solar Absorptance",
         "    0.7000000;               !- Visible Absorptance",
 
-
         "  Material:NoMass,",
         "    CP02,                    !- Name",
         "    Rough,                   !- Roughness",
@@ -13706,7 +13912,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    0.9000000,               !- Thermal Absorptance",
         "    0.7500000,               !- Solar Absorptance",
         "    0.7500000;               !- Visible Absorptance",
-
 
         "  WindowMaterial:Glazing,",
         "    CLEAR 3MM,               !- Name",
@@ -13773,7 +13978,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "  Construction,",
         "    GABLE,                   !- Name",
         "    PW03;                    !- Outside Layer",
-
 
         "  Construction,",
         "    Dbl Clr 3mm/6mm Air,     !- Name",
@@ -15343,7 +15547,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "    ,                        !- Motor Loss Zone Name",
         "    ,                        !- Motor Loss Radiative Fraction",
         "    Fan Energy;              !- End-Use Subcategory",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -15444,8 +15648,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
 
     DataAirLoop::AirLoopAFNInfo.deallocate();
 }
-
-
 
 // Missing an AirflowNetwork:Distribution:Node for the Zone Air Node
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
@@ -15574,7 +15776,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     AirflowNetwork::MultizoneZoneData(1).ZoneNum = 1;
     AirflowNetwork::MultizoneZoneData(1).ZoneName = "ATTIC ZONE";
 
-
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
     AirflowNetwork::AirflowNetworkNumOfNodes = 1;
     AirflowNetwork::AirflowNetworkNodeData.allocate(1);
@@ -15584,7 +15785,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     dataAirflowNetworkBalanceManager.SplitterNodeNumbers.allocate(2);
     dataAirflowNetworkBalanceManager.SplitterNodeNumbers(1) = 0;
     dataAirflowNetworkBalanceManager.SplitterNodeNumbers(2) = 0;
-
 
     // MixedAir::NumOAMixers.allocate(1);
     ValidateDistributionSystem(state);
@@ -16976,11 +17176,13 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
         "   ** Warning ** GetHTSurfaceData: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.",
         "   **   ~~~   ** Found first in surface=ZONE FLOOR",
         "   **   ~~~   ** Defaults, constant throughout the year of (0.0) will be used.",
-        "   ** Severe  ** GetAirflowNetworkInput: AirflowNetwork:Distribution:Node=\"FANINLETNODE\" Duplicated Component Name or Node Name=\"AIR LOOP INLET NODE\". Please make a correction.",
+        "   ** Severe  ** GetAirflowNetworkInput: AirflowNetwork:Distribution:Node=\"FANINLETNODE\" Duplicated Component Name or Node Name=\"AIR "
+        "LOOP INLET NODE\". Please make a correction.",
         "   **  Fatal  ** GetAirflowNetworkInput: Errors found getting inputs. Previous error(s) cause program termination.",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=1",
-        "   ..... Last severe error=GetAirflowNetworkInput: AirflowNetwork:Distribution:Node=\"FANINLETNODE\" Duplicated Component Name or Node Name=\"AIR LOOP INLET NODE\". Please make a correction.",
+        "   ..... Last severe error=GetAirflowNetworkInput: AirflowNetwork:Distribution:Node=\"FANINLETNODE\" Duplicated Component Name or Node "
+        "Name=\"AIR LOOP INLET NODE\". Please make a correction.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
