@@ -89,7 +89,7 @@ namespace Boilers {
         bool ON;                      // TRUE: simulate the machine at it's operating part load ratio
         Real64 NomCap;                // W - design nominal capacity of Boiler
         bool NomCapWasAutoSized;      // true if previous was set to autosize input
-        Real64 Effic;                 // boiler efficiency at design conditions
+        Real64 NomEffic;                 // boiler efficiency at design conditions
         Real64 TempDesBoilerOut;      // C - Boiler design outlet temperature
         DataPlant::FlowMode FlowMode;       // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;  // True if the setpoint is missing at the outlet node
@@ -128,6 +128,7 @@ namespace Boilers {
         Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
         Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
         Real64 BoilerPLR;          // Boiler operating part-load ratio
+        Real64 BoilerEff;          // Boiler operating efficiency
 
         Real64 BoilerEnergy;             // J - Boiler energy integrated over time
         Real64 FuelConsumed;             // J - Boiler Fuel consumed integrated over time
@@ -139,13 +140,13 @@ namespace Boilers {
         // Default Constructor
         BoilerSpecs()
             : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), Available(false), ON(false), NomCap(0.0),
-              NomCapWasAutoSized(false), Effic(0.0), TempDesBoilerOut(0.0), FlowMode(DataPlant::FlowMode::NOTSET), ModulatedFlowSetToLoop(false),
+              NomCapWasAutoSized(false), NomEffic(0.0), TempDesBoilerOut(0.0), FlowMode(DataPlant::FlowMode::NOTSET), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0),
               BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0),
               CurveTempMode(TempMode::NOTSET), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0),
               EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false), FaultyBoilerFoulingFlag(false),
               FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true), MyFlag(true), FuelUsed(0.0), ParasiticElecPower(0.0),
-              BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0), BoilerEnergy(0.0), FuelConsumed(0.0),
+              BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0), BoilerEff(0.0), BoilerEnergy(0.0), FuelConsumed(0.0),
               BoilerInletTemp(0.0), ParasiticElecConsumption(0.0), BoilerFuelTypeForOutputVariable("")
         {
         }

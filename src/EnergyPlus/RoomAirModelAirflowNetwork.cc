@@ -574,7 +574,7 @@ namespace RoomAirModelAirflowNetwork {
         }
 
         // reuse code in ZoneTempPredictorCorrector for sensible components.
-        CalcNodeSums(RoomAirNode);
+        CalcNodeSums(state.dataZonePlenum, RoomAirNode);
 
         SumNonAirSystemResponseForNode(state, RoomAirNode);
 
@@ -829,7 +829,7 @@ namespace RoomAirModelAirflowNetwork {
         }
     } // UpdateRoomAirModelAirflowNetwork
 
-    void RAFNData::CalcNodeSums(int const RoomAirNodeNum)
+    void RAFNData::CalcNodeSums(ZonePlenumData &dataZonePlenum, int const RoomAirNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -878,10 +878,10 @@ namespace RoomAirModelAirflowNetwork {
         using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        using ZonePlenum::NumZoneReturnPlenums;
-        using ZonePlenum::NumZoneSupplyPlenums;
-        using ZonePlenum::ZoneRetPlenCond;
-        using ZonePlenum::ZoneSupPlenCond;
+        //using ZonePlenum::NumZoneReturnPlenums;
+        //using ZonePlenum::NumZoneSupplyPlenums;
+        //using ZonePlenum::ZoneRetPlenCond;
+        //using ZonePlenum::ZoneSupPlenCond;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;         // System node number
@@ -966,14 +966,14 @@ namespace RoomAirModelAirflowNetwork {
 
         // Check to see if this is a plenum zone
         ZoneRetPlenumAirFlag = false;
-        for (ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= NumZoneReturnPlenums; ++ZoneRetPlenumNum) {
-            if (ZoneRetPlenCond(ZoneRetPlenumNum).ActualZoneNum != ZoneNum) continue;
+        for (ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= dataZonePlenum.NumZoneReturnPlenums; ++ZoneRetPlenumNum) {
+            if (dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ActualZoneNum != ZoneNum) continue;
             ZoneRetPlenumAirFlag = true;
             break;
         } // ZoneRetPlenumNum
         ZoneSupPlenumAirFlag = false;
-        for (ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= NumZoneSupplyPlenums; ++ZoneSupPlenumNum) {
-            if (ZoneSupPlenCond(ZoneSupPlenumNum).ActualZoneNum != ZoneNum) continue;
+        for (ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= dataZonePlenum.NumZoneSupplyPlenums; ++ZoneSupPlenumNum) {
+            if (dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).ActualZoneNum != ZoneNum) continue;
             ZoneSupPlenumAirFlag = true;
             break;
         } // ZoneSupPlenumNum
@@ -1000,17 +1000,17 @@ namespace RoomAirModelAirflowNetwork {
                 } // EquipLoop
             }     // NodeNum
         } else if (ZoneRetPlenumAirFlag) {
-            for (NodeNum = 1; NodeNum <= ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
+            for (NodeNum = 1; NodeNum <= dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
                 // Get node conditions
-                NodeTemp = Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
+                NodeTemp = Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
+                MassFlowRate = Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
                 CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             } // NodeNum
             // add in the leaks
-            for (ADUListIndex = 1; ADUListIndex <= ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
-                ADUNum = ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
+            for (ADUListIndex = 1; ADUListIndex <= dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
+                ADUNum = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
                 if (AirDistUnit(ADUNum).UpStreamLeak) {
                     ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
@@ -1030,8 +1030,8 @@ namespace RoomAirModelAirflowNetwork {
             } // ADUListIndex
         } else if (ZoneSupPlenumAirFlag) {
             // Get node conditions
-            NodeTemp = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
-            MassFlowRate = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
+            NodeTemp = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
+            MassFlowRate = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
             CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
             SumSysMCp += MassFlowRate * CpAir;
             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;

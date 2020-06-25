@@ -53,9 +53,14 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZoneTempPredictorCorrectorData;
+
+// Forward declarations
+struct ChilledCeilingPanelSimpleData;
 
 namespace DataSurfaces {
     struct SurfaceData;
@@ -65,18 +70,6 @@ namespace DataHeatBalance {
 }
 
 namespace HeatBalanceSurfaceManager {
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // Subroutine Specifications for the Heat Balance Module
-    // Driver Routines
 
     // Initialization routines for module
 
@@ -113,7 +106,7 @@ namespace HeatBalanceSurfaceManager {
 
     void ComputeIntSWAbsorpFactors();
 
-    void ComputeDifSolExcZonesWIZWindows(int const NumberOfEnclosures); // Number of solar enclosures
+    void ComputeDifSolExcZonesWIZWindows(int NumberOfEnclosures); // Number of solar enclosures
 
     void InitEMSControlledSurfaceProperties();
 
@@ -128,7 +121,8 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void UpdateFinalSurfaceHeatBalance();
+    void UpdateFinalSurfaceHeatBalance(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
+                                       ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
 
     void UpdateThermalHistories();
 
@@ -141,26 +135,20 @@ namespace HeatBalanceSurfaceManager {
     // *****************************************************************************
 
     void ReportSurfaceHeatBalance();
-    
+
     void ReportIntMovInsInsideSurfTemp();
 
     // End of Reporting subroutines for the HB Module
-    // *****************************************************************************
-
-    // *****************************************************************************
-    // *****************************************************************************
-    // *****************************************************************************
-    // *****************************************************************************
 
     // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
 
     void CalcHeatBalanceOutsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
-    Real64 GetQdotConvOutRepPerArea(int const SurfNum);
+    Real64 GetQdotConvOutRepPerArea(int SurfNum);
 
-    void CalcHeatBalanceInsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+    void CalcHeatBalanceInsideSurf(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
-    void CalcHeatBalanceInsideSurf2(const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
+    void CalcHeatBalanceInsideSurf2(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                     const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
                                     const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
@@ -168,23 +156,19 @@ namespace HeatBalanceSurfaceManager {
 
     void TestSurfTempCalcHeatBalanceInsideSurf(Real64 TH12, DataSurfaces::SurfaceData &surface, DataHeatBalance::ZoneData &zone, int WarmupSurfTemp);
 
-    void CalcOutsideSurfTemp(int const SurfNum,      // Surface number DO loop counter
-                             int const ZoneNum,      // Zone number the current surface is attached to
-                             int const ConstrNum,    // Construction index for the current surface
-                             Real64 const HMovInsul, // "Convection" coefficient of movable insulation
-                             Real64 const TempExt,   // Exterior temperature boundary condition
+    void CalcOutsideSurfTemp(int SurfNum,      // Surface number DO loop counter
+                             int ZoneNum,      // Zone number the current surface is attached to
+                             int ConstrNum,    // Construction index for the current surface
+                             Real64 HMovInsul, // "Convection" coefficient of movable insulation
+                             Real64 TempExt,   // Exterior temperature boundary condition
                              bool &ErrorFlag         // Error flag for movable insulation problem
     );
 
-    void CalcExteriorVentedCavity(int const SurfNum); // index of surface
+    void CalcExteriorVentedCavity(int SurfNum); // index of surface
 
     void GatherComponentLoadsSurfAbsFact();
 
 } // namespace HeatBalanceSurfaceManager
-// *****************************************************************************
-// *****************************************************************************
-// *****************************************************************************
-// *****************************************************************************
 
 } // namespace EnergyPlus
 
