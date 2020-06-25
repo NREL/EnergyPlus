@@ -5782,7 +5782,7 @@ namespace HeatBalanceSurfaceManager {
             ZoneWinHeatLossRepEnergy = 0.0;
 
             if (AllCTF) {
-                CalcHeatBalanceInsideSurf2CTFOnly(dataZoneTempPredictorCorrector, 1, NumOfZones, DataSurfaces::AllIZSurfaceList);
+                CalcHeatBalanceInsideSurf2CTFOnly(1, NumOfZones, DataSurfaces::AllIZSurfaceList);
             } else {
                 CalcHeatBalanceInsideSurf2(dataZoneTempPredictorCorrector, DataSurfaces::AllHTSurfaceList,
                                            DataSurfaces::AllIZSurfaceList,
