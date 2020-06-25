@@ -1280,6 +1280,7 @@ void InputProcessor::reportIDFRecordsStats()
     // METHODOLOGY EMPLOYED:
     // Traverses the IDF Records looking at each field vs object definition for defaults and autosize.
 
+    // Reset the globals
     DataOutputs::iNumberOfRecords = 0;             // Number of IDF Records
     DataOutputs::iNumberOfDefaultedFields = 0;     // Number of defaulted fields in IDF
     DataOutputs::iTotalFieldsWithDefaults = 0;     // Total number of fields that could be defaulted
@@ -1290,6 +1291,75 @@ void InputProcessor::reportIDFRecordsStats()
 
     auto const &schema_properties = schema.at("properties");
 
+    // Lambda to avoid repeating code twice (when processing regular fields, and extensible fields)
+    auto processField = [](const std::string& field, const json& epJSONObj, const json& schema_field_obj) {
+        bool hasDefault = false;
+        bool canBeAutosized = false;
+        bool canBeAutocalculated = false;
+
+        // If we wanted to count number of fields, would do it here
+
+        std::string defaultValue;
+
+        auto const &default_it = schema_field_obj.find("default");
+        if (default_it != schema_field_obj.end()) {
+            ++DataOutputs::iTotalFieldsWithDefaults;
+            hasDefault = true;
+            auto const &default_val = default_it.value();
+            if (default_val.is_string()) {
+                defaultValue = default_val.get<std::string>();
+            }
+        }
+
+        auto const &anyOf_it = schema_field_obj.find("anyOf");
+        if (anyOf_it != schema_field_obj.end()) {
+            for (auto const &anyOf : anyOf_it.value()) {
+                auto const &enum_it = anyOf.find("enum");
+                if (enum_it != anyOf.end()) {
+                    for (auto const &e: enum_it.value()) {
+                        auto const &enumVal = e.get<std::string>();
+                        if (enumVal == "Autosize") {
+                            ++DataOutputs::iTotalAutoSizableFields;
+                            canBeAutosized = true;
+                        } else if (enumVal == "Autocalculate") {
+                            ++DataOutputs::iTotalAutoCalculatableFields;
+                            canBeAutocalculated = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Locate the field in the ep_object
+        auto it = epJSONObj.find(field);
+        if (it != epJSONObj.end()) {
+            // Found it: check if Autosized or Autocalculated
+            auto const &field_value = it.value();
+            if (field_value.is_string()) {
+                // In the IDF, casing is an issue and Autosize/Autocalculate are accepted as synonyms (in schema it's not)
+                if (icompare(field_value, "Autosize") || icompare(field_value, "Autocalculate")) {
+                    if (canBeAutosized) {
+                        ++DataOutputs::iNumberOfAutoSizedFields;
+                    } else if (canBeAutocalculated) {
+                        ++DataOutputs::iNumberOfAutoCalcedFields;
+                    }
+                }
+            }
+
+        } else if (hasDefault) {
+            // Not found: was defaulted
+            ++DataOutputs::iNumberOfDefaultedFields;
+            if (canBeAutosized && (defaultValue == "Autosize")) {
+                ++DataOutputs::iNumberOfAutoSizedFields;
+            } else if (canBeAutocalculated && (defaultValue == "Autocalculate")) {
+                ++DataOutputs::iNumberOfAutoCalcedFields;
+            }
+        }
+    };
+
+
+
+    // Loop on all objectTypes
     for (auto epJSON_iter = epJSON.begin(); epJSON_iter != epJSON.end(); ++epJSON_iter) {
         auto const &objectType = epJSON_iter.key();
         auto const &objects = epJSON_iter.value();
@@ -1303,7 +1373,6 @@ void InputProcessor::reportIDFRecordsStats()
 
         // Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
         auto const &legacy_idd = object_schema["legacy_idd"];
-        auto const &legacy_idd_field_info = legacy_idd["field_info"];
         auto const &legacy_idd_fields = legacy_idd["fields"];
 
         // Look for extensible
@@ -1321,15 +1390,7 @@ void InputProcessor::reportIDFRecordsStats()
             // Loop on all regular fields
             for (size_t i = 0; i < legacy_idd_fields.size(); ++i) {
 
-                bool hasDefault = false;
-                bool canBeAutosized = false;
-                bool canBeAutocalculated = false;
-
                 std::string const &field = legacy_idd_fields[i];
-                auto const &field_info = legacy_idd_field_info.find(field);
-                auto const &field_info_val = field_info.value();
-
-                // If we wanted to count number of fields, would do it here
 
                 // This is weird, but some objects like Building have a Name default... and it's not in the patternProperties
                 if (has_idd_name_field && field == "name") {
@@ -1346,62 +1407,8 @@ void InputProcessor::reportIDFRecordsStats()
 
                 auto const &schema_field_obj = schema_obj_props[field];
 
-                std::string defaultValue;
+                processField(field, ep_object, schema_field_obj);
 
-                auto const &default_it = schema_field_obj.find("default");
-                if (default_it != schema_field_obj.end()) {
-                    ++DataOutputs::iTotalFieldsWithDefaults;
-                    hasDefault = true;
-                    auto const &default_val = default_it.value();
-                    if (default_val.is_string()) {
-                        defaultValue = default_val.get<std::string>();
-                    }
-                }
-
-                auto const &anyOf_it = schema_field_obj.find("anyOf");
-                if (anyOf_it != schema_field_obj.end()) {
-                    for (auto const &anyOf : anyOf_it.value()) {
-                        auto const &enum_it = anyOf.find("enum");
-                        if (enum_it != anyOf.end()) {
-                            for (auto const &e: enum_it.value()) {
-                                auto const &enumVal = e.get<std::string>();
-                                if (enumVal == "Autosize") {
-                                    ++DataOutputs::iTotalAutoSizableFields;
-                                    canBeAutosized = true;
-                                } else if (enumVal == "Autocalculate") {
-                                    ++DataOutputs::iTotalAutoCalculatableFields;
-                                    canBeAutocalculated = true;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Locate the field in the ep_object
-                auto it = ep_object.find(field);
-                if (it != ep_object.end()) {
-                    // Found it: check if Autosized or Autocalculated
-                    auto const &field_value = it.value();
-                    if (field_value.is_string()) {
-                        // In the IDF, casing is an issue and Autosize/Autocalculate are accepted as synonyms (in schema it's not)
-                        if (icompare(field_value, "Autosize") || icompare(field_value, "Autocalculate")) {
-                            if (canBeAutosized) {
-                              ++DataOutputs::iNumberOfAutoSizedFields;
-                            } else if (canBeAutocalculated) {
-                              ++DataOutputs::iNumberOfAutoCalcedFields;
-                            }
-                        }
-                    }
-
-                } else if (hasDefault) {
-                    // Not found: was defaulted
-                    ++DataOutputs::iNumberOfDefaultedFields;
-                    if (canBeAutosized && (defaultValue == "Autosize")) {
-                        ++DataOutputs::iNumberOfAutoSizedFields;
-                    } else if (canBeAutocalculated && (defaultValue == "Autocalculate")) {
-                        ++DataOutputs::iNumberOfAutoCalcedFields;
-                    }
-                }
             } // End regular fields
 
             auto const &legacy_idd_extensibles_iter = legacy_idd.find("extensibles");
@@ -1415,79 +1422,14 @@ void InputProcessor::reportIDFRecordsStats()
                     for (auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it) {
                         auto const &epJSON_extension_obj = it.value();
                         for (size_t i = 0; i < legacy_idd_extensibles.size(); ++i) {
-
-                            bool hasDefault = false;
-                            bool canBeAutosized = false;
-                            bool canBeAutocalculated = false;
-
                             std::string const &field = legacy_idd_extensibles[i];
-                            auto const &field_info = legacy_idd_field_info.find(field);
-                            auto const &field_info_val = field_info.value();
+                            auto const &schema_extension_field_obj = schema_extension_fields[field];
 
-                            // Do same as above probably
-                            auto const &schema_field_obj = schema_extension_fields[field];
-
-                            std::string defaultValue;
-
-                            auto const &default_it = schema_field_obj.find("default");
-                            if (default_it != schema_field_obj.end()) {
-                                ++DataOutputs::iTotalFieldsWithDefaults;
-                                hasDefault = true;
-                                auto const &default_val = default_it.value();
-                                if (default_val.is_string()) {
-                                    defaultValue = default_val.get<std::string>();
-                                }
-                            }
-
-                            auto const &anyOf_it = schema_field_obj.find("anyOf");
-                            if (anyOf_it != schema_field_obj.end()) {
-                                for (auto const &anyOf : anyOf_it.value()) {
-                                    auto const &enum_it = anyOf.find("enum");
-                                    if (enum_it != anyOf.end()) {
-                                        for (auto const &e: enum_it.value()) {
-                                            auto const &enumVal = e.get<std::string>();
-                                            if (enumVal == "Autosize") {
-                                                ++DataOutputs::iTotalAutoSizableFields;
-                                                canBeAutosized = true;
-                                            } else if (enumVal == "Autocalculate") {
-                                                ++DataOutputs::iTotalAutoCalculatableFields;
-                                                canBeAutocalculated = true;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Locate the field in the ep_object
-                            auto it = epJSON_extension_obj.find(field);
-                            if (it != epJSON_extension_obj.end()) {
-                                // Found it: check if Autosized or Autocalculated
-                                auto const &field_value = it.value();
-                                if (field_value.is_string()) {
-                                    // In the IDF, casing is an issue and Autosize/Autocalculate are accepted as synonyms (in schema it's not)
-                                    if (icompare(field_value, "Autosize") || icompare(field_value, "Autocalculate")) {
-                                        if (canBeAutosized) {
-                                          ++DataOutputs::iNumberOfAutoSizedFields;
-                                        } else if (canBeAutocalculated) {
-                                          ++DataOutputs::iNumberOfAutoCalcedFields;
-                                        }
-                                    }
-                                }
-
-                            } else if (hasDefault) {
-                                // Not found: was defaulted
-                                ++DataOutputs::iNumberOfDefaultedFields;
-                                if (canBeAutosized && (defaultValue == "Autosize")) {
-                                    ++DataOutputs::iNumberOfAutoSizedFields;
-                                } else if (canBeAutocalculated && (defaultValue == "Autocalculate")) {
-                                    ++DataOutputs::iNumberOfAutoCalcedFields;
-                                }
-                            }
-
+                            processField(field, epJSON_extension_obj, schema_extension_field_obj);
                         }
                     }
                 }
-            }
+            } // End extensible fields
 
 
         } // End loop on each object of a given objectType
