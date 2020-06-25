@@ -156,10 +156,7 @@ namespace CoolingPanelSimple {
         {
         }
 
-        void CalcCoolingPanel(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
-                              ConvectionCoefficientsData &dataConvectionCoefficients,
-                              ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
-                              int CoolingPanelNum);
+        void CalcCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum);
 
         void SetCoolingPanelControlTemp(Real64 &ControlTemp, int ZoneNum);
 

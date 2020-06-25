@@ -252,9 +252,7 @@ namespace HeatBalanceSurfaceManager {
         // IF NECESSARY, do one final "average" heat balance pass.  This is only
         // necessary if a radiant system is present and it was actually on for
         // part or all of the time step.
-        UpdateFinalSurfaceHeatBalance(state.dataChilledCeilingPanelSimple,
-                                      state.dataConvectionCoefficients,
-                                      state.dataZoneTempPredictorCorrector);
+        UpdateFinalSurfaceHeatBalance(state);
 
         // Before we leave the Surface Manager the thermal histories need to be updated
         if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
@@ -4391,9 +4389,7 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void UpdateFinalSurfaceHeatBalance(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
-                                       ConvectionCoefficientsData &dataConvectionCoefficients,
-                                       ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
+    void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4456,15 +4452,15 @@ namespace HeatBalanceSurfaceManager {
         UpdateBBRadSourceValAvg(HWBaseboardSysOn);
         UpdateBBSteamRadSourceValAvg(SteamBaseboardSysOn);
         UpdateBBElecRadSourceValAvg(ElecBaseboardSysOn);
-        UpdateCoolingPanelSourceValAvg(dataChilledCeilingPanelSimple, CoolingPanelSysOn);
+        UpdateCoolingPanelSourceValAvg(state.dataChilledCeilingPanelSimple, CoolingPanelSysOn);
         UpdatePoolSourceValAvg(SwimmingPoolOn);
 
         if (LowTempRadSysOn || HighTempRadSysOn || HWBaseboardSysOn || SteamBaseboardSysOn || ElecBaseboardSysOn || CoolingPanelSysOn ||
             SwimmingPoolOn) {
             // Solve the zone heat balance 'Detailed' solution
             // Call the outside and inside surface heat balances
-            CalcHeatBalanceOutsideSurf(dataConvectionCoefficients);
-            CalcHeatBalanceInsideSurf(dataConvectionCoefficients, dataZoneTempPredictorCorrector);
+            CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+            CalcHeatBalanceInsideSurf(state.dataConvectionCoefficients, state.dataZoneTempPredictorCorrector);
         }
     }
 

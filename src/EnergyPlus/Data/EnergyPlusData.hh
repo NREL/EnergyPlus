@@ -76,6 +76,7 @@
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
@@ -115,6 +116,7 @@ namespace EnergyPlus {
         // after we've plumbed enough of the functions to allow
         OutputFiles outputFiles;
 
+        ZoneDehumidifierData dataZoneDehumidifier;
         ZoneEquipmentManagerData dataZoneEquipmentManager;
         ZonePlenumData dataZonePlenum;
         ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
@@ -151,6 +153,7 @@ namespace EnergyPlus {
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataZoneDehumidifier.clear_state();
             dataZoneEquipmentManager.clear_state();
             dataZonePlenum.clear_state();
             dataZoneTempPredictorCorrector.clear_state();
