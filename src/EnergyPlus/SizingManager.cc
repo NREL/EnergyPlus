@@ -358,7 +358,7 @@ namespace SizingManager {
                                     DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 }
                             }
-                            UpdateZoneSizing(state, state.dataZoneEquipmentManager, BeginDay);
+                            UpdateZoneSizing(state, BeginDay);
                             UpdateFacilitySizing(state.dataGlobals, BeginDay);
                         }
 
@@ -417,7 +417,7 @@ namespace SizingManager {
                         } // ... End hour loop.
 
                         if (EndDayFlag) {
-                            UpdateZoneSizing(state, state.dataZoneEquipmentManager, EndDay);
+                            UpdateZoneSizing(state, EndDay);
                             UpdateFacilitySizing(state.dataGlobals, EndDay);
                         }
 
@@ -433,7 +433,7 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(state, state.dataZoneEquipmentManager, state.dataGlobals.EndZoneSizingCalc);
+                    UpdateZoneSizing(state, state.dataGlobals.EndZoneSizingCalc);
                     UpdateFacilitySizing(state.dataGlobals, state.dataGlobals.EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
@@ -485,7 +485,7 @@ namespace SizingManager {
             SimAir = true;
             SimZoneEquip = true;
 
-            ManageZoneEquipment(state, state.dataZoneEquipmentManager, true, SimZoneEquip, SimAir);
+            ManageZoneEquipment(state, true, SimZoneEquip, SimAir);
             ManageAirLoops(state, true, SimAir, SimZoneEquip);
             SizingManager::UpdateTermUnitFinalZoneSizing(); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
             SimAirServingZones::SizeSysOutdoorAir();        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
@@ -605,7 +605,7 @@ namespace SizingManager {
             SimAir = true;
             SimZoneEquip = true;
 
-            ManageZoneEquipment(state, state.dataZoneEquipmentManager, true, SimZoneEquip, SimAir);
+            ManageZoneEquipment(state, true, SimZoneEquip, SimAir);
             SizingManager::UpdateTermUnitFinalZoneSizing(); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
         }
         SysSizingCalc = false;
@@ -856,7 +856,7 @@ namespace SizingManager {
             bool t_SimZoneEquip(true);
             bool t_SimAir(false);
             DataGlobals::BeginEnvrnFlag = true; // trigger begin envrn blocks in zone equipment models
-            ZoneEquipmentManager::ManageZoneEquipment(state, state.dataZoneEquipmentManager, true, t_SimZoneEquip, t_SimAir);
+            ZoneEquipmentManager::ManageZoneEquipment(state, true, t_SimZoneEquip, t_SimAir);
             DataGlobals::BeginEnvrnFlag = false;
 
             for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {

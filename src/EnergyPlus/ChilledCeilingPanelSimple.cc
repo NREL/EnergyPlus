@@ -184,9 +184,8 @@ namespace CoolingPanelSimple {
 
             {
                 auto const SELECT_CASE_var(ThisCP.EquipType);
-
                 if (SELECT_CASE_var == TypeOf_CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
-                    ThisCP.CalcCoolingPanel(state.dataChilledCeilingPanelSimple, CoolingPanelNum);
+                    ThisCP.CalcCoolingPanel(state.dataChilledCeilingPanelSimple, state.dataZoneTempPredictorCorrector, CoolingPanelNum);
                 } else {
                     ShowSevereError("SimCoolingPanelSimple: Errors in CoolingPanel=" + state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
                     ShowContinueError("Invalid or unimplemented equipment type=" + TrimSigDigits(state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipType));
@@ -1155,6 +1154,7 @@ namespace CoolingPanelSimple {
     }
 
     void CoolingPanelParams::CalcCoolingPanel(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
+                                              ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
                                               int const CoolingPanelNum)
     {
         // SUBROUTINE INFORMATION:
@@ -1409,7 +1409,7 @@ namespace CoolingPanelSimple {
                 // Now "simulate" the system by recalculating the heat balances
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
 
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataZoneTempPredictorCorrector, ZoneNum);
 
                 // Here an assumption is made regarding radiant heat transfer to people.
                 // While the radiant heat transfer to people array will be used by the thermal comfort

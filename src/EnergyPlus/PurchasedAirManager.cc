@@ -1162,9 +1162,9 @@ namespace PurchasedAirManager {
 
                 // link with return plenum if used (i.e., PlenumExhaustAirNodeNum will be non-zero)
                 if (PurchAir(Loop).PlenumExhaustAirNodeNum > 0) {
-                    PurchAir(Loop).ReturnPlenumIndex = GetReturnPlenumIndex(state, state.dataZonePlenum, PurchAir(Loop).PlenumExhaustAirNodeNum);
+                    PurchAir(Loop).ReturnPlenumIndex = GetReturnPlenumIndex(state, PurchAir(Loop).PlenumExhaustAirNodeNum);
                     if (PurchAir(Loop).ReturnPlenumIndex > 0) {
-                        GetReturnPlenumName(state, state.dataZonePlenum, PurchAir(Loop).ReturnPlenumIndex, PurchAir(Loop).ReturnPlenumName);
+                        GetReturnPlenumName(state, PurchAir(Loop).ReturnPlenumIndex, PurchAir(Loop).ReturnPlenumName);
                         InitializePlenumArrays(Loop);
                     } else {
                         ShowSevereError("InitPurchasedAir: " + PurchAir(Loop).cObjectName + " = " + PurchAir(Loop).Name +
@@ -2969,7 +2969,7 @@ namespace PurchasedAirManager {
 
             // if all ideal loads air systems connected to the same plenum have been simulated, simulate the zone air plenum
             if (all(PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex).IsSimulated)) {
-                SimAirZonePlenum(state, state.dataZonePlenum, PurchAir(PurchAirNum).ReturnPlenumName,
+                SimAirZonePlenum(state, PurchAir(PurchAirNum).ReturnPlenumName,
                                  DataZoneEquipment::ZoneReturnPlenum_Type,
                                  PurchAir(PurchAirNum).ReturnPlenumIndex,
                                  FirstHVACIteration,
