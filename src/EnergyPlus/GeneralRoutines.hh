@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
 
 namespace EnergyPlus {
     // Forward declarations

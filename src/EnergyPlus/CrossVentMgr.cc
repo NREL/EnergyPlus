@@ -91,14 +91,12 @@ namespace CrossVentMgr {
 
     // Using/Aliasing
     using namespace DataGlobals;
-    using namespace DataLoopNode;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
     using namespace DataSurfaces;
     using namespace DataRoomAirModel;
     using ConvectionCoefficients::CalcDetailedHcInForDVModel;
-    using DataHVACGlobals::SysTimeElapsed;
     using namespace DataUCSDSharedData;
 
     // Data

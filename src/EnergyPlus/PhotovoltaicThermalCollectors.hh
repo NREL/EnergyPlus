@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
 
 namespace EnergyPlus {
     // Forward declarations

@@ -184,13 +184,13 @@ namespace CoolingPanelSimple {
 
             {
                 auto const SELECT_CASE_var(ThisCP.EquipType);
+
                 if (SELECT_CASE_var == TypeOf_CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
 
                     ThisCP.CalcCoolingPanel(state.dataChilledCeilingPanelSimple,
                                             state.dataConvectionCoefficients,
-                                            state.dataZoneTempPredictorCorrector
+                                            state.dataZoneTempPredictorCorrector,
                                             CoolingPanelNum);
-
                 } else {
                     ShowSevereError("SimCoolingPanelSimple: Errors in CoolingPanel=" + state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
                     ShowContinueError("Invalid or unimplemented equipment type=" + TrimSigDigits(state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipType));

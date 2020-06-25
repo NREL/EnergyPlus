@@ -49,6 +49,7 @@
 #define DisplacementVentMgr_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
