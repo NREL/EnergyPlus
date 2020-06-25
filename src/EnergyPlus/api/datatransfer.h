@@ -445,7 +445,7 @@ ENERGYPLUSLIB_API int warmupFlag();
 /// \see apiDataFullyReady
 ENERGYPLUSLIB_API int kindOfSim();
 
-/// \brief Returns the current environment number for a specific siulation
+/// \brief Returns the current environment number
 /// \details As EnergyPlus simulates, it runs through multiple phases that often include multiple design days followed
 ///          by a run period.  This function returns the current index which is just incremented for each new phase.
 ///          This has limited value in a general sense, but for some very tightly defined workflows, this could give
