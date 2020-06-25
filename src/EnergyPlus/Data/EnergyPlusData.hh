@@ -56,10 +56,13 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
+#include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
@@ -71,6 +74,9 @@
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 #include <unordered_map>
 #include <string>
 
@@ -78,10 +84,14 @@ namespace EnergyPlus {
 
     struct EnergyPlusData : BaseGlobalStruct {
         // module globals
+
+        AirLoopHVACDOASData dataAirLoopHVACDOAS;
         BaseboardRadiatorData dataBaseboardRadiator;
         BaseboardElectricData dataBaseboardElectric;
         BoilersData dataBoilers;
         BoilerSteamData dataSteamBoilers;
+        BranchInputManagerData dataBranchInputManager;
+        ChilledCeilingPanelSimpleData dataChilledCeilingPanelSimple;
         ChillerAbsorberData dataChillerAbsorbers;
         ChillerElectricEIRData dataChillerElectricEIR;
         ChillerExhaustAbsorptionData dataChillerExhaustAbsorption;
@@ -101,6 +111,10 @@ namespace EnergyPlus {
         // after we've plumbed enough of the functions to allow
         OutputFiles outputFiles;
 
+        ZoneEquipmentManagerData dataZoneEquipmentManager;
+        ZonePlenumData dataZonePlenum;
+        ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
+
         EnergyPlusData() {
             OutputFiles::setSingleton(&outputFiles);
         }
@@ -112,10 +126,13 @@ namespace EnergyPlus {
 
         // all clear states
         void clear_state() override {
+            dataAirLoopHVACDOAS.clear_state();
             dataBaseboardElectric.clear_state();
             dataBaseboardRadiator.clear_state();
             dataBoilers.clear_state();
+            dataBranchInputManager.clear_state();
             dataSteamBoilers.clear_state();
+            dataChilledCeilingPanelSimple.clear_state();
             dataChillerAbsorbers.clear_state();
             dataChillerElectricEIR.clear_state();
             dataChillerExhaustAbsorption.clear_state();
@@ -128,6 +145,9 @@ namespace EnergyPlus {
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataZoneEquipmentManager.clear_state();
+            dataZonePlenum.clear_state();
+            dataZoneTempPredictorCorrector.clear_state();
         };
     };
 
