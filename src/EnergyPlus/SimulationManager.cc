@@ -1208,18 +1208,15 @@ namespace SimulationManager {
                     } else if (overrideModeValue == "MODE02") {
                         // Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler
                         overrideTimestep = true;
-                        // overrideSystemTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                     } else if (overrideModeValue == "MODE03") {
                         // Mode02 plus Minimum Number of Warmup Days will be set to 1
                         overrideTimestep = true;
-                        // overrideSystemTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                     } else if (overrideModeValue == "MODE04") {
                         // Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets
                         overrideTimestep = true;
-                        // overrideSystemTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
@@ -1246,10 +1243,7 @@ namespace SimulationManager {
                         overrideBeginEnvResetSuppress = true;
                         overrideSystemTimestep = true;
                         overrideMaxZoneTempDiff = true;
-                        // To do: Add the flags related to the Max allowed Temperature change between iteration steps
-                        //////////
                         overrideMaxAllowedDelTemp = true; 
-                        //////////
                     } else if (overrideModeValue == "ADVANCED") {
                         bool advancedModeUsed = false;
                         if (fields.find("maxzonetempdiff") != fields.end()) { // not required field, has default value
@@ -1299,15 +1293,8 @@ namespace SimulationManager {
                     }
                     if (overrideSystemTimestep) {
                         ShowWarningError(
-                            "Due to PerformancePrecisionTradeoffs Override Mode, the lower limit of System TimeSteps has been changed to 1 hr.");
-                        // DataGlobals::NumOfTimeStepInHour = 1;
-                        // DataGlobals::TimeStepZone = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
-                        // DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
-                        // DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
-                        // To do: Add code here for linking the Convergency Limit min system timestep
-                        // DataConvergParams::MinTimeStepSys = 6.0/60.0; // Perform override using 1hr.
-                        int MinTimeStepSysOverrideValue = 60.0; // MinutesPerTimeStep; 30.0; 12.0; 6.0;
-                        // MinTimeStepSys = 6.0 / 60.0; // Perform override using 1hr.
+                            "Due to PerformancePrecisionTradeoffs Override Mode, the minimum System TimeSteps has been changed to 1 hr.");
+                        int MinTimeStepSysOverrideValue = 60.0; 
                         if (MinTimeStepSysOverrideValue > MinutesPerTimeStep) {
                             MinTimeStepSysOverrideValue = MinutesPerTimeStep;
                         }
@@ -1320,13 +1307,9 @@ namespace SimulationManager {
                         DataConvergParams::MaxZoneTempDiff = 1.0;
                     }
                     if (overrideMaxAllowedDelTemp) {
-                        // To do: Set the values for the MaxAllowedDelTemp
-                        ///////
                         ShowWarningError(
                             "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxAllowedDelTemp will be set to 0.1 .");
-                        // To do: override MaxAllowDelTemp, some local to global propagations are needed.
                         DataConvergParams::MaxAllowedDelTempOverrideValue = 0.1;
-                        ///////
                     }
                 }
             }
