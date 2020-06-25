@@ -93,15 +93,18 @@ namespace WeatherManager {
         ASHRAE_Tau2017 = 4        // Design Day solar model ASHRAE tau (per 2013 and 2017 HOF)
     };
 
-    extern int const DDHumIndType_WetBulb;   // Design Day Humidity Indicating Type = Wetbulb (default)
-    extern int const DDHumIndType_DewPoint;  // Design Day Humidity Indicating Type = Dewpoint
-    extern int const DDHumIndType_Enthalpy;  // Design Day Humidity Indicating Type = Enthalpy
-    extern int const DDHumIndType_HumRatio;  // Design Day Humidity Indicating Type = Humidity Ratio
-    extern int const DDHumIndType_RelHumSch; // Design Day Humidity Indicating Type = relhum schedule
-    extern int const DDHumIndType_WBProfDef; // Design Day Humidity Indicating Type = Wetbulb default profile
-    extern int const DDHumIndType_WBProfDif; // Design Day Humidity Indicating Type = Wetbulb difference profile
-    extern int const DDHumIndType_WBProfMul; // Design Day Humidity Indicating Type = Wetbulb multiplier profile
-    extern int const DDHumIndType_Count;     // # of DDHumIndTypes
+    // Design Day Humidity Indicating Type
+    enum class DDHumIndType
+    {
+        WetBulb = 0,   // Wetbulb (default)
+        DewPoint = 1,  // Dewpoint
+        Enthalpy = 2,  // Enthalpy
+        HumRatio = 3,  // Humidity Ratio
+        RelHumSch = 4, // relhum schedule
+        WBProfDef = 5, // Wetbulb default profile
+        WBProfDif = 6, // Wetbulb difference profile
+        WBProfMul = 7  // Wetbulb multiplier profile
+    };
 
     extern int const DDDBRangeType_Default;    // Design Day DryBulb Range Type = Default Multipliers
     extern int const DDDBRangeType_Multiplier; // Design Day DryBulb Range Type = Multiplier Schedule
@@ -238,7 +241,7 @@ namespace WeatherManager {
         Real64 MaxDryBulb;   // Maximum Dry-Bulb Temperature (C)
         Real64 DailyDBRange; // Daily Temperature Range (deltaC)
         Real64 HumIndValue;  // Humidity Indicating Value at Max Dry-bulb Temperature
-        int HumIndType;      // Humidity Indicating type  (see Parameters)
+        DDHumIndType HumIndType;      // Humidity Indicating type  (see Parameters)
         Real64 PressBarom;   // Atmospheric/Barometric Pressure (Pascals)
         Real64 WindSpeed;    // Wind Speed (m/s)
         Real64 WindDir;      // Wind Direction (degrees clockwise from North, N=0, E=90, S=180, W=270)
@@ -266,7 +269,7 @@ namespace WeatherManager {
 
         // Default Constructor
         DesignDayData()
-            : MaxDryBulb(0.0), DailyDBRange(0.0), HumIndValue(0.0), HumIndType(0), PressBarom(0.0), WindSpeed(0.0), WindDir(0.0), SkyClear(0.0),
+            : MaxDryBulb(0.0), DailyDBRange(0.0), HumIndValue(0.0), HumIndType(DDHumIndType::WetBulb), PressBarom(0.0), WindSpeed(0.0), WindDir(0.0), SkyClear(0.0),
               RainInd(0), SnowInd(0), DayOfMonth(0), Month(0), DayType(0), DSTIndicator(0), SolarModel(DesignDaySolarModel::ASHRAE_ClearSky), DBTempRangeType(0), TempRangeSchPtr(0),
               HumIndSchPtr(0), BeamSolarSchPtr(0), DiffuseSolarSchPtr(0), TauB(0.0), TauD(0.0), DailyWBRange(0.0), PressureEntered(false),
               DewPointNeedsSet(false),                       //**Trane:BEG: Sizing Speed Up

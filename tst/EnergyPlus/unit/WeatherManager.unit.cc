@@ -779,7 +779,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     ASSERT_FALSE(ErrorsFound);
 
     WeatherManager::SetUpDesignDay(state.outputFiles, 1);
-    EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndType, DDHumIndType_Enthalpy);
+    EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndType, DDHumIndType::Enthalpy);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndValue, 90500.0);
 
     unsigned n_RH_not100 = 0;

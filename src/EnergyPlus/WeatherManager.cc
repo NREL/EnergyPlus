@@ -126,16 +126,6 @@ namespace WeatherManager {
     using namespace Psychrometrics;
 
     // Data
-    int const DDHumIndType_WetBulb(0);   // Design Day Humidity Indicating Type = Wetbulb (default)
-    int const DDHumIndType_DewPoint(1);  // Design Day Humidity Indicating Type = Dewpoint
-    int const DDHumIndType_Enthalpy(2);  // Design Day Humidity Indicating Type = Enthalpy
-    int const DDHumIndType_HumRatio(3);  // Design Day Humidity Indicating Type = Humidity Ratio
-    int const DDHumIndType_RelHumSch(4); // Design Day Humidity Indicating Type = relhum schedule
-    int const DDHumIndType_WBProfDef(5); // Design Day Humidity Indicating Type = Wetbulb default profile
-    int const DDHumIndType_WBProfDif(6); // Design Day Humidity Indicating Type = Wetbulb difference profile
-    int const DDHumIndType_WBProfMul(7); // Design Day Humidity Indicating Type = Wetbulb multiplier profile
-    int const DDHumIndType_Count(8);     // # of DDHumIndTypes
-
     int const DDDBRangeType_Default(0);    // Design Day DryBulb Range Type = Default Multipliers
     int const DDDBRangeType_Multiplier(1); // Design Day DryBulb Range Type = Multiplier Schedule
     int const DDDBRangeType_Difference(2); // Design Day DryBulb Range Type = Difference Schedule
@@ -2361,10 +2351,10 @@ namespace WeatherManager {
             if (DesDayInput(envrnDayNum).DBTempRangeType != DDDBRangeType_Default) {
                 SPSiteDryBulbRangeModScheduleValue(envrnDayNum) = DDDBRngModifier(TimeStep, HourOfDay, envrnDayNum);
             }
-            int const humIndType(DesDayInput(envrnDayNum).HumIndType);
-            if (humIndType == DDHumIndType_WBProfDef || humIndType == DDHumIndType_WBProfDif || humIndType == DDHumIndType_WBProfMul) {
+            DDHumIndType const &humIndType{DesDayInput(envrnDayNum).HumIndType};
+            if (humIndType == DDHumIndType::WBProfDef || humIndType == DDHumIndType::WBProfDif || humIndType == DDHumIndType::WBProfMul) {
                 SPSiteHumidityConditionScheduleValue(envrnDayNum) = DDHumIndModifier(TimeStep, HourOfDay, envrnDayNum);
-            } else if (humIndType == DDHumIndType_RelHumSch) {
+            } else if (humIndType == DDHumIndType::RelHumSch) {
                 SPSiteHumidityConditionScheduleValue(envrnDayNum) = DDHumIndModifier(TimeStep, HourOfDay, envrnDayNum);
             }
             if (DesDayInput(envrnDayNum).SolarModel == DesignDaySolarModel::SolarModel_Schedule) {
@@ -3939,7 +3929,7 @@ namespace WeatherManager {
         }
 
         // verify that design WB or DP <= design DB
-        if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_DewPoint && DesDayInput(EnvrnNum).DewPointNeedsSet) {
+        if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::DewPoint && DesDayInput(EnvrnNum).DewPointNeedsSet) {
             // dew-point
             testval = PsyWFnTdbRhPb(DesDayInput(EnvrnNum).MaxDryBulb, 1.0, DesDayInput(EnvrnNum).PressBarom);
             DesDayInput(EnvrnNum).HumIndValue = PsyTdpFnWPb(testval, DesDayInput(EnvrnNum).PressBarom);
@@ -4006,21 +3996,21 @@ namespace WeatherManager {
 
 
             // Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units
-            if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WetBulb) {
+            if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WetBulb) {
                 StringOut = "Wetbulb," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{C},";
-            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_DewPoint) {
+            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::DewPoint) {
                 StringOut = "Dewpoint," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{C},";
-            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_Enthalpy) {
+            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::Enthalpy) {
                 StringOut = "Enthalpy," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{J/kgDryAir},";
-            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_HumRatio) {
+            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::HumRatio) {
                 StringOut = "HumidityRatio," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 4) + ",{kgWater/kgDryAir},";
-            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_RelHumSch) {
+            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::RelHumSch) {
                 StringOut = "Schedule,<schedule values from 0.0 to 100.0>,{percent},";
-            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDef) {
+            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDef) {
                 StringOut = "WetBulbProfileDefaultMultipliers," + RoundSigDigits(DesDayInput(Envrn).HumIndValue, 2) + ",{C},";
-            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDif) {
+            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDif) {
                 StringOut = "WetBulbProfileDifferenceSchedule," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{C},";
-            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfMul) {
+            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfMul) {
                 StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{C},";
             }
             print(outputFiles.eio, "{}", StringOut);
@@ -4066,31 +4056,31 @@ namespace WeatherManager {
         {
             auto const SELECT_CASE_var(DesDayInput(EnvrnNum).HumIndType);
 
-            if (SELECT_CASE_var == DDHumIndType_WetBulb) {
+            if (SELECT_CASE_var == DDHumIndType::WetBulb) {
                 HumidityRatio = PsyWFnTdbTwbPb(
                     DesDayInput(EnvrnNum).MaxDryBulb, DesDayInput(EnvrnNum).HumIndValue, DesDayInput(EnvrnNum).PressBarom, RoutineNamePsyWFnTdbTwbPb);
                 ConstantHumidityRatio = true;
 
-            } else if (SELECT_CASE_var == DDHumIndType_DewPoint) {
+            } else if (SELECT_CASE_var == DDHumIndType::DewPoint) {
                 HumidityRatio = PsyWFnTdpPb(DesDayInput(EnvrnNum).HumIndValue, DesDayInput(EnvrnNum).PressBarom, RoutineNamePsyWFnTdpPb);
                 ConstantHumidityRatio = true;
 
-            } else if (SELECT_CASE_var == DDHumIndType_HumRatio) {
+            } else if (SELECT_CASE_var == DDHumIndType::HumRatio) {
                 HumidityRatio = DesDayInput(EnvrnNum).HumIndValue;
                 ConstantHumidityRatio = true;
 
-            } else if (SELECT_CASE_var == DDHumIndType_Enthalpy) {
+            } else if (SELECT_CASE_var == DDHumIndType::Enthalpy) {
                 // HumIndValue is already in J/kg, so no conversions needed
                 HumidityRatio = PsyWFnTdbH(DesDayInput(EnvrnNum).MaxDryBulb, DesDayInput(EnvrnNum).HumIndValue, RoutineNamePsyWFnTdbH);
                 ConstantHumidityRatio = true;
 
-            } else if (SELECT_CASE_var == DDHumIndType_RelHumSch) {
+            } else if (SELECT_CASE_var == DDHumIndType::RelHumSch) {
                 // nothing to do -- DDHumIndModifier already contains the scheduled Relative Humidity
                 ConstantHumidityRatio = false;
                 TomorrowOutRelHum = DDHumIndModifier(_, _, EnvrnNum);
 
-            } else if ((SELECT_CASE_var == DDHumIndType_WBProfDef) || (SELECT_CASE_var == DDHumIndType_WBProfDif) ||
-                       (SELECT_CASE_var == DDHumIndType_WBProfMul)) {
+            } else if ((SELECT_CASE_var == DDHumIndType::WBProfDef) || (SELECT_CASE_var == DDHumIndType::WBProfDif) ||
+                       (SELECT_CASE_var == DDHumIndType::WBProfMul)) {
                 ConstantHumidityRatio = false;
 
             } else {
@@ -4132,7 +4122,7 @@ namespace WeatherManager {
         } else {
             DBRange = DesDayInput(EnvrnNum).DailyDBRange;
         }
-        if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDif) {
+        if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDif) {
             WBRange = 1.0; // use unscaled multiplier values if difference
         } else {
             WBRange = DesDayInput(EnvrnNum).DailyWBRange;
@@ -4149,8 +4139,8 @@ namespace WeatherManager {
                 }
 
                 // wet-bulb - generate from profile, humidity ratio, or dew point
-                if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDef || DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDif ||
-                    DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfMul) {
+                if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDef || DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDif ||
+                    DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfMul) {
                     WetBulb = DesDayInput(EnvrnNum).HumIndValue - DDHumIndModifier(TS, Hour, EnvrnNum) * WBRange;
                     WetBulb = min(WetBulb, TomorrowOutDryBulbTemp(TS, Hour)); // WB must be <= DB
                     OutHumRat = PsyWFnTdbTwbPb(TomorrowOutDryBulbTemp(TS, Hour), WetBulb, DesDayInput(EnvrnNum).PressBarom);
@@ -6225,15 +6215,16 @@ namespace WeatherManager {
                                                 "WINTERDESIGNDAY",
                                                 "CUSTOMDAY1",
                                                 "CUSTOMDAY2"});
-        static Array1D_string const HumidityIndicatingType({0, DDHumIndType_Count - 1},
-                                                           {"Wetbulb [C]",
-                                                            "Dewpoint [C]",
-                                                            "Enthalpy [J/kg]",
-                                                            "Humidity Ratio []",
-                                                            "Schedule []",
-                                                            "WetBulbProfileDefaultMultipliers []",
-                                                            "WetBulbProfileDifferenceSchedule []",
-                                                            "WetBulbProfileMultiplierSchedule []"});
+        static std::map<DDHumIndType, std::string> const DDHumIndTypeStringRep{
+            {DDHumIndType::WetBulb, "Wetbulb [C]"},
+            {DDHumIndType::DewPoint, "Dewpoint [C]"},
+            {DDHumIndType::Enthalpy, "Enthalpy [J/kg]"},
+            {DDHumIndType::HumRatio, "Humidity Ratio []"},
+            {DDHumIndType::RelHumSch, "Schedule []"},
+            {DDHumIndType::WBProfDef, "WetBulbProfileDefaultMultipliers []"},
+            {DDHumIndType::WBProfDif, "WetBulbProfileDifferenceSchedule []"},
+            {DDHumIndType::WBProfMul, "WetBulbProfileMultiplierSchedule []"}
+        };
 
         // Below are the 2009 fractions, HOF, Chap 14, Table 6
         static Array1D<Real64> const DefaultTempRangeMult(24, {0.88, 0.92, 0.95, 0.98, 1.0,  0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13,
@@ -6554,7 +6545,7 @@ namespace WeatherManager {
                     ErrorsFound = true;
                 }
                 errFlag = false;
-                DesDayInput(EnvrnNum).HumIndType = DDHumIndType_WetBulb;
+                DesDayInput(EnvrnNum).HumIndType = DDHumIndType::WetBulb;
                 inputProcessor->rangeCheck(errFlag,
                                            cAlphaFieldNames(5) + " - Wet-Bulb",
                                            cCurrentModuleObject,
@@ -6580,7 +6571,7 @@ namespace WeatherManager {
                     ErrorsFound = true;
                 }
                 errFlag = false;
-                DesDayInput(EnvrnNum).HumIndType = DDHumIndType_DewPoint;
+                DesDayInput(EnvrnNum).HumIndType = DDHumIndType::DewPoint;
                 inputProcessor->rangeCheck(errFlag,
                                            cAlphaFieldNames(5) + " - Dew-Point",
                                            cCurrentModuleObject,
@@ -6606,7 +6597,7 @@ namespace WeatherManager {
                     ErrorsFound = true;
                 }
                 errFlag = false;
-                DesDayInput(EnvrnNum).HumIndType = DDHumIndType_HumRatio;
+                DesDayInput(EnvrnNum).HumIndType = DDHumIndType::HumRatio;
                 inputProcessor->rangeCheck(errFlag,
                                            cAlphaFieldNames(5) + " - Humidity-Ratio",
                                            cCurrentModuleObject,
@@ -6632,7 +6623,7 @@ namespace WeatherManager {
                     ErrorsFound = true;
                 }
                 errFlag = false;
-                DesDayInput(EnvrnNum).HumIndType = DDHumIndType_Enthalpy;
+                DesDayInput(EnvrnNum).HumIndType = DDHumIndType::Enthalpy;
                 inputProcessor->rangeCheck(errFlag,
                                            cAlphaFieldNames(5) + " - Enthalpy",
                                            "SizingPeriod:DesignDay",
@@ -6648,12 +6639,12 @@ namespace WeatherManager {
                 }
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "RelativeHumiditySchedule")) {
                 cAlphaArgs(5) = "RelativeHumiditySchedule";
-                DesDayInput(EnvrnNum).HumIndType = DDHumIndType_RelHumSch;
+                DesDayInput(EnvrnNum).HumIndType = DDHumIndType::RelHumSch;
                 units = "[%]";
                 unitType = OutputProcessor::Unit::Perc;
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "WetBulbProfileMultiplierSchedule")) {
                 cAlphaArgs(5) = "WetBulbProfileMultiplierSchedule";
-                DesDayInput(EnvrnNum).HumIndType = DDHumIndType_WBProfMul;
+                DesDayInput(EnvrnNum).HumIndType = DDHumIndType::WBProfMul;
                 units = "[]";
                 unitType = OutputProcessor::Unit::None;
                 if (!lNumericFieldBlanks(5)) {
@@ -6666,7 +6657,7 @@ namespace WeatherManager {
                 }
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "WetBulbProfileDifferenceSchedule")) {
                 cAlphaArgs(5) = "WetBulbProfileDifferenceSchedule";
-                DesDayInput(EnvrnNum).HumIndType = DDHumIndType_WBProfDif;
+                DesDayInput(EnvrnNum).HumIndType = DDHumIndType::WBProfDif;
                 units = "[]";
                 unitType = OutputProcessor::Unit::None;
                 if (!lNumericFieldBlanks(5)) {
@@ -6679,7 +6670,7 @@ namespace WeatherManager {
                 }
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "WetBulbProfileDefaultMultipliers")) {
                 cAlphaArgs(5) = "WetBulbProfileDefaultMultipliers";
-                DesDayInput(EnvrnNum).HumIndType = DDHumIndType_WBProfDef;
+                DesDayInput(EnvrnNum).HumIndType = DDHumIndType::WBProfDef;
                 if (!lNumericFieldBlanks(5)) {
                     DesDayInput(EnvrnNum).HumIndValue = rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
                 } else {
@@ -6693,14 +6684,14 @@ namespace WeatherManager {
                 ShowContinueError("..invalid field: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                 ShowContinueError("WetBulb will be used. Maximum Dry Bulb will be used as WetBulb at Maximum Dry Bulb.");
                 cAlphaArgs(5) = "WetBulb";
-                DesDayInput(EnvrnNum).HumIndType = DDHumIndType_WetBulb;
+                DesDayInput(EnvrnNum).HumIndType = DDHumIndType::WetBulb;
                 DesDayInput(EnvrnNum).HumIndValue = rNumericArgs(3);
             }
 
             // resolve humidity schedule if needed
             //   A6,  \field Humidity Condition Day Schedule Name
-            if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_RelHumSch || DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfMul ||
-                DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDif) {
+            if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::RelHumSch || DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfMul ||
+                DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDif) {
                 if (lAlphaFieldBlanks(6)) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid data.");
                     ShowContinueError("..invalid field: " + cAlphaFieldNames(6) + " is blank.");
@@ -6743,7 +6734,7 @@ namespace WeatherManager {
                         {
                             auto const SELECT_CASE_var(DesDayInput(EnvrnNum).HumIndType);
 
-                            if (SELECT_CASE_var == DDHumIndType_RelHumSch) {
+                            if (SELECT_CASE_var == DDHumIndType::RelHumSch) {
                                 if (!CheckDayScheduleValueMinMax(DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, ">=", 100.0, "<=")) {
                                     ShowSevereError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid data.");
                                     ShowContinueError("..invalid field: " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
@@ -6751,7 +6742,7 @@ namespace WeatherManager {
                                     ErrorsFound = true;
                                 }
 
-                            } else if (SELECT_CASE_var == DDHumIndType_WBProfMul) {
+                            } else if (SELECT_CASE_var == DDHumIndType::WBProfMul) {
                                 // multiplier: use schedule value, check 0 <= v <= 1
                                 if (!CheckDayScheduleValueMinMax(DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, ">=", 1.0, "<=")) {
                                     ShowSevereError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -6760,7 +6751,7 @@ namespace WeatherManager {
                                     ErrorsFound = true;
                                 }
 
-                            } else if (SELECT_CASE_var == DDHumIndType_WBProfDif) {
+                            } else if (SELECT_CASE_var == DDHumIndType::WBProfDif) {
                                 if (!CheckDayScheduleValueMinMax(DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, ">=")) {
                                     ShowSevereError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid data.");
                                     ShowContinueError("..invalid field: " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
@@ -6772,7 +6763,7 @@ namespace WeatherManager {
                     }
                 }
 
-            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDef) {
+            } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDef) {
                 // re WetBulbProfileDefaultMultipliers
                 LastHrValue = DefaultTempRangeMult(24);
                 for (HrLoop = 1; HrLoop <= 24; ++HrLoop) {
@@ -6786,16 +6777,16 @@ namespace WeatherManager {
             }
 
             // verify that design WB or DP <= design DB
-            if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_DewPoint || DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WetBulb ||
-                DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfMul || DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDef ||
-                DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDif) {
+            if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::DewPoint || DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WetBulb ||
+                DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfMul || DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDef ||
+                DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDif) {
                 if (DesDayInput(EnvrnNum).HumIndValue > DesDayInput(EnvrnNum).MaxDryBulb) {
                     ShowWarningError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", range check data.");
                     ShowContinueError("..Humidity Indicator Temperature at Max Temperature=" + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 1) +
                                       " > Max DryBulb=" + RoundSigDigits(DesDayInput(EnvrnNum).MaxDryBulb, 1));
                     ShowContinueError(".." + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                     ShowContinueError("..Conditions for day will be set to Relative Humidity = 100%");
-                    if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_DewPoint) {
+                    if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::DewPoint) {
                         DesDayInput(EnvrnNum).DewPointNeedsSet = true;
                     } else {
                         // wet-bulb
@@ -7003,12 +6994,12 @@ namespace WeatherManager {
             envTitle = DesDayInput(EnvrnNum).Title;
             PreDefTableEntry(pdchDDmaxDB, envTitle, DesDayInput(EnvrnNum).MaxDryBulb);
             PreDefTableEntry(pdchDDrange, envTitle, DesDayInput(EnvrnNum).DailyDBRange);
-            if (DesDayInput(EnvrnNum).HumIndType != DDHumIndType_RelHumSch) {
+            if (DesDayInput(EnvrnNum).HumIndType != DDHumIndType::RelHumSch) {
                 PreDefTableEntry(pdchDDhumid, envTitle, DesDayInput(EnvrnNum).HumIndValue);
             } else {
                 PreDefTableEntry(pdchDDhumid, envTitle, "N/A");
             }
-            PreDefTableEntry(pdchDDhumTyp, envTitle, HumidityIndicatingType(DesDayInput(EnvrnNum).HumIndType));
+            PreDefTableEntry(pdchDDhumTyp, envTitle, DDHumIndTypeStringRep.at(DesDayInput(EnvrnNum).HumIndType));
             PreDefTableEntry(pdchDDwindSp, envTitle, DesDayInput(EnvrnNum).WindSpeed);
             PreDefTableEntry(pdchDDwindDr, envTitle, DesDayInput(EnvrnNum).WindDir);
         }
