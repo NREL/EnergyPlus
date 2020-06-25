@@ -428,7 +428,7 @@ namespace PackagedThermalStorageCoil {
 
     void GetTESCoilInput(EnergyPlusData &state);
 
-    void InitTESCoil(int &TESCoilNum);
+    void InitTESCoil(BranchInputManagerData &dataBranchInputManager, int &TESCoilNum);
 
     void SizeTESCoil(int &TESCoilNum);
 

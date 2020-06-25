@@ -594,7 +594,6 @@ namespace MixedAir {
 
         // USE Statements
         // Using/Aliasing
-        using DataAirLoop::AirLoopInputsFilled;
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;
         using EvaporativeCoolers::SimEvapCooler;
         using HeatingCoils::SimulateHeatingCoilComponents;
@@ -766,12 +765,10 @@ namespace MixedAir {
                                                                              sensOut,
                                                                              latOut);
                 }
-                if (AirLoopInputsFilled) UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, OACoolingCoil, OAHeatingCoil, 0);
                 if (MyOneTimeCheckUnitarySysFlag(OASysNum)) {
-                    if (AirLoopInputsFilled) {
-                        UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
-                        MyOneTimeCheckUnitarySysFlag(OASysNum) = false;
-                    }
+                    UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, OACoolingCoil, OAHeatingCoil, 0);
+                    UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
+                    if (Sim) MyOneTimeCheckUnitarySysFlag(OASysNum) = false;
                 }
             } else if (SELECT_CASE_var == DXHeatPumpSystem) {
                 if (Sim) {
@@ -780,7 +777,7 @@ namespace MixedAir {
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == Coil_UserDefined) {
                 if (Sim) {
-                    SimCoilUserDefined(CompName, CompIndex, AirLoopNum, OAHeatingCoil, OACoolingCoil);
+                    SimCoilUserDefined(state.dataBranchInputManager, CompName, CompIndex, AirLoopNum, OAHeatingCoil, OACoolingCoil);
                 }
                 // Heat recovery
             } else if (SELECT_CASE_var == HeatXchngr) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent',
@@ -945,7 +942,7 @@ namespace MixedAir {
         int OAControllerNum;
 
         if ((GetOAControllerInputFlag) && (AirLoopNum > 0)) { // Gets input for object  first time Sim routine is called from an airloop
-            GetOAControllerInputs(state, OutputFiles::getSingleton());
+            GetOAControllerInputs(state);
             GetOAControllerInputFlag = false;
         }
 
@@ -1340,7 +1337,7 @@ namespace MixedAir {
         GetOASysInputFlag = false;
     }
 
-    void GetOAControllerInputs(EnergyPlusData &state, OutputFiles &outputFiles)
+    void GetOAControllerInputs(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2015,51 +2012,51 @@ namespace MixedAir {
                 "!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
                 "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
                 "Name,DSZAD Name");
-            print(outputFiles.eio, "{}\n", Format_700);
+            print(state.outputFiles.eio, "{}\n", Format_700);
             for (VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum) {
-                print(outputFiles.eio,
+                print(state.outputFiles.eio,
                       " Controller:MechanicalVentilation,{},{},",
                       VentilationMechanical(VentMechNum).Name,
                       VentilationMechanical(VentMechNum).SchName);
 
                 if (VentilationMechanical(VentMechNum).DCVFlag) {
-                    print(outputFiles.eio, "Yes,");
+                    print(state.outputFiles.eio, "Yes,");
                 } else {
-                    print(outputFiles.eio, "No,");
+                    print(state.outputFiles.eio, "No,");
                 }
 
                 if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ZoneSum) {
-                    print(outputFiles.eio, "ZoneSum,");
+                    print(state.outputFiles.eio, "ZoneSum,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRP) {
-                    print(outputFiles.eio, "VentilationRateProcedure,");
+                    print(state.outputFiles.eio, "VentilationRateProcedure,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQP) {
-                    print(outputFiles.eio, "IndoorAirQualityProcedure,");
+                    print(state.outputFiles.eio, "IndoorAirQualityProcedure,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlSchOcc) {
-                    print(outputFiles.eio, "ProportionalControlBasedonOccupancySchedule,");
+                    print(state.outputFiles.eio, "ProportionalControlBasedonOccupancySchedule,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOcc) {
-                    print(outputFiles.eio, "ProportionalControlBasedOnDesignOccupancy,");
+                    print(state.outputFiles.eio, "ProportionalControlBasedOnDesignOccupancy,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOARate) {
-                    print(outputFiles.eio, "ProportionalControlBasedOnDesignOARate,");
+                    print(state.outputFiles.eio, "ProportionalControlBasedOnDesignOARate,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPGC) {
-                    print(outputFiles.eio, "IndoorAirQualityGenericContaminant,");
+                    print(state.outputFiles.eio, "IndoorAirQualityGenericContaminant,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPCOM) {
-                    print(outputFiles.eio, "IndoorAirQualityProcedureCombined,");
+                    print(state.outputFiles.eio, "IndoorAirQualityProcedureCombined,");
                 } else {
-                    print(outputFiles.eio, "Invalid/Unknown,");
+                    print(state.outputFiles.eio, "Invalid/Unknown,");
                 }
 
-                print(outputFiles.eio, "{:.2R},", VentilationMechanical(VentMechNum).ZoneMaxOAFraction);
-                print(outputFiles.eio, "{},", VentilationMechanical(VentMechNum).NumofVentMechZones);
+                print(state.outputFiles.eio, "{:.2R},", VentilationMechanical(VentMechNum).ZoneMaxOAFraction);
+                print(state.outputFiles.eio, "{},", VentilationMechanical(VentMechNum).NumofVentMechZones);
 
                 for (jZone = 1; jZone <= VentilationMechanical(VentMechNum).NumofVentMechZones; ++jZone) {
                     if (jZone < VentilationMechanical(VentMechNum).NumofVentMechZones) {
-                        print(outputFiles.eio,
+                        print(state.outputFiles.eio,
                               "{},{},{},",
                               Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
                               VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),
                               VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone));
                     } else {
-                        print(outputFiles.eio,
+                        print(state.outputFiles.eio,
                               "{},{},{}\n",
                               Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
                               VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),
@@ -4417,7 +4414,7 @@ namespace MixedAir {
         }
     }
 
-    void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state, 
+    void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
         int const AirLoopNum, Real64 const OutAirMinFrac, Real64 &OASignal, bool &HighHumidityOperationFlag, bool const FirstHVACIteration)
     {
         using DataAirLoop::OutsideAirSys;

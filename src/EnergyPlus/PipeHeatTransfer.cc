@@ -169,11 +169,11 @@ namespace PipeHeatTransfer {
 
     // Functions
 
-    PlantComponent *PipeHTData::factory(DataGlobal &dataGlobals, int objectType, std::string objectName)
+    PlantComponent *PipeHTData::factory(EnergyPlusData &state, int objectType, std::string objectName)
     {
         // Process the input data for pipes if it hasn't been done already
         if (GetPipeInputFlag) {
-            GetPipesHeatTransfer(dataGlobals);
+            GetPipesHeatTransfer(state);
             GetPipeInputFlag = false;
         }
         // Now look for this particular pipe in the list
@@ -193,12 +193,12 @@ namespace PipeHeatTransfer {
         PipeHTUniqueNames.clear();
     }
 
-    void PipeHTData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PipeHTData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                               bool const FirstHVACIteration,
                               Real64 &EP_UNUSED(CurLoad),
                               bool const EP_UNUSED(RunFlag))
     {
-        this->InitPipesHeatTransfer(FirstHVACIteration);
+        this->InitPipesHeatTransfer(state.dataBranchInputManager, FirstHVACIteration);
         // make the calculations
         for (int InnerTimeStepCtr = 1; InnerTimeStepCtr <= nsvNumInnerTimeSteps; ++InnerTimeStepCtr) {
             {
@@ -236,7 +236,7 @@ namespace PipeHeatTransfer {
         this->PreviousPipeTemp = this->PipeTemp;
     }
 
-    void GetPipesHeatTransfer(DataGlobal &dataGlobals)
+    void GetPipesHeatTransfer(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -641,7 +641,7 @@ namespace PipeHeatTransfer {
             }
 
             // Get ground temperature model
-            PipeHT(Item).groundTempModel = GetGroundTempModelAndInit(dataGlobals, cAlphaArgs(7), cAlphaArgs(8));
+            PipeHT(Item).groundTempModel = GetGroundTempModelAndInit(state, cAlphaArgs(7), cAlphaArgs(8));
 
             // Select number of pipe sections.  Hanby's optimal number of 20 section is selected.
             NumSections = NumPipeSections;
@@ -823,7 +823,7 @@ namespace PipeHeatTransfer {
 
     //==============================================================================
 
-    void PipeHTData::InitPipesHeatTransfer(bool const FirstHVACIteration // component number
+    void PipeHTData::InitPipesHeatTransfer(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // component number
     )
     {
 
@@ -890,7 +890,7 @@ namespace PipeHeatTransfer {
         // get some data only once
         if (this->OneTimeInit) {
             errFlag = false;
-            ScanPlantLoopsForObject(
+            ScanPlantLoopsForObject(dataBranchInputManager,
                 this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitPipesHeatTransfer: Program terminated due to previous condition(s).");

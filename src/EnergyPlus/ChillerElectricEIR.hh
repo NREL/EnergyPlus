@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -61,6 +62,7 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+struct BranchInputManagerData;
 struct ChillerElectricEIRData;
 
 namespace ChillerElectricEIR {
@@ -239,7 +241,7 @@ namespace ChillerElectricEIR {
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void initialize(bool RunFlag, Real64 MyLoad);
+        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad);
 
         void size(EnergyPlusData &state);
 
@@ -257,6 +259,18 @@ namespace ChillerElectricEIR {
     void GetElectricEIRChillerInput(ChillerElectricEIRData &chillers);
 
 } // namespace ChillerElectricEIR
+
+    struct ChillerElectricEIRData : BaseGlobalStruct {
+        int NumElectricEIRChillers = 0;
+        bool getInputFlag = true;
+        Array1D<ChillerElectricEIR::ElectricEIRChillerSpecs> ElectricEIRChiller;
+        void clear_state() override
+        {
+            NumElectricEIRChillers = 0;
+            getInputFlag = true;
+            ElectricEIRChiller.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

@@ -54,9 +54,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
     class OutputFiles;
 
 namespace HeatBalanceManager {
@@ -142,7 +143,7 @@ namespace HeatBalanceManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ManageHeatBalance(EnergyPlusData &state, OutputFiles &outputFiles);
+    void ManageHeatBalance(EnergyPlusData &state);
 
     // Get Input Section of the Module
     //******************************************************************************
@@ -195,7 +196,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance();
+    void InitHeatBalance(OutputFiles &outputFiles);
 
     void AllocateHeatBalArrays();
 
@@ -223,7 +224,7 @@ namespace HeatBalanceManager {
 
     //        End of Reporting subroutines for the HB Module
 
-    void OpenShadingFile();
+    void OpenShadingFile(OutputFiles &outputFiles);
 
     void GetFrameAndDividerData(bool &ErrorsFound); // set to true if errors found in input
 

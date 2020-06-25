@@ -160,7 +160,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_NoWeather) {
     thisModel->evapotransCoeff = 0.408;
 
     // No Weather file specified, so we expect it to fail
-    ASSERT_THROW(thisModel->getWeatherData(state.dataGlobals), std::runtime_error);
+    ASSERT_THROW(thisModel->getWeatherData(state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.",
@@ -280,14 +280,14 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
 
     // Read the project data, such as Timestep
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
     EXPECT_EQ(DataGlobals::NumOfTimeStepInHour, 4);
 
     // Needed to avoid crash in SetupSimulation (from ElectricPowerServiceManager.hh)
     createFacilityElectricPowerServiceObject();
 
     bool ErrorsFound(false);
-    SimulationManager::SetupSimulation(state, outputFiles(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     EXPECT_EQ(WeatherManager::NumOfEnvrn, 3);
@@ -306,7 +306,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     thisModel->evapotransCoeff = 0.408;
 
     // Shouldn't throw
-    thisModel->getWeatherData(state.dataGlobals);
+    thisModel->getWeatherData(state);
 
     // It should have reverted the added period
     EXPECT_EQ(WeatherManager::NumOfEnvrn, 3);
