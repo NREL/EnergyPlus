@@ -161,9 +161,10 @@ namespace RuntimeLanguageProcessor {
         std::string Name; // name of custom Erl report variable
         int VariableNum;  // pointer to Erl variable associated with custom report variable
         Real64 Value;     // Value registered with output processor for report variable
+        bool BypassFlag;
 
         // Default Constructor
-        RuntimeReportVarType() : VariableNum(0), Value(0.0)
+        RuntimeReportVarType() : VariableNum(0), Value(0.0), BypassFlag(false)
         {
         }
     };

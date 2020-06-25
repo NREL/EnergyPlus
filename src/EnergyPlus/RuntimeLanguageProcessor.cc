@@ -3498,7 +3498,9 @@ namespace RuntimeLanguageProcessor {
         for (RuntimeReportVarNum = 1; RuntimeReportVarNum <= NumEMSOutputVariables + NumEMSMeteredOutputVariables; ++RuntimeReportVarNum) {
             VariableNum = RuntimeReportVar(RuntimeReportVarNum).VariableNum;
             if (ErlVariable(VariableNum).Value.Type == ValueNumber) {
-                RuntimeReportVar(RuntimeReportVarNum).Value = ErlVariable(VariableNum).Value.Number;
+                if (!RuntimeReportVar(RuntimeReportVarNum).BypassFlag) {
+                    RuntimeReportVar(RuntimeReportVarNum).Value = ErlVariable(VariableNum).Value.Number;
+                }
             } else {
                 RuntimeReportVar(RuntimeReportVarNum).Value = 0.0;
             }
