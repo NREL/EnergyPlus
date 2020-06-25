@@ -56,13 +56,13 @@
 #include <EnergyPlus/AirTerminalUnit.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -74,6 +74,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -491,13 +492,13 @@ namespace FourPipeBeam {
         return termUnitSizingNum;
     }
 
-    void HVACFourPipeBeam::simulate(bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
+    void HVACFourPipeBeam::simulate(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                                     Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
     )
     {
 
         // initialize the unit
-        this->init(FirstHVACIteration);
+        this->init(state.dataBranchInputManager, FirstHVACIteration);
 
         // control and simulate the beam
         if (!this->mySizeFlag) {
@@ -511,7 +512,8 @@ namespace FourPipeBeam {
         }
     }
 
-    void HVACFourPipeBeam::init(bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
+    void HVACFourPipeBeam::init(BranchInputManagerData &dataBranchInputManager,
+                                bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
     {
 
@@ -536,7 +538,8 @@ namespace FourPipeBeam {
         if (this->plantLoopScanFlag && allocated(PlantLoop)) {
             errFlag = false;
             if (this->beamCoolingPresent) {
-                ScanPlantLoopsForObject(this->name,
+                ScanPlantLoopsForObject(dataBranchInputManager,
+                                        this->name,
                                         TypeOf_FourPipeBeamAirTerminal,
                                         this->cWLocation.loopNum,
                                         this->cWLocation.loopSideNum,
@@ -553,7 +556,8 @@ namespace FourPipeBeam {
                 }
             }
             if (this->beamHeatingPresent) {
-                ScanPlantLoopsForObject(this->name,
+                ScanPlantLoopsForObject(dataBranchInputManager,
+                                        this->name,
                                         TypeOf_FourPipeBeamAirTerminal,
                                         this->hWLocation.loopNum,
                                         this->hWLocation.loopSideNum,

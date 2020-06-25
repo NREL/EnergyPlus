@@ -50,9 +50,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
     class OutputFiles;
     
 namespace HeatBalanceAirManager {
@@ -81,11 +82,11 @@ namespace HeatBalanceAirManager {
 
     void GetAirHeatBalanceInput(EnergyPlusData &state);
 
-    void GetAirFlowFlag(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if errors found
+    void GetAirFlowFlag(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors found
 
     void SetZoneMassConservationFlag(); // sets the zone air mass flow variables
 
-    void GetSimpleAirModelInputs(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound); // IF errors found in input
+    void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound); // IF errors found in input
 
     //*****************************************************************************************
     // This subroutine was moved from 'RoomAirManager' Module

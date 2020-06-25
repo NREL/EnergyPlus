@@ -57,20 +57,22 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include <functional>
 
 namespace EnergyPlus {
-class OutputFile;
+    // Forward declarations
+    struct EnergyPlusData;
+    class OutputFile;
+    class OutputFiles;
 
 int AbortEnergyPlus(EnergyPlusData &state);
 
-void CloseMiscOpenFiles();
+void CloseMiscOpenFiles(OutputFiles &outputFiles);
 
 void CloseOutOpenFiles();
 
-int EndEnergyPlus();
+int EndEnergyPlus(OutputFiles &outputFiles);
 
 int GetNewUnitNumber();
 
@@ -572,6 +574,12 @@ namespace UtilityRoutines {
     void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
 
     inline bool exists(const std::string& filename);
+
+    bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound);
+
+    bool ValidateFuelTypeWithFuelTypeNum(std::string const &FuelTypeInput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
+
+    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput, std::string &FuelTypeOutput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
 
 } // namespace UtilityRoutines
 

@@ -283,7 +283,7 @@ TEST_F(EnergyPlusFixture, MicroCHPTest_InitGeneratorDynamics)
     DataPlant::PlantLoop(1).LoopSide(1).Branch(2).TotalComponents = 1;
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
     DataPlant::PlantLoop(1).LoopSide(1).Branch(2).Comp.allocate(1);
-    
+
     DataPlant::PlantLoop(1).FluidName = "WATER";
 
     auto &MicroCHP1(DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1));
@@ -301,8 +301,8 @@ TEST_F(EnergyPlusFixture, MicroCHPTest_InitGeneratorDynamics)
     bool FirstHVACIteration = true;
     bool InitLoopEquip = true;
     bool GetCompSizFac = false;
-    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (MicroCHP1.compPtr)->InitMicroCHPNoNormalizeGenerators();
-    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (MicroCHP2.compPtr)->InitMicroCHPNoNormalizeGenerators();
+    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (MicroCHP1.compPtr)->InitMicroCHPNoNormalizeGenerators(state.dataBranchInputManager);
+    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (MicroCHP2.compPtr)->InitMicroCHPNoNormalizeGenerators(state.dataBranchInputManager);
     MicroCHP1.simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
     MicroCHP2.simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
     EXPECT_EQ(DataGenerators::GeneratorDynamics(1).Name, MicroCHP1.Name);

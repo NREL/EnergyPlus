@@ -57,11 +57,14 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
 
     namespace GroundHeatExchangers {
 
@@ -290,11 +293,11 @@ namespace EnergyPlus {
             void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad,
                           bool const RunFlag) override;
 
-            static PlantComponent *factory(DataGlobal &dataGlobals, int const objectType, std::string objectName);
+            static PlantComponent *factory(EnergyPlusData &state, int const objectType, std::string objectName);
 
             virtual Real64 getGFunc(Real64) = 0;
 
-            virtual void initGLHESimVars() = 0;
+            virtual void initGLHESimVars(BranchInputManagerData &dataBranchInputManager) = 0;
 
             virtual Real64 calcHXResistance() = 0;
 
@@ -346,7 +349,7 @@ namespace EnergyPlus {
 
             Real64 calcHXResistance();
 
-            void initGLHESimVars();
+            void initGLHESimVars(BranchInputManagerData &dataBranchInputManager);
 
             void getAnnualTimeConstant();
 
@@ -408,7 +411,7 @@ namespace EnergyPlus {
 
             void calcGFunctions();
 
-            void initGLHESimVars();
+            void initGLHESimVars(BranchInputManagerData &dataBranchInputManager);
 
             void getAnnualTimeConstant();
 
@@ -439,7 +442,7 @@ namespace EnergyPlus {
 
         void clear_state();
 
-        void GetGroundHeatExchangerInput(DataGlobal &dataGlobals);
+        void GetGroundHeatExchangerInput(EnergyPlusData &state);
 
         std::shared_ptr<GLHEResponseFactorsStruct>
         BuildAndGetResponseFactorObjectFromArray(std::shared_ptr<GLHEVertArrayStruct> const &arrayObjectPtr);

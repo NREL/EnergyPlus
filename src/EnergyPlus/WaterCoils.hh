@@ -55,9 +55,10 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace WaterCoils {
 
@@ -342,10 +343,7 @@ namespace WaterCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWaterCoil(EnergyPlusData &state, OutputFiles &outputFiles,
-                       int const CoilNum,
-                       bool const FirstHVACIteration // unused1208
-    );
+    void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
 
     void                                   // refactor for coil report
     CalcAdjustedCoilUA(int const CoilNum); // refactor for coil report

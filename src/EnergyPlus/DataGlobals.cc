@@ -201,10 +201,7 @@ namespace DataGlobals {
     std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
     int OutputFilePerfLog(0);                        // Unit number for performance log outputs
-    int OutputFileShadingFrac(0);                    // Unit number for shading output
     int StdMeterRecordCount(0);                      // Count of Meter output records
-    int OutputDElightIn(0);                          // Unit number for the DElight In file
-    std::ostream *delightin_stream(nullptr);         // Internal stream used for DElight In file
     bool ZoneSizingCalc(false);                      // TRUE if zone sizing calculation
     bool SysSizingCalc(false);                       // TRUE if system sizing calculation
     bool DoZoneSizing(false);                        // User input in SimulationControl object
@@ -240,7 +237,6 @@ namespace DataGlobals {
     bool AnyEnergyManagementSystemInModel(false);  // true if there is any EMS or Erl in model.  otherwise false
     bool AnyLocalEnvironmentsInModel(false);       // true if there is any local environmental data objected defined in model, otherwise false
     bool AnyPlantInModel(false);                   // true if there are any plant or condenser loops in model, otherwise false
-    int CacheIPErrorFile(0);                       // Cache IP errors until IDF processing done.
     bool AnyIdealCondEntSetPointInModel(false);    // true if there is any ideal condenser entering set point manager in model.
     bool RunOptCondEntTemp(false);                 // true if the ideal condenser entering set point optimization is running
     bool CompLoadReportIsReq(false);               // true if the extra sizing calcs are performed to create a "pulse" for the load component report
@@ -265,7 +261,7 @@ namespace DataGlobals {
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state()
+    void clear_state(OutputFiles &outputFiles)
     {
         runReadVars = false;
         DDOnlySimulation = false;
@@ -298,15 +294,15 @@ namespace DataGlobals {
         TimeStep = 0;
         TimeStepZone = 0.0;
         WarmupFlag = false;
-        OutputFiles::getSingleton().eso.close();
+        outputFiles.eso.close();
         OutputStandardError = 0;
         StdOutputRecordCount = 0;
-        OutputFiles::getSingleton().debug.close();
-        OutputFiles::getSingleton().zsz.close();
-        OutputFiles::getSingleton().ssz.close();
-        OutputFiles::getSingleton().mtr.close();
+        outputFiles.debug.close();
+        outputFiles.zsz.close();
+        outputFiles.ssz.close();
+        outputFiles.mtr.close();
         OutputFilePerfLog = 0;
-        OutputFileShadingFrac = 0;
+        outputFiles.shade.close();
         StdMeterRecordCount = 0;
         ZoneSizingCalc = false;
         SysSizingCalc = false;
@@ -343,7 +339,6 @@ namespace DataGlobals {
         AnyEnergyManagementSystemInModel = false;
         AnyLocalEnvironmentsInModel = false;
         AnyPlantInModel = false;
-        CacheIPErrorFile = 0;
         AnyIdealCondEntSetPointInModel = false;
         RunOptCondEntTemp = false;
         CompLoadReportIsReq = false;
@@ -360,9 +355,8 @@ namespace DataGlobals {
         progressCallback = nullptr;
         messageCallback = nullptr;
         errorCallback = nullptr;
-        OutputFiles::getSingleton().mtr.close();
+        outputFiles.mtr.close();
         err_stream = nullptr;
-        delightin_stream = nullptr;
         eplusRunningViaAPI = false;
     }
 

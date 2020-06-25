@@ -55,11 +55,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/SingleDuct.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace HVACVariableRefrigerantFlow {
 
@@ -896,7 +897,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void SetCompFlowRate(int VRFTUNum, int VRFCond, Optional_bool_const UseCurrentMode = _);
 
-    void SizeVRF(EnergyPlusData &state, OutputFiles &outputFiles, int const VRFTUNum);
+    void SizeVRF(EnergyPlusData &state, int const VRFTUNum);
 
     void SimVRF(EnergyPlusData &state, int VRFTUNum,
                 bool FirstHVACIteration,

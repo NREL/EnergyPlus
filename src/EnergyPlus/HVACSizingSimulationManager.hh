@@ -67,7 +67,6 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
@@ -78,6 +77,8 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 class HVACSizingSimulationManager
 {
@@ -103,7 +104,7 @@ private:
 
 extern std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
-void ManageHVACSizingSimulation(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound);
+void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound);
 
 } // namespace EnergyPlus
 
