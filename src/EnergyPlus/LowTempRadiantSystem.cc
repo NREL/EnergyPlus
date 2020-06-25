@@ -83,6 +83,7 @@
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -328,7 +329,7 @@ namespace LowTempRadiantSystem {
             }
 
             if ((SystemType == HydronicSystem) || (SystemType == ConstantFlowSystem) || (SystemType == ElectricSystem) ) {
-                baseSystem->calculateLowTemperatureRadiantSystem(LoadMet);
+                baseSystem->calculateLowTemperatureRadiantSystem(state.dataZoneTempPredictorCorrector, LoadMet);
                 baseSystem->updateLowTemperatureRadiantSystemSurfaces();
                 baseSystem->updateLowTemperatureRadiantSystem(); // Nothing to update for electric systems
                 baseSystem->reportLowTemperatureRadiantSystem();
@@ -1744,12 +1745,13 @@ namespace LowTempRadiantSystem {
                     TotalEffic = CFloRadSys(RadNum).WaterVolFlowMax * CFloRadSys(RadNum).NomPumpHead / CFloRadSys(RadNum).NomPowerUse;
                     CFloRadSys(RadNum).PumpEffic = TotalEffic / CFloRadSys(RadNum).MotorEffic;
                     static constexpr auto fmt = "Check input.  Calc Pump Efficiency={:.5R}% {}, for pump in radiant system {}";
+                    Real64 pumpEfficiency = CFloRadSys(RadNum).PumpEffic * 100.0;
                     if (CFloRadSys(RadNum).PumpEffic < 0.50) {
-                        ShowWarningError(format(fmt, CFloRadSys(RadNum).PumpEffic, "which is less than 50%", CFloRadSys(RadNum).Name));
+                        ShowWarningError(format(fmt, pumpEfficiency, "which is less than 50%", CFloRadSys(RadNum).Name));
                     } else if ((CFloRadSys(RadNum).PumpEffic > 0.95) && (CFloRadSys(RadNum).PumpEffic <= 1.0)) {
-                        ShowWarningError(format(fmt, CFloRadSys(RadNum).PumpEffic, "is approaching 100%", CFloRadSys(RadNum).Name));
+                        ShowWarningError(format(fmt, pumpEfficiency, "is approaching 100%", CFloRadSys(RadNum).Name));
                     } else if (CFloRadSys(RadNum).PumpEffic > 1.0) {
-                        ShowSevereError(format(fmt, CFloRadSys(RadNum).PumpEffic, "which is bigger than 100%", CFloRadSys(RadNum).Name));
+                        ShowSevereError(format(fmt, pumpEfficiency, "which is bigger than 100%", CFloRadSys(RadNum).Name));
                         InitErrorsFound = true;
                     }
                 } else {
@@ -2989,7 +2991,7 @@ namespace LowTempRadiantSystem {
         return sizeRadiantSystemTubeLength;
     }
 
-    void VariableFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(Real64 &LoadMet)   // load met by the radiant system, in Watts
+    void VariableFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet)   // load met by the radiant system, in Watts
     {
 
         // SUBROUTINE INFORMATION:
@@ -3151,11 +3153,11 @@ namespace LowTempRadiantSystem {
             }
 
             // Now simulate the system...
-            if (((OperatingMode == HeatingMode) || (OperatingMode == CoolingMode)) && SysRunning) this->calculateLowTemperatureRadiantSystemComponents(LoadMet);
+            if (((OperatingMode == HeatingMode) || (OperatingMode == CoolingMode)) && SysRunning) this->calculateLowTemperatureRadiantSystemComponents(dataZoneTempPredictorCorrector, LoadMet);
         }
     }
 
-    void VariableFlowRadiantSystemData::calculateLowTemperatureRadiantSystemComponents(Real64 &LoadMet) // Load met by the low temperature radiant system, in Watts
+    void VariableFlowRadiantSystemData::calculateLowTemperatureRadiantSystemComponents(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet) // Load met by the low temperature radiant system, in Watts
     {
 
         // SUBROUTINE INFORMATION:
@@ -3518,7 +3520,7 @@ namespace LowTempRadiantSystem {
                     }
                     // Redo the heat balances since we have changed the heat source (set it to zero)
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataZoneTempPredictorCorrector, ZoneNum);
                     // Now check all of the surface temperatures.  If any potentially have condensation, leave the system off.
                     for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                         if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + this->CondDewPtDeltaT)) {
@@ -3577,7 +3579,7 @@ namespace LowTempRadiantSystem {
 
                         // Redo the heat balances since we have changed the heat source
                         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataZoneTempPredictorCorrector, ZoneNum);
 
                         // Check for condensation one more time.  If no condensation, we are done.  If there is
                         // condensation, shut things down and be done.
@@ -3642,12 +3644,12 @@ namespace LowTempRadiantSystem {
         // SumHATsurf and the value originally calculated by the heat balance with a zero
         // source for all radiant systems in the zone is the load met by the system (approximately).
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataZoneTempPredictorCorrector, ZoneNum);
 
         LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
     }
 
-    void ConstantFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(Real64 &LoadMet)      // load met by the radiant system, in Watts
+    void ConstantFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet)      // load met by the radiant system, in Watts
     {
 
         // SUBROUTINE INFORMATION:
@@ -3927,7 +3929,7 @@ namespace LowTempRadiantSystem {
                     // So, proceed assuming the RadInTemp requested by the controls and then figure out the
                     // mixing after the outlet radiant temperature is calculated.
                     this->WaterInletTemp = RadInTemp;
-                    this->calculateLowTemperatureRadiantSystemComponents(LoopInNode, Iteration, LoadMet);
+                    this->calculateLowTemperatureRadiantSystemComponents(dataZoneTempPredictorCorrector, LoopInNode, Iteration, LoadMet);
 
                     // We now have inlet and outlet temperatures--we still need to set the flow rates
                     if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect divide by zero
@@ -3936,6 +3938,8 @@ namespace LowTempRadiantSystem {
                              (this->WaterInletTemp - this->WaterOutletTemp) /
                              (SysWaterInTemp - this->WaterOutletTemp)) -
                             (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                    } else {
+                        this->WaterInjectionRate = this->WaterMassFlowRate;
                     }
                     this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
 
@@ -3945,7 +3949,7 @@ namespace LowTempRadiantSystem {
                     // the entire flow to the component (no recirculation but potentially some bypass for the
                     // overall loop).  There is no way we can meet the control temperature so don't even try.
                     this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
-                    this->calculateLowTemperatureRadiantSystemComponents(LoopInNode, Iteration, LoadMet);
+                    this->calculateLowTemperatureRadiantSystemComponents(dataZoneTempPredictorCorrector, LoopInNode, Iteration, LoadMet);
 
                     // We now have inlet and outlet temperatures--we still need to set the flow rates
                     if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect divide by zero
@@ -3970,7 +3974,7 @@ namespace LowTempRadiantSystem {
                     // have to repeat the solution for an unknown inlet temperature and a known recirculation
                     // rate.
                     this->WaterInletTemp = RadInTemp;
-                    this->calculateLowTemperatureRadiantSystemComponents(LoopInNode, Iteration, LoadMet);
+                    this->calculateLowTemperatureRadiantSystemComponents(dataZoneTempPredictorCorrector, LoopInNode, Iteration, LoadMet);
 
                     // Now see if we can really get that desired into temperature (RadInTemp) by solving
                     // for the flow that is injected from the loop.  A heat balance for the mixer that relates
@@ -3981,10 +3985,14 @@ namespace LowTempRadiantSystem {
                     // If Mdotloop from this equation is greater that the loop flow rate (Node%MassFlowRate),
                     // then we cannot meet the inlet temperature and we have to "iterate" through the
                     // alternate solution.
-                    InjectFlowRate =
-                        (this->WaterMassFlowRate * (this->WaterInletTemp - this->WaterOutletTemp) /
-                         (SysWaterInTemp - this->WaterOutletTemp)) -
-                        (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                    if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect divide by zero
+                        InjectFlowRate =
+                            (this->WaterMassFlowRate * (this->WaterInletTemp - this->WaterOutletTemp) /
+                             (SysWaterInTemp - this->WaterOutletTemp)) -
+                            (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                    } else {
+                        InjectFlowRate = this->WaterMassFlowRate;
+                    }
                     if (InjectFlowRate > Node(LoopInNode).MassFlowRateMaxAvail) {
                         // We didn't have enough flow from the loop to meet our inlet temperature request.
                         // So, set the injection rate to the loop flow and calculate the recirculation flow.
@@ -3994,7 +4002,7 @@ namespace LowTempRadiantSystem {
                         this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                         this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                         Iteration = true;
-                        this->calculateLowTemperatureRadiantSystemComponents(LoopInNode, Iteration, LoadMet);
+                        this->calculateLowTemperatureRadiantSystemComponents(dataZoneTempPredictorCorrector, LoopInNode, Iteration, LoadMet);
                     } else {
                         this->WaterInjectionRate = InjectFlowRate;
                         this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
@@ -4009,7 +4017,7 @@ namespace LowTempRadiantSystem {
                     this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                     this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                     Iteration = true;
-                    this->calculateLowTemperatureRadiantSystemComponents(LoopInNode, Iteration, LoadMet);
+                    this->calculateLowTemperatureRadiantSystemComponents(dataZoneTempPredictorCorrector, LoopInNode, Iteration, LoadMet);
                }
 
             } else if (OperatingMode == CoolingMode) {
@@ -4044,14 +4052,18 @@ namespace LowTempRadiantSystem {
                         } else {
                             this->WaterInletTemp = LoopReqTemp;
                         }
-                        this->calculateLowTemperatureRadiantSystemComponents(LoopInNode, Iteration, LoadMet);
+                        this->calculateLowTemperatureRadiantSystemComponents(dataZoneTempPredictorCorrector, LoopInNode, Iteration, LoadMet);
 
                         // We now have inlet and outlet temperatures--we still need to set the flow rates
-                        this->WaterInjectionRate =
-                            (this->WaterMassFlowRate *
-                             (this->WaterInletTemp - this->WaterOutletTemp) /
-                             (SysWaterInTemp - this->WaterOutletTemp)) -
-                            (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                        if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect div by zero
+                            this->WaterInjectionRate =
+                                (this->WaterMassFlowRate *
+                                 (this->WaterInletTemp - this->WaterOutletTemp) /
+                                 (SysWaterInTemp - this->WaterOutletTemp)) -
+                                (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                        } else {
+                            this->WaterInjectionRate = this->WaterMassFlowRate;
+                        }
                         this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
 
                     } else if ((SysWaterInTemp > LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
@@ -4060,7 +4072,7 @@ namespace LowTempRadiantSystem {
                         // the entire flow to the component (no recirculation but potentially some bypass for the
                         // overall loop).  There is no way we can meet the control temperature so don't even try.
                         this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
-                        this->calculateLowTemperatureRadiantSystemComponents(LoopInNode, Iteration, LoadMet);
+                        this->calculateLowTemperatureRadiantSystemComponents(dataZoneTempPredictorCorrector, LoopInNode, Iteration, LoadMet);
 
                         // We now have inlet and outlet temperatures--we still need to set the flow rates
                         if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect div by zero
@@ -4090,7 +4102,7 @@ namespace LowTempRadiantSystem {
                         } else {
                             this->WaterInletTemp = LoopReqTemp;
                         }
-                        this->calculateLowTemperatureRadiantSystemComponents(LoopInNode, Iteration, LoadMet);
+                        this->calculateLowTemperatureRadiantSystemComponents(dataZoneTempPredictorCorrector, LoopInNode, Iteration, LoadMet);
 
                         // Now see if we can really get that desired into temperature (RadInTemp) by solving
                         // for the flow that is injected from the loop.  A heat balance for the mixer that relates
@@ -4101,11 +4113,15 @@ namespace LowTempRadiantSystem {
                         // If Mdotloop from this equation is greater that the loop flow rate (Node%MassFlowRate),
                         // then we cannot meet the inlet temperature and we have to "iterate" through the
                         // alternate solution.
-                        InjectFlowRate =
-                            (this->WaterMassFlowRate *
-                             (this->WaterInletTemp - this->WaterOutletTemp) /
-                             (SysWaterInTemp - this->WaterOutletTemp)) -
-                            (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                        if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect div by zero
+                            InjectFlowRate =
+                                (this->WaterMassFlowRate *
+                                 (this->WaterInletTemp - this->WaterOutletTemp) /
+                                 (SysWaterInTemp - this->WaterOutletTemp)) -
+                                (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                        } else {
+                            InjectFlowRate = this->WaterMassFlowRate;
+                        }
                         if (InjectFlowRate > Node(LoopInNode).MassFlowRateMaxAvail) {
                             // We didn't have enough flow from the loop to meet our inlet temperature request.
                             // So, set the injection rate to the loop flow and calculate the recirculation flow.
@@ -4115,7 +4131,7 @@ namespace LowTempRadiantSystem {
                             this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                             this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                             Iteration = true;
-                            this->calculateLowTemperatureRadiantSystemComponents(LoopInNode, Iteration, LoadMet);
+                            this->calculateLowTemperatureRadiantSystemComponents(dataZoneTempPredictorCorrector, LoopInNode, Iteration, LoadMet);
                         } else {
                             this->WaterInjectionRate = InjectFlowRate;
                             this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
@@ -4130,7 +4146,7 @@ namespace LowTempRadiantSystem {
                         this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                         this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                         Iteration = true;
-                        this->calculateLowTemperatureRadiantSystemComponents(LoopInNode, Iteration, LoadMet);
+                        this->calculateLowTemperatureRadiantSystemComponents(dataZoneTempPredictorCorrector, LoopInNode, Iteration, LoadMet);
                     }
 
                     ++CFloCondIterNum;
@@ -4168,7 +4184,7 @@ namespace LowTempRadiantSystem {
     }
 
     void ConstantFlowRadiantSystemData::calculateLowTemperatureRadiantSystemComponents
-                                            (int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
+                                            (ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
                                              bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
                                              Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
     )
@@ -4679,13 +4695,13 @@ namespace LowTempRadiantSystem {
         // SumHATsurf and the value originally calculated by the heat balance with a zero
         // source for all radiant systems in the zone is the load met by the system (approximately).
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataZoneTempPredictorCorrector, ZoneNum);
 
         LoadMet = SumHATsurf(this->ZonePtr) - ZeroSourceSumHATsurf(this->ZonePtr);
 
     }
 
-    void ElectricRadiantSystemData::calculateLowTemperatureRadiantSystem(Real64 &LoadMet)  // load met by the radiant system, in Watts
+    void ElectricRadiantSystemData::calculateLowTemperatureRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet)  // load met by the radiant system, in Watts
     {
 
         // SUBROUTINE INFORMATION:
@@ -4774,7 +4790,7 @@ namespace LowTempRadiantSystem {
 
                 // Now "simulate" the system by recalculating the heat balances
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataZoneTempPredictorCorrector, ZoneNum);
 
                 LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
 

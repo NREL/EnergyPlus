@@ -344,7 +344,6 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     // set load and run flag
     bool RunFlag(true);
     Real64 MyLoad(-18000.0);
-    EnergyPlusData state;
     openOutputFiles(state.outputFiles);
 
     DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;

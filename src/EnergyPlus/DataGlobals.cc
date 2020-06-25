@@ -237,7 +237,6 @@ namespace DataGlobals {
     bool AnyEnergyManagementSystemInModel(false);  // true if there is any EMS or Erl in model.  otherwise false
     bool AnyLocalEnvironmentsInModel(false);       // true if there is any local environmental data objected defined in model, otherwise false
     bool AnyPlantInModel(false);                   // true if there are any plant or condenser loops in model, otherwise false
-    int CacheIPErrorFile(0);                       // Cache IP errors until IDF processing done.
     bool AnyIdealCondEntSetPointInModel(false);    // true if there is any ideal condenser entering set point manager in model.
     bool RunOptCondEntTemp(false);                 // true if the ideal condenser entering set point optimization is running
     bool CompLoadReportIsReq(false);               // true if the extra sizing calcs are performed to create a "pulse" for the load component report
@@ -340,7 +339,6 @@ namespace DataGlobals {
         AnyEnergyManagementSystemInModel = false;
         AnyLocalEnvironmentsInModel = false;
         AnyPlantInModel = false;
-        CacheIPErrorFile = 0;
         AnyIdealCondEntSetPointInModel = false;
         RunOptCondEntTemp = false;
         CompLoadReportIsReq = false;
