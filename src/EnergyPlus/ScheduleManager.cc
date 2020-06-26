@@ -2881,7 +2881,7 @@ namespace ScheduleManager {
         // In the case where DST is applied on 12/31 at 24:00, which is the case for a Southern Hemisphere location for eg
         // (DayOfYear_Schedule is a bit weird, ScheduleManager always assumes LeapYear)
         if (thisDayOfYear == 367) {
-            thisDayOfYear = DataEnvironment::RunPeriodStartJDay;
+            thisDayOfYear = 1;
         }
 
         int WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(thisDayOfYear);

@@ -832,8 +832,6 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_SouthernHemispher
 
     ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
-    DataEnvironment::RunPeriodStartJDay = 1;
-
     DataEnvironment::Month = 12;
     DataEnvironment::DayOfMonth = 31;
     DataGlobals::HourOfDay = 24;
@@ -890,8 +888,6 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     DataEnvironment::CurrentYearIsLeapYear = true;
     WeatherManager::WFAllowsLeapYears = true;
     WeatherManager::LeapYearAdd = 1;
-
-    DataEnvironment::RunPeriodStartJDay = 1;
 
     int nDays = 366;
     int NumOfTimeStepInHour = 4;
@@ -1070,8 +1066,6 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
     // # 'THROUGH" => Number of additional week schedules
     // # 'FOR' => Number of additional day schedules
     // So we use 366 Week Schedules, all with one day (LeapYear)
-    DataEnvironment::RunPeriodStartJDay = 1;
-
     DataEnvironment::CurrentYearIsLeapYear = false;
     WeatherManager::WFAllowsLeapYears = false;
     WeatherManager::LeapYearAdd = 0;
