@@ -69,6 +69,7 @@
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -104,6 +105,7 @@ namespace EnergyPlus {
         ChillerIndirectAbsoprtionData dataChillerIndirectAbsorption;
         ChillerGasAbsorptionData dataChillerGasAbsorption;
         ChillerReformulatedEIRData dataChillerReformulatedEIR;
+        CondenserLoopTowersData dataCondenserLoopTowers;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
@@ -150,6 +152,7 @@ namespace EnergyPlus {
             dataChillerGasAbsorption.clear_state();
             dataChillerIndirectAbsorption.clear_state();
             dataChillerReformulatedEIR.clear_state();
+            dataCondenserLoopTowers.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
             fans.clear_state();
