@@ -2058,6 +2058,24 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
         EXPECT_NEAR(44.402, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(availableCapacity, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
     }
+
+    // now we can call it again from the load side, but this time there is no load (still firsthvac)
+    {
+        bool firstHVAC = true;
+        Real64 curLoad = 0.0;
+        bool runFlag = true;
+        Real64 const expectedLoadMassFlowRate = 0.09999;
+        Real64 const expectedCp = 4180;
+        Real64 const specifiedLoadSetpoint = 45;
+        Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
+        thisHeatingPLHP->simulate(state, myLoadLocation, firstHVAC, curLoad, runFlag);
+        // expect it to miss setpoint and be at max capacity
+        EXPECT_NEAR(45.0, thisHeatingPLHP->loadSideOutletTemp, 0.001);
+        EXPECT_NEAR(30.0, thisHeatingPLHP->sourceSideOutletTemp, 0.001);
+    }
 }
 
 TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_AirSource)
