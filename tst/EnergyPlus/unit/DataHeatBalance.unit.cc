@@ -928,13 +928,12 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setUserTemperatureLocationPerpendicula
 
 TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
 {
-    int nodeNumberAtSource;
-    int nodeNumberAtUserSpecifiedLocation;
     int expectedNodeNumberAtSource;
     int expectedNodeNumberAtUserSpecifiedLocation;
     dataConstruction.Construct.allocate(1);
     auto &thisConstruct(dataConstruction.Construct(1));
-
+    thisConstruct.NumOfPerpendNodes = 4;
+    
     // Data common to all tests
     Array1D_int nodePerLayer(Construction::MaxLayersInConstruct);
     nodePerLayer(1) = 5;
@@ -942,15 +941,14 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
     nodePerLayer(3) = 7;
     nodePerLayer(4) = 8;
     nodePerLayer(5) = 9;
-    int numPerpendicularNodes = 4;
 
     // Test 1: Not a construction with an internal source--both results should be zero
     thisConstruct.SourceSinkPresent = false;
     expectedNodeNumberAtSource = 0;
     expectedNodeNumberAtUserSpecifiedLocation = 0;
-    thisConstruct.setNodeSourceAndUserTemp(nodeNumberAtSource,nodeNumberAtUserSpecifiedLocation,nodePerLayer,numPerpendicularNodes);
-    EXPECT_EQ(expectedNodeNumberAtSource,nodeNumberAtSource);
-    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,nodeNumberAtUserSpecifiedLocation);
+    thisConstruct.setNodeSourceAndUserTemp(nodePerLayer);
+    EXPECT_EQ(expectedNodeNumberAtSource,thisConstruct.NodeSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,thisConstruct.NodeUserTemp);
 
     // Test 2: Construction with Internal Source but 1-D
     thisConstruct.SourceSinkPresent = true;
@@ -959,9 +957,9 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
     thisConstruct.SolutionDimensions = 1;
     expectedNodeNumberAtSource = 11;
     expectedNodeNumberAtUserSpecifiedLocation = 18;
-    thisConstruct.setNodeSourceAndUserTemp(nodeNumberAtSource,nodeNumberAtUserSpecifiedLocation,nodePerLayer,numPerpendicularNodes);
-    EXPECT_EQ(expectedNodeNumberAtSource,nodeNumberAtSource);
-    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,nodeNumberAtUserSpecifiedLocation);
+    thisConstruct.setNodeSourceAndUserTemp(nodePerLayer);
+    EXPECT_EQ(expectedNodeNumberAtSource,thisConstruct.NodeSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,thisConstruct.NodeUserTemp);
 
     // Test 3a: Construction with Internal Source using 2-D Solution
     //          First sub-test--user location in line with source
@@ -971,9 +969,9 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
     thisConstruct.userTemperatureLocationPerpendicular = 0.0;
     expectedNodeNumberAtSource = 41;
     expectedNodeNumberAtUserSpecifiedLocation = 69;
-    thisConstruct.setNodeSourceAndUserTemp(nodeNumberAtSource,nodeNumberAtUserSpecifiedLocation,nodePerLayer,numPerpendicularNodes);
-    EXPECT_EQ(expectedNodeNumberAtSource,nodeNumberAtSource);
-    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,nodeNumberAtUserSpecifiedLocation);
+    thisConstruct.setNodeSourceAndUserTemp(nodePerLayer);
+    EXPECT_EQ(expectedNodeNumberAtSource,thisConstruct.NodeSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,thisConstruct.NodeUserTemp);
 
     // Test 3b: Construction with Internal Source using 2-D Solution
     //          First sub-test--user location at mid-point between tubes
@@ -983,8 +981,8 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
     thisConstruct.userTemperatureLocationPerpendicular = 1.0;
     expectedNodeNumberAtSource = 69;
     expectedNodeNumberAtUserSpecifiedLocation = 104;
-    thisConstruct.setNodeSourceAndUserTemp(nodeNumberAtSource,nodeNumberAtUserSpecifiedLocation,nodePerLayer,numPerpendicularNodes);
-    EXPECT_EQ(expectedNodeNumberAtSource,nodeNumberAtSource);
-    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,nodeNumberAtUserSpecifiedLocation);
+    thisConstruct.setNodeSourceAndUserTemp(nodePerLayer);
+    EXPECT_EQ(expectedNodeNumberAtSource,thisConstruct.NodeSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,thisConstruct.NodeUserTemp);
 
 }

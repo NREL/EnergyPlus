@@ -59,25 +59,6 @@ namespace EnergyPlus {
 ConstructionData dataConstruction;
 
 namespace Construction {
-    int rcmax;                // Total number of nodes in the construct (<= MaxTotNodes)
-    Array2D<Real64> AExp; // Exponential of AMat
-    Array2D<Real64> AInv; // Inverse of AMat
-    Array2D<Real64> AMat; // "A" matrix from Seem's dissertation (constant coefficients of linear system)
-    Array1D<Real64> BMat(3); // "B" matrix of state space method (non-zero elements)
-    Array1D<Real64> CMat(2); // "C" matrix of state space method (non-zero elements)
-    Array1D<Real64> DMat(2); // "D" matrix of state space method (non-zero elements)
-    Array1D<Real64> e;       // Coefficients for the surface flux history term
-    Array2D<Real64> Gamma1;  // Intermediate calculation array corresponding to a term in Seem's dissertation
-    Array2D<Real64> Gamma2; // Intermediate calculation array corresponding to a term in Seem's dissertation
-    Array3D<Real64> s;        // Coefficients for the surface temperature history terms
-    Array2D<Real64> s0(3, 4); // Coefficients for the current surface temperature terms
-    Array2D<Real64> IdenMatrix; // Identity Matrix
-    int const NumOfPerpendNodes(7); // Number of nodes in the direction
-    // perpendicular to the main direction of heat transfer.  This is only used
-    // when a two-dimensional solution has been requested for a construction
-    // with a heat source/sink.
-    int NodeSource;   // Node at which a source or sink is present
-    int NodeUserTemp; // Node where user wishes to calculate a temperature (for constructions with sources/sinks only)
 
     void ConstructionProps::calculateTransferFunction(bool & ErrorsFound, bool & DoCTFErrorReport) {
 
@@ -212,7 +193,6 @@ namespace Construction {
         Real64 SumYi;                              // Summation of all of the Xi terms (cross CTFs) for a construction
         Real64 SumZi;                              // Summation of all of the Xi terms (outside CTFs) for a construction
 
-        int HistTerm;                   // Loop counter
         int ipts1;                      // Intermediate calculation for number of nodes per layer
 
         Real64 DeltaTimestep;      // zone timestep in seconds, for local check of properties
@@ -278,23 +258,10 @@ namespace Construction {
 
             if (rk(Layer) <= PhysPropLimit) { // Thermal conductivity too small,
                 // thus this must be handled as a resistive layer
-
                 ResLayer(Layer) = true;
-
             } else {
-
                 lr(Layer) = dl(Layer) / rk(Layer);
-                if ((dl(Layer) * std::sqrt(rho(Layer) * cp(Layer) / rk(Layer))) < PhysPropLimit) {
-
-                    // If the time constant is smaller than some reasonable
-                    // limit, this should be treated as a resistive layer.
-
-                    ResLayer(Layer) = true;
-
-                } else { // Layer has significant thermal mass (non-resistive)
-
-                    ResLayer(Layer) = false;
-                }
+                ResLayer(Layer) = (dl(Layer) * std::sqrt(rho(Layer) * cp(Layer) / rk(Layer))) < PhysPropLimit;
             }
 
             // If not a resistive layer, nothing further is required
@@ -549,17 +516,17 @@ namespace Construction {
 
                 // Determine the total number of nodes (rcmax)
 
-                rcmax = 0;
+                this->rcmax = 0;
                 for (int Layer = 1; Layer <= LayersInConstruct; ++Layer) {
-                    rcmax += Nodes(Layer);
+                    this->rcmax += Nodes(Layer);
                 }
 
                 // Nodes are placed throughout layers and at the interface between
                 // layers.  As a result, the end layers share a node with the adjacent
                 // layer-leaving one less node total for all layers.
 
-                --rcmax;
-                if (this->SolutionDimensions > 1) rcmax *= NumOfPerpendNodes;
+                --this->rcmax;
+                if (this->SolutionDimensions > 1) this->rcmax *= NumOfPerpendNodes;
 
                 // This section no longer needed as rcmax/number of total nodes is allowed to float.
                 // If reinstated, this node reduction section would have to be modified to account for
@@ -594,7 +561,7 @@ namespace Construction {
                 // For constructions that have sources or sinks present, determine which
                 // node the source/sink is applied at and also where the temperature
                 // calculation has been requested.
-                this->setNodeSourceAndUserTemp(NodeSource, NodeUserTemp, Nodes, NumOfPerpendNodes);
+                this->setNodeSourceAndUserTemp(Nodes);
 
                 // "Adjust time step to ensure stability."  If the time step is too
                 // small, it will result in too many history terms which can lead to
@@ -655,28 +622,28 @@ namespace Construction {
 
                 CTFConvrg = false; // Initialize loop control logical
 
-                AExp.allocate(rcmax, rcmax);
-                AExp = 0.0;
-                AMat.allocate(rcmax, rcmax);
-                AMat = 0.0;
-                AInv.allocate(rcmax, rcmax);
-                AInv = 0.0;
-                IdenMatrix.allocate(rcmax, rcmax);
-                IdenMatrix = 0.0;
-                for (int ir = 1; ir <= rcmax; ++ir) {
-                    IdenMatrix(ir, ir) = 1.0;
+                this->AExp.allocate(this->rcmax, this->rcmax);
+                this->AExp = 0.0;
+                this->AMat.allocate(this->rcmax, this->rcmax);
+                this->AMat = 0.0;
+                this->AInv.allocate(this->rcmax, this->rcmax);
+                this->AInv = 0.0;
+                this->IdenMatrix.allocate(this->rcmax, this->rcmax);
+                this->IdenMatrix = 0.0;
+                for (int ir = 1; ir <= this->rcmax; ++ir) {
+                    this->IdenMatrix(ir, ir) = 1.0;
                 }
-                e.dimension(rcmax, 0.0);
-                Gamma1.allocate(3, rcmax);
-                Gamma1 = 0.0;
-                Gamma2.allocate(3, rcmax);
-                Gamma2 = 0.0;
-                s.allocate(3, 4, rcmax);
-                s = 0.0;
+                this->e.dimension(this->rcmax, 0.0);
+                this->Gamma1.allocate(3, this->rcmax);
+                this->Gamma1 = 0.0;
+                this->Gamma2.allocate(3, this->rcmax);
+                this->Gamma2 = 0.0;
+                this->s.allocate(3, 4, this->rcmax);
+                this->s = 0.0;
 
                 while (!CTFConvrg) { // Begin CTF calculation loop ...
 
-                    BMat(3) = 0.0;
+                    this->BMat(3) = 0.0;
 
                     if (this->SolutionDimensions == 1) {
 
@@ -688,16 +655,16 @@ namespace Construction {
                         // at this node.  Same thing done at the last node...
                         dxtmp = 1.0 / dx(1) / cap;
 
-                        AMat(1, 1) = -2.0 * rk(1) * dxtmp; // Assign the matrix values for the
-                        AMat(2, 1) = rk(1) * dxtmp;        // first node.
-                        BMat(1) = rk(1) * dxtmp;           // Assign non-zero value of BMat.
+                        this->AMat(1, 1) = -2.0 * rk(1) * dxtmp; // Assign the matrix values for the
+                        this->AMat(2, 1) = rk(1) * dxtmp;        // first node.
+                        this->BMat(1) = rk(1) * dxtmp;           // Assign non-zero value of BMat.
 
                         int Layer = 1; // Initialize the "layer" counter
 
                         int NodeInLayer = 2; // Initialize the node (in a layer) counter (already
                         // on the second node for the first layer
 
-                        for (int Node = 2; Node <= rcmax - 1; ++Node) { // Begin nodes loop (includes all nodes except the
+                        for (int Node = 2; Node <= this->rcmax - 1; ++Node) { // Begin nodes loop (includes all nodes except the
                             // first/last which have special equations) ...
 
                             if ((NodeInLayer == Nodes(Layer)) && (LayersInConstruct != 1)) { // For a node at
@@ -707,10 +674,10 @@ namespace Construction {
 
                                 cap = (rho(Layer) * cp(Layer) * dx(Layer) + rho(Layer + 1) * cp(Layer + 1) * dx(Layer + 1)) * 0.5;
 
-                                AMat(Node - 1, Node) = rk(Layer) / dx(Layer) / cap; // Assign matrix
-                                AMat(Node, Node) =
+                                this->AMat(Node - 1, Node) = rk(Layer) / dx(Layer) / cap; // Assign matrix
+                                this->AMat(Node, Node) =
                                         -1.0 * (rk(Layer) / dx(Layer) + rk(Layer + 1) / dx(Layer + 1)) / cap; // values for | the current
-                                AMat(Node + 1, Node) = rk(Layer + 1) / dx(Layer + 1) / cap;               // node.
+                                this->AMat(Node + 1, Node) = rk(Layer + 1) / dx(Layer + 1) / cap;               // node.
 
                                 NodeInLayer = 0; // At an interface, reset nodes in layer counter
                                 ++Layer;         // Also increment the layer counter
@@ -719,13 +686,13 @@ namespace Construction {
 
                                 cap = rho(Layer) * cp(Layer) * dx(Layer);    // Intermediate
                                 dxtmp = 1.0 / dx(Layer) / cap;               // calculations.
-                                AMat(Node - 1, Node) = rk(Layer) * dxtmp;    // Assign matrix
-                                AMat(Node, Node) = -2.0 * rk(Layer) * dxtmp; // values for the
-                                AMat(Node + 1, Node) = rk(Layer) * dxtmp;    // current node.
+                                this->AMat(Node - 1, Node) = rk(Layer) * dxtmp;    // Assign matrix
+                                this->AMat(Node, Node) = -2.0 * rk(Layer) * dxtmp; // values for the
+                                this->AMat(Node + 1, Node) = rk(Layer) * dxtmp;    // current node.
                             }
 
                             ++NodeInLayer; // Increment nodes in layer counter
-                            if (Node == NodeSource) BMat(3) = 1.0 / cap;
+                            if (Node == this->NodeSource) this->BMat(3) = 1.0 / cap;
 
                         } // ... end of nodes loop.
 
@@ -737,14 +704,14 @@ namespace Construction {
                         // at this node.  Same thing done at the first node...
                         dxtmp = 1.0 / dx(LayersInConstruct) / cap;
 
-                        AMat(rcmax, rcmax) = -2.0 * rk(LayersInConstruct) * dxtmp; // Assign matrix
-                        AMat(rcmax - 1, rcmax) = rk(LayersInConstruct) * dxtmp;    // values for the
-                        BMat(2) = rk(LayersInConstruct) * dxtmp;                   // last node.
+                        this->AMat(this->rcmax, this->rcmax) = -2.0 * rk(LayersInConstruct) * dxtmp; // Assign matrix
+                        this->AMat(this->rcmax - 1, this->rcmax) = rk(LayersInConstruct) * dxtmp;    // values for the
+                        this->BMat(2) = rk(LayersInConstruct) * dxtmp;                   // last node.
 
-                        CMat(1) = -rk(1) / dx(1);                                 // Compute the necessary elements
-                        CMat(2) = rk(LayersInConstruct) / dx(LayersInConstruct);  // of all other
-                        DMat(1) = rk(1) / dx(1);                                  // matrices for the state
-                        DMat(2) = -rk(LayersInConstruct) / dx(LayersInConstruct); // space method
+                        this->CMat(1) = -rk(1) / dx(1);                                 // Compute the necessary elements
+                        this->CMat(2) = rk(LayersInConstruct) / dx(LayersInConstruct);  // of all other
+                        this->DMat(1) = rk(1) / dx(1);                                  // matrices for the state
+                        this->DMat(2) = -rk(LayersInConstruct) / dx(LayersInConstruct); // space method
 
                     } else { // 2-D solution requested (assign matrices appropriately)
 
@@ -761,20 +728,20 @@ namespace Construction {
                         // Note also that the first and last nodes in a row are slightly
                         // different from the rest since they are on an adiabatic plane in
                         // the direction perpendicular to the main direction of heat transfer.
-                        AMat(1, 1) = -2.0 * (amatx + amaty);
-                        AMat(2, 1) = 2.0 * amaty;
-                        AMat(NumOfPerpendNodes + 1, 1) = amatx;
+                        this->AMat(1, 1) = -2.0 * (amatx + amaty);
+                        this->AMat(2, 1) = 2.0 * amaty;
+                        this->AMat(this->NumOfPerpendNodes + 1, 1) = amatx;
 
-                        for (int Node = 2; Node <= NumOfPerpendNodes - 1; ++Node) {
-                            AMat(Node - 1, Node) = amaty;
-                            AMat(Node, Node) = -2.0 * (amatx + amaty);
-                            AMat(Node + 1, Node) = amaty;
-                            AMat(Node + NumOfPerpendNodes, Node) = amatx;
+                        for (int Node = 2; Node <= this->NumOfPerpendNodes - 1; ++Node) {
+                            this->AMat(Node - 1, Node) = amaty;
+                            this->AMat(Node, Node) = -2.0 * (amatx + amaty);
+                            this->AMat(Node + 1, Node) = amaty;
+                            this->AMat(Node + this->NumOfPerpendNodes, Node) = amatx;
                         }
 
-                        AMat(NumOfPerpendNodes, NumOfPerpendNodes) = -2.0 * (amatx + amaty);
-                        AMat(NumOfPerpendNodes - 1, NumOfPerpendNodes) = 2.0 * amaty;
-                        AMat(NumOfPerpendNodes + NumOfPerpendNodes, NumOfPerpendNodes) = amatx;
+                        this->AMat(this->NumOfPerpendNodes, this->NumOfPerpendNodes) = -2.0 * (amatx + amaty);
+                        this->AMat(this->NumOfPerpendNodes - 1, this->NumOfPerpendNodes) = 2.0 * amaty;
+                        this->AMat(this->NumOfPerpendNodes + this->NumOfPerpendNodes, this->NumOfPerpendNodes) = amatx;
 
                         BMat(1) = amatx;
 
@@ -782,9 +749,9 @@ namespace Construction {
                         int NodeInLayer = 2;
                         amatx = rk(1) / (rho(1) * cp(1) * dx(1) * dx(1)); // Reset these to the normal capacitance
                         amaty = rk(1) / (rho(1) * cp(1) * dyn * dyn);     // Reset these to the normal capacitance
-                        assert(NumOfPerpendNodes > 0);                    // Autodesk:F2C++ Loop setup assumption
-                        int const Node_stop(rcmax + 1 - 2 * NumOfPerpendNodes);
-                        for (int Node = NumOfPerpendNodes + 1; Node <= Node_stop; Node += NumOfPerpendNodes) {
+                        assert(this->NumOfPerpendNodes > 0);                    // Autodesk:F2C++ Loop setup assumption
+                        int const Node_stop(this->rcmax + 1 - 2 * this->NumOfPerpendNodes);
+                        for (int Node = this->NumOfPerpendNodes + 1; Node <= Node_stop; Node += this->NumOfPerpendNodes) {
                             // INTERNAL ROWS OF NODES: This is the majority of nodes which are all within
                             // a solid layer and not exposed to a boundary condition.
                             if ((LayersInConstruct == 1) || (NodeInLayer != Nodes(Layer))) {
@@ -800,25 +767,25 @@ namespace Construction {
                                 // Note that the first and last layers in a row are slightly different
                                 // from the rest since they are on an adiabatic plane in the direction
                                 // perpendicular to the main direction of heat transfer.
-                                AMat(Node, Node) = -2.0 * (amatx + amaty);
-                                AMat(Node + 1, Node) = 2.0 * amaty;
-                                AMat(Node - NumOfPerpendNodes, Node) = amatx;
-                                AMat(Node + NumOfPerpendNodes, Node) = amatx;
+                                this->AMat(Node, Node) = -2.0 * (amatx + amaty);
+                                this->AMat(Node + 1, Node) = 2.0 * amaty;
+                                this->AMat(Node - this->NumOfPerpendNodes, Node) = amatx;
+                                this->AMat(Node + this->NumOfPerpendNodes, Node) = amatx;
 
-                                for (int NodeInRow = 2; NodeInRow <= NumOfPerpendNodes - 1; ++NodeInRow) {
+                                for (int NodeInRow = 2; NodeInRow <= this->NumOfPerpendNodes - 1; ++NodeInRow) {
                                     int Node2 = Node + NodeInRow - 1;
-                                    AMat(Node2 - 1, Node2) = amaty;
-                                    AMat(Node2, Node2) = -2.0 * (amatx + amaty);
-                                    AMat(Node2 + 1, Node2) = amaty;
-                                    AMat(Node2 - NumOfPerpendNodes, Node2) = amatx;
-                                    AMat(Node2 + NumOfPerpendNodes, Node2) = amatx;
+                                    this->AMat(Node2 - 1, Node2) = amaty;
+                                    this->AMat(Node2, Node2) = -2.0 * (amatx + amaty);
+                                    this->AMat(Node2 + 1, Node2) = amaty;
+                                    this->AMat(Node2 - this->NumOfPerpendNodes, Node2) = amatx;
+                                    this->AMat(Node2 + this->NumOfPerpendNodes, Node2) = amatx;
                                 }
 
-                                int Node2 = Node - 1 + NumOfPerpendNodes;
-                                AMat(Node2, Node2) = -2.0 * (amatx + amaty);
-                                AMat(Node2 - 1, Node2) = 2.0 * amaty;
-                                AMat(Node2 - NumOfPerpendNodes, Node2) = amatx;
-                                AMat(Node2 + NumOfPerpendNodes, Node2) = amatx;
+                                int Node2 = Node - 1 + this->NumOfPerpendNodes;
+                                this->AMat(Node2, Node2) = -2.0 * (amatx + amaty);
+                                this->AMat(Node2 - 1, Node2) = 2.0 * amaty;
+                                this->AMat(Node2 - this->NumOfPerpendNodes, Node2) = amatx;
+                                this->AMat(Node2 + this->NumOfPerpendNodes, Node2) = amatx;
 
                             } else { // Row at a two-layer interface (half of node consists of one layer's materials
                                 // and the other half consist of the next layer's materials)
@@ -827,27 +794,27 @@ namespace Construction {
                                 amatxx = rk(Layer + 1) / (capavg * dx(Layer + 1));
                                 amaty = (rk(Layer) * dx(Layer) + rk(Layer + 1) * dx(Layer + 1)) / (capavg * dyn * dyn);
 
-                                AMat(Node, Node) = -amatx - amatxx - 2.0 * amaty;
-                                AMat(Node + 1, Node) = 2.0 * amaty;
-                                AMat(Node - NumOfPerpendNodes, Node) = amatx;
-                                AMat(Node + NumOfPerpendNodes, Node) = amatxx;
+                                this->AMat(Node, Node) = -amatx - amatxx - 2.0 * amaty;
+                                this->AMat(Node + 1, Node) = 2.0 * amaty;
+                                this->AMat(Node - this->NumOfPerpendNodes, Node) = amatx;
+                                this->AMat(Node + this->NumOfPerpendNodes, Node) = amatxx;
 
-                                for (int NodeInRow = 2; NodeInRow <= NumOfPerpendNodes - 1; ++NodeInRow) {
+                                for (int NodeInRow = 2; NodeInRow <= this->NumOfPerpendNodes - 1; ++NodeInRow) {
                                     int Node2 = Node + NodeInRow - 1;
-                                    AMat(Node2 - 1, Node2) = amaty;
-                                    AMat(Node2, Node2) = -amatx - amatxx - 2.0 * amaty;
-                                    AMat(Node2 + 1, Node2) = amaty;
-                                    AMat(Node2 - NumOfPerpendNodes, Node2) = amatx;
-                                    AMat(Node2 + NumOfPerpendNodes, Node2) = amatxx;
+                                    this->AMat(Node2 - 1, Node2) = amaty;
+                                    this->AMat(Node2, Node2) = -amatx - amatxx - 2.0 * amaty;
+                                    this->AMat(Node2 + 1, Node2) = amaty;
+                                    this->AMat(Node2 - this->NumOfPerpendNodes, Node2) = amatx;
+                                    this->AMat(Node2 + this->NumOfPerpendNodes, Node2) = amatxx;
                                 }
 
-                                int Node2 = Node - 1 + NumOfPerpendNodes;
-                                AMat(Node2, Node2) = -amatx - amatxx - 2.0 * amaty;
-                                AMat(Node2 - 1, Node2) = 2.0 * amaty;
-                                AMat(Node2 - NumOfPerpendNodes, Node2) = amatx;
-                                AMat(Node2 + NumOfPerpendNodes, Node2) = amatxx;
+                                int Node2 = Node - 1 + this->NumOfPerpendNodes;
+                                this->AMat(Node2, Node2) = -amatx - amatxx - 2.0 * amaty;
+                                this->AMat(Node2 - 1, Node2) = 2.0 * amaty;
+                                this->AMat(Node2 - this->NumOfPerpendNodes, Node2) = amatx;
+                                this->AMat(Node2 + this->NumOfPerpendNodes, Node2) = amatxx;
 
-                                if (Node == NodeSource) BMat(3) = 2.0 * double(NumOfPerpendNodes - 1) / capavg;
+                                if (Node == this->NodeSource) BMat(3) = 2.0 * double(this->NumOfPerpendNodes - 1) / capavg;
                                 NodeInLayer = 0;
                                 ++Layer;
                             }
@@ -864,29 +831,29 @@ namespace Construction {
                         amatx /= 1.5;
                         amaty /= 1.5;
 
-                        int Node = rcmax + 1 - NumOfPerpendNodes;
-                        AMat(Node, Node) = -2.0 * (amatx + amaty);
-                        AMat(Node + 1, Node) = 2.0 * amaty;
-                        AMat(Node - NumOfPerpendNodes, Node) = amatx;
+                        int Node = this->rcmax + 1 - this->NumOfPerpendNodes;
+                        this->AMat(Node, Node) = -2.0 * (amatx + amaty);
+                        this->AMat(Node + 1, Node) = 2.0 * amaty;
+                        this->AMat(Node - this->NumOfPerpendNodes, Node) = amatx;
 
-                        for (int Node = rcmax + 2 - NumOfPerpendNodes; Node <= rcmax - 1; ++Node) {
-                            AMat(Node - 1, Node) = amaty;
-                            AMat(Node, Node) = -2.0 * (amatx + amaty);
-                            AMat(Node + 1, Node) = amaty;
-                            AMat(Node - NumOfPerpendNodes, Node) = amatx;
+                        for (int thisNode = this->rcmax + 2 - this->NumOfPerpendNodes; thisNode <= this->rcmax - 1; ++thisNode) {
+                            this->AMat(thisNode - 1, thisNode) = amaty;
+                            this->AMat(thisNode, thisNode) = -2.0 * (amatx + amaty);
+                            this->AMat(thisNode + 1, thisNode) = amaty;
+                            this->AMat(thisNode - this->NumOfPerpendNodes, thisNode) = amatx;
                         }
 
-                        AMat(rcmax, rcmax) = -2.0 * (amatx + amaty);
-                        AMat(rcmax - 1, rcmax) = 2.0 * amaty;
-                        AMat(rcmax - NumOfPerpendNodes, rcmax) = amatx;
+                        this->AMat(this->rcmax, this->rcmax) = -2.0 * (amatx + amaty);
+                        this->AMat(this->rcmax - 1, this->rcmax) = 2.0 * amaty;
+                        this->AMat(this->rcmax - this->NumOfPerpendNodes, this->rcmax) = amatx;
 
-                        BMat(2) = amatx;
+                        this->BMat(2) = amatx;
 
-                        CMat(1) = -rk(1) / dx(1) / double(NumOfPerpendNodes - 1);
-                        CMat(2) = rk(LayersInConstruct) / dx(LayersInConstruct) / double(NumOfPerpendNodes - 1);
+                        this->CMat(1) = -rk(1) / dx(1) / double(this->NumOfPerpendNodes - 1);
+                        this->CMat(2) = rk(LayersInConstruct) / dx(LayersInConstruct) / double(this->NumOfPerpendNodes - 1);
 
-                        DMat(1) = rk(1) / dx(1) / double(NumOfPerpendNodes - 1);
-                        DMat(2) = -rk(LayersInConstruct) / dx(LayersInConstruct) / double(NumOfPerpendNodes - 1);
+                        this->DMat(1) = rk(1) / dx(1) / double(this->NumOfPerpendNodes - 1);
+                        this->DMat(2) = -rk(LayersInConstruct) / dx(LayersInConstruct) / double(this->NumOfPerpendNodes - 1);
                     }
 
                     // Calculation of the CTFs based on the state space
@@ -898,17 +865,17 @@ namespace Construction {
                     DisplayString("Calculating CTFs for \"" + this->Name + "\"");
 
                     //          CALL DisplayNumberAndString(ConstrNum,'Matrix exponential for Construction #')
-                    this->CalculateExponentialMatrix(this->CTFTimeStep); // Compute exponential of AMat
+                    this->CalculateExponentialMatrix(); // Compute exponential of AMat
 
                     //          CALL DisplayNumberAndString(ConstrNum,'Invert Matrix for Construction #')
                     this->CalculateInverseMatrix(); // Compute inverse of AMat
 
                     //          CALL DisplayNumberAndString(ConstrNum,'Gamma calculation for Construction #')
-                    this->CalculateGammas(this->CTFTimeStep, this->SolutionDimensions);
+                    this->CalculateGammas();
                     // Compute "gamma"s from AMat, AExp, and AInv
 
                     //          CALL DisplayNumberAndString(ConstrNum,'Compute CTFs for Construction #')
-                    this->CalculateCTFs(this->NumCTFTerms, this->SolutionDimensions); // Compute CTFs
+                    this->CalculateCTFs(); // Compute CTFs
 
                     // Now check to see if the number of transfer functions
                     // is greater than MaxCTFTerms.  If it is, then increase the
@@ -933,13 +900,13 @@ namespace Construction {
                     // this is not the case, then the terms have not reached a valid solution, and
                     // we need to increase the number of histories and the time step as above.
                     if (CTFConvrg) {
-                        SumXi = s0(2, 2);
-                        SumYi = s0(1, 2);
-                        SumZi = s0(1, 1);
-                        for (HistTerm = 1; HistTerm <= this->NumCTFTerms; ++HistTerm) {
-                            SumXi += s(2, 2, HistTerm);
-                            SumYi += s(1, 2, HistTerm);
-                            SumZi += s(1, 1, HistTerm);
+                        SumXi = this->s0(2, 2);
+                        SumYi = this->s0(1, 2);
+                        SumZi = this->s0(1, 1);
+                        for (int HistTerm = 1; HistTerm <= this->NumCTFTerms; ++HistTerm) {
+                            SumXi += this->s(2, 2, HistTerm);
+                            SumYi += this->s(1, 2, HistTerm);
+                            SumZi += this->s(1, 1, HistTerm);
                         }
                         SumXi = std::abs(SumXi);
                         SumYi = std::abs(SumYi);
@@ -1007,20 +974,20 @@ namespace Construction {
             this->NumHistories = 1;
             this->NumCTFTerms = 1;
 
-            s0(1, 1) = cnd;  // CTFs for current time
-            s0(2, 1) = -cnd; // step are set to the
-            s0(1, 2) = cnd;  // overall conductance
-            s0(2, 2) = -cnd; // of the this->
+            this->s0(1, 1) = cnd;  // CTFs for current time
+            this->s0(2, 1) = -cnd; // step are set to the
+            this->s0(1, 2) = cnd;  // overall conductance
+            this->s0(2, 2) = -cnd; // of the this->
 
-            e.allocate(1);
-            e = 0.0;
-            s.allocate(2, 2, 1);
-            s = 0.0;
-            s(1, 1, 1) = 0.0; // CTF temperature
-            s(2, 1, 1) = 0.0; // and flux
-            s(1, 2, 1) = 0.0; // history terms
-            s(2, 2, 1) = 0.0; // are all
-            e(1) = 0.0;       // zero.
+            this->e.allocate(1);
+            this->e = 0.0;
+            this->s.allocate(2, 2, 1);
+            this->s = 0.0;
+            this->s(1, 1, 1) = 0.0; // CTF temperature
+            this->s(2, 1, 1) = 0.0; // and flux
+            this->s(1, 2, 1) = 0.0; // history terms
+            this->s(2, 2, 1) = 0.0; // are all
+            this->e(1) = 0.0;       // zero.
 
             if (this->SourceSinkPresent) {
                 ShowSevereError("Sources/sinks not allowed in purely resistive constructions --> " + this->Name);
@@ -1043,44 +1010,44 @@ namespace Construction {
 
             // Copy the CTFs into the storage arrays, converting them back to SI
             // units in the process.  First the "zero" terms and then the history terms...
-            this->CTFOutside(0) = s0(1, 1) * DataConversions::CFU;
-            this->CTFCross(0) = s0(1, 2) * DataConversions::CFU;
-            this->CTFInside(0) = -s0(2, 2) * DataConversions::CFU;
+            this->CTFOutside(0) = this->s0(1, 1) * DataConversions::CFU;
+            this->CTFCross(0) = this->s0(1, 2) * DataConversions::CFU;
+            this->CTFInside(0) = -this->s0(2, 2) * DataConversions::CFU;
             if (this->SourceSinkPresent) {
                 // QTFs...
-                this->CTFSourceOut(0) = s0(3, 1);
-                this->CTFSourceIn(0) = s0(3, 2);
+                this->CTFSourceOut(0) = this->s0(3, 1);
+                this->CTFSourceIn(0) = this->s0(3, 2);
                 // QTFs for temperature calculation at source/sink location
-                this->CTFTSourceOut(0) = s0(1, 3);
-                this->CTFTSourceIn(0) = s0(2, 3);
-                this->CTFTSourceQ(0) = s0(3, 3) / DataConversions::CFU;
+                this->CTFTSourceOut(0) = this->s0(1, 3);
+                this->CTFTSourceIn(0) = this->s0(2, 3);
+                this->CTFTSourceQ(0) = this->s0(3, 3) / DataConversions::CFU;
                 if (this->TempAfterLayer != 0) {
                     // QTFs for user specified interior temperature calculations...
-                    this->CTFTUserOut(0) = s0(1, 4);
-                    this->CTFTUserIn(0) = s0(2, 4);
-                    this->CTFTUserSource(0) = s0(3, 4) / DataConversions::CFU;
+                    this->CTFTUserOut(0) = this->s0(1, 4);
+                    this->CTFTUserIn(0) = this->s0(2, 4);
+                    this->CTFTUserSource(0) = this->s0(3, 4) / DataConversions::CFU;
                 }
             }
 
             for (int HistTerm = 1; HistTerm <= this->NumCTFTerms; ++HistTerm) {
                 // "REGULAR" CTFs...
-                this->CTFOutside(HistTerm) = s(1, 1, HistTerm) * DataConversions::CFU;
-                this->CTFCross(HistTerm) = s(1, 2, HistTerm) * DataConversions::CFU;
-                this->CTFInside(HistTerm) = -s(2, 2, HistTerm) * DataConversions::CFU;
+                this->CTFOutside(HistTerm) = this->s(1, 1, HistTerm) * DataConversions::CFU;
+                this->CTFCross(HistTerm) = this->s(1, 2, HistTerm) * DataConversions::CFU;
+                this->CTFInside(HistTerm) = -this->s(2, 2, HistTerm) * DataConversions::CFU;
                 if (HistTerm != 0) this->CTFFlux(HistTerm) = -e(HistTerm);
                 if (this->SourceSinkPresent) {
                     // QTFs...
-                    this->CTFSourceOut(HistTerm) = s(3, 1, HistTerm);
-                    this->CTFSourceIn(HistTerm) = s(3, 2, HistTerm);
+                    this->CTFSourceOut(HistTerm) = this->s(3, 1, HistTerm);
+                    this->CTFSourceIn(HistTerm) = this->s(3, 2, HistTerm);
                     // QTFs for temperature calculation at source/sink location
-                    this->CTFTSourceOut(HistTerm) = s(1, 3, HistTerm);
-                    this->CTFTSourceIn(HistTerm) = s(2, 3, HistTerm);
-                    this->CTFTSourceQ(HistTerm) = s(3, 3, HistTerm) / DataConversions::CFU;
+                    this->CTFTSourceOut(HistTerm) = this->s(1, 3, HistTerm);
+                    this->CTFTSourceIn(HistTerm) = this->s(2, 3, HistTerm);
+                    this->CTFTSourceQ(HistTerm) = this->s(3, 3, HistTerm) / DataConversions::CFU;
                     if (this->TempAfterLayer != 0) {
                         // QTFs for user specified interior temperature calculations...
-                        this->CTFTUserOut(HistTerm) = s(1, 4, HistTerm);
-                        this->CTFTUserIn(HistTerm) = s(2, 4, HistTerm);
-                        this->CTFTUserSource(HistTerm) = s(3, 4, HistTerm) / DataConversions::CFU;
+                        this->CTFTUserOut(HistTerm) = this->s(1, 4, HistTerm);
+                        this->CTFTUserIn(HistTerm) = this->s(2, 4, HistTerm);
+                        this->CTFTUserSource(HistTerm) = this->s(3, 4, HistTerm) / DataConversions::CFU;
                     }
                 }
             }
@@ -1089,17 +1056,17 @@ namespace Construction {
 
         this->UValue = cnd * DataConversions::CFU;
 
-        if (allocated(AExp)) AExp.deallocate();
-        if (allocated(AMat)) AMat.deallocate();
-        if (allocated(AInv)) AInv.deallocate();
-        if (allocated(IdenMatrix)) IdenMatrix.deallocate();
-        if (allocated(e)) e.deallocate();
-        if (allocated(Gamma1)) Gamma1.deallocate();
-        if (allocated(Gamma2)) Gamma2.deallocate();
-        if (allocated(s)) s.deallocate();
+        if (allocated(this->AExp)) this->AExp.deallocate();
+        if (allocated(this->AMat)) AMat.deallocate();
+        if (allocated(this->AInv)) this->AInv.deallocate();
+        if (allocated(this->IdenMatrix)) this->IdenMatrix.deallocate();
+        if (allocated(this->e)) this->e.deallocate();
+        if (allocated(this->Gamma1)) this->Gamma1.deallocate();
+        if (allocated(this->Gamma2)) this->Gamma2.deallocate();
+        if (allocated(this->s)) this->s.deallocate();
     }
 
-    void ConstructionProps::CalculateExponentialMatrix(Real64 &delt) // Time step of the resulting CTFs
+    void ConstructionProps::CalculateExponentialMatrix()
     {
 
         // SUBROUTINE INFORMATION:
@@ -1176,16 +1143,16 @@ namespace Construction {
         // variables reached)
 
         // FLOW:
-        AMat1.allocate(rcmax, rcmax);
-        AMato.allocate(rcmax, rcmax);
-        AMatN.allocate(rcmax, rcmax);
+        AMat1.allocate(this->rcmax, this->rcmax);
+        AMato.allocate(this->rcmax, this->rcmax);
+        AMatN.allocate(this->rcmax, this->rcmax);
 
         // Subroutine initializations.  AMat is assigned to local variable AMat1 to
         // avoid the corruption of the original AMat 2-d array.
         AMat1 = AMat;
 
         //  Other arrays are initialized to zero.
-        AExp = 0.0;
+        this->AExp = 0.0;
         AMato = 0.0;
         AMatN = 0.0;
 
@@ -1198,14 +1165,14 @@ namespace Construction {
 
         AMatRowNormMax = 0.0; // Start of Step 1 ...
 
-        for (i = 1; i <= rcmax; ++i) {
+        for (i = 1; i <= this->rcmax; ++i) {
 
             AMatRowNorm = 0.0;
-            for (j = 1; j <= rcmax; ++j) {
+            for (j = 1; j <= this->rcmax; ++j) {
                 AMatRowNorm += std::abs(AMat1(j, i));
             }
 
-            AMatRowNorm *= delt;
+            AMatRowNorm *= this->CTFTimeStep;
 
             AMatRowNormMax = max(AMatRowNormMax, AMatRowNorm);
 
@@ -1220,7 +1187,7 @@ namespace Construction {
         // takes advantage of the fact that AMat is tridiagonal.  Thus, it
         // only factors the elements of the AMat that are known to be non-zero.
 
-        fact = delt / std::pow(2.0, k); // Start of Step 3 ...
+        fact = this->CTFTimeStep / std::pow(2.0, k); // Start of Step 3 ...
         AMat1 *= fact;                  // ... end of Step 3.
 
         // Step 4, page 128:  Calculate l, the highest power to which AMat
@@ -1238,7 +1205,7 @@ namespace Construction {
 
         // Step 5, page 128:  Calculate the exponential.  First, add the
         // linear term to the identity matrix.
-        AExp = AMat1 + IdenMatrix; // Start of Step 5 ...
+        this->AExp = AMat1 + this->IdenMatrix; // Start of Step 5 ...
 
         // Now, add successive terms to the expansion as per the standard
         // exponential formula.  AMato contains the last "power" of AMat
@@ -1256,16 +1223,16 @@ namespace Construction {
             ++i;                // Increment the loop counter
             SigFigLimit = true; // Set the significant factor limit flag
 
-            for (ir = 1; ir <= rcmax; ++ir) { // Begin matrix multiplication loop ...
+            for (ir = 1; ir <= this->rcmax; ++ir) { // Begin matrix multiplication loop ...
                 // The following matrix multiplication could be "optimized" since
                 // for one-dimensional heat transfer AMat is 3-diagonal, AMat squared
                 // is 5-diagonal, etc.  However, the code can be much simpler if we
                 // ignore this fact and just do a generic matrix multiplication.
                 // For 2-D heat transfer, the number of off-diagonal non-zero terms
                 // is slightly more complicated as well.
-                for (ic = 1; ic <= rcmax; ++ic) {
+                for (ic = 1; ic <= this->rcmax; ++ic) {
                     AMatN(ic, ir) = 0.0;
-                    for (ict = 1; ict <= rcmax; ++ict) {
+                    for (ict = 1; ict <= this->rcmax; ++ict) {
                         // Make sure the next term won't cause an underflow.  If it will end up being
                         // so small as to go below TinyLimit, then ignore it since it won't add anything
                         // to AMatN anyway.
@@ -1279,14 +1246,14 @@ namespace Construction {
 
             // Update AMato and AExp matrices
             AMato = AMatN;
-            AExp += AMato;
+            this->AExp += AMato;
 
             // The next DO loop tests the significant figures limit criteria to
             // see if any values in AExp are still changing appreciably.
-            for (ir = 1; ir <= rcmax; ++ir) {
-                for (ic = 1; ic <= rcmax; ++ic) {
+            for (ir = 1; ir <= this->rcmax; ++ir) {
+                for (ic = 1; ic <= this->rcmax; ++ic) {
                     // Test of limit criteria:
-                    if (std::abs(AExp(ic, ir)) > DataGlobals::rTinyValue) { // Next line divides by AExp entry so it
+                    if (std::abs(this->AExp(ic, ir)) > DataGlobals::rTinyValue) { // Next line divides by AExp entry so it
                         // must be checked to avoid dividing by zero.
                         // If the ratio between any current element in the power
                         // of AMat and its corresponding element in AExp is
@@ -1294,7 +1261,7 @@ namespace Construction {
                         // exponential matrix based on stability criteria, then
                         // continue raising AMat to another power (SigFigLimit = false).
 
-                        if (std::abs(AMato(ic, ir) / AExp(ic, ir)) > DPLimit) {
+                        if (std::abs(AMato(ic, ir) / this->AExp(ic, ir)) > DPLimit) {
                             SigFigLimit = false;
                             break; // DO loop (anytime SigFigLimit is false, AMat must continue to be raised another power)
                         }
@@ -1326,16 +1293,16 @@ namespace Construction {
         for (isq = 1; isq <= k; ++isq) { // Begin squaring DO loop and Step 6 ...
 
             // Use AMato to store the old values of AExp
-            AMato = AExp;
+            AMato = this->AExp;
             Backup = true;
-            AExp = 0.0;
+            this->AExp = 0.0;
 
             // Multiply the old value of AExp (AMato) by itself and store in AExp.
-            for (ir = 1; ir <= rcmax; ++ir) {
-                for (ic = 1; ic <= rcmax; ++ic) {
-                    for (idm = 1; idm <= rcmax; ++idm) {
+            for (ir = 1; ir <= this->rcmax; ++ir) {
+                for (ic = 1; ic <= this->rcmax; ++ic) {
+                    for (idm = 1; idm <= this->rcmax; ++idm) {
                         if (std::abs(AMato(idm, ir) * AMato(ic, idm)) > DataGlobals::rTinyValue) {
-                            AExp(ic, ir) += AMato(idm, ir) * AMato(ic, idm);
+                            this->AExp(ic, ir) += AMato(idm, ir) * AMato(ic, idm);
                             Backup = false;
                         }
                     }
@@ -1343,7 +1310,7 @@ namespace Construction {
             }
             // Backup is true when every item of AExp didnt pass the TinyLimit test
             if (Backup) {
-                AExp = AMato;
+                this->AExp = AMato;
                 break;
             }
 
@@ -1404,10 +1371,10 @@ namespace Construction {
         // FLOW:
 
         // Subroutine initializations ...
-        AMat1.allocate(rcmax, rcmax);
+        AMat1.allocate(this->rcmax, this->rcmax);
 
         AMat1 = AMat;      // Set AMat1 = AMat to avoid AMat changes
-        AInv = IdenMatrix; // Set AInv to Identity Matrix
+        this->AInv = this->IdenMatrix; // Set AInv to Identity Matrix
 
         // Use Gaussian elimination to zero all of the elements of AMat left
         // of the diagonal.
@@ -1416,20 +1383,20 @@ namespace Construction {
         // to eliminate any other rows.  The index ir is the current row
         // number and also the column of the current diagonal element.
 
-        for (ir = 1; ir <= rcmax - 1; ++ir) { // Begin forward elimination loop ...
+        for (ir = 1; ir <= this->rcmax - 1; ++ir) { // Begin forward elimination loop ...
 
             // Factor all of the elements of the row being used to zero the next
             // row in both AMat and AInv by the diagonal element of this row.
             // We should only need to factor the elements to the right of the
             // diagonal since those to the right of it should be zero.
-            for (ic = ir + 1; ic <= rcmax; ++ic) {
+            for (ic = ir + 1; ic <= this->rcmax; ++ic) {
                 AMat1(ic, ir) /= AMat1(ir, ir);
             }
 
             // In the forward elimination process, all the elements in AInv to the
             // right of the diagonal are zero so they do not need to be factored.
             for (ic = 1; ic <= ir; ++ic) {
-                AInv(ic, ir) /= AMat1(ir, ir);
+                this->AInv(ic, ir) /= AMat1(ir, ir);
             }
 
             AMat1(ir, ir) = 1.0; // By definition, the diagonal of AMat is now 1.
@@ -1437,9 +1404,9 @@ namespace Construction {
             // Use this factored row to eliminate the off-diagonal element of the
             // rows below the current one (ir)...
 
-            for (irr = ir + 1; irr <= rcmax; ++irr) { // Start of row reduction loop...
+            for (irr = ir + 1; irr <= this->rcmax; ++irr) { // Start of row reduction loop...
 
-                for (ic = ir + 1; ic <= rcmax; ++ic) {
+                for (ic = ir + 1; ic <= this->rcmax; ++ic) {
                     AMat1(ic, irr) -= AMat1(ir, irr) * AMat1(ic, ir);
                 }
 
@@ -1448,7 +1415,7 @@ namespace Construction {
                 // can be ignored.
 
                 for (ic = 1; ic <= ir; ++ic) {
-                    AInv(ic, irr) -= AMat1(ir, irr) * AInv(ic, ir);
+                    this->AInv(ic, irr) -= AMat1(ir, irr) * this->AInv(ic, ir);
                 }
 
                 AMat1(ir, irr) = 0.0; // By definition, the element to the left of the
@@ -1463,10 +1430,10 @@ namespace Construction {
         // elements of AMat are unity and all of the elements in AMat left of
         // the diagonal are zero.
 
-        for (ic = 1; ic <= rcmax; ++ic) {
-            AInv(ic, rcmax) /= AMat1(rcmax, rcmax);
+        for (ic = 1; ic <= this->rcmax; ++ic) {
+            this->AInv(ic, this->rcmax) /= AMat1(this->rcmax, this->rcmax);
         }
-        AMat1(rcmax, rcmax) = 1.0;
+        AMat1(this->rcmax, this->rcmax) = 1.0;
 
         // Now, use back substitution to eliminate the elements to the right
         // of the diagonal in AMat.  The procedure is similar to the forward
@@ -1481,10 +1448,10 @@ namespace Construction {
         // In the following code ir is the column being zeroed and irr is the
         // row being worked on
 
-        for (ir = rcmax; ir >= 2; --ir) { // Begin reverse elimination loop ...
+        for (ir = this->rcmax; ir >= 2; --ir) { // Begin reverse elimination loop ...
             for (irr = 1; irr <= ir - 1; ++irr) {
-                for (ic = 1; ic <= rcmax; ++ic) {
-                    AInv(ic, irr) -= AMat1(ir, irr) * AInv(ic, ir);
+                for (ic = 1; ic <= this->rcmax; ++ic) {
+                    this->AInv(ic, irr) -= AMat1(ir, irr) * this->AInv(ic, ir);
                 }
                 AMat1(ir, irr) = 0.0;
             }
@@ -1496,10 +1463,7 @@ namespace Construction {
         AMat1.deallocate();
     }
 
-    void ConstructionProps::CalculateGammas(Real64 const delt,           // Time increment in fraction of an hour
-                         int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
-    )
-    {
+    void ConstructionProps::CalculateGammas() {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -1553,26 +1517,26 @@ namespace Construction {
         // states that:  Gamma1  =  [AInv] * ([AExp]-[I]) * [BMat]
         // noting that BMat contains only the non-zero values of the B Matrix.
 
-        ATemp.allocate(rcmax, rcmax);
-        ATemp = AExp - IdenMatrix;
+        ATemp.allocate(this->rcmax, this->rcmax);
+        ATemp = this->AExp - this->IdenMatrix;
         Gamma1 = 0.0;
 
-        for (i = 1; i <= rcmax; ++i) {
+        for (i = 1; i <= this->rcmax; ++i) {
 
-            for (is1 = 1; is1 <= rcmax; ++is1) {
+            for (is1 = 1; is1 <= this->rcmax; ++is1) {
 
-                if (SolutionDimensions == 1) {
-                    Gamma1(1, i) += AInv(is1, i) * ATemp(1, is1) * BMat(1);
-                    Gamma1(2, i) += AInv(is1, i) * ATemp(rcmax, is1) * BMat(2);
+                if (this->SolutionDimensions == 1) {
+                    this->Gamma1(1, i) += this->AInv(is1, i) * ATemp(1, is1) * this->BMat(1);
+                    this->Gamma1(2, i) += this->AInv(is1, i) * ATemp(this->rcmax, is1) * this->BMat(2);
                 } else { // SolutionDimensions = 2
-                    for (SurfNode = 1; SurfNode <= NumOfPerpendNodes; ++SurfNode) {
-                        Gamma1(1, i) += AInv(is1, i) * ATemp(SurfNode, is1) * BMat(1);
-                        Gamma1(2, i) += AInv(is1, i) * ATemp(rcmax + 1 - SurfNode, is1) * BMat(2);
+                    for (SurfNode = 1; SurfNode <= this->NumOfPerpendNodes; ++SurfNode) {
+                        this->Gamma1(1, i) += this->AInv(is1, i) * ATemp(SurfNode, is1) * this->BMat(1);
+                        this->Gamma1(2, i) += this->AInv(is1, i) * ATemp(this->rcmax + 1 - SurfNode, is1) * this->BMat(2);
                     }
                 }
 
-                if (NodeSource > 0) {
-                    Gamma1(3, i) += AInv(is1, i) * ATemp(NodeSource, is1) * BMat(3);
+                if (this->NodeSource > 0) {
+                    this->Gamma1(3, i) += this->AInv(is1, i) * ATemp(this->NodeSource, is1) * this->BMat(3);
                 }
             }
         }
@@ -1583,31 +1547,31 @@ namespace Construction {
         // again noting that BMat contains only the non-zero values of B.
         Gamma2 = 0.0;
 
-        for (i = 1; i <= rcmax; ++i) {
+        for (i = 1; i <= this->rcmax; ++i) {
 
             for (j = 1; j <= 3; ++j) {
 
-                for (is1 = 1; is1 <= rcmax; ++is1) {
+                for (is1 = 1; is1 <= this->rcmax; ++is1) {
 
-                    if (SolutionDimensions == 1) {
+                    if (this->SolutionDimensions == 1) {
                         if ((j == 1) && (is1 == 1)) {
-                            Gamma2(j, i) += AInv(is1, i) * (Gamma1(j, is1) / delt - BMat(1));
-                        } else if ((j == 2) && (is1 == rcmax)) {
-                            Gamma2(j, i) += AInv(is1, i) * (Gamma1(j, is1) / delt - BMat(2));
-                        } else if ((j == 3) && (is1 == NodeSource)) {
-                            Gamma2(j, i) += AInv(is1, i) * (Gamma1(j, is1) / delt - BMat(3));
+                            this->Gamma2(j, i) += this->AInv(is1, i) * (this->Gamma1(j, is1) / this->CTFTimeStep - this->BMat(1));
+                        } else if ((j == 2) && (is1 == this->rcmax)) {
+                            this->Gamma2(j, i) += this->AInv(is1, i) * (this->Gamma1(j, is1) / this->CTFTimeStep - this->BMat(2));
+                        } else if ((j == 3) && (is1 == this->NodeSource)) {
+                            this->Gamma2(j, i) += this->AInv(is1, i) * (this->Gamma1(j, is1) / this->CTFTimeStep - this->BMat(3));
                         } else { // the element of the actual BMat is zero
-                            Gamma2(j, i) += AInv(is1, i) * (Gamma1(j, is1) / delt);
+                            this->Gamma2(j, i) += this->AInv(is1, i) * (this->Gamma1(j, is1) / this->CTFTimeStep);
                         }
                     } else { // SolutionDimensions = 2
-                        if ((j == 1) && ((is1 >= 1) && (is1 <= NumOfPerpendNodes))) {
-                            Gamma2(j, i) += AInv(is1, i) * (Gamma1(j, is1) / delt - BMat(1));
-                        } else if ((j == 2) && ((is1 <= rcmax) && (is1 >= rcmax + 1 - NumOfPerpendNodes))) {
-                            Gamma2(j, i) += AInv(is1, i) * (Gamma1(j, is1) / delt - BMat(2));
-                        } else if ((j == 3) && (is1 == NodeSource)) {
-                            Gamma2(j, i) += AInv(is1, i) * (Gamma1(j, is1) / delt - BMat(3));
+                        if ((j == 1) && ((is1 >= 1) && (is1 <= this->NumOfPerpendNodes))) {
+                            this->Gamma2(j, i) += this->AInv(is1, i) * (this->Gamma1(j, is1) / this->CTFTimeStep - this->BMat(1));
+                        } else if ((j == 2) && ((is1 <= this->rcmax) && (is1 >= this->rcmax + 1 - this->NumOfPerpendNodes))) {
+                            this->Gamma2(j, i) += this->AInv(is1, i) * (this->Gamma1(j, is1) / this->CTFTimeStep - this->BMat(2));
+                        } else if ((j == 3) && (is1 == this->NodeSource)) {
+                            this->Gamma2(j, i) += this->AInv(is1, i) * (this->Gamma1(j, is1) / this->CTFTimeStep - this->BMat(3));
                         } else { // the element of the actual BMat is zero
-                            Gamma2(j, i) += AInv(is1, i) * (Gamma1(j, is1) / delt);
+                            this->Gamma2(j, i) += this->AInv(is1, i) * (this->Gamma1(j, is1) / this->CTFTimeStep);
                         }
                     }
                 }
@@ -1615,10 +1579,7 @@ namespace Construction {
         }
     }
 
-    void ConstructionProps::CalculateCTFs(int &nrf,                    // Number of response factor terms
-                       int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
-    )
-    {
+    void ConstructionProps::CalculateCTFs() {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -1691,23 +1652,23 @@ namespace Construction {
         // FLOW:
 
         // Subroutine initializations
-        PhiR0.allocate(rcmax, rcmax);
-        Rnew.allocate(rcmax, rcmax);
-        Rold.allocate(rcmax, rcmax);
+        PhiR0.allocate(this->rcmax, this->rcmax);
+        Rnew.allocate(this->rcmax, this->rcmax);
+        Rold.allocate(this->rcmax, this->rcmax);
         PhiR0 = 0.0;
         Rold = 0.0;
 
-        s0 = 0.0;
-        s = 0.0;
-        e = 0.0;
-        Rnew = IdenMatrix; // Rnew initialized to the identity matrix
+        this->s0 = 0.0;
+        this->s = 0.0;
+        this->e = 0.0;
+        Rnew = this->IdenMatrix; // Rnew initialized to the identity matrix
 
         // Calculate Gamma1-Gamma2.  Gamma1 is not used by itself in the
         // equations, only Gamma1-Gamma2.  Thus, reset Gamma1 to:
         // Gamma1-Gamma2
-        for (i = 1; i <= rcmax; ++i) {
+        for (i = 1; i <= this->rcmax; ++i) {
             for (j = 1; j <= 3; ++j) {
-                Gamma1(j, i) -= Gamma2(j, i);
+                this->Gamma1(j, i) -= this->Gamma2(j, i);
             }
         }
 
@@ -1716,47 +1677,47 @@ namespace Construction {
         // Note that for a two-dimensional solution, there is more than one
         // node at the surface and the effect of each of these must be added
         // together.
-        if (SolutionDimensions == 1) {
-            s0(1, 1) = CMat(1) * Gamma2(1, 1) + DMat(1);
-            s0(2, 1) = CMat(1) * Gamma2(2, 1);
-            s0(3, 1) = CMat(1) * Gamma2(3, 1);
-            s0(1, 2) = CMat(2) * Gamma2(1, rcmax);
-            s0(2, 2) = CMat(2) * Gamma2(2, rcmax) + DMat(2);
-            s0(3, 2) = CMat(2) * Gamma2(3, rcmax);
+        if (this->SolutionDimensions == 1) {
+            this->s0(1, 1) = this->CMat(1) * this->Gamma2(1, 1) + this->DMat(1);
+            this->s0(2, 1) = this->CMat(1) * this->Gamma2(2, 1);
+            this->s0(3, 1) = this->CMat(1) * this->Gamma2(3, 1);
+            this->s0(1, 2) = this->CMat(2) * this->Gamma2(1, this->rcmax);
+            this->s0(2, 2) = this->CMat(2) * this->Gamma2(2, this->rcmax) + this->DMat(2);
+            this->s0(3, 2) = this->CMat(2) * this->Gamma2(3, this->rcmax);
         } else { // SolutionDimensions = 2
-            for (SurfNode = 1; SurfNode <= NumOfPerpendNodes; ++SurfNode) {
-                if ((SurfNode == 1) || (SurfNode == NumOfPerpendNodes)) {
+            for (SurfNode = 1; SurfNode <= this->NumOfPerpendNodes; ++SurfNode) {
+                if ((SurfNode == 1) || (SurfNode == this->NumOfPerpendNodes)) {
                     SurfNodeFac = 0.5;
                 } else {
                     SurfNodeFac = 1.0;
                 }
-                s0(1, 1) += SurfNodeFac * CMat(1) * Gamma2(1, SurfNode);
-                s0(2, 1) += SurfNodeFac * CMat(1) * Gamma2(2, SurfNode);
-                s0(3, 1) += SurfNodeFac * CMat(1) * Gamma2(3, SurfNode);
-                s0(1, 2) += SurfNodeFac * CMat(2) * Gamma2(1, rcmax + 1 - SurfNode);
-                s0(2, 2) += SurfNodeFac * CMat(2) * Gamma2(2, rcmax + 1 - SurfNode);
-                s0(3, 2) += SurfNodeFac * CMat(2) * Gamma2(3, rcmax + 1 - SurfNode);
+                this->s0(1, 1) += SurfNodeFac * this->CMat(1) * this->Gamma2(1, SurfNode);
+                this->s0(2, 1) += SurfNodeFac * this->CMat(1) * this->Gamma2(2, SurfNode);
+                this->s0(3, 1) += SurfNodeFac * this->CMat(1) * this->Gamma2(3, SurfNode);
+                this->s0(1, 2) += SurfNodeFac * this->CMat(2) * this->Gamma2(1, this->rcmax + 1 - SurfNode);
+                this->s0(2, 2) += SurfNodeFac * this->CMat(2) * this->Gamma2(2, this->rcmax + 1 - SurfNode);
+                this->s0(3, 2) += SurfNodeFac * this->CMat(2) * this->Gamma2(3, this->rcmax + 1 - SurfNode);
             }
-            s0(1, 1) += double(NumOfPerpendNodes - 1) * DMat(1);
-            s0(2, 2) += double(NumOfPerpendNodes - 1) * DMat(2);
+            this->s0(1, 1) += double(this->NumOfPerpendNodes - 1) * this->DMat(1);
+            this->s0(2, 2) += double(this->NumOfPerpendNodes - 1) * this->DMat(2);
         }
 
-        if (NodeSource > 0) {
-            s0(1, 3) = Gamma2(1, NodeSource);
-            s0(2, 3) = Gamma2(2, NodeSource);
-            s0(3, 3) = Gamma2(3, NodeSource);
+        if (this->NodeSource > 0) {
+            this->s0(1, 3) = this->Gamma2(1, this->NodeSource);
+            this->s0(2, 3) = this->Gamma2(2, this->NodeSource);
+            this->s0(3, 3) = this->Gamma2(3, this->NodeSource);
         }
-        if (NodeUserTemp > 0) {
-            s0(1, 4) = Gamma2(1, NodeUserTemp);
-            s0(2, 4) = Gamma2(2, NodeUserTemp);
-            s0(3, 4) = Gamma2(3, NodeUserTemp);
+        if (this->NodeUserTemp > 0) {
+            this->s0(1, 4) = this->Gamma2(1, this->NodeUserTemp);
+            this->s0(2, 4) = this->Gamma2(2, this->NodeUserTemp);
+            this->s0(3, 4) = this->Gamma2(3, this->NodeUserTemp);
         }
 
         // Check for and enforce symmetry in the cross term (Y)
-        if (std::abs(s0(2, 1)) != std::abs(s0(1, 2))) {
-            avg = (std::abs(s0(2, 1)) + std::abs(s0(1, 2))) * 0.5;
-            s0(2, 1) *= avg / std::abs(s0(2, 1));
-            s0(1, 2) *= avg / std::abs(s0(1, 2));
+        if (std::abs(this->s0(2, 1)) != std::abs(this->s0(1, 2))) {
+            avg = (std::abs(this->s0(2, 1)) + std::abs(this->s0(1, 2))) * 0.5;
+            this->s0(2, 1) *= avg / std::abs(this->s0(2, 1));
+            this->s0(1, 2) *= avg / std::abs(this->s0(1, 2));
         }
 
         // Compute S's and e's from 1 to n-1.  See equations (2.1.25) and
@@ -1768,23 +1729,23 @@ namespace Construction {
         // history terms until there are rcmax number of history terms or the
         // latest flux history term is negligibly small compared to the first
         // flux history term.
-        while ((!CTFConvrg) && (inum < rcmax)) { // Begin CTF calculation loop ...
+        while ((!CTFConvrg) && (inum < this->rcmax)) { // Begin CTF calculation loop ...
 
             // Compute e(inum) based on Appendix C (Seem's dissertation). First,
             // compute the new PhiR0 and its trace.
 
             trace = 0.0;
 
-            for (ir = 1; ir <= rcmax; ++ir) {
+            for (ir = 1; ir <= this->rcmax; ++ir) {
 
-                for (ic = 1; ic <= rcmax; ++ic) {
+                for (ic = 1; ic <= this->rcmax; ++ic) {
                     PhiR0(ic, ir) = 0.0;
-                    for (is = 1; is <= rcmax; ++is) {
+                    for (is = 1; is <= this->rcmax; ++is) {
                         // Make sure the next term won't cause an underflow.  If it will end up being
                         // so small as to go below TinyLimit, then ignore it since it won't add anything
                         // to PhiR0 anyway.
                         if (std::abs(Rnew(ic, is)) > DataGlobals::rTinyValue) {
-                            if (std::abs(AExp(is, ir)) > std::abs(DataGlobals::rTinyValue / Rnew(ic, is))) PhiR0(ic, ir) += AExp(is, ir) * Rnew(ic, is);
+                            if (std::abs(this->AExp(is, ir)) > std::abs(DataGlobals::rTinyValue / Rnew(ic, is))) PhiR0(ic, ir) += this->AExp(is, ir) * Rnew(ic, is);
                         }
                     }
                 }
@@ -1795,84 +1756,84 @@ namespace Construction {
             // Now calculate ej from the trace.  According to Appendix C:
             // e(j) = -Trace[AExp*R(j-1)]/j
 
-            e(inum) = -trace / double(inum);
+            this->e(inum) = -trace / double(inum);
 
             // Update Rold and compute Rnew.  Note:  PhiR0 = AExp*R(j-1) here.
             // According to Appendix C:  R(j) = AExp*R(j-1) + e(j-1)
 
-            for (ir = 1; ir <= rcmax; ++ir) {
-                for (ic = 1; ic <= rcmax; ++ic) {
+            for (ir = 1; ir <= this->rcmax; ++ir) {
+                for (ic = 1; ic <= this->rcmax; ++ic) {
                     Rold(ic, ir) = Rnew(ic, ir);
                     Rnew(ic, ir) = PhiR0(ic, ir);
                 }
-                Rnew(ir, ir) += e(inum);
+                Rnew(ir, ir) += this->e(inum);
             }
 
             // Compute S(inum) based on eq.(2.1.25) which states:
             // S(j)  =  CMat*[R(j-1)*(Gamma1-Gamma2)+R(j)*Gamma2]
             //          + e(j)*DMat
-            if (SolutionDimensions == 1) {
+            if (this->SolutionDimensions == 1) {
                 for (j = 1; j <= 3; ++j) {
-                    for (is2 = 1; is2 <= rcmax; ++is2) {
-                        s(j, 1, inum) += CMat(1) * (Rold(is2, 1) * Gamma1(j, is2) + Rnew(is2, 1) * Gamma2(j, is2));
-                        s(j, 2, inum) += CMat(2) * (Rold(is2, rcmax) * Gamma1(j, is2) + Rnew(is2, rcmax) * Gamma2(j, is2));
-                        if (NodeSource > 0) {
-                            s(j, 3, inum) += (Rold(is2, NodeSource) * Gamma1(j, is2) + Rnew(is2, NodeSource) * Gamma2(j, is2));
+                    for (is2 = 1; is2 <= this->rcmax; ++is2) {
+                        this->s(j, 1, inum) += this->CMat(1) * (Rold(is2, 1) * this->Gamma1(j, is2) + Rnew(is2, 1) * this->Gamma2(j, is2));
+                        this->s(j, 2, inum) += this->CMat(2) * (Rold(is2, this->rcmax) * this->Gamma1(j, is2) + Rnew(is2, this->rcmax) * this->Gamma2(j, is2));
+                        if (this->NodeSource > 0) {
+                            this->s(j, 3, inum) += (Rold(is2, this->NodeSource) * this->Gamma1(j, is2) + Rnew(is2, this->NodeSource) * this->Gamma2(j, is2));
                         }
-                        if (NodeUserTemp > 0) {
-                            s(j, 4, inum) += (Rold(is2, NodeUserTemp) * Gamma1(j, is2) + Rnew(is2, NodeUserTemp) * Gamma2(j, is2));
+                        if (this->NodeUserTemp > 0) {
+                            this->s(j, 4, inum) += (Rold(is2, this->NodeUserTemp) * this->Gamma1(j, is2) + Rnew(is2, this->NodeUserTemp) * this->Gamma2(j, is2));
                         }
                     }
-                    if (j != 3) s(j, j, inum) += e(inum) * DMat(j);
+                    if (j != 3) this->s(j, j, inum) += this->e(inum) * this->DMat(j);
                 }
             } else { // SolutionDimensions = 2
                 for (j = 1; j <= 3; ++j) {
-                    for (is2 = 1; is2 <= rcmax; ++is2) {
-                        for (SurfNode = 1; SurfNode <= NumOfPerpendNodes; ++SurfNode) {
-                            if ((SurfNode == 1) || (SurfNode == NumOfPerpendNodes)) {
+                    for (is2 = 1; is2 <= this->rcmax; ++is2) {
+                        for (SurfNode = 1; SurfNode <= this->NumOfPerpendNodes; ++SurfNode) {
+                            if ((SurfNode == 1) || (SurfNode == this->NumOfPerpendNodes)) {
                                 SurfNodeFac = 0.5;
                             } else {
                                 SurfNodeFac = 1.0;
                             }
-                            s(j, 1, inum) += SurfNodeFac * CMat(1) * (Rold(is2, SurfNode) * Gamma1(j, is2) + Rnew(is2, SurfNode) * Gamma2(j, is2));
-                            s(j, 2, inum) += SurfNodeFac * CMat(2) *
-                                             (Rold(is2, rcmax + 1 - SurfNode) * Gamma1(j, is2) + Rnew(is2, rcmax + 1 - SurfNode) * Gamma2(j, is2));
+                            this->s(j, 1, inum) += SurfNodeFac * this->CMat(1) * (Rold(is2, SurfNode) * this->Gamma1(j, is2) + Rnew(is2, SurfNode) * this->Gamma2(j, is2));
+                            this->s(j, 2, inum) += SurfNodeFac * this->CMat(2) *
+                                             (Rold(is2, this->rcmax + 1 - SurfNode) * this->Gamma1(j, is2) + Rnew(is2, this->rcmax + 1 - SurfNode) * this->Gamma2(j, is2));
                         }
-                        if (NodeSource > 0) {
-                            s(j, 3, inum) += (Rold(is2, NodeSource) * Gamma1(j, is2) + Rnew(is2, NodeSource) * Gamma2(j, is2));
+                        if (this->NodeSource > 0) {
+                            this->s(j, 3, inum) += (Rold(is2, this->NodeSource) * this->Gamma1(j, is2) + Rnew(is2, this->NodeSource) * this->Gamma2(j, is2));
                         }
-                        if (NodeUserTemp > 0) {
-                            s(j, 4, inum) += (Rold(is2, NodeUserTemp) * Gamma1(j, is2) + Rnew(is2, NodeUserTemp) * Gamma2(j, is2));
+                        if (this->NodeUserTemp > 0) {
+                            this->s(j, 4, inum) += (Rold(is2, this->NodeUserTemp) * this->Gamma1(j, is2) + Rnew(is2, this->NodeUserTemp) * this->Gamma2(j, is2));
                         }
                     }
                 }
-                s(1, 1, inum) += e(inum) * DMat(1) * double(NumOfPerpendNodes - 1);
-                s(2, 2, inum) += e(inum) * DMat(2) * double(NumOfPerpendNodes - 1);
+                this->s(1, 1, inum) += this->e(inum) * this->DMat(1) * double(this->NumOfPerpendNodes - 1);
+                this->s(2, 2, inum) += this->e(inum) * this->DMat(2) * double(this->NumOfPerpendNodes - 1);
             }
 
             // Check for and enforce symmetry in the cross term (Y)
             if (std::abs(s(2, 1, inum)) != std::abs(s(1, 2, inum))) {
                 avg = (std::abs(s(2, 1, inum)) + std::abs(s(1, 2, inum))) * 0.5;
-                s(2, 1, inum) *= avg / std::abs(s(2, 1, inum));
-                s(1, 2, inum) *= avg / std::abs(s(1, 2, inum));
+                this->s(2, 1, inum) *= avg / std::abs(s(2, 1, inum));
+                this->s(1, 2, inum) *= avg / std::abs(s(1, 2, inum));
             }
 
             // Check for convergence of the CTFs.
             if (e(1) == 0.0) {
 
-                nrf = 1;          // e(1) is zero, so there are no history terms.
+                this->NumCTFTerms = 1;          // e(1) is zero, so there are no history terms.
                 CTFConvrg = true; // CTF calculations have converged--set logical.
 
             } else {
                 // e(1) is non-zero -- Calculate and compare the ratio of the flux
                 // terms to the convergence limit.
-                rat = std::abs(e(inum) / e(1));
+                rat = std::abs(e(inum) / this->e(1));
 
                 if (rat < ConvrgLim) {
 
                     // If the ratio is less than the convergence limit, then any other
                     // terms would have a neglible impact on the CTF-based energy balances.
-                    nrf = inum;
+                    this->NumCTFTerms = inum;
                     CTFConvrg = true; // CTF calculations have converged--set logical.
                 }
             } // ... end of convergence check block.
@@ -1888,63 +1849,63 @@ namespace Construction {
 
             trace = 0.0;
 
-            for (ir = 1; ir <= rcmax; ++ir) {
-                for (is = 1; is <= rcmax; ++is) {
-                    trace += AExp(is, ir) * Rnew(ir, is);
+            for (ir = 1; ir <= this->rcmax; ++ir) {
+                for (is = 1; is <= this->rcmax; ++is) {
+                    trace += this->AExp(is, ir) * Rnew(ir, is);
                 }
             }
 
-            e(rcmax) = -trace / double(rcmax); // Now calculate ej from the trace.
+            this->e(this->rcmax) = -trace / double(this->rcmax); // Now calculate ej from the trace.
 
             // Compute S(inum) based on eq.(2.1.25) which states:
             //   S(last) = CMat*R(last-1)*(Gamma1-Gamma2)+e(last)*DMat
 
-            if (SolutionDimensions == 1) {
+            if (this->SolutionDimensions == 1) {
                 for (j = 1; j <= 3; ++j) {
-                    for (is2 = 1; is2 <= rcmax; ++is2) {
-                        s(j, 1, rcmax) += CMat(1) * Rnew(is2, 1) * Gamma1(j, is2);
-                        s(j, 2, rcmax) += CMat(2) * Rnew(is2, rcmax) * Gamma1(j, is2);
-                        if (NodeSource > 0) {
-                            s(j, 3, rcmax) += Rnew(is2, NodeSource) * Gamma1(j, is2);
+                    for (is2 = 1; is2 <= this->rcmax; ++is2) {
+                        this->s(j, 1, this->rcmax) += this->CMat(1) * Rnew(is2, 1) * this->Gamma1(j, is2);
+                        this->s(j, 2, this->rcmax) += this->CMat(2) * Rnew(is2, this->rcmax) * this->Gamma1(j, is2);
+                        if (this->NodeSource > 0) {
+                            this->s(j, 3, this->rcmax) += Rnew(is2, this->NodeSource) * this->Gamma1(j, is2);
                         }
-                        if (NodeUserTemp > 0) {
-                            s(j, 4, rcmax) += Rnew(is2, NodeUserTemp) * Gamma1(j, is2);
+                        if (this->NodeUserTemp > 0) {
+                            this->s(j, 4, this->rcmax) += Rnew(is2, this->NodeUserTemp) * this->Gamma1(j, is2);
                         }
                     }
                 }
-                s(1, 1, rcmax) += e(rcmax) * DMat(1);
-                s(2, 2, rcmax) += e(rcmax) * DMat(2);
-                nrf = rcmax;
+                this->s(1, 1, this->rcmax) += this->e(this->rcmax) * this->DMat(1);
+                this->s(2, 2, this->rcmax) += this->e(this->rcmax) * this->DMat(2);
+                this->NumCTFTerms = this->rcmax;
             } else { // SolutionDimensions = 2
                 for (j = 1; j <= 3; ++j) {
-                    for (is2 = 1; is2 <= rcmax; ++is2) {
-                        for (SurfNode = 1; SurfNode <= NumOfPerpendNodes; ++SurfNode) {
-                            if ((SurfNode == 1) || (SurfNode == NumOfPerpendNodes)) {
+                    for (is2 = 1; is2 <= this->rcmax; ++is2) {
+                        for (SurfNode = 1; SurfNode <= this->NumOfPerpendNodes; ++SurfNode) {
+                            if ((SurfNode == 1) || (SurfNode == this->NumOfPerpendNodes)) {
                                 SurfNodeFac = 0.5;
                             } else {
                                 SurfNodeFac = 1.0;
                             }
-                            s(j, 1, rcmax) += SurfNodeFac * CMat(1) * Rnew(is2, SurfNode) * Gamma1(j, is2);
-                            s(j, 2, rcmax) += SurfNodeFac * CMat(2) * Rnew(is2, rcmax + 1 - SurfNode) * Gamma1(j, is2);
+                            this->s(j, 1, this->rcmax) += SurfNodeFac * this->CMat(1) * Rnew(is2, SurfNode) * this->Gamma1(j, is2);
+                            this->s(j, 2, this->rcmax) += SurfNodeFac * this->CMat(2) * Rnew(is2, this->rcmax + 1 - SurfNode) * this->Gamma1(j, is2);
                         }
-                        if (NodeSource > 0) {
-                            s(j, 3, rcmax) += Rnew(is2, NodeSource) * Gamma1(j, is2);
+                        if (this->NodeSource > 0) {
+                            this->s(j, 3, this->rcmax) += Rnew(is2, this->NodeSource) * this->Gamma1(j, is2);
                         }
-                        if (NodeUserTemp > 0) {
-                            s(j, 4, rcmax) += Rnew(is2, NodeUserTemp) * Gamma1(j, is2);
+                        if (this->NodeUserTemp > 0) {
+                            this->s(j, 4, this->rcmax) += Rnew(is2, this->NodeUserTemp) * this->Gamma1(j, is2);
                         }
                     }
                 }
-                s(1, 1, rcmax) += e(rcmax) * DMat(1) * double(NumOfPerpendNodes - 1);
-                s(2, 2, rcmax) += e(rcmax) * DMat(2) * double(NumOfPerpendNodes - 1);
+                this->s(1, 1, this->rcmax) += this->e(this->rcmax) * this->DMat(1) * double(this->NumOfPerpendNodes - 1);
+                this->s(2, 2, this->rcmax) += this->e(this->rcmax) * this->DMat(2) * double(this->NumOfPerpendNodes - 1);
             }
 
             // Check for and enforce symmetry in the cross term (Y)
 
-            if (std::abs(s(2, 1, rcmax)) != std::abs(s(1, 2, rcmax))) {
-                avg = (std::abs(s(2, 1, rcmax)) + std::abs(s(1, 2, rcmax))) * 0.5;
-                s(2, 1, rcmax) *= avg / std::abs(s(2, 1, rcmax));
-                s(1, 2, rcmax) *= avg / std::abs(s(1, 2, rcmax));
+            if (std::abs(s(2, 1, this->rcmax)) != std::abs(s(1, 2, this->rcmax))) {
+                avg = (std::abs(s(2, 1, this->rcmax)) + std::abs(s(1, 2, this->rcmax))) * 0.5;
+                this->s(2, 1, this->rcmax) *= avg / std::abs(s(2, 1, this->rcmax));
+                this->s(1, 2, this->rcmax) *= avg / std::abs(s(1, 2, this->rcmax));
             }
 
         } // ... end of IF block for calculation of last e and S.
@@ -1954,6 +1915,96 @@ namespace Construction {
         Rold.deallocate();
     }
 
+    void ConstructionProps::reportTransferFunction(OutputFiles &outputFiles, int const cCounter) {
+
+        static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
+        print(outputFiles.eio,
+              Format_700,
+              this->Name,
+              cCounter,
+              this->TotLayers,
+              this->NumCTFTerms,
+              this->CTFTimeStep,
+              this->UValue,
+              this->OutsideAbsorpThermal,
+              this->InsideAbsorpThermal,
+              this->OutsideAbsorpSolar,
+              this->InsideAbsorpSolar,
+              DataHeatBalance::DisplayMaterialRoughness(this->OutsideRoughness));
+
+        for (int I = 1; I <= this->TotLayers; ++I) {
+            int Layer = this->LayerPoint(I);
+            {
+                auto const SELECT_CASE_var(dataMaterial.Material(Layer).Group);
+                if (SELECT_CASE_var == DataHeatBalance::Air) {
+                    static constexpr auto Format_702(" Material:Air,{},{:12.4N}\n");
+                    print(outputFiles.eio, Format_702, dataMaterial.Material(Layer).Name, dataMaterial.Material(Layer).Resistance);
+                } else {
+                    static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
+                    print(outputFiles.eio,
+                          Format_701,
+                          dataMaterial.Material(Layer).Name,
+                          dataMaterial.Material(Layer).Thickness,
+                          dataMaterial.Material(Layer).Conductivity,
+                          dataMaterial.Material(Layer).Density,
+                          dataMaterial.Material(Layer).SpecHeat,
+                          dataMaterial.Material(Layer).Resistance);
+                }
+            }
+        }
+
+        for (int I = this->NumCTFTerms; I >= 0; --I) {
+            if (I != 0) {
+                static constexpr auto Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
+                print(outputFiles.eio,
+                      Format_703,
+                      I,
+                      this->CTFOutside(I),
+                      this->CTFCross(I),
+                      this->CTFInside(I),
+                      this->CTFFlux(I));
+            } else {
+                static constexpr auto Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+                print(outputFiles.eio,
+                      Format_704,
+                      I,
+                      this->CTFOutside(I),
+                      this->CTFCross(I),
+                      this->CTFInside(I));
+            }
+        }
+
+        if (this->SourceSinkPresent) {
+            // QTFs...
+            for (int I = this->NumCTFTerms; I >= 0; --I) {
+                static constexpr auto Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
+                print(outputFiles.eio, Format_705, I, this->CTFSourceOut(I), this->CTFSourceIn(I));
+            }
+            // QTFs for source/sink location temperature calculation...
+            for (int I = this->NumCTFTerms; I >= 0; --I) {
+                static constexpr auto Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+                print(outputFiles.eio,
+                      Format_706,
+                      I,
+                      this->CTFTSourceOut(I),
+                      this->CTFTSourceIn(I),
+                      this->CTFTSourceQ(I));
+            }
+            if (this->TempAfterLayer != 0) {
+                // QTFs for user specified interior temperature calculation...
+                for (int I = this->NumCTFTerms; I >= 0; --I) {
+                    static constexpr auto Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+                    print(outputFiles.eio,
+                          Format_707,
+                          I,
+                          this->CTFTUserOut(I),
+                          this->CTFTUserIn(I),
+                          this->CTFTUserSource(I));
+                }
+            }
+        }
+    }
+    
     bool ConstructionProps::isGlazingConstruction() const
     {
         // SUBROUTINE INFORMATION:
@@ -1988,28 +2039,25 @@ namespace Construction {
         }
     }
 
-    void ConstructionProps::setNodeSourceAndUserTemp(int &sourceNodeLocation,
-                                                    int &userTempNodeLocation,
-                                                    Array1D_int & Nodes,
-                                                    int NumOfPerpendNodes)
+    void ConstructionProps::setNodeSourceAndUserTemp(Array1D_int & Nodes)
     {
-        sourceNodeLocation = 0;
-        userTempNodeLocation = 0;
+        this->NodeSource = 0;
+        this->NodeUserTemp = 0;
         if (!this->SourceSinkPresent) return;
 
         for (int Layer = 1; Layer <= this->SourceAfterLayer; ++Layer) {
-            sourceNodeLocation += Nodes(Layer);
+            this->NodeSource += Nodes(Layer);
         }
 
-        if ((sourceNodeLocation > 0) && (this->SolutionDimensions > 1)) sourceNodeLocation = (sourceNodeLocation - 1) * NumOfPerpendNodes + 1;
+        if ((this->NodeSource > 0) && (this->SolutionDimensions > 1)) this->NodeSource = (this->NodeSource - 1) * this->NumOfPerpendNodes + 1;
 
         for (int Layer = 1; Layer <= this->TempAfterLayer; ++Layer) {
-            userTempNodeLocation += Nodes(Layer);
+            this->NodeUserTemp += Nodes(Layer);
         }
 
-        if ((userTempNodeLocation > 0) && (this->SolutionDimensions > 1))
-            userTempNodeLocation = (userTempNodeLocation - 1) * NumOfPerpendNodes
-                                   + round(this->userTemperatureLocationPerpendicular * (NumOfPerpendNodes - 1)) + 1;
+        if ((this->NodeUserTemp > 0) && (this->SolutionDimensions > 1))
+            this->NodeUserTemp = (this->NodeUserTemp - 1) * this->NumOfPerpendNodes
+                                   + round(this->userTemperatureLocationPerpendicular * (this->NumOfPerpendNodes - 1)) + 1;
 
     }
 

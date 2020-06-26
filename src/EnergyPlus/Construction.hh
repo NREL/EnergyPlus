@@ -257,6 +257,26 @@ namespace Construction {
         Real64 AirBoundaryACH;                // Air boundary simple mixing air changes per hour [1/hr]
         int AirBoundaryMixingSched;           // Air boundary simple mixing schedule index
 
+        int rcmax;                // Total number of nodes in the construct (<= MaxTotNodes)
+        Array2D<Real64> AExp; // Exponential of AMat
+        Array2D<Real64> AInv; // Inverse of AMat
+        Array2D<Real64> AMat; // "A" matrix from Seem's dissertation (constant coefficients of linear system)
+        Array1D<Real64> BMat; // "B" matrix of state space method (non-zero elements)
+        Array1D<Real64> CMat; // "C" matrix of state space method (non-zero elements)
+        Array1D<Real64> DMat; // "D" matrix of state space method (non-zero elements)
+        Array1D<Real64> e;       // Coefficients for the surface flux history term
+        Array2D<Real64> Gamma1;  // Intermediate calculation array corresponding to a term in Seem's dissertation
+        Array2D<Real64> Gamma2; // Intermediate calculation array corresponding to a term in Seem's dissertation
+        Array3D<Real64> s;        // Coefficients for the surface temperature history terms
+        Array2D<Real64> s0; // Coefficients for the current surface temperature terms
+        Array2D<Real64> IdenMatrix; // Identity Matrix
+        int NumOfPerpendNodes = 7; // Number of nodes in the direction
+        // perpendicular to the main direction of heat transfer.  This is only used
+        // when a two-dimensional solution has been requested for a construction
+        // with a heat source/sink.
+        int NodeSource;   // Node at which a source or sink is present
+        int NodeUserTemp; // Node where user wishes to calculate a temperature (for constructions with sources/sinks only)
+
         // Default Constructor
         ConstructionProps()
             : TotLayers(0), TotSolidLayers(0), TotGlassLayers(0), LayerPoint(MaxLayersInConstruct, 0), IsUsed(false), IsUsedCTF(false),
@@ -287,34 +307,31 @@ namespace Construction {
               AbsDiffFrontEQL(CFSMAXNL, 0.0), AbsDiffBackEQL(CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false),
               TypeIsAirBoundarySolar(false), TypeIsAirBoundaryInteriorWindow(false), TypeIsAirBoundaryGroupedRadiant(false),
               TypeIsAirBoundaryIRTSurface(false), TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0),
-              AirBoundaryMixingSched(0)
+              AirBoundaryMixingSched(0), rcmax(0), NodeSource(0), NodeUserTemp(0)
         {
+            BMat.allocate(3);
+            CMat.allocate(2);
+            DMat.allocate(2);
+            s0.allocate(3, 4);
         }
 
         void calculateTransferFunction(bool & ErrorsFound, bool & DoCTFErrorReport);
 
-        void CalculateExponentialMatrix(Real64 &delt); // Time step of the resulting CTFs
+        void CalculateExponentialMatrix(); // Time step of the resulting CTFs
 
         void CalculateInverseMatrix();
 
-        void CalculateGammas(Real64 const delt,           // Time increment in fraction of an hour
-                             int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
-        );
+        void CalculateGammas();
 
-        void CalculateCTFs(int &nrf,                    // Number of response factor terms
-                           int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
-        );
+        void CalculateCTFs();
+
+        void reportTransferFunction(OutputFiles &outputFiles, int const cCounter);
 
         bool isGlazingConstruction() const;
 
-        void SetFlagForWindowConstructionWithShadeOrBlindLayer();
-
         Real64 setUserTemperatureLocationPerpendicular(Real64 userValue);
 
-        void setNodeSourceAndUserTemp(int &sourceNodeLocation,
-                                      int &userTempNodeLocation,
-                                      Array1D_int & Nodes,
-                                      int NumOfPerpendNodes);
+        void setNodeSourceAndUserTemp(Array1D_int & Nodes);
     };
 }   // namespace Construction
 

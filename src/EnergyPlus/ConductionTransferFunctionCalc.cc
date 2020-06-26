@@ -48,9 +48,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/ConductionTransferFunctionCalc.hh>
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include "OutputFiles.hh"
 
@@ -89,10 +87,6 @@ namespace ConductionTransferFunctionCalc {
     // Dissertation, Department of Mechanical Engineering, University of
     // Wisconsin-Madison.
 
-    // Using/Aliasing
-    using namespace DataGlobals;
-    using namespace DataHeatBalance; // This is the Heat balance super block data-only module
-
     void InitConductionTransferFunctions(OutputFiles &outputFiles)
     {
         static bool ErrorsFound(false); // Flag for input error condition
@@ -124,7 +118,6 @@ namespace ConductionTransferFunctionCalc {
         General::ScanForReports("Constructions", DoReport, "Constructions");
 
         if (DoReport || DoReportBecauseError) {
-            //                                      Write Descriptions
             print(outputFiles.eio,
                   "! <Construction CTF>,Construction Name,Index,#Layers,#CTFs,Time Step {{hours}},ThermalConductance "
                   "{{w/m2-K}},OuterThermalAbsorptance,InnerThermalAbsorptance,OuterSolarAbsorptance,InnerSolarAbsorptance,Roughness\n");
@@ -134,96 +127,11 @@ namespace ConductionTransferFunctionCalc {
             print(outputFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
             print(outputFiles.eio, "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\n");
 
-            for (int ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
-
-                if (!dataConstruction.Construct(ThisNum).IsUsedCTF) continue;
-
-                static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
-                print(outputFiles.eio,
-                      Format_700,
-                      dataConstruction.Construct(ThisNum).Name,
-                      ThisNum,
-                      dataConstruction.Construct(ThisNum).TotLayers,
-                      dataConstruction.Construct(ThisNum).NumCTFTerms,
-                      dataConstruction.Construct(ThisNum).CTFTimeStep,
-                      dataConstruction.Construct(ThisNum).UValue,
-                      dataConstruction.Construct(ThisNum).OutsideAbsorpThermal,
-                      dataConstruction.Construct(ThisNum).InsideAbsorpThermal,
-                      dataConstruction.Construct(ThisNum).OutsideAbsorpSolar,
-                      dataConstruction.Construct(ThisNum).InsideAbsorpSolar,
-                      DisplayMaterialRoughness(dataConstruction.Construct(ThisNum).OutsideRoughness));
-
-                for (int I = 1; I <= dataConstruction.Construct(ThisNum).TotLayers; ++I) {
-                    int Layer = dataConstruction.Construct(ThisNum).LayerPoint(I);
-                    {
-                        auto const SELECT_CASE_var(dataMaterial.Material(Layer).Group);
-                        if (SELECT_CASE_var == Air) {
-                            static constexpr auto Format_702(" Material:Air,{},{:12.4N}\n");
-                            print(outputFiles.eio, Format_702, dataMaterial.Material(Layer).Name, dataMaterial.Material(Layer).Resistance);
-                        } else {
-                            static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
-                            print(outputFiles.eio,
-                                  Format_701,
-                                  dataMaterial.Material(Layer).Name,
-                                  dataMaterial.Material(Layer).Thickness,
-                                  dataMaterial.Material(Layer).Conductivity,
-                                  dataMaterial.Material(Layer).Density,
-                                  dataMaterial.Material(Layer).SpecHeat,
-                                  dataMaterial.Material(Layer).Resistance);
-                        }
-                    }
-                }
-
-                for (int I = dataConstruction.Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
-                    if (I != 0) {
-                        static constexpr auto Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
-                        print(outputFiles.eio,
-                              Format_703,
-                              I,
-                              dataConstruction.Construct(ThisNum).CTFOutside(I),
-                              dataConstruction.Construct(ThisNum).CTFCross(I),
-                              dataConstruction.Construct(ThisNum).CTFInside(I),
-                              dataConstruction.Construct(ThisNum).CTFFlux(I));
-                    } else {
-                        static constexpr auto Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-                        print(outputFiles.eio,
-                              Format_704,
-                              I,
-                              dataConstruction.Construct(ThisNum).CTFOutside(I),
-                              dataConstruction.Construct(ThisNum).CTFCross(I),
-                              dataConstruction.Construct(ThisNum).CTFInside(I));
-                    }
-                }
-
-                if (dataConstruction.Construct(ThisNum).SourceSinkPresent) {
-                    // QTFs...
-                    for (int I = dataConstruction.Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
-                        static constexpr auto Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
-                        print(outputFiles.eio, Format_705, I, dataConstruction.Construct(ThisNum).CTFSourceOut(I), dataConstruction.Construct(ThisNum).CTFSourceIn(I));
-                    }
-                    // QTFs for source/sink location temperature calculation...
-                    for (int I = dataConstruction.Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
-                        static constexpr auto Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-                        print(outputFiles.eio,
-                              Format_706,
-                              I,
-                              dataConstruction.Construct(ThisNum).CTFTSourceOut(I),
-                              dataConstruction.Construct(ThisNum).CTFTSourceIn(I),
-                              dataConstruction.Construct(ThisNum).CTFTSourceQ(I));
-                    }
-                    if (dataConstruction.Construct(ThisNum).TempAfterLayer != 0) {
-                        // QTFs for user specified interior temperature calculation...
-                        for (int I = dataConstruction.Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
-                            static constexpr auto Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-                            print(outputFiles.eio,
-                                  Format_707,
-                                  I,
-                                  dataConstruction.Construct(ThisNum).CTFTUserOut(I),
-                                  dataConstruction.Construct(ThisNum).CTFTUserIn(I),
-                                  dataConstruction.Construct(ThisNum).CTFTUserSource(I));
-                        }
-                    }
-                }
+            int cCounter = 0; // just used to keep construction index in output report
+            for (auto & construction : dataConstruction.Construct) {
+                cCounter++;
+                if (!construction.IsUsedCTF) continue;
+                construction.reportTransferFunction(outputFiles, cCounter);
             }
         }
     }
