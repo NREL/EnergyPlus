@@ -1197,7 +1197,7 @@ namespace SimulationManager {
                 bool overrideMaxZoneTempDiff(false);
                 bool overrideSystemTimestep(false);
                 bool overrideMaxAllowedDelTemp(false);
-                ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
+                // ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
                 dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
