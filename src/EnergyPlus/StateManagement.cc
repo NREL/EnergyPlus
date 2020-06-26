@@ -213,7 +213,6 @@
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowAC.hh>
-#include <EnergyPlus/WindowComplexManager.hh>
 
 void EnergyPlus::clearThisState(EnergyPlusData &state)
 {
@@ -385,6 +384,5 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     WaterUse::clear_state();
     WeatherManager::clear_state();
     WindowAC::clear_state();
-    dataWindowComplexManager.clear_state();
     ResultsFramework::clear_state();
 }

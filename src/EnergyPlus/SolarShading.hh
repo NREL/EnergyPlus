@@ -70,6 +70,7 @@ namespace EnergyPlus {
 
     // Forward Declarations
     struct EnergyPlusData;
+    struct WindowComplexManagerData;
     struct WindowEquivalentLayerData;
 
 namespace SolarShading {
@@ -295,7 +296,7 @@ namespace SolarShading {
                                  int const NS3  // Location to place results of overlap
     );
 
-    void CalcPerSolarBeam(Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
+    void CalcPerSolarBeam(WindowComplexManagerData &dataWindowComplexManager, Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
                           Real64 const AvgSinSolarDeclin, // Average value of Sine of Solar Declination for period
                           Real64 const AvgCosSolarDeclin  // Average value of Cosine of Solar Declination for period
     );
@@ -340,9 +341,9 @@ namespace SolarShading {
 
     void CalcAborbedOnExteriorOpaqueSurfaces();
 
-    void CalcInteriorSolarDistributionWCE(WindowManagerData &dataWindowManager);
+    void CalcInteriorSolarDistributionWCE(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager);
 
-    void CalcInteriorSolarDistributionWCESimple(WindowManagerData &dataWindowManager);
+    void CalcInteriorSolarDistributionWCESimple(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager);
 
     int WindowScheduledSolarAbs(int const SurfNum, // Surface number
                                 int const ConstNum // Construction number
@@ -352,7 +353,7 @@ namespace SolarShading {
                                  int const ConstNum // Construction number
     );
 
-    void PerformSolarCalculations();
+    void PerformSolarCalculations(WindowComplexManagerData &dataWindowComplexManager);
 
     void SHDRVL(int const HTSS,  // Heat transfer surface number of the subsurface
                 int const SBSNR, // Subsurface number
@@ -412,7 +413,7 @@ namespace SolarShading {
                                   int const ISurf                    // Surface number of the complex fenestration
     );
 
-    void TimestepInitComplexFenestration();
+    void TimestepInitComplexFenestration(WindowComplexManagerData &dataWindowComplexManager);
 
 } // namespace SolarShading
 

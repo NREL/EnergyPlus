@@ -4875,7 +4875,7 @@ namespace SolarShading {
         }
     }
 
-    void CalcPerSolarBeam(Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
+    void CalcPerSolarBeam(WindowComplexManagerData &dataWindowComplexManager, Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
                           Real64 const AvgSinSolarDeclin, // Average value of Sine of Solar Declination for period
                           Real64 const AvgCosSolarDeclin  // Average value of Cosine of Solar Declination for period
     )
@@ -4923,7 +4923,7 @@ namespace SolarShading {
         int TS;      // TimeStep Loop Countergit
         static bool Once(true);
 
-        if (Once) InitComplexWindows();
+        if (Once) InitComplexWindows(dataWindowComplexManager);
         Once = false;
 
         if (KickOffSizing || KickOffSimulation) return; // Skip solar calcs for these Initialization steps.
@@ -4973,7 +4973,7 @@ namespace SolarShading {
             FigureSunCosines(HourOfDay, TimeStep, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
         }
         // Initialize/update the Complex Fenestration geometry and optical properties
-        UpdateComplexWindows();
+        UpdateComplexWindows(dataWindowComplexManager);
         if (!DetailedSolarTimestepIntegration) {
             for (iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
@@ -8873,7 +8873,7 @@ namespace SolarShading {
         }
     }
 
-    void CalcInteriorSolarDistributionWCE(WindowManagerData &dataWindowManager)
+    void CalcInteriorSolarDistributionWCE(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8894,11 +8894,11 @@ namespace SolarShading {
         CalcAborbedOnExteriorOpaqueSurfaces();
 
         if (dataWindowManager.winOpticalModel->isSimplifiedModel()) {
-            CalcInteriorSolarDistributionWCESimple(dataWindowManager);
+            CalcInteriorSolarDistributionWCESimple(dataWindowComplexManager, dataWindowManager);
         } // else for built in BSDF (possible future implementation)
     }
 
-    void CalcInteriorSolarDistributionWCESimple(WindowManagerData &dataWindowManager)
+    void CalcInteriorSolarDistributionWCESimple(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8948,7 +8948,7 @@ namespace SolarShading {
                 }
                 auto &window = SurfaceWindow(SurfNum2);
                 Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum2);
-                std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(SurfNum2, BSDFHemisphere::Incoming);
+                std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(dataWindowComplexManager, SurfNum2, BSDFHemisphere::Incoming);
                 Real64 Theta = incomingAngle.first;
                 Real64 Phi = incomingAngle.second;
                 Real64 SunLitFract = SunlitFrac(TimeStep, HourOfDay, SurfNum2);
@@ -9171,7 +9171,7 @@ namespace SolarShading {
         return SurfaceScheduledSolarInc;
     }
 
-    void PerformSolarCalculations()
+    void PerformSolarCalculations(WindowComplexManagerData &dataWindowComplexManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9284,7 +9284,7 @@ namespace SolarShading {
                 }
             }
 
-            CalcPerSolarBeam(AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
+            CalcPerSolarBeam(dataWindowComplexManager, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
             // Calculate factors for solar reflection
             if (CalcSolRefl) {
@@ -12991,7 +12991,7 @@ namespace SolarShading {
         LOCHCA = 1;
     }
 
-    void TimestepInitComplexFenestration()
+    void TimestepInitComplexFenestration(WindowComplexManagerData &dataWindowComplexManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -13004,13 +13004,6 @@ namespace SolarShading {
         // complex fenestration have construction changed (by EMS) in which case performs addition of current states
         // into complex fenestration array
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using WindowComplexManager::CheckCFSStates;
 
         // Locals
@@ -13021,7 +13014,7 @@ namespace SolarShading {
         for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
             if (SurfaceWindow(iSurf).WindowModelType == WindowBSDFModel) {
                 // This will check complex fenestrations state and add new one if necessary (EMS case)
-                CheckCFSStates(iSurf);
+                CheckCFSStates(dataWindowComplexManager, iSurf);
 
                 NumOfStates = ComplexWind(iSurf).NumStates;
 

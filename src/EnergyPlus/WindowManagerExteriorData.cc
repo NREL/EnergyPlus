@@ -77,7 +77,7 @@ namespace WindowManager {
         return (DotProd > 0);
     }
 
-    std::pair<Real64, Real64> getWCECoordinates(int const t_SurfNum, Vector const &t_Ray, const BSDFHemisphere t_Direction)
+    std::pair<Real64, Real64> getWCECoordinates(WindowComplexManagerData &dataWindowComplexManager, int const t_SurfNum, Vector const &t_Ray, const BSDFHemisphere t_Direction)
     {
         Real64 Theta = 0;
         Real64 Phi = 0;
@@ -93,7 +93,7 @@ namespace WindowManager {
         }
 
         // get the corresponding local Theta, Phi for ray
-        W6CoordsFromWorldVect(t_Ray, RadType, Gamma, Alpha, Theta, Phi);
+        W6CoordsFromWorldVect(dataWindowComplexManager, t_Ray, RadType, Gamma, Alpha, Theta, Phi);
 
         Theta = 180 / Pi * Theta;
         Phi = 180 / Pi * Phi;
@@ -101,9 +101,9 @@ namespace WindowManager {
         return std::make_pair(Theta, Phi);
     }
 
-    std::pair<Real64, Real64> getSunWCEAngles(const int t_SurfNum, const BSDFHemisphere t_Direction)
+    std::pair<Real64, Real64> getSunWCEAngles(WindowComplexManagerData &dataWindowComplexManager, const int t_SurfNum, const BSDFHemisphere t_Direction)
     {
-        return getWCECoordinates(t_SurfNum, DataBSDFWindow::SUNCOSTS(TimeStep, HourOfDay, {1, 3}), t_Direction);
+        return getWCECoordinates(dataWindowComplexManager, t_SurfNum, DataBSDFWindow::SUNCOSTS(TimeStep, HourOfDay, {1, 3}), t_Direction);
     }
 
     ///////////////////////////////////////////////////////////////////////////////
