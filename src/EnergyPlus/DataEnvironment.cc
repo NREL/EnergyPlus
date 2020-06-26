@@ -188,6 +188,7 @@ namespace DataEnvironment {
     int TotalOverallSimDays;                  // Count of all possible simulation days in all environments
     int MaxNumberSimYears;                    // Maximum number of simulation years requested in all RunPeriod statements
     int RunPeriodStartDayOfWeek;              // Day of week of the first day of the run period. (or design day - day of week)
+    int RunPeriodStartJDay(1);                // Day of year of the first day of the run period. (or design day - day of week)
 
     Real64 CosSolarDeclinAngle; // Cosine of the solar declination angle
     Real64 EquationOfTime;      // Value of the equation of time formula
@@ -321,6 +322,7 @@ namespace DataEnvironment {
         TotalOverallSimDays = int();
         MaxNumberSimYears = int();
         RunPeriodStartDayOfWeek = int();
+        RunPeriodStartJDay = 1;
         CosSolarDeclinAngle = Real64();
         EquationOfTime = Real64();
         SinLatitude = Real64();

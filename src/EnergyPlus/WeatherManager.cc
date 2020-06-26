@@ -1281,6 +1281,7 @@ namespace WeatherManager {
                             RunPeriodStartDayOfWeek = TWeekDay;
                             WeekDayTypes = 0;
                             JDay5Start = General::OrdinalDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
+                            RunPeriodStartJDay = JDay5Start;
                             JDay5End = General::OrdinalDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
 
                             curSimDayForEndOfRunPeriod = Environment(Envrn).TotalDays;

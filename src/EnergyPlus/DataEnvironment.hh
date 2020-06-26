@@ -162,6 +162,7 @@ namespace DataEnvironment {
     extern int TotalOverallSimDays;                // Count of all possible simulation days in all environments
     extern int MaxNumberSimYears;                  // Maximum number of simulation years requested in all RunPeriod statements
     extern int RunPeriodStartDayOfWeek;            // Day of week of the first day of the run period. (or design day - day of week)
+    extern int RunPeriodStartJDay;                 // Day of year of the first day of the run period. (or design day - day of week)
 
     extern Real64 CosSolarDeclinAngle; // Cosine of the solar declination angle
     extern Real64 EquationOfTime;      // Value of the equation of time formula
