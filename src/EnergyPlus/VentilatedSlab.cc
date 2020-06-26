@@ -1473,7 +1473,8 @@ namespace VentilatedSlab {
             if ((VentSlab(Item).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
                 (VentSlab(Item).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(VentSlab(Item).HCoilName,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        VentSlab(Item).HCoilName,
                                         VentSlab(Item).HCoil_PlantTypeNum,
                                         VentSlab(Item).HWLoopNum,
                                         VentSlab(Item).HWLoopSide,
@@ -1499,7 +1500,8 @@ namespace VentilatedSlab {
             if ((VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling) ||
                 (VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(VentSlab(Item).CCoilPlantName,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        VentSlab(Item).CCoilPlantName,
                                         VentSlab(Item).CCoil_PlantTypeNum,
                                         VentSlab(Item).CWLoopNum,
                                         VentSlab(Item).CWLoopSide,
@@ -2564,10 +2566,10 @@ namespace VentilatedSlab {
                         CheckSteamCoilSchedule(
                             "Coil:Heating:Steam", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_ElectricCoilType) {
-                        CheckHeatingCoilSchedule(state, 
+                        CheckHeatingCoilSchedule(state,
                             "Coil:Heating:Electric", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_GasCoilType) {
-                        CheckHeatingCoilSchedule(state, 
+                        CheckHeatingCoilSchedule(state,
                             "Coil:Heating:Fuel", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else {
                     }
@@ -2605,10 +2607,10 @@ namespace VentilatedSlab {
                         CheckSteamCoilSchedule(
                             "Coil:Heating:Steam", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_ElectricCoilType) {
-                        CheckHeatingCoilSchedule(state, 
+                        CheckHeatingCoilSchedule(state,
                             "Coil:Heating:Electric", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_GasCoilType) {
-                        CheckHeatingCoilSchedule(state, 
+                        CheckHeatingCoilSchedule(state,
                             "Coil:Heating:Fuel", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else {
                     }
@@ -3241,7 +3243,7 @@ namespace VentilatedSlab {
 
             } // ...end of HEATING/COOLING IF-THEN block
 
-            CalcVentilatedSlabRadComps(Item, FirstHVACIteration);
+            CalcVentilatedSlabRadComps(state.dataZoneTempPredictorCorrector, Item, FirstHVACIteration);
 
         } // ...end of system ON/OFF IF-THEN block
 
@@ -3456,7 +3458,7 @@ namespace VentilatedSlab {
         PowerMet = QUnitOut;
     }
 
-    void CalcVentilatedSlabRadComps(int const Item,                          // System index in ventilated slab array
+    void CalcVentilatedSlabRadComps(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const Item,                          // System index in ventilated slab array
                                     bool const EP_UNUSED(FirstHVACIteration) // flag for 1st HVAV iteration in the time step !unused1208
     )
     {
@@ -3895,7 +3897,7 @@ namespace VentilatedSlab {
                 // SumHATsurf and the value originally calculated by the heat balance with a zero
                 // source for all radiant systems in the zone is the load met by the system (approximately).
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataZoneTempPredictorCorrector, ZoneNum);
 
             } // SYSCONFIG. SLABONLY&SLABANDZONE
 
@@ -4135,7 +4137,7 @@ namespace VentilatedSlab {
                 // source for all radiant systems in the zone is the load met by the system (approximately).
 
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataZoneTempPredictorCorrector);
 
             } // SeriesSlabs
 

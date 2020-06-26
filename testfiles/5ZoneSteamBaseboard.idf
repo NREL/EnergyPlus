@@ -3371,6 +3371,10 @@
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,Hourly;
 
+  Output:Variable,*,Boiler Heating Rate,Hourly;
+
+  Output:Variable,*,Boiler Steam Efficiency,Hourly;
+
 ! Reporting NODES Values
 
   Output:Variable,VAV SYS 1 Air Loop Outlet,System Node Temperature,hourly;

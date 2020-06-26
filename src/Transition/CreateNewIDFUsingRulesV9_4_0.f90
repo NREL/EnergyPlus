@@ -368,6 +368,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with C, insert the rules here
 
+              CASE('CONSTRUCTION:INTERNALSOURCE')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:5)=InArgs(1:5)
+                  OutArgs(6) = '0.0'
+                  OutArgs(7:CurArgs+1)=InArgs(6:CurArgs)
+                  CurArgs = CurArgs + 1
+
               ! If your original object starts with D, insert the rules here
 
               ! If your original object starts with E, insert the rules here
@@ -403,6 +411,27 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with W, insert the rules here
 
               ! If your original object starts with Z, insert the rules here
+
+              CASE('ZONEHVAC:HYBRIDUNITARYHVAC')
+                ObjectName = "ZoneHVAC:HybridUnitaryHVAC"
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  ! fields 1-14 same
+                  OutArgs(1:14)=InArgs(1:14)
+                  ! insert Fan Heat Included in Lookup Tables field
+                  OutArgs(15)='Yes'
+                  ! insert Fan Heat Gain Location
+                  OutArgs(16)=Blank
+                  ! insert Fan Heat Gain In Airstream Fraction field
+                  OutArgs(17)=Blank
+                  ! same Scaling Factor
+                  OutArgs(18)=InArgs(15)
+                  ! remove Number of Operating Modes
+                  OutArgs(19)=InArgs(17)
+                  ! all others equal
+                  OutArgs(20:CurArgs+2)=InArgs(18:CurArgs)
+                  CurArgs = CurArgs + 2
+                  NoDiff = .false.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                   Changes for report variables, meters, tables -- update names                                   !
