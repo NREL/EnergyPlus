@@ -889,8 +889,9 @@ These example simulations each takes about three minutes or less to try. If your
 
 % table X
 {\scriptsize
-\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.7in}p{0.65in}}
-\caption{PerfLog Energy Columns\label{table:perflog_mode_columns_energy}} \tabularnewline
+\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.55in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.7in}p{0.55in}}
+% \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.7in}p{0.65in}}
+\caption{PerfLog Energy Columns\label{table:perflog_energy_columns}} \tabularnewline
 \toprule
 Run & 
 Direct Coil & 
@@ -898,7 +899,7 @@ Radiant Algorithm &
 Override Mode & 
   Electricity {[}MJ{]} &
   Natural Gas {[}MJ{]} &
-  Water {[}m3{]} &
+  Water {[}m$^3${]} &
   Runtime {[}second{]} \tabularnewline
 \midrule
 \endfirsthead
@@ -929,18 +930,19 @@ The CarrollMRT options seem to have a much more significant impact on the natura
 
 % table X
 {\scriptsize
-\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.6in}p{0.65in}}
-\caption{PerfLog Oscillation Columns\label{table:perflog_mode_columns_oscillation}} \tabularnewline
+\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.55in}p{0.7in}p{0.5in}p{0.6in}p{0.7in}p{0.6in}p{0.6in}}
+% \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.6in}p{0.65in}}
+\caption{PerfLog Oscillation Columns\label{table:perflog_oscillation_columns}} \tabularnewline
 \toprule
 Run & 
 Direct Coil & 
 Radiant Algorithm & 
 Override Mode & 
-  Oscillating {[}hours{]} &
-  Oscillating Occupancy {[}hours{]} &
-  Oscillating Deadband {[}hours{]} &
+  Oscillating {[}hour{]} &
+  Oscillating Occupancy {[}hour{]} &
+  Oscillating Deadband {[}hour{]} &
   Warnings &
-  Runtime {[}seconds{]} \tabularnewline
+  Runtime {[}second{]} \tabularnewline
 \midrule
 \endfirsthead
 
