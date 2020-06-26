@@ -983,7 +983,7 @@ Although this input field may eventually affect all coils, the current implement
 The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below
 
 \begin{equation}
-% {\left {PLR}\right} = \frac{SystemLoad-OutputOff}{OutputFull - OutputOff}
+\textnormal{PLR} = \frac{\textnormal{SystemLoad}-\textnormal{OutputOff}}{\textnormal{OutputFull}-\textnormal{OutputOff}}
 \end{equation}
 
 where
@@ -999,7 +999,7 @@ OutputFull = System output at PLR = 1 as full output
 The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below
 
 \begin{equation}
-{\left {SpeedRatio}\right} = \frac{SystemLoad-OutputFull_{i-1}}{OutputFull_{i} - OutputFull_{i-1}}
+\textnormal{SpeedRatio} = \frac{SystemLoad-OutputFull_{i-1}}{OutputFull_{i} - OutputFull_{i-1}}
 \end{equation}
 
 where
