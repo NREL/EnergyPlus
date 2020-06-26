@@ -572,7 +572,7 @@ int AbortEnergyPlus(EnergyPlusData &state)
     }
 
     if (AskForSurfacesReport) {
-        ReportSurfaces();
+        ReportSurfaces(OutputFiles::getSingleton());
     }
 
     ReportSurfaceErrors();
