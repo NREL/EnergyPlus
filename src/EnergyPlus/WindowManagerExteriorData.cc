@@ -47,6 +47,7 @@
 
 #include <cassert>
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -85,10 +86,10 @@ namespace WindowManager {
         Real64 Gamma = DegToRadians * Surface(t_SurfNum).Tilt;
         Real64 Alpha = DegToRadians * Surface(t_SurfNum).Azimuth;
 
-        int RadType = Front_Incident;
+        int RadType = dataWindowComplexManager.Front_Incident;
 
         if (t_Direction == BSDFHemisphere::Outgoing) {
-            RadType = Back_Incident;
+            RadType = dataWindowComplexManager.Back_Incident;
         }
 
         // get the corresponding local Theta, Phi for ray

@@ -53,8 +53,12 @@
 #include <vector>
 
 #include <EnergyPlus/Vectors.hh>
+#include <EnergyPlus/WindowComplexManager.hh>
 
 namespace EnergyPlus {
+
+    struct WindowComplexManagerData;
+
 namespace DataHeatBalance {
     struct MaterialProperties;
 }

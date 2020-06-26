@@ -385,6 +385,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     WaterUse::clear_state();
     WeatherManager::clear_state();
     WindowAC::clear_state();
-    WindowComplexManager::clear_state();
+    dataWindowComplexManager.clear_state();
     ResultsFramework::clear_state();
 }

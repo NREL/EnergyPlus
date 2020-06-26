@@ -59,6 +59,9 @@
 
 namespace EnergyPlus {
 
+    //forward declaration
+    struct WindowComplexManagerData;
+
 namespace WindowComplexManager {
 
     // Using/Aliasing
@@ -70,34 +73,6 @@ namespace WindowComplexManager {
     using DataBSDFWindow::BSDFWindowGeomDescr;
     using DataBSDFWindow::BSDFWindowInputStruct;
     using DataVectorTypes::Vector;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
-    extern Real64 const sigma; // Stefan-Boltzmann constant
-    extern Real64 const PressureDefault;
-
-    extern int const Calculate_Geometry;
-    extern int const Copy_Geometry;
-
-    extern int const TmpLen; // Length increment of temporary arrays
-
-    extern int const Front_Incident; // Ray identification types
-    extern int const Front_Transmitted;
-    extern int const Front_Reflected;
-    extern int const Back_Incident;
-    extern int const Back_Transmitted;
-    extern int const Back_Reflected;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumComplexWind; // Total number of complex windows
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE WindowComplexManager:
-
-    // Types
 
     struct WindowIndex
     {
@@ -131,14 +106,9 @@ namespace WindowComplexManager {
         }
     };
 
-    // Object Data
-    extern Array1D<BasisStruct> BasisList;
-    extern Array1D<WindowIndex> WindowList;
-    extern Array2D<WindowStateIndex> WindowStateList;
-
     // Functions
 
-    void clear_state();
+    //void clear_state();
 
     void InitBSDFWindows();
 
@@ -258,6 +228,49 @@ namespace WindowComplexManager {
     //=================================================================================================
 
 } // namespace WindowComplexManager
+
+    struct WindowComplexManagerData {
+
+        Real64 const sigma; // Stefan-Boltzmann constant
+        Real64 const PressureDefault;
+
+        int const Calculate_Geometry;
+        int const Copy_Geometry;
+
+        int const TmpLen; // Length increment of temporary arrays
+
+        int const Front_Incident; // Ray identification types
+        int const Front_Transmitted;
+        int const Front_Reflected;
+        int const Back_Incident;
+        int const Back_Transmitted;
+        int const Back_Reflected;
+
+        int NumComplexWind; // Total number of complex windows
+
+        Array1D<DataBSDFWindow::BasisStruct> BasisList;
+        Array1D<WindowComplexManager::WindowIndex> WindowList;
+        Array2D<WindowComplexManager::WindowStateIndex> WindowStateList;
+
+        void clear_state() //override
+        {
+            NumComplexWind = 0;
+            BasisList.deallocate();
+            WindowList.deallocate();
+            WindowStateList.deallocate();
+        }
+
+        // Default Constructor
+        WindowComplexManagerData()
+            : sigma(5.6697e-8), PressureDefault(101325.0), Calculate_Geometry(1), Copy_Geometry(2),
+            TmpLen(20), Front_Incident(1), Front_Transmitted(2), Front_Reflected(3), Back_Incident(4),
+            Back_Transmitted(5), Back_Reflected(6), NumComplexWind(0)
+        {
+        }
+
+    };
+
+    extern WindowComplexManagerData dataWindowComplexManager;
 
 } // namespace EnergyPlus
 
