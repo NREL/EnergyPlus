@@ -1467,8 +1467,9 @@ namespace SimulationManager {
         UtilityRoutines::appendPerfLog("Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
         UtilityRoutines::appendPerfLog("Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
         UtilityRoutines::appendPerfLog("SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
+        UtilityRoutines::appendPerfLog("Minimum System Timestep", General::RoundSigDigits(DataConvergParams::MinTimeStepSys));
         UtilityRoutines::appendPerfLog("MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 2));
-    }
+        UtilityRoutines::appendPerfLog("MaxAllowedDelTemp", General::RoundSigDigits(DataConvergParams::MaxAllowedDelTempOverrideValue, 4));    }
 
     std::string bool_to_string(bool logical)
     {
