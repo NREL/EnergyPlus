@@ -106,18 +106,6 @@ namespace ConductionTransferFunctionCalc {
 
     void InitConductionTransferFunctions(OutputFiles &outputFiles);
 
-    void CalculateExponentialMatrix(Real64 &delt); // Time step of the resulting CTFs
-
-    void CalculateInverseMatrix();
-
-    void CalculateGammas(Real64 const delt,           // Time increment in fraction of an hour
-                         int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
-    );
-
-    void CalculateCTFs(int &nrf,                    // Number of response factor terms
-                       int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
-    );
-
     void ReportCTFs(EnergyPlus::OutputFiles &outputFiles, bool const DoReportBecauseError);
 
 } // namespace ConductionTransferFunctionCalc
