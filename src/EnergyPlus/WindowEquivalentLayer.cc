@@ -993,7 +993,7 @@ namespace WindowEquivalentLayer {
         return P01;
     }
 
-    Real64 HEMINT(WindowEquivalentLayerData &dataWindowEquivalentLayer, std::function<Real64(Real64 const THETA, int const OPT, const Array1D<Real64> &)> F, // property integrand function
+    Real64 HEMINT(WindowEquivalentLayerData &dataWindowEquivalentLayer, std::function<Real64(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const THETA, int const OPT, const Array1D<Real64> &)> F, // property integrand function
                   int const F_Opt,                                                                   // options passed to F() (hipRHO, hipTAU)
                   const Array1D<Real64> &F_P                                                          // parameters passed to F()
     )
@@ -1042,7 +1042,7 @@ namespace WindowEquivalentLayer {
                     //   evaluate integrand function for new X values
                     //   2 * sin( x) * cos( x) covers hemisphere with single integral
                     X = X1 + I * DX;
-                    FX = 2.0 * std::sin(X) * std::cos(X) * F(X, F_Opt, F_P);
+                    FX = 2.0 * std::sin(X) * std::cos(X) * F(dataWindowEquivalentLayer, X, F_Opt, F_P);
                     if (K == 1) FX /= 2.0;
                     SUM += FX;
                 }

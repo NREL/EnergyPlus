@@ -471,7 +471,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     GetProjectControlData(state, state.outputFiles, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
-    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data
@@ -682,7 +682,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool FoundError = false;
-    GetMaterialData(state.outputFiles, FoundError);
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, FoundError);
     GetConstructData(FoundError);
     GetZoneData(FoundError); // Read Zone data from input file
     DataHeatBalance::AnyCTF = true;
@@ -915,7 +915,7 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
 
     // Prepare data for the test
     ASSERT_TRUE(process_idf(idf_objects));
-    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);
     GetConstructData(ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);
@@ -3579,7 +3579,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     GetProjectControlData(state, state.outputFiles, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
-    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data
@@ -3692,7 +3692,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Material and Construction, and expect no errors
-    GetMaterialData(state.outputFiles, ErrorsFound);
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -4047,7 +4047,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Materials
-    GetMaterialData(state.outputFiles, ErrorsFound);
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Construction
     GetConstructData(ErrorsFound);
@@ -4385,7 +4385,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Materials
-    GetMaterialData(state.outputFiles, ErrorsFound);
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Construction
     GetConstructData(ErrorsFound);
@@ -4817,7 +4817,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data
@@ -4955,7 +4955,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data
@@ -5096,7 +5096,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data
@@ -5344,7 +5344,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data

@@ -622,7 +622,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     HeatBalanceManager::SetPreConstructionInputParameters();
     ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state.outputFiles, FoundError);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -1021,7 +1021,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     HeatBalanceManager::SetPreConstructionInputParameters();
     ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state.outputFiles, FoundError);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -1429,7 +1429,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     HeatBalanceManager::SetPreConstructionInputParameters();
     ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state.outputFiles, FoundError);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -1799,7 +1799,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     HeatBalanceManager::SetPreConstructionInputParameters();
     ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state.outputFiles, FoundError);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);

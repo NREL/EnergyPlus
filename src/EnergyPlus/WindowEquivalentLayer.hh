@@ -113,7 +113,7 @@ namespace WindowEquivalentLayer {
                std::string const &WHAT // identifier for err msg
     );
 
-    Real64 HEMINT(WindowEquivalentLayerData &dataWindowEquivalentLayer, std::function<Real64(Real64 const THETA, int const OPT, const Array1D<Real64> &)> F, // property integrand function
+    Real64 HEMINT(WindowEquivalentLayerData &dataWindowEquivalentLayer, std::function<Real64(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const THETA, int const OPT, const Array1D<Real64> &)> F, // property integrand function
                   int const F_Opt,                                                                   // options passed to F() (hipRHO, hipTAU)
                   const Array1D<Real64> &F_P                                                          // parameters passed to F()
     );
