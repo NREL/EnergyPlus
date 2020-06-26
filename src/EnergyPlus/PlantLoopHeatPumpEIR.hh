@@ -54,12 +54,13 @@
 #include <vector>
 
 // EnergyPlus headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/WaterToWaterHeatPumps.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace EIRPlantLoopHeatPumps {
 
