@@ -889,7 +889,7 @@ These example simulations each takes about three minutes or less to try. If your
 
 % table X
 {\scriptsize
-\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.55in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.7in}p{0.55in}}
+\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.55in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.6in}}
 % \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.7in}p{0.65in}}
 \caption{PerfLog Energy Columns\label{table:perflog_energy_columns}} \tabularnewline
 \toprule
@@ -994,7 +994,7 @@ SystemLoad = Load requested to meet thermostat setpoint;
 
 OutputOff = System output at PLR = 0 as coil off;
 
-OutputFull = System output at PLR = 1 as full output;
+OutputFull = System output at PLR = 1 as full output.
 
 The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below: 
 
@@ -1014,7 +1014,7 @@ OutputFull$_{i-1}$ = System full output at the lower speed.
 
 Note: When a DX cooling coil with a constant volume fan is used, latent degradation is disabled.
 
-When coils of Coil:Cooling:DX:VariableSpeed, Coil:Heating:DX:SingleSpeed, and Coil:Heating:DX:VariableSpeed are applied, the desired outlet temperature are used to determine part load ratio or speed ratio.
+When coils of Coil:Cooling:DX:VariableSpeed, Coil:Heating:DX:SingleSpeed, and Coil:Heating:DX:VariableSpeed are applied, the desired outlet temperature is used to determine part load ratio or speed ratio.
 
 The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below:
 
@@ -1030,9 +1030,9 @@ DesOutTemp = Desired outlet temperature to meet setpoint;
 
 InletTemp = Inlet temperature;
 
-OutTemptFull = Outlet temperature at PLR =1 as full output.
+OutTemptFull = Outlet temperature at PLR = 1 as full output.
 
-The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below
+The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below:
 
 \begin{equation}
 \textnormal{SpeedRatio} = \frac{\textnormal{DesOutTemp} - \textnormal{OutTempFull}_{i-1}}{\textnormal{OutTempFull}_{i} - \textnormal{OutTempFull}_{i-1}}
@@ -1084,8 +1084,8 @@ Mode & Description \tabularnewline
 \midrule
 \endfirsthead
 
-Normal & no overrides\tabularnewline
-Mode01 & Zone Time step (TimeStep object) will be set to one timestep per hour\tabularnewline
+Normal & No overrides\tabularnewline
+Mode01 & Zone time step (TimeStep object) will be set to one timestep per hour\tabularnewline
 Mode02 & Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler\tabularnewline
 Mode03 & Mode02 plus Minimum Number of Warmup Days will be set to 1\tabularnewline
 Mode04 & Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets\tabularnewline
