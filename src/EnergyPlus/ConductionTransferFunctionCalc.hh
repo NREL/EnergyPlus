@@ -53,9 +53,6 @@ namespace EnergyPlus {
 
 namespace ConductionTransferFunctionCalc {
 
-    void InitConductionTransferFunctions(OutputFiles &outputFiles);
-
-    void ReportCTFs(EnergyPlus::OutputFiles &outputFiles, bool const DoReportBecauseError);
 
 } // namespace ConductionTransferFunctionCalc
 

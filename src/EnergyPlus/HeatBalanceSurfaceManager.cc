@@ -1370,8 +1370,8 @@ namespace HeatBalanceSurfaceManager {
         QRadSWInAbs.dimension(TotSurfaces, 0.0);
         InitialDifSolInAbs.dimension(TotSurfaces, 0.0);
         InitialDifSolInTrans.dimension(TotSurfaces, 0.0);
-        QRadSWwinAbs.dimension(Construction::CFSMAXNL + 1, TotSurfaces, 0.0);
-        InitialDifSolwinAbs.dimension(Construction::CFSMAXNL, TotSurfaces, 0.0);
+        QRadSWwinAbs.dimension(DataWindowEquivalentLayer::CFSMAXNL + 1, TotSurfaces, 0.0);
+        InitialDifSolwinAbs.dimension(DataWindowEquivalentLayer::CFSMAXNL, TotSurfaces, 0.0);
         QRadSWOutMvIns.dimension(TotSurfaces, 0.0);
         QRadThermInAbs.dimension(TotSurfaces, 0.0);
         QAdditionalHeatSourceOutside.dimension(TotSurfaces, 0.0);

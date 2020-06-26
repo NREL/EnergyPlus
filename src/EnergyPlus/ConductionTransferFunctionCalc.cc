@@ -87,54 +87,6 @@ namespace ConductionTransferFunctionCalc {
     // Dissertation, Department of Mechanical Engineering, University of
     // Wisconsin-Madison.
 
-    void InitConductionTransferFunctions(OutputFiles &outputFiles)
-    {
-        static bool ErrorsFound(false); // Flag for input error condition
-        bool DoCTFErrorReport(false);
-        for (auto & construction : dataConstruction.Construct) {
-            construction.calculateTransferFunction(ErrorsFound, DoCTFErrorReport);
-        }
-        ReportCTFs(outputFiles, DoCTFErrorReport);
-        if (ErrorsFound) {
-            ShowFatalError("Program terminated for reasons listed (InitConductionTransferFunctions)");
-        }
-    }
-
-    void ReportCTFs(OutputFiles &outputFiles, bool const DoReportBecauseError)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   July 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This routine gives a detailed report to the user about
-        // the conduction transfer functions and other thermal data
-        // of each construction.
-
-        bool DoReport;
-        General::ScanForReports("Constructions", DoReport, "Constructions");
-
-        if (DoReport || DoReportBecauseError) {
-            print(outputFiles.eio,
-                  "! <Construction CTF>,Construction Name,Index,#Layers,#CTFs,Time Step {{hours}},ThermalConductance "
-                  "{{w/m2-K}},OuterThermalAbsorptance,InnerThermalAbsorptance,OuterSolarAbsorptance,InnerSolarAbsorptance,Roughness\n");
-            print(outputFiles.eio,
-                  "! <Material CTF Summary>,Material Name,Thickness {{m}},Conductivity {{w/m-K}},Density {{kg/m3}},Specific Heat "
-                  "{{J/kg-K}},ThermalResistance {{m2-K/w}}\n");
-            print(outputFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
-            print(outputFiles.eio, "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\n");
-
-            int cCounter = 0; // just used to keep construction index in output report
-            for (auto & construction : dataConstruction.Construct) {
-                cCounter++;
-                if (!construction.IsUsedCTF) continue;
-                construction.reportTransferFunction(outputFiles, cCounter);
-            }
-        }
-    }
 
 } // namespace ConductionTransferFunctionCalc
 

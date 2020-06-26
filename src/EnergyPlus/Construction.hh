@@ -63,10 +63,6 @@ struct ConstructionData;
 
 namespace Construction {
 
-    using DataBSDFWindow::BSDFWindowInputStruct;
-    using DataSurfaces::MaxSlatAngs;
-    using DataWindowEquivalentLayer::CFSMAXNL;
-
     int constexpr MaxLayersInConstruct(11);  // Maximum number of layers allowed in a single construction
     int constexpr MaxCTFTerms(19);           // Maximum number of CTF terms allowed to still allow stability
     // Note Sync with SurfaceGroundHeatExchanger::local::MaxCTFTerms
@@ -239,7 +235,7 @@ namespace Construction {
         bool ReverseConstructionNumLayersWarning;
         bool ReverseConstructionLayersOrderWarning;
         // Complex Fenestration
-        BSDFWindowInputStruct BSDFInput; // nest structure with user input for complex fenestration
+        DataBSDFWindow::BSDFWindowInputStruct BSDFInput; // nest structure with user input for complex fenestration
         // EquivalentLayer Window
         bool WindowTypeEQL;              // True for equivalent layer window, false otherwise
         int EQLConsPtr;                  // Pointer to equivalent Layer window construction
@@ -287,15 +283,15 @@ namespace Construction {
               CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0), CTFTUserOut({0, MaxCTFTerms - 1}, 0.0),
               CTFTUserIn({0, MaxCTFTerms - 1}, 0.0), CTFTUserSource({0, MaxCTFTerms - 1}, 0.0), NumHistories(0), NumCTFTerms(0), UValue(0.0),
               SolutionDimensions(0), SourceAfterLayer(0), TempAfterLayer(0), ThicknessPerpend(0.0), userTemperatureLocationPerpendicular(0.0),
-              AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiff(DataHeatBalance::MaxSolidWinLayers, 0.0), BlAbsDiff(MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0),
-              BlAbsDiffGnd(MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), BlAbsDiffSky(MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffBack(DataHeatBalance::MaxSolidWinLayers, 0.0),
-              BlAbsDiffBack(MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffShade(0.0), AbsDiffBlind(MaxSlatAngs, 0.0),
-              AbsDiffBlindGnd(MaxSlatAngs, 0.0), AbsDiffBlindSky(MaxSlatAngs, 0.0), AbsDiffBackShade(0.0), AbsDiffBackBlind(MaxSlatAngs, 0.0),
+              AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiff(DataHeatBalance::MaxSolidWinLayers, 0.0), BlAbsDiff(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0),
+              BlAbsDiffGnd(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), BlAbsDiffSky(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffBack(DataHeatBalance::MaxSolidWinLayers, 0.0),
+              BlAbsDiffBack(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffShade(0.0), AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0),
+              AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBackShade(0.0), AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0),
               ShadeAbsorpThermal(0.0), AbsBeamCoef(6, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsBeamBackCoef(6, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsBeamShadeCoef(6, 0.0),
-              TransDiff(0.0), BlTransDiff(MaxSlatAngs, 0.0), BlTransDiffGnd(MaxSlatAngs, 0.0), BlTransDiffSky(MaxSlatAngs, 0.0), TransDiffVis(0.0),
-              BlTransDiffVis(MaxSlatAngs, 0.0), ReflectSolDiffBack(0.0), BlReflectSolDiffBack(MaxSlatAngs, 0.0), ReflectSolDiffFront(0.0),
-              BlReflectSolDiffFront(MaxSlatAngs, 0.0), ReflectVisDiffBack(0.0), BlReflectVisDiffBack(MaxSlatAngs, 0.0), ReflectVisDiffFront(0.0),
-              BlReflectVisDiffFront(MaxSlatAngs, 0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0), ReflSolBeamFrontCoef(6, 0.0),
+              TransDiff(0.0), BlTransDiff(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffGnd(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffSky(DataSurfaces::MaxSlatAngs, 0.0), TransDiffVis(0.0),
+              BlTransDiffVis(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffBack(0.0), BlReflectSolDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffFront(0.0),
+              BlReflectSolDiffFront(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffBack(0.0), BlReflectVisDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffFront(0.0),
+              BlReflectVisDiffFront(DataSurfaces::MaxSlatAngs, 0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0), ReflSolBeamFrontCoef(6, 0.0),
               ReflSolBeamBackCoef(6, 0.0), tBareSolCoef(6, 5, 0.0), tBareVisCoef(6, 5, 0.0), rfBareSolCoef(6, 5, 0.0), rfBareVisCoef(6, 5, 0.0),
               rbBareSolCoef(6, 5, 0.0), rbBareVisCoef(6, 5, 0.0), afBareSolCoef(6, 5, 0.0), abBareSolCoef(6, 5, 0.0), tBareSolDiff(5, 0.0),
               tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0), rfBareVisDiff(5, 0.0), rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0), afBareSolDiff(5, 0.0),
@@ -304,7 +300,7 @@ namespace Construction {
               WindowTypeBSDF(false), TypeIsEcoRoof(false), TypeIsIRT(false), TypeIsCfactorWall(false), TypeIsFfactorFloor(false), TCFlag(0),
               TCLayer(0), TCMasterConst(0), TCLayerID(0), TCGlassID(0), CFactor(0.0), Height(0.0), FFactor(0.0), Area(0.0), PerimeterExposed(0.0),
               ReverseConstructionNumLayersWarning(false), ReverseConstructionLayersOrderWarning(false), WindowTypeEQL(false), EQLConsPtr(0),
-              AbsDiffFrontEQL(CFSMAXNL, 0.0), AbsDiffBackEQL(CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false),
+              AbsDiffFrontEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), AbsDiffBackEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false),
               TypeIsAirBoundarySolar(false), TypeIsAirBoundaryInteriorWindow(false), TypeIsAirBoundaryGroupedRadiant(false),
               TypeIsAirBoundaryIRTSurface(false), TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0),
               AirBoundaryMixingSched(0), rcmax(0), NodeSource(0), NodeUserTemp(0)

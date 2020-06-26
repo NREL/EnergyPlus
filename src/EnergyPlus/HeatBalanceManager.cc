@@ -9359,6 +9359,39 @@ namespace HeatBalanceManager {
         if (ErrorsFound) ShowFatalError("Error in complex fenestration input.");
     }
 
+    void InitConductionTransferFunctions(OutputFiles &outputFiles)
+    {
+        static bool ErrorsFound(false); // Flag for input error condition
+        bool DoCTFErrorReport(false);
+        for (auto & construction : dataConstruction.Construct) {
+            construction.calculateTransferFunction(ErrorsFound, DoCTFErrorReport);
+        }
+
+        bool DoReport;
+        General::ScanForReports("Constructions", DoReport, "Constructions");
+        if (DoReport || DoCTFErrorReport) {
+            print(outputFiles.eio,
+                  "! <Construction CTF>,Construction Name,Index,#Layers,#CTFs,Time Step {{hours}},ThermalConductance "
+                  "{{w/m2-K}},OuterThermalAbsorptance,InnerThermalAbsorptance,OuterSolarAbsorptance,InnerSolarAbsorptance,Roughness\n");
+            print(outputFiles.eio,
+                  "! <Material CTF Summary>,Material Name,Thickness {{m}},Conductivity {{w/m-K}},Density {{kg/m3}},Specific Heat "
+                  "{{J/kg-K}},ThermalResistance {{m2-K/w}}\n");
+            print(outputFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
+            print(outputFiles.eio, "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\n");
+
+            int cCounter = 0; // just used to keep construction index in output report
+            for (auto & construction : dataConstruction.Construct) {
+                cCounter++;
+                if (!construction.IsUsedCTF) continue;
+                construction.reportTransferFunction(outputFiles, cCounter);
+            }
+        }
+
+        if (ErrorsFound) {
+            ShowFatalError("Program terminated for reasons listed (InitConductionTransferFunctions)");
+        }
+    }
+
 } // namespace HeatBalanceManager
 
 } // namespace EnergyPlus
