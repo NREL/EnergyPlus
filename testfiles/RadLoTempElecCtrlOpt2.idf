@@ -2216,7 +2216,7 @@
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     1.9637972000759794,      !- Fraction of Autosized Heating Design Capacity
     SurfaceInteriorTemperature,    !- Temperature Control Type
-    2.0,                     !- Heating Throttling Range {deltaC}
+    0.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints 3;  !- Heating Setpoint Temperature Schedule Name
 
   AirLoopHVAC:ZoneSplitter,

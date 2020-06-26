@@ -371,7 +371,7 @@ namespace LowTempRadiantSystem {
         using namespace DataSurfaceLists;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MinThrottlingRange(0.5); // Smallest throttling range allowed in degrees Celsius
+        Real64 const MinThrottlingRange(0.0); // Smallest throttling range allowed in degrees Celsius
         static std::string const RoutineName("GetLowTempRadiantSystem: "); // include trailing blank space
         static std::string const Off("Off");
         static std::string const SimpleOff("SimpleOff");
@@ -668,7 +668,7 @@ namespace LowTempRadiantSystem {
 
             thisRadSys.HotThrottlRange = Numbers(7);
             if (thisRadSys.HotThrottlRange < MinThrottlingRange) {
-                ShowWarningError("ZoneHVAC:LowTemperatureRadiant:VariableFlow: Heating throttling range too small, reset to 0.5");
+                ShowWarningError("ZoneHVAC:LowTemperatureRadiant:VariableFlow: Heating throttling range too small, reset to 0");
                 ShowContinueError("Occurs in Radiant System=" + thisRadSys.Name);
                 thisRadSys.HotThrottlRange = MinThrottlingRange;
             }
@@ -764,7 +764,7 @@ namespace LowTempRadiantSystem {
 
             thisRadSys.ColdThrottlRange = Numbers(12);
             if (thisRadSys.ColdThrottlRange < MinThrottlingRange) {
-                ShowWarningError("ZoneHVAC:LowTemperatureRadiant:VariableFlow: Cooling throttling range too small, reset to 0.5");
+                ShowWarningError("ZoneHVAC:LowTemperatureRadiant:VariableFlow: Cooling throttling range too small, reset to 0");
                 ShowContinueError("Occurs in Radiant System=" + thisRadSys.Name);
                 thisRadSys.ColdThrottlRange = MinThrottlingRange;
             }
@@ -1229,7 +1229,7 @@ namespace LowTempRadiantSystem {
 
             thisElecSys.ThrottlRange = Numbers(4);
             if (thisElecSys.ThrottlRange < MinThrottlingRange) {
-                ShowWarningError(cNumericFields(4) + " out of range, reset to 0.5");
+                ShowWarningError(cNumericFields(4) + " out of range, reset to 0");
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 thisElecSys.ThrottlRange = MinThrottlingRange;
             }
@@ -3110,12 +3110,12 @@ namespace LowTempRadiantSystem {
                     OperatingMode = HeatingMode;
                     ControlNode = this->HotWaterInNode;
                     MaxWaterFlow = this->WaterFlowMaxHeat;
-                    MassFlowFrac = (OffTempHeat - ControlTemp) / this->HotThrottlRange;
+                    MassFlowFrac = this->calculateOperationalFraction(OffTempHeat, ControlTemp, this->HotThrottlRange);
                 } else if (ControlTemp > OffTempCool && this->CoolingSystem) { // Cooling mode
                     OperatingMode = CoolingMode;
                     ControlNode = this->ColdWaterInNode;
                     MaxWaterFlow = this->WaterFlowMaxCool;
-                    MassFlowFrac = (ControlTemp - OffTempCool) / this->ColdThrottlRange;
+                    MassFlowFrac = this->calculateOperationalFraction(OffTempCool, ControlTemp, this->ColdThrottlRange);
                 } else { // ControlTemp is between OffTempHeat and OffTempCool--unit should not run
                     MassFlowFrac = 0.0;
                 }
@@ -4776,9 +4776,7 @@ namespace LowTempRadiantSystem {
 
                 OperatingMode = HeatingMode;
 
-                HeatFrac = (OffTemp - ControlTemp) / this->ThrottlRange;
-                if (HeatFrac < 0.0) HeatFrac = 0.0;
-                if (HeatFrac > 1.0) HeatFrac = 1.0;
+                HeatFrac = this->calculateOperationalFraction(OffTemp, ControlTemp, this->ThrottlRange);
 
                 // Set the heat source for the low temperature electric radiant system
                 for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
@@ -5091,6 +5089,21 @@ namespace LowTempRadiantSystem {
             return 0.0; // hush the compiler
         }
     }
+
+    Real64 RadiantSystemBaseData::calculateOperationalFraction(Real64 const offTemperature, Real64 const controlTemperature, Real64 const throttlingRange)
+    {
+        Real64 temperatureDifference = std::abs(offTemperature - controlTemperature);
+        if (temperatureDifference <= 0.0) {
+            return 0.0; // No temperature difference--turn things off (set to zero); technically shouldn't happen
+        } else if (throttlingRange < 0.001) {
+            return 1.0; // Throttling range is essentially zero and there is a temperature difference--turn it full on
+        } else if (temperatureDifference >= throttlingRange) {
+            return 1.0; // Throttling range non-zero and temperature difference greater than the throttling range--turn it full on
+        } else {
+            return temperatureDifference/throttlingRange;   // Temperature difference is non-zero and less than the throttling range--calculate the operation fraction
+        }
+    }
+
 
     Real64 HydronicSystemBaseData::calculateHXEffectivenessTerm(Real64 const Temperature,   // Temperature of water entering the radiant system, in C
                                                                 Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s
