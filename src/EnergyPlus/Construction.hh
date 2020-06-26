@@ -317,13 +317,13 @@ namespace Construction {
 
         void calculateTransferFunction(bool & ErrorsFound, bool & DoCTFErrorReport);
 
-        void CalculateExponentialMatrix(); // Time step of the resulting CTFs
+        void calculateExponentialMatrix(); // Time step of the resulting CTFs
 
-        void CalculateInverseMatrix();
+        void calculateInverseMatrix();
 
-        void CalculateGammas();
+        void calculateGammas();
 
-        void CalculateCTFs();
+        void calculateFinalCoefficients();
 
         void reportTransferFunction(OutputFiles &outputFiles, int const cCounter);
 

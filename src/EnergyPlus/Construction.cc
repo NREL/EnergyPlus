@@ -865,17 +865,17 @@ namespace Construction {
                     DisplayString("Calculating CTFs for \"" + this->Name + "\"");
 
                     //          CALL DisplayNumberAndString(ConstrNum,'Matrix exponential for Construction #')
-                    this->CalculateExponentialMatrix(); // Compute exponential of AMat
+                    this->calculateExponentialMatrix(); // Compute exponential of AMat
 
                     //          CALL DisplayNumberAndString(ConstrNum,'Invert Matrix for Construction #')
-                    this->CalculateInverseMatrix(); // Compute inverse of AMat
+                    this->calculateInverseMatrix(); // Compute inverse of AMat
 
                     //          CALL DisplayNumberAndString(ConstrNum,'Gamma calculation for Construction #')
-                    this->CalculateGammas();
+                    this->calculateGammas();
                     // Compute "gamma"s from AMat, AExp, and AInv
 
                     //          CALL DisplayNumberAndString(ConstrNum,'Compute CTFs for Construction #')
-                    this->CalculateCTFs(); // Compute CTFs
+                    this->calculateFinalCoefficients(); // Compute CTFs
 
                     // Now check to see if the number of transfer functions
                     // is greater than MaxCTFTerms.  If it is, then increase the
@@ -1066,7 +1066,7 @@ namespace Construction {
         if (allocated(this->s)) this->s.deallocate();
     }
 
-    void ConstructionProps::CalculateExponentialMatrix()
+    void ConstructionProps::calculateExponentialMatrix()
     {
 
         // SUBROUTINE INFORMATION:
@@ -1321,7 +1321,7 @@ namespace Construction {
         AMatN.deallocate();
     }
 
-    void ConstructionProps::CalculateInverseMatrix()
+    void ConstructionProps::calculateInverseMatrix()
     {
 
         // SUBROUTINE INFORMATION:
@@ -1463,7 +1463,7 @@ namespace Construction {
         AMat1.deallocate();
     }
 
-    void ConstructionProps::CalculateGammas() {
+    void ConstructionProps::calculateGammas() {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -1579,7 +1579,7 @@ namespace Construction {
         }
     }
 
-    void ConstructionProps::CalculateCTFs() {
+    void ConstructionProps::calculateFinalCoefficients() {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -1608,26 +1608,9 @@ namespace Construction {
         // these calculations are equations (2.1.24) through (2.1.26) in Seem's
         // dissertation.
 
-        // USE STATEMENTS:
-        // none
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ConvrgLim(1.0e-13); // Convergence limit (ratio) for cutting off the calculation of further
         // CTFs.  This value was found to give suitable accuracy in IBLAST.
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE DUMMY VARIABLE DECLARATIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 avg;     // Intermediate calculation variable (average)
         bool CTFConvrg; // Set after CTFs are calculated, based on whether there are
@@ -1648,8 +1631,6 @@ namespace Construction {
         int SurfNode;         // Loop counter (for nodes at a surface)
         Real64 SurfNodeFac;   // Multiplying factor applied to various surface nodes
         Real64 trace;         // Trace of the product of Phi( = AExp) and R0
-
-        // FLOW:
 
         // Subroutine initializations
         PhiR0.allocate(this->rcmax, this->rcmax);

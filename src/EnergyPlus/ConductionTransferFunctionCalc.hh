@@ -48,44 +48,10 @@
 #ifndef ConductionTransferFunctionCalc_hh_INCLUDED
 #define ConductionTransferFunctionCalc_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array2D.hh>
-#include <ObjexxFCL/Array3D.hh>
-
-// EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
-
 namespace EnergyPlus {
     class OutputFiles;
 
 namespace ConductionTransferFunctionCalc {
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // INTEGER, PRIVATE, PARAMETER :: MaxTotNodes = 75   ! Maximum total number of
-    // nodes per construction.  This limit is a compromise between faster,
-    // less accurate solutions and slower, possibly more accurate answers.
-
-    extern int const NumOfPerpendNodes; // Number of nodes in the direction
-    // perpendicular to the main direction of heat transfer.  This is only used
-    // when a two-dimensional solution has been requested for a construction
-    // with a heat source/sink.
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    extern Array3D<Real64> s;  // Coefficients for the surface temperature history terms
-    extern Array2D<Real64> s0; // Coefficients for the current surface temperature terms
-    extern Real64 TinyLimit;
-    extern Array2D<Real64> IdenMatrix; // Identity Matrix
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
-
-    // Functions
 
     void InitConductionTransferFunctions(OutputFiles &outputFiles);
 

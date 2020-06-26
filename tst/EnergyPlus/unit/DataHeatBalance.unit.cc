@@ -933,7 +933,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
     dataConstruction.Construct.allocate(1);
     auto &thisConstruct(dataConstruction.Construct(1));
     thisConstruct.NumOfPerpendNodes = 4;
-    
+
     // Data common to all tests
     Array1D_int nodePerLayer(Construction::MaxLayersInConstruct);
     nodePerLayer(1) = 5;
