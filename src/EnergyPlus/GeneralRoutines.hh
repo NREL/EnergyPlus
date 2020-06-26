@@ -60,6 +60,11 @@ namespace EnergyPlus {
     struct EnergyPlusData;
     class OutputFiles;
 
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZonePlenumData;
+    class OutputFiles;
+
 void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,               // the component Name
                        std::string const &CompType,               // Type of component
                        int &CompNum,                              // Index of component in component array
