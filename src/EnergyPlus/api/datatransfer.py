@@ -78,7 +78,7 @@ class DataExchange:
         self.api.hour.argtypes = []
         self.api.hour.restype = c_int
         self.api.currentTime.argtypes = []
-        self.api.currentTime.restype = c_int
+        self.api.currentTime.restype = RealEP
         self.api.minutes.argtypes = []
         self.api.minutes.restype = c_int
         self.api.holidayIndex.argtypes = []
@@ -121,6 +121,8 @@ class DataExchange:
         self.api.actualTime.restype = c_int
         self.api.actualDateTime.argtypes = []
         self.api.actualDateTime.restype = c_int
+        self.api.kindOfSim.argtypes = []
+        self.api.kindOfSim.restype = c_int
 
     def list_available_api_data_csv(self) -> bytes:
         """
@@ -752,3 +754,11 @@ class DataExchange:
         :return: Integer value of the date/time function.
         """
         return self.api.actualDateTime()
+
+    def kind_of_sim(self) -> int:
+        """
+        Gets the current environment number.
+
+        :return: Integer value of current environment.
+        """
+        return self.api.kindOfSim()

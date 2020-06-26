@@ -69,6 +69,7 @@ extern "C" {
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -105,7 +106,6 @@ extern "C" {
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
@@ -333,7 +333,7 @@ namespace SimulationManager {
         AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state.outputFiles);
-        GetProjectData(state.outputFiles);
+        GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
         CheckForMisMatchedEnvironmentSpecifications();
         CheckForRequestedReporting();
         SetPredefinedTables();
@@ -711,7 +711,7 @@ namespace SimulationManager {
         }
     }
 
-    void GetProjectData(OutputFiles &outputFiles)
+    void GetProjectData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1198,6 +1198,7 @@ namespace SimulationManager {
                 bool overrideSystemTimestep(false);
                 bool overrideMaxAllowedDelTemp(false);
                 ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
+                dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
                     if (overrideModeValue == "NORMAL") {
@@ -3159,7 +3160,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
         // Surface simulation
         InitSurfaceHeatBalance(state);
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
-        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
+        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state.dataZoneTempPredictorCorrector);
 
         // Air simulation
         InitAirHeatBalance();

@@ -53,7 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -131,7 +131,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     NonAirSystemResponse(1) = 0.0;
     SysDepZoneLoadsLagged.allocate(1);
     SysDepZoneLoadsLagged(1) = 0.0;
-    AirflowNetwork::AirflowNetworkExchangeData.allocate(1);
+    dataAirflowNetworkBalanceManager.exchangeData.allocate(1);
     Node.allocate(1);
     TempTstatAir.allocate(1);
     LoadCorrectionFactor.allocate(1);
@@ -175,7 +175,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     SNLoadCoolRate.allocate(1);
     SNLoadHeatEnergy.allocate(1);
     SNLoadCoolEnergy.allocate(1);
-    ZoneAirRelHum.allocate(1);
+    state.dataZoneTempPredictorCorrector.ZoneAirRelHum.allocate(1);
     IsZoneDV.dimension(1, false);
     IsZoneCV.dimension(1, false);
     IsZoneUI.dimension(1, false);
@@ -566,7 +566,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     ZoneAirHumRat.deallocate();
     NonAirSystemResponse.deallocate();
     SysDepZoneLoadsLagged.deallocate();
-    AirflowNetwork::AirflowNetworkExchangeData.deallocate();
+    dataAirflowNetworkBalanceManager.exchangeData.deallocate();
     Node.deallocate();
     TempTstatAir.deallocate();
     LoadCorrectionFactor.deallocate();
@@ -594,7 +594,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     SNLoadCoolRate.deallocate();
     SNLoadHeatEnergy.deallocate();
     SNLoadCoolEnergy.deallocate();
-    ZoneAirRelHum.deallocate();
+    state.dataZoneTempPredictorCorrector.ZoneAirRelHum.deallocate();
     IsZoneDV.deallocate();
     IsZoneCV.deallocate();
     IsZoneUI.deallocate();
@@ -638,7 +638,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     NonAirSystemResponse(1) = 0.0;
     SysDepZoneLoadsLagged.allocate(1);
     SysDepZoneLoadsLagged(1) = 0.0;
-    AirflowNetwork::AirflowNetworkExchangeData.allocate(1);
+    dataAirflowNetworkBalanceManager.exchangeData.allocate(1);
     Node.allocate(1);
     TempTstatAir.allocate(1);
     LoadCorrectionFactor.allocate(1);
@@ -681,7 +681,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     SurfaceWindow.allocate(1);
     Surface.allocate(2);
     HConvIn.allocate(1);
-    ZoneAirRelHum.allocate(1);
+    state.dataZoneTempPredictorCorrector.ZoneAirRelHum.allocate(1);
     IsZoneDV.dimension(1, false);
     IsZoneCV.dimension(1, false);
     IsZoneUI.dimension(1, false);
@@ -898,7 +898,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     ZoneAirHumRat.deallocate();
     NonAirSystemResponse.deallocate();
     SysDepZoneLoadsLagged.deallocate();
-    AirflowNetwork::AirflowNetworkExchangeData.deallocate();
+    dataAirflowNetworkBalanceManager.exchangeData.deallocate();
     Node.deallocate();
     TempTstatAir.deallocate();
     LoadCorrectionFactor.deallocate();
@@ -922,7 +922,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     SurfaceWindow.deallocate();
     Surface.deallocate();
     HConvIn.deallocate();
-    ZoneAirRelHum.deallocate();
+    state.dataZoneTempPredictorCorrector.ZoneAirRelHum.deallocate();
     IsZoneDV.deallocate();
     IsZoneCV.deallocate();
     IsZoneUI.deallocate();

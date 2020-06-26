@@ -106,7 +106,7 @@ namespace ChillerIndirectAbsorption {
     // OTHER NOTES:
     // Manufacturers performance data can be used to generate the coefficients for the model.
 
-    auto constexpr calcChillerAbsorptionIndirect("CALC Chiller:Absorption:Indirect ");
+    const char * calcChillerAbsorptionIndirect("CALC Chiller:Absorption:Indirect ");
     auto constexpr waterIndex(1);
     const char * fluidNameSteam = "STEAM";
     const char * fluidNameWater = "WATER";
