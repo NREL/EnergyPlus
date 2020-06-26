@@ -47,6 +47,7 @@
 
 #include <cassert>
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
