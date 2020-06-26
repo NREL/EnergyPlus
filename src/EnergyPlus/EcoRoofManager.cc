@@ -52,7 +52,6 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/ConductionTransferFunctionCalc.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -108,7 +107,6 @@ namespace EcoRoofManager {
     using DataWater::RainFall;
     using DataWater::RainSchedDesign;
     // Use statements for access to subroutines in other modules
-    using namespace ConductionTransferFunctionCalc;
 
     // Data
     // MODULE PARAMETER DEFINITIONS

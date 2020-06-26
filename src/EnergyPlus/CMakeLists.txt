@@ -63,8 +63,6 @@ SET( SRC
   Coils/CoilCoolingDXCurveFitSpeed.hh
   CondenserLoopTowers.cc
   CondenserLoopTowers.hh
-  ConductionTransferFunctionCalc.cc
-  ConductionTransferFunctionCalc.hh
   ConfiguredFunctions.hh
   "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc"
   ConvectionCoefficients.cc

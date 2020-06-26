@@ -59,7 +59,6 @@
 
 // EnergyPlus Headers
 #include "OutputFiles.hh"
-#include <EnergyPlus/ConductionTransferFunctionCalc.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
@@ -5180,7 +5179,6 @@ namespace HeatBalanceManager {
         // na
 
         // Using/Aliasing
-        using namespace ConductionTransferFunctionCalc;
         using namespace WindowManager;
         using namespace SolarShading;
         using DataLoopNode::Node;
