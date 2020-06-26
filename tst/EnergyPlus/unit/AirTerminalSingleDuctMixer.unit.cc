@@ -8147,7 +8147,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     QLatOut = 0.0;
     InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
     Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-    // check results when the fna coil unit is not available
+    // check results when the fan coil unit is not available
     EXPECT_NEAR(0.0, QUnitOut, 0.1); // fan coil unit is off
     EXPECT_NEAR(thisFanCoil.PLR, 0.0, 0.00001);
     EXPECT_NEAR(Node(thisFanCoil.AirInNode).MassFlowRate, 0.0, 0.000001);
