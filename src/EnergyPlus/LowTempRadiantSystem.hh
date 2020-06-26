@@ -86,6 +86,11 @@ namespace LowTempRadiantSystem {
       SurfFaceTempControl,  // Controls system using the surface inside face temperature
       SurfIntTempControl    // Controls system using a temperature inside the radiant system construction as defined by the Construction:InternalSource input
     };
+    // Setpoint Types:
+    enum class LowTempRadiantSetpointTypes {
+      halfFlowPower,        // Controls system where the setpoint is at the 50% flow/power point
+      zeroFlowPower,        // Controls system where the setpoint is at the 0% flow/power point
+    };
     // Condensation control types:
     extern int const CondCtrlNone;      // Condensation control--none, so system never shuts down
     extern int const CondCtrlSimpleOff; // Condensation control--simple off, system shuts off when condensation predicted
@@ -144,12 +149,14 @@ namespace LowTempRadiantSystem {
         Array1D<Real64> SurfaceFrac;     // Fraction of flow/pipe length or electric power for a particular surface
         Real64 TotalSurfaceArea;         // Total surface area for all surfaces that are part of this radiant system
         LowTempRadiantControlTypes ControlType; // Control type for the system (MAT, MRT, Op temp, ODB, OWB)
+        LowTempRadiantSetpointTypes SetpointType;   // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
         Real64 HeatPower;             // heating sent to panel in Watts
         Real64 HeatEnergy;            // heating sent to panel in Joules
 
         // Default Constructor
             RadiantSystemBaseData()
-                : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), ControlType(LowTempRadiantControlTypes::MATControl)
+        : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), ControlType(LowTempRadiantControlTypes::MATControl),
+          SetpointType(LowTempRadiantSetpointTypes::halfFlowPower)
             {
             }
         
@@ -157,7 +164,13 @@ namespace LowTempRadiantSystem {
                                                                          std::string const& controlInputField
         );
         
+        LowTempRadiantSetpointTypes processRadiantSystemSetpointInput(std::string const& controlInput,
+                                                                      std::string const& controlInputField
+        );
+        
         Real64 setRadiantSystemControlTemperature();
+        
+        Real64 setOffTemperatureLowTemperatureRadiantSystem(int const scheduleIndex, Real64 const throttlingRange);
         
         virtual void calculateLowTemperatureRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet) = 0;
         
