@@ -980,73 +980,73 @@ If Yes, an analytical or empirical solution will be used instead of iteration ba
 
 Although this input field may eventually affect all coils, the current implementation is available for only the limited number of systems and coil configurations listed in the following table. Since a linear relationship between system output and part load ratio, or speed ratio, is expected, an analytical direct solution is applied to all coils in the listed in the table when Yes is selected. More coils will be allowed when time allows. Note that this simulation parameter is global and when used every such coil model included in the entire building model will be changed to use the direct method.
 
-The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below
+The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below: 
 
 \begin{equation}
-\textnormal{PLR} = \frac{\textnormal{SystemLoad}-\textnormal{OutputOff}}{\textnormal{OutputFull}-\textnormal{OutputOff}}
+\textnormal{PLR} = \frac{\textnormal{SystemLoad} - \textnormal{OutputOff}}{\textnormal{OutputFull} - \textnormal{OutputOff}}
 \end{equation}
 
 where
 
-PLR = Part load ratio for a single speed coil or for a multiple speed coil at speed 1
+PLR = Part load ratio for a single speed coil or for a multiple speed coil at speed 1;
 
-SystemLoad = Load requested to meet thermostat setpoint
+SystemLoad = Load requested to meet thermostat setpoint;
 
-OutputOff = System output at PLR = 0 as coil off
+OutputOff = System output at PLR = 0 as coil off;
 
-OutputFull = System output at PLR = 1 as full output
+OutputFull = System output at PLR = 1 as full output;
 
-The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below
+The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below: 
 
 \begin{equation}
-\textnormal{SpeedRatio} = \frac{SystemLoad-OutputFull_{i-1}}{OutputFull_{i} - OutputFull_{i-1}}
+\textnormal{SpeedRatio} = \frac{\textnormal{SystemLoad} - \textnormal{OutputFull}_{i-1}}{\textnormal{OutputFull}_{i} - \textnormal{OutputFull}_{i-1}}
 \end{equation}
 
 where
 
-SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep
+SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep;
 
-SystemLoad = Load requested to meet thermostat setpoint
+SystemLoad = Load requested to meet thermostat setpoint;
 
-OutputFull_{i} = System full output at the higher speed
+OutputFull$_{i}$ = System full output at the higher speed;
 
-OutputFull_{i-1} = System full output at the lower speed
+OutputFull$_{i-1}$ = System full output at the lower speed.
 
 Note: When a DX cooling coil with a constant volume fan is used, latent degradation is disabled.
 
 When coils of Coil:Cooling:DX:VariableSpeed, Coil:Heating:DX:SingleSpeed, and Coil:Heating:DX:VariableSpeed are applied, the desired outlet temperature are used to determine part load ratio or speed ratio.
 
-The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below
+The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below:
 
 \begin{equation}
-{\left {PLR}\right} = \frac{DesOutTemp - InletTemp}{OutTempFull - InletTemp}
+\textnormal{PLR} = \frac{\textnormal{DesOutTemp} - \textnormal{InletTemp}}{\textnormal{OutTempFull} - \textnormal{InletTemp}}
 \end{equation}
 
 where
 
-PLR = Part load ratio for a single speed coil or for a multiple speed coil at speed 1
+PLR = Part load ratio for a single speed coil or for a multiple speed coil at speed 1;
 
-DesOutTemp = Desired outlet temperature to meet setpoint
+DesOutTemp = Desired outlet temperature to meet setpoint;
 
-InletTemp = Inlet temperature
+InletTemp = Inlet temperature;
 
-OutTemptFull = Outlet temperature at PLR =1 as full output
+OutTemptFull = Outlet temperature at PLR =1 as full output.
 
 The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below
 
 \begin{equation}
-{\left {SpeedRatio}\right} = \frac{DesOutTemp - OutTempFull_{i-1}}{OutTempFull_{i} - OutTempFull_{i-1}}
+\textnormal{SpeedRatio} = \frac{\textnormal{DesOutTemp} - \textnormal{OutTempFull}_{i-1}}{\textnormal{OutTempFull}_{i} - \textnormal{OutTempFull}_{i-1}}
 \end{equation}
 
 where
 
-SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep
+SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep;
 
-DesOutTemp = Desired outlet temperature to meet setpoint
+DesOutTemp = Desired outlet temperature to meet setpoint;
 
-OutTempFull_{i} = Outlet temperature of full output at the higher speed
+OutTempFull$_{i}$ = Outlet temperature of full output at the higher speed;
 
-OutTempFull_{i-1} = Outlet temperature of full output at the lower speed
+OutTempFull$_{i-1}$ = Outlet temperature of full output at the lower speed.
 
 % table 2
 \begin{longtable}[c]{p{4in}p{2.5in}}
