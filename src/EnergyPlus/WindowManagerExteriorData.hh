@@ -55,6 +55,10 @@
 #include <EnergyPlus/Vectors.hh>
 
 namespace EnergyPlus {
+
+    //forward declaration
+    struct EnergyPlusData;
+
 namespace DataHeatBalance {
     struct MaterialProperties;
 }
