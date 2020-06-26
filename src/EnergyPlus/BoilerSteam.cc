@@ -112,9 +112,9 @@ namespace BoilerSteam {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void BoilerSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void BoilerSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
         this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
         this->update(CurLoad, RunFlag, FirstHVACIteration);
@@ -132,9 +132,9 @@ namespace BoilerSteam {
         sizFac = this->SizFac;
     }
 
-    void BoilerSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &)
+    void BoilerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &)
     {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
         this->autosize();
     }
 
@@ -195,57 +195,17 @@ namespace BoilerSteam {
             auto &thisBoiler = boilers.Boiler(BoilerNum);
             thisBoiler.Name = DataIPShortCuts::cAlphaArgs(1);
 
-            {
-                auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(2));
-
-                if (SELECT_CASE_var == "ELECTRICITY") {
-                    thisBoiler.BoilerFuelTypeForOutputVariable = "Electric";
-                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
-
-                } else if (SELECT_CASE_var == "NATURALGAS") {
-                    thisBoiler.BoilerFuelTypeForOutputVariable = "Gas";
-                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
-
-                } else if (SELECT_CASE_var == "DIESEL") {
-                    thisBoiler.BoilerFuelTypeForOutputVariable = "Diesel";
-                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("DIESEL");
-
-                } else if (SELECT_CASE_var == "GASOLINE") {
-                    thisBoiler.BoilerFuelTypeForOutputVariable = "Gasoline";
-                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("GASOLINE");
-
-                } else if (SELECT_CASE_var == "COAL") {
-                    thisBoiler.BoilerFuelTypeForOutputVariable = "Coal";
-                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("COAL");
-
-                } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    thisBoiler.BoilerFuelTypeForOutputVariable = "FuelOil#1";
-                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
-
-                } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    thisBoiler.BoilerFuelTypeForOutputVariable = "FuelOil#2";
-                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    thisBoiler.BoilerFuelTypeForOutputVariable = "Propane";
-                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
-
-                } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    thisBoiler.BoilerFuelTypeForOutputVariable = "OtherFuel1";
-                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL1");
-
-                } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    thisBoiler.BoilerFuelTypeForOutputVariable = "OtherFuel2";
-                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
-
-                } else {
-                    ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
-                    ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
-
-                    // Set to Electric to avoid errors when setting up output variables
-                    thisBoiler.BoilerFuelTypeForOutputVariable = "Electric";
-                    ErrorsFound = true;
-                }
+            // Validate fuel type input
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(
+                DataIPShortCuts::cAlphaArgs(2), thisBoiler.BoilerFuelTypeForOutputVariable, thisBoiler.FuelType, FuelTypeError);
+            if (FuelTypeError) {
+                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
+                // Set to Electric to avoid errors when setting up output variables
+                thisBoiler.BoilerFuelTypeForOutputVariable = "Electric";
+                ErrorsFound = true;
+                FuelTypeError = false;
             }
 
             // INPUTS from the IDF file
@@ -254,7 +214,7 @@ namespace BoilerSteam {
                 ShowWarningMessage(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Field: Maximum Operation Pressure units are Pa. Verify units.");
             }
-            thisBoiler.Effic = DataIPShortCuts::rNumericArgs(2);
+            thisBoiler.NomEffic = DataIPShortCuts::rNumericArgs(2);
             thisBoiler.TempUpLimitBoilerOut = DataIPShortCuts::rNumericArgs(3);
             thisBoiler.NomCap = DataIPShortCuts::rNumericArgs(4);
             if (thisBoiler.NomCap == DataSizing::AutoSize) {
@@ -333,7 +293,7 @@ namespace BoilerSteam {
         }
     }
 
-    void BoilerSpecs::initialize() // number of the current electric chiller being simulated
+    void BoilerSpecs::initialize(BranchInputManagerData &dataBranchInputManager) // number of the current electric chiller being simulated
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
@@ -356,7 +316,7 @@ namespace BoilerSteam {
             this->setupOutputVars();
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                 this->Name, DataPlant::TypeOf_Boiler_Steam, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");
@@ -394,6 +354,7 @@ namespace BoilerSteam {
             this->BoilerPressCheck = 0.0;
             this->FuelUsed = 0.0;
             this->BoilerLoad = 0.0;
+            this->BoilerEff = 0.0;
             this->BoilerOutletTemp = 0.0;
 
             if ((DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -488,6 +449,7 @@ namespace BoilerSteam {
                             "Heating",
                             this->EndUseSubcategory,
                             "Plant");
+        SetupOutputVariable("Boiler Steam Efficiency", OutputProcessor::Unit::None, this->BoilerEff, "System", "Average", this->Name);
         SetupOutputVariable("Boiler Steam Inlet Temperature", OutputProcessor::Unit::C, this->BoilerInletTemp, "System", "Average", this->Name);
         SetupOutputVariable("Boiler Steam Outlet Temperature", OutputProcessor::Unit::C, this->BoilerOutletTemp, "System", "Average", this->Name);
         SetupOutputVariable("Boiler Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, this->BoilerMassFlowRate, "System", "Average", this->Name);
@@ -579,7 +541,7 @@ namespace BoilerSteam {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, this->Name, "Boiler:Steam");
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, this->Name, this->Effic);
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, this->Name, this->NomEffic);
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, this->Name, this->NomCap);
         }
 
@@ -668,11 +630,9 @@ namespace BoilerSteam {
                 auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
                 if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
                     BoilerDeltaTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
-                } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+                } else { // DataPlant::DualSetPointDeadBand
                     BoilerDeltaTemp =
                         DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
-                } else {
-                    assert(false);
                 }
             }
             this->BoilerOutletTemp = BoilerDeltaTemp + DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
@@ -811,10 +771,12 @@ namespace BoilerSteam {
         Real64 OperPLR = this->BoilerLoad / this->NomCap;
         OperPLR = min(OperPLR, this->MaxPartLoadRat);
         OperPLR = max(OperPLR, this->MinPartLoadRat);
-        Real64 TheorFuelUse = this->BoilerLoad / this->Effic;
+        Real64 TheorFuelUse = this->BoilerLoad / this->NomEffic;
 
         // Calculate fuel used
         this->FuelUsed = TheorFuelUse / (this->FullLoadCoef(1) + this->FullLoadCoef(2) * OperPLR + this->FullLoadCoef(3) * pow_2(OperPLR));
+        // Calculate boiler efficiency
+        this->BoilerEff = this->BoilerLoad / this->FuelUsed;
     }
 
     // Beginning of Record Keeping subroutines for the BOILER:SIMPLE Module
@@ -844,6 +806,7 @@ namespace BoilerSteam {
             this->BoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp;
             this->BoilerLoad = 0.0;
             this->FuelUsed = 0.0;
+            this->BoilerEff = 0.0;
             DataLoopNode::Node(BoilerInletNode).Press = this->BoilerPressCheck;
             DataLoopNode::Node(BoilerOutletNode).Press = DataLoopNode::Node(BoilerInletNode).Press;
             DataLoopNode::Node(BoilerInletNode).Quality = 0.0;

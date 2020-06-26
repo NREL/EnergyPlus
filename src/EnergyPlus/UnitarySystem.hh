@@ -51,9 +51,10 @@
 #include <string>
 #include <vector>
 #include <EnergyPlus/DataHVACSystems.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace UnitarySystems {
 
@@ -624,7 +625,7 @@ namespace UnitarySystems {
                                         Real64 &OnOffAirFlowRatio,     // ratio of heating PLR to cooling PLR (is this correct?)
                                         Real64 const ZoneLoad,
                                         Real64 &FullSensibleOutput,
-                                        bool HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
+                                        bool &HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
                                         int CompOn);
 
         void initLoadBasedControl(EnergyPlusData &state, int const AirLoopNum, // number of the current air loop being simulated

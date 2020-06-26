@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -151,6 +152,22 @@ namespace BaseboardRadiator {
     );
 
 } // namespace BaseboardRadiator
+
+    struct BaseboardRadiatorData : BaseGlobalStruct {
+
+        int NumBaseboards;
+        Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
+        Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
+        void clear_state() override
+        {
+            NumBaseboards = 0;
+            Baseboard.deallocate();
+            BaseboardParamsNumericFields.deallocate();
+        }
+        // Default Constructor
+        BaseboardRadiatorData()
+            : NumBaseboards(0) {}
+    };
 
 } // namespace EnergyPlus
 
