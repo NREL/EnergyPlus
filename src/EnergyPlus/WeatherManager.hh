@@ -115,14 +115,17 @@ namespace WeatherManager {
         Profile = 3,    // Temperature Profile
     };
 
-    extern int const WP_ClarkAllenModel;  // Use Clark and Allen model for sky emissivity calculation
-    extern int const WP_ScheduleValue;  // User entered Schedule value for Weather Property
-    extern int const WP_DryBulbDelta;   // User entered DryBulb difference Schedule value for Weather Property
-    extern int const WP_DewPointDelta;  // User entered Dewpoint difference Schedule value for Weather Property
-    extern int const WP_BruntModel;  // Use Brunt model for sky emissivity calculation
-    extern int const WP_IdsoModel;   // Use Isdo model for sky emissivity calculation
-    extern int const WP_BerdahlMartinModel;  // Use Berdahl & Martin model for sky emissivity calculation
-    extern int const WP_SkyTAlgorithmA; // place holder
+    enum class EmissivityCalcType
+    {
+        ClarkAllenModel = 0,     // Use Clark & Allen model for sky emissivity calculation
+        ScheduleValue = 1,       // User entered Schedule value for Weather Property
+        DryBulbDelta = 2,        // User entered DryBulb difference Schedule value for Weather Property
+        DewPointDelta = 3,       // User entered Dewpoint difference Schedule value for Weather Property
+        BruntModel = 4,          // Use Brunt model for sky emissivity calculation
+        IdsoModel = 5,           // Use Isdo model for sky emissivity calculation
+        BerdahlMartinModel = 6,  // Use Martin & Berdahl model for sky emissivity calculation
+        SkyTAlgorithmA = 7,      // place holder
+    };
 
     extern int const GregorianToJulian; // JGDate argument for Gregorian to Julian Date conversion
     extern int const JulianToGregorian; // JGDate argument for Julian to Gregorian Date conversion
@@ -217,7 +220,7 @@ namespace WeatherManager {
         int NumSimYears;              // Total Number of times this period to be performed
         int CurrentCycle;             // Current cycle through weather file in NumSimYears repeats
         int WP_Type1;                 // WeatherProperties SkyTemperature Pointer
-        int SkyTempModel;       // WeatherProperties SkyTemperature CalculationType
+        EmissivityCalcType SkyTempModel;       // WeatherProperties SkyTemperature CalculationType
         bool UseWeatherFileHorizontalIR; // If false, horizontal IR and sky temperature are calculated with WP models
         int CurrentYear;              // Current year
         bool IsLeapYear;              // True if current year is leap year.
@@ -232,7 +235,7 @@ namespace WeatherManager {
             : KindOfEnvrn(0), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0), HVACSizingIterationNum(0), TotalDays(0), StartJDay(0),
               StartMonth(0), StartDay(0), StartYear(0), StartDate(0), EndMonth(0), EndDay(0), EndJDay(0), EndYear(0), EndDate(0), DayOfWeek(0),
               UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true), UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false),
-              NumSimYears(1), CurrentCycle(0), WP_Type1(0), SkyTempModel(0), UseWeatherFileHorizontalIR(true), CurrentYear(0), IsLeapYear(false),
+              NumSimYears(1), CurrentCycle(0), WP_Type1(0), SkyTempModel(EmissivityCalcType::ClarkAllenModel), UseWeatherFileHorizontalIR(true), CurrentYear(0), IsLeapYear(false),
               RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), MatchYear(false), ActualWeather(false), RawSimDays(0)
         {
         }
@@ -522,13 +525,13 @@ namespace WeatherManager {
         std::string Name;         // Reference Name
         std::string ScheduleName; // Schedule Name or Algorithm Name
         bool IsSchedule;          // Default is using Schedule
-        int CalculationType;
+        EmissivityCalcType CalculationType;
         int SchedulePtr; // pointer to schedule when used
         bool UsedForEnvrn;
         bool UseWeatherFileHorizontalIR; // If false, horizontal IR and sky temperature are calculated with WP models
 
         // Default Constructor
-        WeatherProperties() : IsSchedule(true), CalculationType(0), SchedulePtr(0), UsedForEnvrn(false), UseWeatherFileHorizontalIR(true)
+        WeatherProperties() : IsSchedule(true), CalculationType(EmissivityCalcType::ClarkAllenModel), SchedulePtr(0), UsedForEnvrn(false), UseWeatherFileHorizontalIR(true)
         {
         }
     };
@@ -689,7 +692,7 @@ namespace WeatherManager {
     Real64 AirMass(Real64 const CosZen); // COS( solar zenith), 0 - 1
 
     // Calculate sky temperature from weather data
-    Real64 CalcSkyEmissivity(int Envrn, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
+    Real64 CalcSkyEmissivity(EmissivityCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
 
     void ASHRAETauModel(DesignDaySolarModel const TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
                         Real64 const ETR,       // extraterrestrial normal irradiance, W/m2

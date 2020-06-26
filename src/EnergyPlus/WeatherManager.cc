@@ -126,15 +126,6 @@ namespace WeatherManager {
     using namespace Psychrometrics;
 
     // Data
-    int const WP_ClarkAllenModel(0);     // Use Clark & Allen model for sky emissivity calculation
-    int const WP_ScheduleValue(1);  // User entered Schedule value for Weather Property
-    int const WP_DryBulbDelta(2);   // User entered DryBulb difference Schedule value for Weather Property
-    int const WP_DewPointDelta(3);  // User entered Dewpoint difference Schedule value for Weather Property
-    int const WP_BruntModel(4);          // Use Brunt model for sky emissivity calculation
-    int const WP_IdsoModel(5);           // Use Isdo model for sky emissivity calculation
-    int const WP_BerdahlMartinModel(6);  // Use Martin & Berdahl model for sky emissivity calculation
-    int const WP_SkyTAlgorithmA(7);      // place holder
-
     int const GregorianToJulian(1); // JGDate argument for Gregorian to Julian Date conversion
     int const JulianToGregorian(2); // JGDate argument for Julian to Gregorian Date conversion
 
@@ -733,14 +724,15 @@ namespace WeatherManager {
                                                    "WinterDesignDay",
                                                    "CustomDay1",
                                                    "CustomDay2"});
-        static Array1D_string const SkyTempModelNames(7,
-                                                      {"Clark and Allen",
-                                                       "Schedule Value",
-                                                       "DryBulb Difference Schedule Value",
-                                                       "Dewpoint Difference Schedule Value",
-                                                       "Brunt",
-                                                       "Idso",
-                                                       "Berdahl and Martin"});
+        static std::map<EmissivityCalcType, std::string> const SkyTempModelNames {
+            {EmissivityCalcType::ClarkAllenModel, "Clark and Allen"},
+            {EmissivityCalcType::ScheduleValue, "Schedule Value"},
+            {EmissivityCalcType::DryBulbDelta, "DryBulb Difference Schedule Value"},
+            {EmissivityCalcType::DewPointDelta, "Dewpoint Difference Schedule Value"},
+            {EmissivityCalcType::BruntModel, "Brunt"},
+            {EmissivityCalcType::IdsoModel, "Idso"},
+            {EmissivityCalcType::BerdahlMartinModel, "Berdahl and Martin"}
+        };
         int Loop;
         std::string StDate;
         std::string EnDate;
@@ -1121,7 +1113,7 @@ namespace WeatherManager {
                                     AlpUseSnow = "No";
                                 }
                                 cTotalEnvDays = RoundSigDigits(Environment(Envrn).TotalDays);
-                                skyTempModel = SkyTempModelNames(Environment(Envrn).SkyTempModel + 1);
+                                skyTempModel = SkyTempModelNames.at(Environment(Envrn).SkyTempModel);
 
                                 print(state.outputFiles.eio,
                                       EnvNameFormat,
@@ -1291,7 +1283,7 @@ namespace WeatherManager {
                                       "N/A",
                                       "N/A",
                                       "N/A",
-                                      SkyTempModelNames(Environment(Envrn).SkyTempModel + 1));
+                                      SkyTempModelNames.at(Environment(Envrn).SkyTempModel));
                             } else if (DoWeatherInitReporting) {
                                 print(state.outputFiles.eio,
                                       EnvNameFormat,
@@ -1307,7 +1299,7 @@ namespace WeatherManager {
                                       "N/A",
                                       "N/A",
                                       "N/A",
-                                      SkyTempModelNames(Environment(Envrn).SkyTempModel + 1));
+                                      SkyTempModelNames.at(Environment(Envrn).SkyTempModel));
                             }
                             if (DesDayInput(Environment(Envrn).DesignDayNum).DSTIndicator == 0 && DoWeatherInitReporting) {
                                 print(state.outputFiles.eio, EnvDSTNFormat, "SizingPeriod:DesignDay");
@@ -2356,7 +2348,7 @@ namespace WeatherManager {
                 SPSiteBeamSolarScheduleValue(envrnDayNum) = DDBeamSolarValues(TimeStep, HourOfDay, envrnDayNum);
                 SPSiteDiffuseSolarScheduleValue(envrnDayNum) = DDDiffuseSolarValues(TimeStep, HourOfDay, envrnDayNum);
             }
-            if (Environment(Envrn).SkyTempModel <= 3 || Environment(Envrn).SkyTempModel >= 1) {
+            if (Environment(Envrn).SkyTempModel == EmissivityCalcType::ScheduleValue || Environment(Envrn).SkyTempModel == EmissivityCalcType::DryBulbDelta || Environment(Envrn).SkyTempModel == EmissivityCalcType::DewPointDelta) {
                 SPSiteSkyTemperatureScheduleValue(envrnDayNum) = DDSkyTempScheduleValues(TimeStep, HourOfDay, envrnDayNum);
             }
         } else if (TotDesDays > 0) {
@@ -3180,7 +3172,7 @@ namespace WeatherManager {
                         TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
                     }
 
-                    if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
+                    if (Environment(Envrn).SkyTempModel == EmissivityCalcType::BruntModel || Environment(Envrn).SkyTempModel == EmissivityCalcType::IdsoModel || Environment(Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel || Environment(Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA || Environment(Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
                         // Calculate sky temperature, use IRHoriz if not missing
                         if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
                             // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
@@ -3339,7 +3331,7 @@ namespace WeatherManager {
                     TomorrowWindSpeed(TS, Hour) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed(Hour) * WtNow;
                     TomorrowWindDir(TS, Hour) = interpolateWindDirection(LastHrWindDir, Wthr.WindDir(Hour), WtNow);
                     TomorrowHorizIRSky(TS, Hour) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(Hour) * WtNow;
-                    if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
+                    if (Environment(Envrn).SkyTempModel == EmissivityCalcType::BruntModel || Environment(Envrn).SkyTempModel == EmissivityCalcType::IdsoModel || Environment(Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel || Environment(Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA || Environment(Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
                         TomorrowSkyTemp(TS, Hour) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp(Hour) * WtNow;
                     }
                     TomorrowDifSolarRad(TS, Hour) =
@@ -3374,12 +3366,12 @@ namespace WeatherManager {
             {
                 auto const SELECT_CASE_var(WPSkyTemperature(Environment(Environ).WP_Type1).CalculationType);
 
-                if (SELECT_CASE_var == WP_ScheduleValue) {
+                if (SELECT_CASE_var == EmissivityCalcType::ScheduleValue) {
                     GetScheduleValuesForDay(WPSkyTemperature(Environment(Environ).WP_Type1).SchedulePtr,
                                             TomorrowSkyTemp,
                                             TomorrowVariables.DayOfYear_Schedule,
                                             CurDayOfWeek);
-                } else if (SELECT_CASE_var == WP_DryBulbDelta) {
+                } else if (SELECT_CASE_var == EmissivityCalcType::DryBulbDelta) {
                     GetScheduleValuesForDay(WPSkyTemperature(Environment(Environ).WP_Type1).SchedulePtr,
                                             TomorrowSkyTemp,
                                             TomorrowVariables.DayOfYear_Schedule,
@@ -3390,7 +3382,7 @@ namespace WeatherManager {
                         }
                     }
 
-                } else if (SELECT_CASE_var == WP_DewPointDelta) {
+                } else if (SELECT_CASE_var == EmissivityCalcType::DewPointDelta) {
                     GetScheduleValuesForDay(WPSkyTemperature(Environment(Environ).WP_Type1).SchedulePtr,
                                             TomorrowSkyTemp,
                                             TomorrowVariables.DayOfYear_Schedule,
@@ -3424,7 +3416,7 @@ namespace WeatherManager {
         return (fmod(interpAng, 360.)); // fmod is float modulus function
     }
 
-    Real64 CalcSkyEmissivity(int ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum){
+    Real64 CalcSkyEmissivity(EmissivityCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum){
         // Calculate Sky Emissivity
         // References:
         // M. Li, Y. Jiang and C. F. M. Coimbra,
@@ -3435,13 +3427,13 @@ namespace WeatherManager {
 
         Real64 ESky;
 
-        if (ESkyCalcType == WP_BruntModel) {
+        if (ESkyCalcType == EmissivityCalcType::BruntModel) {
             double const PartialPress = RelHum * PsyPsatFnTemp(DryBulb) * 0.01;
             ESky = 0.618 + 0.056 * pow(PartialPress, 0.5);
-        } else if (ESkyCalcType == WP_IdsoModel) {
+        } else if (ESkyCalcType == EmissivityCalcType::IdsoModel) {
             double const PartialPress = RelHum * PsyPsatFnTemp(DryBulb) * 0.01;
             ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + TKelvin));
-        } else if (ESkyCalcType == WP_BerdahlMartinModel) {
+        } else if (ESkyCalcType == EmissivityCalcType::BerdahlMartinModel) {
             double const TDewC = min(DryBulb, DewPoint);
             ESky = 0.758 + 0.521 * (TDewC / 100) + 0.625 * pow_2(TDewC / 100);
         } else {
@@ -4170,7 +4162,7 @@ namespace WeatherManager {
                 ESky = CalcSkyEmissivity(Environment(EnvrnNum).SkyTempModel, OSky, DryBulb, TomorrowOutDewPointTemp(TS, Hour), RelHum);
                 TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(DryBulb + TKelvin);
 
-                if (Environment(EnvrnNum).SkyTempModel > 3 || Environment(EnvrnNum).SkyTempModel == 0) {
+                if (Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::BruntModel || Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::IdsoModel || Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::BerdahlMartinModel || Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA || Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
                     // Design day not scheduled
                     TomorrowSkyTemp(TS, Hour) = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
                 }
@@ -4296,10 +4288,10 @@ namespace WeatherManager {
             {
                 auto const SELECT_CASE_var(WPSkyTemperature(Environment(EnvrnNum).WP_Type1).CalculationType);
 
-                if (SELECT_CASE_var == WP_ScheduleValue) {
+                if (SELECT_CASE_var == EmissivityCalcType::ScheduleValue) {
                     GetSingleDayScheduleValues(WPSkyTemperature(Environment(EnvrnNum).WP_Type1).SchedulePtr, TomorrowSkyTemp);
                     DDSkyTempScheduleValues(_, _, EnvrnNum) = TomorrowSkyTemp;
-                } else if (SELECT_CASE_var == WP_DryBulbDelta) {
+                } else if (SELECT_CASE_var == EmissivityCalcType::DryBulbDelta) {
                     GetSingleDayScheduleValues(WPSkyTemperature(Environment(EnvrnNum).WP_Type1).SchedulePtr, TomorrowSkyTemp);
                     DDSkyTempScheduleValues(_, _, EnvrnNum) = TomorrowSkyTemp;
                     for (Hour = 1; Hour <= 24; ++Hour) {
@@ -4308,7 +4300,7 @@ namespace WeatherManager {
                         }
                     }
 
-                } else if (SELECT_CASE_var == WP_DewPointDelta) {
+                } else if (SELECT_CASE_var == EmissivityCalcType::DewPointDelta) {
                     GetSingleDayScheduleValues(WPSkyTemperature(Environment(EnvrnNum).WP_Type1).SchedulePtr, TomorrowSkyTemp);
                     DDSkyTempScheduleValues(_, _, EnvrnNum) = TomorrowSkyTemp;
                     for (Hour = 1; Hour <= 24; ++Hour) {
@@ -7172,31 +7164,31 @@ namespace WeatherManager {
             }
             // Validate Calculation Type.
             if (UtilityRoutines::SameString(cAlphaArgs(2), "ScheduleValue")) {
-                WPSkyTemperature(Item).CalculationType = WP_ScheduleValue;
+                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::ScheduleValue;
                 WPSkyTemperature(Item).IsSchedule = true;
                 units = "[C]";
                 unitType = OutputProcessor::Unit::C;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "DifferenceScheduleDryBulbValue")) {
-                WPSkyTemperature(Item).CalculationType = WP_DryBulbDelta;
+                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::DryBulbDelta;
                 WPSkyTemperature(Item).IsSchedule = true;
                 units = "[deltaC]";
                 unitType = OutputProcessor::Unit::deltaC;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "DifferenceScheduleDewPointValue")) {
-                WPSkyTemperature(Item).CalculationType = WP_DewPointDelta;
+                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::DewPointDelta;
                 WPSkyTemperature(Item).IsSchedule = true;
                 units = "[deltaC]";
                 unitType = OutputProcessor::Unit::deltaC;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "Brunt")) {
-                WPSkyTemperature(Item).CalculationType = WP_BruntModel;
+                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::BruntModel;
                 WPSkyTemperature(Item).IsSchedule = false;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "Idso")) {
-                WPSkyTemperature(Item).CalculationType = WP_IdsoModel;
+                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::IdsoModel;
                 WPSkyTemperature(Item).IsSchedule = false;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "BerdahlMartin")) {
-                WPSkyTemperature(Item).CalculationType = WP_BerdahlMartinModel;
+                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::BerdahlMartinModel;
                 WPSkyTemperature(Item).IsSchedule = false;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "ClarkAllen")) {
-                WPSkyTemperature(Item).CalculationType = WP_ClarkAllenModel;
+                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::ClarkAllenModel;
                 WPSkyTemperature(Item).IsSchedule = false;
             } else {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + '.');

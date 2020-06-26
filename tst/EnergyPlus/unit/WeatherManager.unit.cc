@@ -153,10 +153,10 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
 {
     // setup environment state
     Environment.allocate(4);
-    Environment(1).SkyTempModel = WP_ClarkAllenModel;
-    Environment(2).SkyTempModel = WP_BruntModel;
-    Environment(3).SkyTempModel = WP_IdsoModel;
-    Environment(4).SkyTempModel = WP_BerdahlMartinModel;
+    Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    Environment(2).SkyTempModel = EmissivityCalcType::BruntModel;
+    Environment(3).SkyTempModel = EmissivityCalcType::IdsoModel;
+    Environment(4).SkyTempModel = EmissivityCalcType::BerdahlMartinModel;
 
     // init local variables
     Real64 OpagueSkyCover(0.0);
@@ -1030,7 +1030,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
     DataGlobals::NumOfTimeStepInHour = 1;
     Environment.allocate(1);
-    Environment(1).SkyTempModel = WP_ClarkAllenModel;
+    Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
 
     AllocateWeatherData();
     OpenWeatherFile(ErrorsFound);
