@@ -74,6 +74,8 @@ namespace WaterManager {
 
     // Functions
 
+    void clear_state();
+
     void ManageWater();
 
     void ManageWaterInits();

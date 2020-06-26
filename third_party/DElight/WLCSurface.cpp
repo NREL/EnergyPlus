@@ -7,24 +7,24 @@
  *           Lawrence Berkeley National Laboratory
  */
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 //#include "Globals.h"
@@ -51,19 +51,19 @@ WLCSurface::~WLCSurface()
 { }
 
 WLCSurface::WLCSurface(string Name, BGL::point3 Origin, Double Sazm, Double Stilt, Double Szeta, vector<BGL::point2> p2List, Double maxNodeArea)
-: surf3(Name, Origin, Sazm, Stilt, Szeta, p2List), mesh(vert2,maxNodeArea), vis_refl(1.)
+: surf3(Name, Origin, Sazm, Stilt, Szeta, p2List), vis_refl(1.), mesh(vert2,maxNodeArea)
 { }
 
 WLCSurface::WLCSurface(string Name, BGL::point3 Origin, Double Sazm, Double Stilt, Double Szeta, vector<BGL::point2> p2List, Double maxNodeArea, Double visrefl)
-: surf3(Name, Origin, Sazm, Stilt, Szeta, p2List), mesh(vert2,maxNodeArea), vis_refl(visrefl)
+: surf3(Name, Origin, Sazm, Stilt, Szeta, p2List), vis_refl(visrefl), mesh(vert2,maxNodeArea)
 { }
 
 WLCSurface::WLCSurface(string Name, BGL::point3 Origin, Double Sazm, Double Stilt, Double Szeta, Double width, Double height, Double maxNodeArea)
-: surf3(Name, Origin, Sazm, Stilt, Szeta, width, height), mesh(vert2,maxNodeArea), vis_refl(1.)
+: surf3(Name, Origin, Sazm, Stilt, Szeta, width, height), vis_refl(1.), mesh(vert2,maxNodeArea)
 { }
 
 WLCSurface::WLCSurface(string Name, BGL::point3 Origin, Double Sazm, Double Stilt, Double Szeta, Double width, Double height, Double maxNodeArea, Double visrefl)
-: surf3(Name, Origin, Sazm, Stilt, Szeta, width, height), mesh(vert2,maxNodeArea), vis_refl(visrefl)
+: surf3(Name, Origin, Sazm, Stilt, Szeta, width, height), vis_refl(visrefl), mesh(vert2,maxNodeArea)
 { }
 
 WLCSurface::WLCSurface(string Name, vector<BGL::point3> p3List, Double maxNodeArea)
@@ -173,18 +173,18 @@ Double		WLCSurface::NodeOmega(Int NodeIterator, BGL::point3 extPoint)
 	visDot = BGL::dot(BGL::norm(VDir_wcs),ics[2]);
 	NodeSolidAngle = min(2*PI,visDot/BGL::sqrlen(VDir_wcs))*NodeArea(NodeIterator);	//	sqrlen() = 0 is trapped by 1st visibility culling above
 		/*
-		cout << 
-				ii+1 << 
-				" " << NodePosition3D(ii) << 
-				" " << visDot << 
+		cout <<
+				ii+1 <<
+				" " << NodePosition3D(ii) <<
+				" " << visDot <<
 //				" " << VDir_wcs <<
-//				" " << NodeArea(ii) << 
-//				" " << BGL::sqrlen(VDir_wcs) << 
-				" " << ExtPtSolidAngle << 
+//				" " << NodeArea(ii) <<
+//				" " << BGL::sqrlen(VDir_wcs) <<
+				" " << ExtPtSolidAngle <<
 				" "	<< "\n";
 		*/
 	return NodeSolidAngle;
-}	
+}
 
 Int		WLCSurface::NearestNodeIndx(BGL::point2 extPoint)
 {
@@ -239,13 +239,13 @@ void SurfNodeIllumPlotArray(vector<WLCSurface *> pWLCSurfList, string outfilenam
 				xMeshMin = xMeshMax = SurfNodePosition2D[0];
 				yMeshMin = yMeshMax = SurfNodePosition2D[1];
 			}
-			if (SurfNodePosition2D[0] < xMeshMin) xMeshMin = SurfNodePosition2D[0]; 
-			if (SurfNodePosition2D[0] > xMeshMax) xMeshMax = SurfNodePosition2D[0]; 
-			if (SurfNodePosition2D[1] < yMeshMin) yMeshMin = SurfNodePosition2D[1]; 
-			if (SurfNodePosition2D[1] > yMeshMax) yMeshMax = SurfNodePosition2D[1]; 
+			if (SurfNodePosition2D[0] < xMeshMin) xMeshMin = SurfNodePosition2D[0];
+			if (SurfNodePosition2D[0] > xMeshMax) xMeshMax = SurfNodePosition2D[0];
+			if (SurfNodePosition2D[1] < yMeshMin) yMeshMin = SurfNodePosition2D[1];
+			if (SurfNodePosition2D[1] > yMeshMax) yMeshMax = SurfNodePosition2D[1];
 		}
 //		cout << "xMeshMin: " << xMeshMin << " xMeshMax: " << xMeshMax << " yMeshMin: " << yMeshMin << " yMeshMax: " << yMeshMax << "\n";
-		
+
 		BGL::point2	LLHC(xMeshMin,yMeshMin);
 //		cout << "LLHC: " << LLHC << "\n";
 

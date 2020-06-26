@@ -31,7 +31,7 @@
 #include <cctype>
 #include <iomanip>
 #include <iostream>
-#include <strstream>
+#include <sstream>
 using namespace std;
 
 #include "DEF.H"
@@ -61,11 +61,11 @@ istream &operator >> (istream &s, vector2 &v)	//	WLC 06/06/2003 major rewrite
 {
     vector2    result;
     Char    c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 
 	// Expected format: [1 2]
 	
-    while (s >> c && isspace(c));
+    while (s >> c && isspace(c)) {;} // skip through spaces
 	if (s.eof()) return(s);
 	if (s.fail()) {
 //		cerr << "vector2:ReadError1: unrecoverable failbit\n";
