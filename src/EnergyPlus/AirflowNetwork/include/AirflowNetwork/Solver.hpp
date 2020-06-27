@@ -65,8 +65,8 @@ namespace AirflowNetwork {
         Real64 temperature{20.0};
         // Real64 pressure;      //{0.0}; // gage pressure
         Real64 humidityRatio{0.0};
-        Real64 density{AIRDENSITY(20.0, 101325.0, 0.0)};
-        Real64 sqrtDensity{sqrt(AIRDENSITY(20.0, 101325.0, 0.0))};
+        Real64 density{AIRDENSITY(101325.0, 20.0, 0.0)};
+        Real64 sqrtDensity{sqrt(AIRDENSITY(101325.0, 20.0, 0.0))};
         Real64 viscosity{AIRDYNAMICVISCOSITY(20.0)};
     };
 

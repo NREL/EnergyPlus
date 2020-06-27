@@ -619,9 +619,9 @@ namespace AirflowNetwork {
 
         int calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const i,                // Linkage number
+                      int const EP_UNUSED(i),     // Linkage number
                       const Real64 EP_UNUSED(multiplier), // Element multiplier
-                      const Real64 EP_UNUSED(control),    // Element control signal
+                      const Real64 control,       // Element control signal
                       const AirProperties &propN, // Node 1 properties
                       const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
@@ -790,9 +790,10 @@ namespace AirflowNetwork {
         std::array<int, 2> NodeNums;          // Node numbers
         int LinkNum;                          // Linkage number
         AirflowElement *element;              // Pointer to airflow element
+        Real64 control;                       // Control value
 
         // Default Constructor
-        AirflowNetworkLinkage() : NodeHeights{{0.0, 0.0}}, CompNum(0), NodeNums{{0, 0}}, LinkNum(0)
+        AirflowNetworkLinkage() : NodeHeights{{0.0, 0.0}}, CompNum(0), NodeNums{{0, 0}}, LinkNum(0), control(1.0)
         {
         }
 

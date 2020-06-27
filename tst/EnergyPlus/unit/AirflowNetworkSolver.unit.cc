@@ -160,3 +160,56 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
     DisSysCompCoilData.deallocate();
     AirflowNetworkCompData.deallocate();
 }
+
+TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Crack)
+{
+
+    int NF;
+    std::array<Real64, 2> F = {0.0, 0.0};
+    std::array<Real64, 2> DF = {0.0, 0.0};
+
+    AirflowNetwork::SurfaceCrack crack;
+    crack.FlowCoef = 0.001;
+    crack.FlowExpo = 0.65;
+    crack.StandardP = 101325.0;
+    crack.StandardT = 20.0;
+    crack.StandardW = 0.0;
+
+    AirflowNetwork::AirProperties state0, state1;
+    Real64 density = state0.density; // = state1.density
+    Real64 sqrt_density = state0.sqrtDensity; // = state1.sqrtDensity
+    Real64 viscosity = state0.viscosity; // = state1.viscosity
+
+    Real64 dp{10.0};
+
+    // Linear
+    NF = crack.calculate(true, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(0.01 * sqrt_density / viscosity, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.001 * sqrt_density / viscosity, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+
+    NF = crack.calculate(true, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(-0.01 * sqrt_density / viscosity, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.001 * sqrt_density / viscosity, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+
+    // Turbulent tests
+    NF = crack.calculate(false, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(0.001 * std::pow(10.0, 0.65), F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_DOUBLE_EQ(0.000065 * std::pow(10.0, 0.65), DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+
+    NF = crack.calculate(false, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(-0.001 * std::pow(10.0, 0.65), F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_DOUBLE_EQ(0.000065 * std::pow(10.0, 0.65), DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+
+}

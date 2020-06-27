@@ -528,9 +528,9 @@ namespace AirflowNetwork {
 
     int SurfaceCrack::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                 Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                int const i,                // Linkage number
+                                int const EP_UNUSED(i),     // Linkage number
                                 const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                const Real64 EP_UNUSED(control),    // Element control signal
+                                const Real64 control,       // Element control signal
                                 const AirProperties &propN, // Node 1 properties
                                 const AirProperties &propM, // Node 2 properties
                                 std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
@@ -573,11 +573,11 @@ namespace AirflowNetwork {
 
         // FLOW:
         // Crack standard condition from given inputs
-        if (i > NetworkNumOfLinks - NumOfLinksIntraZone) {
-            Corr = 1.0;
-        } else {
-            Corr = MultizoneSurfaceData(i).Factor;
-        }
+        //if (i > NetworkNumOfLinks - NumOfLinksIntraZone) {
+        //    Corr = 1.0;
+        //} else {
+        //    Corr = MultizoneSurfaceData(i).Factor;
+        //}
         // CompNum = AirflowNetworkCompData(j).TypeNum;
         RhozNorm = AIRDENSITY(StandardP, StandardT, StandardW);
         VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
@@ -586,9 +586,9 @@ namespace AirflowNetwork {
         VisAve = (propN.viscosity + propM.viscosity) / 2.0;
         Tave = (propN.temperature + propM.temperature) / 2.0;
         if (PDROP >= 0.0) {
-            coef = FlowCoef / propN.sqrtDensity * Corr;
+            coef = FlowCoef / propN.sqrtDensity * control;
         } else {
-            coef = FlowCoef / propM.sqrtDensity * Corr;
+            coef = FlowCoef / propM.sqrtDensity * control;
         }
 
         if (LFLAG) {
@@ -602,7 +602,7 @@ namespace AirflowNetwork {
                 Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 DF[0] = coef * propM.density / propM.viscosity * Ctl;
             }
-            F[0] = -DF[0] * PDROP;
+            F[0] = DF[0] * PDROP;
         } else {
             // Standard calculation.
             if (PDROP >= 0.0) {

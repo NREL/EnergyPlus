@@ -4128,6 +4128,7 @@ namespace AirflowNetworkBalanceManager {
         j = 0;
         for (count = 1; count <= AirflowNetworkNumOfSurfaces; ++count) {
             if (MultizoneSurfaceData(count).SurfNum == 0) continue;
+            AirflowNetworkLinkageData(count).control = MultizoneSurfaceData(count).Factor;
             AirflowNetworkLinkageData(count).Name = MultizoneSurfaceData(count).SurfName;
             AirflowNetworkLinkageData(count).NodeNums[0] = MultizoneSurfaceData(count).NodeNums[0];
             AirflowNetworkLinkageData(count).NodeNums[1] = MultizoneSurfaceData(count).NodeNums[1];

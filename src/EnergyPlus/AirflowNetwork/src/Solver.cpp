@@ -880,8 +880,8 @@ namespace AirflowNetwork {
             } else {
                 DP = PZ(n) - PZ(m) + DpL(i, 1) + PW(i);
             }
-            Real64 multiplier = 1.0;
-            Real64 control = 1.0;
+            Real64 multiplier = 1.0; // This is currently unused, will need to modify IDD to complete
+            Real64 control = AirflowNetworkLinkageData(i).control; // This only gets used by surface crack right now, more will follow
             //if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << "PS:" << i << n << M << PS(i) << PW(i) << AirflowNetworkLinkSimu(i).DP;
 
             j = AirflowNetworkLinkageData(i).CompNum;
