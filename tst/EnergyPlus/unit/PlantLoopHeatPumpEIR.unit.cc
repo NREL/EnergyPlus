@@ -2704,17 +2704,16 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
 
     DataHVACGlobals::TimeStepSys = 60;
 
-    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = 20;
-    DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 20;
-
     Real64 curLoad = -10000;
 
     thisCoolingPLHP->loadSideMassFlowRate = 0.3;
     thisCoolingPLHP->sourceSideMassFlowRate = 0.8;
+    thisCoolingPLHP->loadSideInletTemp = 20;
+    thisCoolingPLHP->sourceSideInletTemp = 20;
     thisCoolingPLHP->doPhysics(curLoad);
 
-    EXPECT_NEAR(thisCoolingPLHP->loadSideOutletTemp, 12.0, 0.1);
-    EXPECT_NEAR(thisCoolingPLHP->sourceSideOutletTemp, 47.9, 0.1);
+    EXPECT_NEAR(thisCoolingPLHP->loadSideOutletTemp, 12.00, 0.1);
+    EXPECT_NEAR(thisCoolingPLHP->sourceSideOutletTemp, 47.66, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, CoolingMetering)
