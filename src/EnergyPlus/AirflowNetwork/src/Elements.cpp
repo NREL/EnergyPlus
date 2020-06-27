@@ -1092,7 +1092,7 @@ namespace AirflowNetwork {
 
         if (solver.AFECTL(i) <= 0.0) {
             // Speed = 0; treat fan as resistance.
-            return GenericCrack(FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            return generic_crack(FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
         }
         // Pressure rise at reference fan speed.
         if (solver.AFECTL(i) >= TranRat) {
@@ -1220,7 +1220,7 @@ namespace AirflowNetwork {
 
         if (control <= 0.0) {
             // Speed = 0; treat fan as resistance.
-            return GenericCrack(FlowCoef, FlowExpo, false, PDROP, propN, propM, F, DF);
+            return generic_crack(FlowCoef, FlowExpo, false, PDROP, propN, propM, F, DF);
         }
         // Pressure rise at reference fan speed.
         if (control >= TranRat) {
@@ -2134,12 +2134,12 @@ namespace AirflowNetwork {
         GDRHO = 9.8 * DRHO;
         // if (LIST >= 4) gio::write(Unit21, Format_903) << " DOR:" << i << n << m << PDROP << std::abs(DRHO) << MinRhoDiff;
         if (OpenFactor == 0.0) {
-            return GenericCrack(coeff, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            return generic_crack(coeff, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
         }
         if (std::abs(DRHO) < MinRhoDiff || LFLAG) {
             DPMID = PDROP - 0.5 * Height * GDRHO;
             // Initialization or identical temps: treat as one-way flow.
-            NF = GenericCrack(coeff, FlowExpo, LFLAG, DPMID, propN, propM, F, DF);
+            NF = generic_crack(coeff, FlowExpo, LFLAG, DPMID, propN, propM, F, DF);
             // if (LIST >= 4) gio::write(Unit21, Format_900) << " Drs:" << DPMID << F[0] << DF[0];
         } else {
             // Possible two-way flow:
@@ -3498,7 +3498,7 @@ namespace AirflowNetwork {
 
         // Check which zone is higher
         if (Fact == 0.0) {
-            return GenericCrack(coef, expn, LFLAG, PDROP, propN, propM, F, DF);
+            return generic_crack(coef, expn, LFLAG, PDROP, propN, propM, F, DF);
         }
 
         fma12 = 0.0;

@@ -1042,14 +1042,14 @@ namespace AirflowNetwork {
 #endif
     }
 
-    int GenericCrack(Real64 &coef,               // Flow coefficient
-                     Real64 const expn,          // Flow exponent
-                     bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                     Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                     const AirProperties &propN, // Node 1 properties
-                     const AirProperties &propM, // Node 2 properties
-                     std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                     std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int generic_crack(Real64 coef,               // Flow coefficient
+                      Real64 const expn,          // Flow exponent
+                      bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     )
     {
 
@@ -1120,7 +1120,7 @@ namespace AirflowNetwork {
                 Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 DF[0] = coef * propM.density / propM.viscosity * Ctl;
             }
-            F[0] = -DF[0] * PDROP;
+            F[0] = DF[0] * PDROP;
         } else {
             // Standard calculation.
             if (PDROP >= 0.0) {
