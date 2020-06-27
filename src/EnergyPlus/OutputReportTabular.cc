@@ -4826,8 +4826,6 @@ namespace OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
-        using CondenserLoopTowers::NumSimpleTowers;
-        using CondenserLoopTowers::towers;
         using DataEnvironment::WeatherFileLocationTitle;
         using DataGlobals::convertJtoGJ;
         using DataHeatBalance::BuildingPreDefRep;
@@ -4882,9 +4880,9 @@ namespace OutputReportTabular {
         }
 
         // Condenser water loop
-        for (iCooler = 1; iCooler <= NumSimpleTowers; ++iCooler) {
+        for (iCooler = 1; iCooler <= state.dataCondenserLoopTowers.NumSimpleTowers; ++iCooler) {
             SysTotalHVACRejectHeatLoss +=
-                towers(iCooler).Qactual * TimeStepSysSec + towers(iCooler).FanEnergy + towers(iCooler).BasinHeaterConsumption;
+                state.dataCondenserLoopTowers.towers(iCooler).Qactual * TimeStepSysSec + state.dataCondenserLoopTowers.towers(iCooler).FanEnergy + state.dataCondenserLoopTowers.towers(iCooler).BasinHeaterConsumption;
         }
         for (iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
             SysTotalHVACRejectHeatLoss += SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
@@ -12496,8 +12494,18 @@ namespace OutputReportTabular {
 
                 zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
                     ((ZnAirRpt(iZone).VentilHeatGain - ZnAirRpt(iZone).VentilHeatLoss) / (TimeStepSys * SecInHour)); // zone ventilation
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                    zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
+                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentSenGainW -
+                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentSenLossW); // air flow network
+                }
                 zoneVentLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) =
                     ((ZnAirRpt(iZone).VentilLatentGain - ZnAirRpt(iZone).VentilLatentLoss) / (TimeStepSys * SecInHour)); // zone ventilation
+                if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+                    zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
+                        (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentLatGainW -
+                         AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentLatLossW); // air flow network
+                }
 
                 interZoneMixInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
                     ((ZnAirRpt(iZone).MixHeatGain - ZnAirRpt(iZone).MixHeatLoss) / (TimeStepSys * SecInHour)); // zone mixing
