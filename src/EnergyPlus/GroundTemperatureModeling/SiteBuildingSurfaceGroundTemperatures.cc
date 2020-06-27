@@ -80,7 +80,6 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(OutputFiles &outputFil
     using DataEnvironment::GroundTempObjInput;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
-    using namespace ObjexxFCL::gio;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

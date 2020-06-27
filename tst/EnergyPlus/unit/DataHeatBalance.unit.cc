@@ -892,3 +892,97 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_EQ(EMSActuatorAvailable(2).ControlTypeName, "Slat Angle");
     EXPECT_EQ(EMSActuatorAvailable(2).Units, "[degrees]");
 }
+
+TEST_F(EnergyPlusFixture, DataHeatBalance_setUserTemperatureLocationPerpendicular)
+{
+
+    Real64 userInputValue;
+    Real64 expectedReturnValue;
+    Real64 actualReturnValue;
+    
+    Construct.allocate(1);
+    auto &thisConstruct(Construct(1));
+    thisConstruct.Name = "RadiantSystem1";
+    
+    // Test 1: User value is less than zero--should be reset to zero
+    userInputValue = -0.25;
+    expectedReturnValue = 0.0;
+    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(userInputValue);
+    EXPECT_EQ(actualReturnValue,expectedReturnValue);
+    
+    // Test 2: User value is greater than unity--should be reset to 1.0
+    userInputValue = 1.23456;
+    expectedReturnValue = 1.0;
+    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(userInputValue);
+    EXPECT_EQ(actualReturnValue,expectedReturnValue);
+
+    // Test 3: User value is valid (between 0 and 1)--returned value should be equal to user input
+    userInputValue = 0.234567;
+    expectedReturnValue = 0.234567;
+    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(userInputValue);
+    EXPECT_EQ(actualReturnValue,expectedReturnValue);
+    
+}
+
+TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
+{
+    int nodeNumberAtSource;
+    int nodeNumberAtUserSpecifiedLocation;
+    int expectedNodeNumberAtSource;
+    int expectedNodeNumberAtUserSpecifiedLocation;
+    Construct.allocate(1);
+    auto &thisConstruct(Construct(1));
+    
+    // Data common to all tests
+    Array1D_int nodePerLayer(MaxLayersInConstruct);
+    nodePerLayer(1) = 5;
+    nodePerLayer(2) = 6;
+    nodePerLayer(3) = 7;
+    nodePerLayer(4) = 8;
+    nodePerLayer(5) = 9;
+    int numPerpendicularNodes = 4;
+    
+    // Test 1: Not a construction with an internal source--both results should be zero
+    thisConstruct.SourceSinkPresent = false;
+    expectedNodeNumberAtSource = 0;
+    expectedNodeNumberAtUserSpecifiedLocation = 0;
+    thisConstruct.setNodeSourceAndUserTemp(nodeNumberAtSource,nodeNumberAtUserSpecifiedLocation,nodePerLayer,numPerpendicularNodes);
+    EXPECT_EQ(expectedNodeNumberAtSource,nodeNumberAtSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,nodeNumberAtUserSpecifiedLocation);
+    
+    // Test 2: Construction with Internal Source but 1-D
+    thisConstruct.SourceSinkPresent = true;
+    thisConstruct.SourceAfterLayer = 2;
+    thisConstruct.TempAfterLayer = 3;
+    thisConstruct.SolutionDimensions = 1;
+    expectedNodeNumberAtSource = 11;
+    expectedNodeNumberAtUserSpecifiedLocation = 18;
+    thisConstruct.setNodeSourceAndUserTemp(nodeNumberAtSource,nodeNumberAtUserSpecifiedLocation,nodePerLayer,numPerpendicularNodes);
+    EXPECT_EQ(expectedNodeNumberAtSource,nodeNumberAtSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,nodeNumberAtUserSpecifiedLocation);
+
+    // Test 3a: Construction with Internal Source using 2-D Solution
+    //          First sub-test--user location in line with source
+    thisConstruct.SourceAfterLayer = 2;
+    thisConstruct.TempAfterLayer = 3;
+    thisConstruct.SolutionDimensions = 2;
+    thisConstruct.userTemperatureLocationPerpendicular = 0.0;
+    expectedNodeNumberAtSource = 41;
+    expectedNodeNumberAtUserSpecifiedLocation = 69;
+    thisConstruct.setNodeSourceAndUserTemp(nodeNumberAtSource,nodeNumberAtUserSpecifiedLocation,nodePerLayer,numPerpendicularNodes);
+    EXPECT_EQ(expectedNodeNumberAtSource,nodeNumberAtSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,nodeNumberAtUserSpecifiedLocation);
+
+    // Test 3b: Construction with Internal Source using 2-D Solution
+    //          First sub-test--user location at mid-point between tubes
+    thisConstruct.SourceAfterLayer = 3;
+    thisConstruct.TempAfterLayer = 4;
+    thisConstruct.SolutionDimensions = 2;
+    thisConstruct.userTemperatureLocationPerpendicular = 1.0;
+    expectedNodeNumberAtSource = 69;
+    expectedNodeNumberAtUserSpecifiedLocation = 104;
+    thisConstruct.setNodeSourceAndUserTemp(nodeNumberAtSource,nodeNumberAtUserSpecifiedLocation,nodePerLayer,numPerpendicularNodes);
+    EXPECT_EQ(expectedNodeNumberAtSource,nodeNumberAtSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,nodeNumberAtUserSpecifiedLocation);
+
+}

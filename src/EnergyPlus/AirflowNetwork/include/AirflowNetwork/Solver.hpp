@@ -48,6 +48,9 @@
 #ifndef SOLVER_HPP
 #define SOLVER_HPP
 
+// C++ Headers
+#include <unordered_map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array2D.hh>
 
@@ -220,13 +223,13 @@ namespace AirflowNetwork {
     void DUMPVD(std::string const &S,     // Description
                 const Array1D<Real64> &V, // Output values
                 int const n,              // Array size
-                int const UOUT            // Output file unit
+                std::ostream &UOUT        // Output file
     );
 
     void DUMPVR(std::string const &S,     // Description
                 const Array1D<Real64> &V, // Output values
                 int const n,              // Array size
-                int const UOUT            // Output file unit
+                std::ostream &UOUT        // Output file
     );
 
     void PresProfile(int const il,                  // Linkage number

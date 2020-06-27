@@ -60,6 +60,7 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -83,7 +84,6 @@
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
@@ -1502,7 +1502,7 @@ namespace SimAirServingZones {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using SplitterComponent::SplitterCond;
         using SplitterComponent::SplitterConditions;
-        using ZonePlenum::ZoneSupPlenCond;
+        //using ZonePlenum::ZoneSupPlenCond;
         using ZonePlenum::ZoneSupplyPlenumConditions;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1621,14 +1621,14 @@ namespace SimAirServingZones {
                         NumAllSupAirPathNodes += SplitterCond(SplitterNum).NumOutletNodes + 1;
                     } else if (UtilityRoutines::SameString(SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:SupplyPlenum")) {
                         PlenumNum = UtilityRoutines::FindItemInList(
-                            SupplyAirPath(SupAirPath).ComponentName(CompNum), ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName);
+                            SupplyAirPath(SupAirPath).ComponentName(CompNum), state.dataZonePlenum.ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName);
                         if (PlenumNum == 0) {
                             ShowSevereError("AirLoopHVAC:SupplyPlenum not found=" + SupplyAirPath(SupAirPath).ComponentName(CompNum));
                             ShowContinueError("Occurs in AirLoopHVAC:SupplyPath=" + SupplyAirPath(SupAirPath).Name);
                             ErrorsFound = true;
                         }
                         SupplyAirPath(SupAirPath).PlenumIndex(CompNum) = PlenumNum;
-                        NumAllSupAirPathNodes += ZoneSupPlenCond(PlenumNum).NumOutletNodes + 1;
+                        NumAllSupAirPathNodes += state.dataZonePlenum.ZoneSupPlenCond(PlenumNum).NumOutletNodes + 1;
                     }
                 }
                 SupNode.allocate(NumAllSupAirPathNodes);
@@ -1654,15 +1654,15 @@ namespace SimAirServingZones {
                         }
                     } else if (PlenumNum > 0) {
                         ++SupAirPathNodeNum;
-                        SupNode(SupAirPathNodeNum) = ZoneSupPlenCond(PlenumNum).InletNode;
+                        SupNode(SupAirPathNodeNum) = state.dataZonePlenum.ZoneSupPlenCond(PlenumNum).InletNode;
                         if (CompNum == 1) {
                             SupNodeType(SupAirPathNodeNum) = PathInlet;
                         } else {
                             SupNodeType(SupAirPathNodeNum) = CompInlet;
                         }
-                        for (PlenumOutNum = 1; PlenumOutNum <= ZoneSupPlenCond(PlenumNum).NumOutletNodes; ++PlenumOutNum) {
+                        for (PlenumOutNum = 1; PlenumOutNum <= state.dataZonePlenum.ZoneSupPlenCond(PlenumNum).NumOutletNodes; ++PlenumOutNum) {
                             ++SupAirPathNodeNum;
-                            SupNode(SupAirPathNodeNum) = ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
+                            SupNode(SupAirPathNodeNum) = state.dataZonePlenum.ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
                             SupNodeType(SupAirPathNodeNum) = 0;
                         }
                     }
@@ -2024,7 +2024,7 @@ namespace SimAirServingZones {
             }
 
             // now connect return nodes with airloops and corresponding inlet nodes
-            ConnectReturnNodes();
+            ConnectReturnNodes(state.dataZonePlenum);
 
             InitAirLoopsOneTimeFlag = false;
 
@@ -2365,7 +2365,7 @@ namespace SimAirServingZones {
         } // end loop over primary air systems
     }
 
-    void ConnectReturnNodes()
+    void ConnectReturnNodes(ZonePlenumData &dataZonePlenum)
     {
         // This initializes ZoneEquipConfig.ReturnNodeInletNum and ReturnNodeAirLoopNum
         // Search all return paths to match return nodes with the airloop they are connected to and find the corresponding zone inlet node (same zone,
@@ -2408,7 +2408,7 @@ namespace SimAirServingZones {
                                 }
                             }
                         } else if (compType == ZoneReturnPlenum_Type) {
-                            auto const &thisPlenum(ZonePlenum::ZoneRetPlenCond(thisRetPath.ComponentIndex(compNum)));
+                            auto const &thisPlenum(dataZonePlenum.ZoneRetPlenCond(thisRetPath.ComponentIndex(compNum)));
                             for (int inNode = 1; inNode <= thisPlenum.NumInletNodes; ++inNode) {
                                 if (thisReturnNode == thisPlenum.InletNode(inNode)) {
                                     thisZoneEquip.ReturnNodeAirLoopNum(zoneOutNum) = airLoopNum; // set the return node airloop num

@@ -3696,6 +3696,8 @@
 
   Output:Variable,*,Boiler Gas Rate,hourly;
 
+  Output:Variable,*,Boiler Efficiency,Hourly;
+
   Output:Variable,*,Pump Electric Power,hourly;
 
   Output:Variable,*,Pump Fluid Heat Gain Rate,hourly;

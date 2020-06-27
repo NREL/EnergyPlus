@@ -119,7 +119,6 @@ namespace DataStringGlobals {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    std::string outputEndFileName("eplusout.end");
     std::string outputErrFileName("eplusout.err");
     std::string outputJsonFileName("eplusout.json");
     std::string outputTSHvacJsonFileName("eplusout_detailed_HVAC.json");
@@ -165,7 +164,6 @@ namespace DataStringGlobals {
     std::string outputPerfLogFileName("eplusout_perflog.csv");
     std::string outputSqlFileName("eplusout.sql");
     std::string outputSqliteErrFileName("eplussqlite.err");
-    std::string TarcogIterationsFileName("TarcogIterations.dbg");
     std::string outputCsvFileName("eplusout.csv");
     std::string outputMtrCsvFileName("eplusmtr.csv");
     std::string outputRvauditFileName("eplusout.rvaudit");

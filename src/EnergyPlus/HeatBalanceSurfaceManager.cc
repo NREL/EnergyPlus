@@ -64,6 +64,7 @@
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DElightManagerF.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDElight.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDaylightingDevices.hh>
@@ -93,7 +94,6 @@
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
@@ -242,7 +242,7 @@ namespace HeatBalanceSurfaceManager {
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Outside Surface Heat Balance");
         CalcHeatBalanceOutsideSurf();
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Inside Surface Heat Balance");
-        CalcHeatBalanceInsideSurf();
+        CalcHeatBalanceInsideSurf(state.dataZoneTempPredictorCorrector);
 
         // The air heat balance must be called before the temperature history
         // updates because there may be a radiant system in the building
@@ -252,7 +252,7 @@ namespace HeatBalanceSurfaceManager {
         // IF NECESSARY, do one final "average" heat balance pass.  This is only
         // necessary if a radiant system is present and it was actually on for
         // part or all of the time step.
-        UpdateFinalSurfaceHeatBalance();
+        UpdateFinalSurfaceHeatBalance(state);
 
         // Before we leave the Surface Manager the thermal histories need to be updated
         if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
@@ -269,7 +269,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        ManageThermalComfort(false); // "Record keeping" for the zone
+        ManageThermalComfort(state.dataZoneTempPredictorCorrector, false); // "Record keeping" for the zone
 
         ReportSurfaceHeatBalance();
         if (ZoneSizingCalc) GatherComponentLoadsSurface();
@@ -4246,6 +4246,11 @@ namespace HeatBalanceSurfaceManager {
 
             if (Surface(SurfNum).EMSConstructionOverrideON && (Surface(SurfNum).EMSConstructionOverrideValue > 0)) {
 
+                if (Construct(Surface(SurfNum).EMSConstructionOverrideValue).TypeIsWindow) { // okay, allways allow windows
+                    EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                    EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                }
+
                 if ((EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) &&
                     (EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum))) {
 
@@ -4256,11 +4261,7 @@ namespace HeatBalanceSurfaceManager {
                     if (!EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) {
                         // check if constructions appear compatible
 
-                        if (Construct(Surface(SurfNum).EMSConstructionOverrideValue).TypeIsWindow) { // okay, allways allow windows
-                            EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
-                            EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
-
-                        } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
+                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
                                    Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
                             // compare old construction to new construction and see if terms match
                             // set as okay and turn false if find a big problem
@@ -4388,7 +4389,7 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void UpdateFinalSurfaceHeatBalance()
+    void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4451,7 +4452,7 @@ namespace HeatBalanceSurfaceManager {
         UpdateBBRadSourceValAvg(HWBaseboardSysOn);
         UpdateBBSteamRadSourceValAvg(SteamBaseboardSysOn);
         UpdateBBElecRadSourceValAvg(ElecBaseboardSysOn);
-        UpdateCoolingPanelSourceValAvg(CoolingPanelSysOn);
+        UpdateCoolingPanelSourceValAvg(state.dataChilledCeilingPanelSimple, CoolingPanelSysOn);
         UpdatePoolSourceValAvg(SwimmingPoolOn);
 
         if (LowTempRadSysOn || HighTempRadSysOn || HWBaseboardSysOn || SteamBaseboardSysOn || ElecBaseboardSysOn || CoolingPanelSysOn ||
@@ -4459,7 +4460,7 @@ namespace HeatBalanceSurfaceManager {
             // Solve the zone heat balance 'Detailed' solution
             // Call the outside and inside surface heat balances
             CalcHeatBalanceOutsideSurf();
-            CalcHeatBalanceInsideSurf();
+            CalcHeatBalanceInsideSurf(state.dataZoneTempPredictorCorrector);
         }
     }
 
@@ -5749,7 +5750,7 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void CalcHeatBalanceInsideSurf(Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
+    void CalcHeatBalanceInsideSurf(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
     {
         // Pass correct list of surfaces to CalcHeatBalanceInsideSurf2
         bool const PartialResimulate(present(ZoneToResimulate));
@@ -5762,7 +5763,7 @@ namespace HeatBalanceSurfaceManager {
             ZoneWinHeatLossRep = 0.0;
             ZoneWinHeatLossRepEnergy = 0.0;
 
-            CalcHeatBalanceInsideSurf2(DataSurfaces::AllHTSurfaceList,
+            CalcHeatBalanceInsideSurf2(dataZoneTempPredictorCorrector, DataSurfaces::AllHTSurfaceList,
                                        DataSurfaces::AllIZSurfaceList,
                                        DataSurfaces::AllHTNonWindowSurfaceList,
                                        DataSurfaces::AllHTWindowSurfaceList);
@@ -5789,7 +5790,7 @@ namespace HeatBalanceSurfaceManager {
             auto const &zoneIZSurfList(Zone(ZoneToResimulate).ZoneIZSurfaceList);
             auto const &zoneHTNonWindowSurfList(Zone(ZoneToResimulate).ZoneHTNonWindowSurfaceList);
             auto const &zoneHTWindowSurfList(Zone(ZoneToResimulate).ZoneHTWindowSurfaceList);
-            CalcHeatBalanceInsideSurf2(zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
+            CalcHeatBalanceInsideSurf2(dataZoneTempPredictorCorrector, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
 
             // Sort window heat gain/loss
             if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
@@ -5802,7 +5803,7 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void CalcHeatBalanceInsideSurf2(const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
+    void CalcHeatBalanceInsideSurf2(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                     const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
                                     const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
@@ -5933,7 +5934,7 @@ namespace HeatBalanceSurfaceManager {
 
             // Initialize Kiva instances ground temperatures
             if (DataHeatBalance::AnyKiva) {
-                SurfaceGeometry::kivaManager.initKivaInstances();
+                SurfaceGeometry::kivaManager.initKivaInstances(dataZoneTempPredictorCorrector);
             }
         }
         if (!BeginEnvrnFlag) {
