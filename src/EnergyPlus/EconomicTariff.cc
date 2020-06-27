@@ -2785,7 +2785,13 @@ namespace EconomicTariff {
                     if (tariff(iTariff).monthSchIndex != 0) {
                         curMonth = GetCurrentScheduleValue(tariff(iTariff).monthSchIndex);
                     } else {
-                        curMonth = Month; // from DataEnvironment
+                        // #7814 - Have to carefull with DST. tariff::seasonForMonth is overwritten at each timestep, and only the last value is
+                        // retained, so make sure to capture the right one
+                        if ((DataGlobals::HourOfDay + DataEnvironment::DSTIndicator) <= 24) {
+                            curMonth = DataEnvironment::Month;
+                        } else {
+                            curMonth = DataEnvironment::MonthTomorrow;
+                        }
                     }
                     if (isWithinRange(curSeason, 1, 5)) {
                         if (isWithinRange(curPeriod, 1, 4)) {

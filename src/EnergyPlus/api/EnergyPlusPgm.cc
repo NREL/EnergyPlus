@@ -376,7 +376,7 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
 
         GenOutputVariablesAuditReport();
 
-        Psychrometrics::ShowPsychrometricSummary();
+        Psychrometrics::ShowPsychrometricSummary(state.outputFiles.audit);
 
         EnergyPlus::inputProcessor->reportOrphanRecordObjects();
         FluidProperties::ReportOrphanFluids();

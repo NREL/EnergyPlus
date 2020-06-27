@@ -70,7 +70,6 @@ OutputFile &OutputFile::ensure_open(const std::string &caller, bool output_to_fi
     return *this;
 }
 
-
 bool OutputFile::good() const
 {
     if (print_to_dev_null && os->bad()) { // badbit is set
@@ -100,6 +99,13 @@ void OutputFile::open_as_stringstream()
     os = std::unique_ptr<std::iostream>(new std::stringstream());
 }
 
+void OutputFile::flush()
+{
+    if (os) {
+        os->flush();
+    }
+}
+
 std::string OutputFile::get_output()
 {
     auto *ss = dynamic_cast<std::stringstream *>(os.get());
@@ -119,6 +125,7 @@ std::ostream::pos_type OutputFile::position() const noexcept
     return os->tellg();
 }
 
+<<<<<<< HEAD
 void OutputFile::open(bool output_to_file)
 {
     if (!output_to_file) {
@@ -129,7 +136,20 @@ void OutputFile::open(bool output_to_file)
         print_to_dev_null = false;
     }
 }
+=======
+void OutputFile::open(const bool forAppend)
+{
+    auto appendMode = [=]() {
+        if (forAppend) {
+            return std::ios_base::app;
+        } else {
+            return std::ios_base::trunc;
+        }
+    }();
+>>>>>>> origin/develop
 
+    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
+}
 
 std::vector<std::string> OutputFile::getLines()
 {
@@ -326,7 +346,8 @@ void OutputFiles::setSingleton(OutputFiles *newSingleton) noexcept
     getSingletonInternal() = newSingleton;
 }
 
-OutputFiles *&OutputFiles::getSingletonInternal() {
+OutputFiles *&OutputFiles::getSingletonInternal()
+{
     static OutputFiles *singleton{nullptr};
     return singleton;
 }

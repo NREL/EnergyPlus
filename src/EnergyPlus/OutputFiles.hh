@@ -48,11 +48,16 @@
 #ifndef OutputFiles_hh_INCLUDED
 #define OutputFiles_hh_INCLUDED
 
-#include <ObjexxFCL/gio.hh>
+#include <fstream>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <ostream>
+<<<<<<< HEAD
 #include <iterator>
+=======
+#include <vector>
+#include <cassert>
+>>>>>>> origin/develop
 
 namespace EnergyPlus {
 class OutputFile
@@ -67,14 +72,19 @@ public:
     OutputFile &ensure_open(const std::string &caller, bool output_to_file = true);
 
     std::string fileName;
+<<<<<<< HEAD
     void open(bool output_to_file = true);
+=======
+    void open(const bool forAppend = false);
+>>>>>>> origin/develop
     std::fstream::pos_type position() const noexcept;
     std::vector<std::string> getLines();
     void open_as_stringstream();
     std::string get_output();
+    void flush();
+    explicit OutputFile(std::string FileName);
 
 private:
-    explicit OutputFile(std::string FileName);
     std::unique_ptr<std::iostream> os;
     bool print_to_dev_null = false;
     template <typename... Args> friend void print(OutputFile &of, fmt::string_view format_str, const Args &... args);
@@ -94,6 +104,11 @@ public:
         OutputFile open(const std::string &caller, bool output_to_file = true) {
             OutputFile of{fileName};
             of.ensure_open(caller, output_to_file);
+            return of;
+        }
+        OutputFile try_open() {
+            OutputFile of{fileName};
+            of.open();
             return of;
         }
     };
@@ -190,12 +205,37 @@ public:
     OutputFile shade{"eplusshading.csv"};
 
     OutputFileName screenCsv{"eplusscreen.csv"};
+    OutputFileName endFile{"eplusout.end"};
 
     static OutputFiles &getSingleton();
     static void setSingleton(OutputFiles *newSingleton) noexcept;
 
 private:
     static OutputFiles *&getSingletonInternal();
+};
+
+class SharedFileHandle
+{
+    std::shared_ptr<OutputFile> file;
+    OutputFile *ptr()
+    {
+        if (!file) {
+            file = std::make_shared<OutputFile>("");
+        }
+
+        return file.get();
+    }
+
+public:
+    OutputFile &operator*()
+    {
+        return *ptr();
+    }
+
+    OutputFile *operator->()
+    {
+        return ptr();
+    }
 };
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count);

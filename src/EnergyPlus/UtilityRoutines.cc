@@ -101,7 +101,6 @@ namespace EnergyPlus {
 namespace UtilityRoutines {
     bool outputErrorHeader(true);
     ObjexxFCL::gio::Fmt fmtLD("*");
-    ObjexxFCL::gio::Fmt fmtA("(A)");
     std::string appendPerfLog_headerRow("");
     std::string appendPerfLog_valuesRow("");
 
@@ -662,7 +661,10 @@ namespace UtilityRoutines {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
+<<<<<<< HEAD
         static constexpr auto fmtLD("*");
+=======
+>>>>>>> origin/develop
         static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -671,7 +673,6 @@ namespace UtilityRoutines {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int tempfl;
         std::string NumWarnings;
         std::string NumSevere;
         std::string NumWarningsDuringWarmup;
@@ -697,7 +698,7 @@ namespace UtilityRoutines {
 
             ErrFound = false;
             TerminalError = false;
-            TestBranchIntegrity(state.outputFiles, ErrFound);
+            TestBranchIntegrity(state.dataBranchInputManager, state.outputFiles, ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(state, state.outputFiles, ErrFound);
             if (ErrFound) TerminalError = true;
@@ -748,7 +749,6 @@ namespace UtilityRoutines {
         Elapsed_Time -= Minutes * 60.0;
         Seconds = Elapsed_Time;
         if (Seconds < 0.0) Seconds = 0.0;
-        static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
         ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
@@ -763,12 +763,28 @@ namespace UtilityRoutines {
         ShowMessage("EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
                     " Severe Errors; Elapsed Time=" + Elapsed);
         DisplayString("EnergyPlus Run Time=" + Elapsed);
+<<<<<<< HEAD
 
         tempfl = state.outputFiles.open_gio(DataStringGlobals::outputEndFileName, "AbortEnergyPlus", state.outputFiles.outputControl.end);
 
         ObjexxFCL::gio::write(tempfl, fmtLD) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
                                                 " Severe Errors; Elapsed Time=" + Elapsed;
         ObjexxFCL::gio::close(tempfl);
+=======
+
+        {
+            auto tempfl = state.outputFiles.endFile.try_open();
+
+            if (!tempfl.good()) {
+                DisplayString("AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+            }
+            print(tempfl,
+                  "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n",
+                  NumWarnings,
+                  NumSevere,
+                  Elapsed);
+        }
+>>>>>>> origin/develop
 
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles();
@@ -776,7 +792,7 @@ namespace UtilityRoutines {
         ResultsFramework::resultsFramework->writeOutputs();
 
 #ifdef EP_Detailed_Timings
-        epSummaryTimes(Time_Finish - Time_Start);
+        epSummaryTimes(state.outputFiles.audit, Time_Finish - Time_Start);
 #endif
         std::cerr << "Program terminated: "
                   << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
@@ -938,8 +954,11 @@ namespace UtilityRoutines {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
+<<<<<<< HEAD
         static constexpr auto fmtA("(A)");
         static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
+=======
+>>>>>>> origin/develop
 
         // INTERFACE BLOCK SPECIFICATIONS
 
@@ -947,14 +966,12 @@ namespace UtilityRoutines {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int tempfl;
         std::string NumWarnings;
         std::string NumSevere;
         std::string NumWarningsDuringWarmup;
         std::string NumSevereDuringWarmup;
         std::string NumWarningsDuringSizing;
         std::string NumSevereDuringSizing;
-        std::string Elapsed;
         int Hours;      // Elapsed Time Hour Reporting
         int Minutes;    // Elapsed Time Minute Reporting
         Real64 Seconds; // Elapsed Time Second Reporting
@@ -995,7 +1012,7 @@ namespace UtilityRoutines {
         Elapsed_Time -= Minutes * 60.0;
         Seconds = Elapsed_Time;
         if (Seconds < 0.0) Seconds = 0.0;
-        ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
+        const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
         ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
         ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
@@ -1014,11 +1031,21 @@ namespace UtilityRoutines {
         ShowMessage("EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
+<<<<<<< HEAD
         tempfl = outputFiles.open_gio(DataStringGlobals::outputEndFileName, "EndEnergyPlus", outputFiles.outputControl.end);
 
         ObjexxFCL::gio::write(tempfl, fmtA) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere +
                                                " Severe Errors; Elapsed Time=" + Elapsed;
         ObjexxFCL::gio::close(tempfl);
+=======
+        {
+            auto tempfl = outputFiles.endFile.try_open();
+            if (!tempfl.good()) {
+                DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+            }
+            print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
+        }
+>>>>>>> origin/develop
 
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles();
@@ -2042,7 +2069,6 @@ namespace UtilityRoutines {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CacheIPErrorFile;
         using DataGlobals::DoingInputProcessing;
         using DataGlobals::err_stream;
         using DataStringGlobals::IDDVerString;
@@ -2070,7 +2096,10 @@ namespace UtilityRoutines {
         if (!DoingInputProcessing) {
             if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
         } else {
-            ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
+            // CacheIPErrorFile is never opened or closed
+            // so this output would just go to stdout
+            // ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
+            std::cout << ErrorMessage << '\n';
         }
         if (present(OutUnit1)) {
             print(OutUnit1(), "  {}", ErrorMessage);
