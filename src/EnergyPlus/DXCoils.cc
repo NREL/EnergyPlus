@@ -57,6 +57,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
@@ -75,7 +76,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
@@ -154,14 +154,14 @@ namespace DXCoils {
     int const On(1);  // normal compressor operation
     int const Off(0); // signal DXCoil that compressor shouldn't run
 
-    Real64 const RatedInletAirTemp(26.6667);        // 26.6667C or 80F
-    Real64 const RatedInletWetBulbTemp(19.44);      // 19.44 or 67F
-    Real64 const RatedInletAirHumRat(0.01125);      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    Real64 const RatedOutdoorAirTemp(35.0);         // 35 C or 95F
-    Real64 const RatedInletAirTempHeat(21.11);      // 21.11C or 70F
-    Real64 const RatedOutdoorAirTempHeat(8.33);     // 8.33 C or 47F
-    Real64 const RatedOutdoorWetBulbTempHeat(6.11); // 6.11 C or 43F
-    Real64 const RatedInletWetBulbTempHeat(15.55);  // 15.55 or 60F
+    Real64 const RatedInletAirTemp(26.6667);   // 26.6667C or 80F
+    Real64 const RatedInletWetBulbTemp(19.4444); // 19.44 or 67F
+    Real64 const RatedInletAirHumRat(0.0111847);      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    Real64 const RatedOutdoorAirTemp(35.0);                                            // 35 C or 95F
+    Real64 const RatedInletAirTempHeat(21.1111);                                       // 21.11C or 70F
+    Real64 const RatedOutdoorAirTempHeat(8.3333);                                      // 8.33 C or 47F
+    Real64 const RatedOutdoorWetBulbTempHeat(6.1111);                                  // 6.11 C or 43F
+    Real64 const RatedInletWetBulbTempHeat(15.5556);                                   // 15.55 or 60F
 
     Real64 const DryCoilOutletHumRatioMin(0.00001); // dry coil outlet minimum hum ratio kgWater/kgDryAir
 
@@ -268,7 +268,8 @@ namespace DXCoils {
     } // namespace
     // Functions
 
-    void SimDXCoil(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimDXCoil(EnergyPlusData &state,
+                   std::string const &CompName,   // name of the fan coil unit
                    int const CompOp,              // compressor operation; 1=on, 0=off
                    bool const FirstHVACIteration, // True when first HVAC iteration
                    int &CompIndex,
@@ -395,7 +396,8 @@ namespace DXCoils {
         ReportDXCoil(DXCoilNum);
     }
 
-    void SimDXCoilMultiSpeed(EnergyPlusData &state, std::string const &CompName, // name of the fan coil unit
+    void SimDXCoilMultiSpeed(EnergyPlusData &state,
+                             std::string const &CompName, // name of the fan coil unit
                              Real64 const SpeedRatio,     // = (CompressorSpeed - CompressorSpeedMin) /
                              Real64 const CycRatio,       // cycling part load ratio for variable speed
                              int &CompIndex,
@@ -510,7 +512,8 @@ namespace DXCoils {
         ReportDXCoil(DXCoilNum);
     }
 
-    void SimDXCoilMultiMode(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimDXCoilMultiMode(EnergyPlusData &state,
+                            std::string const &CompName,   // name of the fan coil unit
                             int const EP_UNUSED(CompOp),   // compressor operation; 1=on, 0=off !unused1208
                             bool const FirstHVACIteration, // true if first hvac iteration
                             Real64 const PartLoadRatio,    // part load ratio
@@ -6549,7 +6552,8 @@ namespace DXCoils {
             // store fan info for coil
             if (DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                 if (DXCoil(DXCoilNum).SupplyFanIndex > -1) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoil(DXCoilNum).Name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                 DXCoil(DXCoilNum).Name,
                                                                  DXCoil(DXCoilNum).DXCoilType,
                                                                  DXCoil(DXCoilNum).SupplyFanName,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
@@ -6558,7 +6562,8 @@ namespace DXCoils {
 
             } else {
                 if (DXCoil(DXCoilNum).SupplyFanIndex > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoil(DXCoilNum).Name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                 DXCoil(DXCoilNum).Name,
                                                                  DXCoil(DXCoilNum).DXCoilType,
                                                                  DXCoil(DXCoilNum).SupplyFanName,
                                                                  DataAirSystems::structArrayLegacyFanModels,
@@ -6648,11 +6653,11 @@ namespace DXCoils {
         static std::string const RoutineName("SizeDXCoil");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 CoilInTemp;                      // DX coil inlet temperature
-        int CapacityStageNum;                   // Loop index for 1,Number of capacity stages
-        int DehumidModeNum;                     // Loop index for 1,Number of enhanced dehumidification modes
-        int Mode;                               // Operating mode for MultiMode DX coil; Always 1 for other coil types
-        int NumOfSpeedCompanion;                // Number of speed for a companion cooling coil (Multispeed HO heating coil only
+        Real64 CoilInTemp;       // DX coil inlet temperature
+        int CapacityStageNum;    // Loop index for 1,Number of capacity stages
+        int DehumidModeNum;      // Loop index for 1,Number of enhanced dehumidification modes
+        int Mode;                // Operating mode for MultiMode DX coil; Always 1 for other coil types
+        int NumOfSpeedCompanion; // Number of speed for a companion cooling coil (Multispeed HO heating coil only
         std::string equipName;
         Real64 RatedAirVolFlowRateDes;          // Design rated air volume flow for reporting
         Real64 RatedAirVolFlowRateUser;         // Hard-sized rated air volume flow for reporting
@@ -6755,7 +6760,7 @@ namespace DXCoils {
         DefrostCapacityUser = 0.0;
         MSRatedAirVolFlowRateDes = 0.0;
         MSRatedAirVolFlowRateUser = 0.0;
-        //MSRatedTotCapDes = 0.0;
+        // MSRatedTotCapDes = 0.0;
         MSRatedTotCapUser = 0.0;
         MSRatedSHRDes = 0.0;
         MSRatedSHRUser = 0.0;
@@ -7300,28 +7305,29 @@ namespace DXCoils {
                     DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = TempSize;
                     DataEMSOverrideON = false;
                     DataEMSOverride = 0.0;
-                    if ( !IsAutoSize && !HardSizeNoDesRun) {
+                    if (!IsAutoSize && !HardSizeNoDesRun) {
                         TempSize = AutoSize;
                         bPRINT = false;
                         RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                         MSRatedAirVolFlowRateDes = TempSize;
                         bPRINT = true;
                     }
-                    if ( IsAutoSize) {
-                        MSRatedAirVolFlowRateDes = TempSize;;
+                    if (IsAutoSize) {
+                        MSRatedAirVolFlowRateDes = TempSize;
+                        ;
                     }
                 } else {
                     FieldNum = 10 + (Mode - 1) * 13;
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                     SizingMethod = CoolingAirflowSizing;
-                    if ( IsAutoSize || !HardSizeNoDesRun) {
+                    if (IsAutoSize || !HardSizeNoDesRun) {
                         SizingMethod = AutoCalculateSizing;
                         // Auto size low speed flow to fraction of the highest speed flow
-                        DataConstantUsedForSizing = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( DXCoil( DXCoilNum ).NumOfSpeeds );
-                        if ( !IsAutoSize && !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
-                        DataFractionUsedForSizing = (float)Mode / DXCoil( DXCoilNum ).NumOfSpeeds;
+                        DataConstantUsedForSizing = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(DXCoil(DXCoilNum).NumOfSpeeds);
+                        if (!IsAutoSize && !HardSizeNoDesRun) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
+                        DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;
                     }
-                    TempSize = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
+                    TempSize = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideON(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideValue(Mode);
                     RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
@@ -7352,37 +7358,37 @@ namespace DXCoils {
                 if (DXCoil(DXCoilNum).MSRatedTotCap(Mode) == AutoSize) {
                     IsAutoSize = true;
                 }
-                CompName = DXCoil( DXCoilNum ).Name;
-                CompType = DXCoil( DXCoilNum ).DXCoilType;
+                CompName = DXCoil(DXCoilNum).Name;
+                CompType = DXCoil(DXCoilNum).DXCoilType;
                 DataSizing::DataIsDXCoil = true;
-                DataSizing::DataTotCapCurveIndex = DXCoil( DXCoilNum ).MSCCapFTemp( Mode );
+                DataSizing::DataTotCapCurveIndex = DXCoil(DXCoilNum).MSCCapFTemp(Mode);
                 if (Mode == DXCoil(DXCoilNum).NumOfSpeeds) {
                     PrintFlag = true;
                     DataSizing::DataFlowUsedForSizing = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
                     SizingMethod = CoolingCapacitySizing;
                     FieldNum = 7 + (Mode - 1) * 13;
-                    SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames( FieldNum ) + " [W]";
-                    DataEMSOverrideON = DXCoil( DXCoilNum ).RatedTotCapEMSOverrideOn( Mode );
-                    DataEMSOverride = DXCoil( DXCoilNum ).RatedTotCapEMSOverrideValue( Mode );
-                    MSRatedTotCapDesAtMaxSpeed = DXCoil( DXCoilNum ).MSRatedTotCap( Mode );
+                    SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
+                    DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
+                    DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
+                    MSRatedTotCapDesAtMaxSpeed = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                     if (!HardSizeNoDesRun) {
                         PrintFlag = false;
                         TempSize = DataSizing::AutoSize;
                         // Auto size capacity at the highest speed
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         SizingMethod = AutoCalculateSizing;
                         DataConstantUsedForSizing = TempSize;
                         DataFractionUsedForSizing = 1.0;
                         MSRatedTotCapDesAtMaxSpeed = TempSize;
-                        DXCoil( DXCoilNum ).MSRatedTotCapDes( Mode ) = TempSize;
+                        DXCoil(DXCoilNum).MSRatedTotCapDes(Mode) = TempSize;
                         PrintFlag = true;
                     }
-                    TempSize = DXCoil( DXCoilNum ).MSRatedTotCap( Mode );
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-                    DXCoil( DXCoilNum ).MSRatedTotCap( Mode ) = TempSize;
+                    TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    DXCoil(DXCoilNum).MSRatedTotCap(Mode) = TempSize;
                     if (IsAutoSize) {
                         MSRatedTotCapDesAtMaxSpeed = TempSize;
-                        DXCoil( DXCoilNum ).MSRatedTotCapDes( Mode ) = TempSize;
+                        DXCoil(DXCoilNum).MSRatedTotCapDes(Mode) = TempSize;
                     }
                 } else {
                     // cooling capacity at lower speeds
@@ -7393,13 +7399,13 @@ namespace DXCoils {
                     if (IsAutoSize || !HardSizeNoDesRun) {
                         SizingMethod = AutoCalculateSizing;
                         // auto size low speed capacity to fraction of the highest speed capacity
-                        if ( !HardSizeNoDesRun ) {
+                        if (!HardSizeNoDesRun) {
                             DataConstantUsedForSizing = MSRatedTotCapDesAtMaxSpeed;
                         } else {
-                            DataConstantUsedForSizing = DXCoil( DXCoilNum ).MSRatedTotCap( DXCoil( DXCoilNum ).NumOfSpeeds );
+                            DataConstantUsedForSizing = DXCoil(DXCoilNum).MSRatedTotCap(DXCoil(DXCoilNum).NumOfSpeeds);
                         }
                         DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;
-                        DXCoil( DXCoilNum ).MSRatedTotCapDes( Mode ) = DataConstantUsedForSizing * DataFractionUsedForSizing;
+                        DXCoil(DXCoilNum).MSRatedTotCapDes(Mode) = DataConstantUsedForSizing * DataFractionUsedForSizing;
                     }
                     TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
@@ -7453,14 +7459,14 @@ namespace DXCoils {
                     // set to yes unless the code below is commented out
                     MSRatedSHRDes = DXCoil(DXCoilNum).MSRatedSHR(Mode);
                 } else {
-                    //TempSize = DXCoil(DXCoilNum).MSRatedSHR(Mode);
-                    //SizingString = "Speed " + TrimSigDigits(Mode) + " Rated Sensible Heat Ratio";
-                    //DataFlowUsedForSizing = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
-                    //DataCapacityUsedForSizing = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
-                    //DataEMSOverrideON = DXCoil(DXCoilNum).RatedSHREMSOverrideOn(Mode);
-                    //DataEMSOverride = DXCoil(DXCoilNum).RatedSHREMSOverrideValue(Mode);
-                    //RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
-                    //DXCoil(DXCoilNum).MSRatedSHR(Mode) = TempSize;
+                    // TempSize = DXCoil(DXCoilNum).MSRatedSHR(Mode);
+                    // SizingString = "Speed " + TrimSigDigits(Mode) + " Rated Sensible Heat Ratio";
+                    // DataFlowUsedForSizing = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
+                    // DataCapacityUsedForSizing = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
+                    // DataEMSOverrideON = DXCoil(DXCoilNum).RatedSHREMSOverrideOn(Mode);
+                    // DataEMSOverride = DXCoil(DXCoilNum).RatedSHREMSOverrideValue(Mode);
+                    // RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                    // DXCoil(DXCoilNum).MSRatedSHR(Mode) = TempSize;
                     if (IsAutoSize) {
                         DXCoil(DXCoilNum).MSRatedSHR(Mode) = MSRatedSHRDes;
                         ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
@@ -7510,9 +7516,9 @@ namespace DXCoils {
                 if (DXCoil(DXCoilNum).MSEvapCondAirFlow(Mode) == AutoSize) {
                     IsAutoSize = true;
                 }
-                if ( IsAutoSize || !HardSizeNoDesRun ) {
-                     // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
-                     MSEvapCondAirFlowDes = ((float)Mode / DXCoil(DXCoilNum).NumOfSpeeds) * MSRatedTotCapDesAtMaxSpeed * 0.000114;
+                if (IsAutoSize || !HardSizeNoDesRun) {
+                    // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+                    MSEvapCondAirFlowDes = ((float)Mode / DXCoil(DXCoilNum).NumOfSpeeds) * MSRatedTotCapDesAtMaxSpeed * 0.000114;
                 } else {
                     // this is done to duplicate any existing calc method
                     MSEvapCondAirFlowDes = DXCoil(DXCoilNum).MSRatedTotCap(Mode) * 0.000114;
@@ -7567,7 +7573,7 @@ namespace DXCoils {
                     IsAutoSize = true;
                 }
 
-                if ( IsAutoSize || !HardSizeNoDesRun ) {
+                if (IsAutoSize || !HardSizeNoDesRun) {
                     // Auto size low speed evap condenser pump power to 1/3 Total Capacity * 0.004266 w/w (15 w/ton)
                     MSEvapCondPumpElecNomPowerDes = ((float)Mode / DXCoil(DXCoilNum).NumOfSpeeds) * MSRatedTotCapDesAtMaxSpeed * 0.004266;
                 } else {
@@ -7641,7 +7647,7 @@ namespace DXCoils {
                     DataEMSOverride = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideValue(Mode);
                     RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = TempSize;
-                    if ( !IsAutoSize && !HardSizeNoDesRun ) {
+                    if (!IsAutoSize && !HardSizeNoDesRun) {
                         TempSize = AutoSize;
                         bPRINT = false;
                         RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
@@ -7652,14 +7658,14 @@ namespace DXCoils {
                     FieldNum = 12 + (Mode - 1) * 5;
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                     SizingMethod = HeatingAirflowSizing;
-                    if ( IsAutoSize || !HardSizeNoDesRun ) {
+                    if (IsAutoSize || !HardSizeNoDesRun) {
                         SizingMethod = AutoCalculateSizing;
                         // Auto size low speed flow to fraction of the highest speed capacity
                         DataConstantUsedForSizing = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(DXCoil(DXCoilNum).NumOfSpeeds);
-                        if (!IsAutoSize && !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
+                        if (!IsAutoSize && !HardSizeNoDesRun) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
                         DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;
                     }
-                    TempSize = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
+                    TempSize = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
                     RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                     DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = TempSize;
                 }
@@ -7751,7 +7757,7 @@ namespace DXCoils {
                         TempSize = DataSizing::AutoSize;
                         DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
                         DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         MSRatedTotCapDesAtMaxSpeed = TempSize;
                         SizingMethod = AutoCalculateSizing;
                         DataConstantUsedForSizing = TempSize;
@@ -7774,10 +7780,10 @@ namespace DXCoils {
                     if (IsAutoSize || !HardSizeNoDesRun) {
                         SizingMethod = AutoCalculateSizing;
                         // auto size low speed capacity to fraction of the highest speed capacity
-                        if ( !HardSizeNoDesRun ) {
+                        if (!HardSizeNoDesRun) {
                             DataConstantUsedForSizing = MSRatedTotCapDesAtMaxSpeed;
                         } else {
-                            DataConstantUsedForSizing = DXCoil( DXCoilNum ).MSRatedTotCap( DXCoil( DXCoilNum ).NumOfSpeeds );
+                            DataConstantUsedForSizing = DXCoil(DXCoilNum).MSRatedTotCap(DXCoil(DXCoilNum).NumOfSpeeds);
                         }
                         DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;
                     }
@@ -8553,7 +8559,7 @@ namespace DXCoils {
             CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, OutdoorPressure);
             CompAmbTemp = OutdoorDryBulb;
         } else if (DXCoil(DXCoilNum).CondenserType(Mode) == WaterHeater) {
-            CompAmbTemp = HPWHCrankcaseDBTemp; // Temperature at HP water heater compressor
+            CompAmbTemp = HPWHCrankcaseDBTemp;   // Temperature at HP water heater compressor
             CondInletTemp = HPWHCrankcaseDBTemp; // Temperature at HP water heater compressor
         }
 
@@ -9434,12 +9440,12 @@ namespace DXCoils {
         Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
 
         static Real64 CurrentEndTime(0.0); // end time of time step for current simulation time step
-        //static Real64 MinAirHumRat(0.0);   // minimum of the inlet air humidity ratio and the outlet air humidity ratio
-        int Mode;                          // Performance mode for Multimode DX coil; Always 1 for other coil types
-        Real64 OutletAirTemp;              // Supply air temperature (average value if constant fan, full output if cycling fan)
-        Real64 OutletAirHumRat;            // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
-        Real64 OutletAirEnthalpy;          // Supply air enthalpy (average value if constant fan, full output if cycling fan)
-        Real64 ADiff;                      // Used for exponential
+        // static Real64 MinAirHumRat(0.0);   // minimum of the inlet air humidity ratio and the outlet air humidity ratio
+        int Mode;                 // Performance mode for Multimode DX coil; Always 1 for other coil types
+        Real64 OutletAirTemp;     // Supply air temperature (average value if constant fan, full output if cycling fan)
+        Real64 OutletAirHumRat;   // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
+        Real64 OutletAirEnthalpy; // Supply air enthalpy (average value if constant fan, full output if cycling fan)
+        Real64 ADiff;             // Used for exponential
 
         // If Performance mode not present, then set to 1.  Used only by Multimode/Multispeed DX coil (otherwise mode = 1)
         if (present(PerfMode)) {
@@ -10075,7 +10081,7 @@ namespace DXCoils {
         Real64 OutletAirTemp;             // Supply air temperature (average value if constant fan, full output if cycling fan)
         Real64 OutletAirHumRat;           // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
         Real64 OutletAirEnthalpy;         // Supply air enthalpy (average value if constant fan, full output if cycling fan)
-        static Real64 CompAmbTemp(0.0); // Ambient temperature at compressor
+        static Real64 CompAmbTemp(0.0);   // Ambient temperature at compressor
 
         if (present(OnOffAirFlowRatio)) {
             AirFlowRatio = OnOffAirFlowRatio;
@@ -10549,7 +10555,7 @@ namespace DXCoils {
         Real64 OutdoorHumRat;            // Outdoor humidity ratio at condenser (kg/kg)
         Real64 OutdoorPressure;          // Outdoor barometric pressure at condenser (Pa)
         bool LocalForceOn;
-        Real64 AirMassFlowRatio2; // Ratio of low speed air mass flow to rated air mass flow
+        Real64 AirMassFlowRatio2;       // Ratio of low speed air mass flow to rated air mass flow
         static Real64 CompAmbTemp(0.0); // Ambient temperature at compressor
 
         if (present(ForceOn)) {
@@ -13480,15 +13486,20 @@ namespace DXCoils {
 
         // Formats
         static constexpr auto Header(
-            "! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, Standard Net Cooling Capacity {{W}}, Standard Net Cooling Capacity {{Btu/h}}, IEER {{Btu/W-h}}, COP 100% Capacity {{W/W}}, COP 75% Capacity {{W/W}}, COP 50% Capacity {{W/W}}, COP 25% Capacity {{W/W}}, EER 100% Capacity {{Btu/W-h}}, EER 75% Capacity {{Btu/W-h}}, EER 50% Capacity {{Btu/W-h}}, EER 25% Capacity {{Btu/W-h}}, Supply Air Flow 100% {{kg/s}}, Supply Air Flow 75% {{kg/s}},Supply Air Flow 50% {{kg/s}},Supply Air Flow 25% {{kg/s}}\n");
+            "! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, Standard Net Cooling Capacity "
+            "{{W}}, Standard Net Cooling Capacity {{Btu/h}}, IEER {{Btu/W-h}}, COP 100% Capacity {{W/W}}, COP 75% Capacity {{W/W}}, COP 50% Capacity "
+            "{{W/W}}, COP 25% Capacity {{W/W}}, EER 100% Capacity {{Btu/W-h}}, EER 75% Capacity {{Btu/W-h}}, EER 50% Capacity {{Btu/W-h}}, EER 25% "
+            "Capacity {{Btu/W-h}}, Supply Air Flow 100% {{kg/s}}, Supply Air Flow 75% {{kg/s}},Supply Air Flow 50% {{kg/s}},Supply Air Flow 25% "
+            "{{kg/s}}\n");
 
         static constexpr auto Format_891{
-            " VAV DX Cooling Coil Standard Rating Information, {},{},{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.4R},{:.4R},{:.4R},{:.4R},\n"};
+            " VAV DX Cooling Coil Standard Rating Information, "
+            "{},{},{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.4R},{:.4R},{:.4R},{:.4R},\n"};
 
         // Get fan index and name if not already available
         if (DXCoil(DXCoilNum).SupplyFanIndex == -1)
-            GetFanIndexForTwoSpeedCoil(state,
-                DXCoilNum, DXCoil(DXCoilNum).SupplyFanIndex, DXCoil(DXCoilNum).SupplyFanName, DXCoil(DXCoilNum).SupplyFan_TypeNum);
+            GetFanIndexForTwoSpeedCoil(
+                state, DXCoilNum, DXCoil(DXCoilNum).SupplyFanIndex, DXCoil(DXCoilNum).SupplyFanName, DXCoil(DXCoilNum).SupplyFan_TypeNum);
         if (DXCoil(DXCoilNum).SupplyFanIndex == -1) { // didn't find VAV fan, do not rate this coil
             DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject = false;
             ShowWarningError("CalcTwoSpeedDXCoilStandardRating: Did not find an appropriate fan associated with DX coil named = \"" +
@@ -13545,8 +13556,8 @@ namespace DXCoils {
                     HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
                     FanPowerCorrection = HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->fanPower();
                 } else {
-                    Fans::SimulateFanComponents(state,
-                        DXCoil(DXCoilNum).SupplyFanName, true, DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
+                    Fans::SimulateFanComponents(
+                        state, DXCoil(DXCoilNum).SupplyFanName, true, DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
                     FanPowerCorrection = Fans::GetFanPower(DXCoil(DXCoilNum).SupplyFanIndex);
                 }
 
@@ -13639,14 +13650,15 @@ namespace DXCoils {
 
             LowerBoundMassFlowRate = 0.01 * DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
 
-            TempSolveRoot::SolveRoot(state, AccuracyTolerance,
-                      MaximumIterations,
-                      SolverFlag,
-                      PartLoadAirMassFlowRate,
-                      CalcTwoSpeedDXCoilIEERResidual,
-                      LowerBoundMassFlowRate,
-                      DXCoil(DXCoilNum).RatedAirMassFlowRate(1),
-                      Par);
+            TempSolveRoot::SolveRoot(state,
+                                     AccuracyTolerance,
+                                     MaximumIterations,
+                                     SolverFlag,
+                                     PartLoadAirMassFlowRate,
+                                     CalcTwoSpeedDXCoilIEERResidual,
+                                     LowerBoundMassFlowRate,
+                                     DXCoil(DXCoilNum).RatedAirMassFlowRate(1),
+                                     Par);
 
             if (SolverFlag == -1) {
 
@@ -13685,8 +13697,8 @@ namespace DXCoils {
                         HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
                         FanPowerCorrection = HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->fanPower();
                     } else {
-                        Fans::SimulateFanComponents(state,
-                            DXCoil(DXCoilNum).SupplyFanName, true, DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
+                        Fans::SimulateFanComponents(
+                            state, DXCoil(DXCoilNum).SupplyFanName, true, DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
                         FanPowerCorrection = Fans::GetFanPower(DXCoil(DXCoilNum).SupplyFanIndex);
                     }
 
@@ -13808,21 +13820,34 @@ namespace DXCoils {
         }
 
         const auto &fan_type_name = [&]() -> std::pair<const char *, std::string> {
-          if (DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
-            return {"Fan:VariableVolume", DXCoil(DXCoilNum).SupplyFanName};
-          } else {
-            return {"N/A", "N/A"};
-          }
+            if (DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
+                return {"Fan:VariableVolume", DXCoil(DXCoilNum).SupplyFanName};
+            } else {
+                return {"N/A", "N/A"};
+            }
         }();
 
-        print(state.outputFiles.eio, Format_891
-            , "Coil:Cooling:DX:TwoSpeed" , DXCoil(DXCoilNum).Name , fan_type_name.first, fan_type_name.second
-            , NetCoolingCapRated , (NetCoolingCapRated * ConvFromSIToIP) , IEER
-            , EER_TestPoint_SI(1) , EER_TestPoint_SI(2) , EER_TestPoint_SI(3)
-            , EER_TestPoint_SI(4) , EER_TestPoint_IP(1) , EER_TestPoint_IP(2)
-            , EER_TestPoint_IP(3) , EER_TestPoint_IP(4) , SupAirMdot_TestPoint(1)
-            , SupAirMdot_TestPoint(2) , SupAirMdot_TestPoint(3)
-            , SupAirMdot_TestPoint(4));
+        print(state.outputFiles.eio,
+              Format_891,
+              "Coil:Cooling:DX:TwoSpeed",
+              DXCoil(DXCoilNum).Name,
+              fan_type_name.first,
+              fan_type_name.second,
+              NetCoolingCapRated,
+              (NetCoolingCapRated * ConvFromSIToIP),
+              IEER,
+              EER_TestPoint_SI(1),
+              EER_TestPoint_SI(2),
+              EER_TestPoint_SI(3),
+              EER_TestPoint_SI(4),
+              EER_TestPoint_IP(1),
+              EER_TestPoint_IP(2),
+              EER_TestPoint_IP(3),
+              EER_TestPoint_IP(4),
+              SupAirMdot_TestPoint(1),
+              SupAirMdot_TestPoint(2),
+              SupAirMdot_TestPoint(3),
+              SupAirMdot_TestPoint(4));
 
         PreDefTableEntry(pdchDXCoolCoilType, DXCoil(DXCoilNum).Name, "Coil:Cooling:DX:TwoSpeed");
         // W to tons
@@ -13859,7 +13884,8 @@ namespace DXCoils {
         OutDryBulbTemp = heldOutDryBulb; // reset the outdoor dry bulb when done with it
     }
 
-    void GetFanIndexForTwoSpeedCoil(EnergyPlusData &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum)
+    void GetFanIndexForTwoSpeedCoil(
+        EnergyPlusData &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -13936,7 +13962,8 @@ namespace DXCoils {
         }
     }
 
-    Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state,
+                                          Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                           Array1D<Real64> const &Par          // par(1) = DX coil number
     )
     {
@@ -14030,8 +14057,8 @@ namespace DXCoils {
             if (DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
             } else {
-                Fans::SimulateFanComponents(state,
-                    DXCoil(DXCoilNum).SupplyFanName, true, DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
+                Fans::SimulateFanComponents(
+                    state, DXCoil(DXCoilNum).SupplyFanName, true, DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
             }
 
             FanHeatCorrection = Node(FanOutletNodeNum).Enthalpy - Node(FanInletNodeNum).Enthalpy;
@@ -14135,7 +14162,8 @@ namespace DXCoils {
         }
     }
 
-    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state),
+                           std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     )
@@ -14394,7 +14422,8 @@ namespace DXCoils {
 
         return MinOAT;
     }
-    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state),
+                         std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     )
@@ -14435,12 +14464,13 @@ namespace DXCoils {
 
     int getCoilInNodeIndex(int const &CoilIndex, // coil index
                            bool &ErrorsFound     // set to true if problem
-    ) {
+    )
+    {
 
         int NodeNumber; // returned node number of matched coil
 
         // Obtains and Allocates DXCoils
-        if ( GetCoilsInputFlag ) {
+        if (GetCoilsInputFlag) {
             GetDXCoils();
             GetCoilsInputFlag = false;
         }
@@ -14456,7 +14486,8 @@ namespace DXCoils {
         return NodeNumber;
     }
 
-    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state),
+                          std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     )
@@ -14498,12 +14529,13 @@ namespace DXCoils {
 
     int getCoilOutNodeIndex(int const &CoilIndex, // must match coil types in this module
                             bool &ErrorsFound     // set to true if problem
-    ) {
+    )
+    {
 
         int NodeNumber; // returned node number of matched coil
 
         // Obtains and Allocates DXCoils
-        if ( GetCoilsInputFlag ) {
+        if (GetCoilsInputFlag) {
             GetDXCoils();
             GetCoilsInputFlag = false;
         }
@@ -14894,7 +14926,8 @@ namespace DXCoils {
         return CapFTCurveIndex;
     }
 
-    void SetDXCoolingCoilData(EnergyPlusData &state, int const DXCoilNum,                    // Number of DX Cooling Coil
+    void SetDXCoolingCoilData(EnergyPlusData &state,
+                              int const DXCoilNum,                    // Number of DX Cooling Coil
                               bool &ErrorsFound,                      // Set to true if certain errors found
                               Optional_int HeatingCoilPLFCurvePTR,    // Parameter equivalent of heating coil PLR curve index
                               Optional_int CondenserType,             // Parameter equivalent of condenser type parameter
@@ -15033,13 +15066,15 @@ namespace DXCoils {
             DXCoil(DXCoilNum).SupplyFan_TypeNum = SupplyFan_TypeNum;
             if (DXCoil(DXCoilNum).SupplyFanIndex > -1) {
                 if (SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoil(DXCoilNum).Name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                 DXCoil(DXCoilNum).Name,
                                                                  DXCoil(DXCoilNum).DXCoilType,
                                                                  HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->name,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
                                                                  DXCoil(DXCoilNum).SupplyFanIndex);
                 } else {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoil(DXCoilNum).Name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                 DXCoil(DXCoilNum).Name,
                                                                  DXCoil(DXCoilNum).DXCoilType,
                                                                  Fans::Fan(DXCoil(DXCoilNum).SupplyFanIndex).FanName,
                                                                  DataAirSystems::structArrayLegacyFanModels,
@@ -15882,19 +15917,19 @@ namespace DXCoils {
             //  InletAirHumRat may be modified in this ADP/BF loop, use temporary varible for calculations
 
             // commented, not used issue #6950
-            //InletAirHumRatTemp = InletAirHumRat;
+            // InletAirHumRatTemp = InletAirHumRat;
 
             //// Calculate apparatus dew point conditions using TotCap and CBF
-            //hDelta = TotCap / AirMassFlow;
+            // hDelta = TotCap / AirMassFlow;
             //// there is an issue here with using CBF to calculate the ADP enthalpy.
             //// at low loads the bypass factor increases significantly.
-            //hADP = InletAirEnthalpy - hDelta / (1.0 - CBF);
-            //tADP = PsyTsatFnHPb(hADP, OutdoorPressure, RoutineName);
+            // hADP = InletAirEnthalpy - hDelta / (1.0 - CBF);
+            // tADP = PsyTsatFnHPb(hADP, OutdoorPressure, RoutineName);
             ////  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
             ////  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
-            //wADP = min(InletAirHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
-            //hTinwADP = PsyHFnTdbW(InletAirDryBulbTemp, wADP);
-            //if ((InletAirEnthalpy - hADP) > 1.e-10) {
+            // wADP = min(InletAirHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
+            // hTinwADP = PsyHFnTdbW(InletAirDryBulbTemp, wADP);
+            // if ((InletAirEnthalpy - hADP) > 1.e-10) {
             //    SHR = min((hTinwADP - hADP) / (InletAirEnthalpy - hADP), 1.0);
             //} else {
             //    SHR = 1.0;
