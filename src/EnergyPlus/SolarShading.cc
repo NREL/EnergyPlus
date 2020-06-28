@@ -8326,8 +8326,6 @@ namespace SolarShading {
                                 }
 
                                 CFBoverlap = 0.0;
-                                // delete values from previous timestep
-                                //AWinCFOverlap = 0.0;
 
                                 // Calculate effects on all back surfaces for each of basis directions.  Each of basis directions from the back of the
                                 // window has to be considered as beam and therefore calcualte CFBoverlap for each of them

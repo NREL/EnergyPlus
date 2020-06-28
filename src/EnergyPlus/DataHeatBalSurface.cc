@@ -93,6 +93,7 @@ namespace DataHeatBalSurface {
     Real64 MaxSurfaceTempLimitBeforeFatal(500.0); // 2.5 times MaxSurfaceTempLimit
     Array1D<Real64> CTFConstInPart;               // Constant Inside Portion of the CTF calculation
     Array1D<Real64> CTFConstOutPart;              // Constant Outside Portion of the CTF calculation
+    // This group of arrays (soon to be vectors) added to facilitate vectorizable loops in CalcHeatBalanceInsideSurf2CTFOnly
     Array1D<Real64> CTFCross0;                    // Construct.CTFCross(0)
     Array1D<Real64> CTFInside0;                   // Construct.CTFInside(0)
     Array1D<Real64> CTFSourceIn0;                 // Construct.CTFSourceIn(0)
@@ -106,6 +107,7 @@ namespace DataHeatBalSurface {
     Array1D_int IsNotPoolSurf;                    // 1 not pool, 0 is pool
     Array1D<Real64> TempTermSurf;                 // TempTerm for heatbalance equation
     Array1D<Real64> TempDivSurf;                  // Divisor for heatbalance equation
+    // end group added to support CalcHeatBalanceInsideSurf2CTFOnly
     Array1D<Real64> TempSurfIn;                   // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> TempSurfInTmp;                // Inside Surface Temperature Of Each Heat Transfer Surface
     Array1D<Real64> HcExtSurf;                    // Outside Convection Coefficient

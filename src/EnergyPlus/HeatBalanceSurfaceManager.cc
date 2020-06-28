@@ -2885,7 +2885,6 @@ namespace HeatBalanceSurfaceManager {
                                             // radiation originating from beam on exterior side.  Third item (AWinCFOverlap(SurfNum,Lay)) is
                                             // accounting for absorptances from beam hitting back of the window which passes through rest of exterior
                                             // windows
-                                            //auto& thisState(SurfaceWindow(SurfNum).ComplexFen.State(CurrentState));
                                             QRadSWwinAbs(Lay, SurfNum) =
                                                 SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyFtAbs(Lay) * SkySolarInc +
                                                 SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyGndAbs(Lay) * GndSolarInc +
@@ -3636,9 +3635,6 @@ namespace HeatBalanceSurfaceManager {
                             // Total Shortwave Radiation Absorbed on Inside of Surface[W]
                             SWInAbsTotalReport(SurfNum) += QRadSWwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
                             // Total Shortwave Absorbed:All Glass Layers[W]
-                            //Real64 qRadSW = QRadSWwinAbs(IGlass, SurfNum);
-                            //Real64 area = Surface(SurfNum).Area;
-                            //std::string name = Surface(SurfNum).Name;
                             SWwinAbsTotalReport(SurfNum) += QRadSWwinAbs(IGlass, SurfNum) * Surface(SurfNum).Area;
                         }
                     } else if (ShadeFlag == IntShadeOn || ShadeFlag >= 3) {
@@ -5811,11 +5807,8 @@ namespace HeatBalanceSurfaceManager {
             auto const &zoneIZSurfList(Zone(ZoneToResimulate).ZoneIZSurfaceList);
             auto const &zoneHTNonWindowSurfList(Zone(ZoneToResimulate).ZoneHTNonWindowSurfaceList);
             auto const &zoneHTWindowSurfList(Zone(ZoneToResimulate).ZoneHTWindowSurfaceList);
-            //if (AllCTF) {
-            //    CalcHeatBalanceInsideSurf2CTFOnly(dataZoneTempPredictorCorrector, ZoneToResimulate, ZoneToResimulate, zoneIZSurfList, ZoneToResimulate);
-            //} else {
-                CalcHeatBalanceInsideSurf2(dataZoneTempPredictorCorrector, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
-            //}
+            // Cannot use CalcHeatBalanceInsideSurf2CTFOnly because resimulated zone includes adjacent interzone surfaces
+            CalcHeatBalanceInsideSurf2(dataZoneTempPredictorCorrector, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
             // Sort window heat gain/loss
             if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
                 ZoneWinHeatGainRep(ZoneToResimulate) = ZoneWinHeatGain(ZoneToResimulate);
@@ -6986,6 +6979,7 @@ namespace HeatBalanceSurfaceManager {
             int const firstNonWinSurf = Zone(zoneNum).NonWindowSurfaceFirst;
             int const lastNonWinSurf = Zone(zoneNum).NonWindowSurfaceLast;
             Real64 const timeStepZoneSeconds = TimeStepZoneSec; // local for vectorization
+            // this loop auto-vectorizes
             for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
 
                 // Pre-calculate a few terms
@@ -7021,6 +7015,7 @@ namespace HeatBalanceSurfaceManager {
                     int const firstSurf = Zone(zoneNum).NonWindowSurfaceFirst;
                     int const lastSurf = Zone(zoneNum).NonWindowSurfaceLast;
                     Real64 const timeStepZoneSeconds = TimeStepZoneSec; // local for vectorization
+                    // this loop auto-vectorizes
                     for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                         TempTermSurf(surfNum) =
                             CTFConstInPart(surfNum) + QRadThermInAbs(surfNum) + QRadSWInAbs(surfNum) + QAdditionalHeatSourceInside(surfNum) +
@@ -7037,6 +7032,7 @@ namespace HeatBalanceSurfaceManager {
             for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
                 int const firstNonWinSurf = Zone(zoneNum).NonWindowSurfaceFirst;
                 int const lastNonWinSurf = Zone(zoneNum).NonWindowSurfaceLast;
+                // this loop auto-vectorizes
                 for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
                     // Perform heat balance on the inside face of the surface ...
                     // The following are possibilities here:
