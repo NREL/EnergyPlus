@@ -1263,17 +1263,33 @@ namespace SurfaceGeometry {
         } // ...end of the Surface DO loop for finding BaseSurf
         //**********************************************************************************
 
-        // The surfaces need to be hierarchical.  Input is allowed to be in any order.  In
+        // The surfaces need to be hierarchical by zone.  Input is allowed to be in any order.  In
         // this section it is reordered into:
-
-        //    Detached shadowing surfaces
+        //    All shadowing surfaces (if mirrored, Mir- surface follows immediately after original)
+        //      Shading:Site
+        //      Shading:Building
+        //      Shading:Zone (and variants)
         //    For each zone:
-        //      For each Wall
-        //        subsurfaces (windows, doors, shading) for that wall
-        //      For each Floor
-        //        subsurfaces for that floor
-        //      For each Roof
-        //        subsurfaces for that roof/ceiling
+        //      Walls
+        //      Floors
+        //      Roofs/Ceilings
+        //      Internal Mass
+        //      Non-Window subsurfaces (doors and TubularDaylightingDomes)
+        //      Window subsurfaces (including TubularDaylightingDiffusers)
+        //    After reordering, MovedSurfs should equal TotSurfaces
+
+        // For reporting purposes, the legacy surface order is also save in DataSurfaces::AllSurfaceListReportOrder:
+        //    All shadowing surfaces (if mirrored, Mir- surface follows immediately after original)
+        //      Shading:Site
+        //      Shading:Building
+        //      Shading:Zone (and variants)
+        //    For each zone:
+        //      Walls
+        //        subsurfaces for each wall (windows, doors, in input order, not sorted) follow the base surface
+        //      Floors
+        //        subsurfaces for each floor (windows, doors, in input order, not sorted) follow the base surface
+        //      Roofs/Ceilings
+        //        subsurfaces for each roof/ceiling (windows, doors, in input order, not sorted) follow the base surface
         //      Internal Mass
         //    After reordering, MovedSurfs should equal TotSurfaces
 
