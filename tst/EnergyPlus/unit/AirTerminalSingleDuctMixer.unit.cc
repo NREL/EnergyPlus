@@ -7949,7 +7949,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     bool ErrorsFound(false);
     bool FirstHVACIteration(false);
     Real64 PrimaryAirMassFlowRate(0.0);
-    Real64 SecondaryAirMassFlowRate(0.0);
     Real64 DesignHeatAirVolFlow(0.50);
     Real64 DesignCoolAirVolFlow(0.60);
     Real64 QUnitOut(0.0);
@@ -7979,7 +7978,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
 
     auto &thisFanCoil(FanCoil(1));
     auto &thisATMixer(SysATMixer(1));
-    auto &thisFan(Fan(1));
     auto &thisAvaiManager(SystemAvailabilityManager::NCycSysAvailMgrData(1));
 
     // get input test for terminal air single duct mixer on inlet side of PTAC
