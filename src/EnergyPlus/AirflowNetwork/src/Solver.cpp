@@ -527,7 +527,7 @@ namespace AirflowNetwork {
                 properties[n].temperature = OutDryBulbTemp;
                 properties[n].humidityRatio = OutHumRat;
             }
-            properties[n].sqrtDensity = std::sqrt(properties[n].density);
+            properties[n].sqrt_density = std::sqrt(properties[n].density);
             properties[n].viscosity = 1.71432e-5 + 4.828e-8 * properties[n].temperature;
             //if (LIST >= 2) ObjexxFCL::gio::write(outputFile, Format_903) << "D,V:" << n << properties[n].density << properties[n].viscosity;
         }
@@ -1042,14 +1042,17 @@ namespace AirflowNetwork {
 #endif
     }
 
-    int generic_crack(Real64 coef,               // Flow coefficient
-                      Real64 const expn,          // Flow exponent
-                      bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                      const AirProperties &propN, // Node 1 properties
-                      const AirProperties &propM, // Node 2 properties
-                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    void generic_crack(Real64 const coefficient,    // Flow coefficient
+                       Real64 const exponent,       // Flow exponent
+                       bool const linear,           // Initialization flag.If true, use linear relationship
+                       Real64 const pdrop,          // Total pressure drop across a component (P1 - P2) [Pa]
+                       const AirProperties &propN,  // Node 1 properties
+                       const AirProperties &propM,  // Node 2 properties
+                       std::array<Real64, 2> &F,    // Airflow through the component [kg/s]
+                       std::array<Real64, 2> &DF,   // Partial derivative:  DF/DP
+                       Real64 const referenceP,     // Reference pressure
+                       Real64 const referenceT,     // Reference temperature
+                       Real64 const referenceW      // Reference humidity ratio
     )
     {
 
@@ -1060,6 +1063,7 @@ namespace AirflowNetwork {
         //                      Revised the subroutine to meet E+ needs
         //       MODIFIED       Lixing Gu, 6/8/05
         //       RE-ENGINEERED  This subroutine is revised from AFEPLR developed by George Walton, NIST
+        //                      Jason DeGraw
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a power law component
@@ -1070,100 +1074,60 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 CDM;
-        Real64 FL;
-        Real64 FT;
-        Real64 RhozNorm;
-        Real64 VisczNorm;
-        Real64 Ctl;
-        Real64 VisAve;
-        Real64 Tave;
-        Real64 RhoCor;
-
-
         // FLOW:
-        // Calculate normal density and viscocity at Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
-        RhozNorm = AIRDENSITY(101325.0, 20.0, 0.0);
-        VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
-        VisAve = (propN.viscosity + propM.viscosity) / 2.0;
-        Tave = (propN.temperature + propM.temperature) / 2.0;
-        if (PDROP >= 0.0) {
-            coef /= propN.sqrtDensity;
-        } else {
-            coef /= propM.sqrtDensity;
+        // Calculate normal density and viscocity at reference conditions
+        Real64 RhozNorm = AIRDENSITY(101325.0, 20.0, 0.0);
+        Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
+
+        double VisAve{0.5 * (propN.viscosity + propM.viscosity)};
+        double Tave{0.5 * (propN.temperature + propM.temperature)};
+
+        double sign{1.0};
+        double upwind_temperature{propN.temperature};
+        double upwind_density{propN.density};
+        double upwind_viscosity{propN.viscosity};
+        double upwind_sqrt_density{propN.sqrt_density};
+        double abs_pdrop = pdrop;
+
+        if (pdrop < 0.0) {
+            sign = -1.0;
+            upwind_temperature = propM.temperature;
+            upwind_density = propM.density;
+            upwind_viscosity = propM.viscosity;
+            upwind_sqrt_density = propM.sqrt_density;
+            abs_pdrop = -pdrop;
         }
 
-        if (LFLAG) {
-            // Initialization by linear relation.
-            if (PDROP >= 0.0) {
-                RhoCor = (propN.temperature + KelvinConv) / (Tave + KelvinConv);
-                Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                DF[0] = coef * propN.density / propN.viscosity * Ctl;
-            } else {
-                RhoCor = (propM.temperature + KelvinConv) / (Tave + KelvinConv);
-                Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                DF[0] = coef * propM.density / propM.viscosity * Ctl;
-            }
-            F[0] = DF[0] * PDROP;
+        double coef = coefficient / upwind_sqrt_density;
+
+        // Laminar calculation
+        double RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
+        double Ctl{std::pow(RhozNorm / upwind_density / RhoCor, exponent - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * exponent - 1.0)};
+        double CDM{coef * upwind_density / upwind_viscosity * Ctl};
+        double FL{CDM * pdrop};
+
+        if (linear) {
+            DF[0] = CDM;
+            F[0] = FL;
         } else {
-            // Standard calculation.
-            if (PDROP >= 0.0) {
-                // Flow in positive direction.
-                // Laminar flow.
-                RhoCor = (propN.temperature + KelvinConv) / (Tave + KelvinConv);
-                Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                CDM = coef * propN.density / propN.viscosity * Ctl;
-                FL = CDM * PDROP;
-                // Turbulent flow.
-                if (expn == 0.5) {
-                    FT = coef * propN.sqrtDensity * std::sqrt(PDROP) * Ctl;
-                } else {
-                    FT = coef * propN.sqrtDensity * std::pow(PDROP, expn) * Ctl;
-                }
+            // Turbulent flow.
+            double abs_FT;
+            if (exponent == 0.5) {
+                abs_FT = coef * upwind_sqrt_density * std::sqrt(abs_pdrop) * Ctl;
             } else {
-                // Flow in negative direction.
-                // Laminar flow.
-                RhoCor = (propM.temperature + KelvinConv) / (Tave + KelvinConv);
-                Ctl = std::pow(RhozNorm / propM.density / RhoCor, 2.0 * expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                CDM = coef * propM.density / propM.viscosity * Ctl;
-                FL = CDM * PDROP;
-                // Turbulent flow.
-                if (expn == 0.5) {
-                    FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP) * Ctl;
-                } else {
-                    FT = -coef * propM.sqrtDensity * std::pow(-PDROP, expn) * Ctl;
-                }
+                abs_FT = coef * upwind_sqrt_density * std::pow(abs_pdrop, exponent) * Ctl;
             }
-            // Select laminar or turbulent flow.
-//            if (LIST >= 4) {
-//                static ObjexxFCL::gio::Fmt Format_901("(A5,6X,4E16.7)");
-//                print(std::cout, " generic crack: {:5}      {:16.7E} {16.7E}\n", PDROP, FL, FT);
-//            }
-            if (std::abs(FL) <= std::abs(FT)) {
+            // Select linear or turbulent flow.
+            if (std::abs(FL) <= abs_FT) {
                 F[0] = FL;
                 DF[0] = CDM;
             } else {
-                F[0] = FT;
-                DF[0] = FT * expn / PDROP;
+                F[0] = sign * abs_FT;
+                DF[0] = F[0] * exponent / pdrop;
             }
         }
-        return 1;
+
+        return;
     }
 
     int GenericDuct(Real64 const Length,        // Duct length

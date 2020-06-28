@@ -463,8 +463,8 @@ namespace AirflowNetworkBalanceManager {
                 }
                 // globalSolverObject.cracks[thisObjectName] = SurfaceCrack(coeff, expnt, refT, refP, refW);
                 MultizoneSurfaceCrackData(i).name = thisObjectName; // Name of surface crack component
-                MultizoneSurfaceCrackData(i).FlowCoef = coeff;      // Air Mass Flow Coefficient
-                MultizoneSurfaceCrackData(i).FlowExpo = expnt;      // Air Mass Flow exponent
+                MultizoneSurfaceCrackData(i).coefficient = coeff;      // Air Mass Flow Coefficient
+                MultizoneSurfaceCrackData(i).exponent = expnt;      // Air Mass Flow exponent
                 MultizoneSurfaceCrackData(i).StandardT = refT;
                 MultizoneSurfaceCrackData(i).StandardP = refP;
                 MultizoneSurfaceCrackData(i).StandardW = refW;

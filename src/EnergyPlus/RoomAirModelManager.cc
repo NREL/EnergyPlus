@@ -1177,12 +1177,12 @@ namespace RoomAirModelManager {
                     CompNum = AirflowNetwork::AirflowNetworkLinkageData(Loop2).CompNum;
                     TypeNum = AirflowNetwork::AirflowNetworkCompData(CompNum).TypeNum;
                     if (AirflowNetwork::AirflowNetworkCompData(CompNum).CompTypeNum == AirflowNetwork::CompTypeNum_SCR) {
-                        if (AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).FlowExpo != 0.50) {
+                        if (AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).exponent != 0.50) {
                             AirModel(ThisZone).AirModelType = RoomAirModel_Mixing;
                             ShowWarningError("Problem with " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                             ShowWarningError("Roomair model will not be applied for Zone=" + cAlphaArgs(1) + '.');
                             ShowContinueError("AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, value was=" +
-                                              RoundSigDigits(AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).FlowExpo, 2));
+                                              RoundSigDigits(AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).exponent, 2));
                         }
                     }
                 }
@@ -2168,7 +2168,7 @@ namespace RoomAirModelManager {
                             } else if (AirflowNetwork::AirflowNetworkCompData(CompNum).CompTypeNum ==
                                        AirflowNetwork::CompTypeNum_SCR) { // surface type = CRACK
                                 SurfParametersCVDV(Loop2).Width = Surface(AirflowNetwork::MultizoneSurfaceData(Loop2).SurfNum).Width / 2;
-                                AinCV = AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).FlowCoef /
+                                AinCV = AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).coefficient /
                                         (BaseDischargeCoef * std::sqrt(2.0 / PsyRhoAirFnPbTdbW(OutBaroPress, MAT(Loop), ZoneAirHumRat(Loop))));
                                 SurfParametersCVDV(Loop2).Height = AinCV / SurfParametersCVDV(Loop2).Width;
                             }

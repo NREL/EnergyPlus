@@ -69,7 +69,7 @@ namespace AirflowNetwork {
         // Real64 pressure;      //{0.0}; // gage pressure
         Real64 humidityRatio{0.0};
         Real64 density{AIRDENSITY(101325.0, 20.0, 0.0)};
-        Real64 sqrtDensity{sqrt(AIRDENSITY(101325.0, 20.0, 0.0))};
+        Real64 sqrt_density{sqrt(AIRDENSITY(101325.0, 20.0, 0.0))};
         Real64 viscosity{AIRDYNAMICVISCOSITY(20.0)};
     };
 
@@ -175,14 +175,17 @@ namespace AirflowNetwork {
 
     // Functions
 
-    int generic_crack(Real64 coef,               // Flow coefficient
-                      Real64 const expn,          // Flow exponent
-                      bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                      const AirProperties &propN, // Node 1 properties
-                      const AirProperties &propM, // Node 2 properties
-                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    void generic_crack(Real64 const coefficient,            // Flow coefficient
+                       Real64 const exponent,               // Flow exponent
+                       bool const linear,                   // Initialization flag.If true, use linear relationship
+                       Real64 const pdrop,                  // Total pressure drop across a component (P1 - P2) [Pa]
+                       const AirProperties &propN,          // Node 1 properties
+                       const AirProperties &propM,          // Node 2 properties
+                       std::array<Real64, 2> &F,            // Airflow through the component [kg/s]
+                       std::array<Real64, 2> &DF,           // Partial derivative:  DF/DP
+                       Real64 const referenceP = 101325.0,  // Reference pressure
+                       Real64 const referenceT = 20.0,      // Reference temperature
+                       Real64 const referenceW = 0.0        // Reference humidity ratio
     );
 
     int GenericDuct(Real64 const Length,        // Duct length

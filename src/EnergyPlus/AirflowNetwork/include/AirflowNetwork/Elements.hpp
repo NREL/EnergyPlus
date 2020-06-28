@@ -606,14 +606,14 @@ namespace AirflowNetwork {
     {
         // Members
         // std::string ExternalNodeNames; // Name of external node.Not required for internal surface
-        Real64 FlowCoef;  // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
-        Real64 FlowExpo;  // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
-        Real64 StandardT; // Standard temperature for crack data
-        Real64 StandardP; // Standard barometric pressure for crack data
-        Real64 StandardW; // Standard humidity ratio for crack data
+        Real64 coefficient; // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
+        Real64 exponent;    // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
+        Real64 StandardT;   // Standard temperature for crack data
+        Real64 StandardP;   // Standard barometric pressure for crack data
+        Real64 StandardW;   // Standard humidity ratio for crack data
 
         // Default Constructor
-        SurfaceCrack() : FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0)
+        SurfaceCrack() : coefficient(0.0), exponent(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0)
         {
         }
 
