@@ -176,7 +176,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Crack)
     crack.StandardW = 0.0;
 
     AirflowNetwork::AirProperties state0, state1;
-    Real64 density = state0.density; // = state1.density
     Real64 sqrt_density = state0.sqrt_density; // = state1.sqrtDensity
     Real64 viscosity = state0.viscosity; // = state1.viscosity
 
@@ -220,14 +219,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_GenericCrack)
     std::array<Real64, 2> F = {0.0, 0.0};
     std::array<Real64, 2> DF = {0.0, 0.0};
 
-    Real64 coef = 0.001;
-    Real64 expo = 0.65;
-    Real64 StandardP = 101325.0;
-    Real64 StandardT = 20.0;
-    Real64 StandardW = 0.0;
+    Real64 coef{0.001};
+    Real64 expo{0.65};
 
     AirflowNetwork::AirProperties state0, state1;
-    Real64 density = state0.density;          // = state1.density
     Real64 sqrt_density = state0.sqrt_density; // = state1.sqrtDensity
     Real64 viscosity = state0.viscosity;      // = state1.viscosity
 
