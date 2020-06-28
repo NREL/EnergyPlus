@@ -4246,6 +4246,11 @@ namespace HeatBalanceSurfaceManager {
 
             if (Surface(SurfNum).EMSConstructionOverrideON && (Surface(SurfNum).EMSConstructionOverrideValue > 0)) {
 
+                if (Construct(Surface(SurfNum).EMSConstructionOverrideValue).TypeIsWindow) { // okay, allways allow windows
+                    EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                    EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                }
+
                 if ((EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) &&
                     (EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum))) {
 
@@ -4256,11 +4261,7 @@ namespace HeatBalanceSurfaceManager {
                     if (!EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) {
                         // check if constructions appear compatible
 
-                        if (Construct(Surface(SurfNum).EMSConstructionOverrideValue).TypeIsWindow) { // okay, allways allow windows
-                            EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
-                            EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
-
-                        } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
+                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
                                    Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
                             // compare old construction to new construction and see if terms match
                             // set as okay and turn false if find a big problem

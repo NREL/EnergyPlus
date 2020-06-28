@@ -10589,7 +10589,7 @@ namespace SolarShading {
                                       SUNCOS(3) * Surface(SurfNum).OutNormVec(3);
                 }
 
-                SHADOW(0, 0);
+                SHADOW(24, 0);
 
                 for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     ShadowingSurf = Surface(SurfNum).ShadowingSurf;

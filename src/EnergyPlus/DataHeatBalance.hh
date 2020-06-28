@@ -928,9 +928,15 @@ namespace DataHeatBalance {
         // 1 or 2 for constructions with sources or sinks)-->may allow 3-D later?
         int SourceAfterLayer;    // Source/sink is present after this layer in the construction
         int TempAfterLayer;      // User is requesting a temperature calculation after this layer in the construction
+                                 // This location is also the position of a temperature on the interior of a slab
+                                 // that could be used to control a low temperature radiant system
         Real64 ThicknessPerpend; // Thickness between planes of symmetry in the direction
-        // perpendicular to the main direction of heat transfer
-        // (same as half the distance between tubes)
+                                 // perpendicular to the main direction of heat transfer
+                                 // (same as half the distance between tubes)
+        Real64 userTemperatureLocationPerpendicular;    // Location of the source perpendicular to the main direction
+                                                        // of heat transfer.  Used in conjunction with the TempAfterLayer
+                                                        // term to provide specific location of user defined temperature.
+                                                        // This value is only used when SolutionDimension = 2.
         // Moisture Transfer Functions term belong here as well
         // BLAST detailed solar model parameters
         Real64 AbsDiffIn;  // Inner absorptance coefficient for diffuse radiation
@@ -1056,9 +1062,9 @@ namespace DataHeatBalance {
               CTFSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, MaxCTFTerms - 1}, 0.0), CTFTSourceOut({0, MaxCTFTerms - 1}, 0.0),
               CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0), CTFTUserOut({0, MaxCTFTerms - 1}, 0.0),
               CTFTUserIn({0, MaxCTFTerms - 1}, 0.0), CTFTUserSource({0, MaxCTFTerms - 1}, 0.0), NumHistories(0), NumCTFTerms(0), UValue(0.0),
-              SolutionDimensions(0), SourceAfterLayer(0), TempAfterLayer(0), ThicknessPerpend(0.0), AbsDiffIn(0.0), AbsDiffOut(0.0),
-              AbsDiff(MaxSolidWinLayers, 0.0), BlAbsDiff(MaxSlatAngs, MaxSolidWinLayers, 0.0), BlAbsDiffGnd(MaxSlatAngs, MaxSolidWinLayers, 0.0),
-              BlAbsDiffSky(MaxSlatAngs, MaxSolidWinLayers, 0.0), AbsDiffBack(MaxSolidWinLayers, 0.0),
+              SolutionDimensions(0), SourceAfterLayer(0), TempAfterLayer(0), ThicknessPerpend(0.0), userTemperatureLocationPerpendicular(0.0),
+              AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiff(MaxSolidWinLayers, 0.0), BlAbsDiff(MaxSlatAngs, MaxSolidWinLayers, 0.0),
+              BlAbsDiffGnd(MaxSlatAngs, MaxSolidWinLayers, 0.0), BlAbsDiffSky(MaxSlatAngs, MaxSolidWinLayers, 0.0), AbsDiffBack(MaxSolidWinLayers, 0.0),
               BlAbsDiffBack(MaxSlatAngs, MaxSolidWinLayers, 0.0), AbsDiffShade(0.0), AbsDiffBlind(MaxSlatAngs, 0.0),
               AbsDiffBlindGnd(MaxSlatAngs, 0.0), AbsDiffBlindSky(MaxSlatAngs, 0.0), AbsDiffBackShade(0.0), AbsDiffBackBlind(MaxSlatAngs, 0.0),
               ShadeAbsorpThermal(0.0), AbsBeamCoef(6, MaxSolidWinLayers, 0.0), AbsBeamBackCoef(6, MaxSolidWinLayers, 0.0), AbsBeamShadeCoef(6, 0.0),
@@ -1084,6 +1090,13 @@ namespace DataHeatBalance {
         bool isGlazingConstruction() const;
 
         void SetFlagForWindowConstructionWithShadeOrBlindLayer();
+        
+        Real64 setUserTemperatureLocationPerpendicular(Real64 userValue);
+        
+        void setNodeSourceAndUserTemp(int &sourceNodeLocation,
+                                      int &userTempNodeLocation,
+                                      Array1D_int & Nodes,
+                                      int NumOfPerpendNodes);
     };
 
     struct SpectralDataProperties
