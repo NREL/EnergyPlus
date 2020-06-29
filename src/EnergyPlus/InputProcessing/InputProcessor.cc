@@ -1317,13 +1317,15 @@ void InputProcessor::reportIDFRecordsStats()
                 auto const &enum_it = anyOf.find("enum");
                 if (enum_it != anyOf.end()) {
                     for (auto const &e: enum_it.value()) {
-                        auto const &enumVal = e.get<std::string>();
-                        if (enumVal == "Autosize") {
-                            ++DataOutputs::iTotalAutoSizableFields;
-                            canBeAutosized = true;
-                        } else if (enumVal == "Autocalculate") {
-                            ++DataOutputs::iTotalAutoCalculatableFields;
-                            canBeAutocalculated = true;
+                        if (e.is_string()) {
+                            auto const &enumVal = e.get<std::string>();
+                            if (enumVal == "Autosize") {
+                                ++DataOutputs::iTotalAutoSizableFields;
+                                canBeAutosized = true;
+                            } else if (enumVal == "Autocalculate") {
+                                ++DataOutputs::iTotalAutoCalculatableFields;
+                                canBeAutocalculated = true;
+                            }
                         }
                     }
                 }
