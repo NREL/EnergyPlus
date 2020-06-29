@@ -5324,6 +5324,7 @@ namespace WeatherManager {
         bool StillLooking;
         int endcol;
 
+        state.files.inputWeatherFile.close();
         state.files.inputWeatherFile.fileName = state.files.inputWeatherFileName.fileName;
         state.files.inputWeatherFile.open();
         if (!state.files.inputWeatherFile.good()) goto Label9999;

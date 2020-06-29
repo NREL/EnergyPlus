@@ -136,7 +136,12 @@ std::istream::iostate InputFile::rdstate() const noexcept
 bool InputFile::is_open() const noexcept
 {
     if (is) {
-        return is->good() || is->eof();
+        auto *ss = dynamic_cast<std::ifstream *>(is.get());
+        if (ss) {
+            return ss->is_open();
+        } else {
+            return true;
+        }
     } else {
         return false;
     }
