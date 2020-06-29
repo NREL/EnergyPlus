@@ -159,7 +159,7 @@ namespace ZonePlenum {
 
     // Functions
 
-    void SimAirZonePlenum(EnergyPlusData &state, ZonePlenumData &dataZonePlenum, std::string const &CompName,
+    void SimAirZonePlenum(EnergyPlusData &state, std::string const &CompName,
                           int const iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
@@ -167,7 +167,7 @@ namespace ZonePlenum {
                           Optional_bool PlenumInletChanged = _        // Autodesk:OPTIONAL Used without PRESENT check
     );
 
-    void GetZonePlenumInput(EnergyPlusData &state, ZonePlenumData &dataZonePlenum);
+    void GetZonePlenumInput(EnergyPlusData &state);
 
     void InitAirZoneReturnPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum);
 
@@ -181,11 +181,11 @@ namespace ZonePlenum {
 
     void UpdateAirZoneSupplyPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
 
-    int GetReturnPlenumIndex(EnergyPlusData &state, ZonePlenumData &dataZonePlenum, int const &ExNodeNum);
+    int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum);
 
-    void GetReturnPlenumName(EnergyPlusData &state, ZonePlenumData &dataZonePlenum, int const &ReturnPlenumIndex, std::string &ReturnPlenumName);
+    void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, std::string &ReturnPlenumName);
 
-    int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, ZonePlenumData &dataZonePlenum, int const &InNodeNum);
+    int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
 
 } // namespace ZonePlenum
 
