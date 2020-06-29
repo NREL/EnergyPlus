@@ -377,13 +377,13 @@ namespace SingleDuct {
 
     void SimATMixer(std::string const &SysName, bool const FirstHVACIteration, int &SysIndex);
 
-    void GetATMixers();
+    void GetATMixers(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager);
 
     void CalcATMixer(int const SysNum);
 
     void UpdateATMixer(int const SysNum);
 
-    void GetATMixer(std::string const &ZoneEquipName, // zone unit name name
+    void GetATMixer(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, std::string const &ZoneEquipName, // zone unit name name
                     std::string &ATMixerName,         // air terminal mixer name
                     int &ATMixerNum,                  // air terminal mixer index
                     int &ATMixerType,                 // air teminal mixer type
