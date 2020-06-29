@@ -661,10 +661,6 @@ namespace UtilityRoutines {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-<<<<<<< HEAD
-        static constexpr auto fmtLD("*");
-=======
->>>>>>> origin/develop
         static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -763,17 +759,9 @@ namespace UtilityRoutines {
         ShowMessage("EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
                     " Severe Errors; Elapsed Time=" + Elapsed);
         DisplayString("EnergyPlus Run Time=" + Elapsed);
-<<<<<<< HEAD
-
-        tempfl = state.outputFiles.open_gio(DataStringGlobals::outputEndFileName, "AbortEnergyPlus", state.outputFiles.outputControl.end);
-
-        ObjexxFCL::gio::write(tempfl, fmtLD) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
-                                                " Severe Errors; Elapsed Time=" + Elapsed;
-        ObjexxFCL::gio::close(tempfl);
-=======
 
         {
-            auto tempfl = state.outputFiles.endFile.try_open();
+            auto tempfl = state.outputFiles.endFile.try_open(state.outputFiles.outputControl.end);
 
             if (!tempfl.good()) {
                 DisplayString("AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
@@ -784,7 +772,6 @@ namespace UtilityRoutines {
                   NumSevere,
                   Elapsed);
         }
->>>>>>> origin/develop
 
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles();
@@ -954,11 +941,6 @@ namespace UtilityRoutines {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-<<<<<<< HEAD
-        static constexpr auto fmtA("(A)");
-        static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
-=======
->>>>>>> origin/develop
 
         // INTERFACE BLOCK SPECIFICATIONS
 
@@ -1031,21 +1013,13 @@ namespace UtilityRoutines {
         ShowMessage("EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
-<<<<<<< HEAD
-        tempfl = outputFiles.open_gio(DataStringGlobals::outputEndFileName, "EndEnergyPlus", outputFiles.outputControl.end);
-
-        ObjexxFCL::gio::write(tempfl, fmtA) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere +
-                                               " Severe Errors; Elapsed Time=" + Elapsed;
-        ObjexxFCL::gio::close(tempfl);
-=======
         {
-            auto tempfl = outputFiles.endFile.try_open();
+            auto tempfl = outputFiles.endFile.try_open(outputFiles.outputControl.end);
             if (!tempfl.good()) {
                 DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }
             print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
         }
->>>>>>> origin/develop
 
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles();

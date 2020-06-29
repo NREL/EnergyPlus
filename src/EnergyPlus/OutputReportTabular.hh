@@ -801,11 +801,7 @@ namespace OutputReportTabular {
 
     void WriteTimeBinTables();
 
-<<<<<<< HEAD
-    void WriteBEPSTable(OutputFiles &outputFiles);
-=======
-    void WriteBEPSTable(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
->>>>>>> origin/develop
+    void WriteBEPSTable(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles);
 
     std::string ResourceWarningMessage(std::string resource);
 

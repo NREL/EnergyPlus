@@ -7842,11 +7842,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     // AnotherEndUseSubCat
     EXPECT_NEAR(extLitUse * 3, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1), 1.);
 
-<<<<<<< HEAD
-    OutputReportTabular::WriteBEPSTable(state.outputFiles);
-=======
-    OutputReportTabular::WriteBEPSTable(state.dataZoneTempPredictorCorrector);
->>>>>>> origin/develop
+    OutputReportTabular::WriteBEPSTable(state.dataZoneTempPredictorCorrector, state.outputFiles);
     OutputReportTabular::WriteDemandEndUseSummary();
 
     EnergyPlus::sqlite->sqliteCommit();

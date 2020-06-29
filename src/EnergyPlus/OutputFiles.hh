@@ -52,12 +52,9 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <ostream>
-<<<<<<< HEAD
 #include <iterator>
-=======
 #include <vector>
 #include <cassert>
->>>>>>> origin/develop
 
 namespace EnergyPlus {
 class OutputFile
@@ -72,11 +69,7 @@ public:
     OutputFile &ensure_open(const std::string &caller, bool output_to_file = true);
 
     std::string fileName;
-<<<<<<< HEAD
-    void open(bool output_to_file = true);
-=======
-    void open(const bool forAppend = false);
->>>>>>> origin/develop
+    void open(const bool forAppend = false, bool output_to_file = true);
     std::fstream::pos_type position() const noexcept;
     std::vector<std::string> getLines();
     void open_as_stringstream();
@@ -106,9 +99,9 @@ public:
             of.ensure_open(caller, output_to_file);
             return of;
         }
-        OutputFile try_open() {
+        OutputFile try_open(bool output_to_file = true) {
             OutputFile of{fileName};
-            of.open();
+            of.open(false, output_to_file);
             return of;
         }
     };

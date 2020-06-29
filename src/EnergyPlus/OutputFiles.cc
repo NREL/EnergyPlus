@@ -125,19 +125,7 @@ std::ostream::pos_type OutputFile::position() const noexcept
     return os->tellg();
 }
 
-<<<<<<< HEAD
-void OutputFile::open(bool output_to_file)
-{
-    if (!output_to_file) {
-        os = std::unique_ptr<std::iostream>(new std::iostream(nullptr));
-        print_to_dev_null = true;
-    } else {
-        os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::trunc));
-        print_to_dev_null = false;
-    }
-}
-=======
-void OutputFile::open(const bool forAppend)
+void OutputFile::open(const bool forAppend, bool output_to_file)
 {
     auto appendMode = [=]() {
         if (forAppend) {
@@ -146,9 +134,13 @@ void OutputFile::open(const bool forAppend)
             return std::ios_base::trunc;
         }
     }();
->>>>>>> origin/develop
-
-    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
+    if (!output_to_file) {
+        os = std::unique_ptr<std::iostream>(new std::iostream(nullptr));
+        print_to_dev_null = true;
+    } else {
+        os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
+        print_to_dev_null = false;
+    }
 }
 
 std::vector<std::string> OutputFile::getLines()
