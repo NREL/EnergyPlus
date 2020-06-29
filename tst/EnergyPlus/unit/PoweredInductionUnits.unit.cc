@@ -227,6 +227,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = false;
     PoweredInductionUnits::CalcParallelPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(0.0, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Second test - Heating load, TurnZoneFansOn is true, no primary flow - expecting secondary flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = 0.0;
@@ -236,6 +237,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = true;
     PoweredInductionUnits::CalcParallelPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(SecMaxMassFlow, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Third test - Cooling load TurnZoneFansOn is true, no primary flow - expecting no secondary flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = 0.0;
@@ -245,6 +247,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = true;
     PoweredInductionUnits::CalcParallelPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(0.0, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Fourth test - Cooling load TurnFansOn is true, no primary flow - expecting no secondary flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = 0.0;
@@ -254,6 +257,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = false;
     PoweredInductionUnits::CalcParallelPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(0.0, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Fifth test - Heating load TurnFansOn is true, no primary flow - expecting secondary flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = 0.0;
@@ -263,6 +267,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = false;
     PoweredInductionUnits::CalcParallelPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(SecMaxMassFlow, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Sixth test - Heating load TurnFansOn is true, yes primary flow, deadbandorsetback is true - expecting no secondary flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = PoweredInductionUnits::PIU(SysNum).MaxPriAirMassFlow;
@@ -273,6 +278,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = false;
     PoweredInductionUnits::CalcParallelPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(0.0, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Seventh test - Heating load TurnFansOn is true, yes primary flow - expecting secondary flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = PoweredInductionUnits::PIU(SysNum).MaxPriAirMassFlow;
@@ -283,6 +289,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = false;
     PoweredInductionUnits::CalcParallelPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(SecMaxMassFlow, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Eighth test - Cooling load TurnFansOn is true, yes primary flow - expecting no secondary flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = PoweredInductionUnits::PIU(SysNum).MaxPriAirMassFlow;
@@ -293,6 +300,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = false;
     PoweredInductionUnits::CalcParallelPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(0.0, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(1.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Cleanup
     DataHeatBalFanSys::TempControlType.deallocate();
@@ -451,6 +459,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = false;
     PoweredInductionUnits::CalcSeriesPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(0.0, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Second test - Heating load, TurnZoneFansOn is true, no primary flow - expecting max secondary flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = 0.0;
@@ -460,6 +469,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = true;
     PoweredInductionUnits::CalcSeriesPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(SecMaxMassFlow, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Third test - Cooling load TurnZoneFansOn is true, no primary flow - expecting no secondary flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = 0.0;
@@ -469,6 +479,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = true;
     PoweredInductionUnits::CalcSeriesPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(0.0, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Fourth test - Cooling load TurnFansOn is true, no primary flow - expecting no secondary flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = 0.0;
@@ -478,6 +489,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = false;
     PoweredInductionUnits::CalcSeriesPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(0.0, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Fifth test - Heating load TurnFansOn is true, no primary flow - expecting max secondary flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = 0.0;
@@ -487,6 +499,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = false;
     PoweredInductionUnits::CalcSeriesPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(SecMaxMassFlow, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Sixth test - Heating load TurnFansOn is true, yes min primary flow, deadbandorsetback is true - expecting secondary flow at primary min flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = PriMinMassFlow;
@@ -498,6 +511,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = false;
     PoweredInductionUnits::CalcSeriesPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(SecMassFlowAtPrimMin, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Seventh test - Heating load TurnFansOn is true, yes min primary flow - expecting secondary flow at primary min flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = PriMinMassFlow;
@@ -509,6 +523,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = false;
     PoweredInductionUnits::CalcSeriesPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(SecMassFlowAtPrimMin, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Eighth test - Cooling load TurnFansOn is true, yes primary flow at max - expecting secondary flow at primary max flow
     DataLoopNode::Node(PriNodeNum).MassFlowRate = PriMaxMassFlow;
@@ -519,6 +534,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     DataHVACGlobals::TurnZoneFansOnlyOn = false;
     PoweredInductionUnits::CalcSeriesPIU(state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
     EXPECT_EQ(SecMassFlowAtPrimMax, DataLoopNode::Node(SecNodeNum).MassFlowRate);
+    EXPECT_EQ(0.0, PoweredInductionUnits::PIU(SysNum).PriDamperPosition);
 
     // Cleanup
     DataHeatBalFanSys::TempControlType.deallocate();
