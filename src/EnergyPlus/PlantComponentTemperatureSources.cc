@@ -128,7 +128,7 @@ namespace PlantComponentTemperatureSources {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WaterSourceSpecs::initialize(Real64 &MyLoad)
+    void WaterSourceSpecs::initialize(BranchInputManagerData &dataBranchInputManager, Real64 &MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -151,7 +151,8 @@ namespace PlantComponentTemperatureSources {
             this->setupOutputVars();
             // Locate the component on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_WaterSource,
                                                     this->Location.loopNum,
                                                     this->Location.loopSideNum,
@@ -396,12 +397,12 @@ namespace PlantComponentTemperatureSources {
         DataLoopNode::Node(this->OutletNodeNum).Temp = this->OutletTemp;
     }
 
-    void WaterSourceSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+    void WaterSourceSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool EP_UNUSED(FirstHVACIteration),
                                     Real64 &CurLoad,
                                     bool EP_UNUSED(RunFlag))
     {
-        this->initialize(CurLoad);
+        this->initialize(state.dataBranchInputManager, CurLoad);
         this->calculate();
         this->update();
     }
@@ -419,10 +420,10 @@ namespace PlantComponentTemperatureSources {
         _SizFac = this->SizFac;
     }
 
-    void WaterSourceSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &)
+    void WaterSourceSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &)
     {
         Real64 myLoad = 0.0;
-        this->initialize(myLoad);
+        this->initialize(state.dataBranchInputManager, myLoad);
         this->autosize();
     }
 
