@@ -174,7 +174,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
 
         EXPECT_TRUE(process_idf(idf_objects));
 
-        SimulationManager::GetProjectData(state.outputFiles);
+        SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
         EXPECT_FALSE(DataReportingFlags::DebugOutput);
         EXPECT_FALSE(DataReportingFlags::EvenDuringWarmup);
 
@@ -191,7 +191,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
 
         EXPECT_TRUE(process_idf(idf_objects));
 
-        SimulationManager::GetProjectData(state.outputFiles);
+        SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
         EXPECT_TRUE(DataReportingFlags::DebugOutput);
         EXPECT_FALSE(DataReportingFlags::EvenDuringWarmup);
 
@@ -208,7 +208,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
 
         EXPECT_TRUE(process_idf(idf_objects));
 
-        SimulationManager::GetProjectData(state.outputFiles);
+        SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
         EXPECT_FALSE(DataReportingFlags::DebugOutput);
         EXPECT_TRUE(DataReportingFlags::EvenDuringWarmup);
 
@@ -233,7 +233,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
         // Instead do it here, making sure to reset the stream
         EXPECT_TRUE(compare_err_stream("   ** Severe  ** <root>[Output:DebuggingData] - Object should have no more than 1 properties.\n", true));
 
-        SimulationManager::GetProjectData(state.outputFiles);
+        SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
         EXPECT_FALSE(DataReportingFlags::DebugOutput);
         EXPECT_TRUE(DataReportingFlags::EvenDuringWarmup);
 
@@ -252,7 +252,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
     EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
@@ -268,7 +268,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
     EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
 
     // Undocumented ones, see SimulationManager_OutputDiagnostics_UndocumentedFlags
-    EXPECT_FALSE(DataReportingFlags::IgnoreInteriorWindowTransmission);
     EXPECT_FALSE(DataEnvironment::IgnoreSolarRadiation);
     EXPECT_FALSE(DataEnvironment::IgnoreBeamRadiation);
     EXPECT_FALSE(DataEnvironment::IgnoreDiffuseRadiation);
@@ -289,7 +288,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_SimpleCase)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     EXPECT_TRUE(DataGlobals::DisplayAllWarnings);
     EXPECT_TRUE(DataGlobals::DisplayExtraWarnings);
@@ -329,7 +328,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_AllKeys)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     EXPECT_TRUE(DataGlobals::DisplayAllWarnings);
     EXPECT_TRUE(DataGlobals::DisplayExtraWarnings);
@@ -363,7 +362,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
     // Instead do it here, making sure to reset the stream
     EXPECT_TRUE(compare_err_stream("   ** Severe  ** <root>[Output:Diagnostics] - Object should have no more than 1 properties.\n", true));
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
     EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
@@ -387,7 +386,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
 {
     std::string const idf_objects = delimited_string({
         "  Output:Diagnostics,",
-        "    IgnoreInteriorWindowTransmission,",
         "    IgnoreSolarRadiation,",
         "    IgnoreBeamRadiation,",
         "    IgnoreDiffuseRadiation,",
@@ -398,16 +396,15 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
     // This will throw a warning in InputProcessor since these aren't supported keys, so do not use assertions
     EXPECT_FALSE(process_idf(idf_objects, false));
     const std::string expected_warning = delimited_string({
-        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][0][key] - \"IgnoreInteriorWindowTransmission\" - Failed to match against any enum values.",
-        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][1][key] - \"IgnoreSolarRadiation\" - Failed to match against any enum values.",
-        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][2][key] - \"IgnoreBeamRadiation\" - Failed to match against any enum values.",
-        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][3][key] - \"IgnoreDiffuseRadiation\" - Failed to match against any enum values.",
-        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][4][key] - \"DeveloperFlag\" - Failed to match against any enum values.",
-        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][5][key] - \"TimingFlag\" - Failed to match against any enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][0][key] - \"IgnoreSolarRadiation\" - Failed to match against any enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][1][key] - \"IgnoreBeamRadiation\" - Failed to match against any enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][2][key] - \"IgnoreDiffuseRadiation\" - Failed to match against any enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][3][key] - \"DeveloperFlag\" - Failed to match against any enum values.",
+        "   ** Severe  ** <root>[Output:Diagnostics][Output:Diagnostics 1][diagnostics][4][key] - \"TimingFlag\" - Failed to match against any enum values.",
     });
     EXPECT_TRUE(compare_err_stream(expected_warning, true));
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
     EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
@@ -423,7 +420,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
     EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
 
     // Still works
-    EXPECT_TRUE(DataReportingFlags::IgnoreInteriorWindowTransmission);
     EXPECT_TRUE(DataEnvironment::IgnoreSolarRadiation);
     EXPECT_TRUE(DataEnvironment::IgnoreBeamRadiation);
     EXPECT_TRUE(DataEnvironment::IgnoreDiffuseRadiation);
@@ -445,7 +441,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    ASSERT_NO_THROW(SimulationManager::GetProjectData(state.outputFiles));
+    ASSERT_NO_THROW(SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles));
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
     EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
