@@ -396,6 +396,5 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     WindowComplexManager::clear_state();
     WindowEquivalentLayer::clear_state();
     WindowManager::clear_state();
-    ZoneAirLoopEquipmentManager::clear_state();
     ResultsFramework::clear_state();
 }

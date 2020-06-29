@@ -785,7 +785,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
     DataZoneEquipment::GetZoneEquipmentData1(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     SingleDuct::GetSysInput(state);
@@ -1017,7 +1017,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
     DataZoneEquipment::GetZoneEquipmentData1(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     SingleDuct::GetSysInput(state);
@@ -1282,7 +1282,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
     DataZoneEquipment::GetZoneEquipmentData1(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     SingleDuct::GetSysInput(state);
@@ -1548,7 +1548,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
     DataZoneEquipment::GetZoneEquipmentData1(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     SingleDuct::GetSysInput(state);
