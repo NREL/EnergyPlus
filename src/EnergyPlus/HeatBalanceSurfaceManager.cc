@@ -6725,31 +6725,10 @@ namespace HeatBalanceSurfaceManager {
                                            const std::vector<int> &IZSurfs, // Last zone to simulate
                                            Optional_int_const ZoneToResimulate)
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         George Walton
-        //       DATE WRITTEN   December 1979
-        //       MODIFIED       Jun 1990 (RDT for new CTF arrays)
-        //                      Dec 1999 (FCW for window calculation)
-        //                      May 2000 (FCW for window frame and dividers)
-        //                      Aug 2000 (RJL for MTF moisture calculations)
-        //                      Sep 2000 (RKS for new radiant exchange algorithm)
-        //                      Dec 2000 (RKS for radiant system model addition)
-        //                      Jul 2003 (CC) set the reference temperatures for inside surface heat balance
-        //                                    depending on convection algorithms and/or air models used
-        //                      May 2006 (RR  account for exterior window screen)
-        //                      Jul 2008 (P. Biddulph include calls to HAMT)
-        //                      Sep 2011 LKL/BG - resimulate only zones needing it for Radiant systems
-        //       RE-ENGINEERED  Mar 1998 (RKS)
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine performs a heat balance on the inside face of each
-        // surface in the building.
-
-        // METHODOLOGY EMPLOYED:
-        // Various boundary conditions are set and additional parameters are set-
-        // up.  Then, the proper heat balance equation is selected based on whether
-        // the surface is a partition or not and on whether or not movable
-        // insulation is present on the inside face.
+        // This function performs a heat balance on the inside face of each
+        // surface in the building. It is a copy of CalcHeatBalanceInsideSurf,
+        // simplified for CTF surfaces only.
 
         // REFERENCES:
         // (I)BLAST legacy routine HBSRF
@@ -6873,7 +6852,7 @@ namespace HeatBalanceSurfaceManager {
             int const firstSurf = Zone(zoneNum).SurfaceFirst;
             int const lastSurf = Zone(zoneNum).SurfaceLast;
 
-            // determine reference air temperatures - loop over all surfaces
+            // determine reference air temperatures and other variable terms - loop over all surfaces
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
 
                 int const ConstrNum = Surface(surfNum).Construction;
@@ -6885,6 +6864,8 @@ namespace HeatBalanceSurfaceManager {
                 if (construct.SourceSinkPresent) {
                     QsrcHistSurf1(surfNum) = QsrcHist(surfNum, 1);
                 }
+
+                // The special heat balance terms for pools are used only when the pool is operating, so IsPool can change
                 if (Surface(surfNum).IsPool) {
                     if ((std::abs(QPoolSurfNumerator(surfNum)) >= SmallNumber) || (std::abs(PoolHeatTransCoefs(surfNum)) >= SmallNumber)) {
                         IsPoolSurf(surfNum) = 1;
@@ -6896,8 +6877,8 @@ namespace HeatBalanceSurfaceManager {
                     }
                 }
 
-                // These conditions are not used in every SurfNum loop here so we don't use them to skip surfaces
-                if (Surface(surfNum).Class == SurfaceClass_TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
+                // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
+                if (Surface(surfNum).Class == SurfaceClass_TDD_Dome) continue;
 
                 {
                     auto const SELECT_CASE_var(Surface(surfNum).TAirRef);
@@ -6982,7 +6963,7 @@ namespace HeatBalanceSurfaceManager {
             // this loop auto-vectorizes
             for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
 
-                // Pre-calculate a few terms
+                // Pre-calculate a few terms before the iteration loop
                 TempTermSurf(surfNum) = CTFConstInPart(surfNum) + QRadThermInAbs(surfNum) + QRadSWInAbs(surfNum) +
                                         QAdditionalHeatSourceInside(surfNum) + HConvIn(surfNum) * RefAirTemp(surfNum) + QHTRadSysSurf(surfNum) +
                                         QCoolingPanelSurf(surfNum) + QHWBaseboardSurf(surfNum) + QSteamBaseboardSurf(surfNum) +
@@ -7035,9 +7016,9 @@ namespace HeatBalanceSurfaceManager {
                 // this loop auto-vectorizes
                 for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
                     // Perform heat balance on the inside face of the surface ...
-                    // The following are possibilities here:
+                    // The following are possibilities here (this function only does CTF, see CalcHeatBalanceInsideSurf2 for others):
                     //   (a) the surface is a pool (no movable insulation, no source/sink, only CTF solution algorithm)
-                    //   (b) the surface is a partition, in which case the temperature of both sides are the same
+                    //   (b) the surface is adiabatic (a partition), in which case the temperature of both sides are the same
                     //   (c) standard (or interzone) opaque surface with no movable insulation, normal heat balance equation
                     //   (d) standard (or interzone) window: call to CalcWindowHeatBalance to get window layer temperatures
                     //   (e) standard opaque surface with movable insulation, special two-part equation
@@ -7088,11 +7069,9 @@ namespace HeatBalanceSurfaceManager {
                                               // Convection and damping term | Radiation from AFN ducts
 
                     TempSurfIn(surfNum) = TempSurfInTmp(surfNum);
-                    // ShowContinueError("CalcHeatBalanceInsideSurf2: InsideSurfIterations=" + RoundSigDigits(InsideSurfIterations) + "  TempTerm=" +
-                    // RoundSigDigits((TempTermSurf(SurfNum) + NetLWRadToSurf(SurfNum)), 8) + "  TempDiv=" + RoundSigDigits(TempDivSurf(SurfNum), 8));
                 }
 
-                // Loop over non-window surfaces
+                // Loop over non-window surfaces (includes TubularDaylightingDomes)
                 for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
                     if (Surface(surfNum).HeatTransferAlgorithm == HeatTransferModel_AirBoundaryNoHT) {
                         // This is a temporary band-aid to get the same results with airboundary surfaces

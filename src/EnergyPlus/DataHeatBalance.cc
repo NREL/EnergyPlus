@@ -869,6 +869,7 @@ namespace DataHeatBalance {
         SolarDistribution = 0;
         InsideSurfIterations = 0;
         OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+        AllCTF = true;
         AnyCTF = false;
         AnyEMPD = false;
         AnyCondFD = false;

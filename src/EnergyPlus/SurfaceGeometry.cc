@@ -1264,7 +1264,7 @@ namespace SurfaceGeometry {
         //**********************************************************************************
 
         // The surfaces need to be hierarchical by zone.  Input is allowed to be in any order.  In
-        // this section it is reordered into:
+        // this section the surfaces are reordered into:
         //    All shadowing surfaces (if mirrored, Mir- surface follows immediately after original)
         //      Shading:Site
         //      Shading:Building
@@ -1278,7 +1278,7 @@ namespace SurfaceGeometry {
         //      Window subsurfaces (including TubularDaylightingDiffusers)
         //    After reordering, MovedSurfs should equal TotSurfaces
 
-        // For reporting purposes, the legacy surface order is also save in DataSurfaces::AllSurfaceListReportOrder:
+        // For reporting purposes, the legacy surface order is also saved in DataSurfaces::AllSurfaceListReportOrder:
         //    All shadowing surfaces (if mirrored, Mir- surface follows immediately after original)
         //      Shading:Site
         //      Shading:Building
@@ -1296,7 +1296,7 @@ namespace SurfaceGeometry {
         MovedSurfs = 0;
         Surface.allocate(TotSurfaces); // Allocate the Surface derived type appropriately
 
-        // Move all Detached Surfaces to Front
+        // Move all shading Surfaces to Front
 
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (SurfaceTmp(SurfNum).Class != SurfaceClass_Detached_F && SurfaceTmp(SurfNum).Class != SurfaceClass_Detached_B &&
@@ -1308,7 +1308,7 @@ namespace SurfaceGeometry {
             ++MovedSurfs;
             Surface(MovedSurfs) = SurfaceTmp(SurfNum);
             SurfaceTmp(SurfNum).Class = SurfaceClass_Moved; //'Moved'
-            // Store list of moved surface numbers in order for reporting
+            // Store list of moved surface numbers in reporting order 
             DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
         }
 
@@ -1316,7 +1316,7 @@ namespace SurfaceGeometry {
 
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
 
-            //  For each Base Surface Type (Wall, Floor, Roof) - put these first
+            //  For each Base Surface Type (Wall, Floor, Roof/Ceiling) - put these first
 
             for (int Loop = 1; Loop <= 3; ++Loop) {
 
@@ -1333,7 +1333,7 @@ namespace SurfaceGeometry {
                     SurfaceTmp(SurfNum).BaseSurf = -1;              // Default has base surface = base surface
                     BaseSurfNum = MovedSurfs;
                     Surface(MovedSurfs).BaseSurf = BaseSurfNum;
-                    // Store list of moved surface numbers in order for reporting (subsurfaces follow their base surface)
+                    // Store list of moved surface numbers in order reporting order (subsurfaces follow their base surface)
                     DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
 
                     //  Find all subsurfaces to this surface - just to update the base surface number - don't move these yet
@@ -1359,11 +1359,12 @@ namespace SurfaceGeometry {
                 Surface(MovedSurfs) = SurfaceTmp(SurfNum);
                 Surface(MovedSurfs).BaseSurf = MovedSurfs;
                 SurfaceTmp(SurfNum).Class = SurfaceClass_Moved; // 'Moved'
-                // Store list of moved surface numbers in order for reporting (subsurfaces follow their base surface)
+                // Store list of moved surface numbers in reporting order
                 DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
             }
 
-            // Opaque subsurfaces are next (anything left in this zone that's not a window or a glass door)
+            // Non-window) subsurfaces are next (anything left in this zone that's not a window or a glass door)
+            // includes SurfaceClass_TDD_Dome which transmits light but is not a window for heat balance purposes
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
                 if (SurfaceTmp(SubSurfNum).Class == SurfaceClass_Moved) continue;
@@ -1383,7 +1384,7 @@ namespace SurfaceGeometry {
                 std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
             }
 
-            // Last but not least, then window subsurfaces
+            // Last but not least, the window subsurfaces (includes SurfaceClass_TDD_Diffuser)
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
                 if (SurfaceTmp(SubSurfNum).Class == SurfaceClass_Moved) continue;
@@ -10742,14 +10743,14 @@ namespace SurfaceGeometry {
 
         static std::string const RoutineName("ProcessSurfaceVertices: ");
 
-        Real64 X1;                  // Intermediate Result
-        Real64 Y1;                  // Intermediate Result
-        Real64 Z1;                  // Intermediate Result
-        Real64 XLLC;                // X-coordinate of lower left corner
-        Real64 YLLC;                // Y-coordinate of lower left corner
-        Real64 ZLLC;                // Z-coordinate of lower left corner
-        int n;                      // Vertex Number in Loop
-        int ThisBaseSurface;        // Current base surface
+        Real64 X1;           // Intermediate Result
+        Real64 Y1;           // Intermediate Result
+        Real64 Z1;           // Intermediate Result
+        Real64 XLLC;         // X-coordinate of lower left corner
+        Real64 YLLC;         // Y-coordinate of lower left corner
+        Real64 ZLLC;         // Z-coordinate of lower left corner
+        int n;               // Vertex Number in Loop
+        int ThisBaseSurface; // Current base surface
         Real64 Xp;
         Real64 Yp;
         Real64 Zp;
