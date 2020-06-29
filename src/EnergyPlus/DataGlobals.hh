@@ -53,6 +53,7 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include "OutputFiles.hh"
 
@@ -273,7 +274,6 @@ namespace DataGlobals {
     extern bool AnyEnergyManagementSystemInModel;  // true if there is any EMS or Erl in model.  otherwise false
     extern bool AnyLocalEnvironmentsInModel;       // true if there is any local environmental data objected defined in model, otherwise false
     extern bool AnyPlantInModel;                   // true if there are any plant or condenser loops in model, otherwise false
-    extern int CacheIPErrorFile;                   // Cache IP errors until IDF processing done.
     extern bool AnyIdealCondEntSetPointInModel;    // true if there is any ideal condenser entering set point manager in model.
     extern bool RunOptCondEntTemp;                 // true if the ideal condenser entering set point optimization is running
     extern bool CompLoadReportIsReq;               // true if the extra sizing calcs are performed to create a "pulse" for the load component report
@@ -300,6 +300,22 @@ namespace DataGlobals {
     void clear_state(EnergyPlus::OutputFiles &outputFiles);
 
 } // namespace DataGlobals
+
+    struct DataGlobal : BaseGlobalStruct {
+        // Data
+        bool AnnualSimulation = false;
+
+        // MODULE VARIABLE DECLARATIONS:
+        std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
+
+        // MODULE PARAMETER DEFINITIONS
+        static constexpr int EndZoneSizingCalc = 4;
+
+        void clear_state() override {
+            AnnualSimulation = false;
+            DayOfSimChr = "0";
+        }
+    };
 
 } // namespace EnergyPlus
 

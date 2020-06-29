@@ -76,7 +76,7 @@ Four correlations for $\epsilon_{sky}$ under clear-sky conditions, proposed by f
 \begin{table}[hbtp]
 \centering
 \begin{tabular}{cl}
-\textbf{Author}   & \epsilon_{sky, clear} \\ \\
+\textbf{Author}   & $\epsilon_{sky, clear}$ \\ \\
 Clark \& Allen    & $= 0.787 + 0.764 \ln\left(T_{dp}/273\right)$ \\ \\
 Martin \& Berdahl & $= 0.758 + 0.521 \left(T_{dp}/100\right) + 0.625  \left(T_{dp} / 100\right)^2$ \\ \\
 Brunt             & $= 0.618 + 0.056 \left(P_{wv}\right)^{0.5}$ \\ \\
@@ -111,10 +111,10 @@ $N$ = opaque sky cover, in tenths.
 \noindent Example:
 \newline
 
-Clear sky ($N=0$), $T_{db} = 20 + 273.15 = \SI{293.15}{\kelivin}$, $T_{dp} = 10 + 273.15 = \SI{283.15}{\kelvin}$
+Clear sky ($N=0$), $T_{db} = 20 + 273.15 = \SI{293.15}{\kelvin}$, $T_{dp} = 10 + 273.15 = \SI{283.15}{\kelvin}$
 \newline
 
-$\epsilon_{sky} = \left(0.787 + 0.764  \ln\left(283.15/273\right)\right)  \left(1 + 0.0224  N - 0.0035  N^2 + 0.00028  N^3) = 0.815$
+$\epsilon_{sky} = \left(0.787 + 0.764  \ln\left(283.15/273\right)\right)  \left(1 + 0.0224  N - 0.0035  N^2 + 0.00028  N^3 \right) = 0.815$
 \newline
 
 $IR_H = 0.815  5.6697E-8  293.15^4 = \SI{341.2}{\watt\per\meter\squared}$

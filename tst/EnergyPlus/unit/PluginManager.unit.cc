@@ -69,7 +69,7 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     // now create a trend variable to track it
     size_t const numValues = 4;
     PluginManagement::trends.emplace_back("TREND_VAR", numValues, globalVarIndex);
-    int trendVarIndex = pluginManager.getTrendVariableHandle("trend_var");
+    int trendVarIndex = EnergyPlus::PluginManagement::PluginManager::getTrendVariableHandle("trend_var");
     EXPECT_EQ(0, trendVarIndex);
 
     // initially it should be filled with zeroes
@@ -82,7 +82,7 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     std::vector<Real64> fakeValues = {3.14, 2.78, 12.0};
     for (int i = 0; i < 3; i++) {
         EnergyPlus::PluginManagement::PluginManager::setGlobalVariableValue(globalVarIndex, fakeValues[i]);
-        pluginManager.updatePluginValues();
+        EnergyPlus::PluginManagement::PluginManager::updatePluginValues();
     }
 
     // now check the values at the end, it should still be zero at the oldest (fourth) item, and 12.0 at the recent

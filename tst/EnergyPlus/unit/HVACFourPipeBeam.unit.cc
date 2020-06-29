@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -1721,7 +1720,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -1730,7 +1729,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
     DataGlobals::DoingSizing = true;
     SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;
@@ -1768,7 +1767,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     // DataLoopNode::Node( 38 ).Temp = 45.0; // hot water inlet node
 
     Real64 NonAirSysOutput = 0.0;
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
+    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(state, FirstHVACIteration, NonAirSysOutput);
 
     EXPECT_NEAR(DataLoopNode::Node(1).MassFlowRate, 0.36165246721684446, 0.00001);
     EXPECT_NEAR(DataLoopNode::Node(15).Temp, 17.835648923740127, 0.00001);
@@ -1784,7 +1783,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
 
     DataLoopNode::Node(40).Temp = 21.0; // zone node
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
+    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(state, FirstHVACIteration, NonAirSysOutput);
 
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).Temp, 14.0);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).MassFlowRate, 0.0);
@@ -1806,7 +1805,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     DataLoopNode::Node(38).Temp = 45.0;    // hot water inlet node
 
     NonAirSysOutput = 0.0;
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
+    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(state, FirstHVACIteration, NonAirSysOutput);
 
     EXPECT_NEAR(DataLoopNode::Node(15).Temp, 18.549803918626715, 0.00001);
     EXPECT_NEAR(DataLoopNode::Node(15).MassFlowRate, 0.22613768427540518, 0.00001);
@@ -1827,7 +1826,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     DataLoopNode::Node(40).Temp = 21.0; // zone node
 
     NonAirSysOutput = 0.0;
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
+    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(state, FirstHVACIteration, NonAirSysOutput);
 
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).Temp, 14.0);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).MassFlowRate, 0.0);
@@ -3295,7 +3294,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -3304,7 +3303,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
     DataGlobals::DoingSizing = true;
     SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;

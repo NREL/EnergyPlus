@@ -2743,12 +2743,13 @@ namespace ScheduleManager {
             }
         }
 
+        // Checking if valid index is passed is necessary
         if (ScheduleIndex == -1) {
             return 1.0;
         } else if (ScheduleIndex == 0) {
             return 0.0;
         } else if (!Schedule(ScheduleIndex).EMSActuatedOn) {
-            return Schedule(ScheduleIndex).CurrentValue;
+            return Schedule(ScheduleIndex).CurrentValue;  // This block probably unecessary, UpdateScheduleValues already does it
         } else {
             return Schedule(ScheduleIndex).EMSValue;
         }
@@ -2776,8 +2777,7 @@ namespace ScheduleManager {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
-
+        
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -2792,59 +2792,26 @@ namespace ScheduleManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ScheduleIndex;
-        int WhichHour;
-        int WeekSchedulePointer;
-        int DaySchedulePointer;
 
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput(OutputFiles::getSingleton());
             ScheduleInputProcessed = true;
         }
 
-        WhichHour = HourOfDay + DSTIndicator;
-
-        for (ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
-
+        for (int ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
             if (Schedule(ScheduleIndex).EMSActuatedOn) {
                 Schedule(ScheduleIndex).CurrentValue = Schedule(ScheduleIndex).EMSValue;
             } else {
-                // Hourly Value
-                if (WhichHour <= 24) {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
-                    if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                    }
-                    Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour);
-                } else if (TimeStep <= NumOfTimeStepInHour) {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule + 1);
-                    if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                    }
-                    Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour - 24);
-                } else {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule + 1);
-                    if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                    }
-                    Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
-                }
+                Schedule(ScheduleIndex).CurrentValue = LookUpScheduleValue(ScheduleIndex, DataGlobals::HourOfDay, DataGlobals::TimeStep);
             }
         }
     }
 
     Real64 LookUpScheduleValue(int const ScheduleIndex,
-                               int const ThisHour,    // Negative => unspecified
+                               int const ThisHour,
                                int const ThisTimeStep // Negative => unspecified
     )
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   January 2003
@@ -2862,10 +2829,9 @@ namespace ScheduleManager {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
 
         // Return value
-        Real64 LookUpScheduleValue(0.0);
+        Real64 scheduleValue(0.0);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -2880,101 +2846,53 @@ namespace ScheduleManager {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int WeekSchedulePointer;
-        int DaySchedulePointer;
-        int WhichHour;
-        int WhichTimeStep;
+
+
+        if (ThisHour > 24) {
+            ShowFatalError("LookUpScheduleValue called with thisHour=" + fmt::to_string(ThisHour));
+        }
+
+        if (ScheduleIndex == -1) {
+            return 1.0;
+        } else if (ScheduleIndex == 0) {
+            return 0.0;
+        }
 
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput(OutputFiles::getSingleton());
             ScheduleInputProcessed = true;
         }
 
-        if (ScheduleIndex == -1) {
-            LookUpScheduleValue = 1.0;
-            return LookUpScheduleValue;
-        } else if (ScheduleIndex == 0) {
-            LookUpScheduleValue = 0.0;
-            return LookUpScheduleValue;
+        //  so, current date, but maybe TimeStep added
+
+        // Hourly Value
+        int thisHour = ThisHour + DSTIndicator;
+        int thisDayOfYear = DataEnvironment::DayOfYear_Schedule;
+        int thisDayOfWeek = DataEnvironment::DayOfWeek;
+        int thisHolidayIndex = DataEnvironment::HolidayIndex;
+        if (thisHour > 24) { // In case HourOfDay is 24 and DSTIndicator is 1, you're actually the next day
+            thisDayOfYear += 1;
+            thisHour -= 24;
+            thisDayOfWeek = DataEnvironment::DayOfWeekTomorrow;
+            thisHolidayIndex = DataEnvironment::HolidayIndexTomorrow;
         }
 
-        if (ThisHour < 0) { // ThisHour unspecified
-            LookUpScheduleValue = GetCurrentScheduleValue(ScheduleIndex);
+        int WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(thisDayOfYear);
+        int DaySchedulePointer;
 
-            //  ELSEIF (ThisHour == 0) THEN  ! odd answers when thishour=0 (initialization of shadowing)
-            //    LookUpScheduleValue=GetCurrentScheduleValue(ScheduleIndex)
-
-        } else { // ThisHour specified
-            //  so, current date, but maybe TimeStep added
-
-            // Determine which Week Schedule is used
-            //  Cant use stored day of year because of leap year inconsistency
-            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
-
-            // Now, which day?
-            if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-            } else {
-                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-            }
-
-            // Hourly Value
-            WhichHour = HourOfDay + DSTIndicator;
-            if (WhichHour <= 24) {
-                LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour);
-            } else {
-                LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour - 24);
-            }
-            WhichHour = ThisHour;
-            while (WhichHour < 1) {
-                WhichHour += 24;
-            }
-            if (WhichHour > 24) {
-                while (WhichHour > 24) {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(General::OrdinalDay(MonthTomorrow, DayOfMonthTomorrow, 1));
-                    if (DayOfWeekTomorrow <= 7 && HolidayIndexTomorrow > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndexTomorrow);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeekTomorrow);
-                    }
-                    WhichHour -= 24;
-                }
-            } else {
-                // Determine which Week Schedule is used
-                //  Cant use stored day of year because of leap year inconsistency
-                WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
-
-                // Now, which day?
-                if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                    DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                } else {
-                    DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                }
-            }
-            WhichHour += DSTIndicator;
-            if (ThisTimeStep >= 0) { // ThisTimeStep specified
-                if (ThisTimeStep == 0) {
-                    WhichTimeStep = NumOfTimeStepInHour;
-                } else {
-                    WhichTimeStep = ThisTimeStep;
-                }
-                if (WhichHour <= 24) {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(WhichTimeStep, WhichHour);
-                } else if (ThisTimeStep <= NumOfTimeStepInHour) {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(WhichTimeStep, WhichHour - 24);
-                } else {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
-                }
-            } else {
-                if (WhichHour <= 24) {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour);
-                } else {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
-                }
-            }
+        // TODO: the (thisDayOfWeek < 7) looks fishy and maybe uncessary... how about if there are more than 7 holidays?
+        // It should use 7 + thisHolidayIndex in that case but it won't
+        if (thisDayOfWeek <= 7 && thisHolidayIndex > 0) {
+            DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + thisHolidayIndex);
+        } else {
+            DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(thisDayOfWeek);
         }
 
-        return LookUpScheduleValue;
+        // If Unspecified or equal to zero, use NumOfTimeStepInHour, otherwise use supplied
+        int thisTimeStep = ThisTimeStep > 0 ? ThisTimeStep : NumOfTimeStepInHour;
+        scheduleValue = DaySchedule(DaySchedulePointer).TSValue(thisTimeStep, thisHour);
+
+        return scheduleValue;
     }
 
     int GetScheduleIndex(std::string const &ScheduleName)
@@ -4925,11 +4843,7 @@ namespace ScheduleManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ScheduleIndex;
-        int WhichHour;
         static bool DoScheduleReportingSetup(true);
-        int WeekSchedulePointer;
-        int DaySchedulePointer;
 
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput(OutputFiles::getSingleton());
@@ -4937,7 +4851,7 @@ namespace ScheduleManager {
         }
 
         if (DoScheduleReportingSetup) { // CurrentModuleObject='Any Schedule'
-            for (ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
+            for (int ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
                 // Set Up Reporting
                 SetupOutputVariable("Schedule Value",
                                     OutputProcessor::Unit::None,
@@ -4949,40 +4863,9 @@ namespace ScheduleManager {
             DoScheduleReportingSetup = false;
         }
 
-        WhichHour = HourOfDay + DSTIndicator;
-        for (ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
-
-            if (Schedule(ScheduleIndex).EMSActuatedOn) {
-                Schedule(ScheduleIndex).CurrentValue = Schedule(ScheduleIndex).EMSValue;
-            } else {
-                // Hourly Value
-                if (WhichHour <= 24) {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
-                    if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                    }
-                    Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour);
-                } else if (TimeStep <= NumOfTimeStepInHour) {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule + 1);
-                    if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                    }
-                    Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour - 24);
-                } else {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule + 1);
-                    if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                    }
-                    Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
-                }
-            }
-        }
+        // TODO: Is this needed?
+        // Why is it doing exactly the same as UpdateScheduleValues?
+        UpdateScheduleValues();
     }
 
     void ReportOrphanSchedules()
