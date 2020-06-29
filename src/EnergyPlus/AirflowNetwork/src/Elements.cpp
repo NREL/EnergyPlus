@@ -557,15 +557,15 @@ namespace AirflowNetwork {
         Real64 rhoz_norm = AIRDENSITY(StandardP, StandardT, StandardW);
         Real64 viscz_norm = 1.71432e-5 + 4.828e-8 * StandardT;
 
-        double VisAve{0.5 * (propN.viscosity + propM.viscosity)};
-        double Tave{0.5 * (propN.temperature + propM.temperature)};
+        Real64 VisAve{0.5 * (propN.viscosity + propM.viscosity)};
+        Real64 Tave{0.5 * (propN.temperature + propM.temperature)};
 
-        double sign{1.0};
-        double upwind_temperature{propN.temperature};
-        double upwind_density{propN.density};
-        double upwind_viscosity{propN.viscosity};
-        double upwind_sqrt_density{propN.sqrt_density};
-        double abs_pdrop = pdrop;
+        Real64 sign{1.0};
+        Real64 upwind_temperature{propN.temperature};
+        Real64 upwind_density{propN.density};
+        Real64 upwind_viscosity{propN.viscosity};
+        Real64 upwind_sqrt_density{propN.sqrt_density};
+        Real64 abs_pdrop = pdrop;
 
         if (pdrop < 0.0) {
             sign = -1.0;
@@ -576,14 +576,14 @@ namespace AirflowNetwork {
             abs_pdrop = -pdrop;
         }
 
-        double coef = coefficient * control * multiplier / upwind_sqrt_density;
+        Real64 coef = coefficient * control * multiplier / upwind_sqrt_density;
 
         // Laminar calculation
-        double RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
-        double Ctl{std::pow(rhoz_norm / upwind_density / RhoCor, exponent - 1.0) * std::pow(viscz_norm / VisAve, 2.0 * exponent - 1.0)};
-        double CDM{coef * upwind_density / upwind_viscosity * Ctl};
-        double FL{CDM * pdrop};
-        double abs_FT;
+        Real64 RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
+        Real64 Ctl{std::pow(rhoz_norm / upwind_density / RhoCor, exponent - 1.0) * std::pow(viscz_norm / VisAve, 2.0 * exponent - 1.0)};
+        Real64 CDM{coef * upwind_density / upwind_viscosity * Ctl};
+        Real64 FL{CDM * pdrop};
+        Real64 abs_FT;
 
         if (linear) {
             DF[0] = CDM;
@@ -636,15 +636,15 @@ namespace AirflowNetwork {
         Real64 rhoz_norm = AIRDENSITY(StandardP, StandardT, StandardW);
         Real64 viscz_norm = 1.71432e-5 + 4.828e-8 * StandardT;
 
-        double VisAve{0.5 * (propN.viscosity + propM.viscosity)};
-        double Tave{0.5 * (propN.temperature + propM.temperature)};
+        Real64 VisAve{0.5 * (propN.viscosity + propM.viscosity)};
+        Real64 Tave{0.5 * (propN.temperature + propM.temperature)};
 
-        double sign{1.0};
-        double upwind_temperature{propN.temperature};
-        double upwind_density{propN.density};
-        double upwind_viscosity{propN.viscosity};
-        double upwind_sqrt_density{propN.sqrt_density};
-        double abs_pdrop = pdrop;
+        Real64 sign{1.0};
+        Real64 upwind_temperature{propN.temperature};
+        Real64 upwind_density{propN.density};
+        Real64 upwind_viscosity{propN.viscosity};
+        Real64 upwind_sqrt_density{propN.sqrt_density};
+        Real64 abs_pdrop = pdrop;
 
         if (pdrop < 0.0) {
             sign = -1.0;
@@ -655,14 +655,14 @@ namespace AirflowNetwork {
             abs_pdrop = -pdrop;
         }
 
-        double coef = coefficient * control * multiplier / upwind_sqrt_density;
+        Real64 coef = coefficient * control * multiplier / upwind_sqrt_density;
 
         // Laminar calculation
-        double RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
-        double Ctl{std::pow(rhoz_norm / upwind_density / RhoCor, exponent - 1.0) * std::pow(viscz_norm / VisAve, 2.0 * exponent - 1.0)};
-        double CDM{coef * upwind_density / upwind_viscosity * Ctl};
-        double FL{CDM * pdrop};
-        double abs_FT;
+        Real64 RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
+        Real64 Ctl{std::pow(rhoz_norm / upwind_density / RhoCor, exponent - 1.0) * std::pow(viscz_norm / VisAve, 2.0 * exponent - 1.0)};
+        Real64 CDM{coef * upwind_density / upwind_viscosity * Ctl};
+        Real64 FL{CDM * pdrop};
+        Real64 abs_FT;
 
         // Turbulent flow.
         if (exponent == 0.5) {

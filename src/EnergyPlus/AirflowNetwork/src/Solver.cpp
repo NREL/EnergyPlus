@@ -1076,18 +1076,18 @@ namespace AirflowNetwork {
 
         // FLOW:
         // Calculate normal density and viscocity at reference conditions
-        Real64 RhozNorm = AIRDENSITY(101325.0, 20.0, 0.0);
-        Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
+        Real64 RhozNorm = AIRDENSITY(referenceP, referenceT, referenceW);
+        Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * referenceT;
 
-        double VisAve{0.5 * (propN.viscosity + propM.viscosity)};
-        double Tave{0.5 * (propN.temperature + propM.temperature)};
+        Real64 VisAve{0.5 * (propN.viscosity + propM.viscosity)};
+        Real64 Tave{0.5 * (propN.temperature + propM.temperature)};
 
-        double sign{1.0};
-        double upwind_temperature{propN.temperature};
-        double upwind_density{propN.density};
-        double upwind_viscosity{propN.viscosity};
-        double upwind_sqrt_density{propN.sqrt_density};
-        double abs_pdrop = pdrop;
+        Real64 sign{1.0};
+        Real64 upwind_temperature{propN.temperature};
+        Real64 upwind_density{propN.density};
+        Real64 upwind_viscosity{propN.viscosity};
+        Real64 upwind_sqrt_density{propN.sqrt_density};
+        Real64 abs_pdrop = pdrop;
 
         if (pdrop < 0.0) {
             sign = -1.0;
@@ -1098,20 +1098,20 @@ namespace AirflowNetwork {
             abs_pdrop = -pdrop;
         }
 
-        double coef = coefficient / upwind_sqrt_density;
+        Real64 coef = coefficient / upwind_sqrt_density;
 
         // Laminar calculation
-        double RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
-        double Ctl{std::pow(RhozNorm / upwind_density / RhoCor, exponent - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * exponent - 1.0)};
-        double CDM{coef * upwind_density / upwind_viscosity * Ctl};
-        double FL{CDM * pdrop};
+        Real64 RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
+        Real64 Ctl{std::pow(RhozNorm / upwind_density / RhoCor, exponent - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * exponent - 1.0)};
+        Real64 CDM{coef * upwind_density / upwind_viscosity * Ctl};
+        Real64 FL{CDM * pdrop};
 
         if (linear) {
             DF[0] = CDM;
             F[0] = FL;
         } else {
             // Turbulent flow.
-            double abs_FT;
+            Real64 abs_FT;
             if (exponent == 0.5) {
                 abs_FT = coef * upwind_sqrt_density * std::sqrt(abs_pdrop) * Ctl;
             } else {
