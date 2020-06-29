@@ -4472,7 +4472,7 @@ namespace HVACVariableRefrigerantFlow {
                               DataLoopNode::NodeID(OANodeNums(4)));
 
             // Get AirTerminal mixer data
-            GetATMixer(VRFTU(VRFTUNum).Name,
+            GetATMixer(state.dataZoneAirLoopEquipmentManager, VRFTU(VRFTUNum).Name,
                        VRFTU(VRFTUNum).ATMixerName,
                        VRFTU(VRFTUNum).ATMixerIndex,
                        VRFTU(VRFTUNum).ATMixerType,
