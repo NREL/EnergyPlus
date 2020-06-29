@@ -58,7 +58,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
 #include <EnergyPlus/ConductionTransferFunctionCalc.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>

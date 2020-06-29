@@ -504,7 +504,7 @@ namespace HeatBalanceKivaManager {
                         if (Pos == std::string::npos) {
                             if (len(LineResult.data) == 0) {
                                 while (Pos == std::string::npos) {
-                                    LineResult = kivaWeatherFile.readLine();
+                                    LineResult.update(kivaWeatherFile.readLine());
                                     strip(LineResult.data);
                                     uppercase(LineResult.data);
                                     Pos = index(LineResult.data, ',');

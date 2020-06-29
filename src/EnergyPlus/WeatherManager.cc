@@ -602,7 +602,7 @@ namespace WeatherManager {
 
         SetCurrentWeather();
 
-        ReportWeatherAndTimeInformation(IOFiles::getSingleton(), PrintEnvrnStamp);
+        ReportWeatherAndTimeInformation(ioFiles, PrintEnvrnStamp);
     }
 
     void ResetEnvironmentCounter()
@@ -5306,7 +5306,6 @@ namespace WeatherManager {
         // METHODOLOGY EMPLOYED:
         // List directed reads, as possible.
 
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const Header(8,
@@ -8764,7 +8763,6 @@ namespace WeatherManager {
         // Using/Aliasing
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -9473,7 +9471,6 @@ namespace WeatherManager {
         // List directed reads, as possible.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
         static std::string const Header("DATA PERIODS");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -9566,7 +9563,7 @@ namespace WeatherManager {
 
     Label9998:;
         ShowFatalError("Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header,
-                       OptionalOutputFileRef{IOFiles::getSingleton().eso});
+                       OptionalOutputFileRef{ioFiles.eso});
     }
 
     void ReportMissing_RangeData()
