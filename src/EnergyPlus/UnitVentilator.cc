@@ -476,7 +476,7 @@ namespace UnitVentilator {
                 GetOnlySingleNode(Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
             // Get AirTerminal mixer data
-            GetATMixer(UnitVent(UnitVentNum).Name,
+            GetATMixer(state.dataZoneAirLoopEquipmentManager, UnitVent(UnitVentNum).Name,
                        UnitVent(UnitVentNum).ATMixerName,
                        UnitVent(UnitVentNum).ATMixerIndex,
                        UnitVent(UnitVentNum).ATMixerType,
@@ -1339,7 +1339,8 @@ namespace UnitVentilator {
             if ((UnitVent(UnitVentNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
                 (UnitVent(UnitVentNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(UnitVent(UnitVentNum).HCoilName,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        UnitVent(UnitVentNum).HCoilName,
                                         UnitVent(UnitVentNum).HCoil_PlantTypeNum,
                                         UnitVent(UnitVentNum).HWLoopNum,
                                         UnitVent(UnitVentNum).HWLoopSide,
@@ -1365,7 +1366,8 @@ namespace UnitVentilator {
             if ((UnitVent(UnitVentNum).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling) ||
                 (UnitVent(UnitVentNum).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(UnitVent(UnitVentNum).CCoilPlantName,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        UnitVent(UnitVentNum).CCoilPlantName,
                                         UnitVent(UnitVentNum).CCoil_PlantTypeNum,
                                         UnitVent(UnitVentNum).CWLoopNum,
                                         UnitVent(UnitVentNum).CWLoopSide,
@@ -3362,7 +3364,7 @@ namespace UnitVentilator {
 
             if (UnitVent(UnitVentNum).CCoilPresent) {
                 if (UnitVent(UnitVentNum).CCoilType == Cooling_CoilHXAssisted) {
-                    SimHXAssistedCoolingCoil(state, 
+                    SimHXAssistedCoolingCoil(state,
                         UnitVent(UnitVentNum).CCoilName, FirstHVACIteration, On, 0.0, UnitVent(UnitVentNum).CCoil_Index, ContFanCycCoil);
                 } else {
                     SimulateWaterCoilComponents(state, UnitVent(UnitVentNum).CCoilName, FirstHVACIteration, UnitVent(UnitVentNum).CCoil_Index);
@@ -3452,10 +3454,10 @@ namespace UnitVentilator {
                                      UnitVent(UnitVentNum).CWCompNum);
 
                 if (UnitVent(UnitVentNum).CCoilType == Cooling_CoilHXAssisted) {
-                    SimHXAssistedCoolingCoil(state, 
+                    SimHXAssistedCoolingCoil(state,
                         UnitVent(UnitVentNum).CCoilName, FirstHVACIteration, On, PartLoadRatio, UnitVent(UnitVentNum).CCoil_Index, FanOpMode);
                 } else {
-                    SimulateWaterCoilComponents(state, 
+                    SimulateWaterCoilComponents(state,
                         UnitVent(UnitVentNum).CCoilName, FirstHVACIteration, UnitVent(UnitVentNum).CCoil_Index, QCoilReq, FanOpMode, PartLoadRatio);
                 }
             }
