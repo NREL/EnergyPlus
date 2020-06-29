@@ -2387,6 +2387,7 @@ namespace DataHeatBalance {
         return MaterialGroup == WindowGlass || MaterialGroup == Shade || MaterialGroup == Screen || MaterialGroup == WindowBlind ||
                MaterialGroup == WindowSimpleGlazing;
     }
+
     void SetFlagForWindowConstructionWithShadeOrBlindLayer()
     {
 
@@ -2449,6 +2450,46 @@ namespace DataHeatBalance {
                 }
             }
         }
+    }
+
+    Real64 ConstructionData::setUserTemperatureLocationPerpendicular(Real64 userValue)
+    {
+        if (userValue < 0.0) {
+            ShowWarningError("Construction:InternalSource has a perpendicular temperature location parameter that is less than zero.");
+            ShowContinueError("Construction=" + this->Name + " has this error.  The parameter has been reset to 0.");
+            return 0.0;
+        } else if (userValue > 1.0) {
+            ShowWarningError("Construction:InternalSource has a perpendicular temperature location parameter that is greater than one.");
+            ShowContinueError("Construction=" + this->Name + " has this error.  The parameter has been reset to 1.");
+            return 1.0;
+        } else {    // Valid value between 0 and 1
+            return userValue;
+        }
+    }
+
+    void ConstructionData::setNodeSourceAndUserTemp(int &sourceNodeLocation,
+                                  int &userTempNodeLocation,
+                                  Array1D_int & Nodes,
+                                  int NumOfPerpendNodes)
+    {
+        sourceNodeLocation = 0;
+        userTempNodeLocation = 0;
+        if (!this->SourceSinkPresent) return;
+
+        for (int Layer = 1; Layer <= this->SourceAfterLayer; ++Layer) {
+            sourceNodeLocation += Nodes(Layer);
+        }
+        
+        if ((sourceNodeLocation > 0) && (this->SolutionDimensions > 1)) sourceNodeLocation = (sourceNodeLocation - 1) * NumOfPerpendNodes + 1;
+
+        for (int Layer = 1; Layer <= this->TempAfterLayer; ++Layer) {
+            userTempNodeLocation += Nodes(Layer);
+        }
+        
+        if ((userTempNodeLocation > 0) && (this->SolutionDimensions > 1))
+            userTempNodeLocation = (userTempNodeLocation - 1) * NumOfPerpendNodes
+                                    + round(this->userTemperatureLocationPerpendicular * (NumOfPerpendNodes - 1)) + 1;
+            
     }
 
 } // namespace DataHeatBalance

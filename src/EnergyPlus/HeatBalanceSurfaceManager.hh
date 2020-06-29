@@ -55,12 +55,11 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
     // Forward declarations
     struct EnergyPlusData;
     struct ZoneTempPredictorCorrectorData;
-
-// Forward declarations
-struct ChilledCeilingPanelSimpleData;
+    struct ChilledCeilingPanelSimpleData;
 
 namespace DataSurfaces {
     struct SurfaceData;
@@ -121,8 +120,7 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void UpdateFinalSurfaceHeatBalance(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
-                                       ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+    void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state);
 
     void UpdateThermalHistories();
 

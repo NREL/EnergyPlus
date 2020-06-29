@@ -69,11 +69,15 @@
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
+#include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
@@ -98,6 +102,7 @@ namespace EnergyPlus {
         ChillerIndirectAbsoprtionData dataChillerIndirectAbsorption;
         ChillerGasAbsorptionData dataChillerGasAbsorption;
         ChillerReformulatedEIRData dataChillerReformulatedEIR;
+        CondenserLoopTowersData dataCondenserLoopTowers;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
@@ -108,6 +113,9 @@ namespace EnergyPlus {
 
         IOFiles files;
 
+        ZoneAirLoopEquipmentManagerData dataZoneAirLoopEquipmentManager;
+        ZoneContaminantPredictorCorrectorData dataZoneContaminantPredictorCorrector;
+        ZoneDehumidifierData dataZoneDehumidifier;
         ZoneEquipmentManagerData dataZoneEquipmentManager;
         ZonePlenumData dataZonePlenum;
         ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
@@ -137,12 +145,16 @@ namespace EnergyPlus {
             dataChillerGasAbsorption.clear_state();
             dataChillerIndirectAbsorption.clear_state();
             dataChillerReformulatedEIR.clear_state();
+            dataCondenserLoopTowers.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
             fans.clear_state();
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataZoneAirLoopEquipmentManager.clear_state();
+            dataZoneContaminantPredictorCorrector.clear_state();
+            dataZoneDehumidifier.clear_state();
             dataZoneEquipmentManager.clear_state();
             dataZonePlenum.clear_state();
             dataZoneTempPredictorCorrector.clear_state();
