@@ -5021,10 +5021,10 @@ namespace HeatBalanceSurfaceManager {
                 } else if (HI > 26.7 && HI <= 32.2) {
                     ZoneHeatIndexHourBins(ZoneNum)[1] += TimeStepZone;
                     ZoneHeatIndexOccuHourBins(ZoneNum)[1] += NumOcc * TimeStepZone;
-                } else if (HI > 32.2 && HI <= 40.6) {
+                } else if (HI > 32.2 && HI <= 39.4) {
                     ZoneHeatIndexHourBins(ZoneNum)[2] += TimeStepZone;
                     ZoneHeatIndexOccuHourBins(ZoneNum)[2] += NumOcc * TimeStepZone;
-                } else if (HI > 40.6 && HI <= 54.4) {
+                } else if (HI > 39.4 && HI <= 51.7) {
                     ZoneHeatIndexHourBins(ZoneNum)[3] += TimeStepZone;
                     ZoneHeatIndexOccuHourBins(ZoneNum)[3] += NumOcc * TimeStepZone;
                 } else {

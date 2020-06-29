@@ -11356,7 +11356,7 @@ namespace OutputReportTabular {
         rowHead(NumOfZones + 1) = "Min";
         rowHead(NumOfZones + 2) = "Max";
         rowHead(NumOfZones + 3) = "Average";
-        for (int j = 0; j < columnNum; j++) {
+        for (int j = 0; j < columnNum - 1; j++) {
             tableBody(j + 1, NumOfZones + 1) = RealToStr(columnMin[j], 2);
             tableBody(j + 1, NumOfZones + 2) = RealToStr(columnMax[j], 2);
             tableBody(j + 1, NumOfZones + 3) = RealToStr(columnSum[j] / NumOfZones, 2);
@@ -11395,17 +11395,17 @@ namespace OutputReportTabular {
             std::string subTitle = "Heat Index Hours";
             std::vector<std::string> columnHeadNames = { "Safe (≤ 80°F) [Hours]",
                                                          "Caution (80, 90°F] [Hours]",
-                                                         "Extreme Caution (90, 105°F] [Hours]",
-                                                         "Danger (105, 130°F] [Hours]",
-                                                         "Extreme Danger (> 130°F) [Hours]" };
+                                                         "Extreme Caution (90, 103°F] [Hours]",
+                                                         "Danger (103, 125°F] [Hours]",
+                                                         "Extreme Danger (> 125°F) [Hours]" };
             WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneHeatIndexHourBins);
 
             subTitle = "Heat Index OccupantHours";
             columnHeadNames = { "Safe (≤ 80°F) [OccupantHours]",
                                 "Caution (80, 90°F] [OccupantHours]",
-                                "Extreme Caution (90, 105°F] [OccupantHours]",
-                                "Danger (105, 130°F] [OccupantHours]",
-                                "Extreme Danger (> 130°F) [OccupantHours]" };
+                                "Extreme Caution (90, 103°F] [OccupantHours]",
+                                "Danger (103, 125°F] [OccupantHours]",
+                                "Extreme Danger (> 125°F) [OccupantHours]" };
             WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneHeatIndexOccuHourBins);
 
             subTitle = "Humidex Hours";
@@ -11434,9 +11434,9 @@ namespace OutputReportTabular {
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 if (!People(iPeople).Pierce) {
                     hasPierceSET = false;
-                    ShowWarningError( "Writing Annual Thermal Resilience Summary - SET Hours reports: "
-                                      "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
-                                      "but no Pierce model is defined in " + People(iPeople).Name + " object.");
+//                    ShowWarningError( "Writing Annual Thermal Resilience Summary - SET Hours reports: "
+//                                      "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
+//                                      "but no Pierce model is defined in " + People(iPeople).Name + " object.");
                 }
             }
 
@@ -11492,9 +11492,9 @@ namespace OutputReportTabular {
 
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::NoDaylighting) {
-                ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
-                                 "Zone Average Daylighting Reference Point Illuminance output is required, "
-                                 "but no Daylight Method is defined in Zone:" + Zone(ZoneNum).Name);
+//                ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
+//                                 "Zone Average Daylighting Reference Point Illuminance output is required, "
+//                                 "but no Daylight Method is defined in Zone:" + Zone(ZoneNum).Name);
             }
         }
 

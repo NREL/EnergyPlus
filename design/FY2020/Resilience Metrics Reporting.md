@@ -36,9 +36,9 @@ Table 1 developed by U.S. National Oceanic and Atmospheric Administration (NOAA)
 |---------------------|------------------------|-------------------------------------------------------------------------------------------------------------------|
 |Less than 26.7 °C    |Less than 80 °F         |Safe: no risk of heat hazard                                                                                       |
 |26.7 - 32.2 °C       |80–90 °F                |Caution: fatigue is possible with prolonged exposure and activity. Continuing activity could result in heat cramps.|
-|32.2 - 40.6 °C       |90–105 °F               |Extreme caution: heat cramps and heat exhaustion are possible. Continuing activity could result in heat stroke.    |
-|40.6 - 54.4 °C       |105–130 °F              |Danger: heat cramps and heat exhaustion are likely; heat stroke is probable with continued activity.               |
-|over 54.4 °C         |over 130 °F             |Extreme danger: heat stroke is imminent.  
+|32.2 - 39.4 °C       |90–103 °F               |Extreme caution: heat cramps and heat exhaustion are possible. Continuing activity could result in heat stroke.    |
+|39.4 - 51.7 °C       |103–125 °F              |Danger: heat cramps and heat exhaustion are likely; heat stroke is probable with continued activity.               |
+|over 51.7 °C         |over 124 °F             |Extreme danger: heat stroke is imminent.  
                                                                          
 The computation of the heat index is a refinement of a result obtained by multiple regression analysis carried out by Lans P. Rothfusz and described in a 1990 National Weather Service (NWS) Technical Attachment (SR 90-23). The calculation is based on degree Fahrenheit.
 
@@ -217,7 +217,7 @@ For: **Entire Facility**
 
 **Heat Index Hours**
 
-|          |Safe (≤ 80°F) [Hours] |Caution (80, 90°F] [Hours] |Extreme Caution (90, 105°F] [Hours] |Danger (105, 130°F] [Hours] |Extreme Danger (> 130°F) [Hours]|
+|          |Safe (≤ 80°F) [Hours] |Caution (80, 90°F] [Hours] |Extreme Caution (90, 103°F] [Hours] |Danger (103, 125°F] [Hours] |Extreme Danger (> 125°F) [Hours]|
 |----------|------|------|------|------|------|
 |Space_1   |      |      |      |      |      |
 |…         |      |      |      |      |      |
@@ -229,7 +229,7 @@ For: **Entire Facility**
 
 **Heat Index OccupantHours**
 
-|          |Safe (≤ 80°F) [OccupantHours] |Caution (80, 90°F] [OccupantHours] |Extreme Caution (90, 105°F] [OccupantHours] |Danger (105, 130°F] [OccupantHours] |Extreme Danger (> 130°F) [OccupantHours]|
+|          |Safe (≤ 80°F) [OccupantHours] |Caution (80, 90°F] [OccupantHours] |Extreme Caution (90, 103°F] [OccupantHours] |Danger (103, 125°F] [OccupantHours] |Extreme Danger (> 125°F) [OccupantHours]|
 |----------|------|------|------|------|------|
 |Space_1   |      |      |      |      |      |
 |…         |      |      |      |      |      |
