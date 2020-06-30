@@ -107,8 +107,6 @@ namespace DataStringGlobals {
     extern std::string outputAdsFileName;
     extern std::string outputGLHEFileName;
     extern std::string outputDelightOutFileName;
-    extern std::string outputDelightEldmpFileName;
-    extern std::string outputDelightDfdmpFileName;
     extern std::string outputIperrFileName;
     extern std::string outputPerfLogFileName;
     extern std::string outputSqlFileName;

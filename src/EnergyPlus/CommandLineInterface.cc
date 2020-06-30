@@ -460,8 +460,6 @@ namespace CommandLineInterface {
         state.files.screenCsv.fileName = outputFilePrefix + screenSuffix + ".csv";
         state.files.delightIn.fileName = "eplusout.delightin";
         outputDelightOutFileName = "eplusout.delightout";
-        outputDelightEldmpFileName = "eplusout.delighteldmp";
-        outputDelightDfdmpFileName = "eplusout.delightdfdmp";
         state.files.iniFile.fileName = "Energy+.ini";
         inStatFileName = weatherFilePathWithoutExtension + ".stat";
         eplusADSFileName = inputDirPathName + "eplusADS.inp";

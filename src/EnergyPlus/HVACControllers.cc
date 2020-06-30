@@ -2506,7 +2506,7 @@ namespace HVACControllers {
             return;
         }
 
-        OutputFileName StatisticsFileName{"statistics.HVACControllers.csv"};
+        InputOutputFileName StatisticsFileName{"statistics.HVACControllers.csv"};
         auto statisticsFile = StatisticsFileName.open("DumpAirLoopStatistics");
 
         // note that the AirLoopStats object does not seem to be initialized when this code

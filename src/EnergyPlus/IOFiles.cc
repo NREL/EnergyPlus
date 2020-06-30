@@ -49,6 +49,7 @@
 
 #include "DataStringGlobals.hh"
 #include "UtilityRoutines.hh"
+#include "FileSystem.hh"
 
 #include <fmt/format.h>
 #include <stdexcept>
@@ -103,6 +104,7 @@ std::ostream::pos_type InputFile::position() const noexcept
 void InputFile::open()
 {
     is = std::unique_ptr<std::istream>(new std::fstream(fileName.c_str(), std::ios_base::in));
+    is->imbue(std::locale("C"));
 }
 
 std::string InputFile::error_state_to_string() const
@@ -195,7 +197,7 @@ void InputOutputFile::del()
 {
     if (os) {
         os.reset();
-        std::remove(fileName.c_str());
+        FileSystem::removeFile(fileName);
     }
 }
 
@@ -241,6 +243,7 @@ void InputOutputFile::open(const bool forAppend)
     }();
 
     os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
+    os->imbue(std::locale("C"));
 }
 
 std::vector<std::string> InputOutputFile::getLines()

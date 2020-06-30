@@ -80,6 +80,7 @@
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -4372,7 +4373,6 @@ namespace DaylightingManager {
 
         using namespace DataIPShortCuts;
         using namespace DElightManagerF; // Module for managing DElight subroutines
-        using DataSystemVariables::GoodIOStatValue;
 
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
@@ -4380,9 +4380,6 @@ namespace DaylightingManager {
         bool ErrorsFound;            // Error flag
         Real64 dLatitude;       // double for argument passing
         int iErrorFlag;         // Error Flag for warning/errors returned from DElight
-        int iDElightErrorFile;  // Unit number for reading DElight Error File
-        int iReadStatus;        // Error File Read Status
-        std::string cErrorLine; // Each DElight Error line can be up to 210 characters long
         std::string cErrorMsg;  // Each DElight Error Message can be up to 200 characters long
         bool bEndofErrFile;     // End of Error File flag
         bool bRecordsOnErrFile; // true if there are records on the error file
@@ -4602,73 +4599,47 @@ namespace DaylightingManager {
             DisplayString("ReturnFrom DElight DaylightCoefficients Calc");
             if (iErrorFlag != 0) {
                 // Open DElight Daylight Factors Error File for reading
-                iDElightErrorFile = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("READWRITE");
-                    ObjexxFCL::gio::open(iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags);
-                }
+                auto iDElightErrorFile = ioFiles.outputDelightDfdmpFileName.try_open();
 
                 // Sequentially read lines in DElight Daylight Factors Error File
                 // and process them using standard EPlus warning/error handling calls
                 // Process all error/warning messages first
                 // Then, if any error has occurred, ShowFatalError to terminate processing
-                bEndofErrFile = false;
+                bEndofErrFile = !iDElightErrorFile.good();
                 bRecordsOnErrFile = false;
                 while (!bEndofErrFile) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(iDElightErrorFile, fmtA, flags) >> cErrorLine;
-                        iReadStatus = flags.ios();
-                    }
-                    if (iReadStatus < GoodIOStatValue) {
+                    auto cErrorLine = iDElightErrorFile.readLine();
+                    if (cErrorLine.eof) {
                         bEndofErrFile = true;
                         continue;
                     }
                     bRecordsOnErrFile = true;
                     // Is the current line a Warning message?
-                    if (has_prefix(cErrorLine, "WARNING: ")) {
-                        cErrorMsg = cErrorLine.substr(9);
+                    if (has_prefix(cErrorLine.data, "WARNING: ")) {
+                        cErrorMsg = cErrorLine.data.substr(9);
                         ShowWarningError(cErrorMsg);
                     }
                     // Is the current line an Error message?
-                    if (has_prefix(cErrorLine, "ERROR: ")) {
-                        cErrorMsg = cErrorLine.substr(7);
+                    if (has_prefix(cErrorLine.data, "ERROR: ")) {
+                        cErrorMsg = cErrorLine.data.substr(7);
                         ShowSevereError(cErrorMsg);
                         iErrorFlag = 1;
                     }
                 }
 
                 // Close and Delete DElight Error File
-                if (bRecordsOnErrFile) {
-                    {
-                        IOFlags flags;
-                        flags.DISPOSE("DELETE");
-                        ObjexxFCL::gio::close(iDElightErrorFile, flags);
-                    }
-                } else {
-                    {
-                        IOFlags flags;
-                        flags.DISPOSE("DELETE");
-                        ObjexxFCL::gio::close(iDElightErrorFile, flags);
-                    }
+                if (iDElightErrorFile.is_open()) {
+                    iDElightErrorFile.close();
+                    FileSystem::removeFile(iDElightErrorFile.fileName);
                 }
+
                 // If any DElight Error occurred then ShowFatalError to terminate
                 if (iErrorFlag > 0) {
                     ErrorsFound = true;
                 }
             } else {
-                // Open, Close, and Delete DElight Daylight Factors Error File for reading
-                iDElightErrorFile = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("READWRITE");
-                    ObjexxFCL::gio::open(iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags);
-                }
-                {
-                    IOFlags flags;
-                    flags.DISPOSE("DELETE");
-                    ObjexxFCL::gio::close(iDElightErrorFile, flags);
+                if (FileSystem::fileExists(ioFiles.outputDelightDfdmpFileName.fileName)) {
+                    FileSystem::removeFile(ioFiles.outputDelightDfdmpFileName.fileName);
                 }
             }
         }

@@ -103,6 +103,17 @@ public:
 
     ReadResult<std::string> readLine() noexcept;
 
+    template<typename T>
+    ReadResult<T> read() noexcept {
+        if (is) {
+            T result;
+            *is >> result;
+            return ReadResult<T>{result, is->eof(), is->good()};
+        } else {
+            return ReadResult<T>{T{}, true, false};
+        }
+    }
+
     explicit InputFile(std::string FileName);
 
 private:
@@ -153,7 +164,7 @@ template <typename FileType> struct IOFileName
     }
 };
 
-using OutputFileName = IOFileName<InputOutputFile>;
+using InputOutputFileName = IOFileName<InputOutputFile>;
 using InputFileName = IOFileName<InputFile>;
 
 
@@ -189,21 +200,24 @@ public:
 
     InputOutputFile dfs{"eplusout.dfs"};
 
-    OutputFileName sln{"eplusout.sln"};
-    OutputFileName dxf{"eplusout.dxf"};
-    OutputFileName sci{"eplusout.sci"};
-    OutputFileName wrl{"eplusout.wrl"};
+    InputOutputFileName sln{"eplusout.sln"};
+    InputOutputFileName dxf{"eplusout.dxf"};
+    InputOutputFileName sci{"eplusout.sci"};
+    InputOutputFileName wrl{"eplusout.wrl"};
 
-    OutputFileName delightIn{"eplusout.delightin"};
+    InputOutputFileName delightIn{"eplusout.delightin"};
 
     InputOutputFile mtd{"eplusout.mtd"};
     InputOutputFile edd{"eplusout.edd"};
     InputOutputFile shade{"eplusshading.csv"};
 
-    OutputFileName screenCsv{"eplusscreen.csv"};
-    OutputFileName endFile{"eplusout.end"};
+    InputOutputFileName screenCsv{"eplusscreen.csv"};
+    InputOutputFileName endFile{"eplusout.end"};
 
     InputFileName iniFile{"EnergyPlus.ini"};
+
+    InputFileName outputDelightEldmpFileName{"eplusout.delighteldmp"};
+    InputFileName outputDelightDfdmpFileName{"eplusout.delightdfdmp"};
 
     // for transient uses of weather files
     // also, keeper of the currently set input weather file name

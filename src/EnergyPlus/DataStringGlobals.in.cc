@@ -158,8 +158,6 @@ namespace DataStringGlobals {
     std::string outputAdsFileName("eplusADS.out");
     std::string outputGLHEFileName("eplusout.glhe");
     std::string outputDelightOutFileName("eplusout.delightout");
-    std::string outputDelightEldmpFileName("eplusout.delighteldmp");
-    std::string outputDelightDfdmpFileName("eplusout.delightdfdmp");
     std::string outputIperrFileName("eplusout.iperr");
     std::string outputPerfLogFileName("eplusout_perflog.csv");
     std::string outputSqlFileName("eplusout.sql");
