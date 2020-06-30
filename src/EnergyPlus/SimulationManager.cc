@@ -1254,9 +1254,9 @@ namespace SimulationManager {
                             advancedModeUsed = true;
                         }
                         if (fields.find("maxalloweddeltemp") != fields.end()) { // not required field, has default value
-                            DataConvergParams::MaxAllowedDelTempOverrideValue = fields.at("maxalloweddeltemp");
+                            DataHeatBalance::MaxAllowedDelTemp = fields.at("maxalloweddeltemp");
                             ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxAllowedDelTemp set to: " +
-                                             RoundSigDigits(DataConvergParams::MaxAllowedDelTempOverrideValue, 4));
+                                             RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4));
                             advancedModeUsed = true;
                         }
                         if (advancedModeUsed) {
@@ -1310,7 +1310,7 @@ namespace SimulationManager {
                     if (overrideMaxAllowedDelTemp) {
                         ShowWarningError(
                             "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxAllowedDelTemp will be set to 0.1 .");
-                        DataConvergParams::MaxAllowedDelTempOverrideValue = 0.1;
+                        DataHeatBalance::MaxAllowedDelTemp = 0.1;
                     }
                 }
             }
@@ -1470,7 +1470,7 @@ namespace SimulationManager {
         UtilityRoutines::appendPerfLog("SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
         UtilityRoutines::appendPerfLog("Minimum System Timestep", General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1));
         UtilityRoutines::appendPerfLog("MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 2));
-        UtilityRoutines::appendPerfLog("MaxAllowedDelTemp", General::RoundSigDigits(DataConvergParams::MaxAllowedDelTempOverrideValue, 4));    }
+        UtilityRoutines::appendPerfLog("MaxAllowedDelTemp", General::RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4));    }
 
     std::string bool_to_string(bool logical)
     {
