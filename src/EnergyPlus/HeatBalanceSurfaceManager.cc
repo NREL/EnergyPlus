@@ -5852,11 +5852,6 @@ namespace HeatBalanceSurfaceManager {
         // REFERENCES:
         // (I)BLAST legacy routine HBSRF
 
-        Real64 const IterDampConst(5.0);             // Damping constant for inside surface temperature iterations
-        int const ItersReevalConvCoeff(30);          // Number of iterations between inside convection coefficient reevaluations
-        Real64 const MaxAllowedDelTemp(0.002);       // Convergence criteria for inside surface temperatures
-        int const MaxIterations(500);                // Maximum number of iterations allowed for inside surface temps
-        int const IterationsForCondFDRelaxChange(5); // number of iterations for inside temps that triggers a change
         Real64 const SmallNumber(0.0001);            // avoid numerical junk causing problems?
         // in the CondFD relaxation factor.
         int const MinEMPDIterations(4); // Minimum number of iterations required for EMPD solution
@@ -6725,21 +6720,6 @@ namespace HeatBalanceSurfaceManager {
         // REFERENCES:
         // (I)BLAST legacy routine HBSRF
 
-        //using namespace DataGlobals;
-        //using namespace DataEnvironment;
-        //using ConvectionCoefficients::InitExteriorConvectionCoeff;
-        //using ConvectionCoefficients::InitInteriorConvectionCoeffs;
-        //using ConvectionCoefficients::SetExtConvectionCoeff;
-        //using DataLoopNode::Node;
-        //using DataZoneEquipment::ZoneEquipConfig;
-        //using General::RoundSigDigits;
-        //using namespace Psychrometrics;
-        //using DataSizing::CurOverallSimDay;
-
-        Real64 const IterDampConst(5.0);       // Damping constant for inside surface temperature iterations
-        int const ItersReevalConvCoeff(30);    // Number of iterations between inside convection coefficient reevaluations
-        Real64 const MaxAllowedDelTemp(0.002); // Convergence criteria for inside surface temperatures
-        int const MaxIterations(500);          // Maximum number of iterations allowed for inside surface temps
         Real64 const SmallNumber(0.0001);      // avoid numerical junk causing problems?
         // in the CondFD relaxation factor.
         static std::string const rhoAirZone("RhoAirZone");

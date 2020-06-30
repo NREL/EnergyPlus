@@ -67,17 +67,19 @@ namespace DataHeatBalSurface {
     extern Real64 const DefaultSurfaceTempLimit;        // Highest inside surface temperature allowed in Celsius
     extern std::vector<bool> Zone_has_mixed_HT_models;  // True if any surfaces in zone use CondFD, HAMT, or Kiva
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalSurface
     // Integer Variables for the Heat Balance Simulation
     extern Array1D_int SUMH; // From Old Bldctf.inc
 
+    // Surface heat balance limits and convergence parameters
+    extern Real64 MaxSurfaceTempLimit;               // Highest inside surface temperature allowed in Celsius
+    extern Real64 MaxSurfaceTempLimitBeforeFatal;    // 2.5 times MaxSurfaceTempLimit
+    extern Real64 const IterDampConst;               // Damping constant for inside surface temperature iterations
+    extern int const ItersReevalConvCoeff;           // Number of iterations between inside convection coefficient reevaluations
+    extern Real64 const MaxAllowedDelTemp;           // Convergence criteria for inside surface temperatures
+    extern int const MaxIterations;                  // Maximum number of iterations allowed for inside surface temps
+    extern int const IterationsForCondFDRelaxChange; // number of iterations for inside temps that triggers a change
+
     // Variables Dimensioned to Max Number of Heat Transfer Surfaces (maxhts)
-    extern Real64 MaxSurfaceTempLimit;            // Highest inside surface temperature allowed in Celsius
-    extern Real64 MaxSurfaceTempLimitBeforeFatal; // 2.5 times MaxSurfaceTempLimit
     extern Array1D<Real64> CTFConstInPart;        // Constant Inside Portion of the CTF calculation
     extern Array1D<Real64> CTFConstOutPart;       // Constant Outside Portion of the CTF calculation
     // This group of arrays (soon to be vectors) added to facilitate vectorizable loops in CalcHeatBalanceInsideSurf2CTFOnly

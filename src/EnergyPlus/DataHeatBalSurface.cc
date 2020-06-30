@@ -56,19 +56,10 @@ namespace DataHeatBalSurface {
     // MODULE INFORMATION:
     //       AUTHOR         Rick Strand
     //       DATE WRITTEN   December 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // The purpose of this module is to contain data needed for the surface
     // heat balances which are now "external" subroutines.
-
-    // METHODOLOGY EMPLOYED:
-    // NA
-
-    // REFERENCES: none
-
-    // OTHER NOTES: none
 
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
@@ -80,17 +71,19 @@ namespace DataHeatBalSurface {
     Real64 const DefaultSurfaceTempLimit(200.0);         // Highest inside surface temperature allowed in Celsius
     std::vector<bool> Zone_has_mixed_HT_models;          // True if any surfaces in zone use CondFD, HAMT, or Kiva
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalSurface
     // Integer Variables for the Heat Balance Simulation
     Array1D_int SUMH; // From Old Bldctf.inc
 
-    // Variables Dimensioned to Max Number of Heat Transfer Surfaces (maxhts)
+    // Surface heat balance limits and convergence parameters
     Real64 MaxSurfaceTempLimit(200.0);            // Highest inside surface temperature allowed in Celsius
     Real64 MaxSurfaceTempLimitBeforeFatal(500.0); // 2.5 times MaxSurfaceTempLimit
+    Real64 const IterDampConst(5.0);              // Damping constant for inside surface temperature iterations
+    int const ItersReevalConvCoeff(30);           // Number of iterations between inside convection coefficient reevaluations
+    Real64 const MaxAllowedDelTemp(0.002);        // Convergence criteria for inside surface temperatures
+    int const MaxIterations(500);                 // Maximum number of iterations allowed for inside surface temps
+    int const IterationsForCondFDRelaxChange(5);  // number of iterations for inside temps that triggers a change
+
+    // Variables Dimensioned to Max Number of Heat Transfer Surfaces (maxhts)
     Array1D<Real64> CTFConstInPart;               // Constant Inside Portion of the CTF calculation
     Array1D<Real64> CTFConstOutPart;              // Constant Outside Portion of the CTF calculation
     // This group of arrays (soon to be vectors) added to facilitate vectorizable loops in CalcHeatBalanceInsideSurf2CTFOnly
