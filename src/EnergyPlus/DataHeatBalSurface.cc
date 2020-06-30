@@ -81,6 +81,8 @@ namespace DataHeatBalSurface {
     int const ItersReevalConvCoeff(30);           // Number of iterations between inside convection coefficient reevaluations
     Real64 const MaxAllowedDelTemp(0.002);        // Convergence criteria for inside surface temperatures
     int const MaxIterations(500);                 // Maximum number of iterations allowed for inside surface temps
+    Real64 const PoolIsOperatingLimit(0.0001);    // Limit to determine if swimming pool is operating or not
+    int const MinEMPDIterations(4);               // Minimum number of iterations required for EMPD solution
     int const IterationsForCondFDRelaxChange(5);  // number of iterations for inside temps that triggers a change
 
     // Variables Dimensioned to Max Number of Heat Transfer Surfaces (maxhts)

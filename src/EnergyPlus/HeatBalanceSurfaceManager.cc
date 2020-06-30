@@ -5852,9 +5852,6 @@ namespace HeatBalanceSurfaceManager {
         // REFERENCES:
         // (I)BLAST legacy routine HBSRF
 
-        Real64 const SmallNumber(0.0001);            // avoid numerical junk causing problems?
-        // in the CondFD relaxation factor.
-        int const MinEMPDIterations(4); // Minimum number of iterations required for EMPD solution
         static std::string const rhoAirZone("RhoAirZone");
         static std::string const wsurf("Wsurf");
         static std::string const HBSurfManInsideSurf("HB,SurfMan:InsideSurf");
@@ -6122,8 +6119,8 @@ namespace HeatBalanceSurfaceManager {
                                               QElecBaseboardSurf(SurfNum) + NetLWRadToSurf(SurfNum) + (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
                         Real64 const TempDiv(1.0 / (construct.CTFInside(0) - construct.CTFCross(0) + HConvIn_surf + IterDampConst));
                         // Calculate the current inside surface temperature
-                        if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
-                                                  (std::abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
+                        if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < PoolIsOperatingLimit) &&
+                                                  (std::abs(PoolHeatTransCoefs(SurfNum)) < PoolIsOperatingLimit))) {
                             if (construct.SourceSinkPresent) {
                                 TempSurfInTmp(SurfNum) =
                                     (TempTerm + construct.CTFSourceIn(0) * QsrcHist(SurfNum, 1) + IterDampConst * TempInsOld(SurfNum)) *
@@ -6220,8 +6217,8 @@ namespace HeatBalanceSurfaceManager {
                                                   (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
                             Real64 const TempDiv(1.0 / (construct.CTFInside(0) + HConvIn_surf + IterDampConst));
                             // Calculate the current inside surface temperature
-                            if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
-                                                      (std::abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
+                            if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < PoolIsOperatingLimit) &&
+                                                      (std::abs(PoolHeatTransCoefs(SurfNum)) < PoolIsOperatingLimit))) {
                                 if (construct.SourceSinkPresent) {
                                     TempSurfInTmp(SurfNum) =
                                         (TempTerm + construct.CTFSourceIn(0) * QsrcHist(SurfNum, 1) + IterDampConst * TempInsOld(SurfNum) +
@@ -6720,8 +6717,6 @@ namespace HeatBalanceSurfaceManager {
         // REFERENCES:
         // (I)BLAST legacy routine HBSRF
 
-        Real64 const SmallNumber(0.0001);      // avoid numerical junk causing problems?
-        // in the CondFD relaxation factor.
         static std::string const rhoAirZone("RhoAirZone");
         static std::string const wsurf("Wsurf");
         static std::string const HBSurfManInsideSurf("HB,SurfMan:InsideSurf");
@@ -6839,11 +6834,11 @@ namespace HeatBalanceSurfaceManager {
 
                 // The special heat balance terms for pools are used only when the pool is operating, so IsPool can change
                 if (Surface(surfNum).IsPool) {
-                    if ((std::abs(QPoolSurfNumerator(surfNum)) >= SmallNumber) || (std::abs(PoolHeatTransCoefs(surfNum)) >= SmallNumber)) {
+                    if ((std::abs(QPoolSurfNumerator(surfNum)) >= PoolIsOperatingLimit) ||
+                        (std::abs(PoolHeatTransCoefs(surfNum)) >= PoolIsOperatingLimit)) {
                         IsPoolSurf(surfNum) = 1;
                         IsNotPoolSurf(surfNum) = 0;
-                    }
-                    else {
+                    } else {
                         IsPoolSurf(surfNum) = 0;
                         IsNotPoolSurf(surfNum) = 1;
                     }
