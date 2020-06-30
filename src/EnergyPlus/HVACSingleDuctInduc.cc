@@ -227,7 +227,7 @@ namespace HVACSingleDuctInduc {
 
         DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(IndUnit(IUNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
-        InitIndUnit(IUNum, FirstHVACIteration);
+        InitIndUnit(state.dataBranchInputManager, IUNum, FirstHVACIteration);
 
         TermUnitIU = true;
 
@@ -496,7 +496,8 @@ namespace HVACSingleDuctInduc {
         }
     }
 
-    void InitIndUnit(int const IUNum,              // number of the current induction unit being simulated
+    void InitIndUnit(BranchInputManagerData &dataBranchInputManager,
+                     int const IUNum,              // number of the current induction unit being simulated
                      bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
     {
@@ -563,7 +564,8 @@ namespace HVACSingleDuctInduc {
         if (MyPlantScanFlag(IUNum) && allocated(PlantLoop)) {
             if (IndUnit(IUNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) {
                 errFlag = false;
-                ScanPlantLoopsForObject(IndUnit(IUNum).HCoil,
+                ScanPlantLoopsForObject(dataBranchInputManager,
+                                        IndUnit(IUNum).HCoil,
                                         IndUnit(IUNum).HCoil_PlantTypeNum,
                                         IndUnit(IUNum).HWLoopNum,
                                         IndUnit(IUNum).HWLoopSide,
@@ -582,7 +584,8 @@ namespace HVACSingleDuctInduc {
             if (IndUnit(IUNum).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling ||
                 IndUnit(IUNum).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling) {
                 errFlag = false;
-                ScanPlantLoopsForObject(IndUnit(IUNum).CCoil,
+                ScanPlantLoopsForObject(dataBranchInputManager,
+                                        IndUnit(IUNum).CCoil,
                                         IndUnit(IUNum).CCoil_PlantTypeNum,
                                         IndUnit(IUNum).CWLoopNum,
                                         IndUnit(IUNum).CWLoopSide,

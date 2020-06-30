@@ -54,9 +54,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZoneTempPredictorCorrectorData;
 
 namespace LowTempRadiantSystem {
 
@@ -151,19 +153,19 @@ namespace LowTempRadiantSystem {
                 : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), ControlType(LowTempRadiantControlTypes::MATControl)
             {
             }
-        
+
         LowTempRadiantControlTypes processRadiantSystemControlInput(std::string const& controlInput,
                                                                          std::string const& controlInputField
         );
-        
+
         Real64 setRadiantSystemControlTemperature();
-        
-        virtual void calculateLowTemperatureRadiantSystem(Real64 &LoadMet) = 0;
-        
+
+        virtual void calculateLowTemperatureRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet) = 0;
+
         void updateLowTemperatureRadiantSystemSurfaces();
-        
+
         virtual void updateLowTemperatureRadiantSystem() = 0;
-        
+
         virtual void reportLowTemperatureRadiantSystem() = 0;
 
     };
@@ -216,7 +218,7 @@ namespace LowTempRadiantSystem {
               WaterInletTemp(0.0), WaterOutletTemp(0.0), CoolPower(0.0), CoolEnergy(0.0), OutRangeHiErrorCount(0), OutRangeLoErrorCount(0)
         {
         }
-        
+
         Real64 calculateHXEffectivenessTerm(Real64 const Temperature,   // Temperature of water entering the radiant system, in C
                                             Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s
                                             Real64 const FlowFraction,  // Mass flow rate fraction for this surface in the radiant system
@@ -224,9 +226,9 @@ namespace LowTempRadiantSystem {
         );
 
         Real64 sizeRadiantSystemTubeLength();
-        
+
         void checkForOutOfRangeTemperatureResult(Real64 const outletTemp, Real64 const inletTemp);
-        
+
     };
 
     struct VariableFlowRadiantSystemData : HydronicSystemBaseData
@@ -259,13 +261,13 @@ namespace LowTempRadiantSystem {
                   ScaledHeatingCapacity(0.0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0)
             {
             }
-        
-        void calculateLowTemperatureRadiantSystem(Real64 &LoadMet);
-        
-        void calculateLowTemperatureRadiantSystemComponents(Real64 &LoadMet);
-        
+
+        void calculateLowTemperatureRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet);
+
+        void calculateLowTemperatureRadiantSystemComponents(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet);
+
         void updateLowTemperatureRadiantSystem();
-        
+
         void reportLowTemperatureRadiantSystem();
 
     };
@@ -330,15 +332,15 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        void calculateLowTemperatureRadiantSystem(Real64 &LoadMet);
-        
-        void calculateLowTemperatureRadiantSystemComponents(int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
+        void calculateLowTemperatureRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet);
+
+        void calculateLowTemperatureRadiantSystemComponents(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
                                                             bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
                                                             Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
         );
-        
+
         void updateLowTemperatureRadiantSystem();
-        
+
         void reportLowTemperatureRadiantSystem();
 
     };
@@ -365,11 +367,11 @@ namespace LowTempRadiantSystem {
             : MaxElecPower(0.0), ThrottlRange(0.0), SetptSchedPtr(0), ElecPower(0.0), ElecEnergy(0.0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
         {
         }
-        
-        void calculateLowTemperatureRadiantSystem(Real64 &LoadMet);
+
+        void calculateLowTemperatureRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet);
 
         void updateLowTemperatureRadiantSystem();
-        
+
         void reportLowTemperatureRadiantSystem();
 
     };

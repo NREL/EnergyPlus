@@ -777,7 +777,7 @@ namespace PluginManagement {
     {
 #if LINK_WITH_PYTHON == 1
         // we'll need the program directory for a few things so get it once here at the top and sanitize it
-        std::string programPath = FileSystem::getProgramPath();
+        std::string programPath = FileSystem::getAbsolutePath(FileSystem::getProgramPath());
         std::string programDir = FileSystem::getParentDirectoryPath(programPath);
         std::string sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
 

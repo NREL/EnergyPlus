@@ -2062,7 +2062,8 @@ namespace SingleDuct {
                 (this->ReheatComp_PlantType == TypeOf_CoilSteamAirHeating)) {
                 // setup plant topology indices for plant fed heating coils
                 errFlag = false;
-                ScanPlantLoopsForObject(this->ReheatName,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        this->ReheatName,
                                         this->ReheatComp_PlantType,
                                         this->HWLoopNum,
                                         this->HWLoopSide,
@@ -2174,7 +2175,7 @@ namespace SingleDuct {
             Real64 CurrentEnvZoneTurndownMinAirFrac = 1.0;
             if (this->ZoneTurndownMinAirFracSchExist) {
                 CurrentEnvZoneTurndownMinAirFrac = ScheduleManager::GetScheduleMinValue(this->ZoneTurndownMinAirFracSchPtr);
-            } 
+            }
             if ((this->SysType_Num == SingleDuctVAVReheat || this->SysType_Num == SingleDuctCBVAVReheat) ||
                 (this->SysType_Num == SingleDuctCBVAVNoReheat)) {
                 // need the lowest schedule value
@@ -2357,7 +2358,7 @@ namespace SingleDuct {
         this->CoolRate = 0.0;
         this->HeatEnergy = 0.0;
         this->CoolEnergy = 0.0;
-        
+
         // update to the current minimum air flow fraction
         this->ZoneMinAirFrac = this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
 
@@ -5427,7 +5428,7 @@ namespace SingleDuct {
         UpdateATMixer(SysNum);
     }
 
-    void GetATMixers()
+    void GetATMixers(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5481,7 +5482,7 @@ namespace SingleDuct {
         SysATMixer.allocate(NumATMixers);
 
         // Need air distribution units first
-        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(dataZoneAirLoopEquipmentManager);
 
         for (ATMixerNum = 1; ATMixerNum <= NumATMixers; ++ATMixerNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
@@ -5949,7 +5950,7 @@ namespace SingleDuct {
         DataDefineEquip::AirDistUnit(aduNum).MassFlowRateSup = Node(PriInNode).MassFlowRate;
     }
 
-    void GetATMixer(std::string const &ZoneEquipName, // zone unit name name
+    void GetATMixer(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, std::string const &ZoneEquipName, // zone unit name name
                     std::string &ATMixerName,         // air terminal mixer name
                     int &ATMixerNum,                  // air terminal mixer index
                     int &ATMixerType,                 // air teminal mixer type
@@ -5975,7 +5976,7 @@ namespace SingleDuct {
 
         if (GetATMixerFlag) {
             // CALL GetZoneAirLoopEquipment
-            GetATMixers();
+            GetATMixers(dataZoneAirLoopEquipmentManager);
             GetATMixerFlag = false;
         }
 
