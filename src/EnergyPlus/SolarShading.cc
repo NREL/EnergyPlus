@@ -9860,15 +9860,15 @@ namespace SolarShading {
         //  20: window has switchable glazing that is unswitched but may be switched later
         //       to control daylight glare or daylight illuminance
         //  30: window has exterior shade that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         //  60: window has interior blind that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         //  70: window has exterior blind that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         //  80: window has between-glass shade that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         //  90: window has between-glass blind that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         // A "shading device" may be an exterior, interior or between-glass shade or blind,
         // or the lower-transmitting (dark) state of switchable glazing (e.g., electrochromic).
         // In all cases, the unshaded condition is represented
@@ -11765,7 +11765,7 @@ namespace SolarShading {
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).HasShadeControl) {
-                WinShadeCtrlNum = Surface(SurfNum).windowShadingControlList.front();
+                WinShadeCtrlNum = Surface(SurfNum).activeWindowShadingControl;
                 if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade ||
                     WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade ||
                     WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {

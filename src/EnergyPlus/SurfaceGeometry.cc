@@ -1900,6 +1900,9 @@ namespace SurfaceGeometry {
                     // ENDIF
                 }
 
+                // set the active shading control to the first one defined for now - this will be updated during timestep later
+                Surface(SurfNum).activeWindowShadingControl = Surface(SurfNum).windowShadingControlList.front();
+
             } // End of surface loop
 
             // final associate fenestration surfaces referenced in WindowShadingControl
