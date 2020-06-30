@@ -6224,6 +6224,8 @@ namespace SurfaceGeometry {
         int NumAlphas;
         int NumNumbers;
 
+        auto const tolerance = 1e-6;
+
         std::string cCurrentModuleObject = "SurfaceProperty:ExposedFoundationPerimeter";
         int numObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
@@ -6268,7 +6270,7 @@ namespace SurfaceGeometry {
             if (!lNumericFieldBlanks(numF)) {
                 if (calculationMethod == "TOTALEXPOSEDPERIMETER") {
                     data.exposedFraction = rNumericArgs(numF) / Surface(Found).Perimeter;
-                    if (data.exposedFraction > 1.0) {
+                    if (data.exposedFraction > 1 + tolerance) {
                         ShowWarningError(cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cNumericFieldNames(numF) +
                                          " is greater than the perimeter of " + Surface(Found).Name);
                         ShowContinueError(Surface(Found).Name + " perimeter = " + RoundSigDigits(Surface(Found).Perimeter) + ", " +
