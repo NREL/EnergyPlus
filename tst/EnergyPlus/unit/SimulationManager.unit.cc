@@ -231,16 +231,24 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
         // Input processor with throw a severe, so do not use assertions
         EXPECT_FALSE(process_idf(idf_objects, false));
         // Instead do it here, making sure to reset the stream
-        EXPECT_TRUE(compare_err_stream("   ** Severe  ** <root>[Output:DebuggingData] - Object should have no more than 1 properties.\n", true));
+        {
+            std::string const expectedError = delimited_string({
+                "   ** Severe  ** <root>[Output:DebuggingData] - Object should have no more than 1 properties.",
+            });
+            EXPECT_TRUE(compare_err_stream(expectedError, true));
+        }
 
         SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
         EXPECT_FALSE(DataReportingFlags::DebugOutput);
         EXPECT_TRUE(DataReportingFlags::EvenDuringWarmup);
 
-        // no error message from
-        EXPECT_TRUE(compare_err_stream("   ** Warning ** Output:DebuggingData: More than 1 occurrence of this object found, only first will be used.\n", true));
+        {
+            std::string const expectedError = delimited_string({
+                "   ** Warning ** Output:DebuggingData: More than 1 occurrence of this object found, only first will be used.",
+            });
+            EXPECT_TRUE(compare_err_stream(expectedError, true));
+        }
     }
-
 
 }
 
@@ -360,8 +368,12 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
     // Input processor will throw a severe, so do not use assertions
     EXPECT_FALSE(process_idf(idf_objects, false));
     // Instead do it here, making sure to reset the stream
-    EXPECT_TRUE(compare_err_stream("   ** Severe  ** <root>[Output:Diagnostics] - Object should have no more than 1 properties.\n", true));
-
+    {
+        std::string const expectedError = delimited_string({
+            "   ** Severe  ** <root>[Output:Diagnostics] - Object should have no more than 1 properties.",
+        });
+        EXPECT_TRUE(compare_err_stream(expectedError, true));
+    }
     SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
@@ -377,9 +389,12 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
     EXPECT_FALSE(DataSystemVariables::ReportDetailedWarmupConvergence);
     EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
 
-
-    // no error message from
-    EXPECT_TRUE(compare_err_stream("   ** Warning ** Output:Diagnostics: More than 1 occurrence of this object found, only first will be used.\n", true));
+    {
+        std::string const expectedError = delimited_string({
+            "   ** Warning ** Output:Diagnostics: More than 1 occurrence of this object found, only first will be used.",
+        });
+        EXPECT_TRUE(compare_err_stream(expectedError, true));
+    }
 }
 
 TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
@@ -459,5 +474,8 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
     EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
 
     // Warning that an empty key was entered
-    EXPECT_TRUE(compare_err_stream("   ** Warning ** Output:Diagnostics: empty key found, consider removing it to avoid this warning.\n", true));
+    std::string const expectedError = delimited_string({
+        "   ** Warning ** Output:Diagnostics: empty key found, consider removing it to avoid this warning.",
+    });
+    EXPECT_TRUE(compare_err_stream(expectedError, true));
 }
