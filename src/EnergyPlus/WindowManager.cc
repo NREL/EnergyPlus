@@ -8345,7 +8345,7 @@ namespace WindowManager {
 
             if (Surface(SurfNum).HasShadeControl) {
                 ConstrNumSh = Surface(SurfNum).ShadedConstruction;
-                MatNum = Construct(ConstrNumSh).LayerPoint(1);
+                MatNum = dataConstruction.Construct(ConstrNumSh).LayerPoint(1);
                 ShadingType = WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType;
                 if (ShadingType == WSC_ST_ExteriorScreen) {
 
