@@ -57,6 +57,8 @@
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -72,11 +74,9 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -2738,7 +2738,7 @@ namespace ZoneTempPredictorCorrector {
                     "Zone Air Humidity Ratio", OutputProcessor::Unit::None, ZoneAirHumRat(Loop), "System", "Average", Zone(Loop).Name);
                 SetupOutputVariable(
                     "Zone Air Relative Humidity", OutputProcessor::Unit::Perc, dataZoneTempPredictorCorrector.ZoneAirRelHum(Loop), "System", "Average", Zone(Loop).Name);
-                
+
                 // The following output variables are for the predicted Heating/Cooling load for the zone which can be compared to actual load.
                 // There are two sets of data available: one where zone and group multipliers have been applied and another where the multipliers have not.
                 // First, these report variables are NOT multiplied by zone and group multipliers
@@ -2779,7 +2779,7 @@ namespace ZoneTempPredictorCorrector {
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
-                
+
                 // The following output variables are for the predicted moisture load for the zone with humidity controlled specified.
                 // There are two sets of data available: one where zone and group multipliers have been applied and another where the multipliers have not.
                 // First, these report variables are NOT multiplied by zone and group multipliers
@@ -4310,9 +4310,9 @@ namespace ZoneTempPredictorCorrector {
         SensLoadSingleZone = TotalLoad * LoadCorrFactor;
         SensLoadHeatSingleZone = OutputHeatSP * LoadCorrFactor;
         SensLoadCoolSingleZone = OutputCoolSP * LoadCorrFactor;
-    
+
         Real64 ZoneMultFac = ZoneMultiplier * ZoneMultiplierList;
-    
+
         TotalLoad = SensLoadSingleZone * ZoneMultFac;
         TotalHeatLoad = SensLoadHeatSingleZone * ZoneMultFac;
         TotalCoolLoad = SensLoadCoolSingleZone * ZoneMultFac;
@@ -4680,9 +4680,9 @@ namespace ZoneTempPredictorCorrector {
         MoistLoadSingleZone = TotalLoad;
         MoistLoadHumidSingleZone = TotalHumidLoad;
         MoistLoadDehumidSingleZone = TotalDehumidLoad;
-        
+
         Real64 ZoneMultFac = ZoneMultiplier * ZoneMultiplierList;
-        
+
         TotalLoad *= ZoneMultFac;
         TotalHumidLoad *= ZoneMultFac;
         TotalDehumidLoad *= ZoneMultFac;
@@ -6304,7 +6304,7 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Other convection term is applicable to equivalent layer window (ASHWAT) model
-                if (Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += SurfaceWindow(SurfNum).OtherConvHeatGain;
+                if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += SurfaceWindow(SurfNum).OtherConvHeatGain;
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
                 if (shading_flag == IntShadeOn || shading_flag == IntBlindOn) SumIntGain += SurfaceWindow(SurfNum).ConvHeatFlowNatural;
@@ -6640,7 +6640,7 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Other convection term is applicable to equivalent layer window (ASHWAT) model
-                if (Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += SurfaceWindow(SurfNum).OtherConvHeatGain;
+                if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += SurfaceWindow(SurfNum).OtherConvHeatGain;
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
                 if (SurfaceWindow(SurfNum).ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn)

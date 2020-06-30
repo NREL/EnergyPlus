@@ -124,7 +124,7 @@ namespace ExteriorEnergyUse {
         bool ManageDemand;  // Flag to indicate whether to use demand limiting
         Real64 DemandLimit; // Demand limit set by demand manager [W]
 
-                            // Default Constructor
+        // Default Constructor
         ExteriorEquipmentUsage() : FuelType(ExteriorFuelUsage::Unknown), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
         {
         }
@@ -148,13 +148,13 @@ namespace ExteriorEnergyUse {
 
     struct ExteriorEnergyUseData : BaseGlobalStruct {
 
-        int NumExteriorLights = 0; // Number of Exterior Light Inputs
-        int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+        int NumExteriorLights; // Number of Exterior Light Inputs
+        int NumExteriorEqs;    // Number of Exterior Equipment Inputs
         Array1D<ExteriorEnergyUse::ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
         Array1D<ExteriorEnergyUse::ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
         std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
-        bool GetExteriorEnergyInputFlag = true; // First time, input is "gotten"
-        ExteriorEnergyUseData() : NumExteriorLights(0), NumExteriorEqs(0), GetExteriorEnergyInputFlag(true) {}
+        bool GetExteriorEnergyInputFlag; // First time, input is "gotten"
+
         void clear_state() override {
             NumExteriorLights = 0;
             NumExteriorEqs = 0;
@@ -163,6 +163,8 @@ namespace ExteriorEnergyUse {
             UniqueExteriorEquipNames.clear();
             GetExteriorEnergyInputFlag = true;
         }
+        // Default Constructor
+        ExteriorEnergyUseData() : NumExteriorLights(0), NumExteriorEqs(0), GetExteriorEnergyInputFlag(true){}
     };
 
 } // namespace EnergyPlus

@@ -62,6 +62,7 @@
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -6621,7 +6622,6 @@ namespace AirflowNetworkBalanceManager {
         using DataEnvironment::OutHumRat;
         using DataGlobals::KelvinConv;
         using DataGlobals::StefanBoltzmann;
-        using DataHeatBalance::Construct;
         using DataHeatBalFanSys::QRadSurfAFNDuct;
         using DataHeatBalSurface::TH;
         using DataHVACGlobals::TimeStepSys;
@@ -6804,7 +6804,7 @@ namespace AirflowNetworkBalanceManager {
                             Real64 TSurfj = TH(1, 1, ZoneSurfNum);
                             Real64 TSurfj_K = TSurfj + KelvinConv;
 
-                            Real64 ZoneSurfEmissivity = Construct(Surface(ZoneSurfNum).Construction).InsideAbsorpThermal;
+                            Real64 ZoneSurfEmissivity = dataConstruction.Construct(Surface(ZoneSurfNum).Construction).InsideAbsorpThermal;
                             Real64 ZoneSurfArea = Surface(ZoneSurfNum).Area;
 
                             Real64 DuctEmissivity = VFObj.DuctEmittance;
@@ -7930,7 +7930,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 AirDensity;
         Real64 CpAir;
         Real64 Tamb;
-        Real64 hg;
+        Real64 hg; // latent heat of vaporization
         Real64 ReportingConstant;
         Real64 ReportingFraction;
         int AirLoopNum;
@@ -8024,7 +8024,7 @@ namespace AirflowNetworkBalanceManager {
                         Tamb = Zone(ZN1).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(OutHumRat);
                     }
-                    hg = Psychrometrics::PsyHgAirFnWTdb(ZoneAirHumRat(ZN1), (MAT(ZN1) + Tamb) / 2.0);
+                    hg = Psychrometrics::PsyHgAirFnWTdb(ZoneAirHumRat(ZN1), MAT(ZN1));
 
                     if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SCR ||
                         AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SEL) {
@@ -8080,7 +8080,7 @@ namespace AirflowNetworkBalanceManager {
                         Tamb = Zone(ZN2).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(OutHumRat);
                     }
-                    hg = Psychrometrics::PsyHgAirFnWTdb(ZoneAirHumRat(ZN2), (MAT(ZN2) + Tamb) / 2.0);
+                    hg = Psychrometrics::PsyHgAirFnWTdb(ZoneAirHumRat(ZN2), MAT(ZN2));
 
                     if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SCR ||
                         AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SEL) {
@@ -8129,7 +8129,7 @@ namespace AirflowNetworkBalanceManager {
                 }
 
                 if (ZN1 > 0 && ZN2 > 0) {
-                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZN1));
+                    CpAir = PsyCpAirFnW((ZoneAirHumRat(ZN1) + ZoneAirHumRat(ZN2))/2.0);
                     hg = Psychrometrics::PsyHgAirFnWTdb((ZoneAirHumRat(ZN1) + ZoneAirHumRat(ZN2)) / 2.0, (MAT(ZN1) + MAT(ZN2)) / 2.0);
                     if (MAT(ZN1) > MAT(ZN2)) {
                         AirflowNetworkReportData(ZN2).MultiZoneMixSenGainW += (AirflowNetworkLinkSimu(i).FLOW * CpAir * (MAT(ZN1) - MAT(ZN2)));
@@ -8151,7 +8151,6 @@ namespace AirflowNetworkBalanceManager {
                         AirflowNetworkReportData(ZN2).MultiZoneMixLatLossJ +=
                             (AirflowNetworkLinkSimu(i).FLOW * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * hg * ReportingConstant;
                     }
-                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZN2));
                     if (MAT(ZN2) > MAT(ZN1)) {
                         AirflowNetworkReportData(ZN1).MultiZoneMixSenGainW += (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (MAT(ZN2) - MAT(ZN1)));
                         AirflowNetworkReportData(ZN1).MultiZoneMixSenGainJ +=
@@ -9573,7 +9572,7 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= NumOfNodes; ++i) {
             if (NodeFound(i)) continue;
             // Skip the inlet and outlet nodes of zone dehumidifiers
-            if (GetZoneDehumidifierNodeNumber(i)) NodeFound(i) = true;
+            if (GetZoneDehumidifierNodeNumber(state.dataZoneDehumidifier, i)) NodeFound(i) = true;
 
             for (j = 1; j <= NumOfZones; ++j) {
                 if (!ZoneEquipConfig(j).IsControlled) continue;

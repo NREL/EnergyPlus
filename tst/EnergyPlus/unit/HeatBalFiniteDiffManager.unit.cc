@@ -51,11 +51,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::HeatBalFiniteDiffManager;
 
@@ -215,7 +217,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
     SurfaceFD(surfaceIndex).PhaseChangeStateOld(finiteDiffLayerIndex) = HysteresisPhaseChange::PhaseChangeStates::MELTING;
 
     // create a materials data object and assign the phase change variable based on above IDF processing
-    DataHeatBalance::MaterialProperties material;
+    Material::MaterialProperties material;
     material.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory("PCMNAME");
 
     // create local variables to calculate and call the new worker function
