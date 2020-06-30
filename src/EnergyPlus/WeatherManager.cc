@@ -5874,7 +5874,7 @@ namespace WeatherManager {
         SPSiteScheduleUnits.allocate(TotDesDays * 5);
 
         SPSiteScheduleNamePtr = 0;
-        SPSiteScheduleUnits.clear();
+        SPSiteScheduleUnits = "";
 
         // Allocate the Design Day and Environment array to the # of DD's or/and
         // Annual runs on input file
