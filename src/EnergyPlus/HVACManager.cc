@@ -383,7 +383,7 @@ namespace HVACManager {
         // ZONE INITIALIZATION  'Get Zone Setpoints'
         ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
         if (Contaminant.SimulateContaminants)
-            ManageZoneContaminanUpdates(state.dataZonePlenum, iGetZoneSetPoints, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+            ManageZoneContaminanUpdates(state, iGetZoneSetPoints, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         ManageHybridVentilation(state);
 
@@ -401,7 +401,7 @@ namespace HVACManager {
 
         ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state.dataZonePlenum, iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         SimHVAC(state);
 
@@ -422,7 +422,7 @@ namespace HVACManager {
         BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
 
         ManageZoneAirUpdates(state, iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state.dataZonePlenum, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         if (ZoneTempChange > MaxZoneTempDiff && !KickOffSimulation) {
             // determine value of adaptive system time step
@@ -457,7 +457,7 @@ namespace HVACManager {
                                      PriorTimeStep);
 
                 if (Contaminant.SimulateContaminants)
-                    ManageZoneContaminanUpdates(state.dataZonePlenum, iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                    ManageZoneContaminanUpdates(state, iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                                 PriorTimeStep);
                 SimHVAC(state);
 
@@ -476,13 +476,13 @@ namespace HVACManager {
                 ManageZoneAirUpdates(state, iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                      PriorTimeStep);
                 if (Contaminant.SimulateContaminants)
-                    ManageZoneContaminanUpdates(state.dataZonePlenum, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                    ManageZoneContaminanUpdates(state, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                                 PriorTimeStep);
 
                 ManageZoneAirUpdates(state, iPushSystemTimestepHistories, ZoneTempChange, ShortenTimeStepSys,
                                      UseZoneTimeStepHistory, PriorTimeStep);
                 if (Contaminant.SimulateContaminants)
-                    ManageZoneContaminanUpdates(state.dataZonePlenum, iPushSystemTimestepHistories, ShortenTimeStepSys,
+                    ManageZoneContaminanUpdates(state, iPushSystemTimestepHistories, ShortenTimeStepSys,
                                                 UseZoneTimeStepHistory, PriorTimeStep);
                 PreviousTimeStep = TimeStepSys;
             }
@@ -625,7 +625,7 @@ namespace HVACManager {
 
         ManageZoneAirUpdates(state, iPushZoneTimestepHistories, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
         if (Contaminant.SimulateContaminants)
-            ManageZoneContaminanUpdates(state.dataZonePlenum, iPushZoneTimestepHistories, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+            ManageZoneContaminanUpdates(state, iPushZoneTimestepHistories, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         NumOfSysTimeStepsLastZoneTimeStep = NumOfSysTimeSteps;
 

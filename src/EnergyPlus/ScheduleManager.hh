@@ -62,7 +62,7 @@
 
 namespace EnergyPlus {
     class OutputFiles;
-    
+
 namespace ScheduleManager {
 
     // Using/Aliasing
@@ -195,13 +195,17 @@ namespace ScheduleManager {
 
     void ReportScheduleDetails(OutputFiles &outputFiles, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
 
+    // Returns the CurrentScheduleValue
     Real64 GetCurrentScheduleValue(int const ScheduleIndex);
 
+    // Updates each schedule value to the current timestep
+    // Uses EMS value if actuated, otherwise calls LookUpScheduleValue with ThisHour=DataGlobals::HourOfDay, ThisTimeStep=DataGlobals::TimeStep
     void UpdateScheduleValues();
 
+    // Looks up a given Schedule value for an hour & timestep, minding whether DST is enabled or not
     Real64 LookUpScheduleValue(int const ScheduleIndex,
-                               int const ThisHour = -1,    // Negative => unspecified
-                               int const ThisTimeStep = -1 // Negative => unspecified
+                               int const ThisHour,
+                               int const ThisTimeStep = -1 // Negative => unspecified, will use NumOfTimeStepInHour
     );
 
     int GetScheduleIndex(std::string const &ScheduleName);

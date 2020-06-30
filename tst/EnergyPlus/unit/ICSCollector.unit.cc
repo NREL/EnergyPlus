@@ -50,10 +50,8 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -61,6 +59,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -111,11 +110,11 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Surface(SurfNum).ExtConvCoeff = 0;
     Surface(SurfNum).ExtWind = false;
     // allocate construction variable data
-    Construct.allocate(ConstrNum);
-    Construct(ConstrNum).LayerPoint.allocate(MatNum);
-    Construct(ConstrNum).LayerPoint(MatNum) = 1;
-    Material.allocate(MatNum);
-    Material(MatNum).AbsorpThermal = 0.8;
+    dataConstruction.Construct.allocate(ConstrNum);
+    dataConstruction.Construct(ConstrNum).LayerPoint.allocate(MatNum);
+    dataConstruction.Construct(ConstrNum).LayerPoint(MatNum) = 1;
+    dataMaterial.Material.allocate(MatNum);
+    dataMaterial.Material(MatNum).AbsorpThermal = 0.8;
     // allocate exterior vented cavaity variable data
     ExtVentedCavity.allocate(1);
     ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
@@ -165,9 +164,9 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
 
     // deallocated variables
     Surface.deallocate();
-    Construct(ConstrNum).LayerPoint.deallocate();
-    Construct.deallocate();
-    Material.deallocate();
+    dataConstruction.Construct(ConstrNum).LayerPoint.deallocate();
+    dataConstruction.Construct.deallocate();
+    dataMaterial.Material.deallocate();
     ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
     ExtVentedCavity.deallocate();
     Zone.deallocate();
