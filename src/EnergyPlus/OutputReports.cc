@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DXFEarClipping.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
@@ -1475,7 +1476,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                 // prescribed R-values for interior and exterior convection coefficients as found in ASHRAE 90.1-2004, Appendix A
                 if (Surface(surf).Construction > 0 && Surface(surf).Construction <= TotConstructs) {
                     cNominalUwithConvCoeffs = "";
-                    ConstructionName = Construct(Surface(surf).Construction).Name;
+                    ConstructionName = dataConstruction.Construct(Surface(surf).Construction).Name;
                     {
                         auto const SELECT_CASE_var(Surface(surf).Class);
                         if (SELECT_CASE_var == SurfaceClass_Wall) {
@@ -1806,7 +1807,7 @@ void CostInfoOut(OutputFiles &outputFiles)
                   Format_801,
                   surf,
                   Surface(surf).Name,
-                  Construct(Surface(surf).Construction).Name,
+                  dataConstruction.Construct(Surface(surf).Construction).Name,
                   cSurfaceClass(Surface(surf).Class),
                   Surface(surf).Area,
                   Surface(surf).GrossArea);
@@ -1926,7 +1927,7 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
     for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         if (Surface(surf).HeatTransSurf) continue;
         if (Surface(surf).Construction > 0) {
-            if (DataHeatBalance::Construct(Surface(surf).Construction).TypeIsAirBoundary) continue;
+            if (dataConstruction.Construct(Surface(surf).Construction).TypeIsAirBoundary) continue;
         }
         if (Surface(surf).Class == SurfaceClass_Shading) continue;
         if (Surface(surf).Sides == 0) continue;

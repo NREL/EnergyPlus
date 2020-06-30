@@ -53,11 +53,12 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -90,7 +91,6 @@ namespace DataHeatBalance {
     // SolarShading, etc. Modules.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::AutoCalculate;
     using DataGlobals::DegToRadians;
     using DataSurfaces::MaxSlatAngs;
@@ -105,16 +105,11 @@ namespace DataHeatBalance {
     // MODULE PARAMETER DEFINITIONS:
 
     // Parameters for the definition and limitation of arrays:
-    int const MaxLayersInConstruct(11); // Maximum number of layers allowed in a single construction
-    int const MaxCTFTerms(
-        19); // Maximum number of CTF terms allowed to still allow stability //Note Sync with SurfaceGroundHeatExchanger::local::MaxCTFTerms
-    int MaxSolidWinLayers(0);               // Maximum number of solid layers in a window construction
-                                            // ** has to be big enough to hold no matter what window model
-                                            //    each window model should validate layers individually
-    int const MaxSpectralDataElements(800); // Maximum number in Spectral Data arrays.
 
     // Parameters to indicate material group type for use with the Material
     // derived type (see below):
+
+    int MaxSolidWinLayers(0);                // Maximum number of solid layers in a window construction
 
     int const RegularMaterial(0);
     int const Air(1);
@@ -795,12 +790,10 @@ namespace DataHeatBalance {
 
     // Object Data
     Array1D<ZonePreDefRepType> ZonePreDefRep;
-    ZonePreDefRepType BuildingPreDefRep; // Autodesk:Note Removed explicit constructor that was missing some entries
+    ZonePreDefRepType BuildingPreDefRep;
     Array1D<ZoneSimData> ZoneIntGain;
-    Array1D<MaterialProperties> Material;
     Array1D<GapSupportPillar> SupportPillar;
     Array1D<GapDeflectionState> DeflectionState;
-    Array1D<ConstructionData> Construct;
     Array1D<SpectralDataProperties> SpectralData;
     Array1D<ZoneData> Zone;
     Array1D<ZoneListData> ZoneList;
@@ -1071,10 +1064,8 @@ namespace DataHeatBalance {
         ZonePreDefRep.deallocate();
         BuildingPreDefRep = ZonePreDefRepType();
         ZoneIntGain.deallocate();
-        Material.deallocate();
         SupportPillar.deallocate();
         DeflectionState.deallocate();
-        Construct.deallocate();
         SpectralData.deallocate();
         Zone.deallocate();
         ZoneList.deallocate();
@@ -1268,41 +1259,41 @@ namespace DataHeatBalance {
         bool ValidBGShadeBlindConst; // True if a valid window construction with between-glass shade/blind
         int GlassLayNum;             // Glass layer number
 
-        TotLayers = Construct(ConstrNum).TotLayers;
+        TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
         if (TotLayers == 0) return; // error condition, hopefully caught elsewhere
         InsideLayer = TotLayers;
-        if (Construct(ConstrNum).LayerPoint(InsideLayer) <= 0) return; // Error condition
+        if (dataConstruction.Construct(ConstrNum).LayerPoint(InsideLayer) <= 0) return; // Error condition
 
         //   window screen is not allowed on inside layer
 
-        Construct(ConstrNum).DayltPropPtr = 0;
-        InsideMaterNum = Construct(ConstrNum).LayerPoint(InsideLayer);
+        dataConstruction.Construct(ConstrNum).DayltPropPtr = 0;
+        InsideMaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(InsideLayer);
         if (InsideMaterNum != 0) {
-            Construct(ConstrNum).InsideAbsorpVis = Material(InsideMaterNum).AbsorpVisible;
-            Construct(ConstrNum).InsideAbsorpSolar = Material(InsideMaterNum).AbsorpSolar;
+            dataConstruction.Construct(ConstrNum).InsideAbsorpVis = dataMaterial.Material(InsideMaterNum).AbsorpVisible;
+            dataConstruction.Construct(ConstrNum).InsideAbsorpSolar = dataMaterial.Material(InsideMaterNum).AbsorpSolar;
 
             // Following line applies only to opaque surfaces; it is recalculated later for windows.
-            Construct(ConstrNum).ReflectVisDiffBack = 1.0 - Material(InsideMaterNum).AbsorpVisible;
+            dataConstruction.Construct(ConstrNum).ReflectVisDiffBack = 1.0 - dataMaterial.Material(InsideMaterNum).AbsorpVisible;
         }
 
-        OutsideMaterNum = Construct(ConstrNum).LayerPoint(1);
+        OutsideMaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(1);
         if (OutsideMaterNum != 0) {
-            Construct(ConstrNum).OutsideAbsorpVis = Material(OutsideMaterNum).AbsorpVisible;
-            Construct(ConstrNum).OutsideAbsorpSolar = Material(OutsideMaterNum).AbsorpSolar;
+            dataConstruction.Construct(ConstrNum).OutsideAbsorpVis = dataMaterial.Material(OutsideMaterNum).AbsorpVisible;
+            dataConstruction.Construct(ConstrNum).OutsideAbsorpSolar = dataMaterial.Material(OutsideMaterNum).AbsorpSolar;
         }
 
-        Construct(ConstrNum).TotSolidLayers = 0;
-        Construct(ConstrNum).TotGlassLayers = 0;
-        Construct(ConstrNum).AbsDiffShade = 0.0;
+        dataConstruction.Construct(ConstrNum).TotSolidLayers = 0;
+        dataConstruction.Construct(ConstrNum).TotGlassLayers = 0;
+        dataConstruction.Construct(ConstrNum).AbsDiffShade = 0.0;
 
         // Check if any layer is glass, gas, shade, screen or blind; if so it is considered a window construction for
         // purposes of error checking.
 
-        Construct(ConstrNum).TypeIsWindow = false;
+        dataConstruction.Construct(ConstrNum).TypeIsWindow = false;
         for (Layer = 1; Layer <= TotLayers; ++Layer) {
-            MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+            MaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
-            switch (Material(MaterNum).Group) {
+            switch (dataMaterial.Material(MaterNum).Group) {
             case WindowGlass:
             case WindowGas:
             case WindowGasMixture:
@@ -1318,23 +1309,23 @@ namespace DataHeatBalance {
             case ScreenEquivalentLayer:
             case BlindEquivalentLayer:
             case GapEquivalentLayer:
-                Construct(ConstrNum).TypeIsWindow = true;
+                dataConstruction.Construct(ConstrNum).TypeIsWindow = true;
             }
         }
 
         if (InsideMaterNum == 0) return;
         if (OutsideMaterNum == 0) return;
 
-        if (Construct(ConstrNum).TypeIsWindow) {
+        if (dataConstruction.Construct(ConstrNum).TypeIsWindow) {
 
-            Construct(ConstrNum).NumCTFTerms = 0;
-            Construct(ConstrNum).NumHistories = 0;
+            dataConstruction.Construct(ConstrNum).NumCTFTerms = 0;
+            dataConstruction.Construct(ConstrNum).NumHistories = 0;
             WrongMaterialsMix = false;
             WrongWindowLayering = false;
             for (Layer = 1; Layer <= TotLayers; ++Layer) {
-                MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+                MaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
                 if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                switch (Material(MaterNum).Group) {
+                switch (dataMaterial.Material(MaterNum).Group) {
                 case WindowGlass:
                 case WindowGas:
                 case WindowGasMixture:
@@ -1357,26 +1348,26 @@ namespace DataHeatBalance {
             }
 
             if (WrongMaterialsMix) { // Illegal material for a window construction
-                ShowSevereError("Error: Window construction=" + Construct(ConstrNum).Name +
+                ShowSevereError("Error: Window construction=" + dataConstruction.Construct(ConstrNum).Name +
                                 " has materials other than glass, gas, shade, screen, blind, complex shading, complex gap, or simple system.");
                 ErrorsFound = true;
                 // Do not check number of layers for BSDF type of window since that can be handled
-            } else if ((TotLayers > 8) && (!Construct(ConstrNum).WindowTypeBSDF) &&
-                       (!Construct(ConstrNum).WindowTypeEQL)) { // Too many layers for a window construction
-                ShowSevereError("CheckAndSetConstructionProperties: Window construction=" + Construct(ConstrNum).Name +
+            } else if ((TotLayers > 8) && (!dataConstruction.Construct(ConstrNum).WindowTypeBSDF) &&
+                       (!dataConstruction.Construct(ConstrNum).WindowTypeEQL)) { // Too many layers for a window construction
+                ShowSevereError("CheckAndSetConstructionProperties: Window construction=" + dataConstruction.Construct(ConstrNum).Name +
                                 " has too many layers (max of 8 allowed -- 4 glass + 3 gap + 1 shading device).");
                 ErrorsFound = true;
 
             } else if (TotLayers == 1) {
 
-                if (Material(Construct(ConstrNum).LayerPoint(1)).Group == Shade || Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGas ||
-                    Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGasMixture ||
-                    Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowBlind ||
-                    Material(Construct(ConstrNum).LayerPoint(1)).Group == Screen ||
-                    Material(Construct(ConstrNum).LayerPoint(1)).Group == ComplexWindowShade ||
-                    Material(Construct(ConstrNum).LayerPoint(1)).Group == ComplexWindowGap) {
+                if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == Shade || dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowGas ||
+                    dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowGasMixture ||
+                    dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowBlind ||
+                    dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == Screen ||
+                    dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == ComplexWindowShade ||
+                    dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == ComplexWindowGap) {
                     ShowSevereError(
-                        "CheckAndSetConstructionProperties: The single-layer window construction=" + Construct(ConstrNum).Name +
+                        "CheckAndSetConstructionProperties: The single-layer window construction=" + dataConstruction.Construct(ConstrNum).Name +
                         " has a gas, complex gap, shade, complex shade, screen or blind material; it should be glass of simple glazing system.");
                     ErrorsFound = true;
                 }
@@ -1388,55 +1379,55 @@ namespace DataHeatBalance {
             TotShadeLayers = 0; // Includes shades, blinds, and screens
             TotGasLayers = 0;
             for (Layer = 1; Layer <= TotLayers; ++Layer) {
-                MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+                MaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
                 if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                if (Material(MaterNum).Group == WindowGlass) ++TotGlassLayers;
-                if (Material(MaterNum).Group == WindowSimpleGlazing) ++TotGlassLayers;
-                if (Material(MaterNum).Group == Shade || Material(MaterNum).Group == WindowBlind || Material(MaterNum).Group == Screen ||
-                    Material(MaterNum).Group == ComplexWindowShade)
+                if (dataMaterial.Material(MaterNum).Group == WindowGlass) ++TotGlassLayers;
+                if (dataMaterial.Material(MaterNum).Group == WindowSimpleGlazing) ++TotGlassLayers;
+                if (dataMaterial.Material(MaterNum).Group == Shade || dataMaterial.Material(MaterNum).Group == WindowBlind || dataMaterial.Material(MaterNum).Group == Screen ||
+                    dataMaterial.Material(MaterNum).Group == ComplexWindowShade)
                     ++TotShadeLayers;
-                if (Material(MaterNum).Group == WindowGas || Material(MaterNum).Group == WindowGasMixture ||
-                    Material(MaterNum).Group == ComplexWindowGap)
+                if (dataMaterial.Material(MaterNum).Group == WindowGas || dataMaterial.Material(MaterNum).Group == WindowGasMixture ||
+                    dataMaterial.Material(MaterNum).Group == ComplexWindowGap)
                     ++TotGasLayers;
                 if (Layer < TotLayers) {
-                    MaterNumNext = Construct(ConstrNum).LayerPoint(Layer + 1);
+                    MaterNumNext = dataConstruction.Construct(ConstrNum).LayerPoint(Layer + 1);
                     // Adjacent layers of same type not allowed
                     if (MaterNumNext == 0) continue;
-                    if (Material(MaterNum).Group == Material(MaterNumNext).Group) WrongWindowLayering = true;
+                    if (dataMaterial.Material(MaterNum).Group == dataMaterial.Material(MaterNumNext).Group) WrongWindowLayering = true;
                 }
             }
 
             // It is not necessary to check rest of BSDF window structure since that is performed inside TARCOG90 routine.
             // That routine also allow structures which are not allowed in rest of this routine
-            if (Construct(ConstrNum).WindowTypeBSDF) {
-                Construct(ConstrNum).TotGlassLayers = TotGlassLayers;
-                Construct(ConstrNum).TotSolidLayers = TotGlassLayers + TotShadeLayers;
-                Construct(ConstrNum).InsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermalBack;
-                Construct(ConstrNum).OutsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
+            if (dataConstruction.Construct(ConstrNum).WindowTypeBSDF) {
+                dataConstruction.Construct(ConstrNum).TotGlassLayers = TotGlassLayers;
+                dataConstruction.Construct(ConstrNum).TotSolidLayers = TotGlassLayers + TotShadeLayers;
+                dataConstruction.Construct(ConstrNum).InsideAbsorpThermal = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermalBack;
+                dataConstruction.Construct(ConstrNum).OutsideAbsorpThermal = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
                 return;
             }
 
-            if (Construct(ConstrNum).WindowTypeEQL) {
-                Construct(ConstrNum).InsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermalBack;
-                Construct(ConstrNum).OutsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
+            if (dataConstruction.Construct(ConstrNum).WindowTypeEQL) {
+                dataConstruction.Construct(ConstrNum).InsideAbsorpThermal = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermalBack;
+                dataConstruction.Construct(ConstrNum).OutsideAbsorpThermal = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
                 return;
             }
 
-            if (Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGas ||
-                Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGasMixture ||
-                Material(Construct(ConstrNum).LayerPoint(TotLayers)).Group == WindowGas ||
-                Material(Construct(ConstrNum).LayerPoint(TotLayers)).Group == WindowGasMixture)
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowGas ||
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowGasMixture ||
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).Group == WindowGas ||
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).Group == WindowGasMixture)
                 WrongWindowLayering = true;                     // Gas cannot be first or last layer
             if (TotShadeLayers > 1) WrongWindowLayering = true; // At most one shade, screen or blind allowed
 
             // If there is a diffusing glass layer no shade, screen or blind is allowed
             for (Layer = 1; Layer <= TotLayers; ++Layer) {
-                MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+                MaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
                 if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                if (Material(MaterNum).SolarDiffusing && TotShadeLayers > 0) {
+                if (dataMaterial.Material(MaterNum).SolarDiffusing && TotShadeLayers > 0) {
                     ErrorsFound = true;
-                    ShowSevereError("CheckAndSetConstructionProperties: Window construction=" + Construct(ConstrNum).Name);
-                    ShowContinueError("has diffusing glass=" + Material(MaterNum).Name + " and a shade, screen or blind layer.");
+                    ShowSevereError("CheckAndSetConstructionProperties: Window construction=" + dataConstruction.Construct(ConstrNum).Name);
+                    ShowContinueError("has diffusing glass=" + dataMaterial.Material(MaterNum).Name + " and a shade, screen or blind layer.");
                     break;
                 }
             }
@@ -1445,31 +1436,31 @@ namespace DataHeatBalance {
             if (TotGlassLayers > 1) {
                 GlassLayNum = 0;
                 for (Layer = 1; Layer <= TotLayers; ++Layer) {
-                    MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+                    MaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
                     if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                    if (Material(MaterNum).Group == WindowGlass) {
+                    if (dataMaterial.Material(MaterNum).Group == WindowGlass) {
                         ++GlassLayNum;
-                        if (GlassLayNum < TotGlassLayers && Material(MaterNum).SolarDiffusing) {
+                        if (GlassLayNum < TotGlassLayers && dataMaterial.Material(MaterNum).SolarDiffusing) {
                             ErrorsFound = true;
-                            ShowSevereError("CheckAndSetConstructionProperties: Window construction=" + Construct(ConstrNum).Name);
-                            ShowContinueError("has diffusing glass=" + Material(MaterNum).Name + " that is not the innermost glass layer.");
+                            ShowSevereError("CheckAndSetConstructionProperties: Window construction=" + dataConstruction.Construct(ConstrNum).Name);
+                            ShowContinueError("has diffusing glass=" + dataMaterial.Material(MaterNum).Name + " that is not the innermost glass layer.");
                         }
                     }
                 }
             }
 
             // interior window screen is not allowed. Check for invalid between-glass screen is checked below.
-            if (TotShadeLayers == 1 && Material(Construct(ConstrNum).LayerPoint(TotLayers)).Group == Screen && TotLayers != 1) {
+            if (TotShadeLayers == 1 && dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).Group == Screen && TotLayers != 1) {
                 WrongWindowLayering = true;
             }
 
             // Consistency checks for a construction with a between-glass shade or blind
 
-            if (TotShadeLayers == 1 && Material(Construct(ConstrNum).LayerPoint(1)).Group != Shade &&
-                Material(Construct(ConstrNum).LayerPoint(1)).Group != WindowBlind && Material(Construct(ConstrNum).LayerPoint(1)).Group != Screen &&
-                Material(Construct(ConstrNum).LayerPoint(TotLayers)).Group != Shade &&
-                Material(Construct(ConstrNum).LayerPoint(TotLayers)).Group != WindowBlind &&
-                Material(Construct(ConstrNum).LayerPoint(TotLayers)).Group != ComplexWindowShade && !WrongWindowLayering) {
+            if (TotShadeLayers == 1 && dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != Shade &&
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != WindowBlind && dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != Screen &&
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).Group != Shade &&
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).Group != WindowBlind &&
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).Group != ComplexWindowShade && !WrongWindowLayering) {
 
                 // This is a construction with a between-glass shade or blind
 
@@ -1482,61 +1473,61 @@ namespace DataHeatBalance {
                         if (TotLayers != 5) {
                             WrongWindowLayering = true;
                         } else {
-                            if (Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGlass &&
-                                (Material(Construct(ConstrNum).LayerPoint(2)).Group == WindowGas ||
-                                 Material(Construct(ConstrNum).LayerPoint(2)).Group == WindowGasMixture) &&
-                                ((Material(Construct(ConstrNum).LayerPoint(3)).Group == Shade ||
-                                  Material(Construct(ConstrNum).LayerPoint(3)).Group == WindowBlind) &&
-                                 Material(Construct(ConstrNum).LayerPoint(3)).Group != Screen) &&
-                                (Material(Construct(ConstrNum).LayerPoint(4)).Group == WindowGas ||
-                                 Material(Construct(ConstrNum).LayerPoint(4)).Group == WindowGasMixture) &&
-                                Material(Construct(ConstrNum).LayerPoint(5)).Group == WindowGlass)
+                            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowGlass &&
+                                (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(2)).Group == WindowGas ||
+                                 dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(2)).Group == WindowGasMixture) &&
+                                ((dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(3)).Group == Shade ||
+                                  dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(3)).Group == WindowBlind) &&
+                                 dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(3)).Group != Screen) &&
+                                (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(4)).Group == WindowGas ||
+                                 dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(4)).Group == WindowGasMixture) &&
+                                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(5)).Group == WindowGlass)
                                 ValidBGShadeBlindConst = true;
                         }
                     } else { // TotGlassLayers = 3
                         if (TotLayers != 7) {
                             WrongWindowLayering = true;
                         } else {
-                            if (Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGlass &&
-                                (Material(Construct(ConstrNum).LayerPoint(2)).Group == WindowGas ||
-                                 Material(Construct(ConstrNum).LayerPoint(2)).Group == WindowGasMixture) &&
-                                Material(Construct(ConstrNum).LayerPoint(3)).Group == WindowGlass &&
-                                (Material(Construct(ConstrNum).LayerPoint(4)).Group == WindowGas ||
-                                 Material(Construct(ConstrNum).LayerPoint(4)).Group == WindowGasMixture) &&
-                                ((Material(Construct(ConstrNum).LayerPoint(5)).Group == Shade ||
-                                  Material(Construct(ConstrNum).LayerPoint(5)).Group == WindowBlind) &&
-                                 Material(Construct(ConstrNum).LayerPoint(5)).Group != Screen) &&
-                                (Material(Construct(ConstrNum).LayerPoint(6)).Group == WindowGas ||
-                                 Material(Construct(ConstrNum).LayerPoint(6)).Group == WindowGasMixture) &&
-                                Material(Construct(ConstrNum).LayerPoint(7)).Group == WindowGlass)
+                            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowGlass &&
+                                (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(2)).Group == WindowGas ||
+                                 dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(2)).Group == WindowGasMixture) &&
+                                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(3)).Group == WindowGlass &&
+                                (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(4)).Group == WindowGas ||
+                                 dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(4)).Group == WindowGasMixture) &&
+                                ((dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(5)).Group == Shade ||
+                                  dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(5)).Group == WindowBlind) &&
+                                 dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(5)).Group != Screen) &&
+                                (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(6)).Group == WindowGas ||
+                                 dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(6)).Group == WindowGasMixture) &&
+                                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(7)).Group == WindowGlass)
                                 ValidBGShadeBlindConst = true;
                         }
                     } // End of check if TotGlassLayers = 2 or 3
                     if (!ValidBGShadeBlindConst) WrongWindowLayering = true;
                     if (!WrongWindowLayering) {
                         LayNumSh = 2 * TotGlassLayers - 1;
-                        MatSh = Construct(ConstrNum).LayerPoint(LayNumSh);
+                        MatSh = dataConstruction.Construct(ConstrNum).LayerPoint(LayNumSh);
                         // For double pane, shade/blind must be layer #3.
                         // For triple pane, it must be layer #5 (i.e., between two inner panes).
-                        if (Material(MatSh).Group != Shade && Material(MatSh).Group != WindowBlind) WrongWindowLayering = true;
+                        if (dataMaterial.Material(MatSh).Group != Shade && dataMaterial.Material(MatSh).Group != WindowBlind) WrongWindowLayering = true;
                         if (TotLayers != 2 * TotGlassLayers + 1) WrongWindowLayering = true;
                         if (!WrongWindowLayering) {
                             // Gas on either side of a between-glass shade/blind must be the same
-                            MatGapL = Construct(ConstrNum).LayerPoint(LayNumSh - 1);
-                            MatGapR = Construct(ConstrNum).LayerPoint(LayNumSh + 1);
+                            MatGapL = dataConstruction.Construct(ConstrNum).LayerPoint(LayNumSh - 1);
+                            MatGapR = dataConstruction.Construct(ConstrNum).LayerPoint(LayNumSh + 1);
                             for (IGas = 1; IGas <= 5; ++IGas) {
-                                if ((Material(MatGapL).GasType(IGas) != Material(MatGapR).GasType(IGas)) ||
-                                    (Material(MatGapL).GasFract(IGas) != Material(MatGapR).GasFract(IGas)))
+                                if ((dataMaterial.Material(MatGapL).GasType(IGas) != dataMaterial.Material(MatGapR).GasType(IGas)) ||
+                                    (dataMaterial.Material(MatGapL).GasFract(IGas) != dataMaterial.Material(MatGapR).GasFract(IGas)))
                                     WrongWindowLayering = true;
                             }
                             // Gap width on either side of a between-glass shade/blind must be the same
-                            if (std::abs(Material(MatGapL).Thickness - Material(MatGapR).Thickness) > 0.0005) WrongWindowLayering = true;
-                            if (Material(MatSh).Group == WindowBlind) {
-                                BlNum = Material(MatSh).BlindDataPtr;
+                            if (std::abs(dataMaterial.Material(MatGapL).Thickness - dataMaterial.Material(MatGapR).Thickness) > 0.0005) WrongWindowLayering = true;
+                            if (dataMaterial.Material(MatSh).Group == WindowBlind) {
+                                BlNum = dataMaterial.Material(MatSh).BlindDataPtr;
                                 if (BlNum > 0) {
-                                    if ((Material(MatGapL).Thickness + Material(MatGapR).Thickness) < Blind(BlNum).SlatWidth) {
+                                    if ((dataMaterial.Material(MatGapL).Thickness + dataMaterial.Material(MatGapR).Thickness) < Blind(BlNum).SlatWidth) {
                                         ErrorsFound = true;
-                                        ShowSevereError("CheckAndSetConstructionProperties: For window construction " + Construct(ConstrNum).Name);
+                                        ShowSevereError("CheckAndSetConstructionProperties: For window construction " + dataConstruction.Construct(ConstrNum).Name);
                                         ShowContinueError("the slat width of the between-glass blind is greater than");
                                         ShowContinueError("the sum of the widths of the gas layers adjacent to the blind.");
                                     }
@@ -1548,20 +1539,20 @@ namespace DataHeatBalance {
             }                     // End of check if construction has between-glass shade/blind
 
             // Check Simple Windows,
-            if (Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowSimpleGlazing) {
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowSimpleGlazing) {
                 if (TotLayers > 1) {
                     // check that none of the other layers are glazing or gas
                     for (Layer = 1; Layer <= TotLayers; ++Layer) {
-                        MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+                        MaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
                         if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                        if (Material(MaterNum).Group == WindowGlass) {
+                        if (dataMaterial.Material(MaterNum).Group == WindowGlass) {
                             ErrorsFound = true;
-                            ShowSevereError("CheckAndSetConstructionProperties: Error in window construction " + Construct(ConstrNum).Name + "--");
+                            ShowSevereError("CheckAndSetConstructionProperties: Error in window construction " + dataConstruction.Construct(ConstrNum).Name + "--");
                             ShowContinueError("For simple window constructions, no other glazing layers are allowed.");
                         }
-                        if (Material(MaterNum).Group == WindowGas) {
+                        if (dataMaterial.Material(MaterNum).Group == WindowGas) {
                             ErrorsFound = true;
-                            ShowSevereError("CheckAndSetConstructionProperties: Error in window construction " + Construct(ConstrNum).Name + "--");
+                            ShowSevereError("CheckAndSetConstructionProperties: Error in window construction " + dataConstruction.Construct(ConstrNum).Name + "--");
                             ShowContinueError("For simple window constructions, no other gas layers are allowed.");
                         }
                     }
@@ -1569,7 +1560,7 @@ namespace DataHeatBalance {
             }
 
             if (WrongWindowLayering) {
-                ShowSevereError("CheckAndSetConstructionProperties: Error in window construction " + Construct(ConstrNum).Name + "--");
+                ShowSevereError("CheckAndSetConstructionProperties: Error in window construction " + dataConstruction.Construct(ConstrNum).Name + "--");
                 ShowContinueError("  For multi-layer window constructions the following rules apply:");
                 ShowContinueError("    --The first and last layer must be a solid layer (glass or shade/screen/blind),");
                 ShowContinueError("    --Adjacent glass layers must be separated by one and only one gas layer,");
@@ -1589,69 +1580,69 @@ namespace DataHeatBalance {
                 ErrorsFound = true;
             }
 
-            Construct(ConstrNum).TotGlassLayers = TotGlassLayers;
-            Construct(ConstrNum).TotSolidLayers = TotGlassLayers + TotShadeLayers;
+            dataConstruction.Construct(ConstrNum).TotGlassLayers = TotGlassLayers;
+            dataConstruction.Construct(ConstrNum).TotSolidLayers = TotGlassLayers + TotShadeLayers;
 
             // In following, InsideLayer is layer number of inside glass and InsideAbsorpThermal applies
             // only to inside glass; it is corrected later in InitGlassOpticalCalculations
             // if construction has inside shade or blind.
-            if (Material(Construct(ConstrNum).LayerPoint(InsideLayer)).Group == Shade ||
-                Material(Construct(ConstrNum).LayerPoint(InsideLayer)).Group == WindowBlind) {
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(InsideLayer)).Group == Shade ||
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(InsideLayer)).Group == WindowBlind) {
                 --InsideLayer;
             }
             if (InsideLayer > 0) {
-                InsideMaterNum = Construct(ConstrNum).LayerPoint(InsideLayer);
-                Construct(ConstrNum).InsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermalBack;
+                InsideMaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(InsideLayer);
+                dataConstruction.Construct(ConstrNum).InsideAbsorpThermal = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermalBack;
             }
             if (InsideMaterNum != 0) {
-                Construct(ConstrNum).InsideAbsorpVis = Material(InsideMaterNum).AbsorpVisible;
-                Construct(ConstrNum).InsideAbsorpSolar = Material(InsideMaterNum).AbsorpSolar;
+                dataConstruction.Construct(ConstrNum).InsideAbsorpVis = dataMaterial.Material(InsideMaterNum).AbsorpVisible;
+                dataConstruction.Construct(ConstrNum).InsideAbsorpSolar = dataMaterial.Material(InsideMaterNum).AbsorpSolar;
             }
 
-            if ((Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGlass) ||
-                (Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowSimpleGlazing)) { // Glass
-                Construct(ConstrNum).OutsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
+            if ((dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowGlass) ||
+                (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowSimpleGlazing)) { // Glass
+                dataConstruction.Construct(ConstrNum).OutsideAbsorpThermal = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
             } else { // Exterior shade, blind or screen
-                Construct(ConstrNum).OutsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+                dataConstruction.Construct(ConstrNum).OutsideAbsorpThermal = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
             }
 
         } else { // Opaque surface
-            Construct(ConstrNum).InsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermal;
-            Construct(ConstrNum).OutsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+            dataConstruction.Construct(ConstrNum).InsideAbsorpThermal = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermal;
+            dataConstruction.Construct(ConstrNum).OutsideAbsorpThermal = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         }
 
-        Construct(ConstrNum).OutsideRoughness = Material(Construct(ConstrNum).LayerPoint(1)).Roughness;
+        dataConstruction.Construct(ConstrNum).OutsideRoughness = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Roughness;
 
-        if (Material(Construct(ConstrNum).LayerPoint(1)).Group == Air) {
-            ShowSevereError("CheckAndSetConstructionProperties: Outside Layer is Air for construction " + Construct(ConstrNum).Name);
-            ShowContinueError("  Error in material " + Material(Construct(ConstrNum).LayerPoint(1)).Name);
+        if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == Air) {
+            ShowSevereError("CheckAndSetConstructionProperties: Outside Layer is Air for construction " + dataConstruction.Construct(ConstrNum).Name);
+            ShowContinueError("  Error in material " + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Name);
             ErrorsFound = true;
         }
         if (InsideLayer > 0) {
-            if (Material(Construct(ConstrNum).LayerPoint(InsideLayer)).Group == Air) {
-                ShowSevereError("CheckAndSetConstructionProperties: Inside Layer is Air for construction " + Construct(ConstrNum).Name);
-                ShowContinueError("  Error in material " + Material(Construct(ConstrNum).LayerPoint(InsideLayer)).Name);
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(InsideLayer)).Group == Air) {
+                ShowSevereError("CheckAndSetConstructionProperties: Inside Layer is Air for construction " + dataConstruction.Construct(ConstrNum).Name);
+                ShowContinueError("  Error in material " + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(InsideLayer)).Name);
                 ErrorsFound = true;
             }
         }
 
-        if (Material(Construct(ConstrNum).LayerPoint(1)).Group == EcoRoof) {
-            Construct(ConstrNum).TypeIsEcoRoof = true;
+        if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == EcoRoof) {
+            dataConstruction.Construct(ConstrNum).TypeIsEcoRoof = true;
             // need to check EcoRoof is not non-outside layer
             for (Layer = 2; Layer <= TotLayers; ++Layer) {
-                if (Material(Construct(ConstrNum).LayerPoint(Layer)).Group == EcoRoof) {
-                    ShowSevereError("CheckAndSetConstructionProperties: Interior Layer is EcoRoof for construction " + Construct(ConstrNum).Name);
-                    ShowContinueError("  Error in material " + Material(Construct(ConstrNum).LayerPoint(Layer)).Name);
+                if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Group == EcoRoof) {
+                    ShowSevereError("CheckAndSetConstructionProperties: Interior Layer is EcoRoof for construction " + dataConstruction.Construct(ConstrNum).Name);
+                    ShowContinueError("  Error in material " + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Name);
                     ErrorsFound = true;
                 }
             }
         }
 
-        if (Material(Construct(ConstrNum).LayerPoint(1)).Group == IRTMaterial) {
-            Construct(ConstrNum).TypeIsIRT = true;
-            if (Construct(ConstrNum).TotLayers != 1) {
+        if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == IRTMaterial) {
+            dataConstruction.Construct(ConstrNum).TypeIsIRT = true;
+            if (dataConstruction.Construct(ConstrNum).TotLayers != 1) {
                 ShowSevereError("CheckAndSetConstructionProperties: Infrared Transparent (IRT) Construction is limited to 1 layer " +
-                                Construct(ConstrNum).Name);
+                                dataConstruction.Construct(ConstrNum).Name);
                 ShowContinueError("  Too many layers in referenced construction.");
                 ErrorsFound = true;
             }
@@ -1698,7 +1689,7 @@ namespace DataHeatBalance {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static Array1D_int LayerPoint(MaxLayersInConstruct, 0); // Pointer array which refers back to
+        static Array1D_int LayerPoint(Construction::MaxLayersInConstruct, 0); // Pointer array which refers back to
         int nLayer;
         int Loop;
         bool Found;
@@ -1709,20 +1700,20 @@ namespace DataHeatBalance {
             return NewConstrNum;
         }
 
-        Construct(ConstrNum).IsUsed = true;
+        dataConstruction.Construct(ConstrNum).IsUsed = true;
         nLayer = 0;
         LayerPoint = 0;
-        for (Loop = Construct(ConstrNum).TotLayers; Loop >= 1; --Loop) {
+        for (Loop = dataConstruction.Construct(ConstrNum).TotLayers; Loop >= 1; --Loop) {
             ++nLayer;
-            LayerPoint(nLayer) = Construct(ConstrNum).LayerPoint(Loop);
+            LayerPoint(nLayer) = dataConstruction.Construct(ConstrNum).LayerPoint(Loop);
         }
 
         // now, got thru and see if there is a match already....
         NewConstrNum = 0;
         for (Loop = 1; Loop <= TotConstructs; ++Loop) {
             Found = true;
-            for (nLayer = 1; nLayer <= MaxLayersInConstruct; ++nLayer) {
-                if (Construct(Loop).LayerPoint(nLayer) != LayerPoint(nLayer)) {
+            for (nLayer = 1; nLayer <= Construction::MaxLayersInConstruct; ++nLayer) {
+                if (dataConstruction.Construct(Loop).LayerPoint(nLayer) != LayerPoint(nLayer)) {
                     Found = false;
                     break;
                 }
@@ -1736,20 +1727,20 @@ namespace DataHeatBalance {
         // if need new one, bunch o stuff
         if (NewConstrNum == 0) {
             ++TotConstructs;
-            Construct.redimension(TotConstructs);
+            dataConstruction.Construct.redimension(TotConstructs);
             NominalRforNominalUCalculation.redimension(TotConstructs);
             NominalRforNominalUCalculation(TotConstructs) = 0.0;
             NominalU.redimension(TotConstructs);
             NominalU(TotConstructs) = 0.0;
             //  Put in new attributes
             NewConstrNum = TotConstructs;
-            Construct(NewConstrNum).IsUsed = true;
-            Construct(TotConstructs) = Construct(ConstrNum); // preserve some of the attributes.
+            dataConstruction.Construct(NewConstrNum).IsUsed = true;
+            dataConstruction.Construct(TotConstructs) = dataConstruction.Construct(ConstrNum); // preserve some of the attributes.
             // replace others...
-            Construct(TotConstructs).Name = "iz-" + Construct(ConstrNum).Name;
-            Construct(TotConstructs).TotLayers = Construct(ConstrNum).TotLayers;
-            for (nLayer = 1; nLayer <= MaxLayersInConstruct; ++nLayer) {
-                Construct(TotConstructs).LayerPoint(nLayer) = LayerPoint(nLayer);
+            dataConstruction.Construct(TotConstructs).Name = "iz-" + dataConstruction.Construct(ConstrNum).Name;
+            dataConstruction.Construct(TotConstructs).TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
+            for (nLayer = 1; nLayer <= Construction::MaxLayersInConstruct; ++nLayer) {
+                dataConstruction.Construct(TotConstructs).LayerPoint(nLayer) = LayerPoint(nLayer);
                 if (LayerPoint(nLayer) != 0) {
                     NominalRforNominalUCalculation(TotConstructs) += NominalR(LayerPoint(nLayer));
                 }
@@ -1915,7 +1906,7 @@ namespace DataHeatBalance {
         //  CALL CalcScreenTransmittance(0, Phi=0.0, Theta=0.0, ScreenNumber=ScNum)
         //   -OR-
         //  CALL same as above using the material structure
-        //  CALL CalcScreenTransmittance(0, Phi=0.0, Theta=0.0, ScreenNumber=Material(MatShade)%ScreenDataPtr)
+        //  CALL CalcScreenTransmittance(0, Phi=0.0, Theta=0.0, ScreenNumber=dataMaterial.Material(MatShade)%ScreenDataPtr)
         //   -OR-
         //  CALL with the surface number and relative azimuth and altitude angles
         //  CALL CalcScreenTransmittance(SurfaceNum, Phi=0.0, Theta=0.0)
@@ -2376,22 +2367,6 @@ namespace DataHeatBalance {
         return NominalUwithConvCoeffs;
     }
 
-    bool ConstructionData::isGlazingConstruction() const
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Simon Vidanovic
-        //       DATE WRITTEN   September 2016
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Commonly used routine in several places in EnergyPlus which examines if current
-        // construcdtion is glazing construction
-        auto const MaterialGroup = Material(LayerPoint(1)).Group;
-        return MaterialGroup == WindowGlass || MaterialGroup == Shade || MaterialGroup == Screen || MaterialGroup == WindowBlind ||
-               MaterialGroup == WindowSimpleGlazing;
-    }
-
     void SetFlagForWindowConstructionWithShadeOrBlindLayer()
     {
 
@@ -2407,8 +2382,6 @@ namespace DataHeatBalance {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::Construct;
-        using DataHeatBalance::Material;
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
@@ -2443,57 +2416,16 @@ namespace DataHeatBalance {
             if (SurfaceWindow(loopSurfNum).ShadedConstruction == 0) continue;
 
             ConstrNum = SurfaceWindow(loopSurfNum).ShadedConstruction;
-            if (Construct(ConstrNum).TypeIsWindow) {
-                NumLayers = Construct(ConstrNum).TotLayers;
+            if (dataConstruction.Construct(ConstrNum).TypeIsWindow) {
+                NumLayers = dataConstruction.Construct(ConstrNum).TotLayers;
                 for (Layer = 1; Layer <= NumLayers; ++Layer) {
-                    MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+                    MaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
                     if (MaterNum == 0) continue;
-                    if (Material(MaterNum).Group == Shade || Material(MaterNum).Group == WindowBlind)
+                    if (dataMaterial.Material(MaterNum).Group == Shade || dataMaterial.Material(MaterNum).Group == WindowBlind)
                         SurfaceWindow(loopSurfNum).HasShadeOrBlindLayer = true;
-                    ;
                 }
             }
         }
-    }
-
-    Real64 ConstructionData::setUserTemperatureLocationPerpendicular(Real64 userValue)
-    {
-        if (userValue < 0.0) {
-            ShowWarningError("Construction:InternalSource has a perpendicular temperature location parameter that is less than zero.");
-            ShowContinueError("Construction=" + this->Name + " has this error.  The parameter has been reset to 0.");
-            return 0.0;
-        } else if (userValue > 1.0) {
-            ShowWarningError("Construction:InternalSource has a perpendicular temperature location parameter that is greater than one.");
-            ShowContinueError("Construction=" + this->Name + " has this error.  The parameter has been reset to 1.");
-            return 1.0;
-        } else {    // Valid value between 0 and 1
-            return userValue;
-        }
-    }
-
-    void ConstructionData::setNodeSourceAndUserTemp(int &sourceNodeLocation,
-                                  int &userTempNodeLocation,
-                                  Array1D_int & Nodes,
-                                  int NumOfPerpendNodes)
-    {
-        sourceNodeLocation = 0;
-        userTempNodeLocation = 0;
-        if (!this->SourceSinkPresent) return;
-
-        for (int Layer = 1; Layer <= this->SourceAfterLayer; ++Layer) {
-            sourceNodeLocation += Nodes(Layer);
-        }
-        
-        if ((sourceNodeLocation > 0) && (this->SolutionDimensions > 1)) sourceNodeLocation = (sourceNodeLocation - 1) * NumOfPerpendNodes + 1;
-
-        for (int Layer = 1; Layer <= this->TempAfterLayer; ++Layer) {
-            userTempNodeLocation += Nodes(Layer);
-        }
-        
-        if ((userTempNodeLocation > 0) && (this->SolutionDimensions > 1))
-            userTempNodeLocation = (userTempNodeLocation - 1) * NumOfPerpendNodes
-                                    + round(this->userTemperatureLocationPerpendicular * (NumOfPerpendNodes - 1)) + 1;
-            
     }
 
 } // namespace DataHeatBalance
