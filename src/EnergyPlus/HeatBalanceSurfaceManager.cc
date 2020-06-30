@@ -4895,43 +4895,16 @@ namespace HeatBalanceSurfaceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Oct 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine puts the reporting part of the HBSurface Module in one area.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::CompLoadReportIsReq;
         using DataGlobals::NumOfTimeStepInHour;
         using DataSizing::CurOverallSimDay;
         using OutputReportTabular::feneSolarRadSeq;
         using OutputReportTabular::lightSWRadSeq;
         using SolarShading::ReportSurfaceShading;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SurfNum;
-        int ZoneNum;
-        static int TimeStepInDay(0);
 
         SumSurfaceHeatEmission = 0.0;
 
@@ -4940,7 +4913,7 @@ namespace HeatBalanceSurfaceManager {
         ReportSurfaceShading();
 
         // update inside face radiation reports
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             Real64 const surfaceArea(Surface(SurfNum).Area);
             // Tuned Replaced by one line form below for speed
             //			QdotRadNetSurfInRep( SurfNum ) = NetLWRadToSurf( SurfNum ) * surfaceArea;
@@ -4958,7 +4931,7 @@ namespace HeatBalanceSurfaceManager {
                 QRadLightsInReport(SurfNum) = QdotRadLightsInRep(SurfNum) * TimeStepZoneSec;
 
                 if (ZoneSizingCalc && CompLoadReportIsReq) {
-                    TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                    int TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
                     lightSWRadSeq(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadLightsInRep(SurfNum);
                     feneSolarRadSeq(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadSolarInRep(SurfNum);
                 }
@@ -5042,7 +5015,7 @@ namespace HeatBalanceSurfaceManager {
                 SumSurfaceHeatEmission += QHeatEmiReport(SurfNum) * TimeStepZoneSec;
             }
         } // loop over surfaces
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneOpaqSurfInsFaceCond(ZoneNum) >= 0.0) {
                 ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) = ZoneOpaqSurfInsFaceCond(ZoneNum);
                 ZnOpqSurfInsFaceCondGnRepEnrg(ZoneNum) = ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) * TimeStepZoneSec;
@@ -5872,7 +5845,6 @@ namespace HeatBalanceSurfaceManager {
         Real64 RhoAirZone;    // Zone moisture density for HAMT
         int OtherSideZoneNum; // Zone Number index for other side of an interzone partition HAMT
         static int WarmupSurfTemp;
-        static int TimeStepInDay(0); // time step number
 
         if (calcHeatBalanceInsideSurfFirstTime) {
             TempInsOld.allocate(TotSurfaces);
@@ -6598,7 +6570,7 @@ namespace HeatBalanceSurfaceManager {
             // sizing for both the normal and pulse cases so that load components can be derived later.
             if (ZoneSizingCalc && CompLoadReportIsReq) {
                 if (!WarmupFlag) {
-                    TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                    int TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
                     if (isPulseZoneSizing) {
                         OutputReportTabular::loadConvectedWithPulse(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
                     } else {
@@ -6717,7 +6689,6 @@ namespace HeatBalanceSurfaceManager {
         static bool MyEnvrnFlag(true);
         static int InsideSurfErrCount(0);
         static int WarmupSurfTemp;
-        static int TimeStepInDay(0); // time step number
 
         if (calcHeatBalanceInsideSurfCTFOnlyFirstTime) {
             TempInsOld.allocate(TotSurfaces);
@@ -7318,7 +7289,7 @@ namespace HeatBalanceSurfaceManager {
                 // sizing for both the normal and pulse cases so that load components can be derived later.
                 if (ZoneSizingCalc && CompLoadReportIsReq) {
                     if (!WarmupFlag) {
-                        TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                        int TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
                         if (isPulseZoneSizing) {
                             OutputReportTabular::loadConvectedWithPulse(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
                         } else {
@@ -7963,8 +7934,6 @@ namespace HeatBalanceSurfaceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   September 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         //   Gather values during sizing used for surface absorption factors
@@ -7987,15 +7956,12 @@ namespace HeatBalanceSurfaceManager {
         using OutputReportTabular::ITABSFseq;
         using OutputReportTabular::TMULTseq;
 
-        static int jSurf(0);
-        static int TimeStepInDay(0);
-
         if (CompLoadReportIsReq && !isPulseZoneSizing) {
-            TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+            int TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
             for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
                 TMULTseq(CurOverallSimDay, TimeStepInDay, enclosureNum) = TMULT(enclosureNum);
             }
-            for (jSurf = 1; jSurf <= TotSurfaces; ++jSurf) {
+            for (int jSurf = 1; jSurf <= TotSurfaces; ++jSurf) {
                 if (!Surface(jSurf).HeatTransSurf || Surface(jSurf).Zone == 0) continue; // Skip non-heat transfer surfaces
                 if (Surface(jSurf).Class == SurfaceClass_TDD_Dome) continue;             // Skip tubular daylighting device domes
                 ITABSFseq(CurOverallSimDay, TimeStepInDay, jSurf) = ITABSF(jSurf);
