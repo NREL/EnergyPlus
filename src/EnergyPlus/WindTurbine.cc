@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -707,7 +708,6 @@ namespace WindTurbine {
         std::string::size_type lnPtr; // scan pointer for Line input
         int mon;                      // loop counter
         bool wsStatFound;             // logical noting that wind stats were found
-        bool fileExists;              // true if Stat file exists
         bool warningShown;            // true if the <365 warning has already been shown
         std::string lineIn;
         Array1D<Real64> MonthWS(12);
@@ -717,12 +717,8 @@ namespace WindTurbine {
         // Estimate average annual wind speed once
         if (MyOneTimeFlag) {
             wsStatFound = false;
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(DataStringGlobals::inStatFileName, flags);
-                fileExists = flags.exists();
-            }
-            if (fileExists) {
+
+            if (FileSystem::fileExists(DataStringGlobals::inStatFileName)) {
                 statFile = GetNewUnitNumber();
                 ReadStatus = 0;
                 {

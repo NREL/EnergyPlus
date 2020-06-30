@@ -894,6 +894,9 @@ namespace UtilityRoutines {
         int UnitNumber;
         int ios;
 
+        // TODO: This function is only used for eplusout.err
+        // once that file is moved into the state object this function
+        // can be removed. Then we can remove gio::inquire
         for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
             {
                 IOFlags flags;
@@ -907,7 +910,9 @@ namespace UtilityRoutines {
                 not_special = name.compare(stdin_name) != 0;
                 not_special = not_special && (name.compare(stdout_name) != 0);
                 not_special = not_special && (name.compare(stderr_name) != 0);
-                if (not_special) ObjexxFCL::gio::close(UnitNumber);
+                if (not_special) {
+                    ObjexxFCL::gio::close(UnitNumber);
+                }
             }
         }
     }
@@ -1129,102 +1134,6 @@ namespace UtilityRoutines {
                                            // {100,101,102})
     }
 
-    int FindUnitNumber(std::string const &FileName) // File name to be searched.
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   September 1997, adapted from reference
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns a unit number for the file name that is either opened or exists.
-
-        // METHODOLOGY EMPLOYED:
-        // Use Inquire function to find out if proposed unit: exists or is opened.
-        // If not, can be used for a new unit number.
-
-        // REFERENCES:
-        // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
-        // Developed at Unicomp, Inc.
-        // Permission to use, copy, modify, and distribute this
-        // software is freely granted, provided that this notice
-        // is preserved.
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        int UnitNumber; // Unit number that should be used
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  Largest allowed unit number (or a large number, if none)
-        int const MaxUnitNumber(1000);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::string TestFileName; // File name returned from opened file
-        bool exists;              // True if file already exists
-        bool opened;              // True if file is open
-        int ios;                  // Status indicator from INQUIRE intrinsic
-
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(FileName, flags);
-            exists = flags.exists();
-            opened = flags.open();
-            ios = flags.ios();
-        }
-        if (!opened) {
-            UnitNumber = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.POSITION("APPEND");
-                ObjexxFCL::gio::open(UnitNumber, FileName, flags);
-                ios = flags.ios();
-            }
-            if (ios != 0) {
-                DisplayString("FindUnitNumber: Could not open file \"" + FileName + "\" for append.");
-            }
-        } else {
-            std::string::size_type const FileNameLength = len(FileName);
-            std::string::size_type TestFileLength;
-            std::string::size_type Pos; // Position pointer
-            for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-                // Skip preassigned units - ObjexxFCL::gio::inquire breaks std::cout on Windows - these units are assigned in objexx\GlobalStreams
-                // constructor
-                if ((UnitNumber == 0) || (UnitNumber == 5) || (UnitNumber == 6) || (UnitNumber == 100) || (UnitNumber == 101) ||
-                    (UnitNumber == 102)) {
-                    continue;
-                }
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::inquire(UnitNumber, flags);
-                    TestFileName = flags.name();
-                    opened = flags.open();
-                }
-                //  Powerstation returns just file name
-                //  DVF (Digital Fortran) returns whole path
-                TestFileLength = len(TestFileName);
-                Pos = index(TestFileName, FileName);
-                if (Pos != std::string::npos) {
-                    //  Must be the last part of the file
-                    if (Pos + FileNameLength == TestFileLength) break;
-                }
-            }
-        }
-
-        return UnitNumber;
-    }
 
     void ConvertCaseToUpper(std::string const &InputString, // Input string
                             std::string &OutputString       // Output string (in UpperCase)

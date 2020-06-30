@@ -72,6 +72,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
@@ -5276,12 +5277,8 @@ namespace WeatherManager {
 
         // FLOW:
 
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(state.files.inputWeatherFileName.fileName, flags);
-            WeatherFileExists = flags.exists();
-        }
-
+        // Global variable used for other checks
+        WeatherFileExists = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
         if (WeatherFileExists) {
             OpenEPlusWeatherFile(state, ErrorsFound, true);
         }
@@ -10525,19 +10522,9 @@ namespace WeatherManager {
         bool epwHasLeapYear(false);
 
         if (!OADryBulbAverage.OADryBulbWeatherDataProcessed) {
-            {
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::inquire(DataStringGlobals::inStatFileName, flags);
-                    statFileExists = flags.exists();
-                }
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::inquire(ioFiles.inputWeatherFileName.fileName, flags);
-                    epwFileExists = flags.exists();
-                }
-                readStat = 0;
-            }
+            statFileExists = FileSystem::fileExists(DataStringGlobals::inStatFileName);
+            epwFileExists = FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName);
+
             readStat = 0;
             if (statFileExists) {
                 statFile = GetNewUnitNumber();

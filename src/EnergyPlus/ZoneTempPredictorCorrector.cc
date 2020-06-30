@@ -77,6 +77,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
@@ -2380,8 +2381,6 @@ namespace ZoneTempPredictorCorrector {
         Real64 dryBulb;
         Real64 avgDryBulb;
 
-        bool epwFileExists = false;
-
         int readStat;
         int calcEndDay;
         int calcStartDayASH;
@@ -2394,13 +2393,7 @@ namespace ZoneTempPredictorCorrector {
         Array1D<Real64> dailyDryTemp(NumDaysInYear, 0.0);
 
         readStat = 0;
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(ioFiles.inputWeatherFileName.fileName, flags);
-            epwFileExists = flags.exists();
-        }
-
-        if (epwFileExists) {
+        if (FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName)) {
             // Read hourly dry bulb temperature first
             auto epwFile = ioFiles.inputWeatherFileName.open("CalcThermalComfortAdaptive");
             for (i = 1; i <= 9; ++i) { // Headers

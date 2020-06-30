@@ -69,6 +69,7 @@ extern "C" {
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/ExternalInterface.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -402,11 +403,7 @@ namespace ExternalInterface {
         // Try to establish socket connection. This is needed if Ptolemy started E+,
         //  but E+ had an error before the call to InitExternalInterface.
 
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(socCfgFilNam, flags);
-            fileExist = flags.exists();
-        }
+        fileExist = FileSystem::fileExists(socCfgFilNam);
 
         if ((socketFD == -1) && fileExist) {
             socketFD = establishclientsocket(socCfgFilNam.c_str());
@@ -488,10 +485,6 @@ namespace ExternalInterface {
         static int nInpVar;       // Number of input values (ExternalInterface -> E+)
         int retVal;               // Return value of function call, used for error handling
         int mainVersion;          // The version number
-        bool socFileExist;        // Set to true if socket configuration
-        // file exists
-        bool simFileExist; // Set to true if simulation configuration
-        // file exists
 
         if (firstCall) {
             DisplayString("ExternalInterface initializes.");
@@ -508,12 +501,7 @@ namespace ExternalInterface {
             }
 
             // Get port number
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(socCfgFilNam, flags);
-                socFileExist = flags.exists();
-            }
-            if (socFileExist) {
+            if (FileSystem::fileExists(socCfgFilNam)) {
                 socketFD = establishclientsocket(socCfgFilNam.c_str());
                 if (socketFD < 0) {
                     ShowSevereError("ExternalInterface: Could not open socket. File descriptor = " + TrimSigDigits(socketFD) + '.');
@@ -542,12 +530,7 @@ namespace ExternalInterface {
 
             // Get input and output variables for EnergyPlus in sequence
             // Check if simCfgFilNam exists.
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(simCfgFilNam, flags);
-                simFileExist = flags.exists();
-            }
-            if (simFileExist) {
+            if (FileSystem::fileExists(simCfgFilNam)) {
 
                 // preprocess the strings into char vectors before making the library call
                 auto xmlStrOutTypArr(getCharArrayFromString(xmlStrOutTyp));

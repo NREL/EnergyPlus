@@ -56,6 +56,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include "FileSystem.hh"
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -2620,8 +2621,6 @@ namespace ThermalComfort {
         Real64 tComf;
         Real64 numOccupants;
         int statFile;
-        bool statFileExists;
-        bool epwFileExists;
         static bool useStatData(false);
         int readStat;
         int jStartDay;
@@ -2648,16 +2647,9 @@ namespace ThermalComfort {
         }
 
         if (initiate && weathersimulation) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(DataStringGlobals::inStatFileName, flags);
-                statFileExists = flags.exists();
-            }
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(ioFiles.inputWeatherFileName.fileName, flags);
-                epwFileExists = flags.exists();
-            }
+            const bool statFileExists = FileSystem::fileExists(DataStringGlobals::inStatFileName);
+            const bool epwFileExists = FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName);
+
             readStat = 0;
             if (statFileExists) {
                 statFile = GetNewUnitNumber();
@@ -2894,7 +2886,6 @@ namespace ThermalComfort {
         Real64 tComfLow;
         static Real64 runningAverageCEN(0.0);
         Real64 numOccupants;
-        bool epwFileExists;
         static bool useEpwData(false);
         static bool firstDaySet(false); // first day is set with initiate -- so do not update
         int readStat;
@@ -2921,11 +2912,7 @@ namespace ThermalComfort {
         }
 
         if (initiate && weathersimulation) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(ioFiles.inputWeatherFileName.fileName, flags);
-                epwFileExists = flags.exists();
-            }
+            const bool epwFileExists = FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName);
             readStat = 0;
             if (epwFileExists) {
                 auto epwFile = ioFiles.inputWeatherFileName.open("CalcThermalComfortAdaptiveCEN15251");

@@ -241,7 +241,6 @@ namespace DataSystemVariables {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool FileExist(false);    // initialize to false, then override to true if present
         static bool firstTime(true);
         std::string InputFileName; // save for changing out path characters
         std::string::size_type pos;
@@ -264,12 +263,7 @@ namespace DataSystemVariables {
         InputFileName = originalInputFileName;
         makeNativePath(InputFileName);
 
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(InputFileName)) {
             FileFound = true;
             CheckedFileName = InputFileName;
             print(ioFiles.audit, "{}={}\n", "found (user input)", getAbsolutePath(CheckedFileName));
@@ -279,12 +273,7 @@ namespace DataSystemVariables {
         }
 
         // Look relative to input file path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(DataStringGlobals::inputDirPathName + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(DataStringGlobals::inputDirPathName + InputFileName)) {
             FileFound = true;
             CheckedFileName = DataStringGlobals::inputDirPathName + InputFileName;
             print(ioFiles.audit, "{}={}\n", "found (input file)", getAbsolutePath(CheckedFileName));
@@ -294,12 +283,7 @@ namespace DataSystemVariables {
         }
 
         // Look relative to input path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(envinputpath1 + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(envinputpath1 + InputFileName)) {
             FileFound = true;
             CheckedFileName = envinputpath1 + InputFileName;
             print(ioFiles.audit, "{}={}\n", "found (epin)", getAbsolutePath(CheckedFileName));
@@ -309,12 +293,7 @@ namespace DataSystemVariables {
         }
 
         // Look relative to input path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(envinputpath2 + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(envinputpath2 + InputFileName)) {
             FileFound = true;
             CheckedFileName = envinputpath2 + InputFileName;
             print(ioFiles.audit, "{}={}\n", "found (input_path)", getAbsolutePath(CheckedFileName));
@@ -324,12 +303,7 @@ namespace DataSystemVariables {
         }
 
         // Look relative to program path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(envprogrampath + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(envprogrampath + InputFileName)) {
             FileFound = true;
             CheckedFileName = envprogrampath + InputFileName;
             print(ioFiles.audit, "{}={}\n", "found (program_path)", getAbsolutePath(CheckedFileName));
@@ -341,12 +315,7 @@ namespace DataSystemVariables {
         if (!TestAllPaths) return;
 
         // Look relative to current working folder
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(CurrentWorkingFolder + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(CurrentWorkingFolder + InputFileName)) {
             FileFound = true;
             CheckedFileName = CurrentWorkingFolder + InputFileName;
             print(ioFiles.audit, "{}={}\n", "found (CWF)", getAbsolutePath(CheckedFileName));
@@ -356,12 +325,7 @@ namespace DataSystemVariables {
         }
 
         // Look relative to program path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(ProgramPath + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(ProgramPath + InputFileName)) {
             FileFound = true;
             CheckedFileName = ProgramPath + InputFileName;
             print(ioFiles.audit, "{}={}\n", "found (program path - ini)", getAbsolutePath(CheckedFileName));

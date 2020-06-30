@@ -95,6 +95,7 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -5833,11 +5834,7 @@ namespace OutputReportTabular {
         bool coolingDesignlinepassed;
         bool desConditionlinepassed;
 
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(DataStringGlobals::inStatFileName, flags);
-            fileExists = flags.exists();
-        }
+        fileExists = FileSystem::fileExists(DataStringGlobals::inStatFileName);
         readStat = 0;
         isASHRAE = false;
         iscalc = false;

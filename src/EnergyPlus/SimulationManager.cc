@@ -103,6 +103,7 @@ extern "C" {
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
@@ -1474,11 +1475,8 @@ namespace SimulationManager {
         NumRunPeriodDesign = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays") +
                              inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileConditionType");
         NumSizingDays = NumDesignDays + NumRunPeriodDesign;
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(ioFiles.inputWeatherFileName.fileName, flags);
-            WeatherFileAttached = flags.exists();
-        }
+
+        WeatherFileAttached = FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName);
 
         if (RunControlInInput) {
             if (DoZoneSizing) {
