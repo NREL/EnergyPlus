@@ -666,6 +666,12 @@ namespace FanCoilUnits {
             } else {
                 if (!UtilityRoutines::SameString(FanCoil(FanCoilNum).FanType, "Fan:SystemModel")) {
                     GetFanType(state.fans, FanCoil(FanCoilNum).FanName, FanCoil(FanCoilNum).FanType_Num, errFlag, CurrentModuleObject, FanCoil(FanCoilNum).Name);
+                    FanCoil(FanCoilNum).fanAvailSchIndex = Fans::GetFanAvailSchPtr(state.fans, FanCoil(FanCoilNum).FanType, FanCoil(FanCoilNum).FanName, errFlag);
+                    if (errFlag) {
+                        ShowContinueError("Occurs in " + CurrentModuleObject + " = " + FanCoil(FanCoilNum).Name);
+                        ErrorsFound = true;
+                        errFlag = false;
+                    }
                     {
                         auto const SELECT_CASE_var(FanCoil(FanCoilNum).FanType_Num);
                         if ((SELECT_CASE_var == FanType_SimpleConstVolume) || (SELECT_CASE_var == FanType_SimpleVAV) ||
@@ -711,6 +717,7 @@ namespace FanCoilUnits {
                     FanCoil(FanCoilNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(FanCoil(FanCoilNum).FanName));           // call constructor
                     FanCoil(FanCoilNum).FanIndex = HVACFan::getFanObjectVectorIndex(FanCoil(FanCoilNum).FanName); // zero-based
+                    FanCoil(FanCoilNum).fanAvailSchIndex = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->availSchedIndex;
                     FanCoil(FanCoilNum).FanAirVolFlow = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->designAirVolFlowRate;
                     // Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
                     if (FanCoil(FanCoilNum).MaxAirVolFlow > FanCoil(FanCoilNum).FanAirVolFlow && FanCoil(FanCoilNum).FanAirVolFlow != AutoSize) {
@@ -1308,7 +1315,8 @@ namespace FanCoilUnits {
             }
         }
         // Set the inlet node mass flow rate
-        if ((GetCurrentScheduleValue(FanCoil(FanCoilNum).SchedPtr) > 0.0 || DataHVACGlobals::ZoneCompTurnFansOn) &&
+        if (((GetCurrentScheduleValue(FanCoil(FanCoilNum).SchedPtr) > 0.0 && GetCurrentScheduleValue(FanCoil(FanCoilNum).fanAvailSchIndex) > 0.0) ||
+             DataHVACGlobals::ZoneCompTurnFansOn) &&
             !DataHVACGlobals::ZoneCompTurnFansOff) {
             Node(InletNode).MassFlowRate = FanCoil(FanCoilNum).MaxAirMassFlow;
             Node(InletNode).MassFlowRateMaxAvail = Node(InletNode).MassFlowRate;
@@ -3542,7 +3550,8 @@ namespace FanCoilUnits {
 
         // Assume the unit is able to vary the flow. A cycling unit is treated as
         // if it were variable flow, with the flow being the averaqe flow over the time step
-        if ((GetCurrentScheduleValue(FanCoil(FanCoilNum).SchedPtr) > 0.0 || DataHVACGlobals::ZoneCompTurnFansOn) &&
+        if (((GetCurrentScheduleValue(FanCoil(FanCoilNum).SchedPtr) > 0.0 && GetCurrentScheduleValue(FanCoil(FanCoilNum).fanAvailSchIndex) > 0.0) ||
+             DataHVACGlobals::ZoneCompTurnFansOn) &&
             !DataHVACGlobals::ZoneCompTurnFansOff) {
             if (FanCoil(FanCoilNum).CapCtrlMeth_Num != CCM_ConsFanVarFlow) {
                 if (FanCoil(FanCoilNum).CapCtrlMeth_Num != CCM_ASHRAE) Node(InletNode).MassFlowRate = PartLoad * Node(InletNode).MassFlowRateMax;
