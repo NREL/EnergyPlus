@@ -673,7 +673,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     Fans::GetFanInput(state.fans);
     state.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
@@ -696,7 +696,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
 
     DataGlobals::BeginEnvrnFlag = true;
     FirstHVACIteration = true;
-    PoweredInductionUnits::InitPIU(PIUNum, FirstHVACIteration);
+    PoweredInductionUnits::InitPIU(state.dataBranchInputManager, PIUNum, FirstHVACIteration);
     Fans::InitFan(state, 1, FirstHVACIteration);
     DataGlobals::BeginEnvrnFlag = false;
     FirstHVACIteration = false;
