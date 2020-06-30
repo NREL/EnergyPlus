@@ -131,6 +131,7 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
 
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfWeek = 1;
+    DataEnvironment::DayOfWeekTomorrow = 2;
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 1;
 
@@ -749,4 +750,57 @@ TEST_F(EnergyPlusFixture, ScheduleFileColumnSeparator)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+}
+
+TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
+{
+    std::string const idf_objects = delimited_string({
+        "Schedule:Compact,",
+        "  Electricity Season Schedule,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  1;                       !- Field 12",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataGlobals::NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
+    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    DataGlobals::TimeStepZone = 0.25;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
+
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+
+    DataEnvironment::Month = 5;
+    DataEnvironment::DayOfMonth = 31;
+    DataGlobals::HourOfDay = 24;
+    DataEnvironment::DayOfWeek = 4;
+    DataEnvironment::DayOfWeekTomorrow = 5;
+    DataEnvironment::HolidayIndex = 0;
+    DataGlobals::TimeStep = 1;
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+
+    DataEnvironment::DSTIndicator = 0; // DST IS OFF
+    ScheduleManager::UpdateScheduleValues();
+    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+    EXPECT_EQ(1.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(1));
+
+    DataEnvironment::DSTIndicator = 1; // DST IS ON
+    ScheduleManager::UpdateScheduleValues();
+    // Since DST is on, you're actually on the next day, on 6/1 at 1:00
+    // so it **should** return 3.0
+    EXPECT_EQ(3.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(3.0, ScheduleManager::GetCurrentScheduleValue(1));
+    EXPECT_EQ(3.0, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
 }

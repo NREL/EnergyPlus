@@ -57,6 +57,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -75,6 +76,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -182,19 +184,19 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
 
     int VBMatNum(0);
     for (int i = 1; i <= 4; i++) {
-        if (DataHeatBalance::Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
+        if (dataMaterial.Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
     }
     EXPECT_EQ(1, DataHeatBalance::TotBlindsEQL);
-    EXPECT_EQ(DataHeatBalance::Material(VBMatNum).Group, DataHeatBalance::BlindEquivalentLayer);
-    EXPECT_EQ(DataHeatBalance::Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscVBNOBM);
+    EXPECT_EQ(dataMaterial.Material(VBMatNum).Group, DataHeatBalance::BlindEquivalentLayer);
+    EXPECT_EQ(dataMaterial.Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscVBNOBM);
 
     int ConstrNum = 1;
     int EQLNum = 0;
     InitEquivalentLayerWindowCalculations();
-    EQLNum = DataHeatBalance::Construct(ConstrNum).EQLConsPtr;
+    EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
     EXPECT_EQ(CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL, WindowEquivalentLayer::lscVBNOBM);
 }
 
@@ -537,7 +539,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     }
     // get venetian blind material index
     for (int i = 1; i <= 7; i++) {
-        if (DataHeatBalance::Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
+        if (dataMaterial.Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
@@ -545,7 +547,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     // get equivalent layer window optical properties
     CalcEQLOpticalProperty(SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
     // check that the slat angle control type is set to MaximizeSolar
-    EXPECT_EQ(DataHeatBalance::Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscVBPROF);
+    EXPECT_EQ(dataMaterial.Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscVBPROF);
     // check the slat angle
     EXPECT_NEAR(-71.0772, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
     // check that for MaximizeSolar slat angle control, the slat angle = -ve vertical profile angle
@@ -892,7 +894,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     }
     // get venetian blind material index
     for (int i = 1; i <= 7; i++) {
-        if (DataHeatBalance::Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
+        if (dataMaterial.Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
@@ -900,7 +902,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     // calc window optical property
     CalcEQLOpticalProperty(SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
     // check VB slat angle for BlockBeamSolar slat angle control
-    EXPECT_EQ(DataHeatBalance::Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscVBNOBM);
+    EXPECT_EQ(dataMaterial.Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscVBNOBM);
     // check the VB slat angle
     EXPECT_NEAR(18.9228, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
     // check that for BlockBeamSolar slat angle control, the slat angle = 90 - ProfAngVer
@@ -933,13 +935,13 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
     HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotMaterials);
-    EXPECT_EQ(DataHeatBalance::Material(1).Group, DataHeatBalance::WindowSimpleGlazing);
+    EXPECT_EQ(dataMaterial.Material(1).Group, DataHeatBalance::WindowSimpleGlazing);
     // get construction returns error forund true due to invalid layer
     GetConstructData(ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotConstructs);
     EXPECT_EQ(1, DataWindowEquivalentLayer::TotWinEquivLayerConstructs);
-    EXPECT_TRUE(DataHeatBalance::Construct(1).TypeIsWindow);
-    EXPECT_TRUE(DataHeatBalance::Construct(1).WindowTypeEQL);
+    EXPECT_TRUE(dataConstruction.Construct(1).TypeIsWindow);
+    EXPECT_TRUE(dataConstruction.Construct(1).WindowTypeEQL);
     EXPECT_TRUE(ErrorsFound); // error found due to invalid layer
 }
 
@@ -1950,21 +1952,21 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     }
     // get venetian blind material index
     for (int i = 1; i <= DataHeatBalance::TotMaterials; i++) {
-        if (DataHeatBalance::Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
+        if (dataMaterial.Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
     }
     // get equivalent layer window contruction index
     for (int ConstrPtr = 1; ConstrPtr <= DataHeatBalance::TotConstructs; ++ConstrPtr) {
-        if (DataHeatBalance::Construct(ConstrPtr).WindowTypeEQL) {
+        if (dataConstruction.Construct(ConstrPtr).WindowTypeEQL) {
             ConstrNum = ConstrPtr;
         }
     }
     // check VB slat angle control for FixedSlatAngle
-    EXPECT_EQ(DataHeatBalance::Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscNONE);
+    EXPECT_EQ(dataMaterial.Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscNONE);
 
-    EQLNum = DataHeatBalance::Construct(ConstrNum).EQLConsPtr;
+    EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
     // check number of solid layers
     EXPECT_EQ(CFS(EQLNum).NL, 3);
     // check optical and thermal property of the VB layer (Inside Layer)
@@ -1973,7 +1975,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLF, 0.90);
     EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLB, 0.90);
     // check inside face effective emissivity
-    EXPECT_NEAR(DataHeatBalance::Construct(ConstrNum).InsideAbsorpThermal, 0.91024, 0.00001);
+    EXPECT_NEAR(dataConstruction.Construct(ConstrNum).InsideAbsorpThermal, 0.91024, 0.00001);
     // for fixed slate angle the emissivity remains the same
     EXPECT_NEAR(EQLWindowInsideEffectiveEmiss(ConstrNum), 0.91024, 0.00001);
 }
