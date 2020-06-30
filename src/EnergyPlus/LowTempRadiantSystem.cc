@@ -368,7 +368,6 @@ namespace LowTempRadiantSystem {
         using namespace DataSurfaceLists;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MinThrottlingRange(0.0); // Smallest throttling range allowed in degrees Celsius
         static std::string const RoutineName("GetLowTempRadiantSystem: "); // include trailing blank space
         static std::string const Off("Off");
         static std::string const SimpleOff("SimpleOff");
@@ -664,11 +663,6 @@ namespace LowTempRadiantSystem {
             }
 
             thisRadSys.HotThrottlRange = Numbers(7);
-            if (thisRadSys.HotThrottlRange < MinThrottlingRange) {
-                ShowWarningError("ZoneHVAC:LowTemperatureRadiant:VariableFlow: Heating throttling range too small, reset to 0");
-                ShowContinueError("Occurs in Radiant System=" + thisRadSys.Name);
-                thisRadSys.HotThrottlRange = MinThrottlingRange;
-            }
 
             thisRadSys.HotSetptSched = Alphas(9);
             thisRadSys.HotSetptSchedPtr = GetScheduleIndex(Alphas(9));
@@ -760,11 +754,6 @@ namespace LowTempRadiantSystem {
             }
 
             thisRadSys.ColdThrottlRange = Numbers(12);
-            if (thisRadSys.ColdThrottlRange < MinThrottlingRange) {
-                ShowWarningError("ZoneHVAC:LowTemperatureRadiant:VariableFlow: Cooling throttling range too small, reset to 0");
-                ShowContinueError("Occurs in Radiant System=" + thisRadSys.Name);
-                thisRadSys.ColdThrottlRange = MinThrottlingRange;
-            }
 
             thisRadSys.ColdSetptSched = Alphas(13);
             thisRadSys.ColdSetptSchedPtr = GetScheduleIndex(Alphas(13));
@@ -1225,11 +1214,6 @@ namespace LowTempRadiantSystem {
             thisElecSys.ControlType = thisElecSys.processRadiantSystemControlInput(Alphas(6),cAlphaFields(6));
 
             thisElecSys.ThrottlRange = Numbers(4);
-            if (thisElecSys.ThrottlRange < MinThrottlingRange) {
-                ShowWarningError(cNumericFields(4) + " out of range, reset to 0");
-                ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
-                thisElecSys.ThrottlRange = MinThrottlingRange;
-            }
 
             thisElecSys.SetptSched = Alphas(7);
             thisElecSys.SetptSchedPtr = GetScheduleIndex(Alphas(7));
