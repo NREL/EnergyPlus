@@ -1266,14 +1266,14 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     SplitterComponent::GetSplitterInput();
     BranchInputManager::GetMixerInput(state.dataBranchInputManager);
     BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
-    GetZoneAirLoopEquipment();
+    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     SingleDuct::GetSysInput(state);
 
     // Get Air Loop HVAC Data
     SimAirServingZones::GetAirPathData(state);
-    SimAirServingZones::InitAirLoops(state, state.dataZonePlenum, FirstHVACIteration);
+    SimAirServingZones::InitAirLoops(state, FirstHVACIteration);
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.outputFiles);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     CurDeadBandOrSetback.allocate(2);
     CurDeadBandOrSetback(1) = false;

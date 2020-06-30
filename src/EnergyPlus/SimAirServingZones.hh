@@ -57,8 +57,9 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct EnergyPlusData;
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZonePlenumData;
 
 namespace SimAirServingZones {
 
@@ -139,7 +140,7 @@ namespace SimAirServingZones {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitAirLoops(EnergyPlusData &state, ZonePlenumData &dataZonePlenum, bool const FirstHVACIteration); // TRUE if first full HVAC iteration in an HVAC timestep
+    void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration); // TRUE if first full HVAC iteration in an HVAC timestep
 
     void ConnectReturnNodes(ZonePlenumData &dataZonePlenum);
 

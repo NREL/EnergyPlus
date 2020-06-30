@@ -51,19 +51,19 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataCostEstimate.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -90,7 +90,6 @@ namespace CostEstimateManager {
     // Create report using utility subroutines taken from OutputReportTabular (by J.Glazer)
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::KickOffSimulation;
     using namespace DataCostEstimate;
 
@@ -249,7 +248,6 @@ namespace CostEstimateManager {
         // Calculates the Cost Estimate based on inputs.
 
         // Using/Aliasing
-        using DataHeatBalance::Construct;
         using DataHeatBalance::Zone;
         using DataPhotovoltaics::iSimplePVModel;
         using DataPhotovoltaics::PVarray;
@@ -297,7 +295,7 @@ namespace CostEstimateManager {
                     }
 
                     ThisConstructStr = CostLineItem(Item).ParentObjName;
-                    ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, Construct);
+                    ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, dataConstruction.Construct);
                     if (ThisConstructID == 0) { // do any surfaces have the specified construction? If not issue warning.
                         ShowWarningError("ComponentCost:LineItem: \"" + CostLineItem(Item).LineName + "\" Construction=\"" +
                                          CostLineItem(Item).ParentObjName + "\", no surfaces have the Construction specified");
@@ -528,7 +526,6 @@ namespace CostEstimateManager {
         // Calculates the Cost Estimate based on inputs.
 
         // Using/Aliasing
-        using DataHeatBalance::Construct;
         using DataHeatBalance::Lights;
         using DataHeatBalance::Zone;
         using DataPhotovoltaics::iSimplePVModel;
@@ -575,7 +572,7 @@ namespace CostEstimateManager {
                 } else if (SELECT_CASE_var == "CONSTRUCTION") {
 
                     ThisConstructStr = CostLineItem(Item).ParentObjName;
-                    ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, Construct);
+                    ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, dataConstruction.Construct);
                     // need to determine unique surfacs... some surfaces are shared by zones and hence doubled
                     uniqueSurfMask.dimension(TotSurfaces, true); // init to true and change duplicates to false
                     SurfMultipleARR.dimension(TotSurfaces, 1.0);
