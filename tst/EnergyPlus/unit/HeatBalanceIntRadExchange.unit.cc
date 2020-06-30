@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -59,7 +59,9 @@
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::HeatBalanceIntRadExchange;
 
@@ -291,8 +293,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     bool DidMIChange;
     int SurfNum;
 
-    DataHeatBalance::Construct.allocate(1);
-    DataHeatBalance::Material.allocate(1);
+    dataConstruction.Construct.allocate(1);
+    dataMaterial.Material.allocate(1);
     DataSurfaces::Surface.allocate(1);
 
     SurfNum = 1;
@@ -301,11 +303,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     DataSurfaces::Surface(1).MovInsulIntPresentPrevTS = false;
     DataSurfaces::Surface(1).Construction = 1;
     DataSurfaces::Surface(1).MaterialMovInsulInt = 1;
-    DataHeatBalance::Construct(1).InsideAbsorpThermal = 0.9;
-    DataHeatBalance::Material(1).AbsorpThermal = 0.5;
-    DataHeatBalance::Material(1).Resistance = 1.25;
+    dataConstruction.Construct(1).InsideAbsorpThermal = 0.9;
+    dataMaterial.Material(1).AbsorpThermal = 0.5;
+    dataMaterial.Material(1).Resistance = 1.25;
     DataSurfaces::Surface(1).SchedMovInsulInt = -1;
-    DataHeatBalance::Material(1).AbsorpSolar = 0.25;
+    dataMaterial.Material(1).AbsorpSolar = 0.25;
 
     // Test 1: Movable insulation present but wasn't in previous time step, also movable insulation emissivity different than base construction
     //         This should result in a true value from the algorithm which will cause interior radiant exchange matrices to be recalculated
@@ -320,7 +322,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     // Test 2: Movable insulation present but wasn't in previous time step.  However, the emissivity of the movable insulation and that of the
     // 		   construction are the same so nothing has actually changed.  This should result in a false value.
     DataSurfaces::Surface(1).MovInsulIntPresentPrevTS = false;
-    DataHeatBalance::Material(1).AbsorpThermal = DataHeatBalance::Construct(1).InsideAbsorpThermal;
+    dataMaterial.Material(1).AbsorpThermal = dataConstruction.Construct(1).InsideAbsorpThermal;
     HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(DidMIChange, SurfNum);
     EXPECT_TRUE(!DidMIChange);
 }
