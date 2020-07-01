@@ -63,12 +63,14 @@ namespace EnergyPlus {
     };
 
     enum class AutoSizingResultType {
-        NoError,
-        ErrorType1
+        NoError,    // no errors found
+        ErrorType1, // sizing error
+        ErrorType2  // uninitialized sizing type
     };
 
     struct BaseSizer {
 
+        bool isInitialized = false;
         AutoSizingType sizingType = AutoSizingType::Unknown;
         std::string sizingString = "";
         Real64 originalValue = 0.0;

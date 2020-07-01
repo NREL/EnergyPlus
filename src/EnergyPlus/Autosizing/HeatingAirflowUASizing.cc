@@ -61,86 +61,71 @@ namespace EnergyPlus {
 
     EnergyPlus::AutoSizingResultType HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue) {
         EnergyPlus::AutoSizingResultType errorsFound = EnergyPlus::AutoSizingResultType::NoError;
-        this->preSize(state, _originalValue);
-        if (this->curZoneEqNum > 0) {
-            if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
-                if (this->printWarningFlag && this->originalValue > 0.0) {
-                    HeatingAirflowUASizer::reportSizerOutput(
-                            this->compType, this->compName, "User-Specified " + this->sizingString,
-                            _originalValue);
-                }
-                this->autoSizedValue = _originalValue;
-            } else {
-                if (this->termUnitSingDuct && (this->curTermUnitSizingNum > 0)) {
-                    this->autoSizedValue = DataEnvironment::StdRhoAir *
-                                           this->termUnitSizing(this->curTermUnitSizingNum).AirVolFlow;
-                } else if ((this->termUnitPIU || this->termUnitIU) &&
-                           (this->curTermUnitSizingNum > 0)) {
-                    this->autoSizedValue = DataEnvironment::StdRhoAir *
-                                           this->termUnitSizing(this->curTermUnitSizingNum).AirVolFlow *
-                                           this->termUnitSizing(this->curTermUnitSizingNum).ReheatAirFlowMult;
-                } else if (this->zoneEqFanCoil) {
-                    this->autoSizedValue =
-                            DataEnvironment::StdRhoAir * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
-                } else if (this->otherEqType) {
-                    if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
-                        this->autoSizedValue =
-                                this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
-                    } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
-                        this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow *
-                                               DataEnvironment::StdRhoAir;
-                    } else {
-                        this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
-                    }
+        if (this->isInitialized) {
+            this->preSize(state, _originalValue);
+            if (this->curZoneEqNum > 0) {
+                if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
+                    this->autoSizedValue = _originalValue;
                 } else {
-                    errorsFound = AutoSizingResultType::ErrorType1;
-                }
-            }
-        } else if (this->curSysNum > 0) {
-            if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
-                if (this->printWarningFlag && this->originalValue > 0.0) {
-                    HeatingAirflowUASizer::reportSizerOutput(
-                            this->compType, this->compName, "User-Specified " + this->sizingString,
-                            _originalValue);
-                }
-                this->autoSizedValue = _originalValue;
-            } else {
-                if (this->curOASysNum > 0) {
-                    if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                        this->autoSizedValue = this->airloopDOAS[this->outsideAirSys(
-                                this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
-                                               DataEnvironment::StdRhoAir;
+                    if (this->termUnitSingDuct && (this->curTermUnitSizingNum > 0)) {
+                        this->autoSizedValue = DataEnvironment::StdRhoAir * this->termUnitSizing(this->curTermUnitSizingNum).AirVolFlow;
+                    } else if ((this->termUnitPIU || this->termUnitIU) && (this->curTermUnitSizingNum > 0)) {
+                        this->autoSizedValue = DataEnvironment::StdRhoAir * this->termUnitSizing(this->curTermUnitSizingNum).AirVolFlow *
+                                               this->termUnitSizing(this->curTermUnitSizingNum).ReheatAirFlowMult;
+                    } else if (this->zoneEqFanCoil) {
+                        this->autoSizedValue = DataEnvironment::StdRhoAir * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
+                    } else if (this->otherEqType) {
+                        if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
+                            this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
+                        } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
+                            this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
+                        } else {
+                            this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
+                        }
                     } else {
-                        this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
+                        errorsFound = AutoSizingResultType::ErrorType1;
                     }
+                }
+            } else if (this->curSysNum > 0) {
+                if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+                    this->autoSizedValue = _originalValue;
                 } else {
-                    if (this->curDuctType == DataHVACGlobals::Main) {
-                        if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0) {
+                    if (this->curOASysNum > 0) {
+                        if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                             this->autoSizedValue =
-                                    this->finalSysSizing(this->curSysNum).SysAirMinFlowRat *
-                                    this->finalSysSizing(this->curSysNum).DesMainVolFlow;
+                                this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow / DataEnvironment::StdRhoAir;
+                        } else {
+                            this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
+                        }
+                    } else {
+                        if (this->curDuctType == DataHVACGlobals::Main) {
+                            if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0) {
+                                this->autoSizedValue =
+                                    this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesMainVolFlow;
+                            } else {
+                                this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
+                            }
+                        } else if (this->curDuctType == DataHVACGlobals::Cooling) {
+                            if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0) {
+                                this->autoSizedValue =
+                                    this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
+                            } else {
+                                this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
+                            }
+                        } else if (this->curDuctType == DataHVACGlobals::Heating) {
+                            this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
                         } else {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                         }
-                    } else if (this->curDuctType == DataHVACGlobals::Cooling) {
-                        if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0) {
-                            this->autoSizedValue =
-                                    this->finalSysSizing(this->curSysNum).SysAirMinFlowRat *
-                                    this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
-                        } else {
-                            this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
-                        }
-                    } else if (this->curDuctType == DataHVACGlobals::Heating) {
-                        this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
-                    } else {
-                        this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                     }
+                    this->autoSizedValue *= DataEnvironment::StdRhoAir;
                 }
-                this->autoSizedValue *= DataEnvironment::StdRhoAir;
             }
+            if (this->autoSizedValue < DataHVACGlobals::SmallAirVolFlow) this->autoSizedValue = 0.0;
+            this->selectSizerOutput();
+        } else {
+            errorsFound = AutoSizingResultType::ErrorType2;
         }
-        if (this->autoSizedValue < DataHVACGlobals::SmallAirVolFlow) this->autoSizedValue = 0.0;
-        if (this->wasAutoSized || this->curOASysNum > 0) this->selectSizerOutput();
         return errorsFound;
     }
 

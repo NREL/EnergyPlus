@@ -69,74 +69,74 @@ void HeatingWaterDesAirInletTempSizer::initializeWithinEP(EnergyPlusData &state,
 
 EnergyPlus::AutoSizingResultType HeatingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _originalValue)
 {
-    this->preSize(state, _originalValue);
-    if (this->curZoneEqNum > 0) {
-        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
-            if (this->printWarningFlag && this->originalValue > 0.0) {
-                HeatingWaterDesAirInletTempSizer::reportSizerOutput(
-                    this->compType, this->compName, "User-Specified " + this->sizingString, _originalValue);
-            }
-            this->autoSizedValue = _originalValue;
-        } else {
-            if (this->termUnitPIU && (this->curTermUnitSizingNum > 0)) {
-                Real64 MinFlowFrac = this->termUnitSizing(this->curTermUnitSizingNum).MinFlowFrac;
-                if (this->termUnitSizing(this->curTermUnitSizingNum).InducesPlenumAir) {
-                    this->autoSizedValue = (this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac) +
-                                           (this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneRetTempAtHeatPeak * (1.0 - MinFlowFrac));
-                } else {
-                    this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac +
-                                           this->finalZoneSizing(this->curZoneEqNum).ZoneTempAtHeatPeak * (1.0 - MinFlowFrac);
-                }
-            } else if (this->termUnitIU && (this->curTermUnitSizingNum > 0)) {
-                this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneTempAtHeatPeak;
-            } else if (this->termUnitSingDuct && (this->curTermUnitSizingNum > 0)) {
-                this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU;
+    EnergyPlus::AutoSizingResultType errorsFound = EnergyPlus::AutoSizingResultType::NoError;
+    if (this->isInitialized) {
+        this->preSize(state, _originalValue);
+        if (this->curZoneEqNum > 0) {
+            if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
+                this->autoSizedValue = _originalValue;
             } else {
-                Real64 DesMassFlow = 0.0;
-                if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
-                    DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
-                } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
-                    DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
+                if (this->termUnitPIU && (this->curTermUnitSizingNum > 0)) {
+                    Real64 MinFlowFrac = this->termUnitSizing(this->curTermUnitSizingNum).MinFlowFrac;
+                    if (this->termUnitSizing(this->curTermUnitSizingNum).InducesPlenumAir) {
+                        this->autoSizedValue =
+                            (this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac) +
+                            (this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneRetTempAtHeatPeak * (1.0 - MinFlowFrac));
+                    } else {
+                        this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac +
+                                               this->finalZoneSizing(this->curZoneEqNum).ZoneTempAtHeatPeak * (1.0 - MinFlowFrac);
+                    }
+                } else if (this->termUnitIU && (this->curTermUnitSizingNum > 0)) {
+                    this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneTempAtHeatPeak;
+                } else if (this->termUnitSingDuct && (this->curTermUnitSizingNum > 0)) {
+                    this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU;
                 } else {
-                    DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
+                    Real64 DesMassFlow = 0.0;
+                    if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
+                        DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
+                    } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
+                        DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
+                    } else {
+                        DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
+                    }
+                    this->autoSizedValue = ReportSizingManager::setHeatCoilInletTempForZoneEqSizing(
+                        ReportSizingManager::setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                        this->zoneEqSizing(this->curZoneEqNum),
+                        this->finalZoneSizing(this->curZoneEqNum));
                 }
-                this->autoSizedValue = ReportSizingManager::setHeatCoilInletTempForZoneEqSizing(
-                    ReportSizingManager::setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)), this->zoneEqSizing(this->curZoneEqNum), this->finalZoneSizing(this->curZoneEqNum));
             }
-        }
-    } else if (this->curSysNum > 0) {
-        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
-            if (this->printWarningFlag && this->originalValue > 0.0) {
-                HeatingWaterDesAirInletTempSizer::reportSizerOutput(
-                    this->compType, this->compName, "User-Specified " + this->sizingString, _originalValue);
-            }
-            this->autoSizedValue = _originalValue;
-        } else {
-            Real64 OutAirFrac = 1.0;
-            if (this->curOASysNum > 0) {
-                OutAirFrac = 1.0;
-            } else if (this->finalSysSizing(this->curSysNum).HeatOAOption == DataSizing::MinOA) {
-                if (this->totalSystemAirVolumeFlowRate > 0.0) {
-                    OutAirFrac = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow / this->totalSystemAirVolumeFlowRate;
-                } else {
+        } else if (this->curSysNum > 0) {
+            if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+                this->autoSizedValue = _originalValue;
+            } else {
+                Real64 OutAirFrac = 1.0;
+                if (this->curOASysNum > 0) {
                     OutAirFrac = 1.0;
+                } else if (this->finalSysSizing(this->curSysNum).HeatOAOption == DataSizing::MinOA) {
+                    if (this->totalSystemAirVolumeFlowRate > 0.0) {
+                        OutAirFrac = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow / this->totalSystemAirVolumeFlowRate;
+                    } else {
+                        OutAirFrac = 1.0;
+                    }
+                    OutAirFrac = min(1.0, max(0.0, OutAirFrac));
+                } // There used to be an ELSE block here, but I just moved the assignment of 1.0 to the var declaration
+                // coil inlet temperature
+                if (this->curOASysNum == 0 && DataAirSystems::PrimaryAirSystem(this->curSysNum).NumOAHeatCoils > 0) {
+                    this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).PreheatTemp +
+                                           (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
+                } else if (this->curOASysNum > 0 && DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
+                    this->autoSizedValue = AirLoopHVACDOAS::airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
+                } else {
+                    this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).HeatOutTemp +
+                                           (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
                 }
-                OutAirFrac = min(1.0, max(0.0, OutAirFrac));
-            } // There used to be an ELSE block here, but I just moved the assignment of 1.0 to the var declaration
-            // coil inlet temperature
-            if (this->curOASysNum == 0 && DataAirSystems::PrimaryAirSystem(this->curSysNum).NumOAHeatCoils > 0) {
-                this->autoSizedValue =
-                    OutAirFrac * this->finalSysSizing(this->curSysNum).PreheatTemp + (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
-            } else if (this->curOASysNum > 0 && DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                this->autoSizedValue = AirLoopHVACDOAS::airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
-            } else {
-                this->autoSizedValue =
-                    OutAirFrac * this->finalSysSizing(this->curSysNum).HeatOutTemp + (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
             }
         }
+        this->selectSizerOutput();
+    } else {
+        errorsFound = AutoSizingResultType::ErrorType2;
     }
-    if (this->wasAutoSized || this->curOASysNum > 0) this->selectSizerOutput();
-    return EnergyPlus::AutoSizingResultType::NoError;;
+    return errorsFound;
 }
 
 } // namespace EnergyPlus

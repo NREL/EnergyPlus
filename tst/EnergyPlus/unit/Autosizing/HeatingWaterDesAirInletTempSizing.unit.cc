@@ -65,6 +65,12 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletTempSizingGauntlet)
 
     // create the sizer and set up the flags to specify the sizing configuration
     HeatingWaterDesAirInletTempSizer sizer;
+    Real64 inputValue = 5;
+
+    // uninitialized sizing type
+    AutoSizingResultType result = sizer.size(state, inputValue);
+    EXPECT_EQ(AutoSizingResultType::ErrorType2, result);
+    EXPECT_NEAR(0.0, sizer.autoSizedValue, 0.01); // unitialized sizing types always return 0
 
     // ZONE EQUIPMENT TESTING
     DataSizing::CurZoneEqNum = 1;
@@ -74,9 +80,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletTempSizingGauntlet)
     sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", false);
 
     // Test #1 - Zone Equipment, no autosizing
-    Real64 inputValue = 5;
-
-    AutoSizingResultType result = sizer.size(state, inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01); // hard-sized value

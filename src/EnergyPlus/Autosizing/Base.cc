@@ -64,6 +64,7 @@ namespace EnergyPlus {
     }
 
     void BaseSizer::initializeWithinEP(EnergyPlusData &EP_UNUSED(state), const std::string &_compType, const std::string &_compName, bool _printWarningFlag) {
+        this->isInitialized = true;
         this->printWarningFlag = _printWarningFlag;
         this->compType = _compType;
         this->compName = _compName;
@@ -212,9 +213,10 @@ namespace EnergyPlus {
 
     void BaseSizer::selectSizerOutput() {
         if (this->printWarningFlag) {
-            if (this->wasAutoSized && this->autoSizedValue > 0.0) {
-                this->reportSizerOutput(this->compType, this->compName,
-                                        "Design Size " + this->sizingString, this->autoSizedValue);
+            if (!this->wasAutoSized && (this->autoSizedValue == this->originalValue)) {
+                this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->originalValue);
+            } else if (this->wasAutoSized && this->originalValue <= 0.0) {
+                this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
             } else if (this->autoSizedValue > 0.0) {
                 if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) >
                     DataSizing::AutoVsHardSizingThreshold) {
