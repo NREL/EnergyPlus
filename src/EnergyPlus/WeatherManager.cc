@@ -683,14 +683,6 @@ namespace WeatherManager {
         // if another environment is available in the "run list" or if the end has been
         // reached.
 
-        // Using/Aliasing
-        using General::BetweenDates;
-        using namespace DataSystemVariables;
-        using DataHeatBalance::AdaptiveComfortRequested_ASH55;
-        using DataHeatBalance::AdaptiveComfortRequested_CEN15251;
-        using ThermalComfort::CalcThermalComfortAdaptiveASH55;
-        using ThermalComfort::CalcThermalComfortAdaptiveCEN15251;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetNextEnvironment: ");
         static constexpr auto EnvNameFormat("Environment,{},{},{},{},{},{},{},{},{},{},{},{},{}\n");
@@ -848,11 +840,11 @@ namespace WeatherManager {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + "No Design Days or Run Period(s) specified, program will terminate.");
             }
-            if (DDOnly && DataEnvironment::TotDesDays == 0) {
+            if (DataSystemVariables::DDOnly && DataEnvironment::TotDesDays == 0) {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + "Requested Design Days only (DDOnly) but no Design Days specified, program will terminate.");
             }
-            if (ReverseDD && DataEnvironment::TotDesDays == 1) {
+            if (DataSystemVariables::ReverseDD && DataEnvironment::TotDesDays == 1) {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + "Requested Reverse Design Days (ReverseDD) but only 1 Design Day specified, program will terminate.");
             }
@@ -891,19 +883,19 @@ namespace WeatherManager {
             DataEnvironment::Month = Environment(Envrn).StartMonth;
             DataGlobals::NumOfDayInEnvrn = Environment(Envrn).TotalDays; // Set day loop maximum from DataGlobals
             if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
-                if (AdaptiveComfortRequested_ASH55 || AdaptiveComfortRequested_CEN15251) {
+                if (DataHeatBalance::AdaptiveComfortRequested_ASH55 || DataHeatBalance::AdaptiveComfortRequested_CEN15251) {
                     if (DataGlobals::KindOfSim == DataGlobals::ksDesignDay) {
                         if (DataGlobals::DoDesDaySim) {
                             ShowWarningError(RoutineName + "Adaptive Comfort being reported during design day.");
                             GrossApproxAvgDryBulb =
                                 (DesDayInput(Envrn).MaxDryBulb + (DesDayInput(Envrn).MaxDryBulb - DesDayInput(Envrn).DailyDBRange)) / 2.0;
-                            if (AdaptiveComfortRequested_ASH55) CalcThermalComfortAdaptiveASH55(true, false, GrossApproxAvgDryBulb);
-                            if (AdaptiveComfortRequested_CEN15251) CalcThermalComfortAdaptiveCEN15251(true, false, GrossApproxAvgDryBulb);
+                            if (DataHeatBalance::AdaptiveComfortRequested_ASH55) ThermalComfort::CalcThermalComfortAdaptiveASH55(true, false, GrossApproxAvgDryBulb);
+                            if (DataHeatBalance::AdaptiveComfortRequested_CEN15251) ThermalComfort::CalcThermalComfortAdaptiveCEN15251(true, false, GrossApproxAvgDryBulb);
                         }
                     } else {
                         if (DataGlobals::DoWeathSim || DataGlobals::DoDesDaySim) {
-                            if (AdaptiveComfortRequested_ASH55) CalcThermalComfortAdaptiveASH55(true, true, 0.0);
-                            if (AdaptiveComfortRequested_CEN15251) CalcThermalComfortAdaptiveCEN15251(true, true, 0.0);
+                            if (DataHeatBalance::AdaptiveComfortRequested_ASH55) ThermalComfort::CalcThermalComfortAdaptiveASH55(true, true, 0.0);
+                            if (DataHeatBalance::AdaptiveComfortRequested_CEN15251) ThermalComfort::CalcThermalComfortAdaptiveCEN15251(true, true, 0.0);
                         }
                     }
                 }
@@ -993,8 +985,8 @@ namespace WeatherManager {
                                         ShowContinueError("...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both, or");
                                         ShowContinueError("...set \"Treat Weather as Actual\" to \"No\".");
                                     }
-                                    if (!BetweenDates(Environment(Envrn).StartDate, runStartJulian, runEndJulian)) continue;
-                                    if (!BetweenDates(Environment(Envrn).EndDate, runStartJulian, runEndJulian)) continue;
+                                    if (!General::BetweenDates(Environment(Envrn).StartDate, runStartJulian, runEndJulian)) continue;
+                                    if (!General::BetweenDates(Environment(Envrn).EndDate, runStartJulian, runEndJulian)) continue;
                                     OkRun = true;
                                     break;
                                 }
@@ -1012,8 +1004,8 @@ namespace WeatherManager {
                                         OkRun = true;
                                         break;
                                     }
-                                    if (!BetweenDates(Environment(Envrn).StartJDay, runStartOrdinal, runEndOrdinal)) continue;
-                                    if (!BetweenDates(Environment(Envrn).EndJDay, runStartOrdinal, runEndOrdinal)) continue;
+                                    if (!General::BetweenDates(Environment(Envrn).StartJDay, runStartOrdinal, runEndOrdinal)) continue;
+                                    if (!General::BetweenDates(Environment(Envrn).EndJDay, runStartOrdinal, runEndOrdinal)) continue;
                                     OkRun = true;
                                 }
                             }
@@ -1122,7 +1114,7 @@ namespace WeatherManager {
 
                             if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
                                 if ((DataGlobals::KindOfSim == DataGlobals::ksRunPeriodWeather && DataGlobals::DoWeathSim)) {
-                                    if (AdaptiveComfortRequested_ASH55 || AdaptiveComfortRequested_CEN15251) {
+                                    if (DataHeatBalance::AdaptiveComfortRequested_ASH55 || DataHeatBalance::AdaptiveComfortRequested_CEN15251) {
                                         if (WFAllowsLeapYears) {
                                             ShowSevereError(RoutineName +
                                                             "AdaptiveComfort Reporting does not work correctly with leap years in weather files.");
