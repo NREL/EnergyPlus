@@ -68,6 +68,7 @@ Two typos were corrected in field names.
   N4 , \field Coefficient4 C4
   N5 , \field Coefficient5 C5
 ```
+
 # Object Change: `PerformancePrecisionTradeoffs'
 
 Fields 1-2 (A1, A2) remain the same.
