@@ -57,6 +57,7 @@ namespace EnergyPlus {
 
     enum class AutoSizingType {
         AutoCalculate,
+        CoolingWaterDesAirInletHumRatSizing,
         HeatingAirflowUASizing,
         HeatingWaterDesAirInletTempSizing,
         Unknown

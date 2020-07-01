@@ -95,7 +95,6 @@ namespace DataHVACGlobals {
     int const CoolingWaterflowSizing(2);                             // request sizing for cooling water flow rate
     int const HeatingWaterflowSizing(3);                             // request sizing for heating coil water flow rate
     int const CoolingWaterDesAirInletTempSizing(4);                  // request sizing for cooling water coil inlet air temp
-    int const CoolingWaterDesAirInletHumRatSizing(5);                // request sizing for cooling water coil inlet air humidity ratio
     int const CoolingWaterDesWaterInletTempSizing(6);                // request sizing for cooling water coil inlet water temp
     int const CoolingWaterDesAirOutletTempSizing(7);                 // request sizing for cooling water coil outlet air temp
     int const CoolingWaterDesAirOutletHumRatSizing(8);               // request sizing for cooling water coil outlet air humidity ratio

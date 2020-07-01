@@ -1859,17 +1859,6 @@ namespace ReportSizingManager {
                         ShowContinueError("    Tair,out = " + RoundSigDigits(AutosizeDes, 3));
                     }
                     bCheckForZero = false;
-                } else if (SizingType == CoolingWaterDesAirInletHumRatSizing) {
-                    if (TermUnitIU) {
-                        AutosizeDes = FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak;
-                    } else if (ZoneEqFanCoil) {
-                        DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow;
-                        AutosizeDes =
-                            setCoolCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
-                    } else {
-                        AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat;
-                    }
-                    bCheckForZero = false;
                 } else if (SizingType == CoolingWaterDesAirOutletHumRatSizing) {
                     if (TermUnitIU) {
                         TDpIn = PsyTdpFnWPb(DataDesInletAirHumRat, StdBaroPress);
@@ -2903,30 +2892,6 @@ namespace ReportSizingManager {
                         ShowContinueError("    Tair,out = " + RoundSigDigits(AutosizeDes, 3));
                     }
                     bCheckForZero = false;
-                } else if (SizingType == CoolingWaterDesAirInletHumRatSizing) {
-                    if (CurOASysNum > 0) { // coil is in OA stream
-                        if (DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum > -1) {
-                            AutosizeDes = AirLoopHVACDOAS::airloopDOAS[DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
-                        } else {
-                            AutosizeDes = FinalSysSizing(CurSysNum).OutHumRatAtCoolPeak;
-                        }
-                    } else if (DataDesInletAirHumRat > 0.0) {
-                        AutosizeDes = DataDesInletAirHumRat;
-                    } else {                                                   // coil is in main air loop
-                        if (PrimaryAirSystem(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
-                            AutosizeDes = FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak;
-                        } else { // there is precooling of the OA stream
-                            if (DataFlowUsedForSizing > 0.0) {
-                                OutAirFrac = FinalSysSizing(CurSysNum).DesOutAirVolFlow / DataFlowUsedForSizing;
-                            } else {
-                                OutAirFrac = 1.0;
-                            }
-                            OutAirFrac = min(1.0, max(0.0, OutAirFrac));
-                            AutosizeDes = OutAirFrac * FinalSysSizing(CurSysNum).PrecoolHumRat +
-                                          (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).RetHumRatAtCoolPeak;
-                        }
-                    }
-                    bCheckForZero = false;
                 } else if (SizingType == CoolingWaterDesAirOutletHumRatSizing) {
                     if (CurOASysNum > 0) {
                         if (DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum > -1) {
@@ -3954,8 +3919,6 @@ namespace ReportSizingManager {
             coilSelectionReportObj->setCoilLvgWaterTemp(CompName, CompType, DataGlobals::HWInitConvTemp - PlantSizData(DataPltSizHeatNum).DeltaT);
         } else if (CurSysNum <= NumPrimaryAirSys && SizingType == CoolingWaterDesAirInletTempSizing) {
             coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, SizingResult, CurSysNum, CurZoneEqNum);
-        } else if (SizingType == CoolingWaterDesAirInletHumRatSizing) {
-            coilSelectionReportObj->setCoilEntAirHumRat(CompName, CompType, SizingResult);
         } else if (SizingType == CoolingWaterDesWaterInletTempSizing) {
             coilSelectionReportObj->setCoilEntWaterTemp(CompName, CompType, SizingResult);
         } else if (SizingType == CoolingWaterDesAirOutletTempSizing) {
