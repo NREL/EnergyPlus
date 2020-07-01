@@ -36,6 +36,6 @@ Fields 1-2 (A1, A2) remain the same.
 
 Change in Field 3 (A3): two more key values---Mode06 and Mode07---are added.
 
-Field 4 (N1) remains the same.
+Field 4 (N1) remains the same; however it is no longer the last field. See the newly added Field 5 (N2) below.
 
-Insert new Field 5 (N2): MaxAllowedDelTemp, supplied with minimu, maximum, and default values.
+Newly added Field 5 (N2): MaxAllowedDelTemp, supplied with minimu, maximum, and default values.
