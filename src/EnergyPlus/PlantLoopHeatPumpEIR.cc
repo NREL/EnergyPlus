@@ -98,6 +98,9 @@ namespace EIRPlantLoopHeatPumps {
         // Call initialize to set flow rates, run flag, and entering temperatures
         this->running = RunFlag;
 
+        this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
+        this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
+
         if (this->waterSource) {
             this->setOperatingFlowRatesWSHP();
             if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
@@ -293,10 +296,6 @@ namespace EIRPlantLoopHeatPumps {
 
         Real64 const reportingInterval = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
-        // read inlet temperatures
-        this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
-        this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
-
         // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
         // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
         if ((this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling && currentLoad >= 0.0) ||
@@ -351,7 +350,7 @@ namespace EIRPlantLoopHeatPumps {
         this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
     }
 
-    void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
+    void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         // This function does all one-time and begin-environment initialization
         std::string const routineName = EIRPlantLoopHeatPumps::__EQUIP__ + ':' + __FUNCTION__;
@@ -417,7 +416,8 @@ namespace EIRPlantLoopHeatPumps {
 
             // find this component on the plant
             bool thisErrFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->name,
+            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                    this->name,
                                                     this->plantTypeOfNum,
                                                     this->loadSideLocation.loopNum,
                                                     this->loadSideLocation.loopSideNum,
@@ -444,7 +444,8 @@ namespace EIRPlantLoopHeatPumps {
 
             thisErrFlag = false;
             if (this->waterSource) {
-                PlantUtilities::ScanPlantLoopsForObject(this->name,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        this->name,
                                                         this->plantTypeOfNum,
                                                         this->sourceSideLocation.loopNum,
                                                         this->sourceSideLocation.loopSideNum,

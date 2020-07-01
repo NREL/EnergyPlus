@@ -46,18 +46,15 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataConversions.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -66,15 +63,8 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
-#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -83,7 +73,6 @@
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -149,17 +138,17 @@ namespace SwimmingPool {
             thisPool.simulate(state, A, FirstHVACIteration, CurLoad, RunFlag);
         }
 
-        if (NumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
+        if (NumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state.dataZoneTempPredictorCorrector);
 
         ReportSwimmingPool();
     }
 
-    void SwimmingPoolData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+    void SwimmingPoolData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool FirstHVACIteration,
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool EP_UNUSED(RunFlag))
     {
-        this->initialize(FirstHVACIteration);
+        this->initialize(state.dataBranchInputManager, FirstHVACIteration);
 
         this->calculate();
 
@@ -255,7 +244,7 @@ namespace SwimmingPool {
             }
 
             Pool(Item).ErrorCheckSetupPoolSurface(Alphas(1),Alphas(2),cAlphaFields(2),ErrorsFound);
-            
+
             Pool(Item).AvgDepth = Numbers(1);
             if (Pool(Item).AvgDepth < MinDepth) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has an average depth that is too small.");
@@ -422,10 +411,10 @@ namespace SwimmingPool {
                                                       bool &ErrorsFound
     )
     {
-    
+
         static std::string const RoutineName("ErrorCheckSetupPoolSurface: "); // include trailing blank space
         static std::string const CurrentModuleObject("SwimmingPool:Indoor");
-        
+
         if (this->SurfacePtr <= 0) {
             ShowSevereError(RoutineName + "Invalid " + cAlphaField2 + " = " + Alpha2);
             ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alpha1);
@@ -450,7 +439,7 @@ namespace SwimmingPool {
             ShowSevereError(DataSurfaces::Surface(this->SurfacePtr).Name +
                             " is a pool and has movable insulation.  This is not allowed.  Remove the movable insulation for this surface.");
             ErrorsFound = true;
-        } else if (DataHeatBalance::Construct(DataSurfaces::Surface(this->SurfacePtr).Construction).SourceSinkPresent) {
+        } else if (dataConstruction.Construct(DataSurfaces::Surface(this->SurfacePtr).Construction).SourceSinkPresent) {
             ShowSevereError(
                 DataSurfaces::Surface(this->SurfacePtr).Name +
                 " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface.");
@@ -469,7 +458,7 @@ namespace SwimmingPool {
         }
     }
 
-    void SwimmingPoolData::initialize(bool const FirstHVACIteration // true during the first HVAC iteration
+    void SwimmingPoolData::initialize(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // true during the first HVAC iteration
     )
     {
         // SUBROUTINE INFORMATION:
@@ -507,7 +496,7 @@ namespace SwimmingPool {
             this->MyOneTimeFlag = false;
         }
 
-        SwimmingPoolData::initSwimmingPoolPlantLoopIndex();
+        SwimmingPoolData::initSwimmingPoolPlantLoopIndex(dataBranchInputManager);
 
         if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
             this->ZeroSourceSumHATsurf = 0.0;
@@ -712,7 +701,7 @@ namespace SwimmingPool {
             "Indoor Pool Current Cover LW Radiation Factor", OutputProcessor::Unit::None, this->CurCoverLWRadFac, "System", "Average", this->Name);
     }
 
-    void SwimmingPoolData::initSwimmingPoolPlantLoopIndex()
+    void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(BranchInputManagerData &dataBranchInputManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -724,7 +713,8 @@ namespace SwimmingPool {
         if (MyPlantScanFlagPool && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
             if (this->WaterInletNode > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         DataPlant::TypeOf_SwimmingPool_Indoor,
                                                         this->HWLoopNum,
                                                         this->HWLoopSide,

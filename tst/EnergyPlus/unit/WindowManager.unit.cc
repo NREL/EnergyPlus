@@ -57,6 +57,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -216,8 +217,8 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     int cNum;
 
-    for (size_t i = 1; i <= DataHeatBalance::Construct.size(); ++i) {
-        if (DataHeatBalance::Construct(i).TypeIsWindow) {
+    for (size_t i = 1; i <= dataConstruction.Construct.size(); ++i) {
+        if (dataConstruction.Construct(i).TypeIsWindow) {
             cNum = i;
         }
     }
@@ -240,7 +241,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     DataHeatBalFanSys::MAT.dimension(1, T_in);
 
     // initial guess temperatures
-    int numTemps = 2 + 2 * DataHeatBalance::Construct(cNum).TotGlassLayers;
+    int numTemps = 2 + 2 * dataConstruction.Construct(cNum).TotGlassLayers;
     Real64 inSurfTemp = T_in - (1.0 / (numTemps - 1)) * (T_in - T_out);
     Real64 outSurfTemp = T_out + (1.0 / (numTemps - 1)) * (T_in - T_out);
 
@@ -609,8 +610,6 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
-
-        "  Output:DebuggingData,0,0;",
 
         "  ZoneCapacitanceMultiplier:ResearchSpecial,",
         "    Multiplier,              !- Name",
@@ -2450,7 +2449,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
     bool FoundError = false;
 
     HeatBalanceManager::GetProjectControlData(state.outputFiles, FoundError); // read project control data
@@ -2495,7 +2494,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.outputFiles, FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
     WindowManager::InitGlassOpticalCalculations(state.outputFiles);

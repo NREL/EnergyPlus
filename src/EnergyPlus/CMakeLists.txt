@@ -69,12 +69,12 @@ SET( SRC
   Coils/CoilCoolingDXCurveFitSpeed.hh
   CondenserLoopTowers.cc
   CondenserLoopTowers.hh
-  ConductionTransferFunctionCalc.cc
-  ConductionTransferFunctionCalc.hh
   ConfiguredFunctions.hh
   "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc"
   ConvectionCoefficients.cc
   ConvectionCoefficients.hh
+  Construction.cc
+  Construction.hh
   CoolTower.cc
   CoolTower.hh
   CostEstimateManager.cc
@@ -89,7 +89,7 @@ SET( SRC
   DXCoils.hh
   DXFEarClipping.cc
   DXFEarClipping.hh
-        Data/BaseData.hh
+  Data/BaseData.hh
   Data/EnergyPlusData.hh
   DataAirLoop.cc
   DataAirLoop.hh
@@ -366,6 +366,8 @@ SET( SRC
   InternalHeatGains.hh
   LowTempRadiantSystem.cc
   LowTempRadiantSystem.hh
+  Material.cc
+  Material.hh
   MatrixDataManager.cc
   MatrixDataManager.hh
   MicroCHPElectricGenerator.cc

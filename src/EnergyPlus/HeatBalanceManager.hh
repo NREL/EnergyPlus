@@ -54,9 +54,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
     class OutputFiles;
 
 namespace HeatBalanceManager {
@@ -257,6 +258,8 @@ namespace HeatBalanceManager {
 
     void SetupComplexFenestrationStateInput(int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound);
+
+    void InitConductionTransferFunctions(OutputFiles &outputFiles);
 
 } // namespace HeatBalanceManager
 

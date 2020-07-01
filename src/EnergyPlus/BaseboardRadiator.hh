@@ -155,7 +155,7 @@ namespace BaseboardRadiator {
 
     struct BaseboardRadiatorData : BaseGlobalStruct {
 
-        int NumBaseboards = 0;
+        int NumBaseboards;
         Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
         Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
         void clear_state() override
@@ -164,6 +164,9 @@ namespace BaseboardRadiator {
             Baseboard.deallocate();
             BaseboardParamsNumericFields.deallocate();
         }
+        // Default Constructor
+        BaseboardRadiatorData()
+            : NumBaseboards(0) {}
     };
 
 } // namespace EnergyPlus

@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -66,6 +67,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -225,16 +227,16 @@ namespace WindowEquivalentLayer {
         CFSDiffAbsTrans = 0.0;
 
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
-            if (!Construct(ConstrNum).TypeIsWindow) continue;
-            if (!Construct(ConstrNum).WindowTypeEQL) continue; // skip if not equivalent layer window
+            if (!dataConstruction.Construct(ConstrNum).TypeIsWindow) continue;
+            if (!dataConstruction.Construct(ConstrNum).WindowTypeEQL) continue; // skip if not equivalent layer window
 
             SetEquivalentLayerWindowProperties(ConstrNum);
 
         } //  end do for TotConstructs
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
-            if (!Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;
+            if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
+            if (!dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;
 
             SurfaceWindow(SurfNum).WindowModelType = WindowEQLModel;
 
@@ -285,129 +287,129 @@ namespace WindowEquivalentLayer {
         Array2D<Real64> SysAbs1(2, CFSMAXNL + 1); // layers absorptance and system transmittance
         // Flow
 
-        if (!allocated(CFSLayers)) CFSLayers.allocate(Construct(ConstrNum).TotLayers);
+        if (!allocated(CFSLayers)) CFSLayers.allocate(dataConstruction.Construct(ConstrNum).TotLayers);
 
         sLayer = 0;
         gLayer = 0;
-        EQLNum = Construct(ConstrNum).EQLConsPtr;
+        EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
 
-        CFS(EQLNum).Name = Construct(ConstrNum).Name;
+        CFS(EQLNum).Name = dataConstruction.Construct(ConstrNum).Name;
 
-        for (Layer = 1; Layer <= Construct(ConstrNum).TotLayers; ++Layer) {
+        for (Layer = 1; Layer <= dataConstruction.Construct(ConstrNum).TotLayers; ++Layer) {
 
-            MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+            MaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
 
-            if (Material(Construct(ConstrNum).LayerPoint(1)).Group != GlassEquivalentLayer &&
-                Material(Construct(ConstrNum).LayerPoint(1)).Group != ShadeEquivalentLayer &&
-                Material(Construct(ConstrNum).LayerPoint(1)).Group != DrapeEquivalentLayer &&
-                Material(Construct(ConstrNum).LayerPoint(1)).Group != ScreenEquivalentLayer &&
-                Material(Construct(ConstrNum).LayerPoint(1)).Group != BlindEquivalentLayer &&
-                Material(Construct(ConstrNum).LayerPoint(1)).Group != GapEquivalentLayer)
+            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != GlassEquivalentLayer &&
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != ShadeEquivalentLayer &&
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != DrapeEquivalentLayer &&
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != ScreenEquivalentLayer &&
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != BlindEquivalentLayer &&
+                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != GapEquivalentLayer)
                 continue;
 
-            if (Material(MaterNum).Group == GapEquivalentLayer) {
+            if (dataMaterial.Material(MaterNum).Group == GapEquivalentLayer) {
                 // Gap or Gas Layer
                 ++gLayer;
             } else {
                 // Solid (Glazing or Shade) Layer
                 ++sLayer;
-                CFS(EQLNum).L(sLayer).Name = Material(MaterNum).Name;
+                CFS(EQLNum).L(sLayer).Name = dataMaterial.Material(MaterNum).Name;
                 // longwave property input
-                CFS(EQLNum).L(sLayer).LWP_MAT.EPSLF = Material(MaterNum).EmissThermalFront;
-                CFS(EQLNum).L(sLayer).LWP_MAT.EPSLB = Material(MaterNum).EmissThermalBack;
-                CFS(EQLNum).L(sLayer).LWP_MAT.TAUL = Material(MaterNum).TausThermal;
+                CFS(EQLNum).L(sLayer).LWP_MAT.EPSLF = dataMaterial.Material(MaterNum).EmissThermalFront;
+                CFS(EQLNum).L(sLayer).LWP_MAT.EPSLB = dataMaterial.Material(MaterNum).EmissThermalBack;
+                CFS(EQLNum).L(sLayer).LWP_MAT.TAUL = dataMaterial.Material(MaterNum).TausThermal;
             }
 
-            if (Material(MaterNum).Group == BlindEquivalentLayer) {
+            if (dataMaterial.Material(MaterNum).Group == BlindEquivalentLayer) {
                 CFS(EQLNum).VBLayerPtr = sLayer;
-                if (Material(MaterNum).SlatOrientation == Horizontal) {
+                if (dataMaterial.Material(MaterNum).SlatOrientation == Horizontal) {
                     CFS(EQLNum).L(sLayer).LTYPE = ltyVBHOR;
-                } else if (Material(MaterNum).SlatOrientation == Vertical) {
+                } else if (dataMaterial.Material(MaterNum).SlatOrientation == Vertical) {
                     CFS(EQLNum).L(sLayer).LTYPE = ltyVBVER;
                 }
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = Material(MaterNum).ReflFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = Material(MaterNum).ReflBackBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = Material(MaterNum).TausFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = Material(MaterNum).TausBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = dataMaterial.Material(MaterNum).ReflFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = dataMaterial.Material(MaterNum).ReflBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = dataMaterial.Material(MaterNum).TausFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = dataMaterial.Material(MaterNum).TausBackBeamDiff;
 
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = Material(MaterNum).ReflFrontDiffDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = Material(MaterNum).ReflBackDiffDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = Material(MaterNum).TausDiffDiff;
-                CFS(EQLNum).L(sLayer).PHI_DEG = Material(MaterNum).SlatAngle;
-                CFS(EQLNum).L(sLayer).CNTRL = Material(MaterNum).SlatAngleType;
-                CFS(EQLNum).L(sLayer).S = Material(MaterNum).SlatSeparation;
-                CFS(EQLNum).L(sLayer).W = Material(MaterNum).SlatWidth;
-                CFS(EQLNum).L(sLayer).C = Material(MaterNum).SlatCrown;
-            } else if (Material(MaterNum).Group == GlassEquivalentLayer) {
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = dataMaterial.Material(MaterNum).ReflFrontDiffDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = dataMaterial.Material(MaterNum).ReflBackDiffDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = dataMaterial.Material(MaterNum).TausDiffDiff;
+                CFS(EQLNum).L(sLayer).PHI_DEG = dataMaterial.Material(MaterNum).SlatAngle;
+                CFS(EQLNum).L(sLayer).CNTRL = dataMaterial.Material(MaterNum).SlatAngleType;
+                CFS(EQLNum).L(sLayer).S = dataMaterial.Material(MaterNum).SlatSeparation;
+                CFS(EQLNum).L(sLayer).W = dataMaterial.Material(MaterNum).SlatWidth;
+                CFS(EQLNum).L(sLayer).C = dataMaterial.Material(MaterNum).SlatCrown;
+            } else if (dataMaterial.Material(MaterNum).Group == GlassEquivalentLayer) {
                 // glazing
                 CFS(EQLNum).L(sLayer).LTYPE = ltyGLAZE;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBB = Material(MaterNum).ReflFrontBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBB = Material(MaterNum).ReflBackBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = Material(MaterNum).TausFrontBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBB = dataMaterial.Material(MaterNum).ReflFrontBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBB = dataMaterial.Material(MaterNum).ReflBackBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = dataMaterial.Material(MaterNum).TausFrontBeamBeam;
 
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = Material(MaterNum).ReflFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = Material(MaterNum).ReflBackBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = Material(MaterNum).TausFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = Material(MaterNum).TausBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = dataMaterial.Material(MaterNum).ReflFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = dataMaterial.Material(MaterNum).ReflBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = dataMaterial.Material(MaterNum).TausFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = dataMaterial.Material(MaterNum).TausBackBeamDiff;
 
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = Material(MaterNum).ReflFrontDiffDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = Material(MaterNum).ReflBackDiffDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = Material(MaterNum).TausDiffDiff;
-            } else if (Material(MaterNum).Group == ShadeEquivalentLayer) {
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = dataMaterial.Material(MaterNum).ReflFrontDiffDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = dataMaterial.Material(MaterNum).ReflBackDiffDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = dataMaterial.Material(MaterNum).TausDiffDiff;
+            } else if (dataMaterial.Material(MaterNum).Group == ShadeEquivalentLayer) {
                 // roller blind
                 CFS(EQLNum).L(sLayer).LTYPE = ltyROLLB;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = Material(MaterNum).TausFrontBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = Material(MaterNum).TausBackBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = Material(MaterNum).ReflFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = Material(MaterNum).ReflBackBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = Material(MaterNum).TausFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = Material(MaterNum).TausBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = dataMaterial.Material(MaterNum).TausFrontBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = dataMaterial.Material(MaterNum).TausBackBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = dataMaterial.Material(MaterNum).ReflFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = dataMaterial.Material(MaterNum).ReflBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = dataMaterial.Material(MaterNum).TausFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = dataMaterial.Material(MaterNum).TausBackBeamDiff;
 
-            } else if (Material(MaterNum).Group == DrapeEquivalentLayer) {
+            } else if (dataMaterial.Material(MaterNum).Group == DrapeEquivalentLayer) {
                 // drapery fabric
                 CFS(EQLNum).L(sLayer).LTYPE = ltyDRAPE;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = Material(MaterNum).TausFrontBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = Material(MaterNum).TausBackBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = Material(MaterNum).ReflFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = Material(MaterNum).ReflBackBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = Material(MaterNum).TausFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = Material(MaterNum).TausBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = dataMaterial.Material(MaterNum).TausFrontBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = dataMaterial.Material(MaterNum).TausBackBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = dataMaterial.Material(MaterNum).ReflFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = dataMaterial.Material(MaterNum).ReflBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = dataMaterial.Material(MaterNum).TausFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = dataMaterial.Material(MaterNum).TausBackBeamDiff;
 
-                CFS(EQLNum).L(sLayer).S = Material(MaterNum).PleatedDrapeLength;
-                CFS(EQLNum).L(sLayer).W = Material(MaterNum).PleatedDrapeWidth;
+                CFS(EQLNum).L(sLayer).S = dataMaterial.Material(MaterNum).PleatedDrapeLength;
+                CFS(EQLNum).L(sLayer).W = dataMaterial.Material(MaterNum).PleatedDrapeWidth;
                 // init diffuse SWP to force default derivation
                 CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = -1.0;
                 CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = -1.0;
                 CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = -1.0;
-            } else if (Material(MaterNum).Group == ScreenEquivalentLayer) {
+            } else if (dataMaterial.Material(MaterNum).Group == ScreenEquivalentLayer) {
                 // insect screen
                 CFS(EQLNum).L(sLayer).LTYPE = ltyINSCRN;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = Material(MaterNum).TausFrontBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = Material(MaterNum).TausBackBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = Material(MaterNum).ReflFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = Material(MaterNum).ReflBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = dataMaterial.Material(MaterNum).TausFrontBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = dataMaterial.Material(MaterNum).TausBackBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = dataMaterial.Material(MaterNum).ReflFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = dataMaterial.Material(MaterNum).ReflBackBeamDiff;
 
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = Material(MaterNum).TausFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = Material(MaterNum).TausBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = dataMaterial.Material(MaterNum).TausFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = dataMaterial.Material(MaterNum).TausBackBeamDiff;
                 // wire geometry
-                CFS(EQLNum).L(sLayer).S = Material(MaterNum).ScreenWireSpacing;
-                CFS(EQLNum).L(sLayer).W = Material(MaterNum).ScreenWireDiameter;
-            } else if (Material(MaterNum).Group == GapEquivalentLayer) {
+                CFS(EQLNum).L(sLayer).S = dataMaterial.Material(MaterNum).ScreenWireSpacing;
+                CFS(EQLNum).L(sLayer).W = dataMaterial.Material(MaterNum).ScreenWireDiameter;
+            } else if (dataMaterial.Material(MaterNum).Group == GapEquivalentLayer) {
                 // This layer is a gap.  Fill in the parameters
-                CFS(EQLNum).G(gLayer).Name = Material(MaterNum).Name;
-                CFS(EQLNum).G(gLayer).GTYPE = Material(MaterNum).GapVentType;
-                CFS(EQLNum).G(gLayer).TAS = Material(MaterNum).Thickness;
-                CFS(EQLNum).G(gLayer).FG.Name = Material(MaterNum).GasName;
-                CFS(EQLNum).G(gLayer).FG.AK = Material(MaterNum).GasCon(1, 1);
-                CFS(EQLNum).G(gLayer).FG.BK = Material(MaterNum).GasCon(2, 1);
-                CFS(EQLNum).G(gLayer).FG.CK = Material(MaterNum).GasCon(3, 1);
-                CFS(EQLNum).G(gLayer).FG.ACP = Material(MaterNum).GasCp(1, 1);
-                CFS(EQLNum).G(gLayer).FG.BCP = Material(MaterNum).GasCp(2, 1);
-                CFS(EQLNum).G(gLayer).FG.CCP = Material(MaterNum).GasCp(3, 1);
-                CFS(EQLNum).G(gLayer).FG.AVISC = Material(MaterNum).GasVis(1, 1);
-                CFS(EQLNum).G(gLayer).FG.BVISC = Material(MaterNum).GasVis(2, 1);
-                CFS(EQLNum).G(gLayer).FG.CVISC = Material(MaterNum).GasVis(3, 1);
-                CFS(EQLNum).G(gLayer).FG.MHAT = Material(MaterNum).GasWght(1);
+                CFS(EQLNum).G(gLayer).Name = dataMaterial.Material(MaterNum).Name;
+                CFS(EQLNum).G(gLayer).GTYPE = dataMaterial.Material(MaterNum).GapVentType;
+                CFS(EQLNum).G(gLayer).TAS = dataMaterial.Material(MaterNum).Thickness;
+                CFS(EQLNum).G(gLayer).FG.Name = dataMaterial.Material(MaterNum).GasName;
+                CFS(EQLNum).G(gLayer).FG.AK = dataMaterial.Material(MaterNum).GasCon(1, 1);
+                CFS(EQLNum).G(gLayer).FG.BK = dataMaterial.Material(MaterNum).GasCon(2, 1);
+                CFS(EQLNum).G(gLayer).FG.CK = dataMaterial.Material(MaterNum).GasCon(3, 1);
+                CFS(EQLNum).G(gLayer).FG.ACP = dataMaterial.Material(MaterNum).GasCp(1, 1);
+                CFS(EQLNum).G(gLayer).FG.BCP = dataMaterial.Material(MaterNum).GasCp(2, 1);
+                CFS(EQLNum).G(gLayer).FG.CCP = dataMaterial.Material(MaterNum).GasCp(3, 1);
+                CFS(EQLNum).G(gLayer).FG.AVISC = dataMaterial.Material(MaterNum).GasVis(1, 1);
+                CFS(EQLNum).G(gLayer).FG.BVISC = dataMaterial.Material(MaterNum).GasVis(2, 1);
+                CFS(EQLNum).G(gLayer).FG.CVISC = dataMaterial.Material(MaterNum).GasVis(3, 1);
+                CFS(EQLNum).G(gLayer).FG.MHAT = dataMaterial.Material(MaterNum).GasWght(1);
                 // fills gas density and effective gap thickness
                 BuildGap(CFS(EQLNum).G(gLayer), CFS(EQLNum).G(gLayer).GTYPE, CFS(EQLNum).G(gLayer).TAS);
             } else {
@@ -429,24 +431,24 @@ namespace WindowEquivalentLayer {
         FinalizeCFS(CFS(EQLNum));
 
         // get total solid layers (glazing layers + shade layers)
-        Construct(ConstrNum).TotSolidLayers = CFS(EQLNum).NL;
+        dataConstruction.Construct(ConstrNum).TotSolidLayers = CFS(EQLNum).NL;
 
         // Calculate layers diffuse absorptance and system diffuse transmittance
         CalcEQLWindowOpticalProperty(CFS(EQLNum), isDIFF, SysAbs1, 0.0, 0.0, 0.0);
-        Construct(ConstrNum).TransDiffFrontEQL = SysAbs1(1, CFS(EQLNum).NL + 1);
+        dataConstruction.Construct(ConstrNum).TransDiffFrontEQL = SysAbs1(1, CFS(EQLNum).NL + 1);
         CFSDiffAbsTrans(_, _, EQLNum) = SysAbs1;
-        Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = SysAbs1(1, {1, CFSMAXNL});
-        Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = SysAbs1(2, {1, CFSMAXNL});
+        dataConstruction.Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = SysAbs1(1, {1, CFSMAXNL});
+        dataConstruction.Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = SysAbs1(2, {1, CFSMAXNL});
         // get construction front and back diffuse effective reflectance
-        Construct(ConstrNum).ReflectSolDiffFront = CFS(EQLNum).L(1).SWP_EL.RHOSFDD;
-        Construct(ConstrNum).ReflectSolDiffBack = CFS(EQLNum).L(CFS(EQLNum).NL).SWP_EL.RHOSBDD;
+        dataConstruction.Construct(ConstrNum).ReflectSolDiffFront = CFS(EQLNum).L(1).SWP_EL.RHOSFDD;
+        dataConstruction.Construct(ConstrNum).ReflectSolDiffBack = CFS(EQLNum).L(CFS(EQLNum).NL).SWP_EL.RHOSBDD;
         // calculate U-Value, SHGC and Normal Transmittance of EQL Window
         CalcEQLWindowStandardRatings(ConstrNum);
 
         if (CFSHasControlledShade(CFS(EQLNum)) > 0) CFS(EQLNum).ISControlled = true; // is controlled
 
         // set internal face emissivity
-        Construct(ConstrNum).InsideAbsorpThermal = EffectiveEPSLB(CFS(EQLNum));
+        dataConstruction.Construct(ConstrNum).InsideAbsorpThermal = EffectiveEPSLB(CFS(EQLNum));
     }
 
     void CalcEQLWindowUvalue(CFSTY const &FS, // CFS to be calculated
@@ -876,7 +878,7 @@ namespace WindowEquivalentLayer {
         QXConv = 0.0;
         ConvHeatFlowNatural = 0.0;
 
-        EQLNum = Construct(ConstrNum).EQLConsPtr;
+        EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
         HcIn = HConvIn(SurfNum); // windows inside surface convective film conductance
 
         if (CalcCondition == noCondition) {
@@ -9758,7 +9760,7 @@ namespace WindowEquivalentLayer {
         ProfAngHor = 0.0;
         ProfAngVer = 0.0;
         ConstrNum = Surface(SurfNum).Construction;
-        EQLNum = Construct(Surface(SurfNum).Construction).EQLConsPtr;
+        EQLNum = dataConstruction.Construct(Surface(SurfNum).Construction).EQLConsPtr;
         if (BeamDIffFlag != isDIFF) {
             if (CosIncAng(TimeStep, HourOfDay, SurfNum) <= 0.0) return;
 
@@ -9791,17 +9793,17 @@ namespace WindowEquivalentLayer {
                 CalcEQLWindowOpticalProperty(CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
                 CFSAbs(_, {1, CFSMAXNL + 1}) = Abs1(_, {1, CFSMAXNL + 1});
                 CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum) = Abs1(_, {1, CFSMAXNL + 1});
-                Construct(ConstrNum).TransDiff = Abs1(1, CFS(EQLNum).NL + 1);
-                Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = Abs1(1, {1, CFSMAXNL});
-                Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = Abs1(2, {1, CFSMAXNL});
-                Construct(ConstrNum).ReflectSolDiffFront = CFS(EQLNum).L(1).SWP_EL.RHOSFDD;
-                Construct(ConstrNum).ReflectSolDiffBack = CFS(EQLNum).L(CFS(EQLNum).NL).SWP_EL.RHOSBDD;
+                dataConstruction.Construct(ConstrNum).TransDiff = Abs1(1, CFS(EQLNum).NL + 1);
+                dataConstruction.Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = Abs1(1, {1, CFSMAXNL});
+                dataConstruction.Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = Abs1(2, {1, CFSMAXNL});
+                dataConstruction.Construct(ConstrNum).ReflectSolDiffFront = CFS(EQLNum).L(1).SWP_EL.RHOSFDD;
+                dataConstruction.Construct(ConstrNum).ReflectSolDiffBack = CFS(EQLNum).L(CFS(EQLNum).NL).SWP_EL.RHOSBDD;
                 if (!CFS(EQLNum).ISControlled) EQLDiffPropFlag(EQLNum) = false;
             } else {
                 CFSAbs(_, {1, CFSMAXNL + 1}) = CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum);
-                Construct(ConstrNum).TransDiff = CFSDiffAbsTrans(1, CFS(EQLNum).NL + 1, EQLNum);
-                Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = CFSAbs(1, {1, CFSMAXNL});
-                Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = CFSAbs(2, {1, CFSMAXNL});
+                dataConstruction.Construct(ConstrNum).TransDiff = CFSDiffAbsTrans(1, CFS(EQLNum).NL + 1, EQLNum);
+                dataConstruction.Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = CFSAbs(1, {1, CFSMAXNL});
+                dataConstruction.Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = CFSAbs(2, {1, CFSMAXNL});
             }
         }
         if (CFS(EQLNum).VBLayerPtr > 0) {
@@ -9853,7 +9855,7 @@ namespace WindowEquivalentLayer {
         SHGCSummer = 0.0;
         TransNormal = 0.0;
 
-        EQLNum = Construct(ConstrNum).EQLConsPtr;
+        EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
 
         // calculate fenestration air-to-air U-value
         CalcEQLWindowUvalue(CFS(EQLNum), UValue);
@@ -9861,8 +9863,8 @@ namespace WindowEquivalentLayer {
 
         // calculate the SHGC and Normal Transmittance
         CalcEQLWindowSHGCAndTransNormal(CFS(EQLNum), SHGCSummer, TransNormal);
-        Construct(ConstrNum).SummerSHGC = SHGCSummer;
-        Construct(ConstrNum).SolTransNorm = TransNormal;
+        dataConstruction.Construct(ConstrNum).SummerSHGC = SHGCSummer;
+        dataConstruction.Construct(ConstrNum).SolTransNorm = TransNormal;
     }
 
     Real64 EQLWindowInsideEffectiveEmiss(int const ConstrNum)
@@ -9900,7 +9902,7 @@ namespace WindowEquivalentLayer {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         // FLOW:
-        return EffectiveEPSLB(CFS(Construct(ConstrNum).EQLConsPtr));
+        return EffectiveEPSLB(CFS(dataConstruction.Construct(ConstrNum).EQLConsPtr));
     }
 
     Real64 EQLWindowOutsideEffectiveEmiss(int const ConstrNum)
@@ -9940,7 +9942,7 @@ namespace WindowEquivalentLayer {
         int EQLNum; // EQL Window object number
 
         // FLOW:
-        EQLNum = Construct(ConstrNum).EQLConsPtr;
+        EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
         OutSideLWEmiss = EffectiveEPSLF(CFS(EQLNum));
 
         return OutSideLWEmiss;

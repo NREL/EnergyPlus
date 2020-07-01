@@ -58,10 +58,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 // Derived class for Finite-Difference Model
 class FiniteDiffGroundTempsModel : public BaseGroundTempsModel
