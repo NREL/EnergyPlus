@@ -54,8 +54,8 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -745,7 +745,7 @@ namespace Photovoltaics {
                 if (!Surface(PVarray(PVnum).SurfacePtr).HeatTransSurf) {
                     ShowSevereError("Must use a surface with heat transfer for IntegratedSurfaceOutsideFace mode in " + PVarray(PVnum).Name);
                     ErrorsFound = true;
-                } else if (!Construct(Surface(PVarray(PVnum).SurfacePtr).Construction).SourceSinkPresent) {
+                } else if (!dataConstruction.Construct(Surface(PVarray(PVnum).SurfacePtr).Construction).SourceSinkPresent) {
                     ShowSevereError("Must use a surface with internal source construction for IntegratedSurfaceOutsideFace mode in " +
                                     PVarray(PVnum).Name);
                     ErrorsFound = true;

@@ -261,6 +261,8 @@ namespace HeatBalanceManager {
     void SetupComplexFenestrationStateInput(int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound);
 
+    void InitConductionTransferFunctions(OutputFiles &outputFiles);
+
 } // namespace HeatBalanceManager
 
 } // namespace EnergyPlus

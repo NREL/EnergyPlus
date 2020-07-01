@@ -57,8 +57,10 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -7414,11 +7416,11 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     // Allocate some needed arrays
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).ListMultiplier = 1;
-    DataHeatBalance::Construct.allocate(1);
-    DataHeatBalance::Construct(1).Name = "A Construction";
+    dataConstruction.Construct.allocate(1);
+    dataConstruction.Construct(1).Name = "A Construction";
     // Avoid trigerring CalcNominalWindowCond
-    DataHeatBalance::Construct(1).SummerSHGC = 0.70;
-    DataHeatBalance::Construct(1).VisTransNorm = 0.80;
+    dataConstruction.Construct(1).SummerSHGC = 0.70;
+    dataConstruction.Construct(1).VisTransNorm = 0.80;
 
     DataHeatBalance::NominalU.allocate(1);
     DataHeatBalance::NominalU(1) = 0.2;
