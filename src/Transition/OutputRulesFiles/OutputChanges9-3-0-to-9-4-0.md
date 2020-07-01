@@ -83,3 +83,33 @@ Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Tur
 24,ZN_1_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000
 24,ZN_1_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000
 ```
+
+### New reporting items added to the _perflog.csv log file for PerformancePrecisionTradeoffs
+
+Two new reporting variables (two columns) related to the new PerformancePrecisionTradeoffs modes are added to the _perflog.csv log file to help with performance tuning of three new added PerformancePrecisionTradeoffs mode. 
+In the log file with _perflog.csv suffix, each simulation will add a line that contains the following the reporting variables (items) below. The two newly added reporting items (Minimum System Timestep, and MaxAllowedDelTemp) are denoted with (*) marks in the following table:
+
+- Program
+- Version
+- TimeStamp
+- Use Coil Direct Solution
+- Zone Radiant Exchange Algorithm
+- Number of Timesteps per Hour
+- Minimum Number of Warmup Days
+- SuppressAllBeginEnvironmentResets
+- Minimum System Timestep (*)
+- MaxZoneTempDiff
+- MaxAllowedDelTemp (*)
+- Electricity ABUPS Total [J]
+- Natural Gas ABUPS Total [J]
+- Additional Fuel ABUPS Total [J]
+- District Cooling ABUPS Total [J]
+- District Heating ABUPS Total [J]
+- Water ABUPS Total [m3]
+- Values Gathered Over [hours]
+- Run Time [seconds]
+- Run Time [string]
+- Number of Warnings
+- Number of Severe
+
+See [8121](https://github.com/NREL/EnergyPlus/pull/8121)

@@ -30,3 +30,12 @@ Field 19, previous field 17. No other changes.
 
 Remaining fields 20 onward are the same as previous fields 18 onwards. No other changes.
 
+# Object Change: `PerformancePrecisionTradeoffs'
+
+Fields 1-2 (A1, A2) remain the same.
+
+Change in Field 3 (A3): two more key values---Mode06 and Mode07---are added.
+
+Field 4 (N1) remains the same.
+
+Insert new Field 5 (N2): MaxAllowedDelTemp, supplied with minimu, maximum, and default values.
