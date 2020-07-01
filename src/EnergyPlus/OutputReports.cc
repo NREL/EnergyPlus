@@ -1971,11 +1971,11 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
         }
     }
     //  ! now do zone surfaces, by zone
-    for (int zones = 1; zones <= NumOfZones; ++zones) {
+    for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
         int oldSurfNum = 0;
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             ++oldSurfNum;
-            if (Surface(surf).Zone != zones) continue;
+            if (Surface(surf).Zone != zoneNum) continue;
             if (Surface(surf).Sides == 0) continue;
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Class == SurfaceClass_Wall) colorindex = 1;
