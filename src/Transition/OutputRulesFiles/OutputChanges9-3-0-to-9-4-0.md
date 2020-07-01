@@ -86,7 +86,7 @@ Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Tur
 
 ### New reporting items added to the _perflog.csv log file for PerformancePrecisionTradeoffs
 
-Two new reporting variables (two columns) related to the new PerformancePrecisionTradeoffs modes are added to the _perflog.csv log file to help with performance tuning of three new added PerformancePrecisionTradeoffs mode. 
+Two new reporting variables (two columns) related to the new PerformancePrecisionTradeoffs modes are added to the _perflog.csv log file to help with performance tuning of newly added and expanded PerformancePrecisionTradeoffs modes. 
 In the log file with _perflog.csv suffix, each simulation will add a line that contains the following the reporting variables (items) below. The two newly added reporting items (Minimum System Timestep, and MaxAllowedDelTemp) are denoted with (*) marks in the following table:
 
 - Program
@@ -111,5 +111,15 @@ In the log file with _perflog.csv suffix, each simulation will add a line that c
 - Run Time [string]
 - Number of Warnings
 - Number of Severe
+
+See [8121](https://github.com/NREL/EnergyPlus/pull/8121)
+
+### EIO reporting items added for PerformancePrecisionTradeoffs
+
+Two new reporting variables (two columns) related to the new PerformancePrecisionTradeoffs modes are added to the .eio file to help with tracing the and tuning of newly added and expanded PerformancePrecisionTradeoffs modes. 
+In the PerformancePrecisionTradeoffs section of .eio file, a line of header of parameter names and a line of corresponding parameter values are reported. Two newly added reporting items (Minimum System Timestep, and MaxAllowedDelTemp) are now added to reporting lines: the parameter names are added to the headline (first line); and the parameter values are added to the data line (secon line). Now the new reporting lines look like the following:
+
+! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, Zone Radiant Exchange Algorithm, Override Mode, Number of Timestep In Hour, Force Euler Method, Minimum Number of Warmup Days, Force Suppress All Begin Environment Resets, Minimum System Timestep, MaxZoneTempDiff, MaxAllowedDelTemp
+ Performance Precision Tradeoffs, No, ScriptF, MODE07, 1, Yes, 1, Yes, 60.0, 1.000, 0.1000
 
 See [8121](https://github.com/NREL/EnergyPlus/pull/8121)
