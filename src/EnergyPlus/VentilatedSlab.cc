@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -321,7 +322,6 @@ namespace VentilatedSlab {
         auto &GetSteamCoilMaxFlowRate(SteamCoils::GetCoilMaxWaterFlowRate);
         auto &GetHXAssistedCoilFlowRate(HVACHXAssistedCoolingCoil::GetCoilMaxWaterFlowRate);
         using DataGlobals::ScheduleAlwaysOn;
-        using DataHeatBalance::Construct;
         using DataHeatBalance::Zone;
         using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
         using ScheduleManager::GetScheduleIndex;
@@ -506,11 +506,11 @@ namespace VentilatedSlab {
                     //        ErrorsFound=.TRUE.
                     //      END IF
                     if (Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction == 0) continue; // invalid construction, detected earlier
-                    if (!Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
+                    if (!dataConstruction.Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
                         ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid surface=\"" +
                                         Surface(VentSlab(Item).SurfacePtr(SurfNum)).Name + "\".");
                         ShowContinueError("Surface Construction does not have a source/sink, Construction name= \"" +
-                                          Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).Name + "\".");
+                                          dataConstruction.Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).Name + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -526,11 +526,11 @@ namespace VentilatedSlab {
                         ErrorsFound = true;
                     }
                     if (Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction == 0) continue; // invalid construction, detected earlier
-                    if (!Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
+                    if (!dataConstruction.Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
                         ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid surface=\"" +
                                         Surface(VentSlab(Item).SurfacePtr(SurfNum)).Name + "\".");
                         ShowContinueError("Surface Construction does not have a source/sink, Construction name= \"" +
-                                          Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).Name + "\".");
+                                          dataConstruction.Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).Name + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -3485,7 +3485,6 @@ namespace VentilatedSlab {
         using DataEnvironment::OutBaroPress;
         using General::RoundSigDigits;
 
-        using DataHeatBalance::Construct;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::CTFTsrcConstPart;
         using DataHeatBalFanSys::MAT;
@@ -3674,9 +3673,9 @@ namespace VentilatedSlab {
                     Cf = RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = CTFTsrcConstPart(SurfNum);
-                    Ch = double(Construct(ConstrNum).CTFTSourceQ(0));
-                    Ci = double(Construct(ConstrNum).CTFTSourceIn(0));
-                    Cj = double(Construct(ConstrNum).CTFTSourceOut(0));
+                    Ch = double(dataConstruction.Construct(ConstrNum).CTFTSourceQ(0));
+                    Ci = double(dataConstruction.Construct(ConstrNum).CTFTSourceIn(0));
+                    Cj = double(dataConstruction.Construct(ConstrNum).CTFTSourceOut(0));
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
@@ -3930,9 +3929,9 @@ namespace VentilatedSlab {
                     Cf = RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = CTFTsrcConstPart(SurfNum);
-                    Ch = double(Construct(ConstrNum).CTFTSourceQ(0));
-                    Ci = double(Construct(ConstrNum).CTFTSourceIn(0));
-                    Cj = double(Construct(ConstrNum).CTFTSourceOut(0));
+                    Ch = double(dataConstruction.Construct(ConstrNum).CTFTSourceQ(0));
+                    Ci = double(dataConstruction.Construct(ConstrNum).CTFTSourceIn(0));
+                    Cj = double(dataConstruction.Construct(ConstrNum).CTFTSourceOut(0));
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));

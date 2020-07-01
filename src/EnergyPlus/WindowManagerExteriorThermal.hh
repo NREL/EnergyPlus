@@ -131,19 +131,19 @@ namespace WindowManager {
         int getNumOfLayers() const;
 
         std::shared_ptr<Tarcog::CBaseIGULayer> getSolidLayer(DataSurfaces::SurfaceData const &surface,
-                                                             DataHeatBalance::MaterialProperties const &material,
+                                                             Material::MaterialProperties const &material,
                                                              int const t_Index,
                                                              int const t_SurfNum);
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getGapLayer(DataHeatBalance::MaterialProperties const &material) const;
+        std::shared_ptr<Tarcog::CBaseIGULayer> getGapLayer(Material::MaterialProperties const &material) const;
 
         std::shared_ptr<Tarcog::CBaseIGULayer> getShadeToGlassLayer(int const t_Index) const;
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getComplexGapLayer(DataHeatBalance::MaterialProperties const &material) const;
+        std::shared_ptr<Tarcog::CBaseIGULayer> getComplexGapLayer(Material::MaterialProperties const &material) const;
 
-        std::shared_ptr<Gases::CGas> getGas(DataHeatBalance::MaterialProperties const &material) const;
+        std::shared_ptr<Gases::CGas> getGas(Material::MaterialProperties const &material) const;
         std::shared_ptr<Gases::CGas> getAir() const;
-        DataHeatBalance::MaterialProperties *getLayerMaterial(int const t_Index) const;
+        Material::MaterialProperties *getLayerMaterial(int const t_Index) const;
     };
 } // namespace WindowManager
 

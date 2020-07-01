@@ -77,7 +77,7 @@ namespace WindowManager {
         return (DotProd > 0);
     }
 
-    std::pair<Real64, Real64> getWCECoordinates(int const t_SurfNum, Vector const &t_Ray, const BSDFHemisphere t_Direction)
+    std::pair<Real64, Real64> getWCECoordinates(WindowComplexManagerData &dataWindowComplexManager, int const t_SurfNum, Vector const &t_Ray, const BSDFHemisphere t_Direction)
     {
         Real64 Theta = 0;
         Real64 Phi = 0;
@@ -86,14 +86,14 @@ namespace WindowManager {
         Real64 Gamma = DegToRadians * Surface(t_SurfNum).Tilt;
         Real64 Alpha = DegToRadians * Surface(t_SurfNum).Azimuth;
 
-        int RadType = Front_Incident;
+        int RadType = dataWindowComplexManager.Front_Incident;
 
         if (t_Direction == BSDFHemisphere::Outgoing) {
-            RadType = Back_Incident;
+            RadType = dataWindowComplexManager.Back_Incident;
         }
 
         // get the corresponding local Theta, Phi for ray
-        W6CoordsFromWorldVect(t_Ray, RadType, Gamma, Alpha, Theta, Phi);
+        W6CoordsFromWorldVect(dataWindowComplexManager, t_Ray, RadType, Gamma, Alpha, Theta, Phi);
 
         Theta = 180 / Pi * Theta;
         Phi = 180 / Pi * Phi;
@@ -101,9 +101,9 @@ namespace WindowManager {
         return std::make_pair(Theta, Phi);
     }
 
-    std::pair<Real64, Real64> getSunWCEAngles(const int t_SurfNum, const BSDFHemisphere t_Direction)
+    std::pair<Real64, Real64> getSunWCEAngles(WindowComplexManagerData &dataWindowComplexManager, const int t_SurfNum, const BSDFHemisphere t_Direction)
     {
-        return getWCECoordinates(t_SurfNum, DataBSDFWindow::SUNCOSTS(TimeStep, HourOfDay, {1, 3}), t_Direction);
+        return getWCECoordinates(dataWindowComplexManager, t_SurfNum, DataBSDFWindow::SUNCOSTS(TimeStep, HourOfDay, {1, 3}), t_Direction);
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ namespace WindowManager {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(MaterialProperties const &t_MaterialProperties)
+    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(Material::MaterialProperties const &t_MaterialProperties)
     {
         Real64 Tsol = t_MaterialProperties.Trans;
         Real64 Rfsol = t_MaterialProperties.ReflectSolBeamFront;

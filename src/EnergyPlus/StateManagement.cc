@@ -50,6 +50,7 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
@@ -213,7 +214,6 @@
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowAC.hh>
-#include <EnergyPlus/WindowComplexManager.hh>
 
 void EnergyPlus::clearThisState(EnergyPlusData &state)
 {
@@ -234,6 +234,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
     DataBranchNodeConnections::clear_state();
+    dataConstruction.clear_state();
     DataContaminantBalance::clear_state();
     DataConvergParams::clear_state();
     DataDefineEquip::clear_state();
@@ -385,6 +386,5 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     WaterUse::clear_state();
     WeatherManager::clear_state();
     WindowAC::clear_state();
-    WindowComplexManager::clear_state();
     ResultsFramework::clear_state();
 }

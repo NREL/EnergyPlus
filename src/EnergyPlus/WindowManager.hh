@@ -68,6 +68,7 @@ namespace EnergyPlus {
 
     // Forward Declarations
     struct EnergyPlusData;
+    struct WindowComplexManagerData;
     struct WindowEquivalentLayerData;
     struct WindowManagerData;
 
@@ -81,9 +82,9 @@ namespace WindowManager {
     //   Optical Calculation Routines
     //   Heat Balance Routines
 
-    void InitWindowOpticalCalculations(WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
+    void InitWindowOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
 
-    void InitGlassOpticalCalculations(WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
+    void InitGlassOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
 
     //*****************************************************************************************
 
@@ -132,13 +133,13 @@ namespace WindowManager {
     // Window Thermal Calculation Subroutines
     //***********************************************************************************
 
-    void CalcWindowHeatBalance(WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalance(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     );
 
-    void CalcWindowHeatBalanceInternalRoutines(WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalanceInternalRoutines(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
                                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
@@ -338,7 +339,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void ReportGlass(WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
+    void ReportGlass(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
 
     //*************************************************************************************
 

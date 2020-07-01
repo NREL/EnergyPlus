@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -138,9 +139,6 @@ namespace LowTempRadiantSystem {
     using DataGlobals::SysSizingCalc;
     using DataGlobals::WarmupFlag;
     using DataHeatBalance::Air;
-    using DataHeatBalance::Construct;
-    using DataHeatBalance::Material;
-    using DataHeatBalance::MaxLayersInConstruct;
     using DataHeatBalance::RegularMaterial;
     using DataHeatBalance::TotConstructs;
     using DataHeatBalance::TotMaterials;
@@ -355,7 +353,6 @@ namespace LowTempRadiantSystem {
         using BranchNodeConnections::TestCompSet;
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::ScheduleAlwaysOn;
-        using DataHeatBalance::Construct;
         using DataHeatBalance::Zone;
         using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;
@@ -578,10 +575,10 @@ namespace LowTempRadiantSystem {
                     ErrorsFound = true;
                 }
                 if (Surface(thisRadSys.SurfacePtr(SurfNum)).Construction == 0) continue; // Invalid construction -- detected earlier
-                if (!Construct(Surface(thisRadSys.SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
+                if (!dataConstruction.Construct(Surface(thisRadSys.SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
                     ShowSevereError("Construction referenced in Hydronic Radiant System Surface does not have a source/sink present");
                     ShowContinueError("Surface name= " + Surface(thisRadSys.SurfacePtr(SurfNum)).Name +
-                                      "  Construction name = " + Construct(Surface(thisRadSys.SurfacePtr(SurfNum)).Construction).Name);
+                                      "  Construction name = " + dataConstruction.Construct(Surface(thisRadSys.SurfacePtr(SurfNum)).Construction).Name);
                     ShowContinueError("Construction needs to be defined with a \"Construction:InternalSource\" object.");
                     ErrorsFound = true;
                 }
@@ -913,10 +910,10 @@ namespace LowTempRadiantSystem {
                     ErrorsFound = true;
                 }
                 if (Surface(thisCFloSys.SurfacePtr(SurfNum)).Construction == 0) continue; // invalid construction, detected earlier
-                if (!Construct(Surface(thisCFloSys.SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
+                if (!dataConstruction.Construct(Surface(thisCFloSys.SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
                     ShowSevereError("Construction referenced in Constant Flow Radiant System Surface does not have a source/sink");
                     ShowContinueError("Surface name= " + Surface(thisCFloSys.SurfacePtr(SurfNum)).Name +
-                                      "  Construction name = " + Construct(Surface(thisCFloSys.SurfacePtr(SurfNum)).Construction).Name);
+                                      "  Construction name = " + dataConstruction.Construct(Surface(thisCFloSys.SurfacePtr(SurfNum)).Construction).Name);
                     ShowContinueError("Construction needs to be defined with a \"Construction:InternalSource\" object.");
                     ErrorsFound = true;
                 }
@@ -1150,10 +1147,10 @@ namespace LowTempRadiantSystem {
                     ErrorsFound = true;
                 }
                 if (Surface(thisElecSys.SurfacePtr(SurfNum)).Construction == 0) continue; // invalid construction -- detected earlier
-                if (!Construct(Surface(thisElecSys.SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
+                if (!dataConstruction.Construct(Surface(thisElecSys.SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
                     ShowSevereError("Construction referenced in Electric Radiant System Surface does not have a source/sink present");
                     ShowContinueError("Surface name= " + Surface(thisElecSys.SurfacePtr(SurfNum)).Name +
-                                      "  Construction name = " + Construct(Surface(thisElecSys.SurfacePtr(SurfNum)).Construction).Name);
+                                      "  Construction name = " + dataConstruction.Construct(Surface(thisElecSys.SurfacePtr(SurfNum)).Construction).Name);
                     ShowContinueError("Construction needs to be defined with a \"Construction:InternalSource\" object.");
                     ErrorsFound = true;
                 }
@@ -2979,7 +2976,7 @@ namespace LowTempRadiantSystem {
 
         for (int surfNum = 1; surfNum <= this->NumOfSurfaces; ++surfNum) {
             auto &thisHydrSysSurf(Surface(this->SurfacePtr(surfNum)));
-            auto &thisHydrSpacing(Construct(thisHydrSysSurf.Construction).ThicknessPerpend);
+            auto &thisHydrSpacing(dataConstruction.Construct(thisHydrSysSurf.Construction).ThicknessPerpend);
             if ((thisHydrSpacing > 0.005) && (thisHydrSpacing < 0.5)) { // limit allowable spacing to between 1cm and 1m
                 tubeLength += thisHydrSysSurf.Area / (2.0 * thisHydrSpacing);
             } else { // if not in allowable limit, default back to 0.15m (15cm or 6 inches)
@@ -3186,7 +3183,6 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
-        using DataHeatBalance::Construct;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::CTFTsrcConstPart;
         using DataHeatBalFanSys::RadSysTiHBConstCoef;
@@ -3354,9 +3350,9 @@ namespace LowTempRadiantSystem {
                     Cf = RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = CTFTsrcConstPart(SurfNum);
-                    Ch = Construct(ConstrNum).CTFTSourceQ(0);
-                    Ci = Construct(ConstrNum).CTFTSourceIn(0);
-                    Cj = Construct(ConstrNum).CTFTSourceOut(0);
+                    Ch = dataConstruction.Construct(ConstrNum).CTFTSourceQ(0);
+                    Ci = dataConstruction.Construct(ConstrNum).CTFTSourceIn(0);
+                    Cj = dataConstruction.Construct(ConstrNum).CTFTSourceOut(0);
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
@@ -3564,9 +3560,9 @@ namespace LowTempRadiantSystem {
                                 Ce = RadSysToHBTinCoef(SurfNum);
                                 Cf = RadSysToHBQsrcCoef(SurfNum);
                                 Cg = CTFTsrcConstPart(SurfNum);
-                                Ch = Construct(ConstrNum).CTFTSourceQ(0);
-                                Ci = Construct(ConstrNum).CTFTSourceIn(0);
-                                Cj = Construct(ConstrNum).CTFTSourceOut(0);
+                                Ch = dataConstruction.Construct(ConstrNum).CTFTSourceQ(0);
+                                Ci = dataConstruction.Construct(ConstrNum).CTFTSourceIn(0);
+                                Cj = dataConstruction.Construct(ConstrNum).CTFTSourceOut(0);
                                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
                                 QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
@@ -4218,7 +4214,6 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
-        using DataHeatBalance::Construct;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::CTFTsrcConstPart;
         using DataHeatBalFanSys::RadSysTiHBConstCoef;
@@ -4411,9 +4406,9 @@ namespace LowTempRadiantSystem {
                 Cf = RadSysToHBQsrcCoef(SurfNum);
 
                 Cg = CTFTsrcConstPart(SurfNum);
-                Ch = Construct(ConstrNum).CTFTSourceQ(0);
-                Ci = Construct(ConstrNum).CTFTSourceIn(0);
-                Cj = Construct(ConstrNum).CTFTSourceOut(0);
+                Ch = dataConstruction.Construct(ConstrNum).CTFTSourceQ(0);
+                Ci = dataConstruction.Construct(ConstrNum).CTFTSourceIn(0);
+                Cj = dataConstruction.Construct(ConstrNum).CTFTSourceOut(0);
 
                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));

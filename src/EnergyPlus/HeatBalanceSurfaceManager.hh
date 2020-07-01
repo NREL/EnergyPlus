@@ -58,6 +58,7 @@ namespace EnergyPlus {
 
     // Forward declarations
     struct EnergyPlusData;
+    struct WindowComplexManagerData;
     struct ZoneTempPredictorCorrectorData;
     struct ChilledCeilingPanelSimpleData;
 
@@ -97,7 +98,7 @@ namespace HeatBalanceSurfaceManager {
 
     void InitThermalAndFluxHistories();
 
-    void InitSolarHeatGains(WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager);
+    void InitSolarHeatGains(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager);
 
     void InitIntSolarDistribution();
 

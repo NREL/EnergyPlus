@@ -59,6 +59,7 @@ namespace EnergyPlus {
 
     // Forward Declarations
     struct EnergyPlusData;
+    struct WindowComplexManagerData;
     struct WindowEquivalentLayerData;
     struct WindowManagerData;
     class OutputFiles;
@@ -199,7 +200,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
+    void InitHeatBalance(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
 
     void AllocateHeatBalArrays();
 
@@ -261,6 +262,8 @@ namespace HeatBalanceManager {
 
     void SetupComplexFenestrationStateInput(int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound);
+
+    void InitConductionTransferFunctions(OutputFiles &outputFiles);
 
 } // namespace HeatBalanceManager
 

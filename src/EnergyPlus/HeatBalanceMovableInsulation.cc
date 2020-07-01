@@ -53,6 +53,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -72,7 +73,6 @@ namespace HeatBalanceMovableInsulation {
 
     // USE STATEMENTS:
     using namespace DataPrecisionGlobals;
-    using DataHeatBalance::Material;
     using DataSurfaces::Surface;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -115,24 +115,24 @@ namespace HeatBalanceMovableInsulation {
             } else { // Movable insulation present-->calculate output parameters
 
                 // Double check resistance and conductivity to avoid divide by zero problems
-                if ((Material(MaterialIndex).Resistance) <= 0.0) {
-                    if ((Material(MaterialIndex).Conductivity) > 0.0) {
-                        Material(MaterialIndex).Resistance =
-                            Material(Surface(SurfNum).MaterialMovInsulExt).Thickness / Material(Surface(SurfNum).MaterialMovInsulExt).Conductivity;
+                if ((dataMaterial.Material(MaterialIndex).Resistance) <= 0.0) {
+                    if ((dataMaterial.Material(MaterialIndex).Conductivity) > 0.0) {
+                        dataMaterial.Material(MaterialIndex).Resistance =
+                            dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).Thickness / dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).Conductivity;
                     } else {
                         ShowFatalError("EvalOutsideMovableInsulation: No resistance or conductivity found for material " +
-                                       Material(Surface(SurfNum).MaterialMovInsulExt).Name);
+                                       dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).Name);
                     }
                 }
 
-                HMovInsul = 1.0 / (MovInsulSchedVal * Material(MaterialIndex).Resistance);
-                RoughIndexMovInsul = Material(MaterialIndex).Roughness;
+                HMovInsul = 1.0 / (MovInsulSchedVal * dataMaterial.Material(MaterialIndex).Resistance);
+                RoughIndexMovInsul = dataMaterial.Material(MaterialIndex).Roughness;
                 {
-                    auto const MaterialGroupNum(Material(MaterialIndex).Group);
+                    auto const MaterialGroupNum(dataMaterial.Material(MaterialIndex).Group);
                     if ((MaterialGroupNum == DataHeatBalance::WindowGlass) || (MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer)) {
-                        AbsExt = max(0.0, 1.0 - Material(MaterialIndex).Trans - Material(MaterialIndex).ReflectSolBeamFront);
+                        AbsExt = max(0.0, 1.0 - dataMaterial.Material(MaterialIndex).Trans - dataMaterial.Material(MaterialIndex).ReflectSolBeamFront);
                     } else {
-                        AbsExt = Material(MaterialIndex).AbsorpSolar;
+                        AbsExt = dataMaterial.Material(MaterialIndex).AbsorpSolar;
                     }
                 }
             }
@@ -181,22 +181,22 @@ namespace HeatBalanceMovableInsulation {
 
                 Surface(SurfNum).MovInsulIntPresent = true;
                 int const &thisMovableInt = Surface(SurfNum).MaterialMovInsulInt;
-                if ((Material(thisMovableInt).Resistance) <= 0.0) {
-                    if (Material(thisMovableInt).Conductivity > 0.0 && Material(thisMovableInt).Thickness > 0.0) {
-                        Material(thisMovableInt).Resistance = Material(thisMovableInt).Thickness / Material(thisMovableInt).Conductivity;
+                if ((dataMaterial.Material(thisMovableInt).Resistance) <= 0.0) {
+                    if (dataMaterial.Material(thisMovableInt).Conductivity > 0.0 && dataMaterial.Material(thisMovableInt).Thickness > 0.0) {
+                        dataMaterial.Material(thisMovableInt).Resistance = dataMaterial.Material(thisMovableInt).Thickness / dataMaterial.Material(thisMovableInt).Conductivity;
                     } else {
-                        ShowFatalError("EvalInsideMovableInsulation: No resistance found for material " + Material(MaterialIndex).Name);
+                        ShowFatalError("EvalInsideMovableInsulation: No resistance found for material " + dataMaterial.Material(MaterialIndex).Name);
                     }
                 }
 
-                HMovInsul = 1.0 / (MovInsulSchedVal * Material(MaterialIndex).Resistance);
+                HMovInsul = 1.0 / (MovInsulSchedVal * dataMaterial.Material(MaterialIndex).Resistance);
 
                 {
-                    auto const MaterialGroupNum(Material(MaterialIndex).Group);
+                    auto const MaterialGroupNum(dataMaterial.Material(MaterialIndex).Group);
                     if ((MaterialGroupNum == DataHeatBalance::WindowGlass) || (MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer)) {
-                        AbsInt = max(0.0, 1.0 - Material(MaterialIndex).Trans - Material(MaterialIndex).ReflectSolBeamFront);
+                        AbsInt = max(0.0, 1.0 - dataMaterial.Material(MaterialIndex).Trans - dataMaterial.Material(MaterialIndex).ReflectSolBeamFront);
                     } else {
-                        AbsInt = Material(MaterialIndex).AbsorpSolar;
+                        AbsInt = dataMaterial.Material(MaterialIndex).AbsorpSolar;
                     }
                 }
             }

@@ -45,7 +45,15 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// C++ Headers
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <limits>
+#include <tuple>
+
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -56,13 +64,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowManager.hh>
-
-// C++ Headers
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <limits>
-#include <tuple>
 
 namespace EnergyPlus {
 
@@ -898,7 +899,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Returns total number of layer for current surface
 
-        auto &construction(Construct(Construction));
+        auto &construction(dataConstruction.Construct(Construction));
         return construction.TotLayers;
     }
 
