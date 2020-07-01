@@ -85,8 +85,6 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     bool ErrorsFound(false);
     int ThisSurf(0);
-    Real64 dummy1;
-    Real64 dummy2;
 
     // Surface 1 - Rectangle
     ThisSurf = 1;
@@ -111,7 +109,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(4).y = 0.0;
     Surface(ThisSurf).Vertex(4).z = 2.0;
 
-    ProcessSurfaceVertices(state.outputFiles, ThisSurf, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Rectangle, Surface(ThisSurf).Shape);
 
@@ -138,7 +136,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(4).y = 0.0;
     Surface(ThisSurf).Vertex(4).z = 2.0;
 
-    ProcessSurfaceVertices(state.outputFiles, ThisSurf, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(ThisSurf).Shape);
 
@@ -165,7 +163,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(4).y = 0.0;
     Surface(ThisSurf).Vertex(4).z = 2.0;
 
-    ProcessSurfaceVertices(state.outputFiles, ThisSurf, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(ThisSurf).Shape);
 
@@ -188,7 +186,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(3).y = 0.0;
     Surface(ThisSurf).Vertex(3).z = 2.0;
 
-    ProcessSurfaceVertices(state.outputFiles, ThisSurf, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Triangle, Surface(ThisSurf).Shape);
 
@@ -219,7 +217,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(5).y = 0.0;
     Surface(ThisSurf).Vertex(5).z = 3.0;
 
-    ProcessSurfaceVertices(state.outputFiles, ThisSurf, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Polygonal, Surface(ThisSurf).Shape);
 }
@@ -495,8 +493,6 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     // compare_err_stream( "" ); // just for debugging
 
     AllocateModuleArrays();
-    Real64 dummy1;
-    Real64 dummy2;
 
     //  Adding additional surfaces will change the index of the following based on where the surfaces are added in the array.
     //	If adding new tests, break here and look at EnergyPlus::DataSurfaces::Surface to see the order.
@@ -504,61 +500,61 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     //	enum surfaceShape:Triangle = 1
     //	"Surface 1 - Triangle"
     int surfNum = UtilityRoutines::FindItemInList("SURFACE 1 - TRIANGLE", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.outputFiles, surfNum, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::Triangle, Surface(surfNum).Shape);
 
     //	enum surfaceShape:Quadrilateral = 2
     //	"Surface 2 - Quadrilateral"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 2 - QUADRILATERAL", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.outputFiles, surfNum, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(surfNum).Shape);
 
     //	enum surfaceShape:Rectangle = 3
     //	"Surface 3 - Rectangle"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 3 - RECTANGLE", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.outputFiles, surfNum, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::Rectangle, Surface(surfNum).Shape);
 
     //	enum surfaceShape:RectangularDoorWindow = 4
     //	"Surface 4 - RectangularDoorWindow"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 4 - RECTANGULARDOORWINDOW", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.outputFiles, surfNum, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::RectangularDoorWindow, Surface(surfNum).Shape);
 
     //	enum surfaceShape:RectangularOverhang = 5
     //	"Surface 5 - RectangularOverhang"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 5 - RECTANGULAROVERHANG", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.outputFiles, surfNum, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, surfNum, ErrorsFound);
     EXPECT_NE(SurfaceShape::RectangularOverhang, Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularLeftFin = 6
     //	"Surface 6 - RectangularLeftFin"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 6 - RECTANGULARLEFTFIN Left", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.outputFiles, surfNum, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, surfNum, ErrorsFound);
     EXPECT_NE(SurfaceShape::RectangularLeftFin, Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularRightFin = 7
     //	"Surface 7 - RectangularRightFin"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 7 - RECTANGULARRIGHTFIN Right", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.outputFiles, surfNum, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, surfNum, ErrorsFound);
     EXPECT_NE(SurfaceShape::RectangularRightFin, Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:TriangularWindow = 8
     //	"Surface 8 - TriangularWindow"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 8 - TRIANGULARWINDOW", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.outputFiles, surfNum, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::TriangularWindow, Surface(surfNum).Shape);
 
     //	enum surfaceShape:TriangularDoor = 9
     //	"Surface 9 - TriangularDoor"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 9 - TRIANGULARDOOR", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.outputFiles, surfNum, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::TriangularDoor, Surface(surfNum).Shape);
 
     //	enum surfaceShape:Polygonal = 10
     //	"Surface 10 - Polygonal"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 10 - POLYGONAL", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.outputFiles, surfNum, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(state.outputFiles, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::Polygonal, Surface(surfNum).Shape);
 }
 

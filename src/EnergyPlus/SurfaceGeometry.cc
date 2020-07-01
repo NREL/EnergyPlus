@@ -316,10 +316,6 @@ namespace SurfaceGeometry {
         FixedShadingCount = 0;
         AttachedShadingCount = 0;
 
-        // Shift of X and Y to Lower Left Corner - saved for base surfaces to use for subsurfaces 
-        std::vector<Real64> baseXShift(DataSurfaces::TotSurfaces + 1, 0.0);
-        std::vector<Real64> baseYShift(DataSurfaces::TotSurfaces + 1, 0.0);
-
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces...
 
             AirSkyRadSplit(SurfNum) = std::sqrt(0.5 * (1.0 + Surface(SurfNum).CosTilt));
@@ -333,10 +329,7 @@ namespace SurfaceGeometry {
             if (Surface(SurfNum).Class == SurfaceClass_Detached_F) ++FixedShadingCount;
             if (Surface(SurfNum).Class == SurfaceClass_Detached_B) ++BuildingShadingCount;
 
-            Real64 thisXShift = baseXShift[Surface(SurfNum).BaseSurf];
-            Real64 thisYShift = baseYShift[Surface(SurfNum).BaseSurf];
-
-            if (Surface(SurfNum).Class != SurfaceClass_IntMass) ProcessSurfaceVertices(state.outputFiles, SurfNum, thisXShift, thisYShift, ErrorsFound);
+            if (Surface(SurfNum).Class != SurfaceClass_IntMass) ProcessSurfaceVertices(state.outputFiles, SurfNum, ErrorsFound);
         }
 
         for (auto &e : Zone) {
@@ -10720,11 +10713,7 @@ namespace SurfaceGeometry {
         return (std::abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < tol);
     }
 
-    void ProcessSurfaceVertices(OutputFiles &outputFiles,
-                                int const ThisSurf, // Surface Number
-                                Real64  &thisXShift, // Base surface shift of X to Lower Left Corner
-                                Real64  &thisYShift, // Base surface shift of Y to Lower Left Corner
-                                bool &ErrorsFound)
+    void ProcessSurfaceVertices(OutputFiles &outputFiles, int const ThisSurf, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11214,9 +11203,10 @@ namespace SurfaceGeometry {
                 X1 = Xpsv(2) - CoordinateTransVector.x;
                 Y1 = Ypsv(2) - CoordinateTransVector.y;
                 Z1 = Zpsv(2) - CoordinateTransVector.z;
-                thisXShift = Surface(ThisBaseSurface).lcsx.x * X1 + Surface(ThisBaseSurface).lcsx.y * Y1 + Surface(ThisBaseSurface).lcsx.z * Z1;
-                thisYShift = Surface(ThisBaseSurface).lcsy.x * X1 + Surface(ThisBaseSurface).lcsy.y * Y1 + Surface(ThisBaseSurface).lcsy.z * Z1;
-
+                // Store the relative coordinate shift values for later use by any subsurfaces
+                Surface(ThisBaseSurface).XShift = Surface(ThisBaseSurface).lcsx.x * X1 + Surface(ThisBaseSurface).lcsx.y * Y1 + Surface(ThisBaseSurface).lcsx.z * Z1;
+                Surface(ThisBaseSurface).YShift = Surface(ThisBaseSurface).lcsy.x * X1 + Surface(ThisBaseSurface).lcsy.y * Y1 + Surface(ThisBaseSurface).lcsy.z * Z1;
+                Surface(ThisBaseSurface).VerticesProcessed = true;
             }
 
             // SUBSURFACES: (Surface(ThisSurf)%BaseSurf /= ThisSurf)
@@ -11225,10 +11215,14 @@ namespace SurfaceGeometry {
 
             // SHIFT RELATIVE COORDINATES FROM LOWER LEFT CORNER TO ORIGIN DEFINED
             // BY CTRAN AND SET DIRECTION COSINES SAME AS BASE SURFACE.
+            if (!Surface(ThisBaseSurface).VerticesProcessed) {
+                ShowFatalError(RoutineName + "Developer error for Subsurface=" + Surface(ThisSurf).Name);
+                ShowContinueError("Base surface=" + Surface(ThisBaseSurface).Name + " vertices must be processed before any subsurfaces.");
+            }
 
             for (n = 1; n <= Surface(ThisSurf).Sides; ++n) {
-                ShadeV(ThisSurf).XV(n) += thisXShift;
-                ShadeV(ThisSurf).YV(n) += thisYShift;
+                ShadeV(ThisSurf).XV(n) += Surface(ThisBaseSurface).XShift;
+                ShadeV(ThisSurf).YV(n) += Surface(ThisBaseSurface).YShift;
             }
         }
 

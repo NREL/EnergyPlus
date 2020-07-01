@@ -693,6 +693,9 @@ namespace DataSurfaces {
         Real64 CosTilt;                   // Cosine of surface tilt angle
         bool IsConvex;                    // true if the surface is convex.
         bool IsDegenerate;                // true if the surface is degenerate.
+        bool VerticesProcessed;           // true if vertices have been processed (only used for base surfaces)
+        Real64 XShift;                    // relative coordinate shift data - used by child subsurfaces
+        Real64 YShift;                    // relative coordinate shift data - used by child subsurfaces
         // Precomputed parameters for PierceSurface performance
         ShapeCat shapeCat;   // Shape category
         Plane plane;         // Plane
@@ -795,11 +798,12 @@ namespace DataSurfaces {
               ShadowSurfRecSurfNum(0), MaterialMovInsulExt(0), MaterialMovInsulInt(0), SchedMovInsulExt(0), SchedMovInsulInt(0),
               MovInsulIntPresent(false), MovInsulIntPresentPrevTS(false), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
               lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
-              CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0),
-              WindowShadingControlPtr(0), HasShadeControl(false), ShadedConstruction(0), StormWinConstruction(0), StormWinShadedConstruction(0),
-              FrameDivider(0), Multiplier(1.0), Shelf(0), TAirRef(ZoneMeanAirTemp), OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false),
-              OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0), OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0),
-              WindSpeed(0.0), WindSpeedEMSOverrideOn(false), WindSpeedEMSOverrideValue(0.0),
+              CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
+              shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0), WindowShadingControlPtr(0), HasShadeControl(false), ShadedConstruction(0),
+              StormWinConstruction(0), StormWinShadedConstruction(0), FrameDivider(0), Multiplier(1.0), Shelf(0), TAirRef(ZoneMeanAirTemp),
+              OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0),
+              OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),
+              WindSpeedEMSOverrideValue(0.0),
 
               WindDir(0.0), WindDirEMSOverrideOn(false), WindDirEMSOverrideValue(0.0),
 
