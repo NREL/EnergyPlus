@@ -2132,3 +2132,72 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
 }
+
+TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
+{
+    Real64 offTemperature;
+    Real64 controlTemperature;
+    Real64 throttlingRange;
+    Real64 functionResult;
+    Real64 expectedResult;
+
+    HydrRadSys.allocate(1);
+    auto &thisRadSys (HydrRadSys(1));
+    
+    // Test 1: Temperature Difference is 0-->answer should be 0.0
+    offTemperature = 15.0;
+    controlTemperature = 15.0;
+    throttlingRange = 1.0;
+    expectedResult = 0.0;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test 2a: Temperature Difference is not zero and positive, throttling range is zero-->answer should be 1.0
+    offTemperature = 16.0;
+    controlTemperature = 15.0;
+    throttlingRange = 0.0;
+    expectedResult = 1.0;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test 2b: Temperature Difference is not zero and negtive, throttling range is zero-->answer should be 1.0
+    offTemperature = 14.0;
+    controlTemperature = 15.0;
+    throttlingRange = 0.0;
+    expectedResult = 1.0;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test 3a: Temperature Difference is not zero and positive, throttling range is non-zero but less than temperature difference
+    offTemperature = 16.0;
+    controlTemperature = 15.0;
+    throttlingRange = 0.5;
+    expectedResult = 2.0;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test 3b: Temperature Difference is not zero and negative, throttling range is non-zero but less than temperature difference
+    offTemperature = 16.0;
+    controlTemperature = 15.0;
+    throttlingRange = 0.5;
+    expectedResult = 2.0;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test 4a: Temperature Difference is not zero and positive, throttling range is non-zero but greater than temperature difference
+    offTemperature = 16.0;
+    controlTemperature = 15.0;
+    throttlingRange = 2.0;
+    expectedResult = 0.5;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test 4b: Temperature Difference is not zero and negative, throttling range is non-zero but greater than temperature difference
+    offTemperature = 14.0;
+    controlTemperature = 15.0;
+    throttlingRange = 2.0;
+    expectedResult = 0.5;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+    
+}

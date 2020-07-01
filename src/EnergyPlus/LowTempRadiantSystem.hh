@@ -165,6 +165,8 @@ namespace LowTempRadiantSystem {
                                                           ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
                                                           Real64 &LoadMet) = 0;
 
+        Real64 calculateOperationalFraction(Real64 const offTemperature, Real64 const controlTemperature, Real64 const throttlingRange);
+
         void updateLowTemperatureRadiantSystemSurfaces();
 
         virtual void updateLowTemperatureRadiantSystem() = 0;
