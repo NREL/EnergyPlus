@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -62,9 +62,12 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 
@@ -119,10 +122,10 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
 
     // Construction
     surface.Construction = 1;
-    DataHeatBalance::Construct.allocate(1);
-    DataHeatBalance::ConstructionData &construction = DataHeatBalance::Construct(1);
+    dataConstruction.Construct.allocate(1);
+    Construction::ConstructionProps &construction = dataConstruction.Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", DataHeatBalance::Material);
+    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", dataMaterial.Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD();
@@ -189,7 +192,7 @@ TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
     MoistureBalanceEMPDManager::GetMoistureBalanceEMPDInput();
 
-    const DataHeatBalance::MaterialProperties &material = DataHeatBalance::Material(1);
+    const Material::MaterialProperties &material = dataMaterial.Material(1);
     ASSERT_NEAR(material.EMPDSurfaceDepth, 0.014143, 0.000001);
     ASSERT_NEAR(material.EMPDDeepDepth, 0.064810, 0.000001);
 }
@@ -245,10 +248,10 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
 
     // Construction
     surface.Construction = 1;
-    DataHeatBalance::Construct.allocate(1);
-    DataHeatBalance::ConstructionData &construction = DataHeatBalance::Construct(1);
+    dataConstruction.Construct.allocate(1);
+    Construction::ConstructionProps &construction = dataConstruction.Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", DataHeatBalance::Material);
+    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", dataMaterial.Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD();
@@ -337,10 +340,10 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Construction
     int constNum = 1;
     surface.Construction = constNum;
-    DataHeatBalance::Construct.allocate( constNum );
-    DataHeatBalance::ConstructionData &construction = DataHeatBalance::Construct( constNum );
+    dataConstruction.Construct.allocate( constNum );
+    Construction::ConstructionProps &construction = dataConstruction.Construct( constNum );
     construction.TotLayers = constNum;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("WOOD", DataHeatBalance::Material);
+    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("WOOD", dataMaterial.Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD();
@@ -357,17 +360,16 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     DataMoistureBalanceEMPD::RVdeepOld(surfNum) = 0.0051402944814058216;
     DataMoistureBalanceEMPD::RVSurfLayerOld(surfNum) = 0.0070277983586713262;
 
-    using DataHeatBalance::Material;
     using DataHeatBalSurface::TempSurfIn;
     using Psychrometrics::PsyRhFnTdbRhov;
 
-    auto const &material(Material(1));
+    auto const &material(dataMaterial.Material(1));
 
     Real64 Tsat(0.0);
     Real64 const KelvinConv(273.15);
     DataHeatBalSurface::TempSurfIn.allocate(surfNum);
     DataHeatBalSurface::TempSurfIn(surfNum) = 20.0;
-    
+
     // Calculate average vapor density [kg/m^3]
     Real64 Taver = DataHeatBalSurface::TempSurfIn(surfNum);
     // Calculate RH for use in material property calculations.

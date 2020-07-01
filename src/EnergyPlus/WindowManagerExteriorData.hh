@@ -48,15 +48,19 @@
 #ifndef WindowManagerExteriorData_hh_INCLUDED
 #define WindowManagerExteriorData_hh_INCLUDED
 
+// C++ Headers
 #include <map>
 #include <memory>
 #include <vector>
 
+// EnergyPlus Headers
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Vectors.hh>
-#include <EnergyPlus/WindowComplexManager.hh>
 
 namespace EnergyPlus {
 
+    //forward declaration
+    struct EnergyPlusData;
     struct WindowComplexManagerData;
 
 namespace DataHeatBalance {
@@ -124,7 +128,7 @@ namespace WindowManager {
     public:
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(int const t_SampleDataPtr);
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData>
-        getSpectralSample(DataHeatBalance::MaterialProperties const &t_MaterialProperties);
+        getSpectralSample(Material::MaterialProperties const &t_MaterialProperties);
         static std::shared_ptr<FenestrationCommon::CSeries> getDefaultSolarRadiationSpectrum(WindowManagerData &dataWindowManager);
         static std::shared_ptr<FenestrationCommon::CSeries> getDefaultVisiblePhotopicResponse(WindowManagerData &dataWindowManager);
     };

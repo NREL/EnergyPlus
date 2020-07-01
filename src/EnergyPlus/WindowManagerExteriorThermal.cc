@@ -46,10 +46,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowManager.hh>
 
@@ -68,7 +69,6 @@ using namespace FenestrationCommon;
 using namespace DataEnvironment;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataHeatBalFanSys;
 using namespace DataGlobals;
 using namespace General;
 
@@ -94,7 +94,7 @@ namespace WindowManager {
         auto &window(SurfaceWindow(SurfNum));
         auto &surface(Surface(SurfNum));
         auto ConstrNum = surface.Construction;
-        auto &construction(Construct(ConstrNum));
+        auto &construction(dataConstruction.Construct(ConstrNum));
 
         auto const solutionTolerance = 0.02;
 
@@ -298,7 +298,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    MaterialProperties *CWCEHeatTransferFactory::getLayerMaterial(int const t_Index) const
+    Material::MaterialProperties *CWCEHeatTransferFactory::getLayerMaterial(int const t_Index) const
     {
         auto ConstrNum = m_Surface.Construction;
 
@@ -309,9 +309,9 @@ namespace WindowManager {
             if (m_Window.StormWinFlag > 0) ConstrNum = m_Surface.StormWinShadedConstruction;
         }
 
-        auto &construction(Construct(ConstrNum));
+        auto &construction(dataConstruction.Construct(ConstrNum));
         auto LayPtr = construction.LayerPoint(t_Index);
-        return &Material(LayPtr);
+        return &dataMaterial.Material(LayPtr);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -339,12 +339,12 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     int CWCEHeatTransferFactory::getNumOfLayers() const
     {
-        return Construct(m_ConstructionNumber).TotLayers;
+        return dataConstruction.Construct(m_ConstructionNumber).TotLayers;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CBaseIGULayer>
-    CWCEHeatTransferFactory::getSolidLayer(SurfaceData const &surface, MaterialProperties const &material, int const t_Index, int const t_SurfNum)
+    CWCEHeatTransferFactory::getSolidLayer(SurfaceData const &surface, Material::MaterialProperties const &material, int const t_Index, int const t_SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -466,7 +466,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getGapLayer(MaterialProperties const &material) const
+    std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getGapLayer(Material::MaterialProperties const &material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -510,7 +510,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getComplexGapLayer(MaterialProperties const &material) const
+    std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getComplexGapLayer(Material::MaterialProperties const &material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -523,14 +523,14 @@ namespace WindowManager {
         auto const pres = 1e5; // Old code uses this constant pressure
         auto thickness = material.Thickness;
         auto gasPointer = material.GasPointer;
-        auto &gasMaterial(Material(gasPointer));
+        auto &gasMaterial(dataMaterial.Material(gasPointer));
         auto aGas = getGas(gasMaterial);
         std::shared_ptr<CBaseIGULayer> aLayer = std::make_shared<CIGUGapLayer>(thickness, pres, aGas);
         return aLayer;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CGas> CWCEHeatTransferFactory::getGas(MaterialProperties const &material) const
+    std::shared_ptr<CGas> CWCEHeatTransferFactory::getGas(Material::MaterialProperties const &material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic

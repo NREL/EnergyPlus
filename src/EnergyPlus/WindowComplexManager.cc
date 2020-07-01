@@ -57,20 +57,19 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataShadowingCombinations.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/General.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/PierceSurface.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -97,7 +96,6 @@ namespace WindowComplexManager {
     //  Initialize data for solar and thermal calculations and also performs thermal calculations for BSDF window
 
     using namespace DataComplexFenestration;
-    using namespace DataPrecisionGlobals;
     using namespace DataVectorTypes;
     using namespace DataBSDFWindow;
     using DataGlobals::DegToRadians;
@@ -185,7 +183,7 @@ namespace WindowComplexManager {
         //            below should be modified to enter both of the bases into the basis list.
 
         for (IConst = FirstBSDF; IConst <= FirstBSDF + TotComplexFenStates - 1; ++IConst) {
-            MatrixNo = Construct(IConst).BSDFInput.BasisMatIndex;
+            MatrixNo = dataConstruction.Construct(IConst).BSDFInput.BasisMatIndex;
             if (NumBasis == 0) {
                 NumBasis = 1;
                 ConstructBasis(IConst, dataWindowComplexManager.BasisList(1));
@@ -212,7 +210,7 @@ namespace WindowComplexManager {
         for (ISurf = 1; ISurf <= TotSurfaces; ++ISurf) {
             IConst = Surface(ISurf).Construction;
             if (IConst == 0) continue; // This is true for overhangs (Shading:Zone:Detailed)
-            if (!(Construct(IConst).TypeIsWindow && (Construct(IConst).WindowTypeBSDF))) continue; // Only BSDF windows
+            if (!(dataConstruction.Construct(IConst).TypeIsWindow && (dataConstruction.Construct(IConst).WindowTypeBSDF))) continue; // Only BSDF windows
             // Simon Check: Thermal construction removed
             // ThConst = Construct(IConst)%BSDFInput%ThermalConstruction
             SurfaceWindow(ISurf).WindowModelType = WindowBSDFModel;
@@ -231,7 +229,7 @@ namespace WindowComplexManager {
             // Simon Check: ThermalConstruction assigned to current construction
             // dataWindowComplexManager.WindowStateList(NumComplexWind, NumStates)%ThermConst = ThConst
             for (I = 1; I <= NumBasis; ++I) { // Find basis in Basis List
-                if (Construct(IConst).BSDFInput.BasisMatIndex == dataWindowComplexManager.BasisList(I).BasisMatIndex) {
+                if (dataConstruction.Construct(IConst).BSDFInput.BasisMatIndex == dataWindowComplexManager.BasisList(I).BasisMatIndex) {
                     dataWindowComplexManager.WindowStateList(NumStates, dataWindowComplexManager.NumComplexWind).IncBasisIndx = I; // Note: square property matrices
                     dataWindowComplexManager.WindowStateList(NumStates, dataWindowComplexManager.NumComplexWind).TrnBasisIndx = I; //   assumption
                 }
@@ -779,22 +777,22 @@ namespace WindowComplexManager {
             for (I = 1; I <= Window.NBkSurf; ++I) { // Back surface loop
                 Sum1 = 0.0;
                 for (J = 1; J <= Geom.NSurfInt(I); ++J) { // Ray loop
-                    Sum1 += Geom.Trn.Lamda(Geom.SurfInt(J, I)) * Construct(IConst).BSDFInput.SolFrtTrans(IBm, Geom.SurfInt(J, I));
+                    Sum1 += Geom.Trn.Lamda(Geom.SurfInt(J, I)) * dataConstruction.Construct(IConst).BSDFInput.SolFrtTrans(IBm, Geom.SurfInt(J, I));
                 } // Ray loop
                 State.WinToSurfBmTrans(Hour, TS, I) = Sum1;
             } // Back surface loop
             // Calculate the directional-hemispherical transmittance
             Sum1 = 0.0;
             for (J = 1; J <= Geom.Trn.NBasis; ++J) {
-                Sum1 += Geom.Trn.Lamda(J) * Construct(IConst).BSDFInput.SolFrtTrans(IBm, J);
+                Sum1 += Geom.Trn.Lamda(J) * dataConstruction.Construct(IConst).BSDFInput.SolFrtTrans(IBm, J);
             }
             State.WinDirHemiTrans(Hour, TS) = Sum1;
             // Calculate the directional specular transmittance
             // Note:  again using assumption that Inc and Trn basis have same structure
-            State.WinDirSpecTrans(Hour, TS) = Geom.Trn.Lamda(IBm) * Construct(IConst).BSDFInput.SolFrtTrans(IBm, IBm);
+            State.WinDirSpecTrans(Hour, TS) = Geom.Trn.Lamda(IBm) * dataConstruction.Construct(IConst).BSDFInput.SolFrtTrans(IBm, IBm);
             // Calculate the layer front absorptance for beam radiation
             for (L = 1; L <= State.NLayers; ++L) {
-                State.WinBmFtAbs(Hour, TS, L) = Construct(IConst).BSDFInput.Layer(L).FrtAbs(IBm, 1);
+                State.WinBmFtAbs(Hour, TS, L) = dataConstruction.Construct(IConst).BSDFInput.Layer(L).FrtAbs(IBm, 1);
             }
         }
         // Calculate,  for a given beam direction, the transmittance into the zone
@@ -808,7 +806,7 @@ namespace WindowComplexManager {
                 Sum2 += Geom.SolBmGndWt(Hour, TS, J) * Geom.Inc.Lamda(JRay);
                 for (M = 1; M <= Geom.Trn.NBasis; ++M) { // Outgoing ray loop
                     Sum1 +=
-                        Geom.SolBmGndWt(Hour, TS, J) * Geom.Inc.Lamda(JRay) * Geom.Trn.Lamda(M) * Construct(IConst).BSDFInput.SolFrtTrans(JRay, M);
+                        Geom.SolBmGndWt(Hour, TS, J) * Geom.Inc.Lamda(JRay) * Geom.Trn.Lamda(M) * dataConstruction.Construct(IConst).BSDFInput.SolFrtTrans(JRay, M);
                 } // Outgoing ray loop
             }
         } // Indcident ray loop
@@ -828,7 +826,7 @@ namespace WindowComplexManager {
                 JRay = Geom.GndIndex(J);
                 if (Geom.SolBmGndWt(Hour, TS, J) > 0.0) {
                     Sum2 += Geom.SolBmGndWt(Hour, TS, J) * Geom.Inc.Lamda(JRay);
-                    Sum1 += Geom.SolBmGndWt(Hour, TS, J) * Geom.Inc.Lamda(JRay) * Construct(IConst).BSDFInput.Layer(L).FrtAbs(JRay, 1);
+                    Sum1 += Geom.SolBmGndWt(Hour, TS, J) * Geom.Inc.Lamda(JRay) * dataConstruction.Construct(IConst).BSDFInput.Layer(L).FrtAbs(JRay, 1);
                 }
             } // Incident ray loop
             if (Sum2 > 0.0) {
@@ -863,11 +861,11 @@ namespace WindowComplexManager {
                 // back surface window and hit this one!
                 Sum1 = 0.0;
                 for (J = 1; J <= Geom.Trn.NBasis; ++J) {
-                    Sum1 += Geom.Trn.Lamda(J) * Construct(IConst).BSDFInput.SolBkRefl(BkIncRay, J);
+                    Sum1 += Geom.Trn.Lamda(J) * dataConstruction.Construct(IConst).BSDFInput.SolBkRefl(BkIncRay, J);
                 }
                 Refl = Sum1;
                 for (L = 1; L <= State.NLayers; ++L) {
-                    Absorb(L) = Construct(IConst).BSDFInput.Layer(L).BkAbs(BkIncRay, 1);
+                    Absorb(L) = dataConstruction.Construct(IConst).BSDFInput.Layer(L).BkAbs(BkIncRay, 1);
                 }
             } else {
                 // solar ray can't be incident on back, so set properties equal to zero
@@ -944,7 +942,7 @@ namespace WindowComplexManager {
         }
         NBasis = 1;
         for (int I = 2; I <= Input.BasisMatNrows; ++I) {
-            NBasis += std::floor(Construct(IConst).BSDFInput.BasisMat(2, I) + 0.001);
+            NBasis += std::floor(dataConstruction.Construct(IConst).BSDFInput.BasisMat(2, I) + 0.001);
         }
     }
 
@@ -1010,10 +1008,10 @@ namespace WindowComplexManager {
         Array1D<Real64> Thetas;        // temp array holding theta values
         Array1D_int NPhis;             // temp array holding number of phis for a given theta
 
-        NThetas = Construct(IConst).BSDFInput.BasisMatNrows; // Note here assuming row by row input
+        NThetas = dataConstruction.Construct(IConst).BSDFInput.BasisMatNrows; // Note here assuming row by row input
         Basis.NThetas = NThetas;
-        Basis.BasisMatIndex = Construct(IConst).BSDFInput.BasisMatIndex;
-        Basis.NBasis = Construct(IConst).BSDFInput.NBasis;
+        Basis.BasisMatIndex = dataConstruction.Construct(IConst).BSDFInput.BasisMatIndex;
+        Basis.NBasis = dataConstruction.Construct(IConst).BSDFInput.NBasis;
         Basis.Grid.allocate(Basis.NBasis);
         Thetas.allocate(NThetas + 1); // Temp array
         // By convention the Thetas array contains a final point at Pi/2 which is not a basis element
@@ -1021,12 +1019,12 @@ namespace WindowComplexManager {
         Basis.Thetas.allocate(NThetas + 1);
         Basis.NPhis.allocate(NThetas + 1);
 
-        Basis.Lamda.allocate(Construct(IConst).BSDFInput.NBasis);
-        Basis.SolAng.allocate(Construct(IConst).BSDFInput.NBasis);
-        if (Construct(IConst).BSDFInput.BasisType == BasisType_WINDOW) {
+        Basis.Lamda.allocate(dataConstruction.Construct(IConst).BSDFInput.NBasis);
+        Basis.SolAng.allocate(dataConstruction.Construct(IConst).BSDFInput.NBasis);
+        if (dataConstruction.Construct(IConst).BSDFInput.BasisType == BasisType_WINDOW) {
             //   WINDOW6 Basis
             Basis.BasisType = BasisType_WINDOW;
-            if (Construct(IConst).BSDFInput.BasisSymmetryType == BasisSymmetry_None) {
+            if (dataConstruction.Construct(IConst).BSDFInput.BasisSymmetryType == BasisSymmetry_None) {
                 // No basis symmetry
                 Basis.BasisSymmetryType = BasisSymmetry_None;
                 Thetas(1) = 0.0;                // By convention, the first basis point is at the center (theta=0,phi=0)
@@ -1034,8 +1032,8 @@ namespace WindowComplexManager {
                 NPhis(1) = 1;
                 NumElem = 1;
                 for (I = 2; I <= NThetas; ++I) {
-                    Thetas(I) = Construct(IConst).BSDFInput.BasisMat(1, I) * DegToRadians;
-                    NPhis(I) = std::floor(Construct(IConst).BSDFInput.BasisMat(2, I) + 0.001);
+                    Thetas(I) = dataConstruction.Construct(IConst).BSDFInput.BasisMat(1, I) * DegToRadians;
+                    NPhis(I) = std::floor(dataConstruction.Construct(IConst).BSDFInput.BasisMat(2, I) + 0.001);
                     if (NPhis(I) <= 0) ShowFatalError("WindowComplexManager: incorrect input, no. phis must be positive.");
                     NumElem += NPhis(I);
                 }
@@ -1044,7 +1042,7 @@ namespace WindowComplexManager {
                 Basis.BasisIndex.allocate(MaxNPhis, NThetas + 1);
                 Basis.Phis = 0.0;                                    // Initialize so undefined elements will contain zero
                 Basis.BasisIndex = 0;                                // Initialize so undefined elements will contain zero
-                if (NumElem != Construct(IConst).BSDFInput.NBasis) { // Constructed Basis must match property matrices
+                if (NumElem != dataConstruction.Construct(IConst).BSDFInput.NBasis) { // Constructed Basis must match property matrices
                     ShowFatalError("WindowComplexManager: Constructed basis length does not match property matrices.");
                 }
                 Basis.Thetas = Thetas;
@@ -1108,14 +1106,14 @@ namespace WindowComplexManager {
                 NPhis = 1;                      // As insurance, define one phi for each theta
                 NumElem = 1;
                 for (I = 2; I <= NThetas; ++I) {
-                    Thetas(I) = Construct(IConst).BSDFInput.BasisMat(1, I) * DegToRadians;
+                    Thetas(I) = dataConstruction.Construct(IConst).BSDFInput.BasisMat(1, I) * DegToRadians;
                     ++NumElem;
                 }
                 Basis.Phis.allocate(1, NThetas);
                 Basis.BasisIndex.allocate(1, NThetas);
                 Basis.Phis = 0.0;                                    // Initialize so undefined elements will contain zero
                 Basis.BasisIndex = 0;                                // Initialize so undefined elements will contain zero
-                if (NumElem != Construct(IConst).BSDFInput.NBasis) { // Constructed Basis must match property matrices
+                if (NumElem != dataConstruction.Construct(IConst).BSDFInput.NBasis) { // Constructed Basis must match property matrices
                     ShowFatalError("WindowComplexManager: Constructed basis length does not match property matrices.");
                 }
                 Basis.Thetas = Thetas;
@@ -1313,7 +1311,7 @@ namespace WindowComplexManager {
         // Note that on call the incoming and outgoing basis structure types have already been filled in
         //  Define the central ray directions (in world coordinate system)
 
-        SurfaceWindow(ISurf).ComplexFen.State(IState).NLayers = Construct(IConst).BSDFInput.NumLayers;
+        SurfaceWindow(ISurf).ComplexFen.State(IState).NLayers = dataConstruction.Construct(IConst).BSDFInput.NumLayers;
         Azimuth = DegToRadians * Surface(ISurf).Azimuth;
         Tilt = DegToRadians * Surface(ISurf).Tilt;
 
@@ -1664,7 +1662,7 @@ namespace WindowComplexManager {
         for (J = 1; J <= Geom.Inc.NBasis; ++J) { // Incident ray loop
             Sum2 += Geom.Inc.Lamda(J);
             for (M = 1; M <= Geom.Trn.NBasis; ++M) { // Outgoing ray loop
-                Sum1 += Geom.Inc.Lamda(J) * Geom.Trn.Lamda(M) * Construct(IConst).BSDFInput.SolFrtTrans(M, J);
+                Sum1 += Geom.Inc.Lamda(J) * Geom.Trn.Lamda(M) * dataConstruction.Construct(IConst).BSDFInput.SolFrtTrans(M, J);
             } // Outgoing ray loop
         }     // Incident ray loop
         if (Sum2 > 0) {
@@ -1681,7 +1679,7 @@ namespace WindowComplexManager {
         for (J = 1; J <= Geom.Inc.NBasis; ++J) { // Incident ray loop
             Sum2 += Geom.Inc.Lamda(J);
             for (M = 1; M <= Geom.Trn.NBasis; ++M) { // Outgoing ray loop
-                Sum1 += Geom.Inc.Lamda(J) * Geom.Trn.Lamda(M) * Construct(IConst).BSDFInput.VisFrtTrans(M, J);
+                Sum1 += Geom.Inc.Lamda(J) * Geom.Trn.Lamda(M) * dataConstruction.Construct(IConst).BSDFInput.VisFrtTrans(M, J);
             } // Outgoing ray loop
         }     // Incident ray loop
         if (Sum2 > 0.0) {
@@ -1702,7 +1700,7 @@ namespace WindowComplexManager {
         for (JJ = 1; JJ <= Geom.NSky; ++JJ) {
             for (M = 1; M <= Geom.Trn.NBasis; ++M) {
                 J = Geom.SkyIndex(JJ);
-                Sum1 += Geom.SolSkyWt(JJ) * Construct(IConst).BSDFInput.SolFrtTrans(M, J) * Geom.Inc.Lamda(J) * Geom.Trn.Lamda(M);
+                Sum1 += Geom.SolSkyWt(JJ) * dataConstruction.Construct(IConst).BSDFInput.SolFrtTrans(M, J) * Geom.Inc.Lamda(J) * Geom.Trn.Lamda(M);
             }
         }
         for (JJ = 1; JJ <= Geom.NSky; ++JJ) {
@@ -1722,7 +1720,7 @@ namespace WindowComplexManager {
             Sum3 = 0.0;
             for (JJ = 1; JJ <= Geom.NSky; ++JJ) {
                 J = Geom.SkyIndex(JJ);
-                Sum3 += Geom.SolSkyWt(JJ) * Geom.Inc.Lamda(J) * Construct(IConst).BSDFInput.Layer(L).FrtAbs(J, 1);
+                Sum3 += Geom.SolSkyWt(JJ) * Geom.Inc.Lamda(J) * dataConstruction.Construct(IConst).BSDFInput.Layer(L).FrtAbs(J, 1);
             }
 
             if (Sum2 != 0.0) {
@@ -1744,7 +1742,7 @@ namespace WindowComplexManager {
         for (JJ = 1; JJ <= Geom.NGnd; ++JJ) {
             for (M = 1; M <= Geom.Trn.NBasis; ++M) {
                 J = Geom.GndIndex(JJ);
-                Sum1 += Geom.SolSkyGndWt(JJ) * Construct(IConst).BSDFInput.SolFrtTrans(M, J) * Geom.Inc.Lamda(J) * Geom.Trn.Lamda(M);
+                Sum1 += Geom.SolSkyGndWt(JJ) * dataConstruction.Construct(IConst).BSDFInput.SolFrtTrans(M, J) * Geom.Inc.Lamda(J) * Geom.Trn.Lamda(M);
             }
         }
 
@@ -1764,7 +1762,7 @@ namespace WindowComplexManager {
             Sum3 = 0.0;
             for (JJ = 1; JJ <= Geom.NGnd; ++JJ) {
                 J = Geom.GndIndex(JJ);
-                Sum3 += Geom.SolSkyGndWt(JJ) * Geom.Inc.Lamda(J) * Construct(IConst).BSDFInput.Layer(L).FrtAbs(J, 1);
+                Sum3 += Geom.SolSkyGndWt(JJ) * Geom.Inc.Lamda(J) * dataConstruction.Construct(IConst).BSDFInput.Layer(L).FrtAbs(J, 1);
             }
 
             if (Sum2 != 0.0) {
@@ -1782,7 +1780,7 @@ namespace WindowComplexManager {
         // Trn basis = incident basis for back incidence
         for (J = 1; J <= Geom.Trn.NBasis; ++J) {
             for (M = 1; M <= Geom.Inc.NBasis; ++M) {
-                Sum1 += Construct(IConst).BSDFInput.SolBkRefl(M, J) * Geom.Trn.Lamda(J) * Geom.Inc.Lamda(M);
+                Sum1 += dataConstruction.Construct(IConst).BSDFInput.SolBkRefl(M, J) * Geom.Trn.Lamda(J) * Geom.Inc.Lamda(M);
             }
         }
         for (J = 1; J <= Geom.Trn.NBasis; ++J) {
@@ -1795,12 +1793,12 @@ namespace WindowComplexManager {
             State.WinBkHemRefl = 0.0;
         }
 
-        Construct(IConst).ReflectSolDiffBack = State.WinBkHemRefl;
+        dataConstruction.Construct(IConst).ReflectSolDiffBack = State.WinBkHemRefl;
 
         State.WinBkHemAbs.allocate(State.NLayers);
         for (L = 1; L <= State.NLayers; ++L) {
             for (J = 1; J <= Geom.Trn.NBasis; ++J) {
-                Sum3 += Geom.Trn.Lamda(J) * Construct(IConst).BSDFInput.Layer(L).BkAbs(J, 1);
+                Sum3 += Geom.Trn.Lamda(J) * dataConstruction.Construct(IConst).BSDFInput.Layer(L).BkAbs(J, 1);
             }
 
             if (Sum2 != 0.0) {
@@ -1810,7 +1808,7 @@ namespace WindowComplexManager {
             }
 
             // Put this into the construction for use in non-detailed optical calculations
-            Construct(IConst).AbsDiffBack(L) = State.WinBkHemAbs(L);
+            dataConstruction.Construct(IConst).AbsDiffBack(L) = State.WinBkHemAbs(L);
         }
 
         // Calculate Window Layer Front Hemispherical Absorptance
@@ -1823,7 +1821,7 @@ namespace WindowComplexManager {
         for (L = 1; L <= State.NLayers; ++L) {
             Sum1 = 0.0;
             for (J = 1; J <= Geom.Inc.NBasis; ++J) {
-                Sum1 += Geom.Inc.Lamda(J) * Construct(IConst).BSDFInput.Layer(L).FrtAbs(J, 1);
+                Sum1 += Geom.Inc.Lamda(J) * dataConstruction.Construct(IConst).BSDFInput.Layer(L).FrtAbs(J, 1);
             }
 
             if (Sum2 != 0.0) {
@@ -1833,7 +1831,7 @@ namespace WindowComplexManager {
             }
 
             // Put this into the construction for use in non-detailed optical calculations
-            Construct(IConst).AbsDiff(L) = State.WinFtHemAbs(L);
+            dataConstruction.Construct(IConst).AbsDiff(L) = State.WinFtHemAbs(L);
         }
 
         // Calculate Window Back Hemispherical Visible Reflectance
@@ -1843,7 +1841,7 @@ namespace WindowComplexManager {
         // Trn basis = incident basis for back incidence
         for (J = 1; J <= Geom.Trn.NBasis; ++J) {
             for (M = 1; M <= Geom.Inc.NBasis; ++M) {
-                Sum1 += Construct(IConst).BSDFInput.VisBkRefl(M, J) * Geom.Trn.Lamda(J) * Geom.Inc.Lamda(M);
+                Sum1 += dataConstruction.Construct(IConst).BSDFInput.VisBkRefl(M, J) * Geom.Trn.Lamda(J) * Geom.Inc.Lamda(M);
             }
         }
         for (J = 1; J <= Geom.Trn.NBasis; ++J) {
@@ -1856,7 +1854,7 @@ namespace WindowComplexManager {
             State.WinBkHemVisRefl = 0.0;
         }
 
-        Construct(IConst).ReflectVisDiffBack = State.WinBkHemVisRefl;
+        dataConstruction.Construct(IConst).ReflectVisDiffBack = State.WinBkHemVisRefl;
 
         //     *     *     *     *
         // Note potential problem if one relaxes the assumption that Inc and Trn basis have same structure:
@@ -1893,7 +1891,7 @@ namespace WindowComplexManager {
                 Sum2 += Geom.Trn.Lamda(Geom.SurfInt(J, KBkSurf));
                 for (M = 1; M <= Geom.Inc.NBasis; ++M) { // Outgoing Ray loop
                     Sum1 += Geom.Trn.Lamda(Geom.SurfInt(J, KBkSurf)) * Geom.Inc.Lamda(M) *
-                            Construct(IConst).BSDFInput.SolBkRefl(Geom.SurfInt(J, KBkSurf), M);
+                            dataConstruction.Construct(IConst).BSDFInput.SolBkRefl(Geom.SurfInt(J, KBkSurf), M);
                 } // Outgoing Ray loop
             }     // Inc Ray loop
             if (Sum2 > 0.0) {
@@ -1917,7 +1915,7 @@ namespace WindowComplexManager {
                 Sum2 = 0.0;
                 for (J = 1; J <= Geom.NSurfInt(KBkSurf); ++J) { // Inc Ray loop
                     Sum2 += Geom.Trn.Lamda(Geom.SurfInt(J, KBkSurf));
-                    Sum1 += Geom.Trn.Lamda(Geom.SurfInt(J, KBkSurf)) * Construct(IConst).BSDFInput.Layer(L).BkAbs(Geom.SurfInt(J, KBkSurf), 1);
+                    Sum1 += Geom.Trn.Lamda(Geom.SurfInt(J, KBkSurf)) * dataConstruction.Construct(IConst).BSDFInput.Layer(L).BkAbs(Geom.SurfInt(J, KBkSurf), 1);
                 } // Inc Ray loop
                 if (Sum2 > 0.0) {
                     Hold = Sum1 / Sum2;
@@ -1946,7 +1944,7 @@ namespace WindowComplexManager {
         for (J = 1; J <= Geom.Inc.NBasis; ++J) {
             Sum1 = 0.0;
             for (L = 1; L <= State.NLayers; ++L) { // layer loop
-                Sum1 += Construct(IConst).BSDFInput.Layer(L).FrtAbs(J, 1);
+                Sum1 += dataConstruction.Construct(IConst).BSDFInput.Layer(L).FrtAbs(J, 1);
             }
             State.IntegratedFtAbs(J) = Sum1;
         }
@@ -1956,7 +1954,7 @@ namespace WindowComplexManager {
         for (J = 1; J <= Geom.Inc.NBasis; ++J) { // Incident ray loop
             Sum1 = 0.0;
             for (M = 1; M <= Geom.Trn.NBasis; ++M) { // Outgoing ray loop
-                Sum1 += Geom.Trn.Lamda(J) * Construct(IConst).BSDFInput.SolFrtTrans(J, M);
+                Sum1 += Geom.Trn.Lamda(J) * dataConstruction.Construct(IConst).BSDFInput.SolFrtTrans(J, M);
             } // Outgoing ray loop
             State.IntegratedFtTrans(J) = Sum1;
         } // Incident ray loop
@@ -1976,7 +1974,7 @@ namespace WindowComplexManager {
         for (J = 1; J <= Geom.Trn.NBasis; ++J) {
             Sum1 = 0.0;
             for (L = 1; L <= State.NLayers; ++L) { // layer loop
-                Sum1 += Construct(IConst).BSDFInput.Layer(L).BkAbs(J, 1);
+                Sum1 += dataConstruction.Construct(IConst).BSDFInput.Layer(L).BkAbs(J, 1);
             }
             State.IntegratedBkAbs(J) = Sum1;
         }
@@ -1986,7 +1984,7 @@ namespace WindowComplexManager {
         for (J = 1; J <= Geom.Trn.NBasis; ++J) { // Outgoing ray loop
             Sum1 = 0.0;
             for (M = 1; M <= Geom.Inc.NBasis; ++M) { // Incident ray loop
-                Sum1 += Geom.Inc.Lamda(J) * Construct(IConst).BSDFInput.SolBkRefl(J, M);
+                Sum1 += Geom.Inc.Lamda(J) * dataConstruction.Construct(IConst).BSDFInput.SolBkRefl(J, M);
             } // Incident ray loop
             State.IntegratedBkRefl(J) = Sum1;
         } // Outgoing ray loop
@@ -2464,11 +2462,8 @@ namespace WindowComplexManager {
         using DataGlobals::StefanBoltzmann;
         using DataHeatBalance::GasCoeffsAir;
         using DataHeatBalance::SupportPillar;
-        using DataHeatBalSurface::HcExtSurf;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
-        using General::InterpSlatAng; // Function for slat angle interpolation
-        using General::InterpSw;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -2769,8 +2764,8 @@ namespace WindowComplexManager {
             ShadeFlag = SurfaceWindow(SurfNum).ShadingFlag;
         }
 
-        TotGlassLay = Construct(ConstrNum).TotGlassLayers;
-        ngllayer = Construct(ConstrNum).TotGlassLayers;
+        TotGlassLay = dataConstruction.Construct(ConstrNum).TotGlassLayers;
+        ngllayer = dataConstruction.Construct(ConstrNum).TotGlassLayers;
         nglface = 2 * ngllayer;
         nglfacep = nglface;
         hrin = 0.0;
@@ -2780,7 +2775,7 @@ namespace WindowComplexManager {
 
         Pa = OutBaroPress;
 
-        ThermalModelNum = Construct(ConstrNum).BSDFInput.ThermalModel;
+        ThermalModelNum = dataConstruction.Construct(ConstrNum).BSDFInput.ThermalModel;
         standard = WindowThermalModel(ThermalModelNum).CalculationStandard;
         ThermalMod = WindowThermalModel(ThermalModelNum).ThermalModel;
         CalcDeflection = WindowThermalModel(ThermalModelNum).DeflectionModel;
@@ -2789,7 +2784,7 @@ namespace WindowComplexManager {
         Tini = WindowThermalModel(ThermalModelNum).InitialTemperature - KelvinConv;
         Pini = WindowThermalModel(ThermalModelNum).InitialPressure;
 
-        nlayer = Construct(ConstrNum).TotSolidLayers;
+        nlayer = dataConstruction.Construct(ConstrNum).TotSolidLayers;
         isky = 3; // IR radiation is provided from external source
         iwd = 0;  // assume windward for now.  TODO compare surface normal with wind direction
 
@@ -2971,7 +2966,7 @@ namespace WindowComplexManager {
         //  IF(Surfacewindow(SurfNum)%StormWinFlag > 0) IConst = Surface(SurfNum)%StormWinShadedConstruction
         // END IF
         // TotLay = Construct(IConst)%TotLayers
-        TotLay = Construct(ConstrNum).TotLayers;
+        TotLay = dataConstruction.Construct(ConstrNum).TotLayers;
         IGap = 0;
 
         //****************************************************************************************************
@@ -2999,22 +2994,22 @@ namespace WindowComplexManager {
         IGlass = 0;
         IGap = 0;
         for (Lay = 1; Lay <= TotLay; ++Lay) {
-            LayPtr = Construct(ConstrNum).LayerPoint(Lay);
+            LayPtr = dataConstruction.Construct(ConstrNum).LayerPoint(Lay);
 
-            if ((Material(LayPtr).Group == WindowGlass) || (Material(LayPtr).Group == WindowSimpleGlazing)) {
+            if ((dataMaterial.Material(LayPtr).Group == WindowGlass) || (dataMaterial.Material(LayPtr).Group == WindowSimpleGlazing)) {
                 ++IGlass;
                 LayerType(IGlass) = 0; // this marks specular layer type
-                thick(IGlass) = Material(LayPtr).Thickness;
-                scon(IGlass) = Material(LayPtr).Conductivity;
-                emis(2 * IGlass - 1) = Material(LayPtr).AbsorpThermalFront;
-                emis(2 * IGlass) = Material(LayPtr).AbsorpThermalBack;
-                tir(2 * IGlass - 1) = Material(LayPtr).TransThermal;
-                tir(2 * IGlass) = Material(LayPtr).TransThermal;
-                YoungsMod(IGlass) = Material(LayPtr).YoungModulus;
-                PoissonsRat(IGlass) = Material(LayPtr).PoissonsRatio;
-            } else if (Material(LayPtr).Group == ComplexWindowShade) {
+                thick(IGlass) = dataMaterial.Material(LayPtr).Thickness;
+                scon(IGlass) = dataMaterial.Material(LayPtr).Conductivity;
+                emis(2 * IGlass - 1) = dataMaterial.Material(LayPtr).AbsorpThermalFront;
+                emis(2 * IGlass) = dataMaterial.Material(LayPtr).AbsorpThermalBack;
+                tir(2 * IGlass - 1) = dataMaterial.Material(LayPtr).TransThermal;
+                tir(2 * IGlass) = dataMaterial.Material(LayPtr).TransThermal;
+                YoungsMod(IGlass) = dataMaterial.Material(LayPtr).YoungModulus;
+                PoissonsRat(IGlass) = dataMaterial.Material(LayPtr).PoissonsRatio;
+            } else if (dataMaterial.Material(LayPtr).Group == ComplexWindowShade) {
                 ++IGlass;
-                TempInt = Material(LayPtr).ComplexShadePtr;
+                TempInt = dataMaterial.Material(LayPtr).ComplexShadePtr;
                 LayerType(IGlass) = ComplexShade(TempInt).LayerType;
 
                 thick(IGlass) = ComplexShade(TempInt).Thickness;
@@ -3037,19 +3032,19 @@ namespace WindowComplexManager {
                 SlatCond(IGlass) = ComplexShade(TempInt).SlatConductivity;
                 SlatSpacing(IGlass) = ComplexShade(TempInt).SlatSpacing;
                 SlatCurve(IGlass) = ComplexShade(TempInt).SlatCurve;
-            } else if (Material(LayPtr).Group == ComplexWindowGap) {
+            } else if (dataMaterial.Material(LayPtr).Group == ComplexWindowGap) {
                 ++IGap;
-                gap(IGap) = Material(LayPtr).Thickness;
-                presure(IGap) = Material(LayPtr).Pressure;
+                gap(IGap) = dataMaterial.Material(LayPtr).Thickness;
+                presure(IGap) = dataMaterial.Material(LayPtr).Pressure;
 
-                DeflectionPtr = Material(LayPtr).DeflectionStatePtr;
+                DeflectionPtr = dataMaterial.Material(LayPtr).DeflectionStatePtr;
                 if (DeflectionPtr != 0) {
                     GapDefMax(IGap) = DeflectionState(DeflectionPtr).DeflectedThickness;
                 } else {
                     GapDefMax(IGap) = gap(IGap);
                 }
 
-                PillarPtr = Material(LayPtr).SupportPillarPtr;
+                PillarPtr = dataMaterial.Material(LayPtr).SupportPillarPtr;
 
                 if (PillarPtr != 0) {
                     SupportPlr(IGap) = 1;
@@ -3057,26 +3052,26 @@ namespace WindowComplexManager {
                     PillarRadius(IGap) = SupportPillar(PillarPtr).Radius;
                 }
 
-                GasPointer = Material(LayPtr).GasPointer;
+                GasPointer = dataMaterial.Material(LayPtr).GasPointer;
 
-                nmix(IGap + 1) = Material(GasPointer).NumberOfGasesInMixture;
+                nmix(IGap + 1) = dataMaterial.Material(GasPointer).NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
-                    // iprop(IGap+1, IMix) = Material(LayPtr)%GasType(IMix)
-                    // iprop(IGap+1, IMix) = GetGasIndex(Material(LayPtr)%GasWght(IMix))
-                    frct(IMix, IGap + 1) = Material(GasPointer).GasFract(IMix);
+                    // iprop(IGap+1, IMix) = dataMaterial.Material(LayPtr)%GasType(IMix)
+                    // iprop(IGap+1, IMix) = GetGasIndex(dataMaterial.Material(LayPtr)%GasWght(IMix))
+                    frct(IMix, IGap + 1) = dataMaterial.Material(GasPointer).GasFract(IMix);
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
                     // to be correctly referenced by gap arrays
 
                     // First check if gas coefficients are already part of array.  Duplicates are not necessary
-                    CheckGasCoefs(Material(GasPointer).GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
+                    CheckGasCoefs(dataMaterial.Material(GasPointer).GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
                     if (feedData) {
-                        wght(iprop(IMix, IGap + 1)) = Material(GasPointer).GasWght(IMix);
-                        gama(iprop(IMix, IGap + 1)) = Material(GasPointer).GasSpecHeatRatio(IMix);
+                        wght(iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasWght(IMix);
+                        gama(iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasSpecHeatRatio(IMix);
                         for (i = 1; i <= 3; ++i) {
-                            gcon(i, iprop(IMix, IGap + 1)) = Material(GasPointer).GasCon(i, IMix);
-                            gvis(i, iprop(IMix, IGap + 1)) = Material(GasPointer).GasVis(i, IMix);
-                            gcp(i, iprop(IMix, IGap + 1)) = Material(GasPointer).GasCp(i, IMix);
+                            gcon(i, iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasCon(i, IMix);
+                            gvis(i, iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasVis(i, IMix);
+                            gcp(i, iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasCp(i, IMix);
                         }
                     } // IF feedData THEN
                 }
@@ -3312,7 +3307,7 @@ namespace WindowComplexManager {
             if (CalcCondition == noCondition) {
                 ShowContinueError("surface name = " + Surface(SurfNum).Name);
             }
-            ShowContinueError("construction name = " + Construct(ConstrNum).Name);
+            ShowContinueError("construction name = " + dataConstruction.Construct(ConstrNum).Name);
             ShowFatalError("halting because of error in tarcog");
         } else if (CalcCondition == winterCondition) {
             NominalU(ConstrNum) = ufactor;
@@ -3336,7 +3331,7 @@ namespace WindowComplexManager {
             //  CALL ShowWarningError('BSDF--Inc basis has zero projected solid angle')
             // endif
 
-            Construct(ConstrNum).SummerSHGC = shgc;
+            dataConstruction.Construct(ConstrNum).SummerSHGC = shgc;
 
             // Construct(SurfNum)%VisTransNorm = SurfaceWindow(SurfNum)%ComplexFen%State(tempInt)%WinDiffVisTrans
         } else if (CalcCondition == noCondition) { // expect converged results...
@@ -3526,7 +3521,7 @@ namespace WindowComplexManager {
     void CheckGasCoefs(Real64 const currentWeight, int &indexNumber, Array1D<Real64> &wght, bool &feedData)
     {
 
-        using namespace DataPrecisionGlobals;
+        // Using/Aliasing
         using TARCOGGassesParams::maxgas;
 
         // Argument array dimensioning
