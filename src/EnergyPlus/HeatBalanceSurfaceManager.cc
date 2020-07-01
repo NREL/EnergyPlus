@@ -1393,6 +1393,7 @@ namespace HeatBalanceSurfaceManager {
         TempSurfInTmp.dimension(TotSurfaces, 0.0);
         TempSurfInTmp.dimension(TotSurfaces, 0.0);
         RefAirTemp.dimension(TotSurfaces, 0.0);
+        QRadSWOutAbs.dimension(TotSurfaces, 0.0);
         QRadSWInAbs.dimension(TotSurfaces, 0.0);
         InitialDifSolInAbs.dimension(TotSurfaces, 0.0);
         InitialDifSolInTrans.dimension(TotSurfaces, 0.0);
