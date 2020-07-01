@@ -5747,7 +5747,8 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void CalcHeatBalanceInsideSurf(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
+    void CalcHeatBalanceInsideSurf(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
+                                   Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
     {
 
         if (calcHeatBalInsideSurfFirstTime) {
@@ -5756,16 +5757,16 @@ namespace HeatBalanceSurfaceManager {
             }
             if (DisplayAdvancedReportVariables) {
                 SetupOutputVariable("Surface Inside Face Heat Balance Calculation Iteration Count",
-                    OutputProcessor::Unit::None,
-                    InsideSurfIterations,
-                    "ZONE",
-                    "Sum",
-                    "Simulation");
+                                    OutputProcessor::Unit::None,
+                                    InsideSurfIterations,
+                                    "ZONE",
+                                    "Sum",
+                                    "Simulation");
             }
             // Precompute whether CTF temperature limits will be needed
             DataHeatBalSurface::Zone_has_mixed_HT_models.resize(NumOfZones + 1, false);
             for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
-                auto const& zone(Zone(iZone));
+                auto const &zone(Zone(iZone));
                 for (int iSurf = zone.SurfaceFirst, eSurf = zone.SurfaceLast; iSurf <= eSurf; ++iSurf) {
                     auto const alg(Surface(iSurf).HeatTransferAlgorithm);
                     if ((alg == HeatTransferModel_CondFD) || (alg == HeatTransferModel_HAMT) || (alg == HeatTransferModel_Kiva)) {
@@ -5807,7 +5808,7 @@ namespace HeatBalanceSurfaceManager {
             if (AllCTF) {
                 CalcHeatBalanceInsideSurf2CTFOnly(1, NumOfZones, DataSurfaces::AllIZSurfaceList);
             } else {
-                CalcHeatBalanceInsideSurf2(dataZoneTempPredictorCorrector, DataSurfaces::AllHTSurfaceList,
+                CalcHeatBalanceInsideSurf2(DataSurfaces::AllHTSurfaceList,
                                            DataSurfaces::AllIZSurfaceList,
                                            DataSurfaces::AllHTNonWindowSurfaceList,
                                            DataSurfaces::AllHTWindowSurfaceList);
@@ -5835,7 +5836,7 @@ namespace HeatBalanceSurfaceManager {
             auto const &zoneHTNonWindowSurfList(Zone(ZoneToResimulate).ZoneHTNonWindowSurfaceList);
             auto const &zoneHTWindowSurfList(Zone(ZoneToResimulate).ZoneHTWindowSurfaceList);
             // Cannot use CalcHeatBalanceInsideSurf2CTFOnly because resimulated zone includes adjacent interzone surfaces
-            CalcHeatBalanceInsideSurf2(dataZoneTempPredictorCorrector, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
+            CalcHeatBalanceInsideSurf2(zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
             // Sort window heat gain/loss
             if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
                 ZoneWinHeatGainRep(ZoneToResimulate) = ZoneWinHeatGain(ZoneToResimulate);
@@ -5847,7 +5848,7 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void CalcHeatBalanceInsideSurf2(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
+    void CalcHeatBalanceInsideSurf2(const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                     const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
                                     const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
