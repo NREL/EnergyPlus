@@ -79,7 +79,7 @@ namespace DataHeatBalSurface {
     Real64 MaxSurfaceTempLimitBeforeFatal(500.0); // 2.5 times MaxSurfaceTempLimit
     Real64 const IterDampConst(5.0);              // Damping constant for inside surface temperature iterations
     int const ItersReevalConvCoeff(30);           // Number of iterations between inside convection coefficient reevaluations
-    Real64 const MaxAllowedDelTemp(0.002);        // Convergence criteria for inside surface temperatures
+    int MinIterations(1);                         // Minimum number of iterations for surface heat balance
     int const MaxIterations(500);                 // Maximum number of iterations allowed for inside surface temps
     Real64 const PoolIsOperatingLimit(0.0001);    // Limit to determine if swimming pool is operating or not
     int const MinEMPDIterations(4);               // Minimum number of iterations required for EMPD solution
@@ -104,6 +104,7 @@ namespace DataHeatBalSurface {
     Array1D<Real64> TempDivSurf;                  // Divisor for heatbalance equation
     // end group added to support CalcHeatBalanceInsideSurf2CTFOnly
     Array1D<Real64> TempSurfIn;                   // Temperature of the Inside Surface for each heat transfer surface
+    Array1D<Real64> TempInsOld;                   // TempSurfIn from previous iteration for convergence check
     Array1D<Real64> TempSurfInTmp;                // Inside Surface Temperature Of Each Heat Transfer Surface
     Array1D<Real64> HcExtSurf;                    // Outside Convection Coefficient
     Array1D<Real64> HAirExtSurf;                  // Outside Convection Coefficient to Air
@@ -271,6 +272,7 @@ namespace DataHeatBalSurface {
         SUMH.deallocate();
         MaxSurfaceTempLimit = 200.0;
         MaxSurfaceTempLimitBeforeFatal = 500.0;
+        MinIterations = 1;
         Zone_has_mixed_HT_models.clear();
         CTFConstInPart.deallocate();
         CTFConstOutPart.deallocate();
@@ -288,6 +290,7 @@ namespace DataHeatBalSurface {
         TempTermSurf.deallocate();
         TempDivSurf.deallocate();
         TempSurfIn.deallocate();
+        TempInsOld.deallocate();
         TempSurfInTmp.deallocate();
         HcExtSurf.deallocate();
         HAirExtSurf.deallocate();

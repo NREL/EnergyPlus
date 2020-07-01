@@ -75,7 +75,7 @@ namespace DataHeatBalSurface {
     extern Real64 MaxSurfaceTempLimitBeforeFatal;    // 2.5 times MaxSurfaceTempLimit
     extern Real64 const IterDampConst;               // Damping constant for inside surface temperature iterations
     extern int const ItersReevalConvCoeff;           // Number of iterations between inside convection coefficient reevaluations
-    extern Real64 const MaxAllowedDelTemp;           // Convergence criteria for inside surface temperatures
+    extern int MinIterations;                        // Minimum number of iterations for surface heat balance
     extern int const MaxIterations;                  // Maximum number of iterations allowed for inside surface temps
     extern Real64 const PoolIsOperatingLimit;        // Limit to determine if swimming pool is operating or not
     extern int const MinEMPDIterations;              // Minimum number of iterations required for EMPD solution
@@ -100,6 +100,7 @@ namespace DataHeatBalSurface {
     extern Array1D<Real64> TempDivSurf;           // Divisor for heatbalance equation
     // end group added to support CalcHeatBalanceInsideSurf2CTFOnly
     extern Array1D<Real64> TempSurfIn;            // Temperature of the Inside Surface for each heat transfer surface
+    extern Array1D<Real64> TempInsOld;            // TempSurfIn from previous iteration for convergence check
     extern Array1D<Real64> TempSurfInTmp;         // Inside Surface Temperature Of Each Heat Transfer Surface
     extern Array1D<Real64> HcExtSurf;             // Outside Convection Coefficient
     extern Array1D<Real64> HAirExtSurf;           // Outside Convection Coefficient

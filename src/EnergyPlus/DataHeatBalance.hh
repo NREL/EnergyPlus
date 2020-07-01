@@ -316,6 +316,7 @@ namespace DataHeatBalance {
     //                           !       this limit of 1.0 corresponds to a completely still layer of air that is around 0.025 m thick
     //                           !  5) The previous limit of 0.1 (before ver. 3.1) caused loads initialization problems in test files
     extern Real64 HighHConvLimit;          // upper limit for HConv, mostly used for user input limits in practice. !W/m2-K
+    extern Real64 MaxAllowedDelTemp;       // Convergence criteria for inside surface temperatures
     extern Real64 MaxAllowedDelTempCondFD; // Convergence criteria for inside surface temperatures for CondFD
 
     extern std::string BuildingName;        // Name of building

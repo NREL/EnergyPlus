@@ -185,6 +185,7 @@ namespace HeatBalanceSurfaceManager {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
+    Array1D<Real64> RefAirTemp; // inside surface convection reference air temperatures
 
     namespace {
         bool ManageSurfaceHeatBalancefirstTime(true);
@@ -192,8 +193,12 @@ namespace HeatBalanceSurfaceManager {
         bool ComputeIntSWAbsorpFactorsfirstTime(true); // First time through routine
         bool UpdateThermalHistoriesFirstTimeFlag(true);
         bool CalculateZoneMRTfirstTime(true); // Flag for first time calculations
-        bool calcHeatBalanceInsideSurfFirstTime(true);
-        bool calcHeatBalanceInsideSurfCTFOnlyFirstTime(true);
+        bool calcHeatBalInsideSurfFirstTime(true);
+        bool calcHeatBalInsideSurfCTFOnlyFirstTime(true);
+        int calcHeatBalInsideSurfErrCount(0);
+        int calcHeatBalInsideSurfErrPointer(0);
+        int calcHeatBalInsideSurfWarmupErrCount(0);
+        bool calcHeatBalInsideSurEnvrnFlag(true);
     } // namespace
 
     // These are now external subroutines
@@ -207,8 +212,13 @@ namespace HeatBalanceSurfaceManager {
         ComputeIntSWAbsorpFactorsfirstTime = true;
         UpdateThermalHistoriesFirstTimeFlag = true;
         CalculateZoneMRTfirstTime = true;
-        calcHeatBalanceInsideSurfFirstTime = true;
-        calcHeatBalanceInsideSurfCTFOnlyFirstTime = true;
+        calcHeatBalInsideSurfFirstTime = true;
+        calcHeatBalInsideSurfCTFOnlyFirstTime = true;
+        calcHeatBalInsideSurfErrCount = 0;
+        calcHeatBalInsideSurfErrPointer = 0;
+        calcHeatBalInsideSurfWarmupErrCount = 0;
+        calcHeatBalInsideSurEnvrnFlag = true;
+        RefAirTemp.deallocate();
     }
 
     void ManageSurfaceHeatBalance(EnergyPlusData &state)
@@ -1379,8 +1389,10 @@ namespace HeatBalanceSurfaceManager {
         HGrdExtSurf.dimension(TotSurfaces, 0.0);
         QRadLWOutSrdSurfs.dimension(TotSurfaces, 0.0);
         TempSurfIn.dimension(TotSurfaces, 0.0);
+        TempInsOld.dimension(TotSurfaces, 0.0);
         TempSurfInTmp.dimension(TotSurfaces, 0.0);
-        QRadSWOutAbs.dimension(TotSurfaces, 0.0);
+        TempSurfInTmp.dimension(TotSurfaces, 0.0);
+        RefAirTemp.dimension(TotSurfaces, 0.0);
         QRadSWInAbs.dimension(TotSurfaces, 0.0);
         InitialDifSolInAbs.dimension(TotSurfaces, 0.0);
         InitialDifSolInTrans.dimension(TotSurfaces, 0.0);
@@ -5739,6 +5751,22 @@ namespace HeatBalanceSurfaceManager {
         // Pass correct list of surfaces to CalcHeatBalanceInsideSurf2
         bool const PartialResimulate(present(ZoneToResimulate));
 
+        if (BeginEnvrnFlag && calcHeatBalInsideSurEnvrnFlag) {
+            TempInsOld = 23.0;
+            RefAirTemp = 23.0;
+            TempEffBulkAir = 23.0;
+            calcHeatBalInsideSurfWarmupErrCount = 0;
+            calcHeatBalInsideSurEnvrnFlag = false;
+
+            // Initialize Kiva instances ground temperatures
+            if (DataHeatBalance::AnyKiva) {
+                SurfaceGeometry::kivaManager.initKivaInstances(dataZoneTempPredictorCorrector);
+            }
+        }
+        if (!BeginEnvrnFlag) {
+            calcHeatBalInsideSurEnvrnFlag = true;
+        }
+
         if (!PartialResimulate) {
             // Zero window heat gains for all zones
             ZoneWinHeatGain = 0.0;
@@ -5831,28 +5859,17 @@ namespace HeatBalanceSurfaceManager {
         static std::string const Inside("Inside");
         static std::string const BlankString;
 
-        static Array1D<Real64> TempInsOld; // Holds previous iteration's value for convergence check
         Real64 TempSurfOutTmp;             // Local Temporary Surface temperature for the outside surface face
         Real64 TempSurfInSat;              // Local temporary surface dew point temperature
 
-        static int MinIterations; // Minimum number of iterations for the inside heat balance
-        static int ErrCount(0);
-
-        static Array1D<Real64> RefAirTemp; // reference air temperatures
-        static bool MyEnvrnFlag(true);
-        static int InsideSurfErrCount(0);
         Real64 Wsurf;         // Moisture ratio for HAMT
         Real64 RhoAirZone;    // Zone moisture density for HAMT
         int OtherSideZoneNum; // Zone Number index for other side of an interzone partition HAMT
-        static int WarmupSurfTemp;
 
-        if (calcHeatBalanceInsideSurfFirstTime) {
-            TempInsOld.allocate(TotSurfaces);
+        if (calcHeatBalInsideSurfFirstTime) {
             RefAirTemp.allocate(TotSurfaces);
             if (DataHeatBalance::AnyEMPD) {
                 MinIterations = MinEMPDIterations;
-            } else {
-                MinIterations = 1;
             }
             if (DisplayAdvancedReportVariables) {
                 SetupOutputVariable("Surface Inside Face Heat Balance Calculation Iteration Count",
@@ -5874,22 +5891,7 @@ namespace HeatBalanceSurfaceManager {
                     }
                 }
             }
-            calcHeatBalanceInsideSurfFirstTime = false;
-        }
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
-            TempInsOld = 23.0;
-            RefAirTemp = 23.0;
-            TempEffBulkAir = 23.0;
-            WarmupSurfTemp = 0;
-            MyEnvrnFlag = false;
-
-            // Initialize Kiva instances ground temperatures
-            if (DataHeatBalance::AnyKiva) {
-                SurfaceGeometry::kivaManager.initKivaInstances(dataZoneTempPredictorCorrector);
-            }
-        }
-        if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            calcHeatBalInsideSurfFirstTime = false;
         }
 
         // determine reference air temperatures
@@ -6476,7 +6478,7 @@ namespace HeatBalanceSurfaceManager {
                 }
 
                 if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
-                    TestSurfTempCalcHeatBalanceInsideSurf(TH12, surface, zone, WarmupSurfTemp);
+                    TestSurfTempCalcHeatBalanceInsideSurf(TH12, surface, zone, calcHeatBalInsideSurfWarmupErrCount);
                 }
 
             } // ...end of main loops over all surfaces for inside heat balances
@@ -6533,8 +6535,8 @@ namespace HeatBalanceSurfaceManager {
 
             if (InsideSurfIterations > MaxIterations) {
                 if (!WarmupFlag) {
-                    ++ErrCount;
-                    if (ErrCount < 16) {
+                    ++calcHeatBalInsideSurfErrCount;
+                    if (calcHeatBalInsideSurfErrCount < 16) {
                         if (!DataHeatBalance::AnyCondFD) {
                             ShowWarningError(
                                 "Inside surface heat balance did not converge with Max Temp Difference [C] =" + General::RoundSigDigits(MaxDelTemp, 3) +
@@ -6548,7 +6550,7 @@ namespace HeatBalanceSurfaceManager {
                         }
                     } else {
                         ShowRecurringWarningErrorAtEnd(
-                            "Inside surface heat balance convergence problem continues", InsideSurfErrCount, MaxDelTemp, MaxDelTemp, _, "[C]", "[C]");
+                            "Inside surface heat balance convergence problem continues", calcHeatBalInsideSurfErrPointer, MaxDelTemp, MaxDelTemp, _, "[C]", "[C]");
                     }
                 }
                 break; // iteration loop
@@ -6680,20 +6682,7 @@ namespace HeatBalanceSurfaceManager {
 
         static std::string const Inside("Inside");
 
-        static Array1D<Real64> TempInsOld; // Holds previous iteration's value for convergence check
-
-        static int MinIterations; // Minimum number of iterations for the inside heat balance
-        static int ErrCount(0);
-
-        static Array1D<Real64> RefAirTemp; // reference air temperatures
-        static bool MyEnvrnFlag(true);
-        static int InsideSurfErrCount(0);
-        static int WarmupSurfTemp;
-
-        if (calcHeatBalanceInsideSurfCTFOnlyFirstTime) {
-            TempInsOld.allocate(TotSurfaces);
-            RefAirTemp.allocate(TotSurfaces);
-            MinIterations = 1;
+        if (calcHeatBalInsideSurfCTFOnlyFirstTime) {
             if (DisplayAdvancedReportVariables) {
                 SetupOutputVariable("Surface Inside Face Heat Balance Calculation Iteration Count",
                                     OutputProcessor::Unit::None,
@@ -6743,17 +6732,7 @@ namespace HeatBalanceSurfaceManager {
                 }
             }
 
-            calcHeatBalanceInsideSurfCTFOnlyFirstTime = false;
-        }
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
-            TempInsOld = 23.0;
-            RefAirTemp = 23.0;
-            TempEffBulkAir = 23.0;
-            WarmupSurfTemp = 0;
-            MyEnvrnFlag = false;
-        }
-        if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            calcHeatBalInsideSurfCTFOnlyFirstTime = false;
         }
 
         for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
@@ -7210,7 +7189,7 @@ namespace HeatBalanceSurfaceManager {
                     }
 
                     if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
-                        TestSurfTempCalcHeatBalanceInsideSurf(TH12, surface, zone, WarmupSurfTemp);
+                        TestSurfTempCalcHeatBalanceInsideSurf(TH12, surface, zone, calcHeatBalInsideSurfWarmupErrCount);
                     }
                 }
             } // ...end of main loops over all surfaces for inside heat balances
@@ -7256,15 +7235,15 @@ namespace HeatBalanceSurfaceManager {
 
             if (InsideSurfIterations > MaxIterations) {
                 if (!WarmupFlag) {
-                    ++ErrCount;
-                    if (ErrCount < 16) {
+                    ++calcHeatBalInsideSurfErrCount;
+                    if (calcHeatBalInsideSurfErrCount < 16) {
                         ShowWarningError(
                             "Inside surface heat balance did not converge with Max Temp Difference [C] =" + General::RoundSigDigits(MaxDelTemp, 3) +
                             " vs Max Allowed Temp Diff [C] =" + General::RoundSigDigits(MaxAllowedDelTempCondFD, 6));
                         ShowContinueErrorTimeStamp("");
                     } else {
                         ShowRecurringWarningErrorAtEnd(
-                            "Inside surface heat balance convergence problem continues", InsideSurfErrCount, MaxDelTemp, MaxDelTemp, _, "[C]", "[C]");
+                            "Inside surface heat balance convergence problem continues", calcHeatBalInsideSurfErrPointer, MaxDelTemp, MaxDelTemp, _, "[C]", "[C]");
                     }
                 }
                 break; // iteration loop
