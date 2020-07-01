@@ -226,6 +226,9 @@ public:
     // for the persistent weather simulation, using the EPW
     // uses the file name set in `inputWeatherFileName`
     InputFile inputWeatherFile{""};
+
+    InputFileName TempFullFileName{""};
+
     static IOFiles &getSingleton();
     static void setSingleton(IOFiles *newSingleton) noexcept;
 

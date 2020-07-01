@@ -97,7 +97,7 @@ TEST_F(EnergyPlusFixture, WCEClear)
     ASSERT_TRUE(process_idf(idf_objects));
 
     HeatBalanceManager::GetMaterialData(state.files, ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     WindowManager::initWindowModel();
     WindowManager::InitWindowOpticalCalculations(state.files);
     HeatBalanceManager::InitHeatBalance(state.files);
@@ -189,7 +189,7 @@ TEST_F(EnergyPlusFixture, WCEVenetian)
     ASSERT_TRUE(process_idf(idf_objects));
 
     HeatBalanceManager::GetMaterialData(state.files, ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     WindowManager::initWindowModel();
     WindowManager::InitWindowOpticalCalculations(state.files);
     HeatBalanceManager::InitHeatBalance(state.files);
@@ -267,7 +267,7 @@ TEST_F(EnergyPlusFixture, WCEShade)
     ASSERT_TRUE(process_idf(idf_objects));
 
     HeatBalanceManager::GetMaterialData(state.files, ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     WindowManager::initWindowModel();
     WindowManager::InitWindowOpticalCalculations(state.files);
     HeatBalanceManager::InitHeatBalance(state.files);

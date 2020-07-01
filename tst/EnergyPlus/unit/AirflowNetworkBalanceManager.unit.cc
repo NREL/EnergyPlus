@@ -2245,7 +2245,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetMaterialData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -4427,7 +4427,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetMaterialData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays();
@@ -5697,7 +5697,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     HeatBalanceManager::GetMaterialData(state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(errors); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errors); // read zone data
@@ -6401,7 +6401,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     HeatBalanceManager::GetMaterialData(state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(errors); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errors); // read zone data
@@ -7024,7 +7024,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     HeatBalanceManager::GetMaterialData(state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(errors); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errors); // read zone data
@@ -7713,7 +7713,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     HeatBalanceManager::GetMaterialData(state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(errors); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errors); // read zone data
@@ -8347,7 +8347,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     HeatBalanceManager::GetMaterialData(state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(errors); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errors); // read zone data
@@ -9079,7 +9079,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetMaterialData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays();
@@ -9555,7 +9555,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
     HeatBalanceManager::GetMaterialData(state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(errors); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errors); // read zone data
@@ -13107,7 +13107,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetMaterialData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -13647,7 +13647,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     HeatBalanceManager::GetMaterialData(state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(errors); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errors); // read zone data
@@ -15582,7 +15582,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetMaterialData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -17161,7 +17161,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetMaterialData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays();
@@ -19939,7 +19939,7 @@ std::string const idf_objects = delimited_string({
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetMaterialData(IOFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     SurfaceGeometry::GetGeometryParameters(IOFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);

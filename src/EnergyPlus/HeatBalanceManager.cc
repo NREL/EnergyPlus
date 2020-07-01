@@ -453,7 +453,7 @@ namespace HeatBalanceManager {
 
         GetFrameAndDividerData(ErrorsFound);
 
-        GetConstructData(ErrorsFound); // Read constructs from input file/transfer from legacy data structure
+        GetConstructData(state.files, ErrorsFound); // Read constructs from input file/transfer from legacy data structure
 
         GetBuildingData(state, ErrorsFound); // Read building data from input file
 
@@ -4124,7 +4124,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void GetConstructData(bool &ErrorsFound) // If errors found in input
+    void GetConstructData(IOFiles &ioFiles, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -4566,7 +4566,7 @@ namespace HeatBalanceManager {
             }
             DisplayString("Searching Window5 data file for Construction=" + ConstructAlphas(0));
 
-            SearchWindow5DataFile(window5DataFileName, ConstructAlphas(0), ConstructionFound, EOFonW5File, ErrorsFound);
+            SearchWindow5DataFile(ioFiles, window5DataFileName, ConstructAlphas(0), ConstructionFound, EOFonW5File, ErrorsFound);
 
             if (EOFonW5File || !ConstructionFound) {
                 DisplayString("--Construction not found");
@@ -6135,7 +6135,8 @@ namespace HeatBalanceManager {
         }
     }
 
-    void SearchWindow5DataFile(std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
+    void SearchWindow5DataFile(IOFiles &ioFiles,
+                               std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
                                std::string const &DesiredConstructionName, // Name that will be searched for in the Window5 data file
                                bool &ConstructionFound,                    // True if DesiredConstructionName is in the Window5 data file
                                bool &EOFonFile,                            // True if EOF during file read
@@ -6179,7 +6180,6 @@ namespace HeatBalanceManager {
         using DataSystemVariables::CheckForActualFileName;
         using DataSystemVariables::GoodIOStatValue;
         using DataSystemVariables::iUnicode_end;
-        using DataSystemVariables::TempFullFileName;
         using General::POLYF; // POLYF       ! Polynomial in cosine of angle of incidence
         using General::TrimSigDigits;
 
@@ -6187,17 +6187,14 @@ namespace HeatBalanceManager {
         static Array1D_string const NumName(5, {"1", "2", "3", "4", "5"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int W5DataFileNum;
         int FileLineCount;            // counter for number of lines read (used in some error messages)
         Array1D_string DataLine(100); // Array of data lines
-        std::string NextLine;         // Line of data
         std::string WindowNameInW5DataFile;
         std::string W5Name;
         Array1D_string GasName(3);      // Gas name from data file
         std::string LayerName;          // Layer name from data file
         std::string MullionOrientation; // Horizontal, vertical or none
         int LineNum;
-        int ReadStat;                       // File read status
         Array1D_int NGlass(2);              // Number of glass layers in glazing system
         Array2D_int NumGases(4, 2);         // Number of gases in each gap of a glazing system
         Array2D_int MaterNumSysGlass(5, 2); // Material numbers for glazing system / glass combinations
@@ -6274,7 +6271,7 @@ namespace HeatBalanceManager {
         // ErrorsFound = .FALSE.
         EOFonFile = false;
 
-        CheckForActualFileName(IOFiles::getSingleton(), DesiredFileName, exists, TempFullFileName);
+        CheckForActualFileName(ioFiles, DesiredFileName, exists, ioFiles.TempFullFileName.fileName);
         // INQUIRE(FILE=TRIM(DesiredFileName), EXIST=exists)
         if (!exists) {
             ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Could not locate Window5 Data File, expecting it as file name=" +
@@ -6284,47 +6281,35 @@ namespace HeatBalanceManager {
             ShowFatalError("Program terminates due to these conditions.");
         }
 
-        W5DataFileNum = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("read");
-            ObjexxFCL::gio::open(W5DataFileNum, TempFullFileName, flags);
-            if (flags.err()) goto Label999;
-        }
-        ObjexxFCL::gio::read(W5DataFileNum, fmtA) >> NextLine;
-        endcol = len(NextLine);
+        auto W5DataFile = ioFiles.TempFullFileName.open("SearchWindow5DataFile");
+        auto NextLine = W5DataFile.readLine();
+        endcol = len(NextLine.data);
         if (endcol > 0) {
-            if (int(NextLine[endcol - 1]) == iUnicode_end) {
+            if (int(NextLine.data[endcol - 1]) == iUnicode_end) {
                 ShowSevereError("SearchWindow5DataFile: For \"" + DesiredConstructionName + "\" in " + DesiredFileName +
                                 " fiile, appears to be a Unicode or binary file.");
                 ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
                 ShowFatalError("Program terminates due to previous condition.");
             }
         }
-
-        ObjexxFCL::gio::rewind(W5DataFileNum);
+        W5DataFile.rewind();
         FileLineCount = 0;
 
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-            ReadStat = flags.ios();
-        }
-        if (ReadStat < GoodIOStatValue) goto Label1000;
+        NextLine = W5DataFile.readLine();
+        int ReadStat = 0;
+        if (NextLine.eof) goto Label1000;
         ++FileLineCount;
-        if (!has_prefixi(NextLine, "WINDOW5")) {
+        if (!has_prefixi(NextLine.data, "WINDOW5")) {
             ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Data File=" + DesiredFileName);
-            ShowFatalError("Error reading Window5 Data File: first word of window entry is \"" + NextLine.substr(0, 7) + "\", should be Window5.");
+            ShowFatalError("Error reading Window5 Data File: first word of window entry is \"" + NextLine.data.substr(0, 7) + "\", should be Window5.");
         }
+
 
     Label10:;
         for (LineNum = 2; LineNum <= 5; ++LineNum) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> DataLine(LineNum);
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
+            DataLine(LineNum) = NextLine.data;
             ++FileLineCount;
         }
 
@@ -6334,14 +6319,10 @@ namespace HeatBalanceManager {
         if (DesiredConstructionName != WindowNameInW5DataFile) {
             // Doesn't match; read through file until next window entry is found
         Label20:;
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
-            if (!has_prefixi(NextLine, "WINDOW5")) goto Label20;
+            if (!has_prefixi(NextLine.data, "WINDOW5")) goto Label20;
             // Beginning of next window entry found
             goto Label10;
         } else {
@@ -6351,43 +6332,31 @@ namespace HeatBalanceManager {
             // Create Material:WindowGlass, Material:WindowGas, Construction
             // and WindowFrameAndDividerObjects for this window
 
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
-            ObjexxFCL::gio::read(NextLine.substr(19), "*") >> NGlSys;
+            ObjexxFCL::gio::read(NextLine.data.substr(19), "*") >> NGlSys;
             if (NGlSys <= 0 || NGlSys > 2) {
                 ShowFatalError("Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has " +
                                TrimSigDigits(NGlSys) + " glazing systems; only 1 or 2 are allowed.");
             }
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat < GoodIOStatValue) goto Label1000;
+                NextLine = W5DataFile.readLine();
+                if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
                 {
                     IOFlags flags;
-                    ObjexxFCL::gio::read(NextLine.substr(19), "*", flags) >> WinHeight(IGlSys) >> WinWidth(IGlSys) >> NGlass(IGlSys) >>
+                    ObjexxFCL::gio::read(NextLine.data.substr(19), "*", flags) >> WinHeight(IGlSys) >> WinWidth(IGlSys) >> NGlass(IGlSys) >>
                         UValCenter(IGlSys) >> SCCenter(IGlSys) >> SHGCCenter(IGlSys) >> TVisCenter(IGlSys);
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of glazing system values. For glazing system=" +
                                     TrimSigDigits(IGlSys));
-                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.substr(0, 100));
+                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                     ErrorsFound = true;
                 }
                 if (WinHeight(IGlSys) == 0.0 || WinWidth(IGlSys) == 0.0) {
@@ -6423,12 +6392,9 @@ namespace HeatBalanceManager {
                 WinWidth(IGlSys) *= 0.001;
             }
             for (LineNum = 1; LineNum <= 11; ++LineNum) {
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> DataLine(LineNum);
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat == -1) goto Label1000;
+                NextLine = W5DataFile.readLine();
+                if (NextLine.eof) goto Label1000;
+                DataLine(LineNum) = NextLine.data;
             }
 
             // Mullion width and orientation
@@ -6509,26 +6475,18 @@ namespace HeatBalanceManager {
             FrameProjectionIn *= 0.001;
             FileLineCount += 11;
 
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
 
             // Divider data for each glazing system
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat < GoodIOStatValue) goto Label1000;
+                NextLine = W5DataFile.readLine();
+                if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
                 {
                     IOFlags flags;
-                    ObjexxFCL::gio::read(NextLine.substr(19), "*", flags) >> DividerWidth(IGlSys) >> DividerProjectionOut(IGlSys) >>
+                    ObjexxFCL::gio::read(NextLine.data.substr(19), "*", flags) >> DividerWidth(IGlSys) >> DividerProjectionOut(IGlSys) >>
                         DividerProjectionIn(IGlSys) >> DividerConductance(IGlSys) >> DivEdgeToCenterGlCondRatio(IGlSys) >> DividerSolAbsorp(IGlSys) >>
                         DividerVisAbsorp(IGlSys) >> DividerEmis(IGlSys) >> DividerType(IGlSys) >> HorDividers(IGlSys) >> VertDividers(IGlSys);
                     ReadStat = flags.ios();
@@ -6536,7 +6494,7 @@ namespace HeatBalanceManager {
                 if (ReadStat != 0) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of divider data values. For Glazing System=" +
                                     TrimSigDigits(IGlSys));
-                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 11) + ") in error (first 100 characters)=" + NextLine.substr(0, 100));
+                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 11) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                     ErrorsFound = true;
                 }
                 uppercase(DividerType(IGlSys));
@@ -6671,12 +6629,8 @@ namespace HeatBalanceManager {
             }
 
             // Glass objects
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
             MaterNum = TotMaterialsPrev;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
@@ -6684,13 +6638,9 @@ namespace HeatBalanceManager {
                     ++MaterNum;
                     MaterNumSysGlass(IGlass, IGlSys) = MaterNum;
                     Material(MaterNum).Group = WindowGlass;
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                        ReadStat = flags.ios();
-                    }
+                    NextLine = W5DataFile.readLine();
                     ++FileLineCount;
-                    ObjexxFCL::gio::read(NextLine.substr(25), "*") >> Material(MaterNum).Thickness >> Material(MaterNum).Conductivity >>
+                    ObjexxFCL::gio::read(NextLine.data.substr(25), "*") >> Material(MaterNum).Thickness >> Material(MaterNum).Conductivity >>
                         Material(MaterNum).Trans >> Material(MaterNum).ReflectSolBeamFront >> Material(MaterNum).ReflectSolBeamBack >>
                         Material(MaterNum).TransVis >> Material(MaterNum).ReflectVisBeamFront >> Material(MaterNum).ReflectVisBeamBack >>
                         Material(MaterNum).TransThermal >> Material(MaterNum).AbsorpThermalFront >> Material(MaterNum).AbsorpThermalBack >> LayerName;
@@ -6707,32 +6657,24 @@ namespace HeatBalanceManager {
                     if (Material(MaterNum).Thickness <= 0.0) {
                         ShowSevereError("SearchWindow5DataFile: Material=\"" + Material(MaterNum).Name +
                                         "\" has thickness of 0.0.  Will be set to thickness = .001 but inaccuracies may result.");
-                        ShowContinueError("Line being read=" + NextLine);
-                        ShowContinueError("Thickness field starts at column 26=" + NextLine.substr(25));
+                        ShowContinueError("Line being read=" + NextLine.data);
+                        ShowContinueError("Thickness field starts at column 26=" + NextLine.data.substr(25));
                         Material(MaterNum).Thickness = 0.001;
                     }
                 }
             }
 
             // Gap objects
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
                     ++MaterNum;
                     MaterNumSysGap(IGap, IGlSys) = MaterNum;
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                        ReadStat = flags.ios();
-                    }
+                    NextLine = W5DataFile.readLine();
                     ++FileLineCount;
-                    ObjexxFCL::gio::read(NextLine.substr(23), "*") >> Material(MaterNum).Thickness >> NumGases(IGap, IGlSys);
+                    ObjexxFCL::gio::read(NextLine.data.substr(23), "*") >> Material(MaterNum).Thickness >> NumGases(IGap, IGlSys);
                     if (NGlSys == 1) {
                         Material(MaterNum).Name = "W5:" + DesiredConstructionName + ":GAP" + NumName(IGap);
                     } else {
@@ -6743,12 +6685,8 @@ namespace HeatBalanceManager {
                 }
             }
 
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
@@ -6757,13 +6695,9 @@ namespace HeatBalanceManager {
                     Material(MaterNum).Group = WindowGas;
                     if (NumGases(IGap, IGlSys) > 1) Material(MaterNum).Group = WindowGasMixture;
                     for (IGas = 1; IGas <= NumGases(IGap, IGlSys); ++IGas) {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                            ReadStat = flags.ios();
-                        }
+                        NextLine = W5DataFile.readLine();
                         ++FileLineCount;
-                        ObjexxFCL::gio::read(NextLine.substr(19), "*") >> GasName(IGas) >> Material(MaterNum).GasFract(IGas) >>
+                        ObjexxFCL::gio::read(NextLine.data.substr(19), "*") >> GasName(IGas) >> Material(MaterNum).GasFract(IGas) >>
                             Material(MaterNum).GasWght(IGas) >> Material(MaterNum).GasCon(_, IGas) >> Material(MaterNum).GasVis(_, IGas) >>
                             Material(MaterNum).GasCp(_, IGas);
                         // Nominal resistance of gap at room temperature (based on first gas in mixture)
@@ -6782,12 +6716,8 @@ namespace HeatBalanceManager {
             NominalRforNominalUCalculation.redimension(TotConstructs);
             NominalU.redimension(TotConstructs);
 
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
 
             // Pre-calculate constants
@@ -6883,73 +6813,54 @@ namespace HeatBalanceManager {
 
                 // Fill Construct with system transmission, reflection and absorption properties
 
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat < GoodIOStatValue) goto Label1000;
+                NextLine = W5DataFile.readLine();
+                if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
                 if (IGlSys == 1) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                        ReadStat = flags.ios();
-                    }
-                    if (ReadStat < GoodIOStatValue) goto Label1000;
+                    NextLine = W5DataFile.readLine();
+                    if (NextLine.eof) goto Label1000;
                     ++FileLineCount;
                 }
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat < GoodIOStatValue) goto Label1000;
+                NextLine = W5DataFile.readLine();
+                if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
                 {
                     IOFlags flags;
-                    ObjexxFCL::gio::read(NextLine.substr(5), "*", flags) >> Tsol;
+                    ObjexxFCL::gio::read(NextLine.data.substr(5), "*", flags) >> Tsol;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of TSol values.");
-                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.substr(0, 100));
+                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                     ErrorsFound = true;
                 } else if (any_lt(Tsol, 0.0) || any_gt(Tsol, 1.0)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of TSol values. (out of range [0,1])");
-                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.substr(0, 100));
+                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                     ErrorsFound = true;
                 }
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                        ReadStat = flags.ios();
-                    }
+                    NextLine = W5DataFile.readLine();
                     ++FileLineCount;
                     {
                         IOFlags flags;
-                        ObjexxFCL::gio::read(NextLine.substr(5), "*", flags) >> AbsSol(_, IGlass);
+                        ObjexxFCL::gio::read(NextLine.data.substr(5), "*", flags) >> AbsSol(_, IGlass);
                         ReadStat = flags.ios();
                     }
                     if (ReadStat != 0) {
                         ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of AbsSol values. For Glass=" +
                                         TrimSigDigits(IGlass));
-                        ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.substr(0, 100));
+                        ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                         ErrorsFound = true;
                     } else if (any_lt(AbsSol(_, IGlass), 0.0) || any_gt(AbsSol(_, IGlass), 1.0)) {
                         ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of AbsSol values. (out of range [0,1]) For Glass=" +
                                         TrimSigDigits(IGlass));
-                        ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.substr(0, 100));
+                        ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                         ErrorsFound = true;
                     }
                 }
                 for (ILine = 1; ILine <= 5; ++ILine) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> DataLine(ILine);
-                        ReadStat = flags.ios();
-                    }
+                    NextLine = W5DataFile.readLine();
+                    DataLine(ILine) = NextLine.data;
                 }
                 {
                     IOFlags flags;
@@ -7146,16 +7057,10 @@ namespace HeatBalanceManager {
             }
         }
 
-        ObjexxFCL::gio::close(W5DataFileNum);
-        return;
-
-    Label999:;
-        ShowFatalError("HeatBalanceManager: SearchWindow5DataFile: Could not open Window5 Data File, expecting it as file name=" + DesiredFileName);
         return;
 
     Label1000:;
         EOFonFile = true;
-        ObjexxFCL::gio::close(W5DataFileNum);
     }
 
     void SetStormWindowControl()

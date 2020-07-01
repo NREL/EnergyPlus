@@ -241,7 +241,6 @@ namespace ScheduleManager {
         using DataStringGlobals::CharTab;
         using DataSystemVariables::CheckForActualFileName;
         using DataSystemVariables::iUnicode_end;
-        using DataSystemVariables::TempFullFileName;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -333,16 +332,13 @@ namespace ScheduleManager {
         Array1D<Real64> hourlyFileValues;
         std::map<std::string, int> CSVAllColumnNames;
         std::map<int, Array1D<Real64>> CSVAllColumnNameAndValues;
-        int SchdFile;
         int colCnt;
         int rowCnt;
         int wordStart;
         int wordEnd;
         std::string::size_type sepPos;
-        std::string LineIn;
         std::string subString;
         Real64 columnValue;
-        int read_stat;
         int iDay;
         int hDay;
         int jHour;
@@ -352,7 +348,6 @@ namespace ScheduleManager {
         std::string::size_type sPos;
         std::string CurrentModuleObject; // for ease in getting objects
         int MaxNums1;
-        std::string::size_type endLine;
         std::string ColumnSep;
         bool firstLine;
         bool FileIntervalInterpolated;
@@ -538,47 +533,36 @@ namespace ScheduleManager {
             inputProcessor->getObjectItem(
                 CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
             std::string ShadingSunlitFracFileName = Alphas(1);
-            CheckForActualFileName(ioFiles, ShadingSunlitFracFileName, FileExists, TempFullFileName);
+            CheckForActualFileName(ioFiles, ShadingSunlitFracFileName, FileExists, ioFiles.TempFullFileName.fileName);
             if (!FileExists) {
                 ShowSevereError(RoutineName + ":\"" + ShadingSunlitFracFileName +
                                 "\" not found when External Shading Calculation Method = ImportedShading.");
                 ShowContinueError("Certain run environments require a full path to be included with the file name in the input field.");
                 ShowContinueError("Try again with putting full path and file name in the field.");
                 ShowFatalError("Program terminates due to previous condition.");
-            } else {
-                SchdFile = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("read");
-                    ObjexxFCL::gio::open(SchdFile, TempFullFileName, flags);
-                    read_stat = flags.ios();
-                }
-                if (read_stat != 0) {
-                    ShowSevereError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\" cannot be opened.");
-                    ShowContinueError("... It may be open in another program (such as Excel).  Please close and try again.");
+            }
+
+            auto SchdFile = ioFiles.TempFullFileName.try_open();
+            if (!SchdFile.good()) {
+                ShowSevereError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\" cannot be opened.");
+                ShowContinueError("... It may be open in another program (such as Excel).  Please close and try again.");
+                ShowFatalError("Program terminates due to previous condition.");
+            }
+            // check for stripping
+            auto LineIn = SchdFile.readLine();
+            const auto endLine = len(LineIn.data);
+            if (endLine > 0) {
+                if (int(LineIn.data[endLine - 1]) == iUnicode_end) {
+                    SchdFile.close();
+                    ShowSevereError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\" appears to be a Unicode or binary file.");
+                    ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
                     ShowFatalError("Program terminates due to previous condition.");
                 }
-                // check for stripping
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
-                    read_stat = flags.ios();
-                }
-                endLine = len(LineIn);
-                if (endLine > 0) {
-                    if (int(LineIn[endLine - 1]) == iUnicode_end) {
-                        ObjexxFCL::gio::close(SchdFile);
-                        ShowSevereError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\" appears to be a Unicode or binary file.");
-                        ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
-                        ShowFatalError("Program terminates due to previous condition.");
-                    }
-                }
-                ObjexxFCL::gio::backspace(SchdFile);
             }
+            SchdFile.backspace();
 
             numerrors = 0;
             errFlag = false;
-            read_stat = 0;
 
             rowCnt = 0;
             firstLine = true;
@@ -588,10 +572,8 @@ namespace ScheduleManager {
                 rowLimitCount = 365 * 24 * NumOfTimeStepInHour;
             }
             ColumnSep = CharComma;
-            while (read_stat == 0) { // end of file
-                IOFlags flags;
-                ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
-                read_stat = flags.ios();
+            while (!LineIn.eof) { // end of file
+                LineIn = SchdFile.readLine();
                 ++rowCnt;
                 if (rowCnt - 2 > rowLimitCount) break;
                 colCnt = 0;
@@ -599,7 +581,7 @@ namespace ScheduleManager {
                 columnValue = 0.0;
                 // scan through the line and write values into 2d array
                 while (true) {
-                    sepPos = index(LineIn, ColumnSep);
+                    sepPos = index(LineIn.data, ColumnSep);
                     ++colCnt;
                     if (sepPos != std::string::npos) {
                         if (sepPos > 0) {
@@ -607,20 +589,20 @@ namespace ScheduleManager {
                         } else {
                             wordEnd = wordStart;
                         }
-                        subString = LineIn.substr(wordStart, wordEnd - wordStart + 1);
+                        subString = LineIn.data.substr(wordStart, wordEnd - wordStart + 1);
                         // the next word will start after the comma
                         wordStart = sepPos + 1;
                         // get rid of separator so next INDEX will find next separator
-                        LineIn.erase(0, wordStart);
+                        LineIn.data.erase(0, wordStart);
                         firstLine = false;
                         wordStart = 0;
                     } else {
                         // no more commas
-                        subString = LineIn.substr(wordStart);
+                        subString = LineIn.data.substr(wordStart);
                         if (firstLine && subString == BlankString) {
                             ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName +
                                              "\"  first line does not contain the indicated column separator=comma.");
-                            ShowContinueError("...first 40 characters of line=[" + LineIn.substr(0, 40) + ']');
+                            ShowContinueError("...first 40 characters of line=[" + LineIn.data.substr(0, 40) + ']');
                             firstLine = false;
                         }
                         break;
@@ -660,7 +642,7 @@ namespace ScheduleManager {
                     }
                 }
             }
-            ObjexxFCL::gio::close(SchdFile);
+            SchdFile.close();
 
             if (rowCnt - 2 != rowLimitCount) {
                 if (rowCnt - 2 < rowLimitCount) {
@@ -1766,7 +1748,7 @@ namespace ScheduleManager {
             //      ENDDO
             //    ENDIF
 
-            CheckForActualFileName(ioFiles, Alphas(3), FileExists, TempFullFileName);
+            CheckForActualFileName(ioFiles, Alphas(3), FileExists, ioFiles.TempFullFileName.fileName);
 
             //    INQUIRE(file=Alphas(3),EXIST=FileExists)
             // Setup file reading parameters
@@ -1778,48 +1760,32 @@ namespace ScheduleManager {
                 ShowContinueError("Try again with putting full path and file name in the field.");
                 ErrorsFound = true;
             } else {
-                SchdFile = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("read");
-                    ObjexxFCL::gio::open(SchdFile, TempFullFileName, flags);
-                    read_stat = flags.ios();
-                }
-                if (read_stat != 0) {
+                auto SchdFile = ioFiles.TempFullFileName.try_open();
+                if (!SchdFile.good()) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
                                     "\" cannot be opened.");
                     ShowContinueError("... It may be open in another program (such as Excel).  Please close and try again.");
                     ShowFatalError("Program terminates due to previous condition.");
                 }
                 // check for stripping
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
-                    read_stat = flags.ios();
-                }
-                endLine = len(LineIn);
+                auto LineIn = SchdFile.readLine();
+                const auto endLine = len(LineIn.data);
                 if (endLine > 0) {
-                    if (int(LineIn[endLine - 1]) == iUnicode_end) {
-                        ObjexxFCL::gio::close(SchdFile);
+                    if (int(LineIn.data[endLine - 1]) == iUnicode_end) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
                                         " appears to be a Unicode or binary file.");
                         ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
                         ShowFatalError("Program terminates due to previous condition.");
                     }
                 }
-                ObjexxFCL::gio::backspace(SchdFile);
+                SchdFile.backspace();
 
                 // skip lines if any need to be skipped.
                 numerrors = 0;
                 rowCnt = 0;
-                read_stat = 0;
                 if (skiprowCount > 0) {      // Numbers(2) has number of rows to skip
-                    while (read_stat == 0) { // end of file
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
-                            read_stat = flags.ios();
-                        }
+                    while (!LineIn.eof) { // end of file
+                        LineIn = SchdFile.readLine();
                         ++rowCnt;
                         if (rowCnt == skiprowCount) {
                             break;
@@ -1831,19 +1797,15 @@ namespace ScheduleManager {
                 // for the rest of the lines read from the file
                 rowCnt = 0;
                 firstLine = true;
-                while (read_stat == 0) { // end of file
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
-                        read_stat = flags.ios();
-                    }
+                while (!LineIn.eof) { // end of file
+                    LineIn = SchdFile.readLine();
                     ++rowCnt;
                     colCnt = 0;
                     wordStart = 0;
                     columnValue = 0.0;
                     // scan through the line looking for a specific column
                     while (true) {
-                        sepPos = index(LineIn, ColumnSep);
+                        sepPos = index(LineIn.data, ColumnSep);
                         ++colCnt;
                         if (sepPos != std::string::npos) {
                             if (sepPos > 0) {
@@ -1851,20 +1813,20 @@ namespace ScheduleManager {
                             } else {
                                 wordEnd = wordStart;
                             }
-                            subString = LineIn.substr(wordStart, wordEnd - wordStart + 1);
+                            subString = LineIn.data.substr(wordStart, wordEnd - wordStart + 1);
                             // the next word will start after the comma
                             wordStart = sepPos + 1;
                             // get rid of separator so next INDEX will find next separator
-                            LineIn.erase(0, wordStart);
+                            LineIn.data.erase(0, wordStart);
                             firstLine = false;
                             wordStart = 0;
                         } else {
                             // no more commas
-                            subString = LineIn.substr(wordStart);
+                            subString = LineIn.data.substr(wordStart);
                             if (firstLine && subString == BlankString) {
                                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                                  "\" first line does not contain the indicated column separator=" + Alphas(4) + '.');
-                                ShowContinueError("...first 40 characters of line=[" + LineIn.substr(0, 40) + ']');
+                                ShowContinueError("...first 40 characters of line=[" + LineIn.data.substr(0, 40) + ']');
                                 firstLine = false;
                             }
                             break;
@@ -1884,7 +1846,7 @@ namespace ScheduleManager {
                     hourlyFileValues(rowCnt) = columnValue;
                     if (rowCnt == rowLimitCount) break;
                 }
-                ObjexxFCL::gio::close(SchdFile);
+                SchdFile.close();
 
                 // schedule values have been filled into the hourlyFileValues array.
 

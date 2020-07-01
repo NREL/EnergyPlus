@@ -443,7 +443,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
     EXPECT_FALSE(errorsFound);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errorsFound);
@@ -918,7 +918,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
     EXPECT_FALSE(errorsFound);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errorsFound);
@@ -975,7 +975,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
     EXPECT_FALSE(errorsFound);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errorsFound);
@@ -1032,7 +1032,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
     EXPECT_FALSE(errorsFound);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errorsFound);
@@ -1089,7 +1089,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
     EXPECT_FALSE(errorsFound);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errorsFound);
@@ -1146,7 +1146,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
     EXPECT_FALSE(errorsFound);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errorsFound);
@@ -1203,7 +1203,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
     EXPECT_FALSE(errorsFound);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errorsFound);

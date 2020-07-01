@@ -1120,7 +1120,7 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     GetMaterialData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    GetConstructData(ErrorsFound);
+    GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetPlantSizingInput();

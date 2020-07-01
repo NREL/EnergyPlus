@@ -354,7 +354,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
 
     // call to get valid window material types
     ErrorsFound = false;
-    GetConstructData(ErrorsFound); // returns ErrorsFound as false since all layers are valid
+    GetConstructData(state.files, ErrorsFound); // returns ErrorsFound as false since all layers are valid
     EXPECT_FALSE(ErrorsFound);
 
     // Clear shared arrays that were allocated in GetConstructData
@@ -1215,7 +1215,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetMaterialData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
@@ -1828,7 +1828,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
 
     // get constructions
     ErrorsFound = false;
-    GetConstructData(ErrorsFound);
+    GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     EXPECT_EQ(DataHeatBalance::TotConstructs, 3);
@@ -1907,7 +1907,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 
     // get constructions
     ErrorsFound = false;
-    GetConstructData(ErrorsFound);
+    GetConstructData(state.files, ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({
