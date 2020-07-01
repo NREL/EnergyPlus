@@ -4023,6 +4023,182 @@ TEST_F(InputProcessorFixture, clean_epjson)
     EXPECT_EQ(expected, cleanstring);
 }
 
+TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
+{
+    std::string const idf_objects = delimited_string({
+
+        // 1 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Version,",
+        "  9.4;", // Has a default
+
+        // 8 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 1 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Building,",
+        "  ,  !- Name",                                                                     // Has a default   - DEFAULTED - Special case (name)
+        "  0,                       !- North Axis {deg}",                                   // Has a default
+        "  Suburbs,                 !- Terrain",                                            // Has a default
+        "  0.001,                   !- Loads Convergence Tolerance Value",                  // Has a default
+        "  0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}",   // Has a default
+        "  FullInteriorAndExterior, !- Solar Distribution",                                 // Has a default
+        "  25,                      !- Maximum Number of Warmup Days",                      // Has a default
+        "  6;                       !- Minimum Number of Warmup Days",                      // Has a default
+
+        // 2 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "  GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    Relative,                !- Coordinate System",
+        "    Relative,                !- Daylighting Reference Point Coordinate System", // Has a default
+        "    Relative;                !- Rectangular Surface Coordinate System",         // Has a default
+
+        // SUBTOTAL:
+        // 11 fields with defaults, 0 Autosizable, 0 Autocalculatable
+        // 1 fields defaulted     , 0 Autosized  , 0 Autocalculated
+
+
+
+        // 23 fields with default, 6 Autosizable, 3 Autocalculatable
+        // 10 fields defaulted   , 4 Autosized  , 2 Autocalculated
+        "CoolingTower:SingleSpeed,",
+        "  CT Single Speed,                        !- Name",                                                      // No Default
+        "  CT Single Speed Inlet Node,             !- Water Inlet Node Name",                                     // No Default
+        "  CT Single Speed Outlet Node,            !- Water Outlet Node Name",                                    // No Default
+        "  AutosiZe,                               !- Design Water Flow Rate {m3/s}",                             // Autosizable, no default (testing casing too)
+        "  Autosize,                               !- Design Air Flow Rate {m3/s}",                               // Autosizable, no default, required
+        "  10000,                                  !- Design Fan Power {W}",                                      // Autosizable, no default, required
+        "  Autosize,                               !- Design U-Factor Times Area Value {W/K}",                    // Autosizable, no default
+        "  AutoSIze,                               !- Free Convection Air Flow Rate {m3/s}",                      // Autocalculatable, default numeric: NOTE, using "Autosize" and not "Autocalculate
+        "  0.1,                                    !- Free Convection Air Flow Rate Sizing Factor",               // Has numeric default
+        "  AutocAlcUlate,                          !- Free Convection U-Factor Times Area Value {W/K}",           // Autocalculatable, default numeric
+        "  ,                                       !- Free Convection U-Factor Times Area Value Sizing Factor",   // Has numeric default - DEFAULTED
+        "  UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",                                  // Has default (UFactorTimesAreaAndDesignWaterFlowRate)
+        "  1.25,                                   !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio", // Has numeric default
+        "  ,                                       !- Nominal Capacity {W}",                                      // No default
+        "  0,                                      !- Free Convection Capacity {W}",                              // Autocalculatable, no default
+        "  ,                                       !- Free Convection Nominal Capacity Sizing Factor",            // Has numeric default - DEFAULTED
+        "  ,                                       !- Design Inlet Air Dry-Bulb Temperature {C}",                 // Has numeric default - DEFAULTED
+        "  25.6,                                   !- Design Inlet Air Wet-Bulb Temperature {C}",                 // Has numeric default
+        "  ,                                       !- Design Approach Temperature {deltaC}",                      // Autosizable, default Autosize - DEFAULTED
+        "  10,                                     !- Design Range Temperature {deltaC}",                         // Autosizable, default Autosize
+        "  0,                                      !- Basin Heater Capacity {W/K}",                               // Has numeric default
+        "  ,                                       !- Basin Heater Setpoint Temperature {C}",                     // Has numeric default - DEFAULTED
+        "  ,                                       !- Basin Heater Operating Schedule Name",                      // No default
+        "  LossFactor,                             !- Evaporation Loss Mode",                                     // No default
+        "  0.2,                                    !- Evaporation Loss Factor {percent/K}",                       // Has numeric default
+        "  ,                                       !- Drift Loss Percent {percent}",                              // Has numeric default - DEFAULTED
+        "  ConcentrationRatio,                     !- Blowdown Calculation Mode",                                 // No default
+        "  3,                                      !- Blowdown Concentration Ratio",                              // Has numeric default
+        "  ,                                       !- Blowdown Makeup Water Usage Schedule Name",                 // No default
+        "  ,                                       !- Supply Water Storage Tank Name",                            // No default
+        "  ,                                       !- Outdoor Air Inlet Node Name",                               // No default
+        "  FanCycling,                             !- Capacity Control",                                          // Has default
+        "  1,                                      !- Number of Cells",                                           // Has numeric default
+        "  ,                                       !- Cell Control",                                              // Has default - DEFAULTED
+        "  0.33,                                   !- Cell Minimum  Water Flow Rate Fraction",                    // Has numeric default
+        "  ;                                       !- Cell Maximum Water Flow Rate Fraction",                     // Has numeric default - DEFAULTED
+     // "  ,                                       !- Sizing Factor",                                             // Has numeric default - DEFAULTED by ommission
+     // "  ;                                       !- End-Use Subcategory",                                       // Has default - DEFAULTED by ommission
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    inputProcessor->reportIDFRecordsStats();
+
+    // TOTAL:
+    // 34 fields with defaults, 6 Autosizable, 3 Autocalculatable
+    // 11 fields defaulted    , 4 Autosized  , 2 Autocalculated
+
+    EXPECT_EQ(4,  DataOutputs::iNumberOfRecords);             // Number of IDF Records (=Objects)
+
+    EXPECT_EQ(34, DataOutputs::iTotalFieldsWithDefaults);     // Total number of fields that could be defaulted
+    EXPECT_EQ(6,  DataOutputs::iTotalAutoSizableFields);      // Total number of autosizeable fields
+    EXPECT_EQ(3,  DataOutputs::iTotalAutoCalculatableFields); // Total number of autocalculatable fields
+
+    EXPECT_EQ(11, DataOutputs::iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
+    EXPECT_EQ(4,  DataOutputs::iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
+    EXPECT_EQ(2,  DataOutputs::iNumberOfAutoCalcedFields);    // Number of autocalculated fields
+}
+
+TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        // 1 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Version,",
+        "  9.4;", // Has a default
+
+        // 8 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 1 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Building,",
+        "  ,  !- Name",                                                                     // Has a default   - DEFAULTED - Special case (name)
+        "  0,                       !- North Axis {deg}",                                   // Has a default
+        "  Suburbs,                 !- Terrain",                                            // Has a default
+        "  0.001,                   !- Loads Convergence Tolerance Value",                  // Has a default
+        "  0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}",   // Has a default
+        "  FullInteriorAndExterior, !- Solar Distribution",                                 // Has a default
+        "  25,                      !- Maximum Number of Warmup Days",                      // Has a default
+        "  6;                       !- Minimum Number of Warmup Days",                      // Has a default
+
+        // 2 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "  GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    Relative,                !- Coordinate System",
+        "    Relative,                !- Daylighting Reference Point Coordinate System", // Has a default
+        "    Relative;                !- Rectangular Surface Coordinate System",         // Has a default
+
+        // SUBTOTAL:
+        // 11 fields with defaults, 0 Autosizable, 0 Autocalculatable
+        // 1 fields defaulted     , 0 Autosized  , 0 Autocalculated
+
+        // Object with extensible fields, one of which actually has a default. Given that it uses 2 extensible groups
+        // 4 fields with defaults, 0 Autosizable, 0 Autocalculatable
+        // 1 fields defaulted    , 0 Autosizable, 0 Autocalculatable
+        "SurfaceProperty:SurroundingSurfaces,",
+        "  SrdSurfs:Living:East,        !- Name",
+        "  0.3,                         !- Sky View Factor",                             // Has numeric default
+        "  ,                            !- Sky Temperature Schedule Name",
+        "  0.1,                         !- Ground View Factor",                          // Has numeric default
+        "  ,                            !- Ground Temperature Schedule Name",
+        "  SurroundingSurface1,         !- Surrounding Surface 1 Name",                  // (begin extensible)
+        "  0.6,                         !- Surrounding Surface 1 View Factor",           // Has numeric default
+        "  Surrounding Temp Sch 1,      !- Surrounding Surface 1 Temperature Schedule Name",
+        "  SurroundingSurface2,         !- Surrounding Surface 2 Name",
+        "  ,                            !- Surrounding Surface 2 View Factor",           //  Has numeric default - DEFAULTED
+        "  Surrounding Temp Sch 1;      !- Surrounding Surface 2 Temperature Schedule Name",
+
+    });
+
+    // Not really happy about the processing of the SurfaceProperty object (needs a SurfaceProperty:LocalEnvironment, a surface itself, etc)
+    // but that's not what I'm trying to test so power through.
+    bool use_assertions = false;
+    process_idf(idf_objects, use_assertions);
+
+    inputProcessor->reportIDFRecordsStats();
+
+    // TOTAL:
+    // 15 fields with defaults, 0 Autosizable, 0 Autocalculatable
+    // 2  fields defaulted    , 0 Autosized  , 0 Autocalculated
+
+    EXPECT_EQ(4,  DataOutputs::iNumberOfRecords);             // Number of IDF Records (=Objects)
+
+    EXPECT_EQ(15, DataOutputs::iTotalFieldsWithDefaults);     // Total number of fields that could be defaulted
+    EXPECT_EQ(0,  DataOutputs::iTotalAutoSizableFields);      // Total number of autosizeable fields
+    EXPECT_EQ(0,  DataOutputs::iTotalAutoCalculatableFields); // Total number of autocalculatable fields
+
+    EXPECT_EQ(2,  DataOutputs::iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
+    EXPECT_EQ(0,  DataOutputs::iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
+    EXPECT_EQ(0,  DataOutputs::iNumberOfAutoCalcedFields);    // Number of autocalculated fields
+
+}
+
+
 /*
    TEST_F( InputProcessorFixture, processIDF_json )
    {
