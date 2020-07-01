@@ -744,7 +744,7 @@ namespace SimulationManager {
         static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string Alphas(8);
+        Array1D_string Alphas(10);
         Array1D<Real64> Number(4);
         int NumAlpha;
         int NumNumber;
@@ -1411,14 +1411,16 @@ namespace SimulationManager {
         } else {
             Alphas(7) = "No";
         }
-        Alphas(8) = General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 3);
+        Alphas(8) = General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1); 
+        Alphas(9) = General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 3);
+        Alphas(10) = General::RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4);
         std::string pptHeader = "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, "
                                 "Zone Radiant Exchange Algorithm, Override Mode, Number of Timestep In Hour, "
                                 "Force Euler Method, Minimum Number of Warmup Days, Force Suppress All Begin Environment Resets, "
-                                "MaxZoneTempDiff";
+                                "Minimum System Timestep, MaxZoneTempDiff, MaxAllowedDelTemp";
         print(outputFiles.eio, "{}\n", pptHeader);
         print(outputFiles.eio, " Performance Precision Tradeoffs");
-        for (Num = 1; Num <= 8; ++Num) {
+        for (Num = 1; Num <= 10; ++Num) {
             print(outputFiles.eio, ", {}", Alphas(Num));
         }
         print(outputFiles.eio, "\n");
