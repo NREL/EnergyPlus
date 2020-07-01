@@ -51,31 +51,29 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::LowTempRadiantSystem;
@@ -91,10 +89,8 @@ using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataSurfaceLists;
-using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::PlantManager;
-using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::SurfaceGeometry;
@@ -253,8 +249,8 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
     Surface.allocate(1);
     Surface(1).Construction = 1;
     Surface(1).Area = 1500.0;
-    Construct.allocate(1);
-    Construct(1).ThicknessPerpend = 0.075;
+    dataConstruction.Construct.allocate(1);
+    dataConstruction.Construct(1).ThicknessPerpend = 0.075;
 
     SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, HydrRadSys(RadSysNum).WaterVolFlowMaxHeat, 0.1);
@@ -334,8 +330,8 @@ TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
     Surface.allocate(1);
     Surface(1).Construction = 1;
     Surface(1).Area = 1500.0;
-    Construct.allocate(1);
-    Construct(1).ThicknessPerpend = 0.075;
+    dataConstruction.Construct.allocate(1);
+    dataConstruction.Construct(1).ThicknessPerpend = 0.075;
 
     SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, HydrRadSys(RadSysNum).ScaledHeatingCapacity, 0.1);
@@ -402,8 +398,8 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow)
     Surface.allocate(1);
     Surface(1).Construction = 1;
     Surface(1).Area = 150.0;
-    Construct.allocate(1);
-    Construct(1).ThicknessPerpend = 0.075;
+    dataConstruction.Construct.allocate(1);
+    dataConstruction.Construct(1).ThicknessPerpend = 0.075;
 
     SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, CFloRadSys(RadSysNum).WaterVolFlowMax, 0.001);
@@ -1674,9 +1670,9 @@ TEST_F(LowTempRadiantSystemTest, SizeRadSysTubeLengthTest)
     Surface(3).Construction = 3;
     Surface(3).Area = 300.0;
 
-    Construct.allocate(3);
-    Construct(1).ThicknessPerpend = 0.05;
-    Construct(2).ThicknessPerpend = 0.125;
+    dataConstruction.Construct.allocate(3);
+    dataConstruction.Construct(1).ThicknessPerpend = 0.05;
+    dataConstruction.Construct(2).ThicknessPerpend = 0.125;
 
     // Test 1: Hydronic radiant system 1 (one surface)
     RadSysType = HydronicSystem;
@@ -1705,28 +1701,28 @@ TEST_F(LowTempRadiantSystemTest, SizeRadSysTubeLengthTest)
     // Test 5: Hydronic radiant system 3 (thickness out of range, low side)
     RadSysType = HydronicSystem;
     RadSysNum = 3;
-    Construct(3).ThicknessPerpend = 0.004;
+    dataConstruction.Construct(3).ThicknessPerpend = 0.004;
     FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength();
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
     // Test 6: Hydronic radiant system 3 (thickness out of range, high side)
     RadSysType = HydronicSystem;
     RadSysNum = 3;
-    Construct(3).ThicknessPerpend = 0.6;
+    dataConstruction.Construct(3).ThicknessPerpend = 0.6;
     FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength();
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
     // Test 7: Constant flow radiant system 3 (thickness out of range, low side)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 3;
-    Construct(3).ThicknessPerpend = 0.004;
+    dataConstruction.Construct(3).ThicknessPerpend = 0.004;
     FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength();
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
     // Test 8: Constant flow radiant system 3 (thickness out of range, high side)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 3;
-    Construct(3).ThicknessPerpend = 0.6;
+    dataConstruction.Construct(3).ThicknessPerpend = 0.6;
     FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength();
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
@@ -1758,8 +1754,8 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadConFlowSystemAutoSizeTempTest)
     Surface.allocate(1);
     Surface(1).Construction = 1;
     Surface(1).Area = 150.0;
-    Construct.allocate(1);
-    Construct(1).ThicknessPerpend = 0.075;
+    dataConstruction.Construct.allocate(1);
+    dataConstruction.Construct(1).ThicknessPerpend = 0.075;
 
     // Hydronic - Hot water volume flow rate autosize
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
@@ -2140,6 +2136,75 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
 }
 
+TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
+{
+    Real64 offTemperature;
+    Real64 controlTemperature;
+    Real64 throttlingRange;
+    Real64 functionResult;
+    Real64 expectedResult;
+
+    HydrRadSys.allocate(1);
+    auto &thisRadSys (HydrRadSys(1));
+    
+    // Test 1: Temperature Difference is 0-->answer should be 0.0
+    offTemperature = 15.0;
+    controlTemperature = 15.0;
+    throttlingRange = 1.0;
+    expectedResult = 0.0;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test 2a: Temperature Difference is not zero and positive, throttling range is zero-->answer should be 1.0
+    offTemperature = 16.0;
+    controlTemperature = 15.0;
+    throttlingRange = 0.0;
+    expectedResult = 1.0;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test 2b: Temperature Difference is not zero and negtive, throttling range is zero-->answer should be 1.0
+    offTemperature = 14.0;
+    controlTemperature = 15.0;
+    throttlingRange = 0.0;
+    expectedResult = 1.0;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test 3a: Temperature Difference is not zero and positive, throttling range is non-zero but less than temperature difference
+    offTemperature = 16.0;
+    controlTemperature = 15.0;
+    throttlingRange = 0.5;
+    expectedResult = 2.0;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test 3b: Temperature Difference is not zero and negative, throttling range is non-zero but less than temperature difference
+    offTemperature = 16.0;
+    controlTemperature = 15.0;
+    throttlingRange = 0.5;
+    expectedResult = 2.0;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test 4a: Temperature Difference is not zero and positive, throttling range is non-zero but greater than temperature difference
+    offTemperature = 16.0;
+    controlTemperature = 15.0;
+    throttlingRange = 2.0;
+    expectedResult = 0.5;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test 4b: Temperature Difference is not zero and negative, throttling range is non-zero but greater than temperature difference
+    offTemperature = 14.0;
+    controlTemperature = 15.0;
+    throttlingRange = 2.0;
+    expectedResult = 0.5;
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+    
+}
+
 TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTest)
 {
 
@@ -2198,5 +2263,5 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     expectedResult = 0.75;
     actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(scheduleIndex,throttlingRange);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
-    
+
 }

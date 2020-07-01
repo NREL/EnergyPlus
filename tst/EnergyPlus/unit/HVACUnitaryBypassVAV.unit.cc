@@ -823,7 +823,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     Real64 FullOutput = 0.0;
     HVACUnitaryBypassVAV::CalcCBVAV(state, cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
-    EXPECT_NEAR(PartLoadFrac, 0.935, 0.001); // load = -7000 W, coil capacity = 10,000 W, SHR = 0.7 so max sensible is just over 7,000 W
+    EXPECT_NEAR(PartLoadFrac, 0.9387, 0.001); // load = -7000 W, coil capacity = 10,000 W, SHR = 0.7 so max sensible is just over 7,000 W
     EXPECT_NEAR(cbvav.OutletTempSetPoint, DataLoopNode::Node(cbvav.AirOutNode).Temp, 0.0001);
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 12.771, 0.001);
 

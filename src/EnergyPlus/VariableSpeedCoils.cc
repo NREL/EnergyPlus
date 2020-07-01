@@ -117,14 +117,14 @@ namespace VariableSpeedCoils {
     // MODULE PARAMETER DEFINITIONS
 
     Real64 const RatedInletAirTemp(26.6667);     // 26.6667C or 80F
-    Real64 const RatedInletWetBulbTemp(19.44);   // 19.44 or 67F, cooling mode
-    Real64 const RatedInletAirHumRat(0.01125);   // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    Real64 const RatedInletWaterTemp(29.4);      // 85 F cooling mode
+    Real64 const RatedInletWetBulbTemp(19.4444);   // 19.44 or 67F, cooling mode
+    Real64 const RatedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    Real64 const RatedInletWaterTemp(29.4444);      // 85 F cooling mode
     Real64 const RatedAmbAirTemp(35.0);          // 95 F cooling mode
-    Real64 const RatedInletAirTempHeat(21.11);   // 21.11C or 70F, heating mode
-    Real64 const RatedInletWaterTempHeat(21.11); // 21.11C or 70F, heating mode
-    Real64 const RatedAmbAirTempHeat(8.33);      // 8.33 or 47F, heating mode
-    Real64 const RatedAmbAirWBHeat(6.11);        // 8.33 or 43F, heating mode, rated wet bulb temperature
+    Real64 const RatedInletAirTempHeat(21.1111);   // 21.11C or 70F, heating mode
+    Real64 const RatedInletWaterTempHeat(21.1111); // 21.11C or 70F, heating mode
+    Real64 const RatedAmbAirTempHeat(8.3333);      // 8.33 or 47F, heating mode
+    Real64 const RatedAmbAirWBHeat(6.1111);        // 8.33 or 43F, heating mode, rated wet bulb temperature
 
     // Water Systems
     int const CondensateDiscarded(1001); // default mode where water is "lost"

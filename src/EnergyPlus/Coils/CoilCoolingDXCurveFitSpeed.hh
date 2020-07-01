@@ -139,8 +139,8 @@ struct CoilCoolingDXCurveFitSpeed
 
     // rating data
     Real64 RatedInletAirTemp = 26.6667;        // 26.6667C or 80F
-    Real64 RatedInletWetBulbTemp = 19.44;    // 19.44 or 67F
-    Real64 RatedInletAirHumRat = 0.01125;      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    Real64 RatedInletWetBulbTemp = 19.4444;    // 19.44 or 67F
+    Real64 RatedInletAirHumRat = 0.0111847;    // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
     Real64 RatedOutdoorAirTemp = 35.0;      // 35 C or 95F
     Real64 DryCoilOutletHumRatioMin = 0.00001; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
