@@ -4065,13 +4065,13 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
         "  CT Single Speed,                        !- Name",                                                      // No Default
         "  CT Single Speed Inlet Node,             !- Water Inlet Node Name",                                     // No Default
         "  CT Single Speed Outlet Node,            !- Water Outlet Node Name",                                    // No Default
-        "  Autosize,                               !- Design Water Flow Rate {m3/s}",                             // Autosizable, no default
+        "  AutosiZe,                               !- Design Water Flow Rate {m3/s}",                             // Autosizable, no default (testing casing too)
         "  Autosize,                               !- Design Air Flow Rate {m3/s}",                               // Autosizable, no default, required
         "  10000,                                  !- Design Fan Power {W}",                                      // Autosizable, no default, required
         "  Autosize,                               !- Design U-Factor Times Area Value {W/K}",                    // Autosizable, no default
-        "  Autosize,                               !- Free Convection Air Flow Rate {m3/s}",                      // Autocalculatable, default numeric: NOTE, using "Autosize" and not "Autocalculatable
+        "  AutoSIze,                               !- Free Convection Air Flow Rate {m3/s}",                      // Autocalculatable, default numeric: NOTE, using "Autosize" and not "Autocalculate
         "  0.1,                                    !- Free Convection Air Flow Rate Sizing Factor",               // Has numeric default
-        "  Autocalculate,                          !- Free Convection U-Factor Times Area Value {W/K}",           // Autocalculatable, default numeric
+        "  AutocAlcUlate,                          !- Free Convection U-Factor Times Area Value {W/K}",           // Autocalculatable, default numeric
         "  ,                                       !- Free Convection U-Factor Times Area Value Sizing Factor",   // Has numeric default - DEFAULTED
         "  UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",                                  // Has default (UFactorTimesAreaAndDesignWaterFlowRate)
         "  1.25,                                   !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio", // Has numeric default

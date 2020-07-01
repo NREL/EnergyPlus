@@ -74,12 +74,6 @@
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
 
-auto const icompare = [](std::string const &a, std::string const &b) {
-    return (a.length() == b.length()
-                ? std::equal(a.begin(), a.end(), b.begin(), [](char const c, char const d) { return (::tolower(c) == ::tolower(d)); })
-                : false);
-};
-
 namespace EnergyPlus {
 // Module containing the input processor routines
 
@@ -1339,13 +1333,14 @@ void InputProcessor::reportIDFRecordsStats()
             auto const &field_value = it.value();
             if (field_value.is_string()) {
                 std::string const val = field_value.get<std::string>();
-                // In the IDF, casing is an issue and Autosize/Autocalculate are accepted as synonyms (in schema it's not)
-                if (icompare(val, "Autosize") || icompare(val, "Autocalculate")) {
-                    if (canBeAutosized) {
-                        ++DataOutputs::iNumberOfAutoSizedFields;
-                    } else if (canBeAutocalculated) {
-                        ++DataOutputs::iNumberOfAutoCalcedFields;
-                    }
+                // In the IDF, casing is an issue and Autosize/Autocalculate are accepted as synonyms
+                // but once converted to epJSON everything should is resolved, eg:
+                // * if "AutoSize" is entered for an autosizable field, the result is "Autosize"
+                // * if "AutoSize" is entered for an autocalculatable field, the result is "Autocalculate"
+                if (canBeAutosized && (val == "Autosize")) {
+                    ++DataOutputs::iNumberOfAutoSizedFields;
+                } else if (canBeAutocalculated && (val == "Autocalculate")) {
+                    ++DataOutputs::iNumberOfAutoCalcedFields;
                 }
             }
         } else if (hasDefault) {
