@@ -2168,19 +2168,19 @@ TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
     functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
     EXPECT_NEAR(expectedResult, functionResult, 0.001);
 
-    // Test 3a: Temperature Difference is not zero and positive, throttling range is non-zero but less than temperature difference-->answer should be 1.0
+    // Test 3a: Temperature Difference is not zero and positive, throttling range is non-zero but less than temperature difference
     offTemperature = 16.0;
     controlTemperature = 15.0;
     throttlingRange = 0.5;
-    expectedResult = 1.0;
+    expectedResult = 2.0;
     functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
     EXPECT_NEAR(expectedResult, functionResult, 0.001);
 
-    // Test 3b: Temperature Difference is not zero and negative, throttling range is non-zero but less than temperature difference-->answer should be 1.0
+    // Test 3b: Temperature Difference is not zero and negative, throttling range is non-zero but less than temperature difference
     offTemperature = 16.0;
     controlTemperature = 15.0;
     throttlingRange = 0.5;
-    expectedResult = 1.0;
+    expectedResult = 2.0;
     functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
     EXPECT_NEAR(expectedResult, functionResult, 0.001);
 
