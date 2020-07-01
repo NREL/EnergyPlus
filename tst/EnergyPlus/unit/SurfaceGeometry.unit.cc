@@ -5126,7 +5126,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     ErrorsFound = false;
 
     //std::string const error_string = delimited_string({
-    //"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:bySurfaceName=\"Zone 6\" did not find a matching radiant or solar enclosure name."
+    //"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Zone 6\" did not find a matching radiant or solar enclosure name."
     //    });
     //EXPECT_TRUE(compare_err_stream(error_string, true));
 

@@ -824,8 +824,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
 
-        "  Output:DebuggingData,0,0;",
-
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
         "    No,                      !- Do System Sizing Calculation",
