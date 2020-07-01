@@ -70,7 +70,7 @@ namespace EnergyPlus {
 
     struct BaseSizer {
 
-        bool isInitialized = false;
+        bool isNotInitialized = true;
         AutoSizingType sizingType = AutoSizingType::Unknown;
         std::string sizingString = "";
         Real64 originalValue = 0.0;
