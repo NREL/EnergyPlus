@@ -2088,7 +2088,8 @@ void GeneratorController::reinitAtBeginEnvironment()
     thermProdRate = 0.0;
 }
 
-void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool const runFlag,
+void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
+                                                     bool const runFlag,
                                                      Real64 const myElecLoadRequest,
                                                      bool const FirstHVACIteration, // Unused 2010 JANUARY
                                                      Real64 &electricPowerOutput,   // Actual generator electric power output
@@ -2207,7 +2208,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool
         break;
     }
     case GeneratorType::windTurbine: {
-        WindTurbine::SimWindTurbine(DataGlobalConstants::iGeneratorWindTurbine, name, generatorIndex, runFlag, myElecLoadRequest);
+        WindTurbine::SimWindTurbine(state.files, DataGlobalConstants::iGeneratorWindTurbine, name, generatorIndex, runFlag, myElecLoadRequest);
         WindTurbine::GetWTGeneratorResults(
             DataGlobalConstants::iGeneratorWindTurbine, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
         electricPowerOutput = electProdRate;

@@ -56,17 +56,11 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
-#include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/PluginManager.hh>
-#include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -75,12 +69,8 @@ namespace CommandLineInterface {
 
     using namespace DataGlobals;
     using namespace DataStringGlobals;
-    using namespace DataSystemVariables;
     using namespace FileSystem;
-    using namespace SimulationManager;
-    using namespace OutputReportTabular;
     using namespace OutputProcessor;
-    using namespace SolarShading;
     using namespace ez;
 
     int ProcessArgs(EnergyPlusData &state, int argc, const char *argv[])
@@ -461,7 +451,7 @@ namespace CommandLineInterface {
         state.files.delightIn.fileName = "eplusout.delightin";
         outputDelightOutFileName = "eplusout.delightout";
         state.files.iniFile.fileName = "Energy+.ini";
-        inStatFileName = weatherFilePathWithoutExtension + ".stat";
+        state.files.inStatFileName.fileName = weatherFilePathWithoutExtension + ".stat";
         eplusADSFileName = inputDirPathName + "eplusADS.inp";
 
         // Readvars files
@@ -642,7 +632,6 @@ namespace CommandLineInterface {
         // Using/Aliasing
         using namespace EnergyPlus;
         using namespace DataStringGlobals;
-        using namespace DataSystemVariables;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

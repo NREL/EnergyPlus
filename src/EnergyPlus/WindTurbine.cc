@@ -58,11 +58,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGenerators.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -101,8 +97,6 @@ namespace WindTurbine {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using namespace DataGenerators;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DegToRadians;
     using DataGlobals::Pi;
@@ -133,7 +127,8 @@ namespace WindTurbine {
 
     // Functions
 
-    void SimWindTurbine(int const EP_UNUSED(GeneratorType), // Type of Generator
+    void SimWindTurbine(IOFiles &ioFiles,
+                        int const EP_UNUSED(GeneratorType), // Type of Generator
                         std::string const &GeneratorName,   // User specified name of Generator
                         int &GeneratorIndex,                // Generator index
                         bool const RunFlag,                 // ON or OFF
@@ -182,7 +177,7 @@ namespace WindTurbine {
             }
         }
 
-        InitWindTurbine(WindTurbineNum);
+        InitWindTurbine(ioFiles, WindTurbineNum);
 
         CalcWindTurbine(WindTurbineNum, RunFlag);
 
@@ -661,7 +656,7 @@ namespace WindTurbine {
         }
     }
 
-    void InitWindTurbine(int const WindTurbineNum)
+    void InitWindTurbine(IOFiles &ioFiles, int const WindTurbineNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -693,7 +688,6 @@ namespace WindTurbine {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static char const TabChr('\t'); // Tab character
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -703,13 +697,9 @@ namespace WindTurbine {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true);
-        int ReadStatus;               // Reading status of stat file
-        int statFile;                 // Weather Stat File
-        std::string::size_type lnPtr; // scan pointer for Line input
         int mon;                      // loop counter
         bool wsStatFound;             // logical noting that wind stats were found
         bool warningShown;            // true if the <365 warning has already been shown
-        std::string lineIn;
         Array1D<Real64> MonthWS(12);
         static Real64 AnnualTMYWS(0.0); // Annual average wind speed in stat file
         Real64 LocalTMYWS;              // Annual average wind speed at the rotor height
@@ -718,62 +708,44 @@ namespace WindTurbine {
         if (MyOneTimeFlag) {
             wsStatFound = false;
 
-            if (FileSystem::fileExists(DataStringGlobals::inStatFileName)) {
-                statFile = GetNewUnitNumber();
-                ReadStatus = 0;
-                {
-                    IOFlags flags;
-                    flags.ACTION("READ");
-                    ObjexxFCL::gio::open(statFile, DataStringGlobals::inStatFileName, flags);
-                    ReadStatus = flags.ios();
-                }
-                if (ReadStatus != 0) {
-                    ShowFatalError("InitWindTurbine: Could not open file " + DataStringGlobals::inStatFileName + " for input (read).");
-                }
-                while (ReadStatus == 0) { // end of file
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
-                        ReadStatus = flags.ios();
-                    }
+            if (FileSystem::fileExists(ioFiles.inStatFileName.fileName)) {
+                auto statFile = ioFiles.inStatFileName.open("InitWindTurbine");
+                while (statFile.good()) { // end of file
+                    auto lineIn = statFile.readLine();
                     // reconcile line with different versions of stat file
-                    lnPtr = index(lineIn, "Wind Speed");
+                    auto lnPtr = index(lineIn.data, "Wind Speed");
                     if (lnPtr == std::string::npos) continue;
                     // have hit correct section.
-                    while (ReadStatus == 0) { // find daily avg line
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
-                            ReadStatus = flags.ios();
-                        }
-                        lnPtr = index(lineIn, "Daily Avg");
+                    while (statFile.good()) { // find daily avg line
+                        lineIn = statFile.readLine();
+                        lnPtr = index(lineIn.data, "Daily Avg");
                         if (lnPtr == std::string::npos) continue;
                         // tab delimited file
-                        lineIn.erase(0, lnPtr + 10);
+                        lineIn.data.erase(0, lnPtr + 10);
                         MonthWS = 0.0;
                         wsStatFound = true;
                         warningShown = false;
                         for (mon = 1; mon <= 12; ++mon) {
-                            lnPtr = index(lineIn, TabChr);
+                            lnPtr = index(lineIn.data, TabChr);
                             if (lnPtr != 1) {
-                                if ((lnPtr == std::string::npos) || (!stripped(lineIn.substr(0, lnPtr)).empty())) {
+                                if ((lnPtr == std::string::npos) || (!stripped(lineIn.data.substr(0, lnPtr)).empty())) {
                                     if (lnPtr != std::string::npos) {
-                                        ObjexxFCL::gio::read(lineIn.substr(0, lnPtr), "*") >> MonthWS(mon);
-                                        lineIn.erase(0, lnPtr + 1);
+                                        ObjexxFCL::gio::read(lineIn.data.substr(0, lnPtr), "*") >> MonthWS(mon);
+                                        lineIn.data.erase(0, lnPtr + 1);
                                     }
                                 } else { // blank field
                                     if (!warningShown) {
-                                        ShowWarningError("InitWindTurbine: read from " + DataStringGlobals::inStatFileName +
+                                        ShowWarningError("InitWindTurbine: read from " + ioFiles.inStatFileName.fileName +
                                                          " file shows <365 days in weather file. Annual average wind speed used will be inaccurate.");
-                                        lineIn.erase(0, lnPtr + 1);
+                                        lineIn.data.erase(0, lnPtr + 1);
                                         warningShown = true;
                                     }
                                 }
                             } else { // two tabs in succession
                                 if (!warningShown) {
-                                    ShowWarningError("InitWindTurbine: read from " + DataStringGlobals::inStatFileName +
+                                    ShowWarningError("InitWindTurbine: read from " + ioFiles.inStatFileName.fileName +
                                                      " file shows <365 days in weather file. Annual average wind speed used will be inaccurate.");
-                                    lineIn.erase(0, lnPtr + 1);
+                                    lineIn.data.erase(0, lnPtr + 1);
                                     warningShown = true;
                                 }
                             }
@@ -782,7 +754,6 @@ namespace WindTurbine {
                     }
                     if (wsStatFound) break;
                 }
-                ObjexxFCL::gio::close(statFile);
                 if (wsStatFound) {
                     AnnualTMYWS = sum(MonthWS) / 12.0;
                 } else {

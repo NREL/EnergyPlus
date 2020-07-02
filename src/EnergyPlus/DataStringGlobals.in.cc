@@ -166,7 +166,6 @@ namespace DataStringGlobals {
     std::string outputMtrCsvFileName("eplusmtr.csv");
     std::string outputRvauditFileName("eplusout.rvaudit");
 
-    std::string inStatFileName;
     std::string eplusADSFileName;
     std::string idfFileNameOnly;
     std::string idfDirPathName;
@@ -196,7 +195,6 @@ namespace DataStringGlobals {
 
     void clear_state()
     {
-        inStatFileName.clear();
         eplusADSFileName.clear();
         idfFileNameOnly.clear();
         idfDirPathName.clear();

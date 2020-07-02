@@ -5668,8 +5668,7 @@ namespace OutputReportTabular {
         //   types of tabular reports are each created. If another type of
         //   report is added it can be added to the list here.
 
-
-        FillWeatherPredefinedEntries();
+        FillWeatherPredefinedEntries(state.files);
         FillRemainingPredefinedEntries(state);
 
         if (WriteTabularFiles) {
@@ -5782,7 +5781,7 @@ namespace OutputReportTabular {
         if (has(lineIn, "ASHRAE Standard")) lineType = StatLineType::AshStdLine;
     }
 
-    void FillWeatherPredefinedEntries()
+    void FillWeatherPredefinedEntries(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -5803,12 +5802,8 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        std::string lineIn;
-        int statFile;
-        bool fileExists;
         StatLineType lineType = StatLineType::Initialized;
         StatLineType lineTypeinterim = StatLineType::Initialized;
-        int readStat;
         bool isASHRAE;
         bool iscalc;
         bool isKoppen;
@@ -5834,8 +5829,6 @@ namespace OutputReportTabular {
         bool coolingDesignlinepassed;
         bool desConditionlinepassed;
 
-        fileExists = FileSystem::fileExists(DataStringGlobals::inStatFileName);
-        readStat = 0;
         isASHRAE = false;
         iscalc = false;
         isKoppen = false;
@@ -5845,22 +5838,11 @@ namespace OutputReportTabular {
         storeASHRAEHDD = "";
         storeASHRAECDD = "";
         lineTypeinterim = StatLineType::Initialized;
-        if (fileExists) {
-            statFile = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.ACTION("READ");
-                ObjexxFCL::gio::open(statFile, DataStringGlobals::inStatFileName, flags);
-                readStat = flags.ios();
-            }
-            if (readStat != 0) {
-                ShowFatalError("FillWeatherPredefinedEntries: Could not open file " + DataStringGlobals::inStatFileName + " for input (read).");
-            }
-            IOFlags flags;
-            while (readStat == 0) { // end of file, or error
+        if (FileSystem::fileExists(ioFiles.inStatFileName.fileName)) {
+            auto statFile = ioFiles.inStatFileName.open("FillWeatherPredefinedEntries");
+            while (statFile.good()) { // end of file, or error
                 lineType = lineTypeinterim;
-                ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
-                readStat = flags.ios();
+                auto lineIn = statFile.readLine().data;
                 // reconcile line with different versions of stat file
                 // v7.1 added version as first line.
                 strip(lineIn);
@@ -6345,7 +6327,6 @@ namespace OutputReportTabular {
                 if (lineType == StatLineType::KoppenDes1Line) lineTypeinterim = StatLineType::KoppenDes1Line;
                 if (lineType == StatLineType::KoppenLine) lineTypeinterim = StatLineType::KoppenLine;
             }
-            ObjexxFCL::gio::close(statFile);
         }
     }
 

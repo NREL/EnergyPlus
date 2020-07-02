@@ -2364,7 +2364,6 @@ namespace ZoneTempPredictorCorrector {
 
         // Using/Aliasing
 
-        using DataStringGlobals::inStatFileName;
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
         using WeatherManager::NumDaysInYear;

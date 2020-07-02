@@ -228,6 +228,7 @@ public:
     InputFile inputWeatherFile{""};
 
     InputFileName TempFullFileName{""};
+    InputFileName inStatFileName{""};
 
     static IOFiles &getSingleton();
     static void setSingleton(IOFiles *newSingleton) noexcept;

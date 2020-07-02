@@ -789,7 +789,7 @@ namespace OutputReportTabular {
 
     void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
 
-    void FillWeatherPredefinedEntries();
+    void FillWeatherPredefinedEntries(IOFiles &ioFiles);
 
     std::string GetColumnUsingTabs(std::string const &inString, // Input String
                                    int const colNum             // Column number

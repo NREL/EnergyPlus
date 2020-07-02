@@ -10508,61 +10508,37 @@ namespace WeatherManager {
         static Real64 DailyAverageDryBulbTemp(0.0);                // daily average outside air dry-bulb temperature
         static Array1D<Real64> MonthlyAverageDryBulbTemp(12, 0.0); // monthly-daily average outside air temperature
         static Array1D<int> EndDayOfMonthLocal(12, 0);             // number of days in each month
-        std::string lineIn;
-        std::string lineAvg;
         std::string::size_type pos;
         int AnnualNumberOfDays(0);
         int i;
         int j;
         int ind;
-        int readStat;
-        int statFile;
-        bool statFileExists;
-        bool epwFileExists;
         bool epwHasLeapYear(false);
 
         if (!OADryBulbAverage.OADryBulbWeatherDataProcessed) {
-            statFileExists = FileSystem::fileExists(DataStringGlobals::inStatFileName);
-            epwFileExists = FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName);
+            const auto statFileExists = FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName);
+            const auto epwFileExists = FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName);
 
-            readStat = 0;
             if (statFileExists) {
-                statFile = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("READ");
-                    ObjexxFCL::gio::open(statFile, DataStringGlobals::inStatFileName, flags);
-                    readStat = flags.ios();
-                }
-                if (readStat != 0) {
-                    ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + DataStringGlobals::inStatFileName +
+                auto statFile = ioFiles.inputWeatherFileName.try_open();
+                if (!statFile.good()) {
+                    ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + ioFiles.inputWeatherFileName.fileName +
                                     " for input (read).");
                     ShowContinueError("Water Mains Temperature will be set to a fixed deafult value of 10.0 C.");
                     return;
                 }
-                while (readStat == 0) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
-                        readStat = flags.ios();
-                    }
-                    if (has(lineIn, "Monthly Statistics for Dry Bulb temperatures")) {
+
+                std::string lineAvg;
+                while (statFile.good()) {
+                    auto lineIn = statFile.readLine();
+                    if (has(lineIn.data, "Monthly Statistics for Dry Bulb temperatures")) {
                         for (i = 1; i <= 7; ++i) {
-                            {
-                                IOFlags flags;
-                                ObjexxFCL::gio::read(statFile, fmtA, flags);
-                                readStat = flags.ios();
-                            }
+                            lineIn = statFile.readLine();
                         }
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineAvg;
-                            readStat = flags.ios();
-                        }
-                        break;
+                        lineIn = statFile.readLine();
+                        lineAvg = lineIn.data;
                     }
                 }
-                ObjexxFCL::gio::close(statFile);
                 AnnualNumberOfDays = 0;
                 for (i = 1; i <= 12; ++i) {
                     MonthlyAverageDryBulbTemp(i) = StrToReal(GetColumnUsingTabs(lineAvg, i + 2));
@@ -10636,7 +10612,7 @@ namespace WeatherManager {
             } else {
                 ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exist.");
                 ShowContinueError("Weather file: " + ioFiles.inputWeatherFileName.fileName + ".");
-                ShowContinueError("Stat file: " + DataStringGlobals::inStatFileName + ".");
+                ShowContinueError("Stat file: " + ioFiles.inStatFileName.fileName + ".");
                 ShowContinueError("Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
                 ShowContinueError("Instead a fixed default value of 10.0 C will be used.");
             }

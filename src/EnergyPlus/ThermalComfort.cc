@@ -66,7 +66,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/General.hh>
@@ -2612,7 +2611,6 @@ namespace ThermalComfort {
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string lineIn;
         std::string lineAvg;
         std::string epwLine;
         static Real64 avgDryBulbASH(0.0);
@@ -2620,7 +2618,6 @@ namespace ThermalComfort {
         static Array1D<Real64> monthlyTemp(12, 0.0);
         Real64 tComf;
         Real64 numOccupants;
-        int statFile;
         static bool useStatData(false);
         int readStat;
         int jStartDay;
@@ -2647,45 +2644,23 @@ namespace ThermalComfort {
         }
 
         if (initiate && weathersimulation) {
-            const bool statFileExists = FileSystem::fileExists(DataStringGlobals::inStatFileName);
+            const bool statFileExists = FileSystem::fileExists(ioFiles.inStatFileName.fileName);
             const bool epwFileExists = FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName);
 
             readStat = 0;
             if (statFileExists) {
-                statFile = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("READ");
-                    ObjexxFCL::gio::open(statFile, DataStringGlobals::inStatFileName, flags);
-                    readStat = flags.ios();
-                }
-                if (readStat != 0) {
-                    ShowFatalError("CalcThermalComfortAdaptiveASH55: Could not open file " + DataStringGlobals::inStatFileName +
-                                   " for input (read).");
-                }
-                while (readStat == 0) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
-                        readStat = flags.ios();
-                    }
-                    if (has(lineIn, "Monthly Statistics for Dry Bulb temperatures")) {
+                auto statFile = ioFiles.inStatFileName.open("CalcThermalComfortAdapctiveASH55");
+                while (statFile.good()) {
+                    auto lineIn = statFile.readLine();
+                    if (has(lineIn.data, "Monthly Statistics for Dry Bulb temperatures")) {
                         for (i = 1; i <= 7; ++i) {
-                            {
-                                IOFlags flags;
-                                ObjexxFCL::gio::read(statFile, fmtA, flags);
-                                readStat = flags.ios();
-                            }
+                            lineIn = statFile.readLine();
                         }
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineAvg;
-                            readStat = flags.ios();
-                        }
+                        lineIn = statFile.readLine();
+                        lineAvg = lineIn.data;
                         break;
                     }
                 }
-                ObjexxFCL::gio::close(statFile);
                 for (i = 1; i <= 12; ++i) {
                     monthlyTemp(i) = StrToReal(GetColumnUsingTabs(lineAvg, i + 2));
                 }
