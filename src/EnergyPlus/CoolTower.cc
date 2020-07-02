@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -68,8 +67,6 @@
 #include <EnergyPlus/WaterManager.hh>
 
 namespace EnergyPlus {
-
-// (ref: Object: COOLTOWER:SHOWER)
 
 namespace CoolTower {
     // Module containing the data for cooltower system
@@ -83,41 +80,20 @@ namespace CoolTower {
     // PURPOSE OF THIS MODULE:
     // To encapsulate the data and algorithyms required to manage the cooltower component.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
     // REFERENCES:
     // Baruch Givoni. 1994. Passive and Low Energy Cooling of Buildings. Chapter 5: Evaporative Cooling Systems.
     //     John Wiley & Sons, Inc.
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataHeatBalance;
 
-    // Use statements for access to subroutines in other modules
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    int const WaterSupplyFromMains(101);
-    int const WaterSupplyFromTank(102);
-    int const WaterFlowSchedule(0);
-    int const WindDrivenFlow(1);
-
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
-
     // MODULE VARIABLES DECLARATIONS:
-    int NumCoolTowers(0); // Total cooltower statements in inputs
-
-    // Subroutine Specifications for the Heat Balance Module
+    int NumCoolTowers(0);
 
     // Object Data
     Array1D<CoolTowerParams> CoolTowerSys;
-
-    // Functions
 
     void clear_state()
     {
@@ -138,32 +114,8 @@ namespace CoolTower {
         // This subroutine manages the simulation of Cooltower component.
         // This driver manages the calls to all of the other drivers and simulation algorithms.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool GetInputFlag(true);
-        // unused1208  LOGICAL :: ErrorsFound=.FALSE.
-        // unused1208  INTEGER :: CoolTowerNum
 
         // Obtains and allocates heat balance related parameters from input
         if (GetInputFlag) {
@@ -208,12 +160,6 @@ namespace CoolTower {
         Real64 const MinValue(0.0);                  // Minimum limit of outlet area, airflow, and temperature
         Real64 const MaxFrac(1.0);                   // Maximum fraction
         Real64 const MinFrac(0.0);                   // Minimum fraction
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ErrorsFound(false); // If errors detected in input
@@ -285,8 +231,8 @@ namespace CoolTower {
 
             CoolTowerSys(CoolTowerNum).CoolTWaterSupplyName = cAlphaArgs(4); // Name of water storage tank
             if (lAlphaBlanks(4)) {
-                CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode = WaterSupplyFromMains;
-            } else if (CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyFromTank) {
+                CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode =  WaterSupplyMode::FromMains;
+            } else if (CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
                 SetupTankDemandComponent(CoolTowerSys(CoolTowerNum).Name,
                                          CurrentModuleObject,
                                          CoolTowerSys(CoolTowerNum).CoolTWaterSupplyName,
@@ -298,16 +244,15 @@ namespace CoolTower {
             {
                 auto const SELECT_CASE_var(cAlphaArgs(5)); // Type of flow control
                 if (SELECT_CASE_var == "WATERFLOWSCHEDULE") {
-                    CoolTowerSys(CoolTowerNum).FlowCtrlType = WaterFlowSchedule;
-                } else if ((SELECT_CASE_var == "WINDDRIVENFLOW") || (SELECT_CASE_var == "NONE") || (SELECT_CASE_var == "")) {
-                    CoolTowerSys(CoolTowerNum).FlowCtrlType = WindDrivenFlow;
+                    CoolTowerSys(CoolTowerNum).FlowCtrlType = FlowCtrlEnum::FlowSchedule;
+                } else if ((SELECT_CASE_var == "WINDDRIVENFLOW") || (SELECT_CASE_var == "NONE") || (SELECT_CASE_var.empty())) {
+                    CoolTowerSys(CoolTowerNum).FlowCtrlType = FlowCtrlEnum::FlowSchedule;
                 } else {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(5) + "=\"" + cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
             }
 
-            CoolTowerSys(CoolTowerNum).PumpSchedName = cAlphaArgs(6); // Get schedule for water pump
             CoolTowerSys(CoolTowerNum).PumpSchedPtr = GetScheduleIndex(cAlphaArgs(6));
             if (CoolTowerSys(CoolTowerNum).PumpSchedPtr == 0) {
                 if (lAlphaBlanks(6)) {
@@ -526,7 +471,7 @@ namespace CoolTower {
                                 "Cooling",
                                 _,
                                 "System");
-            if (CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyFromMains) {
+            if (CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromMains) {
                 SetupOutputVariable("Zone Cooltower Water Volume",
                                     OutputProcessor::Unit::m3,
                                     CoolTowerSys(CoolTowerNum).CoolTWaterConsump,
@@ -544,7 +489,7 @@ namespace CoolTower {
                                     "Cooling",
                                     _,
                                     "System");
-            } else if (CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyFromTank) {
+            } else if (CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
                 SetupOutputVariable("Zone Cooltower Water Volume",
                                     OutputProcessor::Unit::m3,
                                     CoolTowerSys(CoolTowerNum).CoolTWaterConsump,
@@ -581,11 +526,6 @@ namespace CoolTower {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
         // REFERENCES:
         // Baruch Givoni. 1994. Passive and Low Energy Cooling of Buildings. Chapter 5: Evaporative Cooling Systems.
         //     John Wiley & Sons, Inc.
@@ -611,19 +551,10 @@ namespace CoolTower {
         using Psychrometrics::RhoH2O;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const MinWindSpeed(0.1);  // Minimum limit of outdoor air wind speed in m/s
         Real64 const MaxWindSpeed(30.0); // Maximum limit of outdoor air wind speed in m/s
         Real64 const UCFactor(60000.0);  // Unit conversion factor m3/s to l/min
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;            // Number of zone being served
@@ -637,7 +568,6 @@ namespace CoolTower {
         Real64 WaterFlowRate;   // Calculated water flow rate in m3/s
         Real64 AirVolFlowRate;  // Calculated air volume flow rate in m3/s
         Real64 InletHumRat;     // Humidity ratio of outdoor air
-        // unused1208REAL(r64) :: InletEnthalpy      ! Enthalpy of outdoor air
         Real64 OutletHumRat; // Humidity ratio of air at the cooltower outlet
         Real64 OutletTemp;   // Dry bulb temperature of air at the cooltower outlet
         Real64 IntHumRat;    // Humidity ratio of initialized air
@@ -656,7 +586,7 @@ namespace CoolTower {
 
                 // Unit is on and simulate this component
                 // Determine the temperature and air flow rate at the cooltower outlet
-                if (CoolTowerSys(CoolTowerNum).FlowCtrlType == WindDrivenFlow) {
+                if (CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrlEnum::WindDriven) {
                     Real64 const height_sqrt(std::sqrt(CoolTowerSys(CoolTowerNum).TowerHeight));
                     CoolTowerSys(CoolTowerNum).OutletVelocity = 0.7 * height_sqrt + 0.47 * (WindSpeed - 1.0);
                     AirVolFlowRate = CoolTowerSys(CoolTowerNum).OutletArea * CoolTowerSys(CoolTowerNum).OutletVelocity;
@@ -671,7 +601,7 @@ namespace CoolTower {
                     OutletTemp = OutDryBulbTemp - (OutDryBulbTemp - OutWetBulbTemp) *
                                                       (1.0 - std::exp(-0.8 * CoolTowerSys(CoolTowerNum).TowerHeight)) *
                                                       (1.0 - std::exp(-0.15 * WaterFlowRate));
-                } else if (CoolTowerSys(CoolTowerNum).FlowCtrlType == WaterFlowSchedule) {
+                } else if (CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrlEnum::FlowSchedule) {
                     WaterFlowRate = CoolTowerSys(CoolTowerNum).MaxWaterFlowRate * UCFactor;
                     AirVolFlowRate = 0.0125 * WaterFlowRate * std::sqrt(CoolTowerSys(CoolTowerNum).TowerHeight);
                     AirVolFlowRate = min(AirVolFlowRate, CoolTowerSys(CoolTowerNum).MaxAirVolFlowRate);
@@ -762,44 +692,22 @@ namespace CoolTower {
         //       MODIFIED       Aug 2008 Daeho Kang
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataWater;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoolTowerNum;
         Real64 AvailWaterRate;
 
         for (CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum) {
 
             // Set the demand request for supply water from water storage tank (if needed)
-            if (CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyFromTank) {
+            if (CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
                 WaterStorage(CoolTowerSys(CoolTowerNum).CoolTWaterSupTankID).VdotRequestDemand(CoolTowerSys(CoolTowerNum).CoolTWaterTankDemandARRID) =
                     CoolTowerSys(CoolTowerNum).CoolTWaterConsumpRate;
             }
 
             // check if should be starved by restricted flow from tank
-            if (CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyFromTank) {
+            if (CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
                 AvailWaterRate = WaterStorage(CoolTowerSys(CoolTowerNum).CoolTWaterSupTankID)
                                      .VdotAvailDemand(CoolTowerSys(CoolTowerNum).CoolTWaterTankDemandARRID);
                 if (AvailWaterRate < CoolTowerSys(CoolTowerNum).CoolTWaterConsumpRate) {
@@ -819,29 +727,8 @@ namespace CoolTower {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoolTowerNum;
@@ -860,8 +747,6 @@ namespace CoolTower {
             CoolTowerSys(CoolTowerNum).CoolTWaterStarvMakeup = CoolTowerSys(CoolTowerNum).CoolTWaterStarvMakeupRate * TSMult;
         }
     }
-
-    //*****************************************************************************************
 
 } // namespace CoolTower
 
