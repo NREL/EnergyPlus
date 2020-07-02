@@ -51,6 +51,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -96,6 +97,9 @@ namespace EnergyPlus {
         this->sysSizingInputData = DataSizing::SysSizInput;
         this->finalSysSizing = DataSizing::FinalSysSizing;
         this->airloopDOAS = state.dataAirLoopHVACDOAS.airloopDOAS;
+        if (this->isValidCoilType(this->compType)) { // coil reports fail if coilType is not one of DataHVACGlobals::cAllCoilTypes
+            this->getCoilReportObject = true;
+        }
     }
 
     void BaseSizer::preSize(EnergyPlusData &EP_UNUSED(state), Real64 const _originalValue) {
@@ -255,5 +259,14 @@ namespace EnergyPlus {
                                   General::TrimSigDigits(this->originalValue, 1));
             }
         }
+    }
+    bool BaseSizer::isValidCoilType(std::string const &compType)
+    {
+        for (auto const &coilType : DataHVACGlobals::cAllCoilTypes) {
+            if (UtilityRoutines::SameString(compType, coilType)) {
+                return true;
+            }
+        }
+        return false;
     }
 } // namespace EnergyPlus

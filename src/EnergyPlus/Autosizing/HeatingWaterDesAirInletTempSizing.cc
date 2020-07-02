@@ -69,12 +69,19 @@ void HeatingWaterDesAirInletTempSizer::initializeWithinEP(EnergyPlusData &state,
     this->totalSystemAirVolumeFlowRate = DataSizing::DataFlowUsedForSizing;
 }
 
-EnergyPlus::AutoSizingResultType HeatingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _originalValue)
+Real64 HeatingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (this->isNotInitialized) return AutoSizingResultType::ErrorType2;
+    if (this->isNotInitialized) {
+        this->errorType = AutoSizingResultType::ErrorType2;
+        this->autoSizedValue = 0.0;
+        errorsFound = true;
+        ShowSevereError("Developer Error: autosizing of water heating coil design air inlet temperature failed.");
+        ShowContinueError("Occurs in water heating coil object= " + this->compName);
+        return this->autoSizedValue;
+    }
     this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
-    EnergyPlus::AutoSizingResultType errorsFound = EnergyPlus::AutoSizingResultType::NoError;
+    this->errorType = EnergyPlus::AutoSizingResultType::NoError;
     this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
@@ -137,8 +144,15 @@ EnergyPlus::AutoSizingResultType HeatingWaterDesAirInletTempSizer::size(EnergyPl
     }
     this->selectSizerOutput();
     // report not written for OA coils and needs to be corrected
-    if (this->curSysNum <= this->numPrimaryAirSys) coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
-    return errorsFound;
+    if (this->curSysNum <= this->numPrimaryAirSys) {
+        if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
+    }
+    if (this->errorType != AutoSizingResultType::NoError) {
+        ShowSevereError("Developer Error: autosizing of water heating coil design air inlet temperature failed.");
+        ShowContinueError("Occurs in water heating coil object= " + this->compName);
+        errorsFound = true;
+    }
+    return this->autoSizedValue;
 }
 
 } // namespace EnergyPlus

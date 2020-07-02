@@ -64,12 +64,19 @@ void HeatingAirflowUASizer::initializeWithinEP(EnergyPlusData &state,
     this->sizingString = "Heating Coil Airflow For UA";
 }
 
-EnergyPlus::AutoSizingResultType HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue)
+Real64 HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (this->isNotInitialized) return AutoSizingResultType::ErrorType2;
+    if (this->isNotInitialized) {
+        this->errorType = AutoSizingResultType::ErrorType2;
+        this->autoSizedValue = 0.0;
+        errorsFound = true;
+        ShowSevereError("Developer Error: autosizing of water heating coil air flow used for UA failed.");
+        ShowContinueError("Occurs in water heating coil object= " + this->compName);
+        return this->autoSizedValue;
+    }
     this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
-    EnergyPlus::AutoSizingResultType errorsFound = EnergyPlus::AutoSizingResultType::NoError;
+    this->errorType = EnergyPlus::AutoSizingResultType::NoError;
     this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
@@ -91,7 +98,8 @@ EnergyPlus::AutoSizingResultType HeatingAirflowUASizer::size(EnergyPlusData &sta
                     this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                 }
             } else {
-                errorsFound = AutoSizingResultType::ErrorType1;
+                this->errorType = AutoSizingResultType::ErrorType1;
+                errorsFound = true;
             }
         }
     } else if (this->curSysNum > 0) {
@@ -131,7 +139,12 @@ EnergyPlus::AutoSizingResultType HeatingAirflowUASizer::size(EnergyPlusData &sta
     }
     if (this->autoSizedValue < DataHVACGlobals::SmallAirVolFlow) this->autoSizedValue = 0.0;
     this->selectSizerOutput();
-    return errorsFound;
+    if (this->errorType != AutoSizingResultType::NoError) {
+        ShowSevereError("Developer Error: autosizing of water heating coil air flow used for UA failed.");
+        ShowContinueError("Occurs in water heating coil object= " + this->compName);
+        errorsFound = true;
+    }
+    return this->autoSizedValue;
 }
 
 } // namespace EnergyPlus

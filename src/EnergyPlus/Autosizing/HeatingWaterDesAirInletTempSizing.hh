@@ -66,7 +66,7 @@ namespace EnergyPlus {
 
         void initializeWithinEP(EnergyPlusData &state, std::string const &_compType, std::string const &_compName, bool printWarningFlag) override;
 
-        AutoSizingResultType size(EnergyPlusData &state, Real64 originalValue) override;
+        Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
     };
 
 } // namespace EnergyPlus

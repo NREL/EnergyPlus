@@ -69,12 +69,19 @@ void CoolingWaterDesAirInletHumRatSizer::initializeWithinEP(EnergyPlusData &stat
     this->dataFlowUsedForSizing = DataSizing::DataFlowUsedForSizing;
 }
 
-EnergyPlus::AutoSizingResultType CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _originalValue)
+Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (this->isNotInitialized) return AutoSizingResultType::ErrorType2;
+    if (this->isNotInitialized) {
+        this->errorType = AutoSizingResultType::ErrorType2;
+        this->autoSizedValue = 0.0;
+        errorsFound = true;
+        ShowSevereError("Developer Error: autosizing of water cooling coil design air inlet humidity ratio failed.");
+        ShowContinueError("Occurs in water cooling coil object= " + this->compName);
+        return this->autoSizedValue;
+    }
     this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
-    EnergyPlus::AutoSizingResultType errorsFound = EnergyPlus::AutoSizingResultType::NoError;
+    this->errorType = EnergyPlus::AutoSizingResultType::NoError;
     this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
@@ -123,8 +130,13 @@ EnergyPlus::AutoSizingResultType CoolingWaterDesAirInletHumRatSizer::size(Energy
         }
     }
     this->selectSizerOutput();
-    coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
-    return errorsFound;
+    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
+    if (this->errorType != AutoSizingResultType::NoError) {
+        ShowSevereError("Developer Error: autosizing of water cooling coil design air inlet humidity ratio failed.");
+        ShowContinueError("Occurs in water cooling coil object= " + this->compName);
+        errorsFound = true;
+    }
+    return this->autoSizedValue;
 }
 
 } // namespace EnergyPlus
