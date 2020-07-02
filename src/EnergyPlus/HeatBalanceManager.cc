@@ -448,7 +448,7 @@ namespace HeatBalanceManager {
 
         GetSiteAtmosphereData(state.outputFiles, ErrorsFound);
 
-        GetWindowGlassSpectralData(state.dataWindowManager, ErrorsFound);
+        GetWindowGlassSpectralData(ErrorsFound);
 
         GetMaterialData(state.outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
@@ -3907,7 +3907,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void GetWindowGlassSpectralData(WindowManagerData &dataWindowManager, bool &ErrorsFound) // set to true if errors found in input
+    void GetWindowGlassSpectralData(bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
