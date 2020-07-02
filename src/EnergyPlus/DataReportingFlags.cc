@@ -94,6 +94,21 @@ namespace DataReportingFlags {
     bool DebugOutput(false);
     bool EvenDuringWarmup(false);
 
+    // MODULE SUBROUTINES:
+
+    // Functions
+    void clear_state() {
+        NumOfWarmupDays = 0;
+        cWarmupDay.clear();
+        DisplayPerfSimulationFlag = false;
+        DoWeatherInitReporting = false;
+        PrintEndDataDictionary = false;
+        MakeMirroredDetachedShading = true;
+        MakeMirroredAttachedShading = true;
+        DebugOutput = false;
+        EvenDuringWarmup = false;
+    }
+
 } // namespace DataReportingFlags
 
 } // namespace EnergyPlus
