@@ -497,6 +497,7 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
         "    0.012,                   !- Hydronic Tubing Inside Diameter {m}",
         "    autosize,                !- Hydronic Tubing Length {m}",
         "    MeanAirTemperature,      !- Temperature Control Type",
+        "    HalfFlowPower,           !- Setpoint Type",
         "    FractionOfAutosizedHeatingCapacity,  !- Heating Design Capacity Method",
         "    ,                        !- Heating Design Capacity {W}",
         "    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
@@ -1428,6 +1429,7 @@ TEST_F(EnergyPlusFixture, LowTempElecRadSurfaceGroupTest)
         "    ,                        !- Heating Design Capacity Per Floor Area{ W/m2 }",
         "    1.0,                     !- Fraction of Autosized Heating Design Capacity",
         "    MeanAirTemperature,      !- Temperature Control Type",
+        "    HalfFlowPower,           !- Setpoint Type",
         "    2.0,                     !- Heating Throttling Range {deltaC}",
         "    Radiant Heating Setpoints;  !- Heating Control Temperature Schedule Name",
 
@@ -1441,6 +1443,7 @@ TEST_F(EnergyPlusFixture, LowTempElecRadSurfaceGroupTest)
         "    ,                        !- Heating Design Capacity Per Floor Area{ W/m2 }",
         "    1.0,                     !- Fraction of Autosized Heating Design Capacity",
         "    MeanAirTemperature,      !- Temperature Control Type",
+        "    HalfFlowPower,           !- Setpoint Type",
         "    2.0,                     !- Heating Throttling Range {deltaC}",
         "    Radiant Heating Setpoints;  !- Heating Control Temperature Schedule Name",
 
@@ -2200,4 +2203,65 @@ TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
     functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
     EXPECT_NEAR(expectedResult, functionResult, 0.001);
     
+}
+
+TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTest)
+{
+
+    Real64 expectedResult;
+    Real64 actualResult;
+    Real64 acceptibleError = 0.001;
+    Real64 throttlingRange;
+    int scheduleIndex;
+
+    HydrRadSys.allocate(1);
+
+    // Test 1: zeroFlow and no throttling range
+    scheduleIndex = -1; // this assigns a value of 1.0
+    throttlingRange = 0.0;
+    HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::zeroFlowPower;
+    expectedResult = 1.0;
+    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(scheduleIndex,throttlingRange);
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+
+    // Test 2: zeroFlow and positive throttling range
+    scheduleIndex = -1; // this assigns a value of 1.0
+    throttlingRange = 0.5;
+    HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::zeroFlowPower;
+    expectedResult = 1.0;
+    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(scheduleIndex,throttlingRange);
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+
+    // Test 3: zeroFlow and negative throttling range (cooling situation)
+    scheduleIndex = -1; // this assigns a value of 1.0
+    throttlingRange = -0.5;
+    HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::zeroFlowPower;
+    expectedResult = 1.0;
+    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(scheduleIndex,throttlingRange);
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+
+    // Test 4: halfFlow and no throttling range
+    scheduleIndex = -1; // this assigns a value of 1.0
+    throttlingRange = 0.0;
+    HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::halfFlowPower;
+    expectedResult = 1.0;
+    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(scheduleIndex,throttlingRange);
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+
+    // Test 5: halfFlow and positive throttling range
+    scheduleIndex = -1; // this assigns a value of 1.0
+    throttlingRange = 0.5;
+    HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::halfFlowPower;
+    expectedResult = 1.25;
+    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(scheduleIndex,throttlingRange);
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+
+    // Test 5: halfFlow and negative throttling range (cooling situation)
+    scheduleIndex = -1; // this assigns a value of 1.0
+    throttlingRange = -0.5;
+    HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::halfFlowPower;
+    expectedResult = 0.75;
+    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(scheduleIndex,throttlingRange);
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+
 }
