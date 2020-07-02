@@ -1909,6 +1909,7 @@ namespace SurfaceGeometry {
 
             // final associate fenestration surfaces referenced in WindowShadingControl
             FinalAssociateWindowShadingControlFenestration(ErrorsFound);
+            CheckWindowShadingControlSimilarForWindow(ErrorsFound);
         }
 
         // Check for zones with not enough surfaces
