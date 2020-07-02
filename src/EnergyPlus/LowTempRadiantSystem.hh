@@ -176,7 +176,7 @@ namespace LowTempRadiantSystem {
         Real64 setOffTemperatureLowTemperatureRadiantSystem(int const scheduleIndex, Real64 const throttlingRange);
         
         virtual void calculateLowTemperatureRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Real64 &LoadMet) = 0;
-                        
+
         void updateLowTemperatureRadiantSystemSurfaces();
 
         virtual void updateLowTemperatureRadiantSystem() = 0;
