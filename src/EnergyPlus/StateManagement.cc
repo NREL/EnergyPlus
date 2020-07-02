@@ -234,7 +234,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     using namespace EnergyPlus;
     // A to Z order
     CoilCoolingDX::clear_state();
-    CoolTower::clear_state();
     CrossVentMgr::clear_state();
     CTElectricGenerator::clear_state();
     CurveManager::clear_state();

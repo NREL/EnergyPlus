@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
 
@@ -132,11 +133,6 @@ namespace CoolTower {
         }
     };
 
-    // Object Data
-    extern Array1D<CoolTowerParams> CoolTowerSys;
-
-    void clear_state();
-
     void ManageCoolTower();
 
     void GetCoolTower();
@@ -148,6 +144,22 @@ namespace CoolTower {
     void ReportCoolTower();
 
 } // namespace CoolTower
+
+struct CoolTowerData : BaseGlobalStruct {
+
+    bool GetInputFlag = true;
+    int NumCoolTowers = 0;
+    Array1D<CoolTower::CoolTowerParams> CoolTowerSys;
+
+    void clear_state() override
+    {
+        GetInputFlag = true;
+        NumCoolTowers = 0;
+        CoolTowerSys.deallocate();
+    }
+};
+
+extern CoolTowerData dataCoolTower;
 
 } // namespace EnergyPlus
 
