@@ -315,7 +315,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EnergyPlus::DataAirLoop::OutsideAirSys(1).AirLoopDOASNum = 0;
     state.dataAirLoopHVACDOAS.airloopDOAS.emplace_back();
     state.dataAirLoopHVACDOAS.airloopDOAS[0].SizingCoolOAHumRat = 0.0036;
-    auto& thisDOAS = state.dataAirLoopHVACDOAS.airloopDOAS[0];
+
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
 
@@ -344,7 +344,6 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_NEAR(inputValue, sizer.autoSizedValue, 0.01); // hard-sized value
     sizer.autoSizedValue = 0.0;                          // reset for next test
 
-    // autosized value = thisDOAS.SizingCoolOAHumRat = 0.0036
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
     eiooutput =
         std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Inlet Air Humidity Ratio, 3.60000E-003\n"

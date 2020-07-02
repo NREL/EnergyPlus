@@ -50,6 +50,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/api/TypeDefs.h>
 
@@ -71,6 +72,7 @@ void HeatingWaterDesAirInletTempSizer::initializeWithinEP(EnergyPlusData &state,
 EnergyPlus::AutoSizingResultType HeatingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _originalValue)
 {
     if (this->isNotInitialized) return AutoSizingResultType::ErrorType2;
+    this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
     EnergyPlus::AutoSizingResultType errorsFound = EnergyPlus::AutoSizingResultType::NoError;
     this->preSize(state, _originalValue);
@@ -120,7 +122,7 @@ EnergyPlus::AutoSizingResultType HeatingWaterDesAirInletTempSizer::size(EnergyPl
                     OutAirFrac = 1.0;
                 }
                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
-            } // There used to be an ELSE block here, but I just moved the assignment of 1.0 to the var declaration
+            }
             // coil inlet temperature
             if (this->curOASysNum == 0 && DataAirSystems::PrimaryAirSystem(this->curSysNum).NumOAHeatCoils > 0) {
                 this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).PreheatTemp +
@@ -134,6 +136,8 @@ EnergyPlus::AutoSizingResultType HeatingWaterDesAirInletTempSizer::size(EnergyPl
         }
     }
     this->selectSizerOutput();
+    // report not written for OA coils and needs to be corrected
+    if (this->curSysNum <= this->numPrimaryAirSys) coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
     return errorsFound;
 }
 

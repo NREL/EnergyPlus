@@ -67,6 +67,7 @@ void HeatingAirflowUASizer::initializeWithinEP(EnergyPlusData &state,
 EnergyPlus::AutoSizingResultType HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue)
 {
     if (this->isNotInitialized) return AutoSizingResultType::ErrorType2;
+    this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
     EnergyPlus::AutoSizingResultType errorsFound = EnergyPlus::AutoSizingResultType::NoError;
     this->preSize(state, _originalValue);

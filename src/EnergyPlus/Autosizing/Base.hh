@@ -137,7 +137,7 @@ namespace EnergyPlus {
         static void clear_state();
     };
 
-    extern bool oneTimeBaseSizerFlag;
+    extern bool oneTimeCompRptHeaderFlag;
 
 } // namespace EnergyPlus
 

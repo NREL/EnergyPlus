@@ -50,6 +50,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/api/TypeDefs.h>
 
@@ -71,6 +72,7 @@ void CoolingWaterDesAirInletHumRatSizer::initializeWithinEP(EnergyPlusData &stat
 EnergyPlus::AutoSizingResultType CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _originalValue)
 {
     if (this->isNotInitialized) return AutoSizingResultType::ErrorType2;
+    this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
     EnergyPlus::AutoSizingResultType errorsFound = EnergyPlus::AutoSizingResultType::NoError;
     this->preSize(state, _originalValue);
@@ -121,6 +123,7 @@ EnergyPlus::AutoSizingResultType CoolingWaterDesAirInletHumRatSizer::size(Energy
         }
     }
     this->selectSizerOutput();
+    coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
     return errorsFound;
 }
 

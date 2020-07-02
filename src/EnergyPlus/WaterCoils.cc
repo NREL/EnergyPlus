@@ -2132,36 +2132,28 @@ namespace WaterCoils {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int PltSizNum;     // do loop index for plant sizing
-        int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
-        int PltSizHeatNum; // index of plant sizing object for 1st heating loop
-        bool ErrorsFound;  // If errors detected in input
-        bool LoopErrorsFound;
         Real64 rho;
         int FieldNum = 2;                      // IDD numeric field number where input field description is found
-        std::string CompName;                  // component name
         std::string CompType;                  // component type
         int SizingType;                        // type of sizing to perform
         std::string SizingString;              // input field sizing description (e.g., Nominal Capacity)
         bool bPRINT = true;                    // TRUE if sizing is reported to output (eio)
         Real64 TempSize;                       // autosized value
-        Real64 CpAirStd;                       // specific heat of air at standard conditions
-        Real64 DesCoilAirFlow;                 // design air flow rate for the coil [m3/s]
-        Real64 DesCoilExitTemp;                // design coil exit temperature [C]
         Real64 DesCoilWaterInTempSaved;        // coil water inlet temp used for error checking UA sizing
         Real64 DesCoilInletWaterTempUsed(0.0); // coil design inlet water temp for UA sizing only
         Real64 Cp;
         bool NomCapUserInp = false; // flag for whether user has onput a nominal heating capacity
         int SizingMethod;           // Integer representation of sizing method (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
 
-        ErrorsFound = false;
-        PltSizCoolNum = 0;
-        PltSizHeatNum = 0;
-        PltSizNum = 0;
-        DesCoilAirFlow = 0.0;
-        DesCoilExitTemp = 0.0;
-        LoopErrorsFound = false;
-        CpAirStd = PsyCpAirFnW(0.0);
+        bool ErrorsFound = false;
+        bool LoopErrorsFound = false;
+        int PltSizCoolNum = 0;
+        int PltSizHeatNum = 0;
+        int PltSizNum = 0;
+        Real64 DesCoilAirFlow = 0.0;
+        Real64 DesCoilExitTemp = 0.0;
+        Real64 CpAirStd = PsyCpAirFnW(0.0);
+        std::string CompName = WaterCoil(CoilNum).Name;
 
         // cooling coils
         if (WaterCoil(CoilNum).WaterCoilType == CoilType_Cooling && WaterCoil(CoilNum).RequestingAutoSize) {
@@ -2197,7 +2189,6 @@ namespace WaterCoils {
                                       // should print this!)
                 TempSize = AutoSize;  // get the autosized air volume flow rate for use in other calculations
                 SizingString.clear(); // doesn't matter
-                CompName = WaterCoil(CoilNum).Name;
                 RequestSizing(state, CompType, CompName, CoolingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
                 WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * TempSize; // inlet air mass flow rate is the autosized value
                 DataAirFlowUsedForSizing = TempSize; // many autosized inputs use the design (autosized) air volume flow rate, save this value
@@ -2219,10 +2210,16 @@ namespace WaterCoils {
                 } else {
                     TempSize = WaterCoil(CoilNum).DesInletAirHumRat; // preserve input if entered
                 }
-                CoolingWaterDesAirInletHumRatSizer sizer3;
-                sizer3.initializeWithinEP(state, DataHVACGlobals::cAllCoilTypes(WaterCoil(CoilNum).WaterCoilType_Num), WaterCoil(CoilNum).Name, false);
-                AutoSizingResultType result = sizer3.size(state, TempSize);
-                DataDesInletAirHumRat = sizer3.autoSizedValue;
+                CoolingWaterDesAirInletHumRatSizer sizerCWDesInHumRat;
+                sizerCWDesInHumRat.initializeWithinEP(state, CompType, CompName, bPRINT);
+                AutoSizingResultType result = sizerCWDesInHumRat.size(state, TempSize);
+                DataDesInletAirHumRat = sizerCWDesInHumRat.autoSizedValue;
+                if (result != AutoSizingResultType::NoError) {
+                    ShowSevereError("Developer Error: autosizing of water cooling coil design air inlet humidity ratio failed.");
+                    ShowContinueError("Occurs in water cooling coil object= " + CompName);
+                    ErrorsFound = true;
+                }
+
                 TempSize = AutoSize;
                 RequestSizing(state, CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName);
                 DataCapacityUsedForSizing = TempSize;
@@ -2271,9 +2268,14 @@ namespace WaterCoils {
                         TempSize = WaterCoil(CoilNum).DesInletAirHumRat; // preserve input if entered
                         SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [kgWater/kgDryAir]";
                     }
-                    AutoSizingResultType result = sizer3.size(state, TempSize);
-                    WaterCoil(CoilNum).DesInletAirHumRat = sizer3.autoSizedValue;
-                    coilSelectionReportObj->setCoilEntAirHumRat(CompName, CompType, WaterCoil(CoilNum).DesInletAirHumRat);
+                    sizerCWDesInHumRat.initializeWithinEP(state, CompType, CompName, bPRINT);
+                    AutoSizingResultType result = sizerCWDesInHumRat.size(state, TempSize);
+                    WaterCoil(CoilNum).DesInletAirHumRat = sizerCWDesInHumRat.autoSizedValue;
+                    if (result != AutoSizingResultType::NoError) {
+                        ShowSevereError("Developer Error: autosizing of water cooling coil design air inlet humidity ratio failed.");
+                        ShowContinueError("Occurs in water cooling coil object= " + CompName);
+                        ErrorsFound = true;
+                    }
                 }
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
@@ -2304,9 +2306,14 @@ namespace WaterCoils {
                         TempSize = WaterCoil(CoilNum).DesInletAirHumRat;
                         SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [kgWater/kgDryAir]";
                     }
-                    AutoSizingResultType result = sizer3.size(state, TempSize);
-                    WaterCoil(CoilNum).DesInletAirHumRat = sizer3.autoSizedValue;
-                    coilSelectionReportObj->setCoilEntAirHumRat(CompName, CompType, WaterCoil(CoilNum).DesInletAirHumRat);
+                    sizerCWDesInHumRat.initializeWithinEP(state, CompType, CompName, bPRINT);
+                    AutoSizingResultType result = sizerCWDesInHumRat.size(state, TempSize);
+                    WaterCoil(CoilNum).DesInletAirHumRat = sizerCWDesInHumRat.autoSizedValue;
+                    if (result != AutoSizingResultType::NoError) {
+                        ShowSevereError("Developer Error: autosizing of water cooling coil design air inlet humidity ratio failed.");
+                        ShowContinueError("Occurs in water cooling coil object= " + CompName);
+                        ErrorsFound = true;
+                    }
                 }
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
@@ -2625,14 +2632,13 @@ namespace WaterCoils {
                     WaterCoil(CoilNum).DesAirVolFlowRate = DataAirFlowUsedForSizing;                // coil report
                     WaterCoil(CoilNum).InletAirMassFlowRate = DataAirFlowUsedForSizing * StdRhoAir; // this is stiil volume flow!
                 } else {
-                    HeatingWaterDesAirInletTempSizer sizer;
-                    sizer.initializeWithinEP(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), WaterCoil(CoilNum).Name, false);
-                    AutoSizingResultType result = sizer.size(state, DataSizing::AutoSize);
-                    WaterCoil(CoilNum).InletAirTemp = sizer.autoSizedValue;
-                    if (CurSysNum <= sizer.numPrimaryAirSys) coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, WaterCoil(CoilNum).InletAirTemp, CurSysNum, CurZoneEqNum);
+                    HeatingWaterDesAirInletTempSizer sizerHWDesInTemp;
+                    sizerHWDesInTemp.initializeWithinEP(state, CompType, CompName, bPRINT);
+                    AutoSizingResultType result = sizerHWDesInTemp.size(state, DataSizing::AutoSize);
+                    WaterCoil(CoilNum).InletAirTemp = sizerHWDesInTemp.autoSizedValue;
                     if (result != AutoSizingResultType::NoError) {
                         ShowSevereError("Developer Error: autosizing of water heating coil design air inlet temperature failed.");
-                        ShowContinueError("Occurs in water heating coil object= " + WaterCoil(CoilNum).Name);
+                        ShowContinueError("Occurs in water heating coil object= " + CompName);
                         ErrorsFound = true;
                     }
 
@@ -2641,14 +2647,14 @@ namespace WaterCoils {
                     WaterCoil(CoilNum).DesInletAirHumRat = TempSize; // coil report
                     WaterCoil(CoilNum).InletAirHumRat = TempSize;
 
-                    HeatingAirflowUASizer sizer2;
-                    sizer2.initializeWithinEP(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), WaterCoil(CoilNum).Name, false);
-                    result = sizer2.size(state, DataSizing::AutoSize);
-                    WaterCoil(CoilNum).DesAirMassFlowRate = sizer2.autoSizedValue; // coil report
-                    WaterCoil(CoilNum).InletAirMassFlowRate = sizer2.autoSizedValue;
+                    HeatingAirflowUASizer sizerHWAirFlowUA;
+                    sizerHWAirFlowUA.initializeWithinEP(state, CompType, CompName, bPRINT);
+                    result = sizerHWAirFlowUA.size(state, DataSizing::AutoSize);
+                    WaterCoil(CoilNum).DesAirMassFlowRate = sizerHWAirFlowUA.autoSizedValue; // coil report
+                    WaterCoil(CoilNum).InletAirMassFlowRate = sizerHWAirFlowUA.autoSizedValue;
                     if (result != AutoSizingResultType::NoError) {
                         ShowSevereError("Developer Error: autosizing of water heating coil air flow used for UA failed.");
-                        ShowContinueError("Occurs in water heating coil object= " + WaterCoil(CoilNum).Name);
+                        ShowContinueError("Occurs in water heating coil object= " + CompName);
                         ErrorsFound = true;
                     }
                 }

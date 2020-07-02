@@ -58,10 +58,10 @@
 
 namespace EnergyPlus {
 
-    bool oneTimeBaseSizerFlag = true;
+    bool oneTimeCompRptHeaderFlag = true;
 
     void BaseSizer::clear_state() {
-        oneTimeBaseSizerFlag = true;
+        oneTimeCompRptHeaderFlag = true;
     }
 
     void BaseSizer::initializeWithinEP(EnergyPlusData &state, const std::string &_compType, const std::string &_compName, bool _printWarningFlag) {
@@ -187,10 +187,10 @@ namespace EnergyPlus {
         // to do, make this a parameter. Unfortunately this function is used in MANY
         // places so it involves touching most of E+
         auto &outputFiles = EnergyPlus::OutputFiles::getSingleton();
-        if (oneTimeBaseSizerFlag) {
+        if (oneTimeCompRptHeaderFlag) {
             if (ReportSizingManager::MyOneTimeFlag) print(outputFiles.eio, Format_990);
             ReportSizingManager::MyOneTimeFlag = false;
-            oneTimeBaseSizerFlag = false;
+            oneTimeCompRptHeaderFlag = false;
         }
 
         print(outputFiles.eio, Format_991, CompType, CompName, VarDesc, VarValue);
