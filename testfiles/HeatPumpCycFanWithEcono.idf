@@ -59,7 +59,9 @@
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   Site:Location,
     Chanute AFB IL,          !- Name
