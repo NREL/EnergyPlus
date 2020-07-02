@@ -738,12 +738,6 @@ namespace SingleDuct {
                                 "System",
                                 "Average",
                                 sd_airterminal(SysNum).SysName);
-            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
-                                sd_airterminal(SysNum).OutdoorAirFlowRate,
-                                "System",
-                                "Average",
-                                sd_airterminal(SysNum).SysName);
 
         } // end Number of Sys Loop
 
@@ -1154,14 +1148,6 @@ namespace SingleDuct {
             //  CALL SetupOutputVariable('Damper Position', Sys(SysNum)%DamperPosition, &
             //                        'System','Average',Sys(SysNum)%SysName)
 
-            // Setup output for the air terminal single duct constant volume no reheat.
-            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
-                OutputProcessor::Unit::m3_s,
-                sd_airterminal(SysNum).OutdoorAirFlowRate,
-                "System",
-                "Average",
-                sd_airterminal(SysNum).SysName);
-
         } // End Number of Sys Loop
 
         CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:NoReheat";
@@ -1302,14 +1288,6 @@ namespace SingleDuct {
                     ShowContinueError("..invalid " + cAlphaFields(6) + "=\"" + Alphas(6) + "\". The default input of CurrentOccupancy is assigned");
                 }
             }
-
-            // Setup output for the air terminal single duct constant volume no reheat.
-            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
-                                sd_airterminal(SysNum).OutdoorAirFlowRate,
-                                "System",
-                                "Average",
-                                sd_airterminal(SysNum).SysName);
 
             if (DataGlobals::AnyEnergyManagementSystemInModel) {
                 // model results related actuators
@@ -1526,12 +1504,6 @@ namespace SingleDuct {
             SetupOutputVariable("Zone Air Terminal Minimum Air Flow Fraction",
                                 OutputProcessor::Unit::None,
                                 sd_airterminal(SysNum).ZoneMinAirFracReport,
-                                "System",
-                                "Average",
-                                sd_airterminal(SysNum).SysName);
-            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
-                                sd_airterminal(SysNum).OutdoorAirFlowRate,
                                 "System",
                                 "Average",
                                 sd_airterminal(SysNum).SysName);
@@ -1969,6 +1941,16 @@ namespace SingleDuct {
                                 "System",
                                 "Average",
                                 sd_airterminal(SysNum).SysName);
+        }
+
+        // common report variable for all single duct air terminals
+        for ( int sdIndex = 1; sdIndex <= NumSDAirTerminal; ++sdIndex) {
+            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
+                OutputProcessor::Unit::m3_s,
+                sd_airterminal(sdIndex).OutdoorAirFlowRate,
+                "System",
+                "Average",
+                sd_airterminal(sdIndex).SysName );
         }
 
         // Error check to see if a single duct air terminal is assigned to zone that has zone secondary recirculation
@@ -5316,8 +5298,6 @@ namespace SingleDuct {
         if (Contaminant.GenericContamSimulation) {
             Node(OutletNode).GenContam = Node(InletNode).GenContam;
         }
-        // set OA volume flow rate report variable
-        this->CalcOutdoorAirVolumeFlowRate();
     }
 
     //        End of Update subroutines for the Sys Module
@@ -5362,6 +5342,9 @@ namespace SingleDuct {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // Still needs to report the Sys power from this component
+
+        // set zone OA volume flow rate
+        this->CalcOutdoorAirVolumeFlowRate();
     }
 
     void GetHVACSingleDuctSysIndex(EnergyPlusData &state, std::string const &SDSName,
@@ -6245,11 +6228,11 @@ namespace SingleDuct {
 
     void SingleDuctAirTerminal::CalcOutdoorAirVolumeFlowRate()
     {
-        // calculates the amount of outdoor air volume flow rate using the supply air flow rate and OA fraction
+        // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
             this->OutdoorAirFlowRate = (this->sd_airterminalOutlet.AirMassFlowRate / StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
-            // do nothing for now
+            this->OutdoorAirFlowRate = 0.0;
         }
     }
 
