@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -63,7 +64,7 @@ namespace EnergyPlus {
         oneTimeBaseSizerFlag = true;
     }
 
-    void BaseSizer::initializeWithinEP(EnergyPlusData &EP_UNUSED(state), const std::string &_compType, const std::string &_compName, bool _printWarningFlag) {
+    void BaseSizer::initializeWithinEP(EnergyPlusData &state, const std::string &_compType, const std::string &_compName, bool _printWarningFlag) {
         this->isNotInitialized = false;
         this->printWarningFlag = _printWarningFlag;
         this->compType = _compType;
@@ -94,7 +95,7 @@ namespace EnergyPlus {
         this->zoneEqSizing = DataSizing::ZoneEqSizing;
         this->sysSizingInputData = DataSizing::SysSizInput;
         this->finalSysSizing = DataSizing::FinalSysSizing;
-        this->airloopDOAS = AirLoopHVACDOAS::airloopDOAS;
+        this->airloopDOAS = state.dataAirLoopHVACDOAS.airloopDOAS;
     }
 
     void BaseSizer::preSize(EnergyPlusData &EP_UNUSED(state), Real64 const _originalValue) {

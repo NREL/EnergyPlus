@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletHumRatSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -97,7 +98,7 @@ EnergyPlus::AutoSizingResultType CoolingWaterDesAirInletHumRatSizer::size(Energy
             if (this->curOASysNum > 0) { // coil is in OA stream
                 if (DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                     this->autoSizedValue =
-                        AirLoopHVACDOAS::airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
+                    state.dataAirLoopHVACDOAS.airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).OutHumRatAtCoolPeak;
                 }

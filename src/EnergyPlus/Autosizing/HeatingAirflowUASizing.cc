@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -99,7 +100,7 @@ EnergyPlus::AutoSizingResultType HeatingAirflowUASizer::size(EnergyPlusData &sta
             if (this->curOASysNum > 0) {
                 if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                     this->autoSizedValue =
-                        this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow / DataEnvironment::StdRhoAir;
+                    state.dataAirLoopHVACDOAS.airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow / DataEnvironment::StdRhoAir;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
                 }

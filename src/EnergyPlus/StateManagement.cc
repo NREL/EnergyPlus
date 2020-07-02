@@ -49,6 +49,7 @@
 
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CoolTower.hh>

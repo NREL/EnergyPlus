@@ -27,6 +27,8 @@ SET( SRC
   AirTerminalUnit.hh
   Autosizing/Base.cc
   Autosizing/Base.hh
+  Autosizing/CoolingWaterDesAirInletHumRatSizing.cc
+  Autosizing/CoolingWaterDesAirInletHumRatSizing.hh
   Autosizing/HeatingAirflowUASizing.cc
   Autosizing/HeatingAirflowUASizing.hh
   Autosizing/HeatingWaterDesAirInletTempSizing.cc

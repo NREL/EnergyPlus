@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletTempSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -125,7 +126,7 @@ EnergyPlus::AutoSizingResultType HeatingWaterDesAirInletTempSizer::size(EnergyPl
                 this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).PreheatTemp +
                                        (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
             } else if (this->curOASysNum > 0 && DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                this->autoSizedValue = AirLoopHVACDOAS::airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
+                this->autoSizedValue = state.dataAirLoopHVACDOAS.airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
             } else {
                 this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).HeatOutTemp +
                                        (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;

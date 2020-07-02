@@ -49,6 +49,7 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletTempSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -247,8 +248,6 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletTempSizingGauntlet)
     EnergyPlus::DataSizing::SysSizInput.allocate(1);
     EnergyPlus::DataSizing::SysSizInput(1).AirLoopNum = 1;
     DataAirSystems::PrimaryAirSystem.allocate(1);
-    AirLoopHVACDOAS::AirLoopDOAS thisDOAS;
-    EnergyPlus::AirLoopHVACDOAS::airloopDOAS.push_back(thisDOAS);
 
    // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
@@ -353,9 +352,9 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletTempSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 17 - Outdoor Air System Equipment with DOAS system
-    EnergyPlus::DataAirLoop::OutsideAirSys(1).AirLoopDOASNum = 1;
-    thisDOAS.HeatOutTemp = 12.0;
-    EnergyPlus::AirLoopHVACDOAS::airloopDOAS.push_back(thisDOAS);
+    DataAirLoop::OutsideAirSys(DataSizing::CurOASysNum).AirLoopDOASNum = 0;
+    state.dataAirLoopHVACDOAS.airloopDOAS.emplace_back();
+    state.dataAirLoopHVACDOAS.airloopDOAS[0].HeatOutTemp = 12.0;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
 

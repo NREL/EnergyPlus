@@ -49,6 +49,7 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -391,9 +392,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     // Test 18 - Outdoor Air System Equipment with DOAS system
     EnergyPlus::DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.0;
     EnergyPlus::DataAirLoop::OutsideAirSys(1).AirLoopDOASNum = 0;
-    AirLoopHVACDOAS::AirLoopDOAS thisDOAS;
-    thisDOAS.SizingMassFlow = 5.0;
-    EnergyPlus::AirLoopHVACDOAS::airloopDOAS.push_back(thisDOAS);
+    state.dataAirLoopHVACDOAS.airloopDOAS.emplace_back();
+    state.dataAirLoopHVACDOAS.airloopDOAS[0].SizingMassFlow = 5.0;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
 
@@ -412,7 +412,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     // Test 19 - Outdoor Air System Equipment with DOAS system, hard-sized air flow rate
     // start with an auto-sized value as the user input
     inputValue = 5.0;
-    EnergyPlus::AirLoopHVACDOAS::airloopDOAS[0].SizingMassFlow = 3.0;
+    state.dataAirLoopHVACDOAS.airloopDOAS[0].SizingMassFlow = 3.0;
 
     // do sizing
     sizer.wasAutoSized = false;
