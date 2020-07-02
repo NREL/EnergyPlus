@@ -155,11 +155,11 @@ namespace LowTempRadiantSystem {
         Real64 HeatEnergy;            // heating sent to panel in Joules
 
         // Default Constructor
-            RadiantSystemBaseData()
-        : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), ControlType(LowTempRadiantControlTypes::MATControl),
-          SetpointType(LowTempRadiantSetpointTypes::halfFlowPower)
-            {
-            }
+        RadiantSystemBaseData()
+            : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), ControlType(LowTempRadiantControlTypes::MATControl),
+              SetpointType(LowTempRadiantSetpointTypes::halfFlowPower)
+        {
+        }
 
         LowTempRadiantControlTypes processRadiantSystemControlInput(std::string const& controlInput,
                                                                          std::string const& controlInputField
