@@ -8367,6 +8367,41 @@ namespace SurfaceGeometry {
         }
     }
 
+    void CheckWindowShadingControlSimilarForWindow(bool& ErrorsFound)
+    {
+        // J.Glazer 2020 - for each window check if all window shading controls on list are the same except for name, schedule name, construction, and material
+        for (auto theSurf : Surface) {
+            if (theSurf.HasShadeControl) {
+                if (theSurf.windowShadingControlList.size() > 1) {
+                    int firstWindowShadingControl = theSurf.windowShadingControlList.front();
+                    for (auto wsc = std::next(theSurf.windowShadingControlList.begin()); wsc != theSurf.windowShadingControlList.end(); ++wsc) {
+                        if (!isWindowShadingControlSimilar(firstWindowShadingControl, *wsc)) {
+                            ErrorsFound = true;
+                            ShowSevereError("CheckWindowShadingControlSimilarForWindow: Fenestration surface named \"" + theSurf.Name +
+                                        "\" has multiple WindowShadingContols that are not similar.");
+                            ShowContinueError("for: \"" + WindowShadingControl(firstWindowShadingControl).Name + " and: " + WindowShadingControl(*wsc).Name); 
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    bool isWindowShadingControlSimilar(int a, int b)
+    {
+        // J.Glazer 2020 - compares two window shading controls are the same except for the name, schedule name, construction, and material
+        return (WindowShadingControl(a).ZoneIndex == WindowShadingControl(b).ZoneIndex &&
+            WindowShadingControl(a).ShadingType == WindowShadingControl(b).ShadingType &&
+            WindowShadingControl(a).ShadingControlType == WindowShadingControl(b).ShadingControlType &&
+            WindowShadingControl(a).SetPoint == WindowShadingControl(b).SetPoint &&
+            WindowShadingControl(a).ShadingControlIsScheduled == WindowShadingControl(b).ShadingControlIsScheduled &&
+            WindowShadingControl(a).GlareControlIsActive == WindowShadingControl(b).GlareControlIsActive &&
+            WindowShadingControl(a).SlatAngleControlForBlinds == WindowShadingControl(b).SlatAngleControlForBlinds &&
+            WindowShadingControl(a).SetPoint2 == WindowShadingControl(b).SetPoint2 &&
+            WindowShadingControl(a).DaylightControlIndex == WindowShadingControl(b).DaylightControlIndex &&
+            WindowShadingControl(a).MultiSurfaceCtrlIsGroup == WindowShadingControl(b).MultiSurfaceCtrlIsGroup);
+    }
+
     void GetStormWindowData(bool &ErrorsFound) // If errors found in input
     {
 
