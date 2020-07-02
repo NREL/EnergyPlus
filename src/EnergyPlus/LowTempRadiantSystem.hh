@@ -163,6 +163,8 @@ namespace LowTempRadiantSystem {
 
         Real64 setRadiantSystemControlTemperature();
         
+        Real64 calculateOperationalFraction(Real64 const offTemperature, Real64 const controlTemperature, Real64 const throttlingRange);
+        
         virtual void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet) = 0;
         
         void updateLowTemperatureRadiantSystemSurfaces();
