@@ -4,7 +4,7 @@ Implement Optional Time Delay Between Mode Changeover for Low Temperature Radian
 **Rick Strand, UIUC**
 
  - Original Date: July 2, 2020
- - Revision Date: 
+ - Revision Date: Version 2—July 2, 2020
  
 
 ## Justification for New Feature ##
@@ -26,7 +26,7 @@ Current controls in EnergyPlus look at what is happening at the present only and
 
 This work will implement a changeover “delay” that prevents the radiant system from bouncing from heating to cooling or vice versa for a certain period of time.  This changeover period or lockout will prevent this for a user specified period of time (in hours).  So, as the system operates, it will track what was the last operating mode and how long it has been since it was last in that mode.  If the length of time since it was last in whatever conditioning mode equals or exceeds the need to go into the opposite conditioning mode, then the algorithm will allow the changeover to the other conditioning mode.  However, if the length of time is less than the changeover delay, then it will simply keep the system off.
 
-A new input parameter for both the variable and constant flow low temperature radiant systems will allow the user to set the delay between changeover in hours (integer).  The code will read that value in and store it in the local data type for hydronic systems.  When the radiant system is simulated and checks as to whether the unit is scheduled on, it will now also check to see when the system last operated, which mode it was in, and compare that time difference to the delay parameter.  The new variables in the data structure are expected to include the delay parameter input by the user as well as time markers for last on time and the mode that the system was in.  Additional variables may be needed as the code work progresses.
+A new input parameter for both the variable and constant flow low temperature radiant systems will allow the user to set the delay between changeover in hours (integer) via a schedule of values, allowing the user to change this value as desired over time if necessary.  The code will read that value in and store it in the local data type for hydronic systems.  When the radiant system is simulated and checks as to whether the unit is scheduled on, it will now also check to see when the system last operated, which mode it was in, and compare that time difference to the delay parameter.  The new variables in the data structure are expected to include the delay parameter input by the user as well as time markers for last on time and the mode that the system was in.  Additional variables may be needed as the code work progresses.
 
 In addition to the code to check whether the system is allowed to operate in a certain mode, there will need to be code that accurately reflects the mode that the radiant system ends up being in during a particular time step.  This will require some code in the “initialize” routine and some code in the “update” routine as well.
 
@@ -42,9 +42,9 @@ Descriptions for the new input parameter will need to show up in two locations: 
 
 The following is the plan for making an addition to the input description for both system types in tex format.  This new parameter will be added to the end of the existing description.
 
-\paragraph{Field: Changeover Delay Time Period}\label{changover-delay-time-period}
+\paragraph{Field: Changeover Delay Time Period Schedule Name}\label{changover-delay-time-period-schedule-name}
 
-This parameter defines the amount of time in hours that is required before this low temperature radiant system can switch between either heating or cooling and the opposite conditioning mode.  If this parameter is set to 1 (hour) and the system was previously in heating mode, then it will be locked out from switching into cooling mode until at least one hour of time has passed in the simulation.  This helps avoid systems bouncing back and forth between the two conditioning modes in successive time steps.  This parameter can be set to an positive value and the default value is zero.
+This parameter defines a schedule which should be populated with values for the amount of time in hours that is required before this low temperature radiant system can switch between either heating or cooling and the opposite conditioning mode.  If this schedule value is set to 1 (hour) at a particular time and the system was previously in heating mode, then it will be locked out from switching into cooling mode until at least one hour of time has passed in the simulation.  This helps avoid systems bouncing back and forth between the two conditioning modes in successive time steps.  This parameter can be set to any positive value, and a negative value will be assumed to have no delay (equivalent to a delay of zero).  If the user leaves this field blank, EnergyPlus will assume that no changeover delay is requested.
 
 ## Outputs Description ##
 
