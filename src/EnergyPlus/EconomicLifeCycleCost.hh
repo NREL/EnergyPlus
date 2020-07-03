@@ -106,9 +106,9 @@ namespace EconomicLifeCycleCost {
     // The NIST supplement includes UPV* factors for
     //   Electricity
     //   Natural gas
-    //   Distillate oil - FuelOil#1
+    //   Distillate oil - FuelOilNo1
     //   Liquified petroleum gas - Propane
-    //   Residual oil - FuelOil#2
+    //   Residual oil - FuelOilNo2
     //   Coal
 
     extern int const startServicePeriod;

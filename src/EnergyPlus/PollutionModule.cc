@@ -848,7 +848,7 @@ namespace PollutionModule {
                         continue;
                     }
                     Pollution.FuelOil2Coef.FuelFactorUsed = true;
-                    // FuelOil#2 Coeffs
+                    // FuelOilNo2 Coeffs
                     Pollution.FuelOil2Coef.Source = rNumericArgs(2);
                     if (!lAlphaFieldBlanks(3)) {
                         CheckFFSchedule(
@@ -942,7 +942,7 @@ namespace PollutionModule {
                         continue;
                     }
                     Pollution.FuelOil1Coef.FuelFactorUsed = true;
-                    // FuelOil#1 Coeffs
+                    // FuelOilNo1 Coeffs
                     Pollution.FuelOil1Coef.Source = rNumericArgs(2);
                     if (!lAlphaFieldBlanks(3)) {
                         CheckFFSchedule(
@@ -1772,12 +1772,12 @@ namespace PollutionModule {
                 ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for NATURAL GAS");
                 ErrorsFound = true;
             }
-            // Check for FuelOil#2 (Residual Oil)
+            // Check for FuelOilNo2 (Residual Oil)
             if (!Pollution.FuelOil2Coef.FuelFactorUsed && (FuelType.FuelOil2FacilityIndex > 0)) {
                 ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #2");
                 ErrorsFound = true;
             }
-            // Check for FuelOil#1 (Distillate Oil)
+            // Check for FuelOilNo1 (Distillate Oil)
             if (!Pollution.FuelOil1Coef.FuelFactorUsed && (FuelType.FuelOil1FacilityIndex > 0)) {
                 ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #1");
                 ErrorsFound = true;
@@ -2039,7 +2039,7 @@ namespace PollutionModule {
                                         "");
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    // Pollutants from FuelOil#2
+                    // Pollutants from FuelOilNo2
                     SetupOutputVariable("Environmental Impact Fuel Oil No2 Source Energy",
                                         OutputProcessor::Unit::J,
                                         Pollution.FuelOil2Comp.Source,
@@ -2229,7 +2229,7 @@ namespace PollutionModule {
                                         "");
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    // Pollutants from FuelOil#1
+                    // Pollutants from FuelOilNo1
                     SetupOutputVariable("Environmental Impact Fuel Oil No1 Source Energy",
                                         OutputProcessor::Unit::J,
                                         Pollution.FuelOil1Comp.Source,

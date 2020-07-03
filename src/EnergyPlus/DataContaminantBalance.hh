@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+    // Forward Declarations
+    struct EnergyPlusData;
+
 namespace DataContaminantBalance {
 
     // Using/Aliasing

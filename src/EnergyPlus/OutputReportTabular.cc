@@ -4393,8 +4393,8 @@ namespace OutputReportTabular {
         //          Gasoline
         //          Diesel
         //          Coal
-        //          FuelOil#1
-        //          FuelOil#2
+        //          FuelOilNo1
+        //          FuelOilNo2
         //          Propane
         //          Water
         //          Steam
@@ -4541,8 +4541,8 @@ namespace OutputReportTabular {
         //          Gasoline 6
         //          Diesel 8
         //          Coal 9
-        //          FuelOil#1 10
-        //          FuelOil#2 11
+        //          FuelOilNo1 10
+        //          FuelOilNo2 11
         //          Propane 12
         //          Water 7
         //          Steam 5
@@ -4554,8 +4554,8 @@ namespace OutputReportTabular {
         //          sourceTypeNames(3)='Gasoline'
         //          sourceTypeNames(4)='Diesel'
         //          sourceTypeNames(5)='Coal'
-        //          sourceTypeNames(6)='FuelOil#1'
-        //          sourceTypeNames(7)='FuelOil#2'
+        //          sourceTypeNames(6)='FuelOilNo1'
+        //          sourceTypeNames(7)='FuelOilNo2'
         //          sourceTypeNames(8)='Propane'
         //          sourceTypeNames(9)='PurchasedElectric'
         //          sourceTypeNames(10)='SoldElectric'
@@ -4674,8 +4674,8 @@ namespace OutputReportTabular {
         //          Gasoline
         //          Diesel
         //          Coal
-        //          FuelOil#1
-        //          FuelOil#2
+        //          FuelOilNo1
+        //          FuelOilNo2
         //          Propane
         //          Water
         //          Steam

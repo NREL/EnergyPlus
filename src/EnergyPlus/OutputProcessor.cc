@@ -1358,8 +1358,8 @@ namespace OutputProcessor {
         //         \key Electricity
         //         \key NaturalGas
         //         \key PropaneGas
-        //         \key FuelOil#1
-        //         \key FuelOil#2
+        //         \key FuelOilNo1
+        //         \key FuelOilNo2
         //         \key Coal
         //         \key Diesel
         //         \key Gasoline
@@ -1386,8 +1386,8 @@ namespace OutputProcessor {
         //         \key Electricity
         //         \key NaturalGas
         //         \key PropaneGas
-        //         \key FuelOil#1
-        //         \key FuelOil#2
+        //         \key FuelOilNo1
+        //         \key FuelOilNo2
         //         \key Coal
         //         \key Diesel
         //         \key Gasoline
@@ -8486,8 +8486,8 @@ void InitPollutionMeterReporting(OutputFiles &outputFiles, std::string const &Re
     //       Gas:Facility [J]
     //       GASOLINE:Facility [J]
     //       COAL:Facility [J]
-    //       FuelOil#1:Facility [J]
-    //       FuelOil#2:Facility [J]
+    //       FuelOilNo1:Facility [J]
+    //       FuelOilNo2:Facility [J]
     //       Propane:Facility [J]
     //       ElectricityProduced:Facility [J]
     //       Pollutant:CO2
