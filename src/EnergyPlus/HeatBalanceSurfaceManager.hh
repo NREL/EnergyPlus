@@ -91,13 +91,13 @@ namespace HeatBalanceSurfaceManager {
 
     void InitSurfaceHeatBalance(EnergyPlusData &state);
 
-    void GatherForPredefinedReport();
+    void GatherForPredefinedReport(WindowManagerData &dataWindowManager);
 
     void AllocateSurfaceHeatBalArrays();
 
     void InitThermalAndFluxHistories();
 
-    void InitSolarHeatGains();
+    void InitSolarHeatGains(WindowManagerData &dataWindowManager);
 
     void InitIntSolarDistribution();
 

@@ -613,10 +613,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
@@ -1013,10 +1013,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     SolarShading::clear_state();
 
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
@@ -1424,10 +1424,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     SolarShading::clear_state();
 
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
@@ -1794,10 +1794,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                                                           // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();

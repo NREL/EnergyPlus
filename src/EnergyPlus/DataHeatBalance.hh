@@ -66,6 +66,9 @@
 
 namespace EnergyPlus {
 
+    // Forward Declarations
+    struct EnergyPlusData;
+
 namespace DataHeatBalance {
 
     extern int MaxSolidWinLayers;                // Maximum number of solid layers in a window construction

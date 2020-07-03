@@ -1094,7 +1094,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
 
     bool localErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, localErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
     HeatBalanceManager::GetZoneData(localErrorsFound);
     EXPECT_FALSE(localErrorsFound);

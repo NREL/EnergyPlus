@@ -75,7 +75,7 @@ using namespace DataGlobals;
 
 namespace WindowManager {
 
-    std::shared_ptr<CBSDFLayer> getBSDFLayer( const Material::MaterialProperties & t_Material, const WavelengthRange t_Range )
+    std::shared_ptr<CBSDFLayer> getBSDFLayer(WindowManagerData &dataWindowManager, const Material::MaterialProperties & t_Material, const WavelengthRange t_Range )
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -96,10 +96,10 @@ namespace WindowManager {
         } else if (t_Material.Group == Shade) {
             aFactory = std::make_shared<CWCEDiffuseShadeLayerFactory>(t_Material, t_Range);
         }
-        return aFactory->getBSDFLayer();
+        return aFactory->getBSDFLayer(dataWindowManager);
     }
 
-    std::shared_ptr<CScatteringLayer> getScatteringLayer( const Material::MaterialProperties & t_Material, const WavelengthRange t_Range )
+    std::shared_ptr<CScatteringLayer> getScatteringLayer(WindowManagerData &dataWindowManager, const Material::MaterialProperties & t_Material, const WavelengthRange t_Range )
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -120,7 +120,7 @@ namespace WindowManager {
         } else if (t_Material.Group == Shade) {
             aFactory = std::make_shared<CWCEDiffuseShadeLayerFactory>(t_Material, t_Range);
         }
-        return aFactory->getLayer();
+        return aFactory->getLayer(dataWindowManager);
     }
 
     // void InitWCE_BSDFOpticalData() {
@@ -163,7 +163,7 @@ namespace WindowManager {
     // 	}
     // }
 
-    void InitWCE_SimplifiedOpticalData(OutputFiles &outputFiles)
+    void InitWCE_SimplifiedOpticalData(WindowManagerData &dataWindowManager, OutputFiles &outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -197,11 +197,11 @@ namespace WindowManager {
                         construction.TransDiff = 0.1;
 
                         auto aRange = WavelengthRange::Solar;
-                        auto aSolarLayer = getScatteringLayer(material, aRange);
+                        auto aSolarLayer = getScatteringLayer(dataWindowManager, material, aRange);
                         aWinConstSimp.pushLayer(aRange, ConstrNum, aSolarLayer);
 
                         aRange = WavelengthRange::Visible;
-                        auto aVisibleLayer = getScatteringLayer(material, aRange);
+                        auto aVisibleLayer = getScatteringLayer(dataWindowManager, material, aRange);
                         aWinConstSimp.pushLayer(aRange, ConstrNum, aVisibleLayer);
                     }
                 }
@@ -274,10 +274,10 @@ namespace WindowManager {
     {
     }
 
-    std::shared_ptr<CMaterial> CWCEMaterialFactory::getMaterial()
+    std::shared_ptr<CMaterial> CWCEMaterialFactory::getMaterial(WindowManagerData &dataWindowManager)
     {
         if (!m_Initialized) {
-            init();
+            init(dataWindowManager);
             m_Initialized = true;
         }
         return m_Material;
@@ -291,9 +291,9 @@ namespace WindowManager {
     {
     }
 
-    void CWCESpecularMaterialsFactory::init()
+    void CWCESpecularMaterialsFactory::init(WindowManagerData &dataWindowManager)
     {
-        auto aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
+        auto aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(dataWindowManager);
         std::shared_ptr<CSpectralSampleData> aSampleData = nullptr;
         if (m_MaterialProperties.GlassSpectralDataPtr > 0) {
             aSampleData = CWCESpecturmProperties::getSpectralSample(m_MaterialProperties.GlassSpectralDataPtr);
@@ -309,7 +309,7 @@ namespace WindowManager {
         auto highLambda = aRange.maxLambda();
 
         if (m_Range == WavelengthRange::Visible) {
-            auto aPhotopicResponse = CWCESpecturmProperties::getDefaultVisiblePhotopicResponse();
+            auto aPhotopicResponse = CWCESpecturmProperties::getDefaultVisiblePhotopicResponse(dataWindowManager);
             aSample->setDetectorData(aPhotopicResponse);
         }
 
@@ -326,7 +326,7 @@ namespace WindowManager {
     {
     }
 
-    void CWCEMaterialDualBandFactory::init()
+    void CWCEMaterialDualBandFactory::init(WindowManagerData &EP_UNUSED(dataWindowManager))
     {
         if (m_Range == WavelengthRange::Visible) {
             m_Material = createVisibleRangeMaterial();
@@ -539,10 +539,10 @@ namespace WindowManager {
     {
     }
 
-    std::pair<std::shared_ptr<CMaterial>, std::shared_ptr<ICellDescription>> CWCELayerFactory::init()
+    std::pair<std::shared_ptr<CMaterial>, std::shared_ptr<ICellDescription>> CWCELayerFactory::init(WindowManagerData &dataWindowManager)
     {
         createMaterialFactory();
-        auto aMaterial = m_MaterialFactory->getMaterial();
+        auto aMaterial = m_MaterialFactory->getMaterial(dataWindowManager);
         assert(aMaterial != nullptr);
         auto aCellDescription = getCellDescription();
         assert(aCellDescription != nullptr);
@@ -550,10 +550,10 @@ namespace WindowManager {
         return std::make_pair(aMaterial, aCellDescription);
     }
 
-    std::shared_ptr<CBSDFLayer> CWCELayerFactory::getBSDFLayer()
+    std::shared_ptr<CBSDFLayer> CWCELayerFactory::getBSDFLayer(WindowManagerData &dataWindowManager)
     {
         if (!m_BSDFInitialized) {
-            auto res = init();
+            auto res = init(dataWindowManager);
             auto aBSDF = std::make_shared<CBSDFHemisphere>(BSDFBasis::Full);
 
             auto aMaker = CBSDFLayerMaker(res.first, aBSDF, res.second);
@@ -563,10 +563,10 @@ namespace WindowManager {
         return m_BSDFLayer;
     }
 
-    std::shared_ptr<CScatteringLayer> CWCELayerFactory::getLayer()
+    std::shared_ptr<CScatteringLayer> CWCELayerFactory::getLayer(WindowManagerData &dataWindowManager)
     {
         if (!m_SimpleInitialized) {
-            auto res = init();
+            auto res = init(dataWindowManager);
 
             m_ScatteringLayer = std::make_shared<CScatteringLayer>(res.first, res.second);
             m_SimpleInitialized = true;
