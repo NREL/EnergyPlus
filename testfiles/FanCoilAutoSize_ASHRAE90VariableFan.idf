@@ -1836,7 +1836,7 @@ Coil:Heating:Electric,
     autosize,                !- Nominal Capacity {W}
     Zone1FanCoilCCOutletNode,!- Air Inlet Node Name
     Zone1FanCoilAirOutletNode;  !- Air Outlet Node Name
-	
+
 ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
     Zone2Equipment,          !- Zone Conditioning Equipment List Name
