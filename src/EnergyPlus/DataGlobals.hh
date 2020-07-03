@@ -149,36 +149,6 @@ namespace DataGlobals {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    struct JsonOutputStreams
-    {
-        std::unique_ptr<std::ostream> json_stream; // Internal stream used for json output
-        std::unique_ptr<std::ostream> json_TSstream_Zone;
-        std::unique_ptr<std::ostream> json_TSstream_HVAC;
-        std::unique_ptr<std::ostream> json_TSstream;
-        std::unique_ptr<std::ostream> json_HRstream;
-        std::unique_ptr<std::ostream> json_MNstream;
-        std::unique_ptr<std::ostream> json_DYstream;
-        std::unique_ptr<std::ostream> json_SMstream;
-        std::unique_ptr<std::ostream> json_YRstream;
-        std::unique_ptr<std::ostream> cbor_stream; // Internal stream used for cbor output
-        std::unique_ptr<std::ostream> cbor_TSstream_Zone;
-        std::unique_ptr<std::ostream> cbor_TSstream_HVAC;
-        std::unique_ptr<std::ostream> cbor_TSstream;
-        std::unique_ptr<std::ostream> cbor_HRstream;
-        std::unique_ptr<std::ostream> cbor_MNstream;
-        std::unique_ptr<std::ostream> cbor_DYstream;
-        std::unique_ptr<std::ostream> cbor_SMstream;
-        std::unique_ptr<std::ostream> cbor_YRstream;
-        std::unique_ptr<std::ostream> msgpack_stream; // Internal stream used for messagepack output
-        std::unique_ptr<std::ostream> msgpack_TSstream_Zone;
-        std::unique_ptr<std::ostream> msgpack_TSstream_HVAC;
-        std::unique_ptr<std::ostream> msgpack_TSstream;
-        std::unique_ptr<std::ostream> msgpack_HRstream;
-        std::unique_ptr<std::ostream> msgpack_MNstream;
-        std::unique_ptr<std::ostream> msgpack_DYstream;
-        std::unique_ptr<std::ostream> msgpack_SMstream;
-        std::unique_ptr<std::ostream> msgpack_YRstream;
-    };
 
     extern bool BeginDayFlag;           // True at the start of each day, False after first time step in day
     extern bool BeginEnvrnFlag;         // True at the start of each environment, False after first time step in environ
@@ -205,7 +175,6 @@ namespace DataGlobals {
     extern int TimeStep;                             // Counter for time steps (fractional hours)
     extern Real64 TimeStepZone;                      // Zone time step in fractional hours
     extern bool WarmupFlag;                          // True during the warmup portion of a simulation
-    extern JsonOutputStreams jsonOutputStreams;      // Internal streams used for json outputs
     extern int OutputStandardError;                  // Unit number for the standard error output file
     extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records

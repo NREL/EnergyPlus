@@ -93,7 +93,7 @@ namespace SimulationManager {
 
     void OpenOutputFiles(IOFiles &ioFiles);
 
-    void OpenOutputJsonFiles();
+    void OpenOutputJsonFiles(JsonOutputStreams &jsonOutputStreams);
 
     void CloseOutputFiles(IOFiles &ioFiles);
 

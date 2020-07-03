@@ -167,7 +167,64 @@ template <typename FileType> struct IOFileName
 using InputOutputFileName = IOFileName<InputOutputFile>;
 using InputFileName = IOFileName<InputFile>;
 
+struct JsonOutputStreams
+{
+    std::unique_ptr<std::ostream> json_stream; // Internal stream used for json output
+    std::unique_ptr<std::ostream> json_TSstream_Zone;
+    std::unique_ptr<std::ostream> json_TSstream_HVAC;
+    std::unique_ptr<std::ostream> json_TSstream;
+    std::unique_ptr<std::ostream> json_HRstream;
+    std::unique_ptr<std::ostream> json_MNstream;
+    std::unique_ptr<std::ostream> json_DYstream;
+    std::unique_ptr<std::ostream> json_SMstream;
+    std::unique_ptr<std::ostream> json_YRstream;
+    std::unique_ptr<std::ostream> cbor_stream; // Internal stream used for cbor output
+    std::unique_ptr<std::ostream> cbor_TSstream_Zone;
+    std::unique_ptr<std::ostream> cbor_TSstream_HVAC;
+    std::unique_ptr<std::ostream> cbor_TSstream;
+    std::unique_ptr<std::ostream> cbor_HRstream;
+    std::unique_ptr<std::ostream> cbor_MNstream;
+    std::unique_ptr<std::ostream> cbor_DYstream;
+    std::unique_ptr<std::ostream> cbor_SMstream;
+    std::unique_ptr<std::ostream> cbor_YRstream;
+    std::unique_ptr<std::ostream> msgpack_stream; // Internal stream used for messagepack output
+    std::unique_ptr<std::ostream> msgpack_TSstream_Zone;
+    std::unique_ptr<std::ostream> msgpack_TSstream_HVAC;
+    std::unique_ptr<std::ostream> msgpack_TSstream;
+    std::unique_ptr<std::ostream> msgpack_HRstream;
+    std::unique_ptr<std::ostream> msgpack_MNstream;
+    std::unique_ptr<std::ostream> msgpack_DYstream;
+    std::unique_ptr<std::ostream> msgpack_SMstream;
+    std::unique_ptr<std::ostream> msgpack_YRstream;
 
+    std::string outputJsonFileName;
+    std::string outputTSHvacJsonFileName;
+    std::string outputTSZoneJsonFileName;
+    std::string outputTSJsonFileName;
+    std::string outputYRJsonFileName;
+    std::string outputMNJsonFileName;
+    std::string outputDYJsonFileName;
+    std::string outputHRJsonFileName;
+    std::string outputSMJsonFileName;
+    std::string outputCborFileName;
+    std::string outputTSHvacCborFileName;
+    std::string outputTSZoneCborFileName;
+    std::string outputTSCborFileName;
+    std::string outputYRCborFileName;
+    std::string outputMNCborFileName;
+    std::string outputDYCborFileName;
+    std::string outputHRCborFileName;
+    std::string outputSMCborFileName;
+    std::string outputMsgPackFileName;
+    std::string outputTSHvacMsgPackFileName;
+    std::string outputTSZoneMsgPackFileName;
+    std::string outputTSMsgPackFileName;
+    std::string outputYRMsgPackFileName;
+    std::string outputMNMsgPackFileName;
+    std::string outputDYMsgPackFileName;
+    std::string outputHRMsgPackFileName;
+    std::string outputSMMsgPackFileName;
+};
 
 class IOFiles
 {
@@ -232,6 +289,8 @@ public:
 
     static IOFiles &getSingleton();
     static void setSingleton(IOFiles *newSingleton) noexcept;
+
+    JsonOutputStreams json; // Internal streams used for json outputs
 
 private:
     static IOFiles *&getSingletonInternal();

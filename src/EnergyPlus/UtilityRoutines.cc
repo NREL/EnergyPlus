@@ -775,14 +775,14 @@ namespace UtilityRoutines {
         }
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles();
+        SimulationManager::OpenOutputJsonFiles(state.files.json);
 
         if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports();
+            ResultsFramework::OutputSchema->writeTimeSeriesReports(state.files.json);
         }
 
         if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport();
+            ResultsFramework::OutputSchema->WriteReport(state.files.json);
         }
 
 #ifdef EP_Detailed_Timings
@@ -1034,14 +1034,14 @@ namespace UtilityRoutines {
         }
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles();
+        SimulationManager::OpenOutputJsonFiles(ioFiles.json);
 
         if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports();
+            ResultsFramework::OutputSchema->writeTimeSeriesReports(ioFiles.json);
         }
 
         if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport();
+            ResultsFramework::OutputSchema->WriteReport(ioFiles.json);
         }
 
 #ifdef EP_Detailed_Timings

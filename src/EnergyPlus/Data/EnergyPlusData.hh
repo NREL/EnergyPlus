@@ -70,6 +70,7 @@
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -81,8 +82,8 @@
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 namespace EnergyPlus {
 
@@ -124,6 +125,7 @@ namespace EnergyPlus {
             // todo, try to eliminate the need for the singleton
             IOFiles::setSingleton(&files);
         }
+
 
         // Cannot safely copy or delete this until we eradicate all remaining
         // calls to IOFiles::getSingleton and IOFiles::setSingleton

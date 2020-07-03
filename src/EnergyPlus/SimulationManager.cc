@@ -1603,19 +1603,19 @@ namespace SimulationManager {
         return result;
     }
 
-    void OpenOutputJsonFiles()
+    void OpenOutputJsonFiles(JsonOutputStreams &jsonOutputStreams)
     {
 
         //// timeSeriesAndTabularEnabled() will return true if only timeSeriesAndTabular is set, that's the only time we write to that file
         if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
             if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                jsonOutputStreams.json_stream = OpenStreamFile(DataStringGlobals::outputJsonFileName);
+                jsonOutputStreams.json_stream = OpenStreamFile(jsonOutputStreams.outputJsonFileName);
             }
             if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                jsonOutputStreams.cbor_stream = OpenStreamFile(DataStringGlobals::outputCborFileName);
+                jsonOutputStreams.cbor_stream = OpenStreamFile(jsonOutputStreams.outputCborFileName);
             }
             if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                jsonOutputStreams.msgpack_stream = OpenStreamFile(DataStringGlobals::outputMsgPackFileName);
+                jsonOutputStreams.msgpack_stream = OpenStreamFile(jsonOutputStreams.outputMsgPackFileName);
             }
         }
         //// timeSeriesEnabled() will return true if timeSeries is set, so we can write meter reports
@@ -1624,13 +1624,13 @@ namespace SimulationManager {
             if (ResultsFramework::OutputSchema->RIDetailedZoneTSData.rDataFrameEnabled() ||
                 ResultsFramework::OutputSchema->RIDetailedZoneTSData.iDataFrameEnabled()) {
                 if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream_Zone = OpenStreamFile(DataStringGlobals::outputTSZoneJsonFileName);
+                    jsonOutputStreams.json_TSstream_Zone = OpenStreamFile(jsonOutputStreams.outputTSZoneJsonFileName);
                 }
                 if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream_Zone = OpenStreamFile(DataStringGlobals::outputTSZoneCborFileName);
+                    jsonOutputStreams.cbor_TSstream_Zone = OpenStreamFile(jsonOutputStreams.outputTSZoneCborFileName);
                 }
                 if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream_Zone = OpenStreamFile(DataStringGlobals::outputTSZoneMsgPackFileName);
+                    jsonOutputStreams.msgpack_TSstream_Zone = OpenStreamFile(jsonOutputStreams.outputTSZoneMsgPackFileName);
                 }
             }
 
@@ -1638,13 +1638,13 @@ namespace SimulationManager {
             if (ResultsFramework::OutputSchema->RIDetailedHVACTSData.iDataFrameEnabled() ||
                 ResultsFramework::OutputSchema->RIDetailedHVACTSData.rDataFrameEnabled()) {
                 if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream_HVAC = OpenStreamFile(DataStringGlobals::outputTSHvacJsonFileName);
+                    jsonOutputStreams.json_TSstream_HVAC = OpenStreamFile(jsonOutputStreams.outputTSHvacJsonFileName);
                 }
                 if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream_HVAC = OpenStreamFile(DataStringGlobals::outputTSHvacCborFileName);
+                    jsonOutputStreams.cbor_TSstream_HVAC = OpenStreamFile(jsonOutputStreams.outputTSHvacCborFileName);
                 }
                 if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream_HVAC = OpenStreamFile(DataStringGlobals::outputTSHvacMsgPackFileName);
+                    jsonOutputStreams.msgpack_TSstream_HVAC = OpenStreamFile(jsonOutputStreams.outputTSHvacMsgPackFileName);
                 }
             }
 
@@ -1652,13 +1652,13 @@ namespace SimulationManager {
             if (ResultsFramework::OutputSchema->RITimestepTSData.iDataFrameEnabled() ||
                 ResultsFramework::OutputSchema->RITimestepTSData.rDataFrameEnabled()) {
                 if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream = OpenStreamFile(DataStringGlobals::outputTSJsonFileName);
+                    jsonOutputStreams.json_TSstream = OpenStreamFile(jsonOutputStreams.outputTSJsonFileName);
                 }
                 if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream = OpenStreamFile(DataStringGlobals::outputTSCborFileName);
+                    jsonOutputStreams.cbor_TSstream = OpenStreamFile(jsonOutputStreams.outputTSCborFileName);
                 }
                 if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream = OpenStreamFile(DataStringGlobals::outputTSMsgPackFileName);
+                    jsonOutputStreams.msgpack_TSstream = OpenStreamFile(jsonOutputStreams.outputTSMsgPackFileName);
                 }
             }
 
@@ -1666,13 +1666,13 @@ namespace SimulationManager {
             if (ResultsFramework::OutputSchema->RIHourlyTSData.iDataFrameEnabled() ||
                 ResultsFramework::OutputSchema->RIHourlyTSData.rDataFrameEnabled()) {
                 if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    jsonOutputStreams.json_HRstream = OpenStreamFile(DataStringGlobals::outputHRJsonFileName);
+                    jsonOutputStreams.json_HRstream = OpenStreamFile(jsonOutputStreams.outputHRJsonFileName);
                 }
                 if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    jsonOutputStreams.cbor_HRstream = OpenStreamFile(DataStringGlobals::outputHRCborFileName);
+                    jsonOutputStreams.cbor_HRstream = OpenStreamFile(jsonOutputStreams.outputHRCborFileName);
                 }
                 if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_HRstream = OpenStreamFile(DataStringGlobals::outputHRMsgPackFileName);
+                    jsonOutputStreams.msgpack_HRstream = OpenStreamFile(jsonOutputStreams.outputHRMsgPackFileName);
                 }
             }
 
@@ -1680,13 +1680,13 @@ namespace SimulationManager {
             if (ResultsFramework::OutputSchema->RIDailyTSData.iDataFrameEnabled() ||
                 ResultsFramework::OutputSchema->RIDailyTSData.rDataFrameEnabled()) {
                 if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    jsonOutputStreams.json_DYstream = OpenStreamFile(DataStringGlobals::outputDYJsonFileName);
+                    jsonOutputStreams.json_DYstream = OpenStreamFile(jsonOutputStreams.outputDYJsonFileName);
                 }
                 if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    jsonOutputStreams.cbor_DYstream = OpenStreamFile(DataStringGlobals::outputDYCborFileName);
+                    jsonOutputStreams.cbor_DYstream = OpenStreamFile(jsonOutputStreams.outputDYCborFileName);
                 }
                 if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_DYstream = OpenStreamFile(DataStringGlobals::outputDYMsgPackFileName);
+                    jsonOutputStreams.msgpack_DYstream = OpenStreamFile(jsonOutputStreams.outputDYMsgPackFileName);
                 }
             }
 
@@ -1694,13 +1694,13 @@ namespace SimulationManager {
             if (ResultsFramework::OutputSchema->RIMonthlyTSData.iDataFrameEnabled() ||
                 ResultsFramework::OutputSchema->RIMonthlyTSData.rDataFrameEnabled()) {
                 if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    jsonOutputStreams.json_MNstream = OpenStreamFile(DataStringGlobals::outputMNJsonFileName);
+                    jsonOutputStreams.json_MNstream = OpenStreamFile(jsonOutputStreams.outputMNJsonFileName);
                 }
                 if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    jsonOutputStreams.cbor_MNstream = OpenStreamFile(DataStringGlobals::outputMNCborFileName);
+                    jsonOutputStreams.cbor_MNstream = OpenStreamFile(jsonOutputStreams.outputMNCborFileName);
                 }
                 if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_MNstream = OpenStreamFile(DataStringGlobals::outputMNMsgPackFileName);
+                    jsonOutputStreams.msgpack_MNstream = OpenStreamFile(jsonOutputStreams.outputMNMsgPackFileName);
                 }
             }
 
@@ -1708,13 +1708,13 @@ namespace SimulationManager {
             if (ResultsFramework::OutputSchema->RIRunPeriodTSData.iDataFrameEnabled() ||
                 ResultsFramework::OutputSchema->RIRunPeriodTSData.rDataFrameEnabled()) {
                 if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    jsonOutputStreams.json_SMstream = OpenStreamFile(DataStringGlobals::outputSMJsonFileName);
+                    jsonOutputStreams.json_SMstream = OpenStreamFile(jsonOutputStreams.outputSMJsonFileName);
                 }
                 if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    jsonOutputStreams.cbor_SMstream = OpenStreamFile(DataStringGlobals::outputSMCborFileName);
+                    jsonOutputStreams.cbor_SMstream = OpenStreamFile(jsonOutputStreams.outputSMCborFileName);
                 }
                 if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_SMstream = OpenStreamFile(DataStringGlobals::outputSMMsgPackFileName);
+                    jsonOutputStreams.msgpack_SMstream = OpenStreamFile(jsonOutputStreams.outputSMMsgPackFileName);
                 }
             }
         }

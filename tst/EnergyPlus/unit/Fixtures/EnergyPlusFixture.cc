@@ -106,7 +106,7 @@ void EnergyPlusFixture::SetUp()
     this->json_stream = new std::ostringstream;
 
     DataGlobals::err_stream = this->err_stream.get();
-    DataGlobals::jsonOutputStreams.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
+    state.files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
 
     m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     m_redirect_cout = std::unique_ptr<RedirectCout>(new RedirectCout(m_cout_buffer));

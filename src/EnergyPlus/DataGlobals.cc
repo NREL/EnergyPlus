@@ -196,7 +196,6 @@ namespace DataGlobals {
     int TimeStep(0);                   // Counter for time steps (fractional hours)
     Real64 TimeStepZone(0.0);          // Zone time step in fractional hours
     bool WarmupFlag(false);            // True during the warmup portion of a simulation
-    JsonOutputStreams jsonOutputStreams;
     int OutputStandardError(0);                      // Unit number for the standard error output file
     std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
