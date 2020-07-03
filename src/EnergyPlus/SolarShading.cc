@@ -59,7 +59,9 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDaylightingDevices.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -8871,7 +8873,7 @@ namespace SolarShading {
         }
     }
 
-    void CalcInteriorSolarDistributionWCE()
+    void CalcInteriorSolarDistributionWCE(WindowManagerData &dataWindowManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8891,12 +8893,12 @@ namespace SolarShading {
 
         CalcAborbedOnExteriorOpaqueSurfaces();
 
-        if (winOpticalModel->isSimplifiedModel()) {
-            CalcInteriorSolarDistributionWCESimple();
+        if (dataWindowManager.winOpticalModel->isSimplifiedModel()) {
+            CalcInteriorSolarDistributionWCESimple(dataWindowManager);
         } // else for built in BSDF (possible future implementation)
     }
 
-    void CalcInteriorSolarDistributionWCESimple()
+    void CalcInteriorSolarDistributionWCESimple(WindowManagerData &dataWindowManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8953,7 +8955,7 @@ namespace SolarShading {
 
                 int ConstrNum = Surface(SurfNum2).Construction;
                 if (window.ShadedConstruction > 0) ConstrNum = window.ShadedConstruction;
-                auto aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(WavelengthRange::Solar, ConstrNum);
+                auto aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(dataWindowManager, WavelengthRange::Solar, ConstrNum);
 
                 ///////////////////////////////////////////////
                 // Solar absorbed in window layers

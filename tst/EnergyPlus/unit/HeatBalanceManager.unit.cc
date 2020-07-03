@@ -393,7 +393,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(ZoneAirMassFlow.BalanceMixing);
@@ -456,7 +456,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     // call to process input
     ProcessScheduleInput(state.outputFiles);
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -603,7 +603,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -663,7 +663,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     NumOfZones = 2;
     ZoneReOrder.allocate(NumOfZones);
@@ -1207,7 +1207,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 
     ScheduleManager::ProcessScheduleInput(state.outputFiles);
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1272,7 +1272,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_DOUBLE_EQ(0.012611481326656135, DataLoopNode::Node(1).HumRat);
     EXPECT_DOUBLE_EQ(57247.660939392081, DataLoopNode::Node(1).Enthalpy);
 
-    InitHeatBalance(state.outputFiles);
+    InitHeatBalance(state.dataWindowManager, state.outputFiles);
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
@@ -1290,7 +1290,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataEnvironment::WindSpeed = 1.5;
     DataEnvironment::WindDir = 90.0;
 
-    InitHeatBalance(state.outputFiles);
+    InitHeatBalance(state.dataWindowManager, state.outputFiles);
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
@@ -1327,7 +1327,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "REGULAFALSITHENBISECTION");
 }
@@ -1357,7 +1357,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi");
 }
@@ -1615,7 +1615,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1642,7 +1642,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1668,7 +1668,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_TRUE(DataHeatBalance::AnyEMPD);
@@ -1691,7 +1691,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1714,7 +1714,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -2039,7 +2039,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisec
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "BISECTION");
 }

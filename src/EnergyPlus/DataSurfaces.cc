@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -822,7 +823,7 @@ namespace DataSurfaces {
         return temperature;
     }
 
-    Real64 SurfaceData::getOutsideIR(const int t_SurfNum) const
+    Real64 SurfaceData::getOutsideIR(WindowManagerData &dataWindowManager, const int t_SurfNum) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -838,8 +839,8 @@ namespace DataSurfaces {
                     QSteamBaseboardSurf(ExtBoundCond) + QElecBaseboardSurf(ExtBoundCond);
         } else {
             Real64 tout = getOutsideAirTemperature(t_SurfNum) + KelvinConv;
-            value = sigma * pow_4(tout);
-            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
+            value = dataWindowManager.sigma * pow_4(tout);
+            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * dataWindowManager.sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
                     ViewFactorGroundIR * value;
         }
         return value;
