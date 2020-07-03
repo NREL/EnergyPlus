@@ -64,7 +64,7 @@ void CoolingWaterDesAirInletHumRatSizer::initializeWithinEP(EnergyPlusData &stat
                                                             bool const printWarningFlag)
 {
     BaseSizer::initializeWithinEP(state, _compType, _compName, printWarningFlag);
-    this->sizingString = "Design Inlet Air Humidity Ratio";
+    this->sizingString = "Design Inlet Air Humidity Ratio [kgWater/kgDryAir]";
     this->dataDesInletAirHumRat = DataSizing::DataDesInletAirHumRat;
     this->dataFlowUsedForSizing = DataSizing::DataFlowUsedForSizing;
 }

@@ -2149,7 +2149,6 @@ namespace WaterCoils {
         bool LoopErrorsFound = false;
         int PltSizCoolNum = 0;
         int PltSizHeatNum = 0;
-        int PltSizNum = 0;
         Real64 DesCoilAirFlow = 0.0;
         Real64 DesCoilExitTemp = 0.0;
         Real64 CpAirStd = PsyCpAirFnW(0.0);

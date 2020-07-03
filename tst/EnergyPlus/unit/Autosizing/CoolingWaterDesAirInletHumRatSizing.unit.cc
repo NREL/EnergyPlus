@@ -87,7 +87,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(0.009, sizedValue, 0.001); // hard-sized value
-    sizedValue = 0.0;                      // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     std::string eiooutput = std::string("");
 
@@ -99,7 +99,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(0.009, sizedValue, 0.001); // hard-sized value
-    sizedValue = 0.0;                      // reset for next test
+    sizer.autoSizedValue = 0.0;            // reset for next test
 
     eiooutput =
         std::string("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
@@ -156,7 +156,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.008, sizedValue, 0.0001);
-    sizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 5 - Zone Equipment, Zone Eq Fan Coil
     DataSizing::TermUnitIU = false;
@@ -171,7 +171,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.007, sizedValue, 0.0001);
-    sizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 6 - Zone Equipment w/ 10% OA
     DataSizing::ZoneEqSizing(1).OAVolFlow =
@@ -186,7 +186,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     Real64 mixedHumRat = 0.9 * 0.007 + 0.1 * 0.004; // 90% of ZoneHumRatAtCoolPeak, 10% of OutHumRatAtCoolPeak
     EXPECT_NEAR(mixedHumRat, sizedValue, 0.0001);
-    sizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 7 - Zone Equipment w/ AT Mixer at 20% of design flow
     DataSizing::ZoneEqSizing(1).ATMixerCoolPriHumRat = 0.001;
@@ -202,7 +202,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(mixedHumRat2, sizedValue, 0.00001);
-    sizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
     DataSizing::ZoneEqFanCoil = false;
     // reset eio stream
@@ -230,7 +230,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(0.012, sizedValue, 0.0001); // hard-sized value
-    sizedValue = 0.0;                       // reset for next test
+    sizer.autoSizedValue = 0.0;             // reset for next test
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 9 - Airloop Equipment - no OA coils
@@ -254,7 +254,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.0105, sizedValue, 0.01);
-    sizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
     eiooutput =
@@ -277,7 +277,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.010, sizedValue, 0.00001);
-    sizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 11 - Airloop Equipment - 1 OA coil use mixture of outdoor and return hum rat since DataFlowUsedForSizing > 0
     EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow = 0.01;
@@ -292,7 +292,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.0145, sizedValue, 0.00001);
-    sizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
     // OUTDOOR AIR SYSTEM EQUIPMENT TESTING
     // Test 12 - Outdoor Air System Equipment, no DOAS air loop
@@ -311,7 +311,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     Real64 outAirHumRat = EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).OutHumRatAtCoolPeak;
     EXPECT_NEAR(outAirHumRat, sizedValue, 0.00001);
-    sizedValue = 0.0; // reset for next test
+    sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 13 - Outdoor Air System Equipment with DOAS system
     EnergyPlus::DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.0;
@@ -329,7 +329,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.0036, sizedValue, 0.00001); // DOAS system hum rat
-    sizedValue = 0.0;                         // reset for next test
+    sizer.autoSizedValue = 0.0;               // reset for next test
 
     // reset eio stream
     has_eio_output(true);
@@ -342,10 +342,10 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", true);
     sizedValue = sizer.size(state, inputValue, errorsFound);
-    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
+    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // cumulative of previous calls
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(inputValue, sizedValue, 0.01); // hard-sized value
-    sizedValue = 0.0;                          // reset for next test
+    sizer.autoSizedValue = 0.0;                // reset for next test
 
     EXPECT_FALSE(errorsFound);
 

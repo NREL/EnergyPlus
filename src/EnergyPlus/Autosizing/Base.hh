@@ -48,8 +48,6 @@
 #ifndef Base_hh_INCLUDED
 #define Base_hh_INCLUDED
 
-#include <vector>
-
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataSizing.hh>
