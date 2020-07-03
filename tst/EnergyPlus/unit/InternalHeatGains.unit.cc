@@ -176,7 +176,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
     std::string const error_string = delimited_string(
         {"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
          "   ** Severe  ** GetInternalHeatGains: OtherEquipment=\"OTHEREQ1\", Design Level is not allowed to be negative",
-         "   **   ~~~   ** ... when a fuel type of FuelOil#1 is specified.",
+         "   **   ~~~   ** ... when a fuel type of FuelOilNo1 is specified.",
          "   **  Fatal  ** GetInternalHeatGains: Errors found in Getting Internal Gains Input, Program Stopped",
          "   ...Summary of Errors that led to program termination:", "   ..... Reference severe error count=1",
          "   ..... Last severe error=GetInternalHeatGains: OtherEquipment=\"OTHEREQ1\", Design Level is not allowed to be negative"});

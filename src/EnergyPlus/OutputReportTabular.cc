@@ -2217,8 +2217,8 @@ namespace OutputReportTabular {
             resourceTypeNames(7) = "Water";
             resourceTypeNames(8) = "Diesel";
             resourceTypeNames(9) = "Coal";
-            resourceTypeNames(10) = "FuelOil#1";
-            resourceTypeNames(11) = "FuelOil#2";
+            resourceTypeNames(10) = "FuelOilNo1";
+            resourceTypeNames(11) = "FuelOilNo2";
             resourceTypeNames(12) = "Propane";
             resourceTypeNames(13) = "OtherFuel1";
             resourceTypeNames(14) = "OtherFuel2";
@@ -2228,8 +2228,8 @@ namespace OutputReportTabular {
             sourceTypeNames(3) = "Gasoline";
             sourceTypeNames(4) = "Diesel";
             sourceTypeNames(5) = "Coal";
-            sourceTypeNames(6) = "FuelOil#1";
-            sourceTypeNames(7) = "FuelOil#2";
+            sourceTypeNames(6) = "FuelOilNo1";
+            sourceTypeNames(7) = "FuelOilNo2";
             sourceTypeNames(8) = "Propane";
             sourceTypeNames(9) = "PurchasedElectric";
             sourceTypeNames(10) = "SoldElectric";
@@ -2678,10 +2678,10 @@ namespace OutputReportTabular {
             curReport = AddMonthlyReport("EnergyConsumptionDieselFuelOilMonthly", 2);
             AddMonthlyFieldSetInput(curReport, "Diesel:Facility", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Diesel:Facility", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "FuelOil#1:Facility", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "FuelOil#1:Facility", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "FuelOil#2:Facility", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "FuelOil#2:Facility", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "FuelOilNo1:Facility", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "FuelOilNo1:Facility", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "FuelOilNo2:Facility", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "FuelOilNo2:Facility", "", aggTypeMaximum);
         }
         if (namedMonthly(10).show) {
             curReport = AddMonthlyReport("EnergyConsumptionDistrictHeatingCoolingMonthly", 2);
@@ -2740,16 +2740,16 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(16).show) {
             curReport = AddMonthlyReport("EndUseEnergyConsumptionFuelOilMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOil#1", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOil#1", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:FuelOil#1", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOil#1", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOil#1", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOil#2", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOil#2", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:FuelOil#2", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOil#2", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOil#2", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOilNo1", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOilNo1", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Heating:FuelOilNo1", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOilNo1", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOilNo1", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOilNo2", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOilNo2", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Heating:FuelOilNo2", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOilNo2", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOilNo2", "", aggTypeSumOrAvg);
         }
         if (namedMonthly(17).show) {
             curReport = AddMonthlyReport("EndUseEnergyConsumptionCoalMonthly", 2);
@@ -2838,16 +2838,16 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(26).show) {
             curReport = AddMonthlyReport("PeakEnergyEndUseFuelOilMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOil#1", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOil#1", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:FuelOil#1", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOil#1", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOil#1", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOil#2", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOil#2", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:FuelOil#2", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOil#2", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOil#2", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOilNo1", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOilNo1", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Heating:FuelOilNo1", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOilNo1", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOilNo1", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOilNo2", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOilNo2", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Heating:FuelOilNo2", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOilNo2", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOilNo2", "", aggTypeMaximum);
         }
         if (namedMonthly(27).show) {
             curReport = AddMonthlyReport("PeakEnergyEndUseCoalMonthly", 2);
@@ -3317,7 +3317,7 @@ namespace OutputReportTabular {
             ffSchedIndex(2) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("FuelOil#2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOilNo2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil2 = curSourceFactor;
             fuelfactorsused(7) = true;
@@ -3330,7 +3330,7 @@ namespace OutputReportTabular {
             ffSchedIndex(11) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("FuelOil#1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOilNo1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil1 = curSourceFactor;
             fuelfactorsused(6) = true;

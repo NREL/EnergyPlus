@@ -3302,9 +3302,9 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "COAL") {
                             ResourceTypeString = "Coal";
                         } else if (SELECT_CASE_var == "FUELOILNO1") {
-                            ResourceTypeString = "FuelOil#1";
+                            ResourceTypeString = "FuelOilNo1";
                         } else if (SELECT_CASE_var == "FUELOILNO2") {
-                            ResourceTypeString = "FuelOil#2";
+                            ResourceTypeString = "FuelOilNo2";
                         } else if (SELECT_CASE_var == "OTHERFUEL1") {
                             ResourceTypeString = "OtherFuel1";
                         } else if (SELECT_CASE_var == "OTHERFUEL2") {

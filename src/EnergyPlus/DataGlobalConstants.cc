@@ -123,11 +123,11 @@ namespace DataGlobalConstants {
     std::string const cRT_Coal("Coal");
     std::string const cRT_CoalUC("COAL");
     int const iRT_Coal(1005);
-    std::string const cRT_FuelOil_1("FuelOil#1");
-    std::string const cRT_FuelOil_1UC("FUELOIL#1");
+    std::string const cRT_FuelOil_1("FuelOilNo1");
+    std::string const cRT_FuelOil_1UC("FUELOILNO1");
     int const iRT_FuelOil_1(1006);
-    std::string const cRT_FuelOil_2("FuelOil#2");
-    std::string const cRT_FuelOil_2UC("FUELOIL#2");
+    std::string const cRT_FuelOil_2("FuelOilNo2");
+    std::string const cRT_FuelOil_2UC("FUELOILNO2");
     int const iRT_FuelOil_2(1007);
     std::string const cRT_Propane("Propane");
     std::string const cRT_PropaneUC("PROPANE");
@@ -357,10 +357,10 @@ namespace DataGlobalConstants {
             } else if (SELECT_CASE_var == "COAL") {
                 ResourceTypeNum = iRT_Coal;
 
-            } else if ((SELECT_CASE_var == "FUELOILNO1") || (SELECT_CASE_var == "FUELOIL#1")) {
+            } else if ((SELECT_CASE_var == "FUELOILNO1") || (SELECT_CASE_var == "FuelOilNo1")) {
                 ResourceTypeNum = iRT_FuelOil_1;
 
-            } else if ((SELECT_CASE_var == "FUELOILNO2") || (SELECT_CASE_var == "FUELOIL#2")) {
+            } else if ((SELECT_CASE_var == "FUELOILNO2") || (SELECT_CASE_var == "FuelOilNo2")) {
                 ResourceTypeNum = iRT_FuelOil_2;
 
             } else if (SELECT_CASE_var == "PROPANE") {
@@ -522,10 +522,10 @@ namespace DataGlobalConstants {
                 ResourceTypeChar = "Coal";
 
             } else if (SELECT_CASE_var == iRT_FuelOil_1) {
-                ResourceTypeChar = "FuelOil#1";
+                ResourceTypeChar = "FuelOilNo1";
 
             } else if (SELECT_CASE_var == iRT_FuelOil_2) {
-                ResourceTypeChar = "FuelOil#2";
+                ResourceTypeChar = "FuelOilNo2";
 
             } else if (SELECT_CASE_var == iRT_Propane) {
                 ResourceTypeChar = "Propane";

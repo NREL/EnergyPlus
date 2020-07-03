@@ -559,10 +559,10 @@ namespace PluginManagement {
                         sResourceType = "Diesel";
                     } else if (resourceType == "COAL") {
                         sResourceType = "Coal";
-                    } else if (resourceType == "FUELOIL#1") {
-                        sResourceType = "FuelOil#1";
-                    } else if (resourceType == "FUELOIL#2") {
-                        sResourceType = "FuelOil#2";
+                    } else if (resourceType == "FUELOILNO1") {
+                        sResourceType = "FuelOilNo1";
+                    } else if (resourceType == "FUELOILNO2") {
+                        sResourceType = "FuelOilNo2";
                     } else if (resourceType == "OTHERFUEL1") {
                         sResourceType = "OtherFuel1";
                     } else if (resourceType == "OTHERFUEL2") {

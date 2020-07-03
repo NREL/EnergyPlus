@@ -2343,10 +2343,10 @@ namespace WaterThermalTanks {
                     Tank.FuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.FuelType = "FuelOil#1";
+                    Tank.FuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.FuelType = "FuelOil#2";
+                    Tank.FuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.FuelType = "Propane";
@@ -2429,10 +2429,10 @@ namespace WaterThermalTanks {
                     Tank.OffCycParaFuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.OffCycParaFuelType = "FuelOil#1";
+                    Tank.OffCycParaFuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.OffCycParaFuelType = "FuelOil#2";
+                    Tank.OffCycParaFuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OffCycParaFuelType = "Propane";
@@ -2484,10 +2484,10 @@ namespace WaterThermalTanks {
                     Tank.OnCycParaFuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.OnCycParaFuelType = "FuelOil#1";
+                    Tank.OnCycParaFuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.OnCycParaFuelType = "FuelOil#2";
+                    Tank.OnCycParaFuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OnCycParaFuelType = "Propane";
@@ -2934,10 +2934,10 @@ namespace WaterThermalTanks {
                     Tank.FuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.FuelType = "FuelOil#1";
+                    Tank.FuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.FuelType = "FuelOil#2";
+                    Tank.FuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.FuelType = "Propane";
@@ -2995,10 +2995,10 @@ namespace WaterThermalTanks {
                     Tank.OffCycParaFuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.OffCycParaFuelType = "FuelOil#1";
+                    Tank.OffCycParaFuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.OffCycParaFuelType = "FuelOil#2";
+                    Tank.OffCycParaFuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OffCycParaFuelType = "Propane";
@@ -3051,10 +3051,10 @@ namespace WaterThermalTanks {
                     Tank.OnCycParaFuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.OnCycParaFuelType = "FuelOil#1";
+                    Tank.OnCycParaFuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.OnCycParaFuelType = "FuelOil#2";
+                    Tank.OnCycParaFuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OnCycParaFuelType = "Propane";
@@ -10486,9 +10486,9 @@ namespace WaterThermalTanks {
                     FuelTypeIsLikeGas = true;
                 } else if (UtilityRoutines::SameString(this->FuelType, "Coal")) {
                     FuelTypeIsLikeGas = true;
-                } else if (UtilityRoutines::SameString(this->FuelType, "FuelOil#1")) {
+                } else if (UtilityRoutines::SameString(this->FuelType, "FuelOilNo1")) {
                     FuelTypeIsLikeGas = true;
-                } else if (UtilityRoutines::SameString(this->FuelType, "FuelOil#2")) {
+                } else if (UtilityRoutines::SameString(this->FuelType, "FuelOilNo2")) {
                     FuelTypeIsLikeGas = true;
                 } else if (UtilityRoutines::SameString(this->FuelType, "Propane")) {
                     FuelTypeIsLikeGas = true;
@@ -11182,9 +11182,9 @@ namespace WaterThermalTanks {
                         FuelTypeIsLikeGas = true;
                     } else if (UtilityRoutines::SameString(this->FuelType, "Coal")) {
                         FuelTypeIsLikeGas = true;
-                    } else if (UtilityRoutines::SameString(this->FuelType, "FuelOil#1")) {
+                    } else if (UtilityRoutines::SameString(this->FuelType, "FuelOilNo1")) {
                         FuelTypeIsLikeGas = true;
-                    } else if (UtilityRoutines::SameString(this->FuelType, "FuelOil#2")) {
+                    } else if (UtilityRoutines::SameString(this->FuelType, "FuelOilNo2")) {
                         FuelTypeIsLikeGas = true;
                     } else if (UtilityRoutines::SameString(this->FuelType, "Propane")) {
                         FuelTypeIsLikeGas = true;

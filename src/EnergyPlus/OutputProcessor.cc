@@ -1921,11 +1921,11 @@ namespace OutputProcessor {
             } else if (meterType == "COAL") {
                 OutResourceType = "Coal";
 
-            } else if (meterType == "FUELOIL#1") {
-                OutResourceType = "FuelOil#1";
+            } else if (meterType == "FUELOILNO1") {
+                OutResourceType = "FuelOilNo1";
 
-            } else if (meterType == "FUELOIL#2") {
-                OutResourceType = "FuelOil#2";
+            } else if (meterType == "FUELOILNO2") {
+                OutResourceType = "FuelOilNo2";
 
             } else if (meterType == "PROPANE" || meterType == "PROPANEGAS") {
                 OutResourceType = "Propane";
@@ -2478,11 +2478,11 @@ namespace OutputProcessor {
             } else if (endUseMeter == "NATURALGASEMISSIONS") {
                 EndUse = "NaturalGasEmissions";
 
-            } else if (endUseMeter == "FUELOIL#1EMISSIONS") {
-                EndUse = "FuelOil#1Emissions";
+            } else if (endUseMeter == "FUELOILNO1EMISSIONS") {
+                EndUse = "FuelOilNo1Emissions";
 
-            } else if (endUseMeter == "FUELOIL#2EMISSIONS") {
-                EndUse = "FuelOil#2Emissions";
+            } else if (endUseMeter == "FUELOILNO2EMISSIONS") {
+                EndUse = "FuelOilNo2Emissions";
 
             } else if (endUseMeter == "COALEMISSIONS") {
                 EndUse = "CoalEmissions";
@@ -8521,8 +8521,8 @@ void InitPollutionMeterReporting(OutputFiles &outputFiles, std::string const &Re
                                                  "Gas:Facility",
                                                  "GASOLINE:Facility",
                                                  "COAL:Facility",
-                                                 "FuelOil#1:Facility",
-                                                 "FuelOil#2:Facility",
+                                                 "FuelOilNo1:Facility",
+                                                 "FuelOilNo2:Facility",
                                                  "Propane:Facility",
                                                  "ElectricityProduced:Facility",
                                                  "Steam:Facility",
