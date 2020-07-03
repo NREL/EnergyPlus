@@ -61,6 +61,9 @@ namespace EnergyPlus {
     struct ConvectionCoefficientsData;
     struct ZoneTempPredictorCorrectorData;
 
+    // Forward Declarations
+    struct EnergyPlusData;
+
 namespace LowTempRadiantSystem {
 
     // Using/Aliasing
@@ -138,7 +141,7 @@ namespace LowTempRadiantSystem {
 
     struct RadiantSystemBaseData
     {
-    // Members
+        // Members
         std::string Name;                // name of hydronic radiant system
         std::string SchedName;           // availability schedule
         int SchedPtr;                    // index to schedule
@@ -169,16 +172,14 @@ namespace LowTempRadiantSystem {
         LowTempRadiantSetpointTypes processRadiantSystemSetpointInput(std::string const& controlInput,
                                                                       std::string const& controlInputField
         );
-        
+
         Real64 setRadiantSystemControlTemperature();
 
         Real64 calculateOperationalFraction(Real64 const offTemperature, Real64 const controlTemperature, Real64 const throttlingRange);
 
-        Real64 setOffTemperatureLowTemperatureRadiantSystem(int const scheduleIndex, Real64 const throttlingRange);
+        virtual void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet) = 0;
 
-        virtual void calculateLowTemperatureRadiantSystem(ConvectionCoefficientsData &dataConvectionCoefficients,
-                                                          ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
-                                                          Real64 &LoadMet) = 0;
+        Real64 setOffTemperatureLowTemperatureRadiantSystem(int const scheduleIndex, Real64 const throttlingRange);
 
         void updateLowTemperatureRadiantSystemSurfaces();
 
@@ -280,13 +281,9 @@ namespace LowTempRadiantSystem {
             {
             }
 
-        void calculateLowTemperatureRadiantSystem(ConvectionCoefficientsData &dataConvectionCoefficients,
-                                                  ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
-                                                  Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet);
 
-        void calculateLowTemperatureRadiantSystemComponents(ConvectionCoefficientsData &dataConvectionCoefficients,
-                                                            ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
-                                                            Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystemComponents(EnergyPlusData &state, Real64 &LoadMet);
 
         void updateLowTemperatureRadiantSystem();
 
@@ -354,13 +351,9 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        void calculateLowTemperatureRadiantSystem(ConvectionCoefficientsData &dataConvectionCoefficients,
-                                                  ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
-                                                  Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet);
 
-        void calculateLowTemperatureRadiantSystemComponents(ConvectionCoefficientsData &dataConvectionCoefficients,
-                                                            ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
-                                                            int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
+        void calculateLowTemperatureRadiantSystemComponents(EnergyPlusData &state, int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
                                                             bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
                                                             Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
         );
@@ -394,9 +387,7 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        void calculateLowTemperatureRadiantSystem(ConvectionCoefficientsData &dataConvectionCoefficients,
-                                                  ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
-                                                  Real64 &LoadMet);
+        void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet);
 
         void updateLowTemperatureRadiantSystem();
 

@@ -61,6 +61,9 @@ namespace EnergyPlus {
     struct ConvectionCoefficientsData;
     struct ZoneTempPredictorCorrectorData;
 
+    // Forward Declarations
+    struct EnergyPlusData;
+
 namespace ElectricBaseboardRadiator {
 
     // Using/Aliasing
@@ -160,9 +163,7 @@ namespace ElectricBaseboardRadiator {
 
     void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    void CalcElectricBaseboard(ConvectionCoefficientsData &dataConvectionCoefficients,
-                               ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
-                               int const BaseboardNum, int const ControlledZoneNum);
+    void CalcElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum);
 
     void UpdateElectricBaseboardOff(Real64 &LoadMet,
                                     Real64 &QBBCap,

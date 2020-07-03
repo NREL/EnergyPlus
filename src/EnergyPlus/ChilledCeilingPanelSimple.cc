@@ -1408,7 +1408,7 @@ namespace CoolingPanelSimple {
                 // Now "simulate" the system by recalculating the heat balances
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
 
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state.dataConvectionCoefficients, state.dataZoneTempPredictorCorrector, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                 // Here an assumption is made regarding radiant heat transfer to people.
                 // While the radiant heat transfer to people array will be used by the thermal comfort

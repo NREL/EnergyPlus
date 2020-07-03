@@ -59,6 +59,9 @@ namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
 
+    // Forward Declarations
+    struct EnergyPlusData;
+
 namespace SteamBaseboardRadiator {
 
     // Using/Aliasing
@@ -186,7 +189,7 @@ namespace SteamBaseboardRadiator {
 
     void SizeSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    void CalcSteamBaseboard(ConvectionCoefficientsData &dataConvectionCoefficients, ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int &BaseboardNum, Real64 &LoadMet);
+    void CalcSteamBaseboard(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
 
     void UpdateSteamBaseboard(int const BaseboardNum);
 

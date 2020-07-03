@@ -1102,7 +1102,7 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetProjectControlData(state.outputFiles, ErrorsFound);
+    GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneData(ErrorsFound);
@@ -1558,14 +1558,14 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     CFloRadSys(RadSysNum).CoolingSystem = true;
     CFloRadSys(RadSysNum).HeatingSystem = false;
     Load = 1000.0;
-    CFloRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(state.dataConvectionCoefficients, state.dataZoneTempPredictorCorrector, Load);
+    CFloRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(state, Load);
     EXPECT_EQ(NotOperating, OperatingMode);
 
     // Cooling
     CFloRadSys(RadSysNum).CoolingSystem = false;
     CFloRadSys(RadSysNum).HeatingSystem = true;
     DataHeatBalFanSys::MAT(1) = 26.0;
-    CFloRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(state.dataConvectionCoefficients, state.dataZoneTempPredictorCorrector, Load);
+    CFloRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(state, Load);
     EXPECT_EQ(NotOperating, OperatingMode);
 
     CFloRadSys.deallocate();
@@ -1613,14 +1613,14 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     HydrRadSys(RadSysNum).CoolingSystem = true;
     HydrRadSys(RadSysNum).HeatingSystem = false;
     Load = 1000.0;
-    HydrRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(state.dataConvectionCoefficients, state.dataZoneTempPredictorCorrector, Load);
+    HydrRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(state, Load);
     EXPECT_EQ(0, LowTempRadiantSystem::OperatingMode);
 
     // Cooling
     HydrRadSys(RadSysNum).CoolingSystem = false;
     HydrRadSys(RadSysNum).HeatingSystem = true;
     DataHeatBalFanSys::MAT(1) = 26.0;
-    HydrRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(state.dataConvectionCoefficients, state.dataZoneTempPredictorCorrector, Load);
+    HydrRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(state, Load);
     EXPECT_EQ(NotOperating, OperatingMode);
 
     HydrRadSys.deallocate();
@@ -2146,7 +2146,7 @@ TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
 
     HydrRadSys.allocate(1);
     auto &thisRadSys (HydrRadSys(1));
-    
+
     // Test 1: Temperature Difference is 0-->answer should be 0.0
     offTemperature = 15.0;
     controlTemperature = 15.0;
@@ -2202,7 +2202,7 @@ TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
     expectedResult = 0.5;
     functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
     EXPECT_NEAR(expectedResult, functionResult, 0.001);
-    
+
 }
 
 TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTest)

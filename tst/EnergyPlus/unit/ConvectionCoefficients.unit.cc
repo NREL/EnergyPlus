@@ -436,7 +436,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
@@ -911,7 +911,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
@@ -968,7 +968,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
@@ -1025,7 +1025,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
@@ -1082,7 +1082,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
@@ -1139,7 +1139,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
@@ -1196,7 +1196,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
