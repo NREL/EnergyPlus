@@ -200,7 +200,6 @@ namespace DataGlobals {
     int OutputStandardError(0);                      // Unit number for the standard error output file
     std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
-    int OutputFilePerfLog(0);                        // Unit number for performance log outputs
     int StdMeterRecordCount(0);                      // Count of Meter output records
     bool ZoneSizingCalc(false);                      // TRUE if zone sizing calculation
     bool SysSizingCalc(false);                       // TRUE if system sizing calculation
@@ -241,7 +240,6 @@ namespace DataGlobals {
     bool RunOptCondEntTemp(false);                 // true if the ideal condenser entering set point optimization is running
     bool CompLoadReportIsReq(false);               // true if the extra sizing calcs are performed to create a "pulse" for the load component report
     bool isPulseZoneSizing(false);                 // true during the set of zone sizing calcs that include the "pulse" for the load component report
-    int OutputFileZonePulse(0); // file handle for special zone sizing report that contains the result of the "pulse" for the load component report
     bool doLoadComponentPulseNow(false); // true for the time step that is the "pulse" for the load component report
     bool ShowDecayCurvesInEIO(false);    // true if the Radiant to Convective Decay Curves should appear in the EIO file
     bool AnySlabsInModel(false);         // true if there are any zone-coupled ground domains in the input file
@@ -301,7 +299,6 @@ namespace DataGlobals {
         ioFiles.zsz.close();
         ioFiles.ssz.close();
         ioFiles.mtr.close();
-        OutputFilePerfLog = 0;
         ioFiles.shade.close();
         StdMeterRecordCount = 0;
         ZoneSizingCalc = false;
@@ -343,7 +340,6 @@ namespace DataGlobals {
         RunOptCondEntTemp = false;
         CompLoadReportIsReq = false;
         isPulseZoneSizing = false;
-        OutputFileZonePulse = 0;
         doLoadComponentPulseNow = false;
         ShowDecayCurvesInEIO = false;
         AnySlabsInModel = false;

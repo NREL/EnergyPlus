@@ -98,7 +98,6 @@ namespace DataSystemVariables {
     int const iASCII_CR(13);   // endline value when just CR instead of CR/LF
     int const iUnicode_end(0); // endline value when Unicode file
     char const tabchar('\t');
-    int const GoodIOStatValue(0);         // good value for IOStat during reads/writes
 
     std::string const DDOnlyEnvVar("DDONLY");       // Only run design days
     std::string const ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run

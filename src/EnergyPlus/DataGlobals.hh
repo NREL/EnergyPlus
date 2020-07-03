@@ -151,61 +151,33 @@ namespace DataGlobals {
 
     struct JsonOutputStreams
     {
-        std::ostream *json_stream = nullptr; // Internal stream used for json output
-        std::ostream *json_TSstream_Zone = nullptr;
-        std::ostream *json_TSstream_HVAC = nullptr;
-        std::ostream *json_TSstream = nullptr;
-        std::ostream *json_HRstream = nullptr;
-        std::ostream *json_MNstream = nullptr;
-        std::ostream *json_DYstream = nullptr;
-        std::ostream *json_SMstream = nullptr;
-        std::ostream *json_YRstream = nullptr;
-        std::ostream *cbor_stream = nullptr; // Internal stream used for cbor output
-        std::ostream *cbor_TSstream_Zone = nullptr;
-        std::ostream *cbor_TSstream_HVAC = nullptr;
-        std::ostream *cbor_TSstream = nullptr;
-        std::ostream *cbor_HRstream = nullptr;
-        std::ostream *cbor_MNstream = nullptr;
-        std::ostream *cbor_DYstream = nullptr;
-        std::ostream *cbor_SMstream = nullptr;
-        std::ostream *cbor_YRstream = nullptr;
-        std::ostream *msgpack_stream = nullptr; // Internal stream used for messagepack output
-        std::ostream *msgpack_TSstream_Zone = nullptr;
-        std::ostream *msgpack_TSstream_HVAC = nullptr;
-        std::ostream *msgpack_TSstream = nullptr;
-        std::ostream *msgpack_HRstream = nullptr;
-        std::ostream *msgpack_MNstream = nullptr;
-        std::ostream *msgpack_DYstream = nullptr;
-        std::ostream *msgpack_SMstream = nullptr;
-        std::ostream *msgpack_YRstream = nullptr;
-
-        int OutputFileJson = 0; // Unit number for Schema output
-        int OutputFileTSZoneJson = 0;
-        int OutputFileTSHVACJson = 0;
-        int OutputFileTSJson = 0;
-        int OutputFileHRJson = 0;
-        int OutputFileDYJson = 0;
-        int OutputFileMNJson = 0;
-        int OutputFileSMJson = 0;
-        int OutputFileYRJson = 0;
-        int OutputFileCBOR = 0; // Unit number for Schema output
-        int OutputFileTSZoneCBOR = 0;
-        int OutputFileTSHVACCBOR = 0;
-        int OutputFileTSCBOR = 0;
-        int OutputFileHRCBOR = 0;
-        int OutputFileDYCBOR = 0;
-        int OutputFileMNCBOR = 0;
-        int OutputFileSMCBOR = 0;
-        int OutputFileYRCBOR = 0;
-        int OutputFileMsgPack = 0; // Unit number for Schema output
-        int OutputFileTSZoneMsgPack = 0;
-        int OutputFileTSHVACMsgPack = 0;
-        int OutputFileTSMsgPack = 0;
-        int OutputFileHRMsgPack = 0;
-        int OutputFileDYMsgPack = 0;
-        int OutputFileMNMsgPack = 0;
-        int OutputFileSMMsgPack = 0;
-        int OutputFileYRMsgPack = 0;
+        std::unique_ptr<std::ostream> json_stream; // Internal stream used for json output
+        std::unique_ptr<std::ostream> json_TSstream_Zone;
+        std::unique_ptr<std::ostream> json_TSstream_HVAC;
+        std::unique_ptr<std::ostream> json_TSstream;
+        std::unique_ptr<std::ostream> json_HRstream;
+        std::unique_ptr<std::ostream> json_MNstream;
+        std::unique_ptr<std::ostream> json_DYstream;
+        std::unique_ptr<std::ostream> json_SMstream;
+        std::unique_ptr<std::ostream> json_YRstream;
+        std::unique_ptr<std::ostream> cbor_stream; // Internal stream used for cbor output
+        std::unique_ptr<std::ostream> cbor_TSstream_Zone;
+        std::unique_ptr<std::ostream> cbor_TSstream_HVAC;
+        std::unique_ptr<std::ostream> cbor_TSstream;
+        std::unique_ptr<std::ostream> cbor_HRstream;
+        std::unique_ptr<std::ostream> cbor_MNstream;
+        std::unique_ptr<std::ostream> cbor_DYstream;
+        std::unique_ptr<std::ostream> cbor_SMstream;
+        std::unique_ptr<std::ostream> cbor_YRstream;
+        std::unique_ptr<std::ostream> msgpack_stream; // Internal stream used for messagepack output
+        std::unique_ptr<std::ostream> msgpack_TSstream_Zone;
+        std::unique_ptr<std::ostream> msgpack_TSstream_HVAC;
+        std::unique_ptr<std::ostream> msgpack_TSstream;
+        std::unique_ptr<std::ostream> msgpack_HRstream;
+        std::unique_ptr<std::ostream> msgpack_MNstream;
+        std::unique_ptr<std::ostream> msgpack_DYstream;
+        std::unique_ptr<std::ostream> msgpack_SMstream;
+        std::unique_ptr<std::ostream> msgpack_YRstream;
     };
 
     extern bool BeginDayFlag;           // True at the start of each day, False after first time step in day
@@ -237,7 +209,6 @@ namespace DataGlobals {
     extern int OutputStandardError;                  // Unit number for the standard error output file
     extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records
-    extern int OutputFilePerfLog;                    // Unit number for performance log outputs
     extern int StdMeterRecordCount;                  // Count of Meter output records
     extern bool ZoneSizingCalc;                      // TRUE if zone sizing calculation
     extern bool SysSizingCalc;                       // TRUE if system sizing calculation

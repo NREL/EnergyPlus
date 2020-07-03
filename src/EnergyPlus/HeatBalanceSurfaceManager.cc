@@ -322,7 +322,6 @@ namespace HeatBalanceSurfaceManager {
         using DataRoomAirModel::IsZoneCV;
         using DataRoomAirModel::IsZoneDV;
         using DataRoomAirModel::IsZoneUI;
-        using DataSystemVariables::GoodIOStatValue;
         using HeatBalanceIntRadExchange::CalcInteriorRadExchange;
         using HeatBalFiniteDiffManager::InitHeatBalFiniteDiff;
         using InternalHeatGains::ManageInternalHeatGains;
@@ -373,7 +372,6 @@ namespace HeatBalanceSurfaceManager {
         // RJH DElight Modification End
 
         int MapNum;
-        int iwriteStatus;
         bool errFlag;
         bool elOpened;
         //  LOGICAL :: ShadowingSurf

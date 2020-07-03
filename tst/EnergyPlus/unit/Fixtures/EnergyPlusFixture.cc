@@ -103,10 +103,10 @@ void EnergyPlusFixture::SetUp()
     openOutputFiles(state.files);
 
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
+    this->json_stream = new std::ostringstream;
 
     DataGlobals::err_stream = this->err_stream.get();
-    DataGlobals::jsonOutputStreams.json_stream = this->json_stream.get();
+    DataGlobals::jsonOutputStreams.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
 
     m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     m_redirect_cout = std::unique_ptr<RedirectCout>(new RedirectCout(m_cout_buffer));
@@ -129,7 +129,6 @@ void EnergyPlusFixture::TearDown()
         flags.DISPOSE("DELETE");
         state.files.mtd.del();
         state.files.eso.del();
-        ObjexxFCL::gio::close(DataGlobals::jsonOutputStreams.OutputFileJson, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputStandardError, flags);
         state.files.eio.del();
         state.files.debug.del();
@@ -137,7 +136,6 @@ void EnergyPlusFixture::TearDown()
         state.files.ssz.del();
         state.files.mtr.del();
         state.files.bnd.del();
-        ObjexxFCL::gio::close(DataGlobals::OutputFileZonePulse, flags);
         state.files.shade.del();
     }
 
