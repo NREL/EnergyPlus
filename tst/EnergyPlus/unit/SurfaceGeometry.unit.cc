@@ -6230,7 +6230,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetProjectControlData(state.outputFiles, ErrorsFound); // read project control data
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);                             // expect no errors
 
     GetMaterialData(state.outputFiles, ErrorsFound); // read material data
