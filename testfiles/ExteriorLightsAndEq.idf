@@ -28,7 +28,7 @@
 ! People:                         None
 ! Lights(Exterior only):          Exterior Lights and Equipment, always "on".
 !                                 Lights configured in two ways: by schedule and by astronomical clock.
-! Exterior Equipment              Lights (2000W), Fuel (1 of each kind, NaturalGas, FuelOil#1, FuelOil#2, Coal,
+! Exterior Equipment              Lights (2000W), Fuel (1 of each kind, NaturalGas, FuelOilNo1, FuelOilNo2, Coal,
 !                                                 LPG, Water, always "on", 1000 units).
 !                                 Also Water Eq 10000 units, always "on"
 ! Windows:                        None
@@ -246,9 +246,9 @@
 
   Output:Variable,*,Exterior Equipment Coal Energy,timestep;
 
-  Output:Variable,*,Exterior Equipment FuelOil#1 Energy,timestep;
+  Output:Variable,*,Exterior Equipment FuelOilNo1 Energy,timestep;
 
-  Output:Variable,*,Exterior Equipment FuelOil#2 Energy,timestep;
+  Output:Variable,*,Exterior Equipment FuelOilNo2 Energy,timestep;
 
   Output:Variable,*,Exterior Equipment Propane Energy,timestep;
 
