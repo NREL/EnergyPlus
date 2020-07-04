@@ -102,10 +102,10 @@ void EnergyPlusFixture::SetUp()
 
     openOutputFiles(state.files);
 
-    this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
+    this->err_stream = new std::ostringstream;
     this->json_stream = new std::ostringstream;
 
-    DataGlobals::err_stream = this->err_stream.get();
+    state.files.err_stream = std::unique_ptr<std::ostream>(this->err_stream);
     state.files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
 
     m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
@@ -129,7 +129,7 @@ void EnergyPlusFixture::TearDown()
         flags.DISPOSE("DELETE");
         state.files.mtd.del();
         state.files.eso.del();
-        ObjexxFCL::gio::close(DataGlobals::OutputStandardError, flags);
+        state.files.err_stream.reset();
         state.files.eio.del();
         state.files.debug.del();
         state.files.zsz.del();

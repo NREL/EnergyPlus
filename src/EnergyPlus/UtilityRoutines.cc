@@ -1966,7 +1966,6 @@ namespace UtilityRoutines {
 
         // Using/Aliasing
         using DataGlobals::DoingInputProcessing;
-        using DataGlobals::err_stream;
         using DataStringGlobals::IDDVerString;
         using DataStringGlobals::VerString;
 
@@ -1984,13 +1983,22 @@ namespace UtilityRoutines {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
+        auto *err_stream = []() -> std::ostream *{
+            if (IOFiles::hasSingleton()) {
+                return IOFiles::getSingleton().err_stream.get();
+            } else {
+                return nullptr;
+            }
+        }();
+
+
         if (UtilityRoutines::outputErrorHeader && err_stream) {
             *err_stream << "Program Version," + VerString + ',' + IDDVerString + DataStringGlobals::NL;
             UtilityRoutines::outputErrorHeader = false;
         }
 
         if (!DoingInputProcessing) {
-            if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
+           if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
         } else {
             // CacheIPErrorFile is never opened or closed
             // so this output would just go to stdout

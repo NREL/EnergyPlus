@@ -8965,23 +8965,13 @@ void AddToOutputVariableList(std::string const &VarName, // Variable Name
     }
 }
 
-int initErrorFile() {
-    DataGlobals::OutputStandardError = GetNewUnitNumber();
-    {
-        IOFlags flags;
-        flags.ACTION("write");
-        flags.STATUS("UNKNOWN");
-        ObjexxFCL::gio::open(DataGlobals::OutputStandardError, DataStringGlobals::outputErrFileName, flags);
-        int write_stat = flags.ios();
-        if (write_stat == 600) {
-            DisplayString("ERROR: Could not open file " + DataStringGlobals::outputErrFileName + " for output (write). Write permission denied in output directory.");
-            return EXIT_FAILURE;
-        } else if (write_stat != 0) {
-            DisplayString("ERROR: Could not open file " + DataStringGlobals::outputErrFileName + " for output (write).");
-            return EXIT_FAILURE;
-        }
+int initErrorFile(IOFiles &ioFiles)
+{
+    ioFiles.err_stream = std::unique_ptr<std::ostream>(new std::ofstream(ioFiles.outputErrFileName));
+    if (ioFiles.err_stream->bad()) {
+        DisplayString("ERROR: Could not open file " + ioFiles.outputErrFileName + " for output (write).");
+        return EXIT_FAILURE;
     }
-    DataGlobals::err_stream = ObjexxFCL::gio::out_stream(DataGlobals::OutputStandardError);
     return EXIT_SUCCESS;
 }
 

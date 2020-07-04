@@ -1059,7 +1059,7 @@ void AddToOutputVariableList(std::string const &VarName, // Variable Name
                              Optional_string_const customUnitName = _ // the custom name for the units from EMS definition of units
 );
 
-int initErrorFile();
+int initErrorFile(IOFiles &ioFiles);
 
 } // namespace EnergyPlus
 

@@ -119,7 +119,6 @@ namespace DataStringGlobals {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    std::string outputErrFileName("eplusout.err");
 
     std::string outputMddFileName("eplusout.mdd");
     std::string outputRddFileName("eplusout.rdd");

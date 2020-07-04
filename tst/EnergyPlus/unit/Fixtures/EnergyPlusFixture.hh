@@ -287,8 +287,10 @@ private:
 
     static bool process_idd(std::string const &idd, bool &errors_found);
 
+    // Note that these are non-owning raw pointers. The `state` object owns the underlying streams.
     std::ostringstream *json_stream;
-    std::unique_ptr<std::ostringstream> err_stream;
+    std::ostringstream *err_stream;
+    
     std::unique_ptr<std::ostringstream> m_cout_buffer;
     std::unique_ptr<std::ostringstream> m_cerr_buffer;
     std::unique_ptr<std::ostringstream> m_delightin_stream;

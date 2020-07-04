@@ -283,7 +283,7 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
         CommandLineInterface::ProcessArgs(state, dummy_argc, dummy_argv);
     }
 
-    int errStatus = initErrorFile();
+    int errStatus = initErrorFile(state.files);
     if (errStatus) {
         return errStatus;
     }
@@ -347,7 +347,7 @@ int initializeAsLibrary(EnergyPlus::EnergyPlusData &state) {
 
     DataSystemVariables::processEnvironmentVariables(state.dataGlobals);
 
-    int errStatus = initErrorFile();
+    int errStatus = initErrorFile(state.files);
     if (errStatus) {
         return errStatus;
     }

@@ -176,7 +176,6 @@ namespace DataGlobals {
     extern Real64 TimeStepZone;                      // Zone time step in fractional hours
     extern bool WarmupFlag;                          // True during the warmup portion of a simulation
     extern int OutputStandardError;                  // Unit number for the standard error output file
-    extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records
     extern int StdMeterRecordCount;                  // Count of Meter output records
     extern bool ZoneSizingCalc;                      // TRUE if zone sizing calculation

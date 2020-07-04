@@ -380,7 +380,7 @@ namespace CommandLineInterface {
         state.files.dxf.fileName = outputFilePrefix + normalSuffix + ".dxf";
         state.files.eio.fileName = outputFilePrefix + normalSuffix + ".eio";
         state.files.endFile.fileName = outputFilePrefix + normalSuffix + ".end";
-        outputErrFileName = outputFilePrefix + normalSuffix + ".err";
+        state.files.outputErrFileName = outputFilePrefix + normalSuffix + ".err";
         state.files.eso.fileName = outputFilePrefix + normalSuffix + ".eso";
 
         state.files.json.outputJsonFileName = outputFilePrefix + normalSuffix + ".json";
