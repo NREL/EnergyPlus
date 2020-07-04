@@ -69,6 +69,7 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -1042,7 +1043,7 @@ namespace GroundHeatExchangers {
         // For convenience
         using json = nlohmann::json;
 
-        if (!ObjexxFCL::gio::file_exists(DataStringGlobals::outputGLHEFileName)) {
+        if (!FileSystem::fileExists(DataStringGlobals::outputGLHEFileName)) {
             // if the file doesn't exist, there are no data to read
             return;
         } else {
@@ -1119,7 +1120,7 @@ namespace GroundHeatExchangers {
         // For convenience
         using json = nlohmann::json;
 
-        if (ObjexxFCL::gio::file_exists(DataStringGlobals::outputGLHEFileName)) {
+        if (FileSystem::fileExists(DataStringGlobals::outputGLHEFileName)) {
             // file exists -- add data
 
             // open file

@@ -790,7 +790,6 @@ namespace UtilityRoutines {
 #endif
         std::cerr << "Program terminated: "
                   << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
-        CloseOutOpenFiles();
         // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
         // indicating that E+ terminated with an error.
         if (NumExternalInterfaces > 0) CloseSocket(-1);
@@ -844,76 +843,6 @@ namespace UtilityRoutines {
             ioFiles.debug.close();
         } else {
             ioFiles.debug.del();
-        }
-    }
-
-    void CloseOutOpenFiles()
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   April 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine scans potential unit numbers and closes
-        // any that are still open.
-
-        // METHODOLOGY EMPLOYED:
-        // Use INQUIRE to determine if file is open.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxUnitNumber(1000);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        bool exists;
-        bool opened;
-        std::string name;
-        const std::string stdin_name("stdin");
-        const std::string stdout_name("stdout");
-        const std::string stderr_name("stderr");
-        bool not_special(false);
-        int UnitNumber;
-        int ios;
-
-        // TODO: This function is only used for eplusout.err
-        // once that file is moved into the state object this function
-        // can be removed. Then we can remove gio::inquire
-        for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(UnitNumber, flags);
-                exists = flags.exists();
-                opened = flags.open();
-                ios = flags.ios();
-                name = flags.name();
-            }
-            if (exists && opened && ios == 0) {
-                not_special = name.compare(stdin_name) != 0;
-                not_special = not_special && (name.compare(stdout_name) != 0);
-                not_special = not_special && (name.compare(stderr_name) != 0);
-                if (not_special) {
-                    ObjexxFCL::gio::close(UnitNumber);
-                }
-            }
         }
     }
 
@@ -1048,92 +977,11 @@ namespace UtilityRoutines {
         epSummaryTimes(Time_Finish - Time_Start);
 #endif
         std::cerr << "EnergyPlus Completed Successfully." << std::endl;
-        CloseOutOpenFiles();
         // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
         // indicating that E+ finished its simulation
         if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
         return EXIT_SUCCESS;
     }
-
-    int GetNewUnitNumber()
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie, adapted from reference
-        //       DATE WRITTEN   September 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns a unit number of a unit that can exist and is not connected.  Note
-        // this routine does not magically mark that unit number in use.  In order to
-        // have the unit "used", the source code must OPEN the file.
-
-        // METHODOLOGY EMPLOYED:
-        // Use Inquire function to find out if proposed unit: exists or is opened.
-        // If not, can be used for a new unit number.
-
-        // REFERENCES:
-        // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
-        // Developed at Unicomp, Inc.
-        // Permission to use, copy, modify, and distribute this
-        // software is freely granted, provided that this notice
-        // is preserved.
-
-        // USE STATEMENTS:
-        // na
-
-        //	// Return value
-        //	int UnitNumber; // Result from scanning currently open files
-        //
-        //	// Locals
-        //	// FUNCTION ARGUMENT DEFINITIONS:
-        //
-        //	// FUNCTION PARAMETER DEFINITIONS:
-        //	//  IO Status Values:
-        //
-        //	int const END_OF_RECORD( -2 );
-        //	int const END_OF_FILE( -1 );
-        //
-        //	//  Indicate default input and output units:
-        //
-        //	int const DEFAULT_INPUT_UNIT( 5 );
-        //	int const DEFAULT_OUTPUT_UNIT( 6 );
-        //
-        //	//  Indicate number and value of preconnected units
-        //
-        //	int const NUMBER_OF_PRECONNECTED_UNITS( 2 );
-        //	static Array1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
-        //
-        //	//  Largest allowed unit number (or a large number, if none)
-        //	int const MaxUnitNumber( 1000 );
-        //
-        //	// INTERFACE BLOCK SPECIFICATIONS
-        //	// na
-        //
-        //	// DERIVED TYPE DEFINITIONS
-        //	// na
-        //
-        //	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-        //	bool exists; // File exists
-        //	bool opened; // Unit is open
-        //	int ios; // return value from Inquire intrinsic
-        //
-        //	for ( UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber ) {
-        //		if ( UnitNumber == DEFAULT_INPUT_UNIT || UnitNumber == DEFAULT_OUTPUT_UNIT ) continue;
-        //		if ( any_eq( UnitNumber, PRECONNECTED_UNITS ) ) continue;
-        //		{ IOFlags flags; ObjexxFCL::gio::inquire( UnitNumber, flags ); exists = flags.exists(); opened = flags.open(); ios =
-        //flags.ios(); } 		if ( exists && ! opened && ios == 0 ) return UnitNumber; // result is set in UnitNumber
-        //	}
-        //
-        //	UnitNumber = -1;
-        //
-        //	return UnitNumber;
-
-        return ObjexxFCL::gio::get_unit(); // Autodesk:Note ObjexxFCL::gio system provides this (and protects the F90+ preconnected units
-                                           // {100,101,102})
-    }
-
 
     void ConvertCaseToUpper(std::string const &InputString, // Input string
                             std::string &OutputString       // Output string (in UpperCase)

@@ -74,8 +74,6 @@ void CloseOutOpenFiles();
 
 int EndEnergyPlus(IOFiles &ioFiles);
 
-int GetNewUnitNumber();
-
 int FindUnitNumber(std::string const &FileName); // File name to be searched.
 
 void ConvertCaseToUpper(std::string const &InputString, // Input string

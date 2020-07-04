@@ -1470,7 +1470,6 @@ namespace PipeHeatTransfer {
         }
     IterationLoop_exit:;
 
-        ObjexxFCL::gio::close(112);
     }
 
     //==============================================================================
