@@ -218,7 +218,9 @@ namespace OutputReportTabular {
     extern bool displayThermalResilienceSummary;
     extern bool displayCO2ResilienceSummary;
     extern bool displayVisualResilienceSummary;
-
+    extern bool displayThermalResilienceSummaryExplicitly;
+    extern bool displayCO2ResilienceSummaryExplicitly;
+    extern bool displayVisualResilienceSummaryExplicitly;
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
     // arrays that hold the meter numbers that are initialized at get input

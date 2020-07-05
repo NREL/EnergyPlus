@@ -300,6 +300,9 @@ namespace OutputReportTabular {
     bool displayThermalResilienceSummary(false);
     bool displayCO2ResilienceSummary(false);
     bool displayVisualResilienceSummary(false);
+    bool displayThermalResilienceSummaryExplicitly(false);
+    bool displayCO2ResilienceSummaryExplicitly(false);
+    bool displayVisualResilienceSummaryExplicitly(false);
 
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
@@ -594,6 +597,9 @@ namespace OutputReportTabular {
         displayThermalResilienceSummary = false;
         displayCO2ResilienceSummary = false;
         displayVisualResilienceSummary = false;
+        displayThermalResilienceSummaryExplicitly = false;
+        displayCO2ResilienceSummaryExplicitly = false;
+        displayVisualResilienceSummaryExplicitly = false;
         displayEioSummary = false;
         meterNumTotalsBEPS = Array1D_int(numResourceTypes, 0);
         meterNumTotalsSource = Array1D_int(numSourceTypes, 0);
@@ -2073,14 +2079,17 @@ namespace OutputReportTabular {
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "ThermalResilienceSummary")) {
                     displayThermalResilienceSummary = true;
+                    displayThermalResilienceSummaryExplicitly = true;
                     WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "CO2ResilienceSummary")) {
                     displayCO2ResilienceSummary = true;
+                    displayCO2ResilienceSummaryExplicitly = true;
                     WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "VisualResilienceSummary")) {
                     displayVisualResilienceSummary = true;
+                    displayVisualResilienceSummaryExplicitly = true;
                     WriteTabularFiles = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "EnergyMeters")) {
@@ -11427,16 +11436,20 @@ namespace OutputReportTabular {
             bool hasPierceSET = true;
             if (TotPeople == 0) {
                 hasPierceSET = false;
-                ShowWarningError( "Writing Annual Thermal Resilience Summary - SET Hours reports: "
-                                  "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
-                                  "but no People object is defined.");
+                if (displayThermalResilienceSummaryExplicitly) {
+                    ShowWarningError("Writing Annual Thermal Resilience Summary - SET Hours reports: "
+                                     "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
+                                     "but no People object is defined.");
+                }
             }
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 if (!People(iPeople).Pierce) {
                     hasPierceSET = false;
-//                    ShowWarningError( "Writing Annual Thermal Resilience Summary - SET Hours reports: "
-//                                      "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
-//                                      "but no Pierce model is defined in " + People(iPeople).Name + " object.");
+                    if (displayThermalResilienceSummaryExplicitly) {
+                        ShowWarningError( "Writing Annual Thermal Resilience Summary - SET Hours reports: "
+                                          "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
+                                          "but no Pierce model is defined in " + People(iPeople).Name + " object.");
+                    }
                 }
             }
 
@@ -11492,9 +11505,11 @@ namespace OutputReportTabular {
 
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::NoDaylighting) {
-//                ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
-//                                 "Zone Average Daylighting Reference Point Illuminance output is required, "
-//                                 "but no Daylight Method is defined in Zone:" + Zone(ZoneNum).Name);
+                if (displayVisualResilienceSummaryExplicitly) {
+                    ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
+                                     "Zone Average Daylighting Reference Point Illuminance output is required, "
+                                     "but no Daylight Method is defined in Zone:" + Zone(ZoneNum).Name);
+                }
             }
         }
 

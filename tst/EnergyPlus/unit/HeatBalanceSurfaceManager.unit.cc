@@ -2668,6 +2668,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataGlobals::HourOfDay = 1;
     DataHeatBalFanSys::ZTAV(1) = 25;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.00988; // RH = 50%
+    CalcThermalResilience();
     ReportThermalResilience();
     EXPECT_NEAR(25, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(28, DataHeatBalFanSys::ZoneHumidex(1), 1);
@@ -2676,6 +2677,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataGlobals::HourOfDay = 2;
     DataHeatBalFanSys::ZTAV(1) = 27;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.02035; // RH = 90%
+    CalcThermalResilience();
     ReportThermalResilience();
     EXPECT_NEAR(31, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(39, DataHeatBalFanSys::ZoneHumidex(1), 1);
@@ -2684,6 +2686,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataGlobals::HourOfDay = 3;
     DataHeatBalFanSys::ZTAV(1) = 27;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.0022; // RH = 10%
+    CalcThermalResilience();
     ReportThermalResilience();
     EXPECT_NEAR(26, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(23, DataHeatBalFanSys::ZoneHumidex(1), 1);
@@ -2692,6 +2695,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataGlobals::HourOfDay = 4;
     DataHeatBalFanSys::ZTAV(1) = 30;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.01604; // RH = 60%
+    CalcThermalResilience();
     ReportThermalResilience();
     EXPECT_NEAR(33, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(38, DataHeatBalFanSys::ZoneHumidex(1), 1);
@@ -2715,6 +2719,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     ScheduleManager::Schedule(1).CurrentValue = 1;
     for (int hour = 5; hour <= 7; hour++) {
         DataGlobals::HourOfDay = hour;
+//        CalcThermalResilience();
         ReportThermalResilience();
     }
     // Test SET-hours calculation - Heating unmet

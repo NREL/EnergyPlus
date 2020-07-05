@@ -291,6 +291,8 @@ namespace HeatBalanceSurfaceManager {
         ReportSurfaceHeatBalance();
         if (ZoneSizingCalc) GatherComponentLoadsSurface();
 
+        CalcThermalResilience();
+
         if (OutputReportTabular::displayThermalResilienceSummary) {
             ReportThermalResilience();
         }
@@ -4906,8 +4908,20 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportThermalResilience() {
+    void CalcThermalResilience() {
+        // This function calculate timestep-wise heat index and humidex.
 
+        // The computation of the heat index is a refinement of a result obtained by multiple regression analysis
+        // carried out by Lans P. Rothfusz and described in a 1990 National Weather Service (NWS)
+        // Technical Attachment (SR 90-23).
+        // Reference: https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml
+
+        // The current formula for determining the humidex was developed by J. M. Masterton and F. A. Richardson of
+        // Canada's Atmospheric Environment Service in 1979.
+        // Reference: Masterson, J., and F. Richardson, 1979: Humidex, a method of quantifying human
+        // discomfort due to excessive heat and humidity CLI 1-79, Environment Canada, Atmosheric Environment Servic
+
+        // Constance for heat index regression equation of Rothfusz.
         Real64 c1 = -42.379;
         Real64 c2 = 2.04901523;
         Real64 c3 = 10.14333127;
@@ -4918,27 +4932,8 @@ namespace HeatBalanceSurfaceManager {
         Real64 c8 = .00085282;
         Real64 c9 = -.00000199;
 
-        int HINoBins = 5; // Heat Index range - number of bins
-        int HumidexNoBins = 5; // Humidex range - number of bins
-        int SETNoBins = 4; // SET report column numbers
-
-        if (reportThermalResilienceFirstTime) {
-            if (TotPeople == 0) hasPierceSET = false;
-            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
-                if (!People(iPeople).Pierce) {
-                    hasPierceSET = false;
-                }
-            }
-
+        if (ManageSurfaceHeatBalancefirstTime) {
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
-                ZoneHeatIndexHourBins(ZoneNum).assign(HINoBins, 0.0);
-                ZoneHeatIndexOccuHourBins(ZoneNum).assign(HINoBins, 0.0);
-                ZoneHumidexHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
-                ZoneHumidexOccuHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
-                if (hasPierceSET) {
-                    ZoneLowSETHours(ZoneNum).assign(SETNoBins, 0.0);
-                    ZoneHighSETHours(ZoneNum).assign(SETNoBins, 0.0);
-                }
                 SetupOutputVariable("Zone Heat Index",
                                     OutputProcessor::Unit::C,
                                     ZoneHeatIndex(ZoneNum),
@@ -4952,11 +4947,6 @@ namespace HeatBalanceSurfaceManager {
                                     "State",
                                     Zone(ZoneNum).Name);
             }
-            lowSETLongestHours.assign(NumOfZones, 0.0);
-            highSETLongestHours.assign(NumOfZones, 0.0);
-            lowSETLongestStart.assign(NumOfZones, 0.0);
-            highSETLongestStart.assign(NumOfZones, 0.0);
-            reportThermalResilienceFirstTime = false;
         }
 
         // Calculate Heat Index and Humidex.
@@ -4991,6 +4981,37 @@ namespace HeatBalanceSurfaceManager {
             ZoneHeatIndex(ZoneNum) = HI;
             ZoneHumidex(ZoneNum) = Humidex;
         }
+    }
+
+    void ReportThermalResilience() {
+
+        int HINoBins = 5; // Heat Index range - number of bins
+        int HumidexNoBins = 5; // Humidex range - number of bins
+        int SETNoBins = 4; // SET report column numbers
+
+        if (reportThermalResilienceFirstTime) {
+            if (TotPeople == 0) hasPierceSET = false;
+            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+                if (!People(iPeople).Pierce) {
+                    hasPierceSET = false;
+                }
+            }
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                ZoneHeatIndexHourBins(ZoneNum).assign(HINoBins, 0.0);
+                ZoneHeatIndexOccuHourBins(ZoneNum).assign(HINoBins, 0.0);
+                ZoneHumidexHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
+                ZoneHumidexOccuHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
+                if (hasPierceSET) {
+                    ZoneLowSETHours(ZoneNum).assign(SETNoBins, 0.0);
+                    ZoneHighSETHours(ZoneNum).assign(SETNoBins, 0.0);
+                }
+            }
+            lowSETLongestHours.assign(NumOfZones, 0.0);
+            highSETLongestHours.assign(NumOfZones, 0.0);
+            lowSETLongestStart.assign(NumOfZones, 0.0);
+            highSETLongestStart.assign(NumOfZones, 0.0);
+            reportThermalResilienceFirstTime = false;
+        }
 
         // Count hours only during weather simulation periods
         if (ksRunPeriodWeather == KindOfSim && !WarmupFlag) {
@@ -5004,10 +5025,10 @@ namespace HeatBalanceSurfaceManager {
                     if (People(iPeople).Pierce) {
                         ZoneOccPierceSET(ZoneNum) = ThermalComfort::ThermalComfortData(iPeople).PierceSET;
                     } else {
-                        ZoneOccPierceSET(ZoneNum) = NAN;
+                        ZoneOccPierceSET(ZoneNum) = -1;
                     }
                 } else {
-                    ZoneOccPierceSET(ZoneNum) = NAN;
+                    ZoneOccPierceSET(ZoneNum) = -1;
                 }
             }
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
@@ -5059,7 +5080,7 @@ namespace HeatBalanceSurfaceManager {
                             ZoneLowSETHours(ZoneNum)[0] += (12.2 - PierceSET) * TimeStepZone;
                             ZoneLowSETHours(ZoneNum)[1] += (12.2 - PierceSET) * NumOcc * TimeStepZone;
                             // Reset duration when last step is out of range.
-                            if (isnan(PierceSETLast) || PierceSETLast > 12.2) {
+                            if (PierceSETLast == -1 || PierceSETLast > 12.2) {
                                 General::EncodeMonDayHrMin(encodedMonDayHrMin, Month, DayOfMonth, HourOfDay,
                                                            TimeStepZone * (TimeStep - 1) * 60);
                                 lowSETLongestHours[ZoneNum - 1] = 0;
@@ -5074,7 +5095,7 @@ namespace HeatBalanceSurfaceManager {
                         } else if (PierceSET > 30) {
                             ZoneHighSETHours(ZoneNum)[0] += (PierceSET - 30) * TimeStepZone;
                             ZoneHighSETHours(ZoneNum)[1] += (PierceSET - 30) * NumOcc * TimeStepZone;
-                            if (isnan(PierceSETLast) || PierceSETLast <= 30) {
+                            if (PierceSETLast == -1 || PierceSETLast <= 30) {
                                 General::EncodeMonDayHrMin(encodedMonDayHrMin, Month, DayOfMonth, HourOfDay,
                                                            TimeStepZone * (TimeStep - 1) * 60);
                                 highSETLongestHours[ZoneNum - 1] = 0;
@@ -5113,9 +5134,11 @@ namespace HeatBalanceSurfaceManager {
             }
             reportCO2ResilienceFirstTime = false;
             if (!DataContaminantBalance::Contaminant.CO2Simulation) {
-                ShowWarningError( "Writing Annual CO2 Resilience Summary - CO2 Level Hours reports: "
-                                  "Zone Air CO2 Concentration output is required, "
-                                  "but no ZoneAirContaminantBalance object is defined.");
+                if (OutputReportTabular::displayCO2ResilienceSummaryExplicitly) {
+                    ShowWarningError("Writing Annual CO2 Resilience Summary - CO2 Level Hours reports: "
+                                     "Zone Air CO2 Concentration output is required, "
+                                     "but no ZoneAirContaminantBalance object is defined.");
+                }
                 OutputReportTabular::displayCO2ResilienceSummary = false;
                 return;
             }
@@ -5160,9 +5183,11 @@ namespace HeatBalanceSurfaceManager {
                 }
             }
             if (!hasDayLighting) {
-                ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
-                                 "Zone Average Daylighting Reference Point Illuminance output is required, "
-                                 "but no Daylighting Control Object is defined.");
+                if (OutputReportTabular::displayVisualResilienceSummaryExplicitly) {
+                    ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
+                                     "Zone Average Daylighting Reference Point Illuminance output is required, "
+                                     "but no Daylighting Control Object is defined.");
+                }
                 OutputReportTabular::displayVisualResilienceSummary = false;
                 return;
             }

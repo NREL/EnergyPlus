@@ -136,6 +136,8 @@ namespace HeatBalanceSurfaceManager {
 
     void ReportIntMovInsInsideSurfTemp();
 
+    void CalcThermalResilience();
+
     void ReportThermalResilience();
 
     void ReportCO2Resilience();
