@@ -80,6 +80,7 @@
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
@@ -7767,4 +7768,413 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     EXPECT_NEAR(Node(thisFanCoil.ATMixerSecNode).MassFlowRate, 0.405995, 0.000001);
     EXPECT_NEAR(Node(thisFanCoil.ATMixerOutNode).MassFlowRate, 0.605995, 0.000001);
 }
+
+TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "  Schedule:Compact,",
+        "    AlwaysOn,                !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 16",
+        "    1.0;                     !- Field 17",
+
+        "  Schedule:Compact,",
+        "    FanAvailSched,           !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 16",
+        "    0.0;                     !- Field 17",
+
+        " ScheduleTypeLimits,",
+        "     Fraction,                !- Name",
+        "     0,                       !- Lower Limit Value",
+        "     1,                       !- Upper Limit Value",
+        "     CONTINUOUS;              !- Numeric Type",
+
+        " Zone,",
+        "     Zone One,                !- Name",
+        "     0,                       !- Direction of Relative North {deg}",
+        "     0,                       !- X Origin {m}",
+        "     0,                       !- Y Origin {m}",
+        "     0,                       !- Z Origin {m}",
+        "     ,                        !- Type",
+        "     1;                       !- Multiplier",
+
+        " ZoneHVAC:FourPipeFanCoil,",
+        "     FCU VarFan VarFluidFlow, !- Name",
+        "     FanAvailSched,           !- Availability Schedule Name",
+        "     VariableFanVariableFlow, !- Capacity Control Method",
+        "     Autosize,                !- Maximum Supply Air Flow Rate {m3/s}",
+        "     ,                        !- Low Speed Supply Air Flow Ratio",
+        "     ,                        !- Medium Speed Supply Air Flow Ratio",
+        "     Autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}",
+        "     ,                        !- Outdoor Air Schedule Name",
+        "     Node 5,                  !- Air Inlet Node Name",
+        "     Node 63,                 !- Air Outlet Node Name",
+        "     ,                        !- Outdoor Air Mixer Object Type",
+        "     ,                        !- Outdoor Air Mixer Name",
+        "     Fan:VariableVolume,      !- Supply Air Fan Object Type",
+        "     FCU VarFan,              !- Supply Air Fan Name",
+        "     Coil:Cooling:Water,      !- Cooling Coil Object Type",
+        "     FCU Cooling Coil,        !- Cooling Coil Name",
+        "     Autosize,                !- Maximum Cold Water Flow Rate {m3/s}",
+        "     ,                        !- Minimum Cold Water Flow Rate {m3/s}",
+        "     ,                        !- Cooling Convergence Tolerance",
+        "     Coil:Heating:Water,      !- Heating Coil Object Type",
+        "     FCU Heating Coil,        !- Heating Coil Name",
+        "     Autosize,                !- Maximum Hot Water Flow Rate {m3/s}",
+        "     ,                        !- Minimum Hot Water Flow Rate {m3/s}",
+        "     ,                        !- Heating Convergence Tolerance",
+        "     ,                        !- Availability Manager List Name",
+        "     ,                        !- Design Specification ZoneHVAC Sizing Object Name",
+        "     ,                        !- Supply Air Fan Operating Mode Schedule Name",
+        "     Autosize,                !- Minimum Supply Air Temperature in Cooling Mode {C}",
+        "     Autosize;                !- Maximum Supply Air Temperature in Heating Mode {C}",
+
+        " AirTerminal:SingleDuct:Mixer,",
+        "     Inlet Side Mixer,        !- Name",
+        "     ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Unit Object Type",
+        "     FCU VarFan VarFluidFlow, !- ZoneHVAC Unit Object Name",
+        "     Node 5,                  !- Mixer Outlet Node Name",
+        "     Node 62,                 !- Mixer Primary Air Inlet Node Name",
+        "     Node 64,                 !- Mixer Secondary Air Inlet Node Name",
+        "     InletSide;               !- Mixer Connection Type",
+
+        " ZoneHVAC:AirDistributionUnit,",
+        "     ADU Inlet Side Mixer,    !- Name",
+        "     Node 5,                  !- Air Distribution Unit Outlet Node Name",
+        "     AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type",
+        "     Inlet Side Mixer;        !- Air Terminal Name",
+
+        " ZoneHVAC:EquipmentList,",
+        "     Zone one Equipment List, !- Name",
+        "     SequentialLoad,          !- Load Distribution Scheme",
+        "     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "     ADU Inlet Side Mixer,    !- Zone Equipment 1 Name",
+        "     1,                       !- Zone Equipment 1 Cooling Sequence",
+        "     1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "     ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+        "     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type",
+        "     FCU VarFan VarFluidFlow, !- Zone Equipment 2 Name",
+        "     2,                       !- Zone Equipment 2 Cooling Sequence",
+        "     2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+
+        " ZoneHVAC:EquipmentConnections,",
+        "     Zone One,                !- Zone Name",
+        "     Zone one Equipment List, !- Zone Conditioning Equipment List Name",
+        "     Node 63,                 !- Zone Air Inlet Node or NodeList Name",
+        "     Node 64,                 !- Zone Air Exhaust Node or NodeList Name",
+        "     Zone one Air Node,       !- Zone Air Node Name",
+        "     Node 61;                 !- Zone Return Air Node or NodeList Name",
+
+        " Fan:VariableVolume,",
+        "     FCU VarFan,              !- Name",
+        "     AlwaysOn,                !- Availability Schedule Name",
+        "     0.6045,                  !- Fan Total Efficiency",
+        "     600.0,                   !- Pressure Rise {Pa}",
+        "     Autosize,                !- Maximum Flow Rate {m3/s}",
+        "     FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method",
+        "     0,                       !- Fan Power Minimum Flow Fraction",
+        "     0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "     0.93,                    !- Motor Efficiency",
+        "     1,                       !- Motor In Airstream Fraction",
+        "     0.040759894,             !- Fan Power Coefficient 1",
+        "     0.08804497,              !- Fan Power Coefficient 2",
+        "     -0.07292612,             !- Fan Power Coefficient 3",
+        "     0.943739823,             !- Fan Power Coefficient 4",
+        "     0,                       !- Fan Power Coefficient 5",
+        "     Node 5,                  !- Air Inlet Node Name",
+        "     FCU Fan Outlet Node,     !- Air Outlet Node Name",
+        "     General;                 !- End-Use Subcategory",
+
+        " Coil:Cooling:Water,",
+        "     FCU Cooling Coil,        !- Name",
+        "     AlwaysOn,                !- Availability Schedule Name",
+        "     Autosize,                !- Design Water Flow Rate {m3/s}",
+        "     Autosize,                !- Design Air Flow Rate {m3/s}",
+        "     Autosize,                !- Design Inlet Water Temperature {C}",
+        "     Autosize,                !- Design Inlet Air Temperature {C}",
+        "     Autosize,                !- Design Outlet Air Temperature {C}",
+        "     Autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}",
+        "     Autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}",
+        "     Node 66,                 !- Water Inlet Node Name",
+        "     Node 68,                 !- Water Outlet Node Name",
+        "     FCU Fan Outlet Node,     !- Air Inlet Node Name",
+        "     FCU CCoil Outlet Node,   !- Air Outlet Node Name",
+        "     SimpleAnalysis,          !- Type of Analysis",
+        "     CrossFlow;               !- Heat Exchanger Configuration",
+
+        " Coil:Heating:Water,",
+        "     FCU Heating Coil,        !- Name",
+        "     AlwaysOn,                !- Availability Schedule Name",
+        "     Autosize,                !- U-Factor Times Area Value {W/K}",
+        "     Autosize,                !- Maximum Water Flow Rate {m3/s}",
+        "     Node 67,                 !- Water Inlet Node Name",
+        "     Node 65,                 !- Water Outlet Node Name",
+        "     FCU CCoil Outlet Node,   !- Air Inlet Node Name",
+        "     Node 63,                 !- Air Outlet Node Name",
+        "     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method",
+        "     Autosize,                !- Rated Capacity {W}",
+        "     82.2,                    !- Rated Inlet Water Temperature {C}",
+        "     16.6,                    !- Rated Inlet Air Temperature {C}",
+        "     71.1,                    !- Rated Outlet Water Temperature {C}",
+        "     32.2,                    !- Rated Outlet Air Temperature {C}",
+        "     0.5;                     !- Rated Ratio for Air and Water Convection",
+
+        " AvailabilityManagerAssignmentList,",
+        "    Zone Availability Manager,     !- Name",
+        "    AvailabilityManager:NightCycle,!- Availability Manager 1 Object Type",
+        "    NightCycle AvailMgr;           !- Availability Manager 1 Name",
+        
+        " AvailabilityManager:NightCycle,",
+        "    NightCycle AvailMgr,     !- Name",
+        "    AlwaysOn,                !- Applicability Schedule Name",
+        "    FanAvailSched,           !- Fan Schedule Name",
+        "    CycleOnControlZone,      !- Control Type",
+        "    0.2,                     !- Thermostat Tolerance {deltaC}",
+        "    ThermostatWithMinimumRunTime, !- Cycling Run Time Control Type",
+        "    300.0,                   !- Cycling Run Time {s}",
+        "    Zone one;                !- Control Zone or Zone List Name",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    bool FirstHVACIteration(false);
+    Real64 PrimaryAirMassFlowRate(0.0);
+    Real64 DesignHeatAirVolFlow(0.50);
+    Real64 DesignCoolAirVolFlow(0.60);
+    Real64 QUnitOut(0.0);
+    Real64 QLatOut(0.0);
+    Real64 QZnReq(0.0);
+    int ZoneNum(1);
+    int FanCoilNum(1);
+
+    DataSizing::CurZoneEqNum = 1;
+    DataEnvironment::OutBaroPress = 101325.0;
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
+    WaterCoils::GetWaterCoilsInputFlag = true;
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DataGlobals::TimeStep = 1;
+    DataGlobals::MinutesPerTimeStep = 60;
+    ProcessScheduleInput(state.outputFiles); // read schedules
+    InitializePsychRoutines();
+    OutputReportPredefined::SetPredefinedTables();
+    GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(state.outputFiles);
+    ScheduleInputProcessed = true;
+    GetFanCoilUnits(state);
+    SystemAvailabilityManager::GetSysAvailManagerInputs();
+
+    auto &thisFanCoil(FanCoil(1));
+    auto &thisATMixer(SysATMixer(1));
+    auto &thisAvaiManager(SystemAvailabilityManager::NCycSysAvailMgrData(1));
+
+    // get input test for terminal air single duct mixer on inlet side of PTAC
+    ASSERT_EQ(1, NumATMixers);
+    EXPECT_EQ("INLET SIDE MIXER", thisATMixer.Name);                        // single duct air terminal mixer name
+    EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, thisATMixer.MixerType);   // air terminal mixer connection type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
+    EXPECT_EQ("FAN:VARIABLEVOLUME", thisFanCoil.FanType);
+    EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
+    EXPECT_EQ("FCU COOLING COIL", thisFanCoil.CCoilName);
+    EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
+    EXPECT_EQ("FCU HEATING COIL", thisFanCoil.HCoilName);
+    EXPECT_EQ("NIGHTCYCLE AVAILMGR", thisAvaiManager.Name);
+    EXPECT_EQ(SystemAvailabilityManager::SysAvailMgr_NightCycle, thisAvaiManager.MgrType);
+
+    TotNumLoops = 2;
+    PlantLoop.allocate(TotNumLoops);
+    NumPltSizInput = 2;
+    PlantSizData.allocate(NumPltSizInput);
+    // chilled water coil
+    auto &CWCoil(WaterCoil(2));
+    thisFanCoil.CCoilName_Index = 2;
+    Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
+    CWCoil.WaterLoopNum = 2;
+    CWCoil.WaterLoopSide = 1;
+    CWCoil.WaterLoopBranchNum = 1;
+    CWCoil.WaterLoopCompNum = 1;
+    // hot water coil
+    auto &HWCoil(WaterCoil(1));
+    thisFanCoil.HCoilName_Index = 1;
+    Node(HWCoil.WaterInletNodeNum).Temp = 60.0;
+    HWCoil.WaterLoopNum = 1;
+    HWCoil.WaterLoopSide = 1;
+    HWCoil.WaterLoopBranchNum = 1;
+    HWCoil.WaterLoopCompNum = 1;
+    for (int l = 1; l <= TotNumLoops; ++l) {
+        auto &loop(PlantLoop(l));
+        loop.LoopSide.allocate(2);
+        auto &loopside(PlantLoop(l).LoopSide(1));
+        loopside.TotalBranches = 1;
+        loopside.Branch.allocate(1);
+        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        loopsidebranch.TotalComponents = 1;
+        loopsidebranch.Comp.allocate(1);
+    }
+    // chilled water plant loop
+    auto &CWLoop(PlantLoop(2));
+    CWLoop.Name = "ChilledWaterLoop";
+    CWLoop.FluidName = "Water";
+    CWLoop.FluidIndex = 1;
+    CWLoop.FluidName = "WATER";
+    CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WaterCoil_Cooling;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
+    auto &CWLoopSizingData(DataSizing::PlantSizData(2));
+    // Chilled Water Loop
+    CWLoop.PlantSizNum = 2;
+    CWLoopSizingData.PlantLoopName = CWLoop.Name;
+    CWLoopSizingData.DesVolFlowRate = 1.0;
+    CWLoopSizingData.DeltaT = 5.6;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    // hot water plant loop
+    auto &HWLoop(PlantLoop(1));
+    HWLoop.Name = "HotWaterLoop";
+    HWLoop.FluidName = "Water";
+    HWLoop.FluidIndex = 1;
+    HWLoop.FluidName = "WATER";
+    HWLoop.LoopSide(1).Branch(1).Comp(1).Name = HWCoil.Name;
+    HWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WaterCoil_SimpleHeating;
+    HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = HWCoil.WaterInletNodeNum;
+    HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = HWCoil.WaterOutletNodeNum;
+    auto &HWLoopSizingData(DataSizing::PlantSizData(1));
+    // Hot Water Loop
+    HWLoop.PlantSizNum = 1;
+    HWLoopSizingData.PlantLoopName = HWLoop.Name;
+    HWLoopSizingData.DesVolFlowRate = 1.0;
+    HWLoopSizingData.DeltaT = 10.0;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    BeginEnvrnFlag = true;
+    DataGlobals::DoingSizing = true;
+    state.fans.LocalTurnFansOff = false;
+    state.fans.LocalTurnFansOn = true;
+    DataEnvironment::Month = 1;
+    DataEnvironment::DayOfMonth = 21;
+    DataGlobals::HourOfDay = 1;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+    UpdateScheduleValues();
+
+    ZoneEqSizing.allocate(1);
+    auto &zoneEqSizing(ZoneEqSizing(1));
+    zoneEqSizing.SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    CurDeadBandOrSetback.allocate(1);
+    CurDeadBandOrSetback(1) = false;
+    TempControlType.allocate(1);
+    TempControlType(1) = 4;
+    ZoneSizingRunDone = true;
+
+    FinalZoneSizing.allocate(1);
+    auto &finalZoneSizing(FinalZoneSizing(1));
+    finalZoneSizing.DesCoolVolFlow = DesignHeatAirVolFlow;
+    finalZoneSizing.DesCoolMassFlow = finalZoneSizing.DesCoolVolFlow * DataEnvironment::StdRhoAir;
+    finalZoneSizing.DesHeatVolFlow = DesignCoolAirVolFlow;
+    finalZoneSizing.DesHeatMassFlow = finalZoneSizing.DesHeatVolFlow * DataEnvironment::StdRhoAir;
+    finalZoneSizing.ZoneTempAtHeatPeak = 20.0;
+    finalZoneSizing.ZoneRetTempAtHeatPeak = finalZoneSizing.ZoneTempAtHeatPeak;
+    zoneEqSizing.ATMixerHeatPriDryBulb = 4.0;
+    finalZoneSizing.ZoneHumRatAtHeatPeak = 0.075;
+    zoneEqSizing.ATMixerHeatPriHumRat = 0.005;
+    finalZoneSizing.ZoneTempAtCoolPeak = 24.0;
+    finalZoneSizing.ZoneRetTempAtCoolPeak = finalZoneSizing.ZoneTempAtCoolPeak;
+    zoneEqSizing.ATMixerCoolPriDryBulb = 30.0;
+    finalZoneSizing.ZoneHumRatAtCoolPeak = 0.0075;
+    zoneEqSizing.ATMixerCoolPriHumRat = 0.0095;
+    finalZoneSizing.DesCoolLoad = 10000.0;
+    finalZoneSizing.DesHeatLoad = 10000.0;
+    finalZoneSizing.CoolDesTemp = 12.8;
+    finalZoneSizing.CoolDesHumRat = 0.0085;
+    finalZoneSizing.HeatDesTemp = 40.0;
+    finalZoneSizing.HeatDesHumRat = 0.0075;
+
+    // heating mode tests
+    FanCoilUnits::CoolingLoad = false;
+    FanCoilUnits::HeatingLoad = true;
+    ZoneSysEnergyDemand.allocate(1);
+    auto &zoneSysEnergyDemand(ZoneSysEnergyDemand(1));
+    auto &zoneEquipConfig(ZoneEquipConfig(1));
+
+    // set zone air node conditions
+    Node(zoneEquipConfig.ZoneNode).Temp = 20.0;
+    Node(zoneEquipConfig.ZoneNode).HumRat = 0.0075;
+    Node(zoneEquipConfig.ZoneNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(zoneEquipConfig.ZoneNode).Temp, Node(zoneEquipConfig.ZoneNode).HumRat);
+    // primary air conditions
+    DataEnvironment::OutDryBulbTemp = 5.0;
+    DataEnvironment::OutHumRat = 0.005;
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    // primary air condition set at outdoor air condition
+    Node(thisFanCoil.ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(thisFanCoil.ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
+    Node(thisFanCoil.ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
+    // initialize air terminal mixer primary air mass flow rate
+    PrimaryAirMassFlowRate = 0.1;
+    Node(thisFanCoil.ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
+    Node(thisFanCoil.ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
+    // set secondary air (recirculating air) conditions to zone air node
+    Node(thisATMixer.SecInNode).Temp = Node(zoneEquipConfig.ZoneNode).Temp;
+    Node(thisATMixer.SecInNode).HumRat = Node(zoneEquipConfig.ZoneNode).HumRat;
+    Node(thisATMixer.SecInNode).Enthalpy = Node(zoneEquipConfig.ZoneNode).Enthalpy;
+
+    BeginEnvrnFlag = true;
+    ZoneEqFanCoil = true;
+    // check availability manager Night Cycle parameters
+    EXPECT_EQ(SystemAvailabilityManager::ThermostatWithMinimumRunTime, SystemAvailabilityManager::NCycSysAvailMgrData(1).CycRunTimeCntrlType);
+    EXPECT_EQ(DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus);
+
+    // set predicted heating load
+    zoneSysEnergyDemand.RemainingOutputReqToCoolSP = 4000.0;
+    zoneSysEnergyDemand.RemainingOutputReqToHeatSP = 4000.0;
+    zoneSysEnergyDemand.RemainingOutputRequired = 4000.0;
+    QZnReq = zoneSysEnergyDemand.RemainingOutputRequired;
+    QUnitOut = 0.0;
+    QLatOut = 0.0;
+    InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    // check results when the fan coil unit is not available
+    EXPECT_NEAR(0.0, QUnitOut, 0.1); // fan coil unit is off
+    EXPECT_NEAR(thisFanCoil.PLR, 0.0, 0.00001);
+    EXPECT_NEAR(Node(thisFanCoil.AirInNode).MassFlowRate, 0.0, 0.000001);
+
+    int SysAvailNum = 1;
+    int PriAirSysNum = 0;
+    int AvailStatus;
+    int const ZoneEquipType = 1;
+    int const CompNum = 1;
+    // current time is within the run time period, starting time is less than stopping time
+    DataGlobals::SimTimeSteps = 0;
+    DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 0.0;
+    DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
+    SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus = 0;
+    // run CalcNCycSysAvailMgr to the availability of the fan coil unit on
+    SystemAvailabilityManager::CalcNCycSysAvailMgr(SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
+    // check that the NightCycle has turned on the equipment
+    EXPECT_EQ(DataHVACGlobals::CycleOn, AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::CycleOn, SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus);
+    // set zone equipment is CyclOn based on night cycle manager status
+    if (SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus) {
+        ZoneCompTurnFansOn = true;
+        ZoneCompTurnFansOff = false;
+    }
+    InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    EXPECT_NEAR(QZnReq, QUnitOut, 3.0);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.187, 0.00001);
+    EXPECT_NEAR(Node(thisFanCoil.AirInNode).MassFlowRate, thisFanCoil.PLR * Node(thisFanCoil.AirInNode).MassFlowRateMax, 0.000001);
+}
+
 } // namespace EnergyPlus

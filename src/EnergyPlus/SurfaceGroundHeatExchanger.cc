@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -66,6 +67,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -220,7 +222,6 @@ namespace SurfaceGroundHeatExchanger {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataHeatBalance::Construct;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using DataEnvironment::GroundTemp_Surface;
@@ -261,7 +262,7 @@ namespace SurfaceGroundHeatExchanger {
             // General user input data
             SurfaceGHE(Item).Name = cAlphaArgs(1);
             SurfaceGHE(Item).ConstructionName = cAlphaArgs(2);
-            SurfaceGHE(Item).ConstructionNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Construct);
+            SurfaceGHE(Item).ConstructionNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), dataConstruction.Construct);
 
             if (SurfaceGHE(Item).ConstructionNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
@@ -270,7 +271,7 @@ namespace SurfaceGroundHeatExchanger {
             }
 
             // Error checking for surfaces, zones, and construction information
-            if (!Construct(SurfaceGHE(Item).ConstructionNum).SourceSinkPresent) {
+            if (!dataConstruction.Construct(SurfaceGHE(Item).ConstructionNum).SourceSinkPresent) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError("Construction must have internal source/sink and use Construction:InternalSource object");
@@ -458,8 +459,6 @@ namespace SurfaceGroundHeatExchanger {
         using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::Pi;
         using namespace DataEnvironment;
-        using DataHeatBalance::Construct;
-        using DataHeatBalance::Material;
         using DataHeatBalance::TotConstructs;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
@@ -512,28 +511,28 @@ namespace SurfaceGroundHeatExchanger {
         // get QTF data - only once
         if (this->InitQTF) {
             for (Cons = 1; Cons <= TotConstructs; ++Cons) {
-                if (UtilityRoutines::SameString(Construct(Cons).Name, this->ConstructionName)) {
+                if (UtilityRoutines::SameString(dataConstruction.Construct(Cons).Name, this->ConstructionName)) {
                     // some error checking ??
                     // CTF stuff
-                    LayerNum = Construct(Cons).TotLayers;
-                    this->NumCTFTerms = Construct(Cons).NumCTFTerms;
-                    this->CTFin = Construct(Cons).CTFInside;         // Z coefficents
-                    this->CTFout = Construct(Cons).CTFOutside;       // X coefficents
-                    this->CTFcross = Construct(Cons).CTFCross;       // Y coefficents
-                    this->CTFflux({1, _}) = Construct(Cons).CTFFlux; // F & f coefficents
+                    LayerNum = dataConstruction.Construct(Cons).TotLayers;
+                    this->NumCTFTerms = dataConstruction.Construct(Cons).NumCTFTerms;
+                    this->CTFin = dataConstruction.Construct(Cons).CTFInside;         // Z coefficents
+                    this->CTFout = dataConstruction.Construct(Cons).CTFOutside;       // X coefficents
+                    this->CTFcross = dataConstruction.Construct(Cons).CTFCross;       // Y coefficents
+                    this->CTFflux({1, _}) = dataConstruction.Construct(Cons).CTFFlux; // F & f coefficents
                     // QTF stuff
-                    this->CTFSourceIn = Construct(Cons).CTFSourceIn;     // Wi coefficents
-                    this->CTFSourceOut = Construct(Cons).CTFSourceOut;   // Wo coefficents
-                    this->CTFTSourceOut = Construct(Cons).CTFTSourceOut; // y coefficents
-                    this->CTFTSourceIn = Construct(Cons).CTFTSourceIn;   // x coefficents
-                    this->CTFTSourceQ = Construct(Cons).CTFTSourceQ;     // w coefficents
+                    this->CTFSourceIn = dataConstruction.Construct(Cons).CTFSourceIn;     // Wi coefficents
+                    this->CTFSourceOut = dataConstruction.Construct(Cons).CTFSourceOut;   // Wo coefficents
+                    this->CTFTSourceOut = dataConstruction.Construct(Cons).CTFTSourceOut; // y coefficents
+                    this->CTFTSourceIn = dataConstruction.Construct(Cons).CTFTSourceIn;   // x coefficents
+                    this->CTFTSourceQ = dataConstruction.Construct(Cons).CTFTSourceQ;     // w coefficents
                     this->ConstructionNum = Cons;
                     // surface properties
-                    this->BtmRoughness = Material(Construct(Cons).LayerPoint(LayerNum)).Roughness;
-                    this->TopThermAbs = Material(Construct(Cons).LayerPoint(LayerNum)).AbsorpThermal;
-                    this->TopRoughness = Material(Construct(Cons).LayerPoint(1)).Roughness;
-                    this->TopThermAbs = Material(Construct(Cons).LayerPoint(1)).AbsorpThermal;
-                    this->TopSolarAbs = Material(Construct(Cons).LayerPoint(1)).AbsorpSolar;
+                    this->BtmRoughness = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(LayerNum)).Roughness;
+                    this->TopThermAbs = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(LayerNum)).AbsorpThermal;
+                    this->TopRoughness = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(1)).Roughness;
+                    this->TopThermAbs = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(1)).AbsorpThermal;
+                    this->TopSolarAbs = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(1)).AbsorpSolar;
                 }
             }
             // set one-time flag

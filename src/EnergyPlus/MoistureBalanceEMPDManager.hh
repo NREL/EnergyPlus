@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Material.hh>
 
 namespace EnergyPlus {
 
@@ -89,7 +90,7 @@ namespace MoistureBalanceEMPDManager {
 
     // Functions
     Real64 CalcDepthFromPeriod(Real64 const period,                           // in seconds
-                               DataHeatBalance::MaterialProperties const &mat // material
+                               Material::MaterialProperties const &mat // material
     );
 
     void GetMoistureBalanceEMPDInput();

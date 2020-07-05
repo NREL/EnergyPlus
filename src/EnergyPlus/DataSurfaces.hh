@@ -66,6 +66,10 @@
 
 namespace EnergyPlus {
 
+    // Forward Declarations
+    struct EnergyPlusData;
+    struct WindowManagerData;
+
 namespace DataSurfaces {
 
     // Using/Aliasing
@@ -830,7 +834,7 @@ namespace DataSurfaces {
 
         Real64 getOutsideAirTemperature(const int t_SurfNum) const;
 
-        Real64 getOutsideIR(const int t_SurfNum) const;
+        Real64 getOutsideIR(WindowManagerData &dataWindowManager, const int t_SurfNum) const;
 
         static Real64 getSWIncident(const int t_SurfNum);
 

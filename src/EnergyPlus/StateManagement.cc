@@ -50,6 +50,7 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
@@ -78,6 +79,7 @@
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -242,6 +244,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
     DataBranchNodeConnections::clear_state();
+    dataConstruction.clear_state();
     DataContaminantBalance::clear_state();
     DataConvergParams::clear_state();
     DataDefineEquip::clear_state();
@@ -260,6 +263,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     DataOutputs::clear_state();
     DataPhotovoltaics::clear_state();
     DataPlant::clear_state();
+    DataReportingFlags::clear_state();
     DataRoomAirModel::clear_state();
     DataRuntimeLanguage::clear_state();
     DataSizing::clear_state();
@@ -395,6 +399,5 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     WindowAC::clear_state();
     WindowComplexManager::clear_state();
     WindowEquivalentLayer::clear_state();
-    WindowManager::clear_state();
     ResultsFramework::clear_state();
 }

@@ -2237,7 +2237,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -3740,7 +3740,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
         "    4.2672,                  !- Vertex 4 Y-coordinate {m}",
         "    4.5034;                  !- Vertex 4 Z-coordinate {m}",
 
-        "  ZoneProperty:UserViewFactors:bySurfaceName,",
+        "  ZoneProperty:UserViewFactors:BySurfaceName,",
         "    ATTIC ZONE,              !- Zone Name",
         "    Attic Floor,		!=From Surface 1",
         "    Attic Floor,		!=To Surface 1",
@@ -4418,8 +4418,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    SimulationManager::GetProjectData(state, state.outputFiles);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -9070,8 +9070,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    SimulationManager::GetProjectData(state, state.outputFiles);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -9625,8 +9625,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
-
-        "  Output:DebuggingData,0,0;",
 
         "  ZoneCapacitanceMultiplier:ResearchSpecial,",
         "    Multiplier,              !- Name",
@@ -13091,15 +13089,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "  20.44,                                                   !- November Ground Temperature",
         "  20.20;                                                   !- December Ground Temperature",
 
-        "Output:Diagnostics,DisplayExtraWarnings;",
-
-        "Output:Diagnostics,DisplayUnusedSchedules;"});
+        "Output:Diagnostics,DisplayExtraWarnings,DisplayUnusedSchedules;"
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -13710,8 +13707,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
-
-        "  Output:DebuggingData,0,0;",
 
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
@@ -15574,7 +15569,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -16474,7 +16469,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
         "    4.2672,                  !- Vertex 4 Y-coordinate {m}",
         "    4.5034;                  !- Vertex 4 Z-coordinate {m}",
 
-        "  ZoneProperty:UserViewFactors:bySurfaceName,",
+        "  ZoneProperty:UserViewFactors:BySurfaceName,",
         "    ATTIC ZONE,              !- Zone Name",
         "    Attic Floor,		!=From Surface 1",
         "    Attic Floor,		!=To Surface 1",
@@ -17152,8 +17147,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    SimulationManager::GetProjectData(state, state.outputFiles);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -19931,7 +19926,7 @@ std::string const idf_objects = delimited_string({
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);

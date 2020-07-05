@@ -57,6 +57,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -216,8 +217,8 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     int cNum;
 
-    for (size_t i = 1; i <= DataHeatBalance::Construct.size(); ++i) {
-        if (DataHeatBalance::Construct(i).TypeIsWindow) {
+    for (size_t i = 1; i <= dataConstruction.Construct.size(); ++i) {
+        if (dataConstruction.Construct(i).TypeIsWindow) {
             cNum = i;
         }
     }
@@ -240,7 +241,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     DataHeatBalFanSys::MAT.dimension(1, T_in);
 
     // initial guess temperatures
-    int numTemps = 2 + 2 * DataHeatBalance::Construct(cNum).TotGlassLayers;
+    int numTemps = 2 + 2 * dataConstruction.Construct(cNum).TotGlassLayers;
     Real64 inSurfTemp = T_in - (1.0 / (numTemps - 1)) * (T_in - T_out);
     Real64 outSurfTemp = T_out + (1.0 / (numTemps - 1)) * (T_in - T_out);
 
@@ -253,7 +254,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         DataEnvironment::SunIsUp = true;
     }
 
-    HeatBalanceSurfaceManager::InitSolarHeatGains();
+    HeatBalanceSurfaceManager::InitSolarHeatGains(state.dataWindowManager);
     SolarShading::CalcInteriorSolarDistribution();
 
     // Calculate heat balance (iteratively solve for surface temperatures)
@@ -288,7 +289,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
             winNum, inSurfTemp,
             T_in); // This time it's actually being used as intended. HConvIn( 1 ) is referenced from the actual heat balance calculation.
 
-        WindowManager::CalcWindowHeatBalance(winNum, h_exterior, inSurfTemp, outSurfTemp);
+        WindowManager::CalcWindowHeatBalance(state.dataWindowManager, winNum, h_exterior, inSurfTemp, outSurfTemp);
 
         outSurfTempDiff = std::fabs(outSurfTemp - outSurfTempPrev);
         inSurfTempDiff = std::fabs(inSurfTemp - inSurfTempPrev);
@@ -433,7 +434,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
     HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
@@ -562,19 +563,19 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     Real64 outSurfTemp;
 
     // Claculate temperature based on supply flow rate
-    WindowManager::CalcWindowHeatBalance(2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
+    WindowManager::CalcWindowHeatBalance(state.dataWindowManager, 2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
     EXPECT_NEAR(20.0, DataHeatBalance::TempEffBulkAir(2), 0.0001);
     // Claculate temperature based on zone temperature with supply flow rate = 0
     DataLoopNode::Node(1).MassFlowRate = 0.0;
     DataLoopNode::Node(2).MassFlowRate = 0.0;
-    WindowManager::CalcWindowHeatBalance(2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
+    WindowManager::CalcWindowHeatBalance(state.dataWindowManager, 2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
     EXPECT_NEAR(25.0, DataHeatBalance::TempEffBulkAir(2), 0.0001);
 
     // Adjacent surface
     DataLoopNode::Node(1).MassFlowRate = 0.1;
     DataLoopNode::Node(2).MassFlowRate = 0.1;
     DataSurfaces::Surface(1).ExtBoundCond = 2;
-    WindowManager::CalcWindowHeatBalance(2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
+    WindowManager::CalcWindowHeatBalance(state.dataWindowManager, 2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
     EXPECT_NEAR(20.0, DataHeatBalance::TempEffBulkAir(2), 0.0001);
 
     DataLoopNode::Node(1).MassFlowRate = 0.0;
@@ -582,7 +583,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataSurfaces::Surface(1).ExtBoundCond = 2;
     DataSurfaces::Surface(2).ExtBoundCond = 1;
     DataSurfaces::Surface(1).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
-    WindowManager::CalcWindowHeatBalance(2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
+    WindowManager::CalcWindowHeatBalance(state.dataWindowManager, 2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
     EXPECT_NEAR(25.0, DataHeatBalance::TempEffBulkAir(2), 0.0001);
 }
 
@@ -609,8 +610,6 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
-
-        "  Output:DebuggingData,0,0;",
 
         "  ZoneCapacitanceMultiplier:ResearchSpecial,",
         "    Multiplier,              !- Name",
@@ -2450,10 +2449,10 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
@@ -2498,7 +2497,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
-    WindowManager::InitGlassOpticalCalculations(state.outputFiles);
+    WindowManager::InitGlassOpticalCalculations(state.dataWindowManager, state.outputFiles);
 
     int NumAngles = 10; // Number of incident angles
     Real64 sum;
@@ -2516,11 +2515,11 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         NumAngles, {0.131680954, 0.118416146, 0.105964377, 0.093826087, 0.08151269, 0.068601358, 0.054850634, 0.040339052, 0.025090929, 0.0});
 
     for (int i = 1; i <= NumAngles; i++) {
-        EXPECT_NEAR(correctT(i), WindowManager::tsolPhi(i), 0.0001);
-        EXPECT_NEAR(correctR(i), WindowManager::rfsolPhi(i), 0.0001);
-        EXPECT_NEAR(correctabs1(i), WindowManager::solabsPhi(1, i), 0.0001);
-        EXPECT_NEAR(correctabs2(i), WindowManager::solabsPhi(2, i), 0.0001);
-        sum = tsolPhi(i) + rfsolPhi(i) + solabsPhi(1, i) + solabsPhi(2, i);
+        EXPECT_NEAR(correctT(i), state.dataWindowManager.tsolPhi(i), 0.0001);
+        EXPECT_NEAR(correctR(i), state.dataWindowManager.rfsolPhi(i), 0.0001);
+        EXPECT_NEAR(correctabs1(i), state.dataWindowManager.solabsPhi(1, i), 0.0001);
+        EXPECT_NEAR(correctabs2(i), state.dataWindowManager.solabsPhi(2, i), 0.0001);
+        sum = state.dataWindowManager.tsolPhi(i) + state.dataWindowManager.rfsolPhi(i) + state.dataWindowManager.solabsPhi(1, i) + state.dataWindowManager.solabsPhi(2, i);
         EXPECT_NEAR(sum, 1.0, 0.0001);
     }
 
@@ -2655,7 +2654,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
     HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
@@ -2790,9 +2789,9 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     ScheduleManager::Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
     // Claculate temperature based on supply flow rate
 
-    WindowManager::CalcWindowHeatBalance(2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
+    WindowManager::CalcWindowHeatBalance(state.dataWindowManager, 2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(thetas(1))), DataHeatBalSurface::QRadLWOutSrdSurfs(2));
+    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(state.dataWindowManager.thetas(1))), DataHeatBalSurface::QRadLWOutSrdSurfs(2));
     EXPECT_NEAR(-24.9342, DataHeatBalSurface::QHeatEmiReport(2),3);
 }
 TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
