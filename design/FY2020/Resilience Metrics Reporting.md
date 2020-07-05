@@ -217,7 +217,7 @@ For: **Entire Facility**
 
 **Heat Index Hours**
 
-|          |Safe (≤ 80°F) [Hours] |Caution (80, 90°F] [Hours] |Extreme Caution (90, 103°F] [Hours] |Danger (103, 125°F] [Hours] |Extreme Danger (> 125°F) [Hours]|
+|          |Safe (≤ 26.7°C) [Hours] |Caution (26.7, 32.2°C] [Hours] |Extreme Caution (32.2, 39.4°C] [Hours] |Danger (39.4, 51.7°C] [Hours] |Extreme Danger (> 51.7°C) [Hours]|
 |----------|------|------|------|------|------|
 |Space_1   |      |      |      |      |      |
 |…         |      |      |      |      |      |
@@ -229,7 +229,7 @@ For: **Entire Facility**
 
 **Heat Index OccupantHours**
 
-|          |Safe (≤ 80°F) [OccupantHours] |Caution (80, 90°F] [OccupantHours] |Extreme Caution (90, 103°F] [OccupantHours] |Danger (103, 125°F] [OccupantHours] |Extreme Danger (> 125°F) [OccupantHours]|
+|          |Safe (≤ 26.7°C) [OccupantHours] |Caution (26.7, 32.2°C] [OccupantHours] |Extreme Caution (32.2, 39.4°C] [OccupantHours] |Danger (39.4, 51.7°C] [OccupantHours] |Extreme Danger (> 51.7°C) [OccupantHours]|
 |----------|------|------|------|------|------|
 |Space_1   |      |      |      |      |      |
 |…         |      |      |      |      |      |

@@ -829,15 +829,11 @@ namespace OutputReportTabular {
     void WriteVisualResilienceTables();
 
     void WriteResilienceBinsTable(int const columnNum,
-                                  std::string const tblTitle,
-                                  std::string const tblSubTitle,
-                                  std::string const sqlTitle,
-                                  std::vector<std::string> const &columnHeadNames,
+                                  std::vector<int> const &columnHead,
                                   Array1D<std::vector<double>> const &ZoneBins);
 
     void WriteSETHoursTable(int const columnNum,
-                            std::string const tblSubTitle,
-                            std::vector<std::string> const &columnHeadNames,
+                            std::vector<std::string> const &columnHead,
                             Array1D<std::vector<double>> const &ZoneBins);
 
     void WriteHeatEmissionTable();

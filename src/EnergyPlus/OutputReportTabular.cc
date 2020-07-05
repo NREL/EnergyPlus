@@ -3850,18 +3850,18 @@ namespace OutputReportTabular {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Heat_Emissions_Summary, Entire_Facility)
                                << "\">Annual Heat Emissions Summary</a>\n";
                 }
-                if (displayThermalResilienceSummary) {
-                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Thermal_Resilience_Summary, Entire_Facility)
-                               << "\">Annual Thermal Resilience Summary</a>\n";
-                }
-                if (displayCO2ResilienceSummary) {
-                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_CO2_Resilience_Summary, Entire_Facility)
-                               << "\">Annual CO2 Resilience Summary</a>\n";
-                }
-                if (displayVisualResilienceSummary) {
-                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Visual_Resilience_Summary, Entire_Facility)
-                               << "\">Annual Visual Resilience Summary</a>\n";
-                }
+//                if (displayThermalResilienceSummary) {
+//                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Thermal_Resilience_Summary, Entire_Facility)
+//                               << "\">Annual Thermal Resilience Summary</a>\n";
+//                }
+//                if (displayCO2ResilienceSummary) {
+//                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_CO2_Resilience_Summary, Entire_Facility)
+//                               << "\">Annual CO2 Resilience Summary</a>\n";
+//                }
+//                if (displayVisualResilienceSummary) {
+//                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Visual_Resilience_Summary, Entire_Facility)
+//                               << "\">Annual Visual Resilience Summary</a>\n";
+//                }
                 for (kReport = 1; kReport <= numReportName; ++kReport) {
                     if (reportName(kReport).show) {
                         tbl_stream << "<br><a href=\"#" << MakeAnchorName(reportName(kReport).namewithspaces, Entire_Facility) << "\">"
@@ -11260,29 +11260,9 @@ namespace OutputReportTabular {
     }
 
     void WriteResilienceBinsTable(int const columnNum,
-                                  std::string const tblTitle,
-                                  std::string const tblSubTitle,
-                                  std::string const sqlTitle,
-                                  std::vector<std::string> const &columnHeadNames,
+                                  std::vector<int> const &columnHead,
                                   Array1D<std::vector<double>> const &ZoneBins)
     {
-        Array1D_string columnHead;
-        Array1D_int columnWidth;
-        Array1D_string rowHead;
-        Array2D_string tableBody;
-
-        WriteSubtitle(tblSubTitle);
-
-        columnHead.allocate(columnNum);
-        rowHead.allocate(NumOfZones + 4);
-        tableBody.allocate(columnNum, NumOfZones + 4);
-        columnWidth.allocate(columnNum);
-        columnWidth = 10;
-
-        for (int j = 0; j < columnNum; j++) {
-            columnHead(j + 1) = columnHeadNames[j];
-        }
-        tableBody = "";
         std::vector<double> columnMax(columnNum, 0);
         std::vector<double> columnMin(columnNum, 0);
         std::vector<double> columnSum(columnNum, 0);
@@ -11290,60 +11270,28 @@ namespace OutputReportTabular {
             columnMin[j] = ZoneBins(1)[j];
         }
         for (int i = 1; i <= NumOfZones; ++i) {
-            rowHead(i) = Zone(i).Name;
+            std::string ZoneName = Zone(i).Name;
             for (int j = 0; j < columnNum; j++) {
                 double curValue = ZoneBins(i)[j];
                 if (curValue > columnMax[j]) columnMax[j] = curValue;
                 if (curValue < columnMin[j]) columnMin[j] = curValue;
                 columnSum[j] += curValue;
-                tableBody(j + 1, i) = RealToStr(curValue, 2);
+                PreDefTableEntry(columnHead[j], ZoneName, RealToStr(curValue, 2));
             }
         }
-        rowHead(NumOfZones + 1) = "Min";
-        rowHead(NumOfZones + 2) = "Max";
-        rowHead(NumOfZones + 3) = "Average";
-        rowHead(NumOfZones + 4) = "Sum";
         for (int j = 0; j < columnNum; j++) {
-            tableBody(j + 1, NumOfZones + 1) = RealToStr(columnMin[j], 2);
-            tableBody(j + 1, NumOfZones + 2) = RealToStr(columnMax[j], 2);
-            tableBody(j + 1, NumOfZones + 3) = RealToStr(columnSum[j] / NumOfZones, 2);
-            tableBody(j + 1, NumOfZones + 4) = RealToStr(columnSum[j], 2);
+            PreDefTableEntry(columnHead[j], "Min", RealToStr(columnMin[j], 2));
+            PreDefTableEntry(columnHead[j], "Max", RealToStr(columnMax[j], 2));
+            PreDefTableEntry(columnHead[j], "Average", RealToStr(columnSum[j] / NumOfZones, 2));
+            PreDefTableEntry(columnHead[j], "Sum", RealToStr(columnSum[j], 2));
         }
 
-        WriteTable(tableBody, rowHead, columnHead, columnWidth);
-        if (sqlite) {
-            sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, sqlTitle, "Entire Facility", tblSubTitle);
-        }
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead,  tblTitle, "Entire Facility", tblSubTitle);
-        }
     }
 
     void WriteSETHoursTable(int const columnNum,
-                            std::string const tblSubTitle,
-                            std::vector<std::string> const &columnHeadNames,
+                            std::vector<int> const &columnHead,
                             Array1D<std::vector<double>> const &ZoneBins)
     {
-        Array1D_string columnHead;
-        Array1D_int columnWidth;
-        Array1D_string rowHead;
-        Array2D_string tableBody;
-        std::string tblTitle = "Annual Thermal Resilience Summary";
-        std::string sqlTitle = "AnnualThermalResilienceSummary";
-
-        WriteSubtitle(tblSubTitle);
-
-        columnHead.allocate(columnNum);
-        rowHead.allocate(NumOfZones + 3);
-        tableBody.allocate(columnNum, NumOfZones + 3);
-        columnWidth.allocate(columnNum);
-        columnWidth = 10;
-
-        for (int j = 0; j < columnNum; j++) {
-            columnHead(j + 1) = columnHeadNames[j];
-        }
-        tableBody = "";
         std::vector<double> columnMax(columnNum - 1, 0);
         std::vector<double> columnMin(columnNum - 1, 0);
         std::vector<double> columnSum(columnNum - 1, 0);
@@ -11351,37 +11299,24 @@ namespace OutputReportTabular {
             columnMin[j] = ZoneBins(1)[j];
         }
         for (int i = 1; i <= NumOfZones; ++i) {
-            rowHead(i) = Zone(i).Name;
             for (int j = 0; j < columnNum - 1; j++) {
                 double curValue = ZoneBins(i)[j];
                 if (curValue > columnMax[j]) columnMax[j] = curValue;
                 if (curValue < columnMin[j]) columnMin[j] = curValue;
                 columnSum[j] += curValue;
-                tableBody(j + 1, i) = RealToStr(curValue, 2);
+                PreDefTableEntry(columnHead[j], Zone(i).Name, RealToStr(curValue, 2));
             }
             std::string startDateTime = DateToString(int(ZoneBins(i)[columnNum - 1]));
-            tableBody(columnNum, i) = startDateTime;
+            PreDefTableEntry(columnHead[columnNum - 1], Zone(i).Name, startDateTime);
         }
-        rowHead(NumOfZones + 1) = "Min";
-        rowHead(NumOfZones + 2) = "Max";
-        rowHead(NumOfZones + 3) = "Average";
         for (int j = 0; j < columnNum - 1; j++) {
-            tableBody(j + 1, NumOfZones + 1) = RealToStr(columnMin[j], 2);
-            tableBody(j + 1, NumOfZones + 2) = RealToStr(columnMax[j], 2);
-            tableBody(j + 1, NumOfZones + 3) = RealToStr(columnSum[j] / NumOfZones, 2);
+            PreDefTableEntry(columnHead[j], "Min", RealToStr(columnMin[j], 2));
+            PreDefTableEntry(columnHead[j], "Max", RealToStr(columnMax[j], 2));
+            PreDefTableEntry(columnHead[j], "Average", RealToStr(columnSum[j] / NumOfZones, 2));
         }
-        tableBody(columnNum, NumOfZones + 1) = "-";
-        tableBody(columnNum, NumOfZones + 2) = "-";
-        tableBody(columnNum, NumOfZones + 3) = "-";
-
-        WriteTable(tableBody, rowHead, columnHead, columnWidth);
-        if (sqlite) {
-            sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, sqlTitle, "Entire Facility", tblSubTitle);
-        }
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead,  tblTitle, "Entire Facility", tblSubTitle);
-        }
+        PreDefTableEntry(columnHead[columnNum - 1], "Min", "-");
+        PreDefTableEntry(columnHead[columnNum - 1], "Max", "-");
+        PreDefTableEntry(columnHead[columnNum - 1], "Average", "-");
     }
 
     void WriteThermalResilienceTables()
@@ -11396,42 +11331,34 @@ namespace OutputReportTabular {
         using DataHeatBalFanSys::ZoneHighSETHours;
 
         if (NumOfZones > 0) {
-            std::string tblTitle = "Annual Thermal Resilience Summary";
-            std::string sqlTitle = "AnnualThermalResilienceSummary";
-            WriteReportHeaders(tblTitle, "Entire Facility", OutputProcessor::StoreType::Averaged);
-
             int columnNum = 5;
-            std::string subTitle = "Heat Index Hours";
-            std::vector<std::string> columnHeadNames = { "Safe (≤ 80°F) [Hours]",
-                                                         "Caution (80, 90°F] [Hours]",
-                                                         "Extreme Caution (90, 103°F] [Hours]",
-                                                         "Danger (103, 125°F] [Hours]",
-                                                         "Extreme Danger (> 125°F) [Hours]" };
-            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneHeatIndexHourBins);
+            std::vector<int> columnHead = {pdchHIHourSafe,
+                                           pdchHIHourCaution,
+                                           pdchHIHourExtremeCaution,
+                                           pdchHIHourDanger,
+                                           pdchHIHourExtremeDanger};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneHeatIndexHourBins);
 
-            subTitle = "Heat Index OccupantHours";
-            columnHeadNames = { "Safe (≤ 80°F) [OccupantHours]",
-                                "Caution (80, 90°F] [OccupantHours]",
-                                "Extreme Caution (90, 103°F] [OccupantHours]",
-                                "Danger (103, 125°F] [OccupantHours]",
-                                "Extreme Danger (> 125°F) [OccupantHours]" };
-            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneHeatIndexOccuHourBins);
+            columnHead = {pdchHIOccuHourSafe,
+                          pdchHIOccuHourCaution,
+                          pdchHIOccuHourExtremeCaution,
+                          pdchHIOccuHourDanger,
+                          pdchHIOccuHourExtremeDanger};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneHeatIndexOccuHourBins);
 
-            subTitle = "Humidex Hours";
-            columnHeadNames = { "Little to no Discomfort (≤ 29) [Hours]",
-                                "Some Discomfort (29, 40] [Hours]",
-                                "Great Discomfort; Avoid Exertion (40, 45] [Hours]",
-                                "Dangerous (45, 50] [Hours]",
-                                "Heat Stroke Quite Possible (> 50) [Hours]" };
-            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneHumidexHourBins);
+            columnHead = {pdchHumidexHourLittle,
+                          pdchHumidexHourSome,
+                          pdchHumidexHourGreat,
+                          pdchHumidexHourDanger,
+                          pdchHumidexHourStroke};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneHumidexHourBins);
 
-            subTitle = "Humidex OccupantHours";
-            columnHeadNames = { "Little to no Discomfort (≤ 29) [OccupantHours]",
-                                "Some Discomfort (29, 40] [OccupantHours]",
-                                "Great Discomfort; Avoid Exertion (40, 45] [OccupantHours]",
-                                "Dangerous (45, 50] [OccupantHours]",
-                                "Heat Stroke Quite Possible (> 50) [OccupantHours]" };
-            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneHumidexOccuHourBins);
+            columnHead = {pdchHumidexOccuHourLittle,
+                          pdchHumidexOccuHourSome,
+                          pdchHumidexOccuHourGreat,
+                          pdchHumidexOccuHourDanger,
+                          pdchHumidexOccuHourStroke };
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneHumidexOccuHourBins);
 
             bool hasPierceSET = true;
             if (TotPeople == 0) {
@@ -11455,17 +11382,14 @@ namespace OutputReportTabular {
 
             if (hasPierceSET) {
                 columnNum = 4;
-                subTitle = "Heating SET Hours";
-                columnHeadNames = {"SET ≤ 12.2°C Hours (°C)", "SET ≤ 12.2°C OccupantHours (°C)",
-                                   "Longest SET ≤ 12.2°C Duration [Hours]", "Start Time of the Longest SET ≤ 12.2°C Duration"};
-                WriteSETHoursTable(columnNum, subTitle, columnHeadNames, ZoneLowSETHours);
+                columnHead = {pdchHeatingSETHours, pdchHeatingSETOccuHours,
+                              pdchHeatingSETUnmetDuration, pdchHeatingSETUnmetTime};
+                WriteSETHoursTable(columnNum, columnHead, ZoneLowSETHours);
 
-                subTitle = "Cooling SET Hours";
-                columnHeadNames = {"SET > 30°C Hours (°C)", "SET > 30°C OccupantHours (°C)",
-                                   "Longest SET > 30°C Duration [Hours]", "Start Time of the Longest SET > 30°C Duration"};
-                WriteSETHoursTable(columnNum, subTitle, columnHeadNames, ZoneHighSETHours);
+                columnHead = {pdchCoolingSETHours, pdchCoolingSETOccuHours,
+                              pdchCoolingSETUnmetDuration, pdchCoolingSETUnmetTime};
+                WriteSETHoursTable(columnNum, columnHead, ZoneHighSETHours);
             }
-
         }
     }
 
@@ -11475,24 +11399,17 @@ namespace OutputReportTabular {
         // Using/Aliasing
         using DataHeatBalFanSys::ZoneCO2LevelHourBins;
         using DataHeatBalFanSys::ZoneCO2LevelOccuHourBins;
-
         if (NumOfZones > 0) {
-            std::string tblTitle = "Annual CO2 Resilience Summary";
-            std::string sqlTitle = "AnnualCO2ResilienceSummary";
-            WriteReportHeaders(tblTitle, "Entire Facility", OutputProcessor::StoreType::Averaged);
-
             int columnNum = 3;
-            std::string subTitle = "CO2 Level Hours";
-            std::vector<std::string> columnHeadNames = { "Safe (<= 1000 ppm) [Hours]",
-                                                         "Caution (1000, 5000 ppm] [Hours]",
-                                                         "Hazard (> 5000 ppm) [Hours]" };
-            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneCO2LevelHourBins);
+            std::vector<int> columnHead = {pdchCO2HourSafe,
+                                           pdchCO2HourCaution,
+                                           pdchCO2HourHazard};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneCO2LevelHourBins);
 
-            subTitle = "CO2 Level OccupantHours";
-            columnHeadNames = { "Safe (<= 1000 ppm) [OccupantHours]",
-                                "Caution (1000, 5000 ppm] [OccupantHours]",
-                                "Hazard (> 5000 ppm) [OccupantHours]" };
-            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneCO2LevelOccuHourBins);
+            columnHead = {pdchCO2OccuHourSafe,
+                          pdchCO2OccuHourCaution,
+                          pdchCO2OccuHourHazard};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneCO2LevelOccuHourBins);
         }
     }
 
@@ -11514,24 +11431,18 @@ namespace OutputReportTabular {
         }
 
         if (NumOfZones > 0) {
-            std::string tblTitle = "Annual Visual Resilience Summary";
-            std::string sqlTitle = "AnnualVisualResilienceSummary";
-            WriteReportHeaders(tblTitle, "Entire Facility", OutputProcessor::StoreType::Averaged);
-
             int columnNum = 4;
-            std::string subTitle = "Illuminance Level Hours";
-            std::vector<std::string> columnHeadNames = { "A Bit Dark (<= 100 lux) [Hours]",
-                                                         "Dim (100, 300 lux] [Hours]",
-                                                         "Adequate (300, 500 lux] [Hours]",
-                                                         "Bright (>500 lux) [Hours]" };
-            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneLightingLevelHourBins);
+            std::vector<int> columnHead = {pdchIllumHourDark,
+                                           pdchIllumHourDim,
+                                           pdchIllumHourAdequate,
+                                           pdchIllumHourBright};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneLightingLevelHourBins);
 
-            subTitle = "Illuminance Level OccupantHours";
-            columnHeadNames = { "A Bit Dark (<= 100 lux) [OccupantHours]",
-                                "Dim (100, 300 lux] [OccupantHours]",
-                                "Adequate (300, 500 lux] [OccupantHours]",
-                                "Bright (>500 lux) [OccupantHours]" };
-            WriteResilienceBinsTable(columnNum, tblTitle, subTitle, sqlTitle, columnHeadNames, ZoneLightingLevelOccuHourBins);
+            columnHead = {pdchIllumOccuHourDark,
+                          pdchIllumOccuHourDim,
+                          pdchIllumOccuHourAdequate,
+                          pdchIllumOccuHourBright};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneLightingLevelOccuHourBins);
         }
     }
 
