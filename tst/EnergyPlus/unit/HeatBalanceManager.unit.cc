@@ -2243,7 +2243,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     SimulationManager::ManageSimulation(state);
-    EXPECT_EQ(DataSurfaces::Surface(2).Construction, DataSurfaces::Surface(2).EMSConstructionOverrideValue);
+ 
+    int surfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
+    EXPECT_EQ(DataSurfaces::Surface(surfNum).Construction, DataSurfaces::Surface(surfNum).EMSConstructionOverrideValue);
+    EXPECT_TRUE(DataSurfaces::Surface(surfNum).EMSConstructionOverrideON);
 }
 
 } // namespace EnergyPlus

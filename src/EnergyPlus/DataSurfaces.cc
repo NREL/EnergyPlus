@@ -505,6 +505,7 @@ namespace DataSurfaces {
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
     std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
     std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
+    std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
     bool AnyHeatBalanceInsideSourceTerm(false);  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     bool AnyHeatBalanceOutsideSourceTerm(false); // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
@@ -1163,6 +1164,7 @@ namespace DataSurfaces {
         AllIZSurfaceList.clear();
         AllHTNonWindowSurfaceList.clear();
         AllHTWindowSurfaceList.clear();
+        AllSurfaceListReportOrder.clear();
         AnyHeatBalanceInsideSourceTerm = false;
         AnyHeatBalanceOutsideSourceTerm = false;
         Surface.deallocate();
