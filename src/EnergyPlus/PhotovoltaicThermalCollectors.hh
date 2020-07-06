@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
 
 namespace EnergyPlus {
     // Forward declarations
@@ -174,7 +175,7 @@ namespace PhotovoltaicThermalCollectors {
 
         void control();
 
-        void calculate();
+        void calculate(ConvectionCoefficientsData &dataConvectionCoefficients);
 
         void update();
     };

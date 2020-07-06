@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -143,7 +144,7 @@ namespace HeatBalanceSurfaceManager {
 
     // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
 
-    void CalcHeatBalanceOutsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+    void CalcHeatBalanceOutsideSurf(ConvectionCoefficientsData &dataConvectionCoefficients, Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
     Real64 GetQdotConvOutRepPerArea(int SurfNum);
 
@@ -173,7 +174,7 @@ namespace HeatBalanceSurfaceManager {
                              bool &ErrorFlag         // Error flag for movable insulation problem
     );
 
-    void CalcExteriorVentedCavity(int SurfNum); // index of surface
+    void CalcExteriorVentedCavity(ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum); // index of surface
 
     void GatherComponentLoadsSurfAbsFact();
 
