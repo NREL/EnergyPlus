@@ -58,6 +58,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct CoolTowerData;
+
 namespace CoolTower {
 
     enum class FlowCtrlEnum
@@ -133,15 +136,15 @@ namespace CoolTower {
         }
     };
 
-    void ManageCoolTower();
+    void ManageCoolTower(CoolTowerData &dataCoolTower);
 
-    void GetCoolTower();
+    void GetCoolTower(CoolTowerData &dataCoolTower);
 
-    void CalcCoolTower();
+    void CalcCoolTower(CoolTowerData &dataCoolTower);
 
-    void UpdateCoolTower();
+    void UpdateCoolTower(CoolTowerData &dataCoolTower);
 
-    void ReportCoolTower();
+    void ReportCoolTower(CoolTowerData &dataCoolTower);
 
 } // namespace CoolTower
 
@@ -158,8 +161,6 @@ struct CoolTowerData : BaseGlobalStruct {
         CoolTowerSys.deallocate();
     }
 };
-
-extern CoolTowerData dataCoolTower;
 
 } // namespace EnergyPlus
 

@@ -68,8 +68,6 @@
 
 namespace EnergyPlus {
 
-CoolTowerData dataCoolTower;
-
 namespace CoolTower {
     // Module containing the data for cooltower system
 
@@ -91,7 +89,7 @@ namespace CoolTower {
     using namespace DataGlobals;
     using namespace DataHeatBalance;
 
-    void ManageCoolTower()
+    void ManageCoolTower(CoolTowerData &dataCoolTower)
     {
 
         // SUBROUTINE INFORMATION:
@@ -108,20 +106,20 @@ namespace CoolTower {
 
         // Obtains and allocates heat balance related parameters from input
         if (dataCoolTower.GetInputFlag) {
-            GetCoolTower();
+            GetCoolTower(dataCoolTower);
             dataCoolTower.GetInputFlag = false;
         }
 
         if (dataCoolTower.NumCoolTowers == 0) return;
 
-        CalcCoolTower();
+        CalcCoolTower(dataCoolTower);
 
-        UpdateCoolTower();
+        UpdateCoolTower(dataCoolTower);
 
-        ReportCoolTower();
+        ReportCoolTower(dataCoolTower);
     }
 
-    void GetCoolTower()
+    void GetCoolTower(CoolTowerData &dataCoolTower)
     {
 
         // SUBROUTINE INFORMATION:
@@ -506,7 +504,7 @@ namespace CoolTower {
         }
     }
 
-    void CalcCoolTower()
+    void CalcCoolTower(CoolTowerData &dataCoolTower)
     {
 
         // SUBROUTINE INFORMATION:
@@ -672,7 +670,7 @@ namespace CoolTower {
         }
     }
 
-    void UpdateCoolTower()
+    void UpdateCoolTower(CoolTowerData &dataCoolTower)
     {
 
         // SUBROUTINE INFORMATION:
@@ -707,7 +705,7 @@ namespace CoolTower {
         }
     }
 
-    void ReportCoolTower()
+    void ReportCoolTower(CoolTowerData &dataCoolTower)
     {
 
         // SUBROUTINE INFORMATION:
