@@ -220,9 +220,10 @@ namespace EnergyPlus {
         if (this->printWarningFlag) {
             if (!this->wasAutoSized && (this->autoSizedValue == this->originalValue)) {
                 this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->originalValue);
+                this->autoSizedValue = this->originalValue;
             } else if (this->wasAutoSized && this->originalValue <= 0.0) {
                 this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
-            } else if (this->autoSizedValue > 0.0) {
+            } else if (this->autoSizedValue >= 0.0) {
                 if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) >
                     DataSizing::AutoVsHardSizingThreshold) {
                     this->reportSizerOutput(this->compType,
@@ -250,7 +251,7 @@ namespace EnergyPlus {
                                 "Verify that the value entered is intended and is consistent with other components.");
                     }
                 }
-                this->autoSizedValue = this->originalValue;
+                if (!this->wasAutoSized) this->autoSizedValue = this->originalValue;
             } else {
                 ShowSevereError(this->callingRoutine + ' ' + this->compType + ' ' +
                                 this->compName +
@@ -258,6 +259,8 @@ namespace EnergyPlus {
                 ShowContinueError("SizingString = " + this->sizingString + ", SizingResult = " +
                                   General::TrimSigDigits(this->originalValue, 1));
             }
+        } else if (!this->wasAutoSized) {
+            this->autoSizedValue = this->originalValue;
         }
     }
     bool BaseSizer::isValidCoilType(std::string const &compType)
