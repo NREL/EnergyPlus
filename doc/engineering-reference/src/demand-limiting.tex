@@ -19,7 +19,7 @@ Demand limiting controls shut off or reduce the power to non-essential loads in 
 
 The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies.~ The DemandManagerAssignmentList object is a high level control that makes demand limiting decisions based on a list of possible demand limiting strategies.~ Each demand limiting strategy is described in a separate DemandManager object.~ Each DemandManager object controls a group of similar load objects of the same type, such as DemandManager:Lights, DemandManager:ElectricEquipment, DemandManager:Thermostats, or DemandManager:Ventilation objects.
 
-\subsection{Algorithm}\label{algorithm}
+\section{Algorithm}\label{algorithm}
 
 In EnergyPlus the DemandManagerAssignmentList and DemandManager objects are simulated by the Demand Manager module.~ The Demand Manager is built into the overall solution method for the program.~ For each zone time step, the program executes three major segments of code:
 
@@ -60,7 +60,7 @@ DemandManager:Ventilation & ~ & ~ & X \tabularnewline
 
 All demand limiting controls are disabled during warmup days and sizing runs.
 
-\subsubsection{Sequential Priority}\label{sequential-priority}
+\subsection{Sequential Priority}\label{sequential-priority}
 
 If the \emph{Demand Manager Priority} field of the DemandManagerAssignmentList object is set to SEQUENTIAL, each DemandManager in the list is activated in sequence from first to last until demand is reduced below the limit or until all managers are activated.~ A DemandManager is skipped if it cannot reduce the demand.~ Possible reasons that a manager cannot reduce demand include:
 
@@ -77,6 +77,6 @@ For each DemandManager in the list that is successfully activated, one or more o
 
 The implication of sequential priority is that a DemandManagerAssignmentList with many DemandManagers may make many passes through the Demand Manager before all demand limiting decisions are finalized.~ Each pass requires an additional resimulation of the current time step.~ In some cases this could significantly slow down the overall simulation runtime.~ The use of the \emph{Minimum Limit Duration} field can help to ensure that not every DemandManager is being activated at every time step.
 
-\subsubsection{All Priority}\label{all-priority}
+\subsection{All Priority}\label{all-priority}
 
 If the \emph{Demand Manager Priority} field of the DemandManagerAssignmentList object is set to ALL, all DemandManagers in the list are activated simultaneously to achieve the maximum demand reduction.~ This priority option requires only one final resimulation after all DemandManagers are activated.

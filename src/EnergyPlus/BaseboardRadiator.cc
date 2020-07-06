@@ -55,12 +55,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -72,6 +72,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -544,7 +545,8 @@ namespace BaseboardRadiator {
         }
         if (baseboard.Baseboard(BaseboardNum).SetLoopIndexFlag && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(baseboard.Baseboard(BaseboardNum).EquipID,
+            ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                    baseboard.Baseboard(BaseboardNum).EquipID,
                                     baseboard.Baseboard(BaseboardNum).EquipType,
                                     baseboard.Baseboard(BaseboardNum).LoopNum,
                                     baseboard.Baseboard(BaseboardNum).LoopSideNum,

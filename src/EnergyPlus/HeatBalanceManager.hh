@@ -54,9 +54,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+
+    // Forward Declarations
+    struct EnergyPlusData;
+    struct WindowManagerData;
     class OutputFiles;
 
 namespace HeatBalanceManager {
@@ -155,7 +158,7 @@ namespace HeatBalanceManager {
 
     void SetPreConstructionInputParameters();
 
-    void GetProjectControlData(OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if errors detected during getting data
+    void GetProjectControlData(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if errors detected during getting data
 
     void GetSiteAtmosphereData(EnergyPlus::OutputFiles &outputFiles, bool &ErrorsFound);
 
@@ -195,7 +198,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(OutputFiles &outputFiles);
+    void InitHeatBalance(WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
 
     void AllocateHeatBalArrays();
 
@@ -257,6 +260,8 @@ namespace HeatBalanceManager {
 
     void SetupComplexFenestrationStateInput(int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound);
+
+    void InitConductionTransferFunctions(OutputFiles &outputFiles);
 
 } // namespace HeatBalanceManager
 

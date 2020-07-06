@@ -74,7 +74,7 @@ using DataHeatBalFanSys::ZoneThermostatSetPointHi;
 using DataHeatBalFanSys::ZoneThermostatSetPointLo;
 using DataHeatBalance::ZoneIntGain;
 
-TEST_F(EnergyPlusFixture, AdvancedAFNTest_Test1)
+TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
 {
 
     int AirflowNetworkNumOfOccuVentCtrls;

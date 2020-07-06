@@ -145,6 +145,7 @@ int getInt (void* element, Att a, ValueStatus* vs);
 unsigned int getUInt (void* element, Att a, ValueStatus* vs);
 char getBoolean (void* element, Att a, ValueStatus* vs);
 Enu getEnumValue (void* element, Att a, ValueStatus* vs);
+void printidf(const char* fmuFilNam, ModelDescription* md);
 void freeElement (void* element);
 
 // Convenience methods for AST access. To be used afer successful validation only.
