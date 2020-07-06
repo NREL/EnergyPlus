@@ -118,6 +118,7 @@
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
@@ -5806,9 +5807,9 @@ namespace HeatBalanceSurfaceManager {
             ZoneWinHeatLossRepEnergy = 0.0;
 
             if (AllCTF) {
-                CalcHeatBalanceInsideSurf2CTFOnly(state.dataWindowManager, 1, NumOfZones, DataSurfaces::AllIZSurfaceList);
+                CalcHeatBalanceInsideSurf2CTFOnly(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, 1, NumOfZones, DataSurfaces::AllIZSurfaceList);
             } else {
-                CalcHeatBalanceInsideSurf2(state.dataWindowManager,
+                CalcHeatBalanceInsideSurf2(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager,
                                            DataSurfaces::AllHTSurfaceList,
                                            DataSurfaces::AllIZSurfaceList,
                                            DataSurfaces::AllHTNonWindowSurfaceList,
@@ -5838,7 +5839,7 @@ namespace HeatBalanceSurfaceManager {
             auto const &zoneHTWindowSurfList(Zone(ZoneToResimulate).ZoneHTWindowSurfaceList);
             // Cannot use CalcHeatBalanceInsideSurf2CTFOnly because resimulated zone includes adjacent interzone surfaces
             CalcHeatBalanceInsideSurf2(
-                state.dataWindowManager, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
+                state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
             // Sort window heat gain/loss
             if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
                 ZoneWinHeatGainRep(ZoneToResimulate) = ZoneWinHeatGain(ZoneToResimulate);
@@ -5850,7 +5851,7 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void CalcHeatBalanceInsideSurf2(WindowManagerData &dataWindowManager,
+    void CalcHeatBalanceInsideSurf2(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager,
                                     const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                     const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
@@ -6452,7 +6453,7 @@ namespace HeatBalanceSurfaceManager {
 
                         // Following call determines inside surface temperature of glazing, and of
                         // frame and/or divider, if present
-                        CalcWindowHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, SurfNum, HcExtSurf(SurfNum), TempSurfInTmp(SurfNum), TH11);
+                        CalcWindowHeatBalance(dataWindowComplexManager, dataWindowEquivalentLayer, dataWindowManager, SurfNum, HcExtSurf(SurfNum), TempSurfInTmp(SurfNum), TH11);
 
                         TempSurfIn(SurfNum) = TempSurfInTmp(SurfNum);
                     }
@@ -6674,7 +6675,7 @@ namespace HeatBalanceSurfaceManager {
         CalculateZoneMRT(ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
     }
 
-    void CalcHeatBalanceInsideSurf2CTFOnly(WindowManagerData &dataWindowManager,
+    void CalcHeatBalanceInsideSurf2CTFOnly(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager,
                                            const int FirstZone,             // First zone to simulate
                                            const int LastZone,              // Last zone to simulate
                                            const std::vector<int> &IZSurfs, // Last zone to simulate
@@ -7149,7 +7150,7 @@ namespace HeatBalanceSurfaceManager {
 
                             // Following call determines inside surface temperature of glazing, and of
                             // frame and/or divider, if present
-                            CalcWindowHeatBalance(dataWindowManager, surfNum, HcExtSurf(surfNum), TempSurfInTmp(surfNum), TH11);
+                            CalcWindowHeatBalance(dataWindowComplexManager, dataWindowEquivalentLayer, dataWindowManager, surfNum, HcExtSurf(surfNum), TempSurfInTmp(surfNum), TH11);
 
                             TempSurfIn(surfNum) = TempSurfInTmp(surfNum);
                         }

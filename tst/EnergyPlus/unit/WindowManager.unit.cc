@@ -581,6 +581,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataSurfaces::Surface(1).ExtBoundCond = 2;
     WindowManager::CalcWindowHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
     EXPECT_NEAR(20.0, DataHeatBalance::TempEffBulkAir(surfNum2), 0.0001);
+
     DataLoopNode::Node(1).MassFlowRate = 0.0;
     DataLoopNode::Node(2).MassFlowRate = 0.0;
     DataSurfaces::Surface(1).ExtBoundCond = 2;
