@@ -83,6 +83,13 @@ Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Tur
 24,ZN_1_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000
 24,ZN_1_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000
 ```
+### Surface Order in Output Reports
+
+The internal ordering of surfaces has changed. Previously subsurfaces (doors and windows) immdediately followed their respective base surface. 
+Now subsurfaces are at the end of each group of zone surfaces.Many reports preserve the old order, but some outputs do not.
+Changed outputs include the rdd, edd, eso (and resulting csv), shd, and sci output files.
+
+See [PR#7847](https://github.com/NREL/EnergyPlus/pull/7847)
 
 ### New reporting items added to the _perflog.csv log file for PerformancePrecisionTradeoffs
 

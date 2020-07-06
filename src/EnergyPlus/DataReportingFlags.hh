@@ -76,6 +76,9 @@ namespace DataReportingFlags {
     extern bool DebugOutput;
     extern bool EvenDuringWarmup;
 
+    // Functions
+    void clear_state();
+
 } // namespace DataReportingFlags
 
 } // namespace EnergyPlus

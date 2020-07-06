@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -105,7 +106,6 @@ namespace DataHeatBalance {
     // MODULE PARAMETER DEFINITIONS:
 
     // Parameters for the definition and limitation of arrays:
-
     // Parameters to indicate material group type for use with the Material
     // derived type (see below):
 
@@ -472,7 +472,7 @@ namespace DataHeatBalance {
     //                           !       this limit of 1.0 corresponds to a completely still layer of air that is around 0.025 m thick
     //                           !  5) The previous limit of 0.1 (before ver. 3.1) caused loads initialization problems in test files
     Real64 HighHConvLimit(1000.0);         // upper limit for HConv, mostly used for user input limits in practics. !W/m2-K
-    Real64 MaxAllowedDelTemp(0.002);       // Convergence criteria for inside surface temperatures 
+    Real64 MaxAllowedDelTemp(0.002);       // Convergence criteria for inside surface temperatures
     Real64 MaxAllowedDelTempCondFD(0.002); // Convergence criteria for inside surface temperatures for CondFD
 
     std::string BuildingName;           // Name of building
@@ -487,6 +487,7 @@ namespace DataHeatBalance {
     int OverallHeatTransferSolutionAlgo(DataSurfaces::HeatTransferModel_CTF); // Global HeatBalanceAlgorithm setting
 
     // Flags for HeatTransfer Algorithms Used
+    bool AllCTF(true);                      // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
     bool AnyCTF(false);                     // CTF used
     bool AnyEMPD(false);                    // EMPD used
     bool AnyCondFD(false);                  // CondFD used
@@ -494,6 +495,7 @@ namespace DataHeatBalance {
     bool AnyKiva(false);                    // Kiva used
     bool AnyAirBoundary(false);             // Construction:AirBoundary used
     bool AnyAirBoundaryGroupedSolar(false); // Construction:AirBoundary with GroupedZones for solar used somewhere
+    bool AnyBSDF(false);                    // True if any WindowModelType == WindowBSDFModel
 
     int MaxNumberOfWarmupDays(25);      // Maximum number of warmup days allowed
     int MinNumberOfWarmupDays(1);       // Minimum number of warmup days allowed
@@ -862,6 +864,7 @@ namespace DataHeatBalance {
         SolarDistribution = 0;
         InsideSurfIterations = 0;
         OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+        AllCTF = true;
         AnyCTF = false;
         AnyEMPD = false;
         AnyCondFD = false;
@@ -869,6 +872,7 @@ namespace DataHeatBalance {
         AnyKiva = false;
         AnyAirBoundary = false;
         AnyAirBoundaryGroupedSolar = false;
+        AnyBSDF = false;
         MaxNumberOfWarmupDays = 25;
         MinNumberOfWarmupDays = 1;
         CondFDRelaxFactor = 1.0;
