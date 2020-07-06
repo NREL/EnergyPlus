@@ -569,7 +569,6 @@ namespace HVACMultiSpeedHeatPump {
         using DXCoils::SetMSHPDXCoilHeatRecoveryFlag;
         using FluidProperties::GetSatDensityRefrig;
         using SteamCoils::GetTypeOfCoil;
-        //using ZoneTempPredictorCorrector::NumStageCtrZone;
 
         // Locals
         // PARAMETERS

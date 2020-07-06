@@ -49,6 +49,7 @@
 #define DisplacementVentMgr_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -77,7 +78,7 @@ namespace DisplacementVentMgr {
 
     // Functions
 
-    void ManageUCSDDVModel(int const ZoneNum); // index number for the specified zone
+    void ManageUCSDDVModel(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // index number for the specified zone
 
     //**************************************************************************************************
 
@@ -85,7 +86,7 @@ namespace DisplacementVentMgr {
 
     //**************************************************************************************************
 
-    void HcUCSDDV(int const ZoneNum, Real64 const FractionHeight);
+    void HcUCSDDV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum, Real64 const FractionHeight);
 
     //**************************************************************************************************
 
@@ -99,7 +100,7 @@ namespace DisplacementVentMgr {
                                                Real64 zoneMultiplier,
                                                Real64 airCap);
 
-    void CalcUCSDDV(int const ZoneNum); // Which Zonenum
+    void CalcUCSDDV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // Which Zonenum
 
 } // namespace DisplacementVentMgr
 
