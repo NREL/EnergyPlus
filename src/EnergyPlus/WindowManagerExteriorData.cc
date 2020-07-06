@@ -47,6 +47,7 @@
 
 #include <cassert>
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -108,7 +109,7 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //       CWCESpecturmProperties
     ///////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSeries> CWCESpecturmProperties::getDefaultSolarRadiationSpectrum()
+    std::shared_ptr<CSeries> CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(WindowManagerData &dataWindowManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -120,15 +121,15 @@ namespace WindowManager {
         // Handles solar radiation spetrum from defalut location or IDF
         std::shared_ptr<CSeries> solarRadiation = std::make_shared<CSeries>();
 
-        for (auto i = 1; i <= nume; ++i) {
-            solarRadiation->addProperty(wle(i), e(i));
+        for (auto i = 1; i <= dataWindowManager.nume; ++i) {
+            solarRadiation->addProperty(dataWindowManager.wle(i), dataWindowManager.e(i));
         }
 
         return solarRadiation;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSeries> CWCESpecturmProperties::getDefaultVisiblePhotopicResponse()
+    std::shared_ptr<CSeries> CWCESpecturmProperties::getDefaultVisiblePhotopicResponse(WindowManagerData &dataWindowManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -140,8 +141,8 @@ namespace WindowManager {
         // Handles solar radiation spetrum from defalut location or IDF
         std::shared_ptr<CSeries> visibleResponse = std::make_shared<CSeries>();
 
-        for (auto i = 1; i <= numt3; ++i) {
-            visibleResponse->addProperty(wlt3(i), y30(i));
+        for (auto i = 1; i <= dataWindowManager.numt3; ++i) {
+            visibleResponse->addProperty(dataWindowManager.wlt3(i), dataWindowManager.y30(i));
         }
 
         return visibleResponse;
@@ -174,7 +175,7 @@ namespace WindowManager {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(MaterialProperties const &t_MaterialProperties)
+    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(Material::MaterialProperties const &t_MaterialProperties)
     {
         Real64 Tsol = t_MaterialProperties.Trans;
         Real64 Rfsol = t_MaterialProperties.ReflectSolBeamFront;
@@ -229,7 +230,7 @@ namespace WindowManager {
         aMap.at(t_ConstrNum).push_back(t_Layer);
     }
 
-    std::shared_ptr<CMultiLayerScattered> CWindowConstructionsSimplified::getEquivalentLayer(WavelengthRange const t_Range, int const t_ConstrNum)
+    std::shared_ptr<CMultiLayerScattered> CWindowConstructionsSimplified::getEquivalentLayer(WindowManagerData &dataWindowManager, WavelengthRange const t_Range, int const t_ConstrNum)
     {
         auto it = m_Equivalent.find(std::make_pair(t_Range, t_ConstrNum));
         if (it == m_Equivalent.end()) {
@@ -241,7 +242,7 @@ namespace WindowManager {
                 aEqLayer->addLayer(iguLayers[i]);
             }
 
-            std::shared_ptr<CSeries> aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
+            std::shared_ptr<CSeries> aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(dataWindowManager);
             aEqLayer->setSourceData(aSolarSpectrum);
             m_Equivalent[std::make_pair(t_Range, t_ConstrNum)] = aEqLayer;
         }

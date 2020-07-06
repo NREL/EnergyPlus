@@ -206,7 +206,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     DataGlobals::MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state.outputFiles);
 
-    GetProjectControlData(state.outputFiles, ErrorsFound); // read project control data
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneData(ErrorsFound);
@@ -229,7 +229,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(state.outputFiles, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     DataEnvironment::OutDryBulbTemp = 20.0;

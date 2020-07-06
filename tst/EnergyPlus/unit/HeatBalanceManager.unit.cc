@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDaylighting.hh>
@@ -61,18 +62,16 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -335,15 +334,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     bool ErrorsFound(false); // If errors detected in input
 
     TotMaterials = 3;
-    Material.allocate(TotMaterials);
-    Material(1).Name = "GLASS";
-    Material(2).Name = "AIRGAP";
-    Material(3).Name = "GLASS";
+    dataMaterial.Material.allocate(TotMaterials);
+    dataMaterial.Material(1).Name = "GLASS";
+    dataMaterial.Material(2).Name = "AIRGAP";
+    dataMaterial.Material(3).Name = "GLASS";
 
     // Material layer group index
-    Material(1).Group = 3; // WindowGlass
-    Material(2).Group = 4; // WindowGas
-    Material(3).Group = 3; // WindowGlass
+    dataMaterial.Material(1).Group = 3; // WindowGlass
+    dataMaterial.Material(2).Group = 4; // WindowGas
+    dataMaterial.Material(3).Group = 3; // WindowGlass
 
     NominalRforNominalUCalculation.allocate(1);
     NominalRforNominalUCalculation(1) = 0.0;
@@ -359,7 +358,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     EXPECT_FALSE(ErrorsFound);
 
     // Clear shared arrays that were allocated in GetConstructData
-    Construct.deallocate();
+    dataConstruction.Construct.deallocate();
 
     // call to get invalid window material type
     //		Material( 2 ).Group = 16; // BlindEquivalentLayer, this layer is invalid in plain windows
@@ -394,7 +393,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(ZoneAirMassFlow.BalanceMixing);
@@ -457,7 +456,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     // call to process input
     ProcessScheduleInput(state.outputFiles);
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -604,7 +603,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -664,7 +663,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     NumOfZones = 2;
     ZoneReOrder.allocate(NumOfZones);
@@ -714,11 +713,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
     EXPECT_FALSE(ErrorsFound);
 
     // check the "Material:RoofVegetation" names
-    EXPECT_EQ(Material(1).Name, "THICKSOIL");
+    EXPECT_EQ(dataMaterial.Material(1).Name, "THICKSOIL");
     // check maximum (saturated) moisture content
-    EXPECT_EQ(0.4, Material(1).Porosity);
+    EXPECT_EQ(0.4, dataMaterial.Material(1).Porosity);
     // check initial moisture Content was reset
-    EXPECT_EQ(0.4, Material(1).InitMoisture); // reset from 0.45 to 0.4 during get input
+    EXPECT_EQ(0.4, dataMaterial.Material(1).InitMoisture); // reset from 0.45 to 0.4 during get input
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
@@ -824,8 +823,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
         "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
-
-        "  Output:DebuggingData,0,0;",
 
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
@@ -1210,7 +1207,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 
     ScheduleManager::ProcessScheduleInput(state.outputFiles);
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1275,7 +1272,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_DOUBLE_EQ(0.012611481326656135, DataLoopNode::Node(1).HumRat);
     EXPECT_DOUBLE_EQ(57247.660939392081, DataLoopNode::Node(1).Enthalpy);
 
-    InitHeatBalance(state.outputFiles);
+    InitHeatBalance(state.dataWindowManager, state.outputFiles);
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
@@ -1293,7 +1290,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataEnvironment::WindSpeed = 1.5;
     DataEnvironment::WindDir = 90.0;
 
-    InitHeatBalance(state.outputFiles);
+    InitHeatBalance(state.dataWindowManager, state.outputFiles);
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
@@ -1330,7 +1327,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "REGULAFALSITHENBISECTION");
 }
@@ -1360,7 +1357,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi");
 }
@@ -1581,7 +1578,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     HeatBalanceManager::ManageHeatBalance(state);
     // Find the fenestration surface
     int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
-    int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", DataHeatBalance::Construct);
+    int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", dataConstruction.Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win1ConstNum);
     Real64 transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
     EXPECT_GT(transSol, 0.8);
@@ -1596,7 +1593,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     HeatBalanceManager::ManageHeatBalance(state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
     HeatBalanceManager::ManageHeatBalance(state);
-    int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", DataHeatBalance::Construct);
+    int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", dataConstruction.Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
     transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
     EXPECT_LT(transSol, 0.2);
@@ -1618,7 +1615,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1645,7 +1642,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1671,7 +1668,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_TRUE(DataHeatBalance::AnyEMPD);
@@ -1694,7 +1691,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1717,7 +1714,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1769,7 +1766,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
     HeatBalanceManager::GetMaterialData(state.outputFiles, errorsfound);
 
     EXPECT_FALSE(errorsfound);
-    EXPECT_NEAR(DataHeatBalance::Material(1).Resistance,0.158,0.0001);
+    EXPECT_NEAR(dataMaterial.Material(1).Resistance,0.158,0.0001);
 
 }
 
@@ -1815,17 +1812,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHeatBalance::TotMaterials, 1);
     int MaterNum = 1;
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).Group, DataHeatBalance::IRTMaterial);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).Name, "~AirBoundary-IRTMaterial");
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).ROnly, true);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).Resistance, 0.01);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).AbsorpThermal, 0.9999);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).AbsorpThermalInput, 0.9999);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).AbsorpSolar, 0.0);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).AbsorpSolarInput, 0.0);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).AbsorpVisible, 0.0);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).AbsorpVisibleInput, 0.0);
-    EXPECT_EQ(DataHeatBalance::NominalR(MaterNum), Material(MaterNum).Resistance);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).Group, DataHeatBalance::IRTMaterial);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).Name, "~AirBoundary-IRTMaterial");
+    EXPECT_EQ(dataMaterial.Material(MaterNum).ROnly, true);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).Resistance, 0.01);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpThermal, 0.9999);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpThermalInput, 0.9999);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpSolar, 0.0);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpSolarInput, 0.0);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpVisible, 0.0);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpVisibleInput, 0.0);
+    EXPECT_EQ(DataHeatBalance::NominalR(MaterNum), dataMaterial.Material(MaterNum).Resistance);
 
     // get constructions
     ErrorsFound = false;
@@ -1834,48 +1831,48 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
 
     EXPECT_EQ(DataHeatBalance::TotConstructs, 3);
 
-    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Non-Grouped Air Boundary"), DataHeatBalance::Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Non-Grouped Air Boundary"));
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).TotLayers, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Material(DataHeatBalance::Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.5); // Default value from IDD
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, -1);
+    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Non-Grouped Air Boundary"), dataConstruction.Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataConstruction.Construct(constrNum).Name, "Non-Grouped Air Boundary"));
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).IsUsedCTF);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).TotLayers, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataMaterial.Material(dataConstruction.Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryACH, 0.5); // Default value from IDD
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryMixingSched, -1);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.01);
 
-    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Grouped Air Boundary"), DataHeatBalance::Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Grouped Air Boundary"));
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).TotLayers, 0);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.0); // Not processed for GroupedZone mixing option
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, 0);
+    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Grouped Air Boundary"), dataConstruction.Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataConstruction.Construct(constrNum).Name, "Grouped Air Boundary"));
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).IsUsedCTF);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).TotLayers, 0);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryACH, 0.0); // Not processed for GroupedZone mixing option
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryMixingSched, 0);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
 
-    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Good Mixing Schedule"), DataHeatBalance::Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).TotLayers, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Material(DataHeatBalance::Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.4);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, 1);
+    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Good Mixing Schedule"), dataConstruction.Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataConstruction.Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).IsUsedCTF);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).TotLayers, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataMaterial.Material(dataConstruction.Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryACH, 0.4);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryMixingSched, 1);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.01);
 
 }
@@ -1921,18 +1918,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 
     EXPECT_EQ(DataHeatBalance::TotConstructs, 1);
 
-    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Bad Mixing Schedule"), DataHeatBalance::Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).TotLayers, 0);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.1);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, 0);
+    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Bad Mixing Schedule"), dataConstruction.Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataConstruction.Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).IsUsedCTF);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).TotLayers, 0);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryACH, 0.1);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryMixingSched, 0);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
 
 }
@@ -1954,14 +1951,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
 
     int MaterNum = 1;
 
-    EXPECT_EQ(Material(MaterNum).ROnly, true);
-    EXPECT_NEAR(Material(MaterNum).Resistance, 0.01, 0.00001);
-    EXPECT_NEAR(Material(MaterNum).AbsorpThermal, 0.9999, 0.00001);
-    EXPECT_NEAR(Material(MaterNum).AbsorpThermalInput, 0.9999, 0.00001);
-    EXPECT_NEAR(Material(MaterNum).AbsorpSolar, 1.0, 0.00001);
-    EXPECT_NEAR(Material(MaterNum).AbsorpSolarInput, 1.0, 0.00001);
-    EXPECT_NEAR(Material(MaterNum).AbsorpVisible, 1.0, 0.00001);
-    EXPECT_NEAR(Material(MaterNum).AbsorpVisibleInput, 1.0, 0.00001);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).ROnly, true);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).Resistance, 0.01, 0.00001);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpThermal, 0.9999, 0.00001);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpThermalInput, 0.9999, 0.00001);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpSolar, 1.0, 0.00001);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpSolarInput, 1.0, 0.00001);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpVisible, 1.0, 0.00001);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpVisibleInput, 1.0, 0.00001);
 
 }
 
@@ -1971,7 +1968,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     DataSurfaces::TotSurfaces = 3;
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataHeatBalance::TotConstructs = 3;
-    DataHeatBalance::Construct.allocate( DataHeatBalance::TotConstructs);
+    dataConstruction.Construct.allocate( DataHeatBalance::TotConstructs);
 
     DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Wall;
     DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
@@ -1979,17 +1976,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     DataSurfaces::Surface(1).Construction = 1;
     DataSurfaces::Surface(2).Construction = 2;
     DataSurfaces::Surface(3).Construction = 3;
-    DataHeatBalance::Construct(1).WindowTypeBSDF = false;
-    DataHeatBalance::Construct(2).WindowTypeBSDF = false;
-    DataHeatBalance::Construct(3).WindowTypeBSDF = true;
+    dataConstruction.Construct(1).WindowTypeBSDF = false;
+    dataConstruction.Construct(2).WindowTypeBSDF = false;
+    dataConstruction.Construct(3).WindowTypeBSDF = true;
     int SurfsForRegWindow = 3;
-    DataHeatBalance::Construct(1).TotLayers = 1;
-    DataHeatBalance::Construct(2).TotLayers = SurfsForRegWindow;
-    DataHeatBalance::Construct(3).TotLayers = 1;
+    dataConstruction.Construct(1).TotLayers = 1;
+    dataConstruction.Construct(2).TotLayers = SurfsForRegWindow;
+    dataConstruction.Construct(3).TotLayers = 1;
 
     FenLaySurfTempFront.dimension(10, DataSurfaces::TotSurfaces, 0.0);
     FenLaySurfTempBack.dimension(10, DataSurfaces::TotSurfaces, 0.0);
-    DataHeatBalSurface::TH.dimension(2, MaxCTFTerms, DataSurfaces::TotSurfaces, 0.0);
+    DataHeatBalSurface::TH.dimension(2, Construction::MaxCTFTerms, DataSurfaces::TotSurfaces, 0.0);
 
     DataHeatBalSurface::TH(1,1,1) = 21.0;
     DataHeatBalSurface::TH(1,1,2) = 22.0;
@@ -2042,9 +2039,214 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisec
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "BISECTION");
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
+{
+
+    DataIPShortCuts::lAlphaFieldBlanks = true;
+
+    std::string const idf_objects = delimited_string({
+        "Version,9.3;",
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
+        "    No;                      !- Run Simulation for Weather File Run Periods",
+
+        "  SizingPeriod:DesignDay,",
+        "    SunnyWinterDay,  !- Name",
+        "    1,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    WinterDesignDay,         !- Day Type",
+        "    5.0,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    0.0,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    4.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    83411.,                  !- Barometric Pressure {Pa}",
+        "    4,                       !- Wind Speed {m/s}",
+        "    120,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    1.00;                    !- Sky Clearness",
+
+        "  Site:Location,",
+        "    Denver Stapleton Intl Arpt CO USA WMO=724690,  !- Name",
+        "    39.77,                   !- Latitude {deg}",
+        "    -104.87,                 !- Longitude {deg}",
+        "    -7.00,                   !- Time Zone {hr}",
+        "    1611.00;                 !- Elevation {m}",
+        "Material,",
+        "  Concrete Block,          !- Name",
+        "  MediumRough,             !- Roughness",
+        "  0.1014984,               !- Thickness {m}",
+        "  0.3805070,               !- Conductivity {W/m-K}",
+        "  608.7016,                !- Density {kg/m3}",
+        "  836.8000;                !- Specific Heat {J/kg-K}",
+        "Construction,",
+        "  WallConstruction,        !- Name",
+        "  Concrete Block;          !- Outside Layer",
+        "  WindowMaterial:Glazing,",
+        "    ELECTRO GLASS DARK STATE,!- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.006,                   !- Thickness {m}",
+        "    0.111,                   !- Solar Transmittance at Normal Incidence",
+        "    0.179,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.179,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.128,                   !- Visible Transmittance at Normal Incidence",
+        "    0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.081,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.0001,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.0001,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+        "  WindowMaterial:Glazing,",
+        "    ELECTRO GLASS LIGHT STATE,!- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.006,                   !- Thickness {m}",
+        "    0.9,                   !- Solar Transmittance at Normal Incidence",
+        "    0.1,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.1,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.9,                   !- Visible Transmittance at Normal Incidence",
+        "    0.1,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.1,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.0001,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.0001,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+        "Construction,",
+        "  WindowConstruction1,      !- Name",
+        "  ELECTRO GLASS LIGHT STATE;          !- Outside Layer",
+        "Construction,",
+        "  WindowConstruction2,      !- Name",
+        "  ELECTRO GLASS DARK STATE;          !- Outside Layer",
+        "FenestrationSurface:Detailed,",
+        "  FenestrationSurface,     !- Name",
+        "  Window,                  !- Surface Type",
+        "  WindowConstruction1,      !- Construction Name",
+        "  Wall,                    !- Building Surface Name",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  0.5000000,               !- View Factor to Ground",
+        "  ,                        !- Frame and Divider Name",
+        "  1.0,                     !- Multiplier",
+        "  4,                       !- Number of Vertices",
+        "  0.200000,0.000000,9.900000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  0.200000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  9.900000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  9.900000,0.000000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,"
+        "  Wall,                    !- Name",
+        "  Wall,                    !- Surface Type",
+        "  WallConstruction,        !- Construction Name",
+        "  Zone,                    !- Zone Name",
+        "  Outdoors,                !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  SunExposed,              !- Sun Exposure",
+        "  WindExposed,             !- Wind Exposure",
+        "  0.5000000,               !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  0.000000,0.000000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  10.00000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,"
+        "  Floor,                   !- Name",
+        "  Floor,                   !- Surface Type",
+        "  WallConstruction,        !- Construction Name",
+        "  Zone,                    !- Zone Name",
+        "  Outdoors,                !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  1.0,                     !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  0.000000,10.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  10.00000,10.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  10.00000,0.000000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+        "Zone,"
+        "  Zone,                    !- Name",
+        "  0,                       !- Direction of Relative North {deg}",
+        "  6.000000,                !- X Origin {m}",
+        "  6.000000,                !- Y Origin {m}",
+        "  0,                       !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  autocalculate,           !- Ceiling Height {m}",
+        "  autocalculate;           !- Volume {m3}",
+        "  Daylighting:Controls,",
+        "    Daylighting Control,!- Name",
+        "    Zone,          !- Zone Name",
+        "    SplitFlux,               !- Daylighting Method",
+        "    ,                        !- Availability Schedule Name",
+        "    Continuous,              !- Lighting Control Type",
+        "    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control",
+        "    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control",
+        "    1,                       !- Number of Stepped Control Steps",
+        "    1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control",
+        "    ,                        !- Glare Calculation Daylighting Reference Point Name",
+        "    ,                        !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}",
+        "    22,                      !- Maximum Allowable Discomfort Glare Index",
+        "    ,                        !- DElight Gridding Resolution {m2}",
+        "    Reference Point 1,  !- Daylighting Reference Point 1 Name",
+        "    1,                       !- Fraction of Zone Controlled by Reference Point 1",
+        "    500;                     !- Illuminance Setpoint at Reference Point 1 {lux}",
+        "",
+        "  Daylighting:ReferencePoint,",
+        "    Reference Point 1,  !- Name",
+        "    Zone,          !- Zone Name",
+        "    12,                      !- X-Coordinate of Reference Point {m}",
+        "    2.5,                     !- Y-Coordinate of Reference Point {m}",
+        "    0.8;                     !- Z-Coordinate of Reference Point {m}",
+        "  ShadowCalculation,",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Timestep,                !- Shading Calculation Update Frequency Method",
+        "    30,                       !- Shading Calculation Update Frequency",
+        "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
+        "EnergyManagementSystem:ConstructionIndexVariable, Win_1, WINDOWCONSTRUCTION1;",
+        "EnergyManagementSystem:ConstructionIndexVariable, Win_2, WINDOWCONSTRUCTION2;",
+        "  EnergyManagementSystem:Actuator,",
+        "    Win1_Construct,          !- Name",
+        "    FenestrationSurface,  !- Actuated Component Unique Name",
+        "    Surface,                 !- Actuated Component Type",
+        "    Construction State;      !- Actuated Component Control Type",
+        "",
+        "  EnergyManagementSystem:ProgramCallingManager,",
+        "    Window Switcher,  !- Name",
+        "    BeginZoneTimestepBeforeInitHeatBalance,  !- EnergyPlus Model Calling Point",
+        "    ZN_1_wall_south_Window_1_Control;  !- Program Name 1",
+        "",
+        "  EnergyManagementSystem:Program,",
+        "    ZN_1_wall_south_Window_1_Control,  !- Name",
+        "    Set Win1_Construct = Win_2;  !- Program Line 2",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::ManageSimulation(state);
+ 
+    int surfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
+    EXPECT_EQ(DataSurfaces::Surface(surfNum).Construction, DataSurfaces::Surface(surfNum).EMSConstructionOverrideValue);
+    EXPECT_TRUE(DataSurfaces::Surface(surfNum).EMSConstructionOverrideON);
 }
 
 } // namespace EnergyPlus

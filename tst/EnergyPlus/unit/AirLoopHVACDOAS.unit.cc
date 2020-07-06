@@ -3951,7 +3951,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -3972,7 +3972,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     SurfaceGeometry::SinZoneRelNorth = 0.0;
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ZoneEquipmentManager::GetZoneEquipment(state);
@@ -4000,7 +4000,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     DataLoopNode::Node(65).HumRat = 0.001;
     DataLoopNode::Node(66).HumRat = 0.001;
 
-    auto &thisAirLoopDOASObjec = AirLoopHVACDOAS::airloopDOAS[0];
+    auto &thisAirLoopDOASObjec = state.dataAirLoopHVACDOAS.airloopDOAS[0];
 
     int index = 0;
     thisAirLoopDOASObjec.SizingOnceFlag = false;

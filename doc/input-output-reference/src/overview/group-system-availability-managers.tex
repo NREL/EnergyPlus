@@ -135,15 +135,15 @@ This object gives the user considerable flexibility in determining how the night
 
 A unique, user-assigned name for an instance of a night cycle availability manager. Other objects that use this availability manager will reference it by this name.
 
-\paragraph{Field: Applicability Schedule Name}\label{field-applicability-schedule-name}
+\paragraph{Field: Applicability Schedule Name}
 
 The name of a schedule defined elsewhere in the input file. This schedule determines whether or not for a given time period this availability manager is to be applied. Schedule values greater than zero (usually 1 is used) indicate the availability manager is to be applied. Schedule values less than or equal to zero (usually 0 is used) denote that the availability manager is not used for this time period.
 
-\paragraph{Field: Fan Schedule Name}\label{field-fan-schedule-name}
+\paragraph{Field: Fan Schedule Name}
 
 The name of the central fan on/off schedule for the air system that this availability manager will affect.
 
-\paragraph{Field: Control Type}\label{field-control-type}
+\paragraph{Field: Control Type}
 
 The possible inputs are \emph{StayOff}, \emph{CycleOnAny}, \emph{CycleOnControlZone}, \emph{CycleOnAnyZoneFansOnly}, \emph{CycleOnAnyCoolingOrHeatingZone}, \emph{CycleOnAnyCoolingZone}, \emph{CycleOnAnyHeatingZone}, or \emph{CycleOnAnyHeatingZoneFansOnly}. The default is \emph{StayOff}.
 

@@ -2815,11 +2815,11 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
     BeginSimFlag = true;
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
@@ -3995,11 +3995,11 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
     BeginSimFlag = true;
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
@@ -5413,11 +5413,11 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
     BeginSimFlag = true;
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
@@ -6656,11 +6656,11 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
     BeginSimFlag = true;
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;

@@ -63,6 +63,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataDaylighting.hh>
@@ -83,6 +84,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -172,6 +174,8 @@ namespace DaylightingManager {
     bool DayltgInteriorMapIllum_FirstTimeFlag(true);
     bool ReportIllumMap_firstTime(true);
     bool SQFirstTime(true);
+    bool doSkyReporting(true);
+    bool CreateDFSReportFile(true);
 
     // Surface count crossover for using octree algorithm
     // The octree gives lower computational complexity for much higher performance
@@ -234,8 +238,6 @@ namespace DaylightingManager {
 
     Array1D_bool CheckTDDZone;
 
-    std::string mapLine; // character variable to hold map outputs
-
     // SUBROUTINE SPECIFICATIONS FOR MODULE DaylightingModule
 
     // MODULE SUBROUTINES:
@@ -280,7 +282,8 @@ namespace DaylightingManager {
         MapErrIndex.deallocate();
         RefErrIndex.deallocate();
         CheckTDDZone.deallocate();
-        mapLine = "";
+        doSkyReporting = true;
+        CreateDFSReportFile = true;
     }
 
     void DayltgAveInteriorReflectance(int &ZoneNum) // Zone number
@@ -358,7 +361,7 @@ namespace DaylightingManager {
                 AInsTot += AREA + SurfaceWindow(ISurf).FrameArea * (1.0 + 0.5 * SurfaceWindow(ISurf).ProjCorrFrIn) +
                            SurfaceWindow(ISurf).DividerArea * (1.0 + SurfaceWindow(ISurf).ProjCorrDivIn);
                 ARHTOT +=
-                    AREA * Construct(Surface(ISurf).Construction).ReflectVisDiffBack +
+                    AREA * dataConstruction.Construct(Surface(ISurf).Construction).ReflectVisDiffBack +
                     SurfaceWindow(ISurf).FrameArea * (1.0 + 0.5 * SurfaceWindow(ISurf).ProjCorrFrIn) * (1.0 - SurfaceWindow(ISurf).FrameSolAbsorp) +
                     SurfaceWindow(ISurf).DividerArea * (1.0 + SurfaceWindow(ISurf).ProjCorrDivIn) * (1.0 - SurfaceWindow(ISurf).DividerSolAbsorp);
                 ITILT = 3;                                                                // Ceiling
@@ -367,7 +370,7 @@ namespace DaylightingManager {
                 AR(ITILT) += AREA + SurfaceWindow(ISurf).FrameArea * (1.0 + 0.5 * SurfaceWindow(ISurf).ProjCorrFrIn) +
                              SurfaceWindow(ISurf).DividerArea * (1.0 + SurfaceWindow(ISurf).ProjCorrDivIn);
                 ARH(ITILT) +=
-                    AREA * Construct(Surface(ISurf).Construction).ReflectVisDiffBack +
+                    AREA * dataConstruction.Construct(Surface(ISurf).Construction).ReflectVisDiffBack +
                     SurfaceWindow(ISurf).FrameArea * (1.0 + 0.5 * SurfaceWindow(ISurf).ProjCorrFrIn) * (1.0 - SurfaceWindow(ISurf).FrameSolAbsorp) +
                     SurfaceWindow(ISurf).DividerArea * (1.0 + SurfaceWindow(ISurf).ProjCorrDivIn) * (1.0 - SurfaceWindow(ISurf).DividerSolAbsorp);
             }
@@ -388,7 +391,7 @@ namespace DaylightingManager {
                 // Initialize gross area of surface (including subsurfaces)
                 ATWL = Surface(ISurf).Area; // This is the surface area less subsurfaces
                 // Area * reflectance for this surface, excluding attached windows and doors
-                ARHTWL = Surface(ISurf).Area * Construct(Surface(ISurf).Construction).ReflectVisDiffBack;
+                ARHTWL = Surface(ISurf).Area * dataConstruction.Construct(Surface(ISurf).Construction).ReflectVisDiffBack;
                 // Tilt index
                 if (Surface(ISurf).Tilt > 45.0 && Surface(ISurf).Tilt < 135.0) {
                     ITILT = 2; // Wall
@@ -403,7 +406,7 @@ namespace DaylightingManager {
                         Surface(IWinDr).BaseSurf == ISurf) {
                         ATWL += Surface(IWinDr).Area + SurfaceWindow(IWinDr).FrameArea * (1.0 + 0.5 * SurfaceWindow(IWinDr).ProjCorrFrIn) +
                                 SurfaceWindow(IWinDr).DividerArea * (1.0 + SurfaceWindow(IWinDr).ProjCorrDivIn);
-                        ARHTWL += Surface(IWinDr).Area * Construct(Surface(IWinDr).Construction).ReflectVisDiffBack +
+                        ARHTWL += Surface(IWinDr).Area * dataConstruction.Construct(Surface(IWinDr).Construction).ReflectVisDiffBack +
                                   SurfaceWindow(IWinDr).FrameArea * (1.0 + 0.5 * SurfaceWindow(IWinDr).ProjCorrFrIn) *
                                       (1.0 - SurfaceWindow(IWinDr).FrameSolAbsorp) +
                                   SurfaceWindow(IWinDr).DividerArea * (1.0 + SurfaceWindow(IWinDr).ProjCorrDivIn) *
@@ -555,12 +558,6 @@ namespace DaylightingManager {
         Real64 SlatAngle;
         int ISA;
         int ISlatAngle;
-
-        static bool CreateDFSReportFile(true);
-        static bool doSkyReporting(true);
-
-        // Formats
-
 
         // FLOW:
         if (CalcDayltghCoefficients_firstTime) {
@@ -1875,9 +1872,9 @@ namespace DaylightingManager {
         //  at base TC layer temperature. During each time step calculations at DayltgInteriorIllum,
         //  DayltgInteriorMapIllum, and DayltgGlare, the daylight and glare factors are adjusted by the visible
         //  transmittance ratio = VT of actual TC window based on last hour TC layer temperature / VT of the base TC window
-        if (Construct(IConst).TCFlag == 1) {
+        if (dataConstruction.Construct(IConst).TCFlag == 1) {
             // For thermochromic windows, use the base window construction at base temperature of the TC layer
-            IConst = Construct(IConst).TCMasterConst;
+            IConst = dataConstruction.Construct(IConst).TCMasterConst;
         }
 
         ICtrl = Surface(IWin).WindowShadingControlPtr;
@@ -1917,7 +1914,7 @@ namespace DaylightingManager {
         LSHCAL = 0;
 
         // Visible transmittance at normal incidence
-        SurfaceWindow(IWin).VisTransSelected = POLYF(1.0, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+        SurfaceWindow(IWin).VisTransSelected = POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
         // For windows with switchable glazing, ratio of visible transmittance at normal
         // incidence for fully switched (dark) state to that of unswitched state
         SurfaceWindow(IWin).VisTransRatio = 1.0;
@@ -1925,7 +1922,7 @@ namespace DaylightingManager {
             if (ShType == WSC_ST_SwitchableGlazing) {
                 IConstShaded = Surface(IWin).ShadedConstruction;
                 SurfaceWindow(IWin).VisTransRatio =
-                    SafeDivide(POLYF(1.0, Construct(IConstShaded).TransVisBeamCoef), POLYF(1.0, Construct(IConst).TransVisBeamCoef));
+                    SafeDivide(POLYF(1.0, dataConstruction.Construct(IConstShaded).TransVisBeamCoef), POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef));
             }
         }
 
@@ -2362,7 +2359,7 @@ namespace DaylightingManager {
             } else { // Regular window
                 if (SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) {
                     // Vis trans of glass for COSB incidence angle
-                    TVISB = POLYF(COSB, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
+                    TVISB = POLYF(COSB, dataConstruction.Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
                 } else {
                     // Complex fenestration needs to use different equation for visible transmittance.  That will be calculated later
                     // in the code since it depends on different incoming directions.  For now, just put zero to differentiate from
@@ -2383,7 +2380,7 @@ namespace DaylightingManager {
                                         IntWinHitNum = 0;
                                         continue;
                                     }
-                                    TVISIntWin = POLYF(COSBIntWin, Construct(Surface(IntWin).Construction).TransVisBeamCoef);
+                                    TVISIntWin = POLYF(COSBIntWin, dataConstruction.Construct(Surface(IntWin).Construction).TransVisBeamCoef);
                                     TVISB *= TVISIntWin;
                                     break; // Ray passes thru interior window; exit from DO loop
                                 }
@@ -3577,13 +3574,13 @@ namespace DaylightingManager {
                 ObsConstrNum = Surface(NearestHitSurfNum).Construction;
                 if (ObsConstrNum > 0) {
                     // Exterior building surface is nearest hit
-                    if (!Construct(ObsConstrNum).TypeIsWindow) {
+                    if (!dataConstruction.Construct(ObsConstrNum).TypeIsWindow) {
                         // Obstruction is not a window, i.e., is an opaque surface
-                        ObsVisRefl = 1.0 - Material(Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
+                        ObsVisRefl = 1.0 - dataMaterial.Material(dataConstruction.Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
                     } else {
                         // Obstruction is a window; assume it is bare
                         if (SurfaceWindow(NearestHitSurfNum).StormWinFlag == 1) ObsConstrNum = Surface(NearestHitSurfNum).StormWinConstruction;
-                        ObsVisRefl = Construct(ObsConstrNum).ReflectVisDiffFront;
+                        ObsVisRefl = dataConstruction.Construct(ObsConstrNum).ReflectVisDiffFront;
                     }
                 } else {
                     // Shadowing surface is nearest hit
@@ -3594,7 +3591,7 @@ namespace DaylightingManager {
                         ObsVisRefl = Surface(NearestHitSurfNum).ShadowSurfDiffuseVisRefl;
                         if (Surface(NearestHitSurfNum).ShadowSurfGlazingConstruct > 0)
                             ObsVisRefl += Surface(NearestHitSurfNum).ShadowSurfGlazingFrac *
-                                          Construct(Surface(NearestHitSurfNum).ShadowSurfGlazingConstruct).ReflectVisDiffFront;
+                                          dataConstruction.Construct(Surface(NearestHitSurfNum).ShadowSurfGlazingConstruct).ReflectVisDiffFront;
                     }
                 }
                 NearestHitSurfNumX = NearestHitSurfNum;
@@ -3750,7 +3747,7 @@ namespace DaylightingManager {
                                             IntWinDiskHitNum = 0;
                                             continue;
                                         }
-                                        TVISIntWinDisk = POLYF(COSBIntWin, Construct(Surface(IntWinDisk).Construction).TransVisBeamCoef);
+                                        TVISIntWinDisk = POLYF(COSBIntWin, dataConstruction.Construct(Surface(IntWinDisk).Construction).TransVisBeamCoef);
                                         break;
                                     }
                                 }
@@ -3809,7 +3806,7 @@ namespace DaylightingManager {
                         } else {
                             // Beam transmittance for bare window and all types of blinds
                             TVISS =
-                                POLYF(COSI, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
+                                POLYF(COSI, dataConstruction.Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
                             if (ExtWinType == AdjZoneExtWin && hitIntWinDisk) TVISS *= TVISIntWinDisk;
                         }
 
@@ -3972,13 +3969,13 @@ namespace DaylightingManager {
                                 if (Surface(ReflSurfNum).Class == SurfaceClass_Window) {
                                     ConstrNumRefl = Surface(ReflSurfNum).Construction;
                                     if (SurfaceWindow(ReflSurfNum).StormWinFlag == 1) ConstrNumRefl = Surface(ReflSurfNum).StormWinConstruction;
-                                    SpecReflectance = POLYF(std::abs(CosIncAngRefl), Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
+                                    SpecReflectance = POLYF(std::abs(CosIncAngRefl), dataConstruction.Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }
                                 if (Surface(ReflSurfNum).ShadowingSurf && Surface(ReflSurfNum).ShadowSurfGlazingConstruct > 0)
                                     SpecReflectance = Surface(ReflSurfNum).ShadowSurfGlazingFrac *
                                                       POLYF(std::abs(CosIncAngRefl),
-                                                            Construct(Surface(ReflSurfNum).ShadowSurfGlazingConstruct).ReflSolBeamFrontCoef);
-                                TVisRefl = POLYF(CosIncAngRec, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac *
+                                                            dataConstruction.Construct(Surface(ReflSurfNum).ShadowSurfGlazingConstruct).ReflSolBeamFrontCoef);
+                                TVisRefl = POLYF(CosIncAngRec, dataConstruction.Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac *
                                            SurfaceWindow(IWin).LightWellEff;
                                 EDIRSUdisk(iHour, 1) += SunVecMir(3) * SpecReflectance * TVisRefl; // Bare window
 
@@ -6428,13 +6425,13 @@ namespace DaylightingManager {
             VTRatio = 1.0;
             if (NREFPT > 0) {
                 IConst = Surface(IWin).Construction;
-                if (Construct(IConst).TCFlag == 1) {
+                if (dataConstruction.Construct(IConst).TCFlag == 1) {
                     // For thermochromic windows, daylight and glare factors are always calculated
                     //  based on the master construction. They need to be adjusted by the VTRatio, including:
                     //  ZoneDaylight()%DaylIllFacSky, DaylIllFacSun, DaylIllFacSunDisk; DaylBackFacSky,
                     //  DaylBackFacSun, DaylBackFacSunDisk, DaylSourceFacSky, DaylSourceFacSun, DaylSourceFacSunDisk
-                    VTNow = POLYF(1.0, Construct(IConst).TransVisBeamCoef);
-                    VTMaster = POLYF(1.0, Construct(Construct(IConst).TCMasterConst).TransVisBeamCoef);
+                    VTNow = POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef);
+                    VTMaster = POLYF(1.0, dataConstruction.Construct(dataConstruction.Construct(IConst).TCMasterConst).TransVisBeamCoef);
                     VTRatio = VTNow / VTMaster;
                 }
             }
@@ -6800,11 +6797,11 @@ namespace DaylightingManager {
                         IConst = Surface(IWin).Construction;
                         if (SurfaceWindow(IWin).StormWinFlag == 1) IConst = Surface(IWin).StormWinConstruction;
                         // Vis trans at normal incidence of unswitched glass
-                        TVIS1(igroup) = POLYF(1.0, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                        TVIS1(igroup) = POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
 
                         // Vis trans at normal incidence of fully switched glass
                         IConstShaded = Surface(IWin).ShadedConstruction;
-                        TVIS2(igroup) = POLYF(1.0, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                        TVIS2(igroup) = POLYF(1.0, dataConstruction.Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
 
                         // Reset shading flag to indicate that window is shaded by being partially or fully switched
                         SurfaceWindow(IWin).ShadingFlag = SwitchableGlazing;
@@ -6958,11 +6955,11 @@ namespace DaylightingManager {
 
                             IConst = Surface(IWin).Construction;
                             // Vis trans at normal incidence of unswitched glass
-                            TVIS1(igroup) = POLYF(1.0, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                            TVIS1(igroup) = POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
 
                             // Vis trans at normal incidence of fully switched glass
                             IConstShaded = Surface(IWin).ShadedConstruction;
-                            TVIS2(igroup) = POLYF(1.0, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                            TVIS2(igroup) = POLYF(1.0, dataConstruction.Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
                         }
                     }
                 }
@@ -7957,14 +7954,14 @@ namespace DaylightingManager {
                         ObsConstrNum = Surface(NearestHitSurfNum).Construction;
                         if (ObsConstrNum > 0) {
                             // Exterior building surface is nearest hit
-                            if (!Construct(ObsConstrNum).TypeIsWindow) {
+                            if (!dataConstruction.Construct(ObsConstrNum).TypeIsWindow) {
                                 // Obstruction is not a window, i.e., is an opaque surface
-                                ObsVisRefl = 1.0 - Material(Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
+                                ObsVisRefl = 1.0 - dataMaterial.Material(dataConstruction.Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
                             } else {
                                 // Obstruction is a window; assume it is bare
                                 if (SurfaceWindow(NearestHitSurfNum).StormWinFlag == 1)
                                     ObsConstrNum = Surface(NearestHitSurfNum).StormWinConstruction;
-                                ObsVisRefl = Construct(ObsConstrNum).ReflectVisDiffFront;
+                                ObsVisRefl = dataConstruction.Construct(ObsConstrNum).ReflectVisDiffFront;
                             }
                         } else {
                             // Shadowing surface is nearest hit
@@ -7975,7 +7972,7 @@ namespace DaylightingManager {
                                 ObsVisRefl = Surface(NearestHitSurfNum).ShadowSurfDiffuseVisRefl;
                                 if (Surface(NearestHitSurfNum).ShadowSurfGlazingConstruct > 0)
                                     ObsVisRefl += Surface(NearestHitSurfNum).ShadowSurfGlazingFrac *
-                                                  Construct(Surface(NearestHitSurfNum).ShadowSurfGlazingConstruct).ReflectVisDiffFront;
+                                                  dataConstruction.Construct(Surface(NearestHitSurfNum).ShadowSurfGlazingConstruct).ReflectVisDiffFront;
                                 // Note in the above that ShadowSurfDiffuseVisRefl is the reflectance of opaque part of
                                 // shadowing surface times (1 - ShadowSurfGlazingFrac)
                             }
@@ -8033,7 +8030,7 @@ namespace DaylightingManager {
                 } else { // Bare window
 
                     // Transmittance of bare window for this sky/ground element
-                    TVISBR = POLYF(COSB, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
+                    TVISBR = POLYF(COSB, dataConstruction.Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
 
                     if (InShelfSurf > 0) { // Inside daylighting shelf
                         // Daylighting shelf simplification:  All light is diffuse
@@ -8061,7 +8058,7 @@ namespace DaylightingManager {
                                     // cosine of incidence angle of light from sky or ground element for
                                     COSBintWin = SPH * std::sin(SurfaceWindow(IntWinNum).Phi) +
                                                  CPH * std::cos(SurfaceWindow(IntWinNum).Phi) * std::cos(TH - SurfaceWindow(IntWinNum).Theta);
-                                    TVISBR *= POLYF(COSBintWin, Construct(Surface(IntWinNum).Construction).TransVisBeamCoef);
+                                    TVISBR *= POLYF(COSBintWin, dataConstruction.Construct(Surface(IntWinNum).Construction).TransVisBeamCoef);
                                     break;
                                 }
                             }
@@ -8131,16 +8128,16 @@ namespace DaylightingManager {
                             TransMult(1) = TransTDD(PipeNum, COSB, VisibleBeam) * SurfaceWindow(IWin).GlazedFrac;
                         } else { // Shade only, no TDD
                             // Calculate transmittance of the combined window and shading device for this sky/ground element
-                            TransMult(1) = POLYF(COSB, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac *
+                            TransMult(1) = POLYF(COSB, dataConstruction.Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac *
                                            SurfaceWindow(IWin).LightWellEff;
                         }
 
                     } else if (ScreenOn) { // Screen: get beam-beam, beam-diffuse and diffuse-diffuse vis trans/ref of screen and glazing system
                         CalcScreenTransmittance(IWin, (PH - SurfaceWindow(IWin).Phi), (TH - SurfaceWindow(IWin).Theta));
-                        ReflGlDiffDiffFront = Construct(IConst).ReflectVisDiffFront;
+                        ReflGlDiffDiffFront = dataConstruction.Construct(IConst).ReflectVisDiffFront;
                         ReflScDiffDiffBack = SurfaceScreens(SurfaceWindow(IWin).ScreenNumber).DifReflectVis;
                         TransScBmDiffFront = SurfaceScreens(SurfaceWindow(IWin).ScreenNumber).BmDifTransVis;
-                        TransMult(1) = TransScBmDiffFront * SurfaceWindow(IWin).GlazedFrac * Construct(IConst).TransDiffVis /
+                        TransMult(1) = TransScBmDiffFront * SurfaceWindow(IWin).GlazedFrac * dataConstruction.Construct(IConst).TransDiffVis /
                                        (1 - ReflGlDiffDiffFront * ReflScDiffDiffBack) * SurfaceWindow(IWin).LightWellEff;
                         TransBmBmMult(1) = SurfaceScreens(SurfaceWindow(IWin).ScreenNumber).BmBmTransVis;
 
@@ -8156,7 +8153,7 @@ namespace DaylightingManager {
                             TransBlBmDiffFront = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
 
                             if (ShType == WSC_ST_InteriorBlind) { // Interior blind
-                                ReflGlDiffDiffBack = Construct(IConst).ReflectVisDiffBack;
+                                ReflGlDiffDiffBack = dataConstruction.Construct(IConst).ReflectVisDiffBack;
                                 ReflBlBmDiffFront = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
                                 ReflBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffRefl(JB);
                                 TransBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffTrans(JB);
@@ -8164,28 +8161,28 @@ namespace DaylightingManager {
                                                                                    (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                             } else if (ShType == WSC_ST_ExteriorBlind) { // Exterior blind
-                                ReflGlDiffDiffFront = Construct(IConst).ReflectVisDiffFront;
+                                ReflGlDiffDiffFront = dataConstruction.Construct(IConst).ReflectVisDiffFront;
                                 ReflBlDiffDiffBack = Blind(BlNum).VisBackDiffDiffRefl(JB);
-                                TransMult(JB) = TransBlBmDiffFront * SurfaceWindow(IWin).GlazedFrac * Construct(IConst).TransDiffVis /
+                                TransMult(JB) = TransBlBmDiffFront * SurfaceWindow(IWin).GlazedFrac * dataConstruction.Construct(IConst).TransDiffVis /
                                                 (1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack) * SurfaceWindow(IWin).LightWellEff;
 
                             } else { // Between-glass blind
-                                t1 = POLYF(COSB, Construct(IConst).tBareVisCoef({1, 6}, 1));
-                                td2 = Construct(IConst).tBareVisDiff(2);
-                                rbd1 = Construct(IConst).rbBareVisDiff(1);
-                                rfd2 = Construct(IConst).rfBareVisDiff(2);
+                                t1 = POLYF(COSB, dataConstruction.Construct(IConst).tBareVisCoef({1, 6}, 1));
+                                td2 = dataConstruction.Construct(IConst).tBareVisDiff(2);
+                                rbd1 = dataConstruction.Construct(IConst).rbBareVisDiff(1);
+                                rfd2 = dataConstruction.Construct(IConst).rfBareVisDiff(2);
                                 tfshBd = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
                                 tfshd = Blind(BlNum).VisFrontDiffDiffTrans(JB);
                                 rfshB = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
                                 rbshd = Blind(BlNum).VisFrontDiffDiffRefl(JB);
-                                if (Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
+                                if (dataConstruction.Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                     TransMult(JB) =
                                         t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * SurfaceWindow(IWin).LightWellEff;
                                 } else { // 3 glass layers; blind between layers 2 and 3
-                                    t2 = POLYF(COSB, Construct(IConst).tBareVisCoef({1, 6}, 2));
-                                    td3 = Construct(IConst).tBareVisDiff(3);
-                                    rfd3 = Construct(IConst).rfBareVisDiff(3);
-                                    rbd2 = Construct(IConst).rbBareVisDiff(2);
+                                    t2 = POLYF(COSB, dataConstruction.Construct(IConst).tBareVisCoef({1, 6}, 2));
+                                    td3 = dataConstruction.Construct(IConst).tBareVisDiff(3);
+                                    rfd3 = dataConstruction.Construct(IConst).rfBareVisDiff(3);
+                                    rbd2 = dataConstruction.Construct(IConst).rbBareVisDiff(2);
                                     TransMult(JB) = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) *
                                                     td3 * SurfaceWindow(IWin).LightWellEff;
                                 }
@@ -8203,7 +8200,7 @@ namespace DaylightingManager {
 
                     } else { // Diffusing glass
                         TransMult(1) =
-                            POLYF(COSB, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
+                            POLYF(COSB, dataConstruction.Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
                     } // End of check if shade, blind or diffusing glass
 
                     if (SurfaceWindow(IWin).OriginalClass == SurfaceClass_TDD_Dome) {
@@ -8247,7 +8244,7 @@ namespace DaylightingManager {
             // Add exterior diffuse illuminance due to outside shelf
             // Since all of the illuminance is added to the zone as upgoing diffuse, it can be added as a lump sum here
 
-            TVISBR = Construct(IConst).TransDiffVis; // Assume diffuse transmittance for shelf illuminance
+            TVISBR = dataConstruction.Construct(IConst).TransDiffVis; // Assume diffuse transmittance for shelf illuminance
 
             for (ISky = 1; ISky <= 4; ++ISky) {
                 // This is only an estimate because the anisotropic sky view of the shelf is not yet taken into account.
@@ -8312,7 +8309,7 @@ namespace DaylightingManager {
                     FLCWSU(1) += ZSU1 * TVISBSun * SurfaceWindow(IWin).FractionUpgoing;
 
                 } else { // Bare window
-                    TVISBSun = POLYF(COSBSun, Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
+                    TVISBSun = POLYF(COSBSun, dataConstruction.Construct(IConst).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
 
                     // Daylighting shelf simplification:  No beam makes it past end of shelf, all light is diffuse
                     if (InShelfSurf > 0) {   // Inside daylighting shelf
@@ -8347,7 +8344,7 @@ namespace DaylightingManager {
                                     TransMult(1) = SurfaceScreens(SurfaceWindow(IWin).ScreenNumber).BmBmTransVis * SurfaceWindow(IWin).GlazedFrac *
                                                    SurfaceWindow(IWin).LightWellEff;
                                 } else {
-                                    TransMult(1) = POLYF(COSBSun, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac *
+                                    TransMult(1) = POLYF(COSBSun, dataConstruction.Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac *
                                                    SurfaceWindow(IWin).LightWellEff;
                                 }
                             }
@@ -8377,18 +8374,18 @@ namespace DaylightingManager {
                             } else if (ShType == WSC_ST_ExteriorBlind) { // Exterior blind
                                 TransMult(JB) =
                                     TransBlBmDiffFront *
-                                    (Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * Blind(BlNum).VisBackDiffDiffRefl(JB))) *
+                                    (dataConstruction.Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * Blind(BlNum).VisBackDiffDiffRefl(JB))) *
                                     SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
 
                             } else { // Between-glass blind
-                                t1 = POLYF(COSBSun, Construct(IConst).tBareVisCoef({1, 6}, 1));
+                                t1 = POLYF(COSBSun, dataConstruction.Construct(IConst).tBareVisCoef({1, 6}, 1));
                                 tfshBd = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
                                 rfshB = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
-                                if (Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
+                                if (dataConstruction.Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                     TransMult(JB) =
                                         t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * SurfaceWindow(IWin).LightWellEff;
                                 } else { // 3 glass layers; blind between layers 2 and 3
-                                    t2 = POLYF(COSBSun, Construct(IConst).tBareVisCoef({1, 6}, 2));
+                                    t2 = POLYF(COSBSun, dataConstruction.Construct(IConst).tBareVisCoef({1, 6}, 2));
                                     TransMult(JB) = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) *
                                                     td3 * SurfaceWindow(IWin).LightWellEff;
                                 }
@@ -8437,7 +8434,7 @@ namespace DaylightingManager {
                 // -- Bare window. We use diffuse-diffuse transmittance here rather than beam-beam to avoid
                 //    complications due to specular reflection from multiple exterior surfaces
 
-                TVisSunRefl = Construct(IConst).TransDiffVis * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
+                TVisSunRefl = dataConstruction.Construct(IConst).TransDiffVis * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
                 // In the following it is assumed that all reflected beam is going downward, as it would be in the
                 // important case of reflection from a highly glazed facade of a neighboring building. However, in
                 // rare cases (such as upward specular reflection from a flat horizontal skylight) it may
@@ -8454,12 +8451,12 @@ namespace DaylightingManager {
                         if (!SurfaceWindow(IWin).MovableSlats && JB > 1) break;
 
                         if (ShadeOn || SurfaceWindow(IWin).SolarDiffusing) { // Shade on or diffusing glass
-                            TransMult(1) = Construct(IConstShaded).TransDiffVis * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
+                            TransMult(1) = dataConstruction.Construct(IConstShaded).TransDiffVis * SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
 
                         } else if (ScreenOn) { // Exterior screen on
                             TransScDiffDiffFront = SurfaceScreens(SurfaceWindow(IWin).ScreenNumber).DifDifTransVis;
                             TransMult(1) = TransScDiffDiffFront *
-                                           (Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * ReflScDiffDiffBack)) *
+                                           (dataConstruction.Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * ReflScDiffDiffBack)) *
                                            SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
 
                         } else { // Blind on
@@ -8473,18 +8470,18 @@ namespace DaylightingManager {
                             } else if (ShType == WSC_ST_ExteriorBlind) { // Exterior blind
                                 TransMult(JB) =
                                     TransBlDiffDiffFront *
-                                    (Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * Blind(BlNum).VisBackDiffDiffRefl(JB))) *
+                                    (dataConstruction.Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * Blind(BlNum).VisBackDiffDiffRefl(JB))) *
                                     SurfaceWindow(IWin).GlazedFrac * SurfaceWindow(IWin).LightWellEff;
 
                             } else { // Between-glass blind
-                                t1 = Construct(IConst).tBareVisDiff(1);
+                                t1 = dataConstruction.Construct(IConst).tBareVisDiff(1);
                                 tfshBd = Blind(BlNum).VisFrontDiffDiffTrans(JB);
                                 rfshB = Blind(BlNum).VisFrontDiffDiffRefl(JB);
-                                if (Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
+                                if (dataConstruction.Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                     TransMult(JB) =
                                         t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * SurfaceWindow(IWin).LightWellEff;
                                 } else { // 3 glass layers; blind between layers 2 and 3
-                                    t2 = Construct(IConst).tBareVisDiff(2);
+                                    t2 = dataConstruction.Construct(IConst).tBareVisDiff(2);
                                     TransMult(JB) = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) *
                                                     td3 * SurfaceWindow(IWin).LightWellEff;
                                 }
@@ -8797,7 +8794,7 @@ namespace DaylightingManager {
         for (iBackElem = 1; iBackElem <= NTrnBasis; ++iBackElem) {
             for (iIncElem = 1; iIncElem <= NIncBasis; ++iIncElem) {
                 LambdaInc = ComplexWind(IWin).Geom(CurCplxFenState).Inc.Lamda(iIncElem);
-                dirTrans = Construct(iConst).BSDFInput.VisFrtTrans(iBackElem, iIncElem);
+                dirTrans = dataConstruction.Construct(iConst).BSDFInput.VisFrtTrans(iBackElem, iIncElem);
 
                 for (iSky = 1; iSky <= 4; ++iSky) {
                     FLSK(iSky, iBackElem) += dirTrans * LambdaInc * ElementLuminanceSky(iSky, iIncElem);
@@ -8934,7 +8931,7 @@ namespace DaylightingManager {
 
         for (iIncElem = 1; iIncElem <= NIncBasis; ++iIncElem) {
             // LambdaInc = ComplexWind(IWin)%Geom(CurCplxFenState)%Inc%Lamda(iIncElem)
-            dirTrans = Construct(iConst).BSDFInput.VisFrtTrans(RefPointIndex, iIncElem);
+            dirTrans = dataConstruction.Construct(iConst).BSDFInput.VisFrtTrans(RefPointIndex, iIncElem);
 
             for (iSky = 1; iSky <= 4; ++iSky) {
                 WinLumSK(iSky) += dirTrans * ElementLuminanceSky(iSky, iIncElem);
@@ -9061,7 +9058,7 @@ namespace DaylightingManager {
 
                 if (PosFac != 0.0) {
                     if (SolBmIndex > 0) {
-                        dirTrans = Construct(iConst).BSDFInput.VisFrtTrans(iTrnElem, SolBmIndex);
+                        dirTrans = dataConstruction.Construct(iConst).BSDFInput.VisFrtTrans(iTrnElem, SolBmIndex);
                     } else {
                         dirTrans = 0.0;
                     }
@@ -9464,8 +9461,8 @@ namespace DaylightingManager {
             // (1 - glazing fraction) * (vis refl of opaque part of shadowing surface); specular reflection is
             // excluded in this value of DiffVisRefl.
         } else { // Exterior building surface
-            if (!Construct(Surface(ReflSurfNum).Construction).TypeIsWindow) {
-                DiffVisRefl = 1.0 - Construct(Surface(ReflSurfNum).Construction).OutsideAbsorpSolar;
+            if (!dataConstruction.Construct(Surface(ReflSurfNum).Construction).TypeIsWindow) {
+                DiffVisRefl = 1.0 - dataConstruction.Construct(Surface(ReflSurfNum).Construction).OutsideAbsorpSolar;
             } else {
                 // Window; assume bare so no beam-to-diffuse reflection
                 DiffVisRefl = 0.0;
@@ -9617,13 +9614,13 @@ namespace DaylightingManager {
                 VTRatio = 1.0;
                 if (NREFPT > 0) {
                     IConst = Surface(IWin).Construction;
-                    if (Construct(IConst).TCFlag == 1) {
+                    if (dataConstruction.Construct(IConst).TCFlag == 1) {
                         // For thermochromic windows, daylight and glare factors are always calculated
                         //  based on the master construction. They need to be adjusted by the VTRatio, including:
                         //  ZoneDaylight()%DaylIllFacSky, DaylIllFacSun, DaylIllFacSunDisk; DaylBackFacSky,
                         //  DaylBackFacSun, DaylBackFacSunDisk, DaylSourceFacSky, DaylSourceFacSun, DaylSourceFacSunDisk
-                        VTNow = POLYF(1.0, Construct(IConst).TransVisBeamCoef);
-                        VTMaster = POLYF(1.0, Construct(Construct(IConst).TCMasterConst).TransVisBeamCoef);
+                        VTNow = POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef);
+                        VTMaster = POLYF(1.0, dataConstruction.Construct(dataConstruction.Construct(IConst).TCMasterConst).TransVisBeamCoef);
                         VTRatio = VTNow / VTMaster;
                     }
                 }
@@ -9889,7 +9886,7 @@ namespace DaylightingManager {
                         // switchable windows in partial or fully switched state,
                         //  get its intermediate VT calculated in DayltgInteriorIllum
                         IConstShaded = Surface(IWin).ShadedConstruction;
-                        if (IConstShaded > 0) VTDark = POLYF(1.0, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                        if (IConstShaded > 0) VTDark = POLYF(1.0, dataConstruction.Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
                         if (VTDark > 0) VTMULT = SurfaceWindow(IWin).VisTransSelected / VTDark;
                     }
                 }
@@ -9926,7 +9923,7 @@ namespace DaylightingManager {
                             // switchable windows in partial or fully switched state,
                             //  get its intermediate VT calculated in DayltgInteriorIllum
                             IConstShaded = Surface(IWin).ShadedConstruction;
-                            if (IConstShaded > 0) VTDark = POLYF(1.0, Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
+                            if (IConstShaded > 0) VTDark = POLYF(1.0, dataConstruction.Construct(IConstShaded).TransVisBeamCoef) * SurfaceWindow(IWin).GlazedFrac;
                             if (VTDark > 0) VTMULT = SurfaceWindow(IWin).VisTransSelected / VTDark;
                         }
                     }
@@ -10031,34 +10028,21 @@ namespace DaylightingManager {
         if (FirstTimeMaps(MapNum)) {
 
             FirstTimeMaps(MapNum) = false;
-            IllumMap(MapNum).UnitNo = GetNewUnitNumber();
-            MapNoString = RoundSigDigits(MapNum);
+
+            auto openMapFile = [&](const std::string &fileName) -> OutputFile & {
+                auto &outputFile = *IllumMap(MapNum).mapFile;
+                outputFile.fileName = fileName + fmt::to_string(MapNum);
+                outputFile.ensure_open("ReportIllumMap");
+                return outputFile;
+            };
             if (MapColSep == CharTab) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("readwrite");
-                    flags.STATUS("UNKNOWN");
-                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, outputFiles.outputMapTabFileName + MapNoString, flags);
-                    if (flags.err()) goto Label901;
-                }
+                if (!openMapFile(outputFiles.outputMapTabFileName).good()) return;
                 //				CommaDelimited = false; //Unused Set but never used
             } else if (MapColSep == CharComma) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("readwrite");
-                    flags.STATUS("UNKNOWN");
-                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, outputFiles.outputMapCsvFileName + MapNoString, flags);
-                    if (flags.err()) goto Label902;
-                }
+                if (!openMapFile(outputFiles.outputMapCsvFileName).good()) return;
                 //				CommaDelimited = true; //Unused Set but never used
             } else {
-                {
-                    IOFlags flags;
-                    flags.ACTION("readwrite");
-                    flags.STATUS("UNKNOWN");
-                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, outputFiles.outputMapTxtFileName + MapNoString, flags);
-                    if (flags.err()) goto Label903;
-                }
+                if (!openMapFile(outputFiles.outputMapTxtFileName).good()) return;
                 //				CommaDelimited = false; //Unused Set but never used
             }
 
@@ -10067,14 +10051,10 @@ namespace DaylightingManager {
             IllumMap(MapNum).Name = IllumMap(MapNum).Name + " at " + RoundSigDigits(IllumMap(MapNum).Z, 2) + 'm';
 
             for (R = 1; R <= ZoneDaylight(IllumMap(MapNum).Zone).TotalDaylRefPoints; ++R) {
-                String = RoundSigDigits(R);
-                RefPts(IllumMap(MapNum).Zone, R) = "RefPt" + String + "=(";
-                String = RoundSigDigits(ZoneDaylight(IllumMap(MapNum).Zone).DaylRefPtAbsCoord(1, R), 2);
-                RefPts(IllumMap(MapNum).Zone, R) = RefPts(IllumMap(MapNum).Zone, R) + String + ':';
-                String = RoundSigDigits(ZoneDaylight(IllumMap(MapNum).Zone).DaylRefPtAbsCoord(2, R), 2);
-                RefPts(IllumMap(MapNum).Zone, R) = RefPts(IllumMap(MapNum).Zone, R) + String + ':';
-                String = RoundSigDigits(ZoneDaylight(IllumMap(MapNum).Zone).DaylRefPtAbsCoord(3, R), 2);
-                RefPts(IllumMap(MapNum).Zone, R) = RefPts(IllumMap(MapNum).Zone, R) + String + ')';
+                RefPts(IllumMap(MapNum).Zone, R) = format("RefPt{}=({:.2R}:{:.2R}:{:.2R})", R,
+                                              ZoneDaylight(IllumMap(MapNum).Zone).DaylRefPtAbsCoord(1, R),
+                                              ZoneDaylight(IllumMap(MapNum).Zone).DaylRefPtAbsCoord(2, R) ,
+                                              ZoneDaylight(IllumMap(MapNum).Zone).DaylRefPtAbsCoord(3, R) );
             }
         }
         if (SavedMnDy(MapNum) != CurMnDyHr.substr(0, 5)) {
@@ -10083,7 +10063,7 @@ namespace DaylightingManager {
         }
         if (EnvrnPrint(MapNum)) {
             WriteDaylightMapTitle(MapNum,
-                                  IllumMap(MapNum).UnitNo,
+                                  *IllumMap(MapNum).mapFile,
                                   IllumMap(MapNum).Name,
                                   EnvironmentName,
                                   IllumMap(MapNum).Zone,
@@ -10097,7 +10077,7 @@ namespace DaylightingManager {
             if (TimeStep == NumOfTimeStepInHour) { // Report only hourly
 
                 // Write X scale column header
-                mapLine = format(" {} {:02}:00", SavedMnDy(MapNum), HourOfDay);
+                auto mapLine = format(" {} {:02}:00", SavedMnDy(MapNum), HourOfDay);
                 if (IllumMap(MapNum).HeaderXLineLengthNeeded) linelen = int(len(mapLine));
                 RefPt = 1;
                 for (X = 1; X <= IllumMap(MapNum).Xnum; ++X) {
@@ -10122,7 +10102,7 @@ namespace DaylightingManager {
                     IllumMap(MapNum).HeaderXLineLengthNeeded = false;
                 }
 
-                ObjexxFCL::gio::write(IllumMap(MapNum).UnitNo, FmtA) << mapLine;
+                print(*IllumMap(MapNum).mapFile, "{}\n", mapLine);
 
                 // Write Y scale prefix and illuminance values
                 RefPt = 1;
@@ -10140,7 +10120,7 @@ namespace DaylightingManager {
                         mapLine += MapColSep + String;
                     }
 
-                    ObjexxFCL::gio::write(IllumMap(MapNum).UnitNo, FmtA) << mapLine;
+                    print(*IllumMap(MapNum).mapFile, "{}\n", mapLine);
 
                     RefPt += IllumMap(MapNum).Xnum;
                 } // X
@@ -10179,19 +10159,6 @@ namespace DaylightingManager {
                 } // WriteOutputToSQLite
             }     // end time step
         }         // not Warmup
-
-        return;
-
-    Label901:;
-        ShowFatalError("ReportIllumMap: Could not open file " + outputFiles.outputMapTabFileName + MapNoString + "\" for output (write).");
-        return;
-
-    Label902:;
-        ShowFatalError("ReportIllumMap: Could not open file " + outputFiles.outputMapCsvFileName + MapNoString + "\" for output (write).");
-        return;
-
-    Label903:;
-        ShowFatalError("ReportIllumMap: Could not open file " + outputFiles.outputMapTxtFileName + MapNoString + "\" for output (write).");
     }
 
     void CloseReportIllumMaps(OutputFiles &outputFiles)
@@ -10234,10 +10201,6 @@ namespace DaylightingManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int MapNum;
-        static int ios(0);
-        int NumLines;
-
         if (TotIllumMaps > 0) {
             // Write map header
             if (MapColSep == CharTab) {
@@ -10250,33 +10213,18 @@ namespace DaylightingManager {
 
             outputFiles.map.ensure_open("CloseReportIllumMaps");
 
-            for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
-                if (IllumMap(MapNum).UnitNo == 0) continue; // fatal error processing
-                NumLines = 0;
-                ObjexxFCL::gio::rewind(IllumMap(MapNum).UnitNo);
-                ios = 0;
-                while (ios == 0) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(IllumMap(MapNum).UnitNo, FmtA, flags) >> mapLine;
-                        ios = flags.ios();
-                    }
-                    if (ios > 0) { // usually a read error
-                        ShowFatalError("CloseReportIllumMaps: Failed to read map. IOError=" + TrimSigDigits(ios));
-                    } else if (ios != 0) {
-                        if (NumLines == 0) {
-                            ShowSevereError("CloseReportIllumMaps: IllumMap=\"" + IllumMap(MapNum).Name + "\" is empty.");
-                        }
-                        break;
-                    }
-                    ++NumLines;
+            for (int MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
+                if (!IllumMap(MapNum).mapFile->good()) continue; // fatal error processing
+
+                const auto mapLines = IllumMap(MapNum).mapFile->getLines();
+                if (mapLines.empty()) {
+                    ShowSevereError("CloseReportIllumMaps: IllumMap=\"" + IllumMap(MapNum).Name + "\" is empty.");
+                    break;
+                }
+                for(const auto &mapLine : mapLines) {
                     print(outputFiles.map, "{}\n", mapLine);
                 }
-                {
-                    IOFlags flags;
-                    flags.DISPOSE("DELETE");
-                    ObjexxFCL::gio::close(IllumMap(MapNum).UnitNo, flags);
-                }
+                IllumMap(MapNum).mapFile->del();
             }
 
             if (!mapResultsReported && !AbortProcessing) {
@@ -10769,7 +10717,7 @@ namespace DaylightingManager {
                 // This is an interior window in ZoneNum
                 int const ConstrNum = Surface(IWin).Construction;
                 int const adjEnclNum = Surface(Surface(IWin).ExtBoundCond).SolarEnclIndex;
-                QDifTrans = QSDifSol(adjEnclNum) * Construct(ConstrNum).TransDiffVis * Surface(IWin).Area * PDIFLW;
+                QDifTrans = QSDifSol(adjEnclNum) * dataConstruction.Construct(ConstrNum).TransDiffVis * Surface(IWin).Area * PDIFLW;
                 QDifTransUp = QDifTrans * SurfaceWindow(IWin).FractionUpgoing;
                 QDifTransDn = QDifTrans * (1.0 - SurfaceWindow(IWin).FractionUpgoing);
                 if (ZoneDaylight(ZoneNum).TotInsSurfArea * (1.0 - ZoneDaylight(ZoneNum).AveVisDiffReflect) != 0.0) {
@@ -10994,7 +10942,7 @@ namespace DaylightingManager {
     }
 
     void WriteDaylightMapTitle(int const mapNum,
-                               int const unitNo,
+                               OutputFile &mapFile,
                                std::string const &mapName,
                                std::string const &environmentName,
                                int const ZoneNum,
@@ -11011,15 +10959,14 @@ namespace DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // The purpose of the routine is to allow the daylighting map data to be written in various formats
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt FmtA("(A)");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string fullmapName; // for output to map units as well as SQL
-
         // must add correct number of commas at end
-        fullmapName = Zone(ZoneNum).Name + ':' + environmentName + ':' + mapName + " Illuminance [lux] (Hourly)";
-        ObjexxFCL::gio::write(unitNo, FmtA) << "Date/Time," + fullmapName + MapColSep + refPt1 + MapColSep + refPt2 + MapColSep + MapColSep;
+        const auto fullmapName = fmt::format("{}:{}:{} Illuminance [lux] (Hourly)", Zone(ZoneNum).Name, environmentName, mapName);
+        print(mapFile,
+              "Date/Time{Sep}{FullMapName}{Sep}{RefPt1}{Sep}{RefPt2}{Sep}{Sep}\n",
+              fmt::arg("Sep", MapColSep),
+              fmt::arg("FullMapName", fullmapName),
+              fmt::arg("RefPt1", refPt1),
+              fmt::arg("RefPt2", refPt2));
 
         if (sqlite) {
             sqlite->createSQLiteDaylightMapTitle(mapNum, fullmapName, environmentName, ZoneNum, refPt1, refPt2, zcoord);

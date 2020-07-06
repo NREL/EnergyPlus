@@ -759,6 +759,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    2,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
+        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
         "    CLN-INS,                 !- Outside Layer",
         "    GYP1,                    !- Layer 2",
         "    GYP2,                    !- Layer 3",
@@ -770,6 +771,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    2,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
+        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
         "    MAT-CLNG-1,              !- Outside Layer",
         "    GYP2,                    !- Layer 2",
         "    GYP1,                    !- Layer 3",
@@ -781,6 +783,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    2,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
+        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
         "    INS - EXPANDED EXT POLYSTYRENE R12,  !- Outside Layer",
         "    CONC,                    !- Layer 2",
         "    CONC,                    !- Layer 3",
@@ -2299,7 +2302,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     ProcessScheduleInput(state.outputFiles);  // read schedule data
 
     ErrorsFound = false;
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;

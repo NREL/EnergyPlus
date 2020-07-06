@@ -67,6 +67,9 @@
 
 namespace EnergyPlus {
 
+    // Forward Declarations
+    struct EnergyPlusData;
+
 namespace SolarShading {
 
     // Using/Aliasing
@@ -335,9 +338,9 @@ namespace SolarShading {
 
     void CalcAborbedOnExteriorOpaqueSurfaces();
 
-    void CalcInteriorSolarDistributionWCE();
+    void CalcInteriorSolarDistributionWCE(WindowManagerData &dataWindowManager);
 
-    void CalcInteriorSolarDistributionWCESimple();
+    void CalcInteriorSolarDistributionWCESimple(WindowManagerData &dataWindowManager);
 
     int WindowScheduledSolarAbs(int const SurfNum, // Surface number
                                 int const ConstNum // Construction number
