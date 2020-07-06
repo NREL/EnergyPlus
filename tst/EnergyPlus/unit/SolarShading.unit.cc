@@ -673,8 +673,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
     FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
 
-    EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, 6), 0.0001);
-    EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, 6), 0.0001);
+    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
+    EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, windowSurfNum), 0.0001);
+    EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, windowSurfNum), 0.0001);
 
 
 }
@@ -1082,9 +1083,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     ;
     EXPECT_FALSE(SolarShading::SUNCOS(3) < DataEnvironment::SunIsUpValue);
 
-    EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, 3));
-    EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, 6));
-    EXPECT_DOUBLE_EQ(0.5432, SunlitFrac(4, 9, 9));
+    int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", DataSurfaces::Surface);
+    EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, surfNum));
+    surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
+    EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, surfNum));
+    surfNum = UtilityRoutines::FindItemInList("ZN001:ROOF", DataSurfaces::Surface);
+    EXPECT_DOUBLE_EQ(0.5432, SunlitFrac(4, 9, surfNum));
     SolarShading::clear_state();
 }
 
@@ -1851,9 +1855,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     CalcSkyDifShading = false;
 
     FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
-
-    EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, 6), 0.0001);
-    EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, 6), 0.0001);
+    int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
+    EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, surfNum), 0.0001);
+    EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, surfNum), 0.0001);
 
     DataSystemVariables::SlaterBarsky = false;
 }

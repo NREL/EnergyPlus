@@ -3387,7 +3387,6 @@ namespace ConvectionCoefficients {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneLoop;
-        int SurfLoop;
         int VertLoop;
         Real64 BldgVolumeSum;
         Real64 PerimExtLengthSum;
@@ -3491,7 +3490,7 @@ namespace ConvectionCoefficients {
                 thisWWR = -999.0; // throw error?
             }
             // first pass thru this zones surfaces to gather data
-            for (SurfLoop = Zone(ZoneLoop).SurfaceFirst; SurfLoop <= Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
+            for (int SurfLoop = Zone(ZoneLoop).SurfaceFirst; SurfLoop <= Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
                 // first catch exterior walls and do summations
                 if ((Surface(SurfLoop).ExtBoundCond == ExternalEnvironment) && (Surface(SurfLoop).Class == SurfaceClass_Wall)) {
                     PerimExtLengthSum += Surface(SurfLoop).Width;
@@ -3504,7 +3503,7 @@ namespace ConvectionCoefficients {
             }
 
             // second pass thru zone surfs to fill data
-            for (SurfLoop = Zone(ZoneLoop).SurfaceFirst; SurfLoop <= Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
+            for (int SurfLoop = Zone(ZoneLoop).SurfaceFirst; SurfLoop <= Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
                 // now fill values
                 Surface(SurfLoop).IntConvZoneWallHeight = Zone(ZoneLoop).CeilingHeight;
                 Surface(SurfLoop).IntConvZonePerimLength = PerimExtLengthSum;
@@ -3514,7 +3513,7 @@ namespace ConvectionCoefficients {
 
             // third pass for window locations
             if ((ExtWindowCount > 0) && (ExtWallCount > 0)) {
-                for (SurfLoop = Zone(ZoneLoop).SurfaceFirst; SurfLoop <= Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
+                for (int SurfLoop = Zone(ZoneLoop).SurfaceFirst; SurfLoop <= Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
                     if ((Surface(SurfLoop).ExtBoundCond == ExternalEnvironment) &&
                         ((Surface(SurfLoop).Class == SurfaceClass_Window) || (Surface(SurfLoop).Class == SurfaceClass_GlassDoor))) {
                         if (Surface(SurfLoop).IntConvWindowWallRatio < 0.5) {
@@ -3550,7 +3549,7 @@ namespace ConvectionCoefficients {
         dataConvectionCoefficients.CubeRootOfOverallBuildingVolume = std::pow(BldgVolumeSum, OneThird);
 
         // first pass over surfaces for outside face params
-        for (SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
+        for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
             if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(SurfLoop).HeatTransSurf) continue;
             thisAzimuth = Surface(SurfLoop).Azimuth;
@@ -3877,7 +3876,7 @@ namespace ConvectionCoefficients {
             dataConvectionCoefficients.RoofLongAxisOutwardAzimuth = 0.0; // flat roofs don't really have azimuth
         }
 
-        for (SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
+        for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
             if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(SurfLoop).HeatTransSurf) continue;
             thisAzimuth = Surface(SurfLoop).Azimuth;
@@ -3940,7 +3939,7 @@ namespace ConvectionCoefficients {
                 "[m], Inside Model Assignment, Inside Height [m], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio, "
                 "Window Location, Near Radiant {{Yes/No}}, Has Active HVAC {{Yes/No}}\n");
             print(outputFiles.eio, Format_900); // header
-            for (SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
+            for (int SurfLoop : DataSurfaces::AllSurfaceListReportOrder) {
                 if (!Surface(SurfLoop).HeatTransSurf) continue;
                 if (Surface(SurfLoop).IntConvSurfGetsRadiantHeat) {
                     YesNo1 = "Yes";
