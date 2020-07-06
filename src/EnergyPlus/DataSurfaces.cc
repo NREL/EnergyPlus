@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -504,6 +505,7 @@ namespace DataSurfaces {
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
     std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
     std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
+    std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
     bool AnyHeatBalanceInsideSourceTerm(false);  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     bool AnyHeatBalanceOutsideSourceTerm(false); // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
@@ -822,7 +824,7 @@ namespace DataSurfaces {
         return temperature;
     }
 
-    Real64 SurfaceData::getOutsideIR(const int t_SurfNum) const
+    Real64 SurfaceData::getOutsideIR(WindowManagerData &dataWindowManager, const int t_SurfNum) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -838,8 +840,8 @@ namespace DataSurfaces {
                     QSteamBaseboardSurf(ExtBoundCond) + QElecBaseboardSurf(ExtBoundCond);
         } else {
             Real64 tout = getOutsideAirTemperature(t_SurfNum) + KelvinConv;
-            value = sigma * pow_4(tout);
-            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
+            value = dataWindowManager.sigma * pow_4(tout);
+            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * dataWindowManager.sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
                     ViewFactorGroundIR * value;
         }
         return value;
@@ -1162,6 +1164,7 @@ namespace DataSurfaces {
         AllIZSurfaceList.clear();
         AllHTNonWindowSurfaceList.clear();
         AllHTWindowSurfaceList.clear();
+        AllSurfaceListReportOrder.clear();
         AnyHeatBalanceInsideSourceTerm = false;
         AnyHeatBalanceOutsideSourceTerm = false;
         Surface.deallocate();
