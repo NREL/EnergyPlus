@@ -448,7 +448,7 @@ namespace HeatBalanceManager {
 
         GetSiteAtmosphereData(state.outputFiles, ErrorsFound);
 
-        GetWindowGlassSpectralData(state.dataWindowManager, ErrorsFound);
+        GetWindowGlassSpectralData(ErrorsFound);
 
         GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
@@ -996,10 +996,11 @@ namespace HeatBalanceManager {
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_EMPD;
                     DataHeatBalance::AnyEMPD = true;
-
+                    DataHeatBalance::AllCTF = false;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
                     DataHeatBalance::AnyCondFD = true;
+                    DataHeatBalance::AllCTF = false;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Conduction Finite Difference but Number of TimeSteps in Hour < 20, Value is " +
@@ -1011,6 +1012,7 @@ namespace HeatBalanceManager {
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
                     DataHeatBalance::AnyHAMT = true;
+                    DataHeatBalance::AllCTF = false;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Combined Heat and Moisture Finite Element but Number of TimeSteps in Hour < 20, Value is " +
@@ -3893,7 +3895,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void GetWindowGlassSpectralData(WindowManagerData &dataWindowManager, bool &ErrorsFound) // set to true if errors found in input
+    void GetWindowGlassSpectralData(bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
