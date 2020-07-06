@@ -6233,7 +6233,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     GetProjectControlData(state, state.outputFiles, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);                             // expect no errors
 
-    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);                       // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data
