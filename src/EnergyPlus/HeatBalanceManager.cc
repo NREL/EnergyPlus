@@ -61,6 +61,7 @@
 #include "OutputFiles.hh"
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -87,7 +88,6 @@
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -358,7 +358,7 @@ namespace HeatBalanceManager {
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(state.outputFiles);                                                                // Initialize all heat balance related parameters
+        InitHeatBalance(state.dataWindowManager, state.outputFiles);                                                                // Initialize all heat balance related parameters
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -444,7 +444,7 @@ namespace HeatBalanceManager {
 
         // FLOW:
 
-        GetProjectControlData(state.outputFiles, ErrorsFound);
+        GetProjectControlData(state, state.outputFiles, ErrorsFound);
 
         GetSiteAtmosphereData(state.outputFiles, ErrorsFound);
 
@@ -653,7 +653,7 @@ namespace HeatBalanceManager {
         // Construction:InternalSource
     }
 
-    void GetProjectControlData(OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors detected during getting data
+    void GetProjectControlData(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors detected during getting data
     {
 
         // SUBROUTINE INFORMATION:
@@ -996,10 +996,11 @@ namespace HeatBalanceManager {
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_EMPD;
                     DataHeatBalance::AnyEMPD = true;
-
+                    DataHeatBalance::AllCTF = false;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
                     DataHeatBalance::AnyCondFD = true;
+                    DataHeatBalance::AllCTF = false;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Conduction Finite Difference but Number of TimeSteps in Hour < 20, Value is " +
@@ -1011,6 +1012,7 @@ namespace HeatBalanceManager {
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
                     DataHeatBalance::AnyHAMT = true;
+                    DataHeatBalance::AllCTF = false;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Combined Heat and Moisture Finite Element but Number of TimeSteps in Hour < 20, Value is " +
@@ -1206,7 +1208,7 @@ namespace HeatBalanceManager {
             AlphaName(3) = "NO";
         }
 
-        WindowManager::initWindowModel();
+        WindowManager::initWindowModel(state.dataWindowManager);
 
         static constexpr auto Format_728(
             "! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
@@ -5157,7 +5159,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(OutputFiles &outputFiles)
+    void InitHeatBalance(WindowManagerData &dataWindowManager, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5220,7 +5222,7 @@ namespace HeatBalanceManager {
             DisplayString("Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
-            InitWindowOpticalCalculations(outputFiles);
+            InitWindowOpticalCalculations(dataWindowManager, outputFiles);
             InitDaylightingDevices(OutputFiles::getSingleton()); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(); // Initialize the shadowing calculations

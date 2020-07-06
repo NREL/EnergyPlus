@@ -56,9 +56,6 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    class OutputFiles;
 
     // Forward declarations
     struct EnergyPlusData;

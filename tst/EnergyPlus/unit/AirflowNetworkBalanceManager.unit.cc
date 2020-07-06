@@ -2237,7 +2237,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -4418,8 +4418,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    SimulationManager::GetProjectData(state, state.outputFiles);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -9070,8 +9070,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    SimulationManager::GetProjectData(state, state.outputFiles);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -13096,7 +13096,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -15569,7 +15569,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -17147,8 +17147,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    SimulationManager::GetProjectData(state, state.outputFiles);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -19926,7 +19926,7 @@ std::string const idf_objects = delimited_string({
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
