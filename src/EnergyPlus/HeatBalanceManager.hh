@@ -166,7 +166,7 @@ namespace HeatBalanceManager {
 
     void GetMaterialData(WindowEquivalentLayerData &dataWindowEquivalentLayer, OutputFiles &outputFiles, bool &ErrorsFound); // set to true if errors found in input
 
-    void GetWindowGlassSpectralData(WindowManagerData &dataWindowManager, bool &ErrorsFound); // set to true if errors found in input
+    void GetWindowGlassSpectralData(bool &ErrorsFound); // set to true if errors found in input
 
     void ValidateMaterialRoughness(int const MaterNum,           // Which Material number being validated.
                                    std::string const &Roughness, // Roughness String

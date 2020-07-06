@@ -588,9 +588,12 @@ namespace LowTempRadiantSystem {
 
             // Process the temperature control type
             thisRadSys.ControlType = thisRadSys.processRadiantSystemControlInput(Alphas(5),cAlphaFields(5));
+            
+            // Process the setpoint type
+            thisRadSys.SetpointType = thisRadSys.processRadiantSystemSetpointInput(Alphas(6),cAlphaFields(6));
 
             // Determine Low Temp Radiant heating design capacity sizing method
-            if (UtilityRoutines::SameString(Alphas(6), "HeatingDesignCapacity")) {
+            if (UtilityRoutines::SameString(Alphas(7), "HeatingDesignCapacity")) {
                 thisRadSys.HeatingCapMethod = HeatingDesignCapacity;
                 if (!lNumericBlanks(3)) {
                     thisRadSys.ScaledHeatingCapacity = Numbers(3);
@@ -600,35 +603,35 @@ namespace LowTempRadiantSystem {
                         ErrorsFound = true;
                     }
                 } else {
-                    if ((!lAlphaBlanks(7)) || (!lAlphaBlanks(8))) {
+                    if ((!lAlphaBlanks(8)) || (!lAlphaBlanks(9))) {
                         ShowSevereError(CurrentModuleObject + " = " + thisRadSys.Name);
-                        ShowContinueError("Input for " + cAlphaFields(6) + " = " + Alphas(6));
+                        ShowContinueError("Input for " + cAlphaFields(7) + " = " + Alphas(7));
                         ShowContinueError("Blank field not allowed for " + cNumericFields(3));
                         ErrorsFound = true;
                     }
                 }
-            } else if (UtilityRoutines::SameString(Alphas(6), "CapacityPerFloorArea")) {
+            } else if (UtilityRoutines::SameString(Alphas(7), "CapacityPerFloorArea")) {
                 thisRadSys.HeatingCapMethod = CapacityPerFloorArea;
                 if (!lNumericBlanks(4)) {
                     thisRadSys.ScaledHeatingCapacity = Numbers(4);
                     if (thisRadSys.ScaledHeatingCapacity <= 0.0) {
                         ShowSevereError(CurrentModuleObject + " = " + thisRadSys.Name);
-                        ShowContinueError("Input for " + cAlphaFields(6) + " = " + Alphas(6));
+                        ShowContinueError("Input for " + cAlphaFields(7) + " = " + Alphas(7));
                         ShowContinueError("Illegal " + cNumericFields(4) + " = " + TrimSigDigits(Numbers(4), 7));
                         ErrorsFound = true;
                     } else if (thisRadSys.ScaledHeatingCapacity == AutoSize) {
                         ShowSevereError(CurrentModuleObject + " = " + thisRadSys.Name);
-                        ShowContinueError("Input for " + cAlphaFields(6) + " = " + Alphas(6));
+                        ShowContinueError("Input for " + cAlphaFields(7) + " = " + Alphas(7));
                         ShowContinueError("Illegal " + cNumericFields(4) + " = Autosize");
                         ErrorsFound = true;
                     }
                 } else {
                     ShowSevereError(CurrentModuleObject + " = " + thisRadSys.Name);
-                    ShowContinueError("Input for " + cAlphaFields(6) + " = " + Alphas(6));
+                    ShowContinueError("Input for " + cAlphaFields(7) + " = " + Alphas(7));
                     ShowContinueError("Blank field not allowed for " + cNumericFields(4));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(Alphas(6), "FractionOfAutosizedHeatingCapacity")) {
+            } else if (UtilityRoutines::SameString(Alphas(7), "FractionOfAutosizedHeatingCapacity")) {
                 thisRadSys.HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
                 if (!lNumericBlanks(5)) {
                     thisRadSys.ScaledHeatingCapacity = Numbers(5);
@@ -639,13 +642,13 @@ namespace LowTempRadiantSystem {
                     }
                 } else {
                     ShowSevereError(CurrentModuleObject + " = " + thisRadSys.Name);
-                    ShowContinueError("Input for " + cAlphaFields(6) + " = " + Alphas(6));
+                    ShowContinueError("Input for " + cAlphaFields(7) + " = " + Alphas(7));
                     ShowContinueError("Blank field not allowed for " + cNumericFields(5));
                     ErrorsFound = true;
                 }
             } else {
                 ShowSevereError(CurrentModuleObject + " = " + thisRadSys.Name);
-                ShowContinueError("Illegal " + cAlphaFields(6) + " = " + Alphas(6));
+                ShowContinueError("Illegal " + cAlphaFields(7) + " = " + Alphas(7));
                 ErrorsFound = true;
             }
 
@@ -653,27 +656,27 @@ namespace LowTempRadiantSystem {
             thisRadSys.WaterVolFlowMaxHeat = Numbers(6);
 
             thisRadSys.HotWaterInNode = GetOnlySingleNode(
-                Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             thisRadSys.HotWaterOutNode = GetOnlySingleNode(
-                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(9), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            if ((!lAlphaBlanks(7)) || (!lAlphaBlanks(8))) {
-                TestCompSet(CurrentModuleObject, Alphas(1), Alphas(7), Alphas(8), "Hot Water Nodes");
+            if ((!lAlphaBlanks(8)) || (!lAlphaBlanks(9))) {
+                TestCompSet(CurrentModuleObject, Alphas(1), Alphas(8), Alphas(9), "Hot Water Nodes");
             }
 
             thisRadSys.HotThrottlRange = Numbers(7);
 
-            thisRadSys.HotSetptSched = Alphas(9);
-            thisRadSys.HotSetptSchedPtr = GetScheduleIndex(Alphas(9));
-            if ((thisRadSys.HotSetptSchedPtr == 0) && (!lAlphaBlanks(9))) {
-                ShowSevereError(cAlphaFields(9) + " not found: " + Alphas(9));
+            thisRadSys.HotSetptSched = Alphas(10);
+            thisRadSys.HotSetptSchedPtr = GetScheduleIndex(Alphas(10));
+            if ((thisRadSys.HotSetptSchedPtr == 0) && (!lAlphaBlanks(10))) {
+                ShowSevereError(cAlphaFields(10) + " not found: " + Alphas(10));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
             if ((thisRadSys.WaterVolFlowMaxHeat == AutoSize) &&
-                (lAlphaBlanks(7) || lAlphaBlanks(8) || lAlphaBlanks(9) || (thisRadSys.HotWaterInNode <= 0) ||
+                (lAlphaBlanks(8) || lAlphaBlanks(9) || lAlphaBlanks(10) || (thisRadSys.HotWaterInNode <= 0) ||
                  (thisRadSys.HotWaterOutNode <= 0) || (thisRadSys.HotSetptSchedPtr == 0))) {
                 ShowSevereError("Hydronic radiant systems may not be autosized without specification of nodes or schedules.");
                 ShowContinueError("Occurs in " + CurrentModuleObject + " (heating input) = " + Alphas(1));
@@ -681,7 +684,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Determine Low Temp Radiant cooling design capacity sizing method
-            if (UtilityRoutines::SameString(Alphas(10), "CoolingDesignCapacity")) {
+            if (UtilityRoutines::SameString(Alphas(11), "CoolingDesignCapacity")) {
                 thisRadSys.CoolingCapMethod = CoolingDesignCapacity;
                 if (!lNumericBlanks(8)) {
                     thisRadSys.ScaledCoolingCapacity = Numbers(8);
@@ -691,35 +694,35 @@ namespace LowTempRadiantSystem {
                         ErrorsFound = true;
                     }
                 } else {
-                    if ((!lAlphaBlanks(11)) || (!lAlphaBlanks(12))) {
+                    if ((!lAlphaBlanks(12)) || (!lAlphaBlanks(13))) {
                         ShowSevereError(CurrentModuleObject + " = " + thisRadSys.Name);
-                        ShowContinueError("Input for " + cAlphaFields(10) + " = " + Alphas(10));
+                        ShowContinueError("Input for " + cAlphaFields(11) + " = " + Alphas(11));
                         ShowContinueError("Blank field not allowed for " + cNumericFields(8));
                         ErrorsFound = true;
                     }
                 }
-            } else if (UtilityRoutines::SameString(Alphas(10), "CapacityPerFloorArea")) {
+            } else if (UtilityRoutines::SameString(Alphas(11), "CapacityPerFloorArea")) {
                 thisRadSys.CoolingCapMethod = CapacityPerFloorArea;
                 if (!lNumericBlanks(9)) {
                     thisRadSys.ScaledCoolingCapacity = Numbers(9);
                     if (thisRadSys.CoolingCapMethod <= 0.0) {
                         ShowSevereError(CurrentModuleObject + " = " + thisRadSys.Name);
-                        ShowContinueError("Input for " + cAlphaFields(10) + " = " + Alphas(10));
+                        ShowContinueError("Input for " + cAlphaFields(11) + " = " + Alphas(11));
                         ShowContinueError("Illegal " + cNumericFields(9) + " = " + TrimSigDigits(Numbers(9), 7));
                         ErrorsFound = true;
                     } else if (thisRadSys.ScaledCoolingCapacity == AutoSize) {
                         ShowSevereError(CurrentModuleObject + " = " + thisRadSys.Name);
-                        ShowContinueError("Input for " + cAlphaFields(10) + " = " + Alphas(10));
+                        ShowContinueError("Input for " + cAlphaFields(11) + " = " + Alphas(11));
                         ShowContinueError("Illegal " + cNumericFields(9) + " = Autosize");
                         ErrorsFound = true;
                     }
                 } else {
                     ShowSevereError(CurrentModuleObject + " = " + thisRadSys.Name);
-                    ShowContinueError("Input for " + cAlphaFields(10) + " = " + Alphas(10));
+                    ShowContinueError("Input for " + cAlphaFields(11) + " = " + Alphas(11));
                     ShowContinueError("Blank field not allowed for " + cNumericFields(9));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(Alphas(10), "FractionOfAutosizedCoolingCapacity")) {
+            } else if (UtilityRoutines::SameString(Alphas(11), "FractionOfAutosizedCoolingCapacity")) {
                 thisRadSys.CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
                 if (!lNumericBlanks(10)) {
                     thisRadSys.ScaledCoolingCapacity = Numbers(10);
@@ -730,13 +733,13 @@ namespace LowTempRadiantSystem {
                     }
                 } else {
                     ShowSevereError(CurrentModuleObject + " = " + thisRadSys.Name);
-                    ShowContinueError("Input for " + cAlphaFields(10) + " = " + Alphas(10));
+                    ShowContinueError("Input for " + cAlphaFields(11) + " = " + Alphas(11));
                     ShowContinueError("Blank field not allowed for " + cNumericFields(10));
                     ErrorsFound = true;
                 }
             } else {
                 ShowSevereError(CurrentModuleObject + " = " + thisRadSys.Name);
-                ShowContinueError("Illegal " + cAlphaFields(10) + " = " + Alphas(10));
+                ShowContinueError("Illegal " + cAlphaFields(11) + " = " + Alphas(11));
                 ErrorsFound = true;
             }
 
@@ -744,30 +747,30 @@ namespace LowTempRadiantSystem {
             thisRadSys.WaterVolFlowMaxCool = Numbers(11);
 
             thisRadSys.ColdWaterInNode = GetOnlySingleNode(
-                Alphas(11), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                Alphas(12), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
             thisRadSys.ColdWaterOutNode = GetOnlySingleNode(
-                Alphas(12), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                Alphas(13), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
-            if ((!lAlphaBlanks(11)) || (!lAlphaBlanks(12))) {
-                TestCompSet(CurrentModuleObject, Alphas(1), Alphas(11), Alphas(12), "Chilled Water Nodes");
+            if ((!lAlphaBlanks(12)) || (!lAlphaBlanks(13))) {
+                TestCompSet(CurrentModuleObject, Alphas(1), Alphas(12), Alphas(13), "Chilled Water Nodes");
             }
 
             thisRadSys.ColdThrottlRange = Numbers(12);
 
-            thisRadSys.ColdSetptSched = Alphas(13);
-            thisRadSys.ColdSetptSchedPtr = GetScheduleIndex(Alphas(13));
-            if ((thisRadSys.ColdSetptSchedPtr == 0) && (!lAlphaBlanks(13))) {
-                ShowSevereError(cAlphaFields(13) + " not found: " + Alphas(13));
+            thisRadSys.ColdSetptSched = Alphas(14);
+            thisRadSys.ColdSetptSchedPtr = GetScheduleIndex(Alphas(14));
+            if ((thisRadSys.ColdSetptSchedPtr == 0) && (!lAlphaBlanks(14))) {
+                ShowSevereError(cAlphaFields(14) + " not found: " + Alphas(14));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(Alphas(14), Off)) {
+            if (UtilityRoutines::SameString(Alphas(15), Off)) {
                 thisRadSys.CondCtrlType = CondCtrlNone;
-            } else if (UtilityRoutines::SameString(Alphas(14), SimpleOff)) {
+            } else if (UtilityRoutines::SameString(Alphas(15), SimpleOff)) {
                 thisRadSys.CondCtrlType = CondCtrlSimpleOff;
-            } else if (UtilityRoutines::SameString(Alphas(14), VariableOff)) {
+            } else if (UtilityRoutines::SameString(Alphas(15), VariableOff)) {
                 thisRadSys.CondCtrlType = CondCtrlVariedOff;
             } else {
                 thisRadSys.CondCtrlType = CondCtrlSimpleOff;
@@ -775,9 +778,9 @@ namespace LowTempRadiantSystem {
 
             thisRadSys.CondDewPtDeltaT = Numbers(13);
 
-            if (UtilityRoutines::SameString(Alphas(15), OnePerSurf)) {
+            if (UtilityRoutines::SameString(Alphas(16), OnePerSurf)) {
                 thisRadSys.NumCircCalcMethod = OneCircuit;
-            } else if (UtilityRoutines::SameString(Alphas(15), CalcFromLength)) {
+            } else if (UtilityRoutines::SameString(Alphas(16), CalcFromLength)) {
                 thisRadSys.NumCircCalcMethod = CalculateFromLength;
             } else {
                 thisRadSys.NumCircCalcMethod = OneCircuit;
@@ -1212,17 +1215,20 @@ namespace LowTempRadiantSystem {
 
             // Process the temperature control type
             thisElecSys.ControlType = thisElecSys.processRadiantSystemControlInput(Alphas(6),cAlphaFields(6));
+            
+            // Process the setpoint type
+            thisElecSys.SetpointType = thisElecSys.processRadiantSystemSetpointInput(Alphas(7),cAlphaFields(7));
 
             thisElecSys.ThrottlRange = Numbers(4);
 
-            thisElecSys.SetptSched = Alphas(7);
-            thisElecSys.SetptSchedPtr = GetScheduleIndex(Alphas(7));
+            thisElecSys.SetptSched = Alphas(8);
+            thisElecSys.SetptSchedPtr = GetScheduleIndex(Alphas(8));
             if (thisElecSys.SetptSchedPtr == 0) {
-                if (lAlphaBlanks(7)) {
-                    ShowSevereError(cAlphaFields(7) + " must be input, missing for " + Alphas(1));
+                if (lAlphaBlanks(8)) {
+                    ShowSevereError(cAlphaFields(8) + " must be input, missing for " + Alphas(1));
                 } else {
-                    ShowSevereError(cAlphaFields(7) + " not found for " + Alphas(1));
-                    ShowContinueError("Incorrect " + cAlphaFields(7) + " = " + Alphas(7));
+                    ShowSevereError(cAlphaFields(8) + " not found for " + Alphas(8));
+                    ShowContinueError("Incorrect " + cAlphaFields(8) + " = " + Alphas(8));
                 }
                 ErrorsFound = true;
             }
@@ -1613,6 +1619,22 @@ namespace LowTempRadiantSystem {
             ShowContinueError("Control reset to MAT control for this Low Temperature Radiant System.");
             return LowTempRadiantControlTypes::MATControl;
         }
+    }
+
+    LowTempRadiantSetpointTypes RadiantSystemBaseData::processRadiantSystemSetpointInput(std::string const& controlInput,
+                                                                                         std::string const& controlInputField)
+    {
+        if (UtilityRoutines::SameString(controlInput, "HalfFlowPower")) {
+            return LowTempRadiantSetpointTypes::halfFlowPower;
+        } else if (UtilityRoutines::SameString(controlInput, "ZeroFlowPower")) {
+            return LowTempRadiantSetpointTypes::zeroFlowPower;
+        } else {
+            ShowWarningError("Invalid " + controlInputField + " = " + controlInput);
+            ShowContinueError("Occurs in Low Temperature Radiant System = " + this->Name);
+            ShowContinueError("Setpoint type reset to HalfFlowPower for this Low Temperature Radiant System.");
+            return LowTempRadiantSetpointTypes::halfFlowPower;
+        }
+
     }
 
     void InitLowTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -3016,7 +3038,6 @@ namespace LowTempRadiantSystem {
         Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/sec]
         Real64 OffTempCool;  // temperature at which the flow rate throttles back to zero for cooling
         Real64 OffTempHeat;  // temperature at which the flow rate throttles back to zero for heating
-        Real64 SetPointTemp; // temperature "goal" for the radiant system [Celsius]
         int SurfNum;         // Surface number in the Surface derived type for a radiant system surface
         int SurfNum2;        // Surface number in the Surface derived type for a radiant system surface
         int ZoneNum;         // number of zone being served
@@ -3066,14 +3087,12 @@ namespace LowTempRadiantSystem {
             ControlTemp = this->setRadiantSystemControlTemperature();
 
             if (this->HotSetptSchedPtr > 0) {
-                SetPointTemp = GetCurrentScheduleValue(this->HotSetptSchedPtr);
-                OffTempHeat = SetPointTemp + 0.5 * this->HotThrottlRange;
+                OffTempHeat = this->setOffTemperatureLowTemperatureRadiantSystem(this->HotSetptSchedPtr,this->HotThrottlRange);
             } else { // This system is not capable of heating, set OffTempHeat to something really low
                 OffTempHeat = LowTempHeating;
             }
             if (this->ColdSetptSchedPtr > 0) {
-                SetPointTemp = GetCurrentScheduleValue(this->ColdSetptSchedPtr);
-                OffTempCool = SetPointTemp - 0.5 * this->ColdThrottlRange;
+                OffTempCool = this->setOffTemperatureLowTemperatureRadiantSystem(this->ColdSetptSchedPtr,-this->ColdThrottlRange);
             } else { // This system is not capable of cooling, set OffTempCool to something really high
                 OffTempCool = HighTempCooling;
             }
@@ -4722,7 +4741,6 @@ namespace LowTempRadiantSystem {
         Real64 HeatFrac;    // fraction of maximum electrical heat input to radiant system [dimensionless]
         Real64 OffTemp;     // Temperature above which the radiant system should be completely off [C]
         int RadSurfNum;     // number of surface that is the radiant system
-        Real64 SetPtTemp;   // Setpoint temperature [C]
         int SurfNum;        // intermediate variable for surface number in Surface derived type
         int ZoneNum;        // number of zone being served
 
@@ -4744,9 +4762,8 @@ namespace LowTempRadiantSystem {
             // that the unit should be on or not
 
             // Determine the current setpoint temperature and the temperature at which the unit should be completely off
-            SetPtTemp = GetCurrentScheduleValue(this->SetptSchedPtr);
-            OffTemp = SetPtTemp + 0.5 * this->ThrottlRange;
-
+            OffTemp = this->setOffTemperatureLowTemperatureRadiantSystem(this->SetptSchedPtr,this->ThrottlRange);
+ 
             // Determine the control temperature--what the setpoint/offtemp is being compared to for unit operation
 
             ControlTemp = this->setRadiantSystemControlTemperature();
@@ -5082,6 +5099,21 @@ namespace LowTempRadiantSystem {
         }
     }
 
+    Real64 RadiantSystemBaseData::setOffTemperatureLowTemperatureRadiantSystem(const int scheduleIndex, const Real64 throttlingRange)
+    {
+        Real64 scheduleValue = ScheduleManager::GetCurrentScheduleValue(scheduleIndex);
+        switch (this->SetpointType) {
+            case LowTempRadiantSetpointTypes::halfFlowPower:
+                return scheduleValue + 0.5 *throttlingRange;
+            case LowTempRadiantSetpointTypes::zeroFlowPower:
+                return scheduleValue;
+            default:
+                ShowSevereError("Illegal setpoint type in low temperature radiant system: " + this->Name);
+                ShowFatalError("Preceding condition causes termination.");
+                return scheduleValue + 0.5 * throttlingRange; // hush the compiler
+        }
+        
+    }
 
     Real64 HydronicSystemBaseData::calculateHXEffectivenessTerm(Real64 const Temperature,   // Temperature of water entering the radiant system, in C
                                                                 Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s

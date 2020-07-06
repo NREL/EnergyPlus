@@ -214,6 +214,7 @@ namespace WindowComplexManager {
             // Simon Check: Thermal construction removed
             // ThConst = Construct(IConst)%BSDFInput%ThermalConstruction
             SurfaceWindow(ISurf).WindowModelType = WindowBSDFModel;
+            DataHeatBalance::AnyBSDF = true;
             ++dataWindowComplexManager.NumComplexWind;
             NumStates = 1;
             dataWindowComplexManager.WindowList(dataWindowComplexManager.NumComplexWind).NumStates = 1; // Having found the construction reference in
