@@ -48,6 +48,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 namespace EnergyPlus {
 
@@ -56,8 +58,6 @@ namespace DataSizing {
     // MODULE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   December 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // This data-only module contains type definitions and variables
@@ -65,20 +65,7 @@ namespace DataSizing {
     // capacities. This data is available to the HVAC component modules
     // for their self sizing calculations.
 
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
 
     // parameters for outside air flow method
     int const NumOAFlowMethods(9);
@@ -197,13 +184,6 @@ namespace DataSizing {
     int const GlobalHeatingSizingFactorMode(102);
     int const GlobalCoolingSizingFactorMode(103);
     int const LoopComponentSizingFactorMode(104);
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
 
     //  days; includes effects of user multiplier
     //  and user set flows)
@@ -854,6 +834,31 @@ namespace DataSizing {
         }
 
         firstPassFlag = false;
+    }
+
+    Real64 ZoneAirDistributionData::calculateEz(int const ZoneNum) // Zone index
+    {
+        Real64 zoneEz = 1.0;
+        // Calc the zone supplied OA flow rate counting the zone air distribution effectiveness
+        //  First check whether the zone air distribution effectiveness schedule exists, if yes uses it;
+        //   otherwise uses the inputs of zone distribution effectiveness in cooling mode or heating mode
+        if (this->ZoneADEffSchPtr > 0) {
+            // Get schedule value for the zone air distribution effectiveness
+            zoneEz = ScheduleManager::GetCurrentScheduleValue(this->ZoneADEffSchPtr);
+        } else {
+            Real64 zoneLoad = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+
+            // Zone in cooling mode
+            if (zoneLoad < 0.0) zoneEz = this->ZoneADEffCooling;
+
+            // Zone in heating mode
+            if (zoneLoad > 0.0) zoneEz = this->ZoneADEffHeating;
+        }
+        if (zoneEz <= 0.0) {
+            // Enforce defaults
+            zoneEz = 1.0;
+        }
+        return zoneEz;
     }
 
 } // namespace DataSizing

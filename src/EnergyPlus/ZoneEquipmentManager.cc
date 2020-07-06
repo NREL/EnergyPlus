@@ -1036,6 +1036,7 @@ namespace ZoneEquipmentManager {
                 FinalZoneSizing(CtrlZoneNum).HeatDesTempDiff = ZoneSizingInput(ZoneSizNum).HeatDesTempDiff;
                 FinalZoneSizing(CtrlZoneNum).CoolDesHumRat = ZoneSizingInput(ZoneSizNum).CoolDesHumRat;
                 FinalZoneSizing(CtrlZoneNum).HeatDesHumRat = ZoneSizingInput(ZoneSizNum).HeatDesHumRat;
+                FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex = ZoneSizingInput(ZoneSizNum).ZoneAirDistributionIndex;
                 FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = ZoneSizingInput(ZoneSizNum).ZoneDesignSpecOAIndex;
                 FinalZoneSizing(CtrlZoneNum).OADesMethod = ZoneSizingInput(ZoneSizNum).OADesMethod;
                 FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = ZoneSizingInput(ZoneSizNum).DesOAFlowPPer;
@@ -1069,6 +1070,7 @@ namespace ZoneEquipmentManager {
                 CalcFinalZoneSizing(CtrlZoneNum).HeatDesTempDiff = ZoneSizingInput(ZoneSizNum).HeatDesTempDiff;
                 CalcFinalZoneSizing(CtrlZoneNum).CoolDesHumRat = ZoneSizingInput(ZoneSizNum).CoolDesHumRat;
                 CalcFinalZoneSizing(CtrlZoneNum).HeatDesHumRat = ZoneSizingInput(ZoneSizNum).HeatDesHumRat;
+                CalcFinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex = ZoneSizingInput(ZoneSizNum).ZoneAirDistributionIndex;
                 CalcFinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = ZoneSizingInput(ZoneSizNum).ZoneDesignSpecOAIndex;
                 CalcFinalZoneSizing(CtrlZoneNum).OADesMethod = ZoneSizingInput(ZoneSizNum).OADesMethod;
                 CalcFinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = ZoneSizingInput(ZoneSizNum).DesOAFlowPPer;
@@ -1101,6 +1103,7 @@ namespace ZoneEquipmentManager {
                 FinalZoneSizing(CtrlZoneNum).HeatDesTempDiff = ZoneSizingInput(1).HeatDesTempDiff;
                 FinalZoneSizing(CtrlZoneNum).CoolDesHumRat = ZoneSizingInput(1).CoolDesHumRat;
                 FinalZoneSizing(CtrlZoneNum).HeatDesHumRat = ZoneSizingInput(1).HeatDesHumRat;
+                FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex = ZoneSizingInput(1).ZoneAirDistributionIndex;
                 FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = ZoneSizingInput(1).ZoneDesignSpecOAIndex;
                 FinalZoneSizing(CtrlZoneNum).OADesMethod = ZoneSizingInput(1).OADesMethod;
                 FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = ZoneSizingInput(1).DesOAFlowPPer;
@@ -1134,6 +1137,7 @@ namespace ZoneEquipmentManager {
                 CalcFinalZoneSizing(CtrlZoneNum).HeatDesTempDiff = ZoneSizingInput(1).HeatDesTempDiff;
                 CalcFinalZoneSizing(CtrlZoneNum).CoolDesHumRat = ZoneSizingInput(1).CoolDesHumRat;
                 CalcFinalZoneSizing(CtrlZoneNum).HeatDesHumRat = ZoneSizingInput(1).HeatDesHumRat;
+                CalcFinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex = ZoneSizingInput(1).ZoneAirDistributionIndex;
                 CalcFinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = ZoneSizingInput(1).ZoneDesignSpecOAIndex;
                 CalcFinalZoneSizing(CtrlZoneNum).OADesMethod = ZoneSizingInput(1).OADesMethod;
                 CalcFinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = ZoneSizingInput(1).DesOAFlowPPer;
@@ -1332,6 +1336,8 @@ namespace ZoneEquipmentManager {
             UseOccSchFlag = false;
             UseMinOASchFlag = false;
             DSOAPtr = FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex;
+            ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex = DSOAPtr; // store for later use
+            ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex = FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex; // store for later use
             OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(DSOAPtr, ZoneIndex, UseOccSchFlag, UseMinOASchFlag);
 
             // Zone(ZoneIndex)%Multiplier and Zone(ZoneIndex)%ListMultiplier applied in CalcDesignSpecificationOutdoorAir

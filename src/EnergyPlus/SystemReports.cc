@@ -4481,7 +4481,15 @@ namespace SystemReports {
             ZoneLoad = ZoneSysEnergyDemand(ActualZoneNum).TotalOutputRequired;
             ZoneVolume = Zone(ActualZoneNum).Volume * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier; // CR 7170
 
-//GLAZER            ComputeTargetVentilationFlow(Zone(ActualZoneNum).TotOccupants, Zone(ActualZoneNum).FloorArea, Rp, Ra);
+            bool UseOccSchFlag = true;
+            bool UseMinOASchFlag = true;
+            ZoneTargetVentilationFlowVoz = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+                ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
+            if (ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex > 0) {
+                ZoneTargetVentilationFlowVoz =
+                    ZoneTargetVentilationFlowVoz /
+                    DataSizing::ZoneAirDistribution(ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex).calculateEz(ActualZoneNum);
+            }
 
 
             // if system operating in deadband reset zone load

@@ -411,7 +411,9 @@ namespace DataSizing {
         Real64 HeatDesTempDiff;    // zone design heating supply air temperature difference [deltaC]
         Real64 CoolDesHumRat;      // zone design cooling supply air humidity ratio [kgWater/kgDryAir]
         Real64 HeatDesHumRat;      // zone design heating supply air humidity ratio [kgWater/kgDryAir]
-        int ZoneDesignSpecOAIndex; // index to DesignSpecification:OutdoorAir object
+        int ZoneAirDistributionIndex; // index to DesignSpecification:ZoneAirDistribution object
+        int ZoneDesignSpecOAIndex;    // index to DesignSpecification:OutdoorAir object
+
         int OADesMethod;           // choice of how to calculate minimum outside air;
         //  1 = m3/s per person; 2 = m3/s per zone; 3 = m3/s per zone area;
         //  4 = sum of flow from 3 OA input fields;
@@ -583,7 +585,7 @@ namespace DataSizing {
         // Default Constructor
         ZoneSizingData()
             : ZnCoolDgnSAMethod(0), ZnHeatDgnSAMethod(0), CoolDesTemp(0.0), HeatDesTemp(0.0), CoolDesTempDiff(0.0), HeatDesTempDiff(0.0),
-              CoolDesHumRat(0.0), HeatDesHumRat(0.0), ZoneDesignSpecOAIndex(0), OADesMethod(0), DesOAFlowPPer(0.0), DesOAFlowPerArea(0.0),
+              CoolDesHumRat(0.0), HeatDesHumRat(0.0), ZoneAirDistributionIndex(0), ZoneDesignSpecOAIndex(0), OADesMethod(0), DesOAFlowPPer(0.0), DesOAFlowPerArea(0.0),
               DesOAFlow(0.0), CoolAirDesMethod(0), InpDesCoolAirFlow(0.0), DesCoolMinAirFlowPerArea(0.0), DesCoolMinAirFlow(0.0),
               DesCoolMinAirFlowFrac(0.0), HeatAirDesMethod(0), InpDesHeatAirFlow(0.0), DesHeatMaxAirFlowPerArea(0.0), DesHeatMaxAirFlow(0.0),
               DesHeatMaxAirFlowFrac(0.0), HeatSizingFactor(0.0), CoolSizingFactor(0.0), AccountForDOAS(false), DOASControlStrategy(0),
@@ -1151,6 +1153,8 @@ namespace DataSizing {
             : ZoneADEffCooling(1.0), ZoneADEffHeating(1.0), ZoneSecondaryRecirculation(0.0), ZoneADEffSchPtr(0), ZoneVentilationEff(0.0)
         {
         }
+
+        Real64 calculateEz(int const ZoneNum);   // Zone index
     };
 
     // Object Data
