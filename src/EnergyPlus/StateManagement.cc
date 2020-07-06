@@ -398,6 +398,5 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     WindowAC::clear_state();
     WindowComplexManager::clear_state();
     WindowEquivalentLayer::clear_state();
-    WindowManager::clear_state();
     ResultsFramework::clear_state();
 }

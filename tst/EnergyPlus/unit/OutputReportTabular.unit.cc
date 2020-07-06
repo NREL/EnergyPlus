@@ -7441,6 +7441,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         DataSurfaces::Surface(i).Tilt = 90.;
         DataSurfaces::Surface(i).Zone = 1;
         DataSurfaces::Surface(i).Construction = 1;
+        DataSurfaces::AllSurfaceListReportOrder.push_back(i);
 
         // Actual interesting stuff
         int entryIndex = (i-1) / 2;
@@ -7465,7 +7466,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     OutputReportPredefined::SetPredefinedTables();
 
     // Call the routine that fills up the table we care about
-    HeatBalanceSurfaceManager::GatherForPredefinedReport();
+    HeatBalanceSurfaceManager::GatherForPredefinedReport(state.dataWindowManager);
 
 
     // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
