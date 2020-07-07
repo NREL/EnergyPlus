@@ -292,7 +292,6 @@ namespace HVACManager {
         using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
         using ZoneEquipmentManager::CalcAirFlowSimple;
         using ZoneEquipmentManager::UpdateZoneSizing;
-        //using ZoneTempPredictorCorrector::NumOnOffCtrZone;
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
