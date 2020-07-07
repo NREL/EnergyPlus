@@ -330,11 +330,11 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;

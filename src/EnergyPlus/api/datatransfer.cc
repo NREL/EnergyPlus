@@ -51,8 +51,8 @@
 #include <ObjexxFCL/time.hh>
 
 #include <EnergyPlus/api/datatransfer.h>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -628,7 +628,7 @@ int getConstructionHandle(const char* constructionName) {
     int handle;
     handle = 0;
     std::string const nameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(constructionName);
-    for (auto const & construct : EnergyPlus::DataHeatBalance::Construct) {
+    for (auto const & construct : EnergyPlus::dataConstruction.Construct) {
         handle++;
         std::string const thisNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(construct.Name);
         if (nameUC == thisNameUC) {

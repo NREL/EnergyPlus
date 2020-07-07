@@ -2032,6 +2032,7 @@
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
     MeanAirTemperature,      !- Temperature Control Type
+    HalfFlowPower,           !- Setpoint Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
@@ -2063,6 +2064,7 @@
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
     OutdoorDryBulbTemperature,  !- Temperature Control Type
+    HalfFlowPower,           !- Setpoint Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
@@ -2094,6 +2096,7 @@
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
     OutdoorWetBulbTemperature,  !- Temperature Control Type
+    HalfFlowPower,           !- Setpoint Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}

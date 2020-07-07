@@ -241,7 +241,9 @@
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   Material,
     A1 - 1 IN STUCCO,        !- Name
