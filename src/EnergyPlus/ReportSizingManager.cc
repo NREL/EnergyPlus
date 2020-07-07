@@ -1812,9 +1812,6 @@ namespace ReportSizingManager {
                     }
                     AutosizeDes += fanDeltaT;
                     bCheckForZero = false;
-                } else if (SizingType == CoolingWaterDesWaterInletTempSizing) {
-                    AutosizeDes = PlantSizData(DataPltSizCoolNum).ExitTemp;
-                    bCheckForZero = false;
                 } else if (SizingType == CoolingWaterNumofTubesPerRowSizing) {
                     // result will be integerized external to this routine , add 0.5 to existing calc to round the result
                     AutosizeDes = int(max(3.0, 13750.0 * DataWaterFlowUsedForSizing + 1.0));
@@ -2773,9 +2770,6 @@ namespace ReportSizingManager {
                         }
                         AutosizeDes += fanDeltaT;
                     }
-                    bCheckForZero = false;
-                } else if (SizingType == CoolingWaterDesWaterInletTempSizing) {
-                    AutosizeDes = PlantSizData(DataPltSizCoolNum).ExitTemp;
                     bCheckForZero = false;
                 } else if (SizingType == CoolingWaterNumofTubesPerRowSizing) {
                     AutosizeDes = int(max(3.0, 13750.0 * DataWaterFlowUsedForSizing + 1.0));
@@ -3823,8 +3817,6 @@ namespace ReportSizingManager {
             coilSelectionReportObj->setCoilLvgWaterTemp(CompName, CompType, DataGlobals::HWInitConvTemp - PlantSizData(DataPltSizHeatNum).DeltaT);
         } else if (CurSysNum <= NumPrimaryAirSys && SizingType == CoolingWaterDesAirInletTempSizing) {
             coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, SizingResult, CurSysNum, CurZoneEqNum);
-        } else if (SizingType == CoolingWaterDesWaterInletTempSizing) {
-            coilSelectionReportObj->setCoilEntWaterTemp(CompName, CompType, SizingResult);
         } else if (SizingType == CoolingWaterDesAirOutletTempSizing) {
             coilSelectionReportObj->setCoilLvgAirTemp(CompName, CompType, SizingResult);
         } else if (SizingType == CoolingWaterNumofTubesPerRowSizing) {

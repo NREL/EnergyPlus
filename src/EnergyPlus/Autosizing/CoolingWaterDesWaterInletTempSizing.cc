@@ -45,38 +45,62 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef CoolingWaterDesAirOutletHumRatSizing_hh_INCLUDED
-#define CoolingWaterDesAirOutletHumRatSizing_hh_INCLUDED
-
-#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <ObjexxFCL/Array1D.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/api/TypeDefs.h>
+
+#include <EnergyPlus/ReportSizingManager.hh>
 
 namespace EnergyPlus {
 
-struct CoolingWaterDesAirOutletHumRatSizer : BaseSizer
+void CoolingWaterDesWaterInletTempSizer::initializeWithinEP(EnergyPlusData &state,
+                                                            std::string const &_compType,
+                                                            std::string const &_compName,
+                                                            bool const &_printWarningFlag,
+                                                            std::string const &_callingRoutine)
 {
+    BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
+    this->sizingString = "Design Inlet Water Temperature [C]";
+    this->dataPltSizCoolNum = DataSizing::DataPltSizCoolNum;
+}
 
-    Real64 dataDesInletAirHumRat = 0.0;
-    Real64 dataDesOutletAirHumRat = 0.0;
-    Real64 dataDesInletWaterTemp = 0.0;
-    Real64 dataDesOutletAirTemp = 0.0;
-
-    CoolingWaterDesAirOutletHumRatSizer()
-    {
-        this->sizingType = AutoSizingType::CoolingWaterDesAirOutletHumRatSizing;
+Real64 CoolingWaterDesWaterInletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+{
+    if (this->isNotInitialized) {
+        this->errorType = AutoSizingResultType::ErrorType2;
+        this->autoSizedValue = 0.0;
+        errorsFound = true;
+        ShowSevereError("Developer Error: autosizing of water cooling coil design water inlet temperature failed.");
+        ShowContinueError("Occurs in water cooling coil object= " + this->compName);
+        return this->autoSizedValue;
     }
-    ~CoolingWaterDesAirOutletHumRatSizer() = default;
+    this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
-    void initializeWithinEP(EnergyPlusData &state,
-                            std::string const &_compType,
-                            std::string const &_compName,
-                            bool const &_printWarningFlag,
-                            std::string const &_callingRoutine) override;
-
-    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
-};
+    this->errorType = EnergyPlus::AutoSizingResultType::NoError;
+    this->preSize(state, _originalValue);
+    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || DataSizing::PlantSizData.size() == 0)) {
+        this->autoSizedValue = _originalValue;
+    } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
+        this->autoSizedValue = DataSizing::PlantSizData(this->dataPltSizCoolNum).ExitTemp;
+    } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
+        this->autoSizedValue = DataSizing::PlantSizData(this->dataPltSizCoolNum).ExitTemp;
+    } else {
+        this->errorType = AutoSizingResultType::ErrorType1;
+    }
+    this->selectSizerOutput();
+    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->autoSizedValue);
+    if (this->errorType != AutoSizingResultType::NoError) {
+        ShowSevereError("Developer Error: autosizing of water cooling coil design water inlet temperature failed.");
+        ShowContinueError("Occurs in water cooling coil object= " + this->compName);
+        errorsFound = true;
+    }
+    return this->autoSizedValue;
+}
 
 } // namespace EnergyPlus
-
-#endif

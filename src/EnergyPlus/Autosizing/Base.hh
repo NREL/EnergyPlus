@@ -59,6 +59,8 @@ enum class AutoSizingType
 {
     AutoCalculate,
     CoolingWaterDesAirInletHumRatSizing,
+    CoolingWaterDesAirOutletHumRatSizing,
+    CoolingWaterDesWaterInletTempSizing,
     HeatingAirflowUASizing,
     HeatingWaterDesAirInletTempSizing,
     Unknown

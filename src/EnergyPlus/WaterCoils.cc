@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletTempSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -2248,8 +2249,9 @@ namespace WaterCoils {
                     TempSize = WaterCoil(CoilNum).DesInletWaterTemp; // preserve input if entered
                     SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [C]";
                 }
-                RequestSizing(state, CompType, CompName, CoolingWaterDesWaterInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
-                WaterCoil(CoilNum).DesInletWaterTemp = TempSize;
+                CoolingWaterDesWaterInletTempSizer sizerCWDesWaterInTemp;
+                sizerCWDesWaterInTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                WaterCoil(CoilNum).DesInletWaterTemp = sizerCWDesWaterInTemp.size(state, TempSize, ErrorsFound);
 
                 if (CurZoneEqNum > 0) { // zone equipment use air inlet humrat to calculate design outlet air temperature
                     if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
