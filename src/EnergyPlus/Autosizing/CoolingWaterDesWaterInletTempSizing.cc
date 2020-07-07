@@ -45,35 +45,62 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef CommandLineInterface_hh_INCLUDED
-#define CommandLineInterface_hh_INCLUDED
+#include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/api/TypeDefs.h>
 
-// C++ Headers
-#include <string>
-
-// EnergyPlus Headers
-#include <EnergyPlus/api/EnergyPlusAPI.h>
+#include <EnergyPlus/ReportSizingManager.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    class OutputFiles;
 
-namespace CommandLineInterface {
+void CoolingWaterDesWaterInletTempSizer::initializeWithinEP(EnergyPlusData &state,
+                                                            std::string const &_compType,
+                                                            std::string const &_compName,
+                                                            bool const &_printWarningFlag,
+                                                            std::string const &_callingRoutine)
+{
+    BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
+    this->sizingString = "Design Inlet Water Temperature [C]";
+    this->dataPltSizCoolNum = DataSizing::DataPltSizCoolNum;
+}
 
-    // Process command line arguments
-    int ENERGYPLUSLIB_API ProcessArgs(EnergyPlusData &state, int argc, const char *argv[]);
+Real64 CoolingWaterDesWaterInletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+{
+    if (this->isNotInitialized) {
+        this->errorType = AutoSizingResultType::ErrorType2;
+        this->autoSizedValue = 0.0;
+        errorsFound = true;
+        ShowSevereError("Developer Error: autosizing of water cooling coil design water inlet temperature failed.");
+        ShowContinueError("Occurs in water cooling coil object= " + this->compName);
+        return this->autoSizedValue;
+    }
+    this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
-    void ReadINIFile(int const UnitNumber,               // Unit number of the opened INI file
-                     std::string const &Heading,         // Heading for the parameters ('[heading]')
-                     std::string const &KindofParameter, // Kind of parameter to be found (String)
-                     std::string &DataOut                // Output from the retrieval
-    );
-
-    int runReadVarsESO(OutputFiles &outputFiles);
-
-} // namespace CommandLineInterface
+    this->errorType = EnergyPlus::AutoSizingResultType::NoError;
+    this->preSize(state, _originalValue);
+    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || DataSizing::PlantSizData.size() == 0)) {
+        this->autoSizedValue = _originalValue;
+    } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
+        this->autoSizedValue = DataSizing::PlantSizData(this->dataPltSizCoolNum).ExitTemp;
+    } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
+        this->autoSizedValue = DataSizing::PlantSizData(this->dataPltSizCoolNum).ExitTemp;
+    } else {
+        this->errorType = AutoSizingResultType::ErrorType1;
+    }
+    this->selectSizerOutput();
+    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->autoSizedValue);
+    if (this->errorType != AutoSizingResultType::NoError) {
+        ShowSevereError("Developer Error: autosizing of water cooling coil design water inlet temperature failed.");
+        ShowContinueError("Occurs in water cooling coil object= " + this->compName);
+        errorsFound = true;
+    }
+    return this->autoSizedValue;
+}
 
 } // namespace EnergyPlus
-
-#endif

@@ -18,6 +18,8 @@ set( test_src
   AirTerminalSingleDuctPIUReheat.unit.cc
   Autosizing/AutosizingFixture.hh
   Autosizing/CoolingWaterDesAirInletHumRatSizing.unit.cc
+  Autosizing/CoolingWaterDesAirOutletHumRatSizing.unit.cc
+  Autosizing/CoolingWaterDesWaterInletTempSizing.unit.cc
   Autosizing/HeatingAirflowUASizing.unit.cc
   Autosizing/HeatingWaterDesAirInletTempSizing.unit.cc
   BaseboardRadiator.unit.cc

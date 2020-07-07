@@ -45,34 +45,37 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef CommandLineInterface_hh_INCLUDED
-#define CommandLineInterface_hh_INCLUDED
+#ifndef CoolingWaterDesAirOutletHumRatSizing_hh_INCLUDED
+#define CoolingWaterDesAirOutletHumRatSizing_hh_INCLUDED
 
-// C++ Headers
-#include <string>
-
-// EnergyPlus Headers
-#include <EnergyPlus/api/EnergyPlusAPI.h>
+#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    class OutputFiles;
 
-namespace CommandLineInterface {
+struct CoolingWaterDesAirOutletHumRatSizer : BaseSizer
+{
 
-    // Process command line arguments
-    int ENERGYPLUSLIB_API ProcessArgs(EnergyPlusData &state, int argc, const char *argv[]);
+    Real64 dataDesInletAirHumRat = 0.0;
+    Real64 dataDesOutletAirHumRat = 0.0;
+    Real64 dataDesInletWaterTemp = 0.0;
+    Real64 dataDesOutletAirTemp = 0.0;
 
-    void ReadINIFile(int const UnitNumber,               // Unit number of the opened INI file
-                     std::string const &Heading,         // Heading for the parameters ('[heading]')
-                     std::string const &KindofParameter, // Kind of parameter to be found (String)
-                     std::string &DataOut                // Output from the retrieval
-    );
+    CoolingWaterDesAirOutletHumRatSizer()
+    {
+        this->sizingType = AutoSizingType::CoolingWaterDesAirOutletHumRatSizing;
+    }
+    ~CoolingWaterDesAirOutletHumRatSizer() = default;
 
-    int runReadVarsESO(OutputFiles &outputFiles);
+    void initializeWithinEP(EnergyPlusData &state,
+                            std::string const &_compType,
+                            std::string const &_compName,
+                            bool const &_printWarningFlag,
+                            std::string const &_callingRoutine) override;
 
-} // namespace CommandLineInterface
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
+};
 
 } // namespace EnergyPlus
 

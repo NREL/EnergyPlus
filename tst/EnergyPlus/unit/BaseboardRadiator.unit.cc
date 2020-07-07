@@ -334,7 +334,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;

@@ -45,11 +45,13 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/Autosizing/CoolingWaterDesAirInletHumRatSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/api/TypeDefs.h>
@@ -58,19 +60,21 @@
 
 namespace EnergyPlus {
 
-void CoolingWaterDesAirInletHumRatSizer::initializeWithinEP(EnergyPlusData &state,
-                                                            std::string const &_compType,
-                                                            std::string const &_compName,
-                                                            bool const &_printWarningFlag,
-                                                            std::string const &_callingRoutine)
+void CoolingWaterDesAirOutletHumRatSizer::initializeWithinEP(EnergyPlusData &state,
+                                                             std::string const &_compType,
+                                                             std::string const &_compName,
+                                                             bool const &_printWarningFlag,
+                                                             std::string const &_callingRoutine)
 {
     BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
-    this->sizingString = "Design Inlet Air Humidity Ratio [kgWater/kgDryAir]";
+    this->sizingString = "Design Outlet Air Humidity Ratio [kgWater/kgDryAir]";
     this->dataDesInletAirHumRat = DataSizing::DataDesInletAirHumRat;
-    this->dataFlowUsedForSizing = DataSizing::DataFlowUsedForSizing;
+    this->dataDesOutletAirHumRat = DataSizing::DataDesOutletAirHumRat;
+    this->dataDesOutletAirTemp = DataSizing::DataDesOutletAirTemp;
+    this->dataDesInletWaterTemp = DataSizing::DataDesInletWaterTemp;
 }
 
-Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
     if (this->isNotInitialized) {
         this->errorType = AutoSizingResultType::ErrorType2;
@@ -89,15 +93,15 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _o
             this->autoSizedValue = _originalValue;
         } else {
             if (this->termUnitIU) {
-                this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).ZoneHumRatAtCoolPeak;
-            } else if (this->zoneEqFanCoil) {
-                Real64 desMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow;
-                this->autoSizedValue = ReportSizingManager::setCoolCoilInletHumRatForZoneEqSizing(
-                    ReportSizingManager::setOAFracForZoneEqSizing(desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
-                    this->zoneEqSizing(this->curZoneEqNum),
-                    this->finalZoneSizing(this->curZoneEqNum));
+                Real64 TDpIn = Psychrometrics::PsyTdpFnWPb(this->dataDesInletAirHumRat, DataEnvironment::StdBaroPress);
+                if (TDpIn <= this->dataDesInletWaterTemp) {
+                    this->autoSizedValue = this->dataDesInletAirHumRat;
+                } else {
+                    this->autoSizedValue = min(Psychrometrics::PsyWFnTdbRhPb(this->dataDesOutletAirTemp, 0.9, DataEnvironment::StdBaroPress),
+                                               this->dataDesInletAirHumRat);
+                }
             } else {
-                this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesCoolCoilInHumRat;
+                this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).CoolDesHumRat;
             }
         }
     } else if (this->curSysNum > 0) {
@@ -112,28 +116,57 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _o
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).OutHumRatAtCoolPeak;
                 }
-            } else if (this->dataDesInletAirHumRat > 0.0) {
-                this->autoSizedValue = this->dataDesInletAirHumRat;
-            } else {                                                                         // coil is in main air loop
-                if (DataAirSystems::PrimaryAirSystem(this->curSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
-                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).MixHumRatAtCoolPeak;
-                } else { // there is precooling of the OA stream
-                    if (this->dataFlowUsedForSizing > 0.0) {
-                        OutAirFrac = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow / this->dataFlowUsedForSizing;
-                    } else {
-                        OutAirFrac = 1.0;
-                    }
-                    OutAirFrac = min(1.0, max(0.0, OutAirFrac));
-                    this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).PrecoolHumRat +
-                                           (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).RetHumRatAtCoolPeak;
-                }
+            } else if (this->dataDesOutletAirHumRat > 0.0) {
+                this->autoSizedValue = this->dataDesOutletAirHumRat;
+            } else {
+                this->autoSizedValue = this->finalSysSizing(this->curSysNum).CoolSupHumRat;
             }
         }
     }
+
+    if (this->wasAutoSized) {
+        if (this->autoSizedValue > this->dataDesInletAirHumRat &&
+            (UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER") ||
+             UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
+            ShowWarningError(this->callingRoutine + ":" + " Coil=\"" + this->compName +
+                             "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.");
+            ShowContinueError("    Wair,in =  " + General::RoundSigDigits(this->dataDesInletAirHumRat, 6));
+            ShowContinueError("    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6));
+            if (this->dataDesInletAirHumRat > 0.016) {
+                this->autoSizedValue = 0.5 * this->dataDesInletAirHumRat;
+            } else {
+                this->autoSizedValue = this->dataDesInletAirHumRat;
+            }
+            ShowContinueError("....coil leaving humidity ratio will be reset to:");
+            ShowContinueError("    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6) + " [kgWater/kgDryAir]");
+        }
+        // check for dry coil and reset outlet humrat if needed
+        Real64 desSatEnthAtWaterInTemp = Psychrometrics::PsyHFnTdbW(
+            this->dataDesInletWaterTemp, Psychrometrics::PsyWFnTdpPb(this->dataDesInletWaterTemp, DataEnvironment::StdBaroPress));
+        Real64 desHumRatAtWaterInTemp = Psychrometrics::PsyWFnTdbH(this->dataDesInletWaterTemp, desSatEnthAtWaterInTemp, this->callingRoutine);
+        if (this->autoSizedValue < this->dataDesInletAirHumRat && desHumRatAtWaterInTemp > this->dataDesInletAirHumRat) {
+            if (this->autoSizedValue < this->dataDesInletAirHumRat &&
+                (UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER") ||
+                 UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
+                ShowWarningError(this->callingRoutine + ":" + " Coil=\"" + this->compName +
+                                 "\", Cooling Coil is running dry for sizing and has minimum humidity ratio at saturation for inlet chilled water "
+                                 "temperature > coil entering air humidity ratio.");
+                ShowContinueError("    Wair,in =  " + General::RoundSigDigits(this->dataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]");
+                ShowContinueError("    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6) + " [kgWater/kgDryAir]");
+                ShowContinueError("    Inlet chilled water temperature = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3) + " [C]");
+                ShowContinueError("    Minimum humidity ratio at saturation for inlet chilled water temperature = " +
+                                  General::RoundSigDigits(desHumRatAtWaterInTemp, 6) + " [kgWater/kgDryAir]");
+                this->autoSizedValue = this->dataDesInletAirHumRat;
+                ShowContinueError("....coil leaving humidity ratio will be reset to:");
+                ShowContinueError("    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6) + " [kgWater/kgDryAir]");
+            }
+        }
+    }
+
     this->selectSizerOutput();
-    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
+    if (this->getCoilReportObject) coilSelectionReportObj->setCoilLvgAirHumRat(this->compName, this->compType, this->autoSizedValue);
     if (this->errorType != AutoSizingResultType::NoError) {
-        ShowSevereError("Developer Error: autosizing of water cooling coil design air inlet humidity ratio failed.");
+        ShowSevereError("Developer Error: autosizing of water cooling coil design air outlet humidity ratio failed.");
         ShowContinueError("Occurs in water cooling coil object= " + this->compName);
         errorsFound = true;
     }

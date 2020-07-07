@@ -45,34 +45,33 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef CommandLineInterface_hh_INCLUDED
-#define CommandLineInterface_hh_INCLUDED
+#ifndef CoolingWaterDesWaterInletTempSizing_hh_INCLUDED
+#define CoolingWaterDesWaterInletTempSizing_hh_INCLUDED
 
-// C++ Headers
-#include <string>
-
-// EnergyPlus Headers
-#include <EnergyPlus/api/EnergyPlusAPI.h>
+#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    class OutputFiles;
 
-namespace CommandLineInterface {
+struct CoolingWaterDesWaterInletTempSizer : BaseSizer
+{
+    Real64 dataPltSizCoolNum = 0.0;
 
-    // Process command line arguments
-    int ENERGYPLUSLIB_API ProcessArgs(EnergyPlusData &state, int argc, const char *argv[]);
+    CoolingWaterDesWaterInletTempSizer()
+    {
+        this->sizingType = AutoSizingType::CoolingWaterDesWaterInletTempSizing;
+    }
+    ~CoolingWaterDesWaterInletTempSizer() = default;
 
-    void ReadINIFile(int const UnitNumber,               // Unit number of the opened INI file
-                     std::string const &Heading,         // Heading for the parameters ('[heading]')
-                     std::string const &KindofParameter, // Kind of parameter to be found (String)
-                     std::string &DataOut                // Output from the retrieval
-    );
+    void initializeWithinEP(EnergyPlusData &state,
+                            std::string const &_compType,
+                            std::string const &_compName,
+                            bool const &_printWarningFlag,
+                            std::string const &_callingRoutine) override;
 
-    int runReadVarsESO(OutputFiles &outputFiles);
-
-} // namespace CommandLineInterface
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
+};
 
 } // namespace EnergyPlus
 
