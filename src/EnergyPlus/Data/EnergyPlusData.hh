@@ -80,6 +80,7 @@
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindTurbine.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
@@ -127,6 +128,7 @@ namespace EnergyPlus {
         WindowComplexManagerData dataWindowComplexManager;
         WindowEquivalentLayerData dataWindowEquivalentLayer;
         WindowManagerData dataWindowManager;
+        WindTurbineData dataWindTurbine;
         ZoneAirLoopEquipmentManagerData dataZoneAirLoopEquipmentManager;
         ZoneContaminantPredictorCorrectorData dataZoneContaminantPredictorCorrector;
         ZoneDehumidifierData dataZoneDehumidifier;
@@ -170,6 +172,7 @@ namespace EnergyPlus {
             dataWindowComplexManager.clear_state();
             dataWindowEquivalentLayer.clear_state();
             dataWindowManager.clear_state();
+            dataWindTurbine.clear_state();
             dataZoneAirLoopEquipmentManager.clear_state();
             dataZoneContaminantPredictorCorrector.clear_state();
             dataZoneDehumidifier.clear_state();
