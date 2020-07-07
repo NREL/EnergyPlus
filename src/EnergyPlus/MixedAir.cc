@@ -4076,10 +4076,24 @@ namespace MixedAir {
 
                         // use the ventilation rate procedure in ASHRAE Standard 62.1-2007
                         // Calc the zone supplied OA flow rate counting the zone air distribution effectiveness
+                        //  First check whether the zone air distribution effectiveness schedule exists, if yes uses it;
+                        //   otherwise uses the inputs of zone distribution effectiveness in cooling mode or heating mode
                         int ADEffSchPtr = this->ZoneADEffSchPtr(ZoneIndex);
                         if (ADEffSchPtr > 0) {
-                            ZoneEz = DataSizing::ZoneAirDistribution(ADEffSchPtr).calculateEz(ZoneIndex);
-                        } else {
+                            // Get schedule value for the zone air distribution effectiveness
+                            ZoneEz = GetCurrentScheduleValue(ADEffSchPtr);
+                        }
+                        else {
+                            ZoneLoad = ZoneSysEnergyDemand(curZoneEquipConfig.ActualZoneNum).TotalOutputRequired;
+
+                            // Zone in cooling mode
+                            if (ZoneLoad < 0.0) ZoneEz = this->ZoneADEffCooling(ZoneIndex);
+
+                            // Zone in heating mode
+                            if (ZoneLoad > 0.0) ZoneEz = this->ZoneADEffHeating(ZoneIndex);
+                        }
+                        if (ZoneEz <= 0.0) {
+                            // Enforce defaults
                             ZoneEz = 1.0;
                         }
 
