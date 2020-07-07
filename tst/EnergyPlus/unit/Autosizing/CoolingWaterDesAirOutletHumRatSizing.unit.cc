@@ -48,7 +48,7 @@
 #include "AutosizingFixture.hh"
 #include <gtest/gtest.h>
 
-#include <EnergyPlus/Autosizing/CoolingWaterDesAirInletHumRatSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -57,16 +57,16 @@
 
 namespace EnergyPlus {
 
-TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
+TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletHumRatSizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
     DataEnvironment::StdRhoAir = 1.2;
-    static std::string const routineName("CoolingWaterDesAirInletHumRatSizingGauntlet");
+    static std::string const routineName("CoolingWaterDesAirOutletHumRatSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
-    CoolingWaterDesAirInletHumRatSizer sizer;
-    Real64 inputValue = 0.009;
+    CoolingWaterDesAirOutletHumRatSizer sizer;
+    Real64 inputValue = 0.006;
     bool errorsFound = false;
     bool printFlag = false;
 
@@ -88,7 +88,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     sizedValue = sizer.size(state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
-    EXPECT_NEAR(0.009, sizedValue, 0.001); // hard-sized value
+    EXPECT_NEAR(0.006, sizedValue, 0.001); // hard-sized value
     sizer.autoSizedValue = 0.0;            // reset for next test
 
     std::string eiooutput = std::string("");
@@ -101,12 +101,12 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     sizedValue = sizer.size(state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
-    EXPECT_NEAR(0.009, sizedValue, 0.001); // hard-sized value
+    EXPECT_NEAR(0.006, sizedValue, 0.001); // hard-sized value
     sizer.autoSizedValue = 0.0;            // reset for next test
 
     eiooutput =
         std::string("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
-                    " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Design Inlet Air Humidity Ratio [kgWater/kgDryAir], 9.00000E-003\n");
+                    " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Design Outlet Air Humidity Ratio [kgWater/kgDryAir], 6.00000E-003\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -115,19 +115,14 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
 
     // now allocate sizing arrays for testing autosized field
     EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
-    EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
 
     // Sizing Type Prerequisites:
-    // TermUnitIU, ZoneEqFanCoil w/ no OA
-    EnergyPlus::DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.007;
-    // All other TU types (TermUnitSingDuct, TermUnitPIU)
-    EnergyPlus::DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInHumRat = 0.008;
-    // ZoneEqFanCoil w/ OA
-    EnergyPlus::DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolMassFlow = 0.01;
-    EnergyPlus::DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutHumRatAtCoolPeak = 0.004;
-
-    EnergyPlus::DataSizing::ZoneSizingInput.allocate(1);
-    EnergyPlus::DataSizing::ZoneSizingInput(DataSizing::CurZoneEqNum).ZoneNum = DataSizing::CurZoneEqNum;
+    // TermUnitIU
+    DataSizing::DataDesInletAirHumRat = 0.009;
+    DataSizing::DataDesOutletAirTemp = 12.0;
+    DataSizing::DataDesInletWaterTemp = 7.0;
+    // All other TU types
+    EnergyPlus::DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.008;
 
     DataSizing::ZoneSizingRunDone = true;
 
@@ -143,7 +138,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_NEAR(0.008, sizedValue, 0.0001);
 
     eiooutput =
-        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Inlet Air Humidity Ratio [kgWater/kgDryAir], 8.00000E-003\n");
+        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Outlet Air Humidity Ratio [kgWater/kgDryAir], 8.00000E-003\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -161,7 +156,22 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_NEAR(0.008, sizedValue, 0.0001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 5 - Zone Equipment, Induction Unit
+    // Test 5 - Zone Equipment, Zone Eq Fan Coil
+    DataSizing::TermUnitPIU = false;
+    DataSizing::ZoneEqFanCoil = true;
+
+    // start with an auto-sized value as the user input
+    inputValue = EnergyPlus::DataSizing::AutoSize;
+    // do sizing
+    sizer.wasAutoSized = false;
+    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(state, inputValue, errorsFound);
+    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
+    EXPECT_TRUE(sizer.wasAutoSized);
+    EXPECT_NEAR(0.008, sizedValue, 0.0001);
+    sizer.autoSizedValue = 0.0; // reset for next test
+
+    // Test 6 - Zone Equipment, Induction Unit
     DataSizing::TermUnitPIU = false;
     DataSizing::TermUnitIU = true;
 
@@ -173,62 +183,17 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     sizedValue = sizer.size(state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(0.007, sizedValue, 0.0001);
+    // humidity ratio at 12 C and 90% RH
+    EXPECT_NEAR(0.0078, sizedValue, 0.0001);
     sizer.autoSizedValue = 0.0; // reset for next test
-
-    // Test 6 - Zone Equipment, Zone Eq Fan Coil
     DataSizing::TermUnitIU = false;
-    DataSizing::ZoneEqFanCoil = true;
 
-    // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
-    // do sizing
-    sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
-    sizedValue = sizer.size(state, inputValue, errorsFound);
-    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
-    EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(0.007, sizedValue, 0.0001);
-    sizer.autoSizedValue = 0.0; // reset for next test
-
-    // Test 7 - Zone Equipment w/ 10% OA
-    DataSizing::ZoneEqSizing(1).OAVolFlow =
-        EnergyPlus::DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolMassFlow / (10.0 * DataEnvironment::StdRhoAir);
-    // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
-    // do sizing
-    sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
-    sizedValue = sizer.size(state, inputValue, errorsFound);
-    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
-    EXPECT_TRUE(sizer.wasAutoSized);
-    Real64 mixedHumRat = 0.9 * 0.007 + 0.1 * 0.004; // 90% of ZoneHumRatAtCoolPeak, 10% of OutHumRatAtCoolPeak
-    EXPECT_NEAR(mixedHumRat, sizedValue, 0.0001);
-    sizer.autoSizedValue = 0.0; // reset for next test
-
-    // Test 7 - Zone Equipment w/ AT Mixer at 20% of design flow
-    DataSizing::ZoneEqSizing(1).ATMixerCoolPriHumRat = 0.001;
-    DataSizing::ZoneEqSizing(1).ATMixerVolFlow = 0.002 / DataEnvironment::StdRhoAir; // AT mass flow smaller than DesCoolMassFlow by factor of 5
-    Real64 mixedHumRat2 = 0.8 * 0.007 + 0.2 * 0.001;                                 // 80% of ZoneHumRatAtCoolPeak, 20% of AT Mixer mass flow
-
-    // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
-    // do sizing
-    sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
-    sizedValue = sizer.size(state, inputValue, errorsFound);
-    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
-    EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(mixedHumRat2, sizedValue, 0.00001);
-    sizer.autoSizedValue = 0.0; // reset for next test
-
-    DataSizing::ZoneEqFanCoil = false;
     // reset eio stream
     has_eio_output(true);
     eiooutput = "";
 
     // AIRLOOP EQUIPMENT TESTING - CurDuctType not set, no reporting
-    // Test 8 - Airloop Equipment
+    // Test 9 - Airloop Equipment
     // delete zone sizing info
     DataSizing::CurZoneEqNum = 0;
     DataSizing::NumZoneSizingInput = 0;
@@ -252,7 +217,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     sizer.autoSizedValue = 0.0;             // reset for next test
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    // Test 9 - Airloop Equipment - no OA coils
+    // Test 10 - Airloop Equipment - no OA coils
     DataSizing::CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
     DataAirSystems::PrimaryAirSystem.allocate(1);
@@ -262,7 +227,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EnergyPlus::DataSizing::SysSizInput.allocate(1);
     EnergyPlus::DataSizing::SysSizInput(1).AirLoopNum = 1;
 
-    EnergyPlus::DataSizing::FinalSysSizing(1).MixHumRatAtCoolPeak = 0.0105;
+    EnergyPlus::DataSizing::FinalSysSizing(1).CoolSupHumRat = 0.0105; // set SA hum rat > inlet air hum rat
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
 
@@ -273,19 +238,20 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     sizedValue = sizer.size(state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(0.0105, sizedValue, 0.01);
+    // outlet air hum rat > inlet air hum rat and capped at inlet air hum rat
+    EXPECT_GT(EnergyPlus::DataSizing::FinalSysSizing(1).CoolSupHumRat, DataSizing::DataDesInletAirHumRat);
+    EXPECT_NEAR(DataSizing::DataDesInletAirHumRat, sizedValue, 0.0001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
     eiooutput =
-        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Inlet Air Humidity Ratio [kgWater/kgDryAir], 1.05000E-002\n");
+        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Outlet Air Humidity Ratio [kgWater/kgDryAir], 9.00000E-003\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    // Test 10 - Airloop Equipment - 1 OA coil, use PrecoolHumRat
+    // Test 11 - Airloop Equipment - 1 OA coil, use PrecoolHumRat
     DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).NumOACoolCoils = 1;
-    EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).RetHumRatAtCoolPeak = 0.015;
-    EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).PrecoolHumRat = 0.01;
+    EnergyPlus::DataSizing::FinalSysSizing(1).CoolSupHumRat = 0.0075;
 
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
@@ -297,12 +263,11 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     sizedValue = sizer.size(state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(0.010, sizedValue, 0.00001);
+    EXPECT_NEAR(0.0075, sizedValue, 0.00001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 11 - Airloop Equipment - 1 OA coil use mixture of outdoor and return hum rat since DataFlowUsedForSizing > 0
-    EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow = 0.01;
-    EnergyPlus::DataSizing::DataFlowUsedForSizing = 0.1; // system volume flow
+    // Test 12 - Airloop Equipment - 1 OA coil use previously set hum rat since DataDesOutletAirHumRat > 0
+    EnergyPlus::DataSizing::DataDesOutletAirHumRat = 0.0077; // system coil outlet air hum rat set
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
 
@@ -312,11 +277,11 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     sizedValue = sizer.size(state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(0.0145, sizedValue, 0.00001);
+    EXPECT_NEAR(0.0077, sizedValue, 0.00001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // OUTDOOR AIR SYSTEM EQUIPMENT TESTING
-    // Test 12 - Outdoor Air System Equipment, no DOAS air loop
+    // Test 13 - Outdoor Air System Equipment, no DOAS air loop
     EnergyPlus::DataSizing::OASysEqSizing.allocate(1);
     EnergyPlus::DataAirLoop::OutsideAirSys.allocate(1);
     DataSizing::CurOASysNum = 1;
@@ -334,7 +299,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_NEAR(outAirHumRat, sizedValue, 0.00001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 13 - Outdoor Air System Equipment with DOAS system
+    // Test 14 - Outdoor Air System Equipment with DOAS system
     EnergyPlus::DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.0;
     EnergyPlus::DataAirLoop::OutsideAirSys(1).AirLoopDOASNum = 0;
     state.dataAirLoopHVACDOAS.airloopDOAS.emplace_back();
@@ -355,7 +320,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     // reset eio stream
     has_eio_output(true);
 
-    // Test 14 - Outdoor Air System Equipment with DOAS system, hard-sized humidity ratio
+    // Test 15 - Outdoor Air System Equipment with DOAS system, hard-sized humidity ratio
     // start with an auto-sized value as the user input
     inputValue = 0.00665; // value not previously used
 
@@ -373,8 +338,8 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
     eiooutput =
-        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Inlet Air Humidity Ratio [kgWater/kgDryAir], 3.60000E-003\n"
-                    " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Design Inlet Air Humidity Ratio [kgWater/kgDryAir], 6.65000E-003\n");
+        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Outlet Air Humidity Ratio [kgWater/kgDryAir], 3.60000E-003\n"
+                    " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Design Outlet Air Humidity Ratio [kgWater/kgDryAir], 6.65000E-003\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
 

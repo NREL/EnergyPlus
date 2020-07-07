@@ -45,8 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef HeatingWaterDesAirInletTempSizing_hh_INCLUDED
-#define HeatingWaterDesAirInletTempSizing_hh_INCLUDED
+#ifndef CoolingWaterDesAirOutletHumRatSizing_hh_INCLUDED
+#define CoolingWaterDesAirOutletHumRatSizing_hh_INCLUDED
 
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -54,17 +54,19 @@
 
 namespace EnergyPlus {
 
-struct HeatingWaterDesAirInletTempSizer : BaseSizer
+struct CoolingWaterDesAirOutletHumRatSizer : BaseSizer
 {
 
-    Array1D<DataSizing::ZoneSizingData> termUnitFinalZoneSizing;
-    Real64 totalSystemAirVolumeFlowRate = 0.0;
+    Real64 dataDesInletAirHumRat = 0.0;
+    Real64 dataDesOutletAirHumRat = 0.0;
+    Real64 dataDesInletWaterTemp = 0.0;
+    Real64 dataDesOutletAirTemp = 0.0;
 
-    HeatingWaterDesAirInletTempSizer()
+    CoolingWaterDesAirOutletHumRatSizer()
     {
-        this->sizingType = AutoSizingType::HeatingWaterDesAirInletTempSizing;
+        this->sizingType = AutoSizingType::CoolingWaterDesAirInletHumRatSizing;
     }
-    ~HeatingWaterDesAirInletTempSizer() = default;
+    ~CoolingWaterDesAirOutletHumRatSizer() = default;
 
     void initializeWithinEP(EnergyPlusData &state,
                             std::string const &_compType,

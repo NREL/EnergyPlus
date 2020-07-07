@@ -58,9 +58,10 @@ namespace EnergyPlus {
 void HeatingAirflowUASizer::initializeWithinEP(EnergyPlusData &state,
                                                std::string const &_compType,
                                                std::string const &_compName,
-                                               bool const printWarningFlag)
+                                               bool const &_printWarningFlag,
+                                               std::string const &_callingRoutine)
 {
-    BaseSizer::initializeWithinEP(state, _compType, _compName, printWarningFlag);
+    BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
     this->sizingString = "Heating Coil Airflow For UA";
 }
 
@@ -109,7 +110,8 @@ Real64 HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue,
             if (this->curOASysNum > 0) {
                 if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                     this->autoSizedValue =
-                    state.dataAirLoopHVACDOAS.airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow / DataEnvironment::StdRhoAir;
+                        state.dataAirLoopHVACDOAS.airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
+                        DataEnvironment::StdRhoAir;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
                 }

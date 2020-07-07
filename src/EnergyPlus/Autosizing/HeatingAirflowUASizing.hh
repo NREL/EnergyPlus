@@ -54,17 +54,23 @@
 
 namespace EnergyPlus {
 
-    struct HeatingAirflowUASizer : BaseSizer {
+struct HeatingAirflowUASizer : BaseSizer
+{
 
-        HeatingAirflowUASizer() {
-            this->sizingType = AutoSizingType::HeatingAirflowUASizing;
-        }
-        ~HeatingAirflowUASizer() = default;
+    HeatingAirflowUASizer()
+    {
+        this->sizingType = AutoSizingType::HeatingAirflowUASizing;
+    }
+    ~HeatingAirflowUASizer() = default;
 
-        void initializeWithinEP(EnergyPlusData &state, std::string const &_compType, std::string const &_compName, bool printWarningFlag) override;
+    void initializeWithinEP(EnergyPlusData &state,
+                            std::string const &_compType,
+                            std::string const &_compName,
+                            bool const &_printWarningFlag,
+                            std::string const &_callingRoutine) override;
 
-        Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
-    };
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
+};
 
 } // namespace EnergyPlus
 

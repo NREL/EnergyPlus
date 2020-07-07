@@ -54,20 +54,26 @@
 
 namespace EnergyPlus {
 
-    struct CoolingWaterDesAirInletHumRatSizer: BaseSizer {
+struct CoolingWaterDesAirInletHumRatSizer : BaseSizer
+{
 
-        Real64 dataDesInletAirHumRat = 0.0;
-        Real64 dataFlowUsedForSizing = 0.0;
+    Real64 dataDesInletAirHumRat = 0.0;
+    Real64 dataFlowUsedForSizing = 0.0;
 
-        CoolingWaterDesAirInletHumRatSizer() {
-            this->sizingType = AutoSizingType::CoolingWaterDesAirInletHumRatSizing;
-        }
-        ~CoolingWaterDesAirInletHumRatSizer() = default;
+    CoolingWaterDesAirInletHumRatSizer()
+    {
+        this->sizingType = AutoSizingType::CoolingWaterDesAirInletHumRatSizing;
+    }
+    ~CoolingWaterDesAirInletHumRatSizer() = default;
 
-        void initializeWithinEP(EnergyPlusData &state, std::string const &_compType, std::string const &_compName, bool printWarningFlag) override;
+    void initializeWithinEP(EnergyPlusData &state,
+                            std::string const &_compType,
+                            std::string const &_compName,
+                            bool const &_printWarningFlag,
+                            std::string const &_callingRoutine) override;
 
-        Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
-    };
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
+};
 
 } // namespace EnergyPlus
 

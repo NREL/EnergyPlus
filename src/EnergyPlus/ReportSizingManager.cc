@@ -1858,53 +1858,6 @@ namespace ReportSizingManager {
                         ShowContinueError("    Tair,out = " + RoundSigDigits(AutosizeDes, 3));
                     }
                     bCheckForZero = false;
-                } else if (SizingType == CoolingWaterDesAirOutletHumRatSizing) {
-                    if (TermUnitIU) {
-                        TDpIn = PsyTdpFnWPb(DataDesInletAirHumRat, StdBaroPress);
-                        if (TDpIn <= DataDesInletWaterTemp) {
-                            AutosizeDes = DataDesInletAirHumRat;
-                        } else {
-                            AutosizeDes = min(PsyWFnTdbRhPb(DataDesOutletAirTemp, 0.9, StdBaroPress), DataDesInletAirHumRat);
-                        }
-                    } else {
-                        AutosizeDes = FinalZoneSizing(CurZoneEqNum).CoolDesHumRat;
-                    }
-                    if (AutosizeDes > DataDesInletAirHumRat && (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
-                                                                UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
-                        ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
-                                         "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.");
-                        ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6));
-                        ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6));
-                        if (DataDesInletAirHumRat > 0.016) {
-                            AutosizeDes = 0.5 * DataDesInletAirHumRat;
-                        } else {
-                            AutosizeDes = DataDesInletAirHumRat;
-                        }
-                        ShowContinueError("....coil leaving humidity ratio will be reset to:");
-                        ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6));
-                    }
-
-                    // check for dry coil and reset outlet humrat if needed
-                    DesSatEnthAtWaterInTemp = PsyHFnTdbW(DataDesInletWaterTemp, PsyWFnTdpPb(DataDesInletWaterTemp, StdBaroPress));
-                    DesHumRatAtWaterInTemp = PsyWFnTdbH(DataDesInletWaterTemp, DesSatEnthAtWaterInTemp, CallingRoutine);
-                    if (AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat) {
-                        if (AutosizeDes < DataDesInletAirHumRat && (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
-                                                                    UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
-                            ShowWarningError(
-                                CallingRoutine + ":" + " Coil=\"" + CompName +
-                                "\", Cooling Coil is running dry for sizing and has minimum humidity ratio at saturation for inlet chilled water "
-                                "temperature > coil entering air humidity ratio.");
-                            ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6));
-                            ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6));
-                            ShowContinueError("    Inlet chilled water temperature = " + RoundSigDigits(DataDesInletWaterTemp, 3) + " [C]");
-                            ShowContinueError("    Minimum humidity ratio at saturation for inlet chilled water temperature = " +
-                                              RoundSigDigits(DesHumRatAtWaterInTemp, 6) + " [kgWater/kgDryAir]");
-                            AutosizeDes = DataDesInletAirHumRat;
-                            ShowContinueError("....coil leaving humidity ratio will be reset to:");
-                            ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6));
-                        }
-                    }
-                    bCheckForZero = false;
                 } else if (SizingType == CoolingSHRSizing) {
                     if (DataFlowUsedForSizing >= SmallAirVolFlow && DataCapacityUsedForSizing > 0.0) {
                         // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
@@ -2891,54 +2844,6 @@ namespace ReportSizingManager {
                         ShowContinueError("    Tair,out = " + RoundSigDigits(AutosizeDes, 3));
                     }
                     bCheckForZero = false;
-                } else if (SizingType == CoolingWaterDesAirOutletHumRatSizing) {
-                    if (CurOASysNum > 0) {
-                        if (DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum > -1) {
-                            AutosizeDes = state.dataAirLoopHVACDOAS.airloopDOAS[DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum].PrecoolHumRat;
-                        } else {
-                            AutosizeDes = FinalSysSizing(CurSysNum).PrecoolHumRat;
-                        }
-                    } else if (DataDesOutletAirHumRat > 0.0) {
-                        AutosizeDes = DataDesOutletAirHumRat;
-                    } else {
-                        AutosizeDes = FinalSysSizing(CurSysNum).CoolSupHumRat;
-                    }
-                    if (AutosizeDes > DataDesInletAirHumRat &&
-                        (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
-                         UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) { // flow here is water vol flow rate
-                        ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
-                                         "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.");
-                        ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]");
-                        ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [kgWater/kgDryAir]");
-                        if (DataDesInletAirHumRat > 0.016) {
-                            AutosizeDes = 0.5 * DataDesInletAirHumRat;
-                        } else {
-                            AutosizeDes = DataDesInletAirHumRat;
-                        }
-                        ShowContinueError("....coil leaving humidity ratio will be reset to:");
-                        ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [kgWater/kgDryAir]");
-                    }
-
-                    // check for dry coil and reset outlet humrat if needed
-                    DesSatEnthAtWaterInTemp = PsyHFnTdbW(DataDesInletWaterTemp, PsyWFnTdpPb(DataDesInletWaterTemp, StdBaroPress));
-                    DesHumRatAtWaterInTemp = PsyWFnTdbH(DataDesInletWaterTemp, DesSatEnthAtWaterInTemp, CallingRoutine);
-                    if (AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat) {
-                        if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
-                            UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
-                            ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
-                                             "\", Cooling Coil is running dry for sizing because minimum humidity ratio at saturation for inlet "
-                                             "chilled water temperature > design air entering humidity ratio.");
-                            ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]");
-                            ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [kgWater/kgDryAir]");
-                            ShowContinueError("    Inlet chilled water temperature = " + RoundSigDigits(DataDesInletWaterTemp, 3) + " [C]");
-                            ShowContinueError("    Minimum humidity ratio at saturation for inlet chilled water temperature = " +
-                                              RoundSigDigits(DesHumRatAtWaterInTemp, 6) + " [kgWater/kgDryAir]");
-                            AutosizeDes = DataDesInletAirHumRat;
-                            ShowContinueError("....coil leaving humidity ratio will be reset to:");
-                            ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [kgWater/kgDryAir]");
-                        }
-                    }
-                    bCheckForZero = false;
                 } else if (SizingType == HeatingCoilDesAirInletTempSizing) {
                     if (DataDesicRegCoil) {
                         if (DesicDehum(DataDesicDehumNum).RegenInletIsOutsideAirNode) {
@@ -3922,8 +3827,6 @@ namespace ReportSizingManager {
             coilSelectionReportObj->setCoilEntWaterTemp(CompName, CompType, SizingResult);
         } else if (SizingType == CoolingWaterDesAirOutletTempSizing) {
             coilSelectionReportObj->setCoilLvgAirTemp(CompName, CompType, SizingResult);
-        } else if (SizingType == CoolingWaterDesAirOutletHumRatSizing) {
-            coilSelectionReportObj->setCoilLvgAirHumRat(CompName, CompType, SizingResult);
         } else if (SizingType == CoolingWaterNumofTubesPerRowSizing) {
             // do nothing
         } else if (SizingType == HeatingWaterDesAirInletHumRatSizing) {

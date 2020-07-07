@@ -61,9 +61,10 @@ namespace EnergyPlus {
 void HeatingWaterDesAirInletTempSizer::initializeWithinEP(EnergyPlusData &state,
                                                           std::string const &_compType,
                                                           std::string const &_compName,
-                                                          bool const printWarningFlag)
+                                                          bool const &_printWarningFlag,
+                                                          std::string const &_callingRoutine)
 {
-    BaseSizer::initializeWithinEP(state, _compType, _compName, printWarningFlag);
+    BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
     this->sizingString = "Rated Inlet Air Temperature";
     this->termUnitFinalZoneSizing = DataSizing::TermUnitFinalZoneSizing;
     this->totalSystemAirVolumeFlowRate = DataSizing::DataFlowUsedForSizing;
@@ -135,7 +136,8 @@ Real64 HeatingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _ori
                 this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).PreheatTemp +
                                        (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
             } else if (this->curOASysNum > 0 && DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                this->autoSizedValue = state.dataAirLoopHVACDOAS.airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
+                this->autoSizedValue =
+                    state.dataAirLoopHVACDOAS.airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
             } else {
                 this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).HeatOutTemp +
                                        (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
@@ -145,7 +147,8 @@ Real64 HeatingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _ori
     this->selectSizerOutput();
     // report not written for OA coils and needs to be corrected
     if (this->curSysNum <= this->numPrimaryAirSys) {
-        if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
+        if (this->getCoilReportObject)
+            coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
     }
     if (this->errorType != AutoSizingResultType::NoError) {
         ShowSevereError("Developer Error: autosizing of water heating coil design air inlet temperature failed.");

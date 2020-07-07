@@ -124,7 +124,11 @@ struct BaseSizer
     Array1D<DataSizing::SystemSizingData> finalSysSizing;
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
 
-    virtual void initializeWithinEP(EnergyPlusData &state, std::string const &_compType, std::string const &_compName, bool _printWarningFlag);
+    virtual void initializeWithinEP(EnergyPlusData &state,
+                                    std::string const &_compType,
+                                    std::string const &_compName,
+                                    bool const &_printWarningFlag,
+                                    std::string const &_callingRoutine);
 
     void preSize(EnergyPlusData &state, Real64 originalValue);
 
