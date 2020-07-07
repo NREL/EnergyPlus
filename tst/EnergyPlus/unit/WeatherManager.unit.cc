@@ -1077,62 +1077,6 @@ TEST_F(EnergyPlusFixture, InterpolateWeatherInputOutputTest)
         "  -6.00,                   !- Time Zone {hr}",
         "  190.00;                  !- Elevation {m}",
 
-        //"SizingPeriod:DesignDay,",
-        //"  CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
-        //"  7,                       !- Month",
-        //"  21,                      !- Day of Month",
-        //"  SummerDesignDay,         !- Day Type",
-        //"  31.5,                    !- Maximum Dry-Bulb Temperature {C}",
-        //"  10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
-        //"  ,                        !- Dry-Bulb Temperature Range Modifier Type",
-        //"  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
-        //"  Wetbulb,                 !- Humidity Condition Type",
-        //"  23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
-        //"  ,                        !- Humidity Condition Day Schedule Name",
-        //"  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
-        //"  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
-        //"  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
-        //"  99063.,                  !- Barometric Pressure {Pa}",
-        //"  5.3,                     !- Wind Speed {m/s}",
-        //"  230,                     !- Wind Direction {deg}",
-        //"  No,                      !- Rain Indicator",
-        //"  No,                      !- Snow Indicator",
-        //"  No,                      !- Daylight Saving Time Indicator",
-        //"  ASHRAEClearSky,          !- Solar Model Indicator",
-        //"  ,                        !- Beam Solar Day Schedule Name",
-        //"  ,                        !- Diffuse Solar Day Schedule Name",
-        //"  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
-        //"  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
-        //"  1.0;                     !- Sky Clearness",
-
-        //"SizingPeriod:DesignDay,",
-        //"  CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
-        //"  1,                       !- Month",
-        //"  21,                      !- Day of Month",
-        //"  WinterDesignDay,         !- Day Type",
-        //"  -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
-        //"  0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
-        //"  ,                        !- Dry-Bulb Temperature Range Modifier Type",
-        //"  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
-        //"  Wetbulb,                 !- Humidity Condition Type",
-        //"  -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
-        //"  ,                        !- Humidity Condition Day Schedule Name",
-        //"  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
-        //"  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
-        //"  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
-        //"  99063.,                  !- Barometric Pressure {Pa}",
-        //"  4.9,                     !- Wind Speed {m/s}",
-        //"  270,                     !- Wind Direction {deg}",
-        //"  No,                      !- Rain Indicator",
-        //"  No,                      !- Snow Indicator",
-        //"  No,                      !- Daylight Saving Time Indicator",
-        //"  ASHRAEClearSky,          !- Solar Model Indicator",
-        //"  ,                        !- Beam Solar Day Schedule Name",
-        //"  ,                        !- Diffuse Solar Day Schedule Name",
-        //"  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
-        //"  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
-        //"  0.0;                     !- Sky Clearness",
-
         "Output:Variable,",
         "*,",
         "Site Outdoor Air Drybulb Temperature,",
@@ -1170,21 +1114,10 @@ TEST_F(EnergyPlusFixture, InterpolateWeatherInputOutputTest)
 
     Environment(1).UseWeatherFileHorizontalIR = false;
 
-    // Environment(2).SkyTempModel = WP_ClarkAllenModel;
-    // WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
-
     AllocateWeatherData();
     OpenWeatherFile(ErrorsFound);
-    // ReadWeatherForDay(1, 1, false);
     ReadWeatherForDay(1, 1, true);
 
     Real64 expected_SkyTemp = -20.818853829586516;
     EXPECT_NEAR(TomorrowSkyTemp(2, 1), expected_SkyTemp, 1e-6);
-
-    //    WeatherManager::ReadEPlusWeatherForDay(state.outputFiles,
-  //                                         1,                            // =1 when starting out, otherwise signifies next day
-    //                                       1,                      // Environment being simulated
-      //                                     BackSpaceAfterRead // True if weather file is to be backspaced after read
-    //); 
-
 }
