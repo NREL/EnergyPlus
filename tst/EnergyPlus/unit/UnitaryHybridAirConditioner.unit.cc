@@ -411,6 +411,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     ZoneOAVolStdRho.allocate(NumOfZones);
     ZoneOAVolCrntRho.allocate(NumOfZones);
     ZoneMechACH.allocate(NumOfZones);
+    DataHeatBalance::ZnAirRpt.allocate(NumOfZones);
     MAT.allocate(NumOfZones);
     ZoneAirHumRatAvg.allocate(NumOfZones);
     MaxHeatingLoadMetByVent.allocate(NumOfZones);

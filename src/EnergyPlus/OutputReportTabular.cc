@@ -6542,11 +6542,13 @@ namespace OutputReportTabular {
                 if (ctrlZoneNum > 0) {
                     for (int zoneInNode = 1; zoneInNode <= DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).NumInletNodes; ++zoneInNode) {
                         int airLoopNumber = DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(zoneInNode);
-                        if (airLoopName.empty()) {
-                            airLoopName = DataAirSystems::PrimaryAirSystem(airLoopNumber).Name;
-                        }
-                        else {
-                            airLoopName += "; " + DataAirSystems::PrimaryAirSystem(airLoopNumber).Name;
+                        if (airLoopNumber > 0) {
+                            if (airLoopName.empty()) {
+                                airLoopName = DataAirSystems::PrimaryAirSystem(airLoopNumber).Name;
+                            }
+                            else {
+                                airLoopName += "; " + DataAirSystems::PrimaryAirSystem(airLoopNumber).Name;
+                            }
                         }
                     }
                     PreDefTableEntry(pdchOaMvAirLpNm, Zone(iZone).Name, airLoopName);
@@ -6593,7 +6595,7 @@ namespace OutputReportTabular {
                     PreDefTableEntry(pdchOaTaBzTotVentInfil, Zone(iZone).Name, ZonePreDefRep(iZone).MechVentVolTotal
                         + ZonePreDefRep(iZone).SimpVentVolTotal + ZonePreDefRep(iZone).AFNInfilVolTotal + ZonePreDefRep(iZone).InfilVolTotal, 0);
 
-                    if (Zone(iZone).isNominalOccupied) {
+                    if (Zone(iZone).isNominalOccupied && (ZonePreDefRep(iZone).TotTimeOcc > 0.0)) {
                         // Mechanical ventilation
                         Real64 mechVent = ZonePreDefRep(iZone).MechVentVolTotalOcc / ZonePreDefRep(iZone).TotTimeOcc;
                         PreDefTableEntry(pdchOaOccBzMechVent, Zone(iZone).Name, mechVent);
