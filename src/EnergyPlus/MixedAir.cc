@@ -3674,6 +3674,24 @@ namespace MixedAir {
         }
         this->MechVentOAMassFlowRequest = MechVentOAMassFlow;
         //****** use greater of Mechanical Ventilation Outside Air fraction and OutAirMinFrac
+        if (OutAirMinFrac > MechVentOutsideAirMinFrac) {
+            if (!WarmupFlag) {
+                if (CountMechVentFrac == 0) {
+                    ++CountMechVentFrac;
+                    ShowWarningError("Min OA fraction > Mechanical vetilation min OA fraction for OA controller=" + this->Name + ", Min OA fraction is used");
+                    ShowWarningError("Therefore, Mechanical vetilation is not effective as desired.");
+                    ShowContinueErrorTimeStamp("Min OA fraction = " + RoundSigDigits(OutAirMinFrac, 4) +
+                                               ", Min Mech Vent OA fraction = " + RoundSigDigits(MechVentOutsideAirMinFrac, 4));
+                } else {
+                    ++CountMechVentFrac;
+                    ShowRecurringWarningErrorAtEnd(this->Name +
+                                                       "\": Min OA fraction > Mechanical vetilation min OA fraction, continues...",
+                                                   this->IndexMechVentFrac,
+                                                   OutAirMinFrac,
+                                                   OutAirMinFrac);
+                }
+            }
+        }
         OutAirMinFrac = max(OutAirMinFrac, MechVentOutsideAirMinFrac);
 
         OutAirMinFrac = min(max(OutAirMinFrac, 0.0), 1.0);
