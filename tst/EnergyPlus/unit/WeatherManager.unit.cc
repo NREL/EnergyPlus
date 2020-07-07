@@ -1165,15 +1165,23 @@ TEST_F(EnergyPlusFixture, InterpolateWeatherInputOutputTest)
     DataGlobals::NumOfTimeStepInHour =4;
     Environment.allocate(1);
     Environment(1).SkyTempModel = WP_ClarkAllenModel;
+    Environment(1).StartMonth = 1;
+    Environment(1).StartDay = 1;
+
+    Environment(1).UseWeatherFileHorizontalIR = false;
 
     // Environment(2).SkyTempModel = WP_ClarkAllenModel;
     // WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
 
     AllocateWeatherData();
     OpenWeatherFile(ErrorsFound);
-    ReadWeatherForDay(1, 1, false);
+    // ReadWeatherForDay(1, 1, false);
+    ReadWeatherForDay(1, 1, true);
 
-//    WeatherManager::ReadEPlusWeatherForDay(state.outputFiles,
+    Real64 expected_SkyTemp = -20.818853829586516;
+    EXPECT_NEAR(TomorrowSkyTemp(2, 1), expected_SkyTemp, 1e-6);
+
+    //    WeatherManager::ReadEPlusWeatherForDay(state.outputFiles,
   //                                         1,                            // =1 when starting out, otherwise signifies next day
     //                                       1,                      // Environment being simulated
       //                                     BackSpaceAfterRead // True if weather file is to be backspaced after read
