@@ -88,3 +88,22 @@ Two typos were corrected in field names.
   N4 , \field Coefficient4 C4
   N5 , \field Coefficient5 C5
 ```
+
+# Object Change: Fuel type synonyms
+For all Boiler:\*, WaterHeater:\* , Generator:\* ,
+OtherEquipment, Exterior:FuelEquipment, HVACTemplate:System:VRF, HVACTemplate:Plant:Boiler, ZoneHVAC:HybridUnitaryHVAC
+Coil:Cooling:DX:MultiSpeed, Coil:Heating:Fuel, Coil:Heating:DX:MultiSpeed, AirConditioner:VariableRefrigerantFlow, Chiller:EngineDriven, Chiller:CombustionTurbine, 
+ChillerHeater:Absorption:DirectFired, EnergyManagementSystem:MeteredOutputVariable, LifeCycleCost:UsePriceEscalation, LifeCycleCost:UseAdjustment, 
+Meter:Custom, Meter:CustomDecrement, FuelFactors and other objects with a fuel type or resource type field
+
+Field: Fuel Type (or similar)
+
+9.3.0:
+
+"FuelOil#1" 
+"FuelOil#2" 
+
+9.4.0:
+
+"FuelOilNo1" 
+"FuelOilNo2" 

@@ -90,3 +90,10 @@ Now subsurfaces are at the end of each group of zone surfaces.Many reports prese
 Changed outputs include the rdd, edd, eso (and resulting csv), shd, and sci output files.
 
 See [PR#7847](https://github.com/NREL/EnergyPlus/pull/7847)
+
+### Output:Variables, Output:Meter, Output:Meter:MeterFileOnly, Output:Table:Monthly
+
+*FuelType* changed:
+
+(a) From "FuelOil#1" in 9.3 to "FuelOilNo1" in 9.4
+(a) From "FuelOil#2" in 9.3 to "FuelOilNo2" in 9.4
