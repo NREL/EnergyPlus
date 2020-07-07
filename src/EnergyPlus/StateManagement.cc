@@ -217,15 +217,6 @@
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowAC.hh>
-#include <EnergyPlus/WindowComplexManager.hh>
-#include <EnergyPlus/WindowEquivalentLayer.hh>
-#include <EnergyPlus/WindowManager.hh>
-#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
-#include <EnergyPlus/ZoneDehumidifier.hh>
-#include <EnergyPlus/ZoneEquipmentManager.hh>
-#include <EnergyPlus/ZonePlenum.hh>
-#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 void EnergyPlus::clearThisState(EnergyPlusData &state)
 {
@@ -401,7 +392,5 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     WaterUse::clear_state();
     WeatherManager::clear_state();
     WindowAC::clear_state();
-    WindowComplexManager::clear_state();
-    WindowEquivalentLayer::clear_state();
     ResultsFramework::clear_state();
 }
