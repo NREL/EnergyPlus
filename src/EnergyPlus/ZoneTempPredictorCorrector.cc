@@ -6205,11 +6205,9 @@ namespace ZoneTempPredictorCorrector {
         // Check to see if this is a controlled zone
         ControlledZoneAirFlag = Zone(ZoneNum).IsControlled;
         if (CorrectorFlag) {
-
             // Check to see if this is a plenum zone
             ZoneRetPlenumAirFlag = Zone(ZoneNum).IsReturnPlenum;
             ZoneSupPlenumAirFlag = Zone(ZoneNum).IsSupplyPlenum;
-            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
             // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
             if (ControlledZoneAirFlag) {
@@ -6222,6 +6220,7 @@ namespace ZoneTempPredictorCorrector {
                     auto const &node(Node(zec.InletNode(NodeNum)));
                     NodeTemp = node.Temp;
                     MassFlowRate = node.MassFlowRate;
+                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
                     Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                     SumSysMCp += MassFlowRate_CpAir;
@@ -6231,11 +6230,13 @@ namespace ZoneTempPredictorCorrector {
             } else if (ZoneRetPlenumAirFlag) {
                 ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
                 auto const &zrpc(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum));
+                Real64 const air_hum_rat(ZoneAirHumRat(ZoneNum));
                 for (int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
                     // Get node conditions
                     auto const &node(Node(zrpc.InletNode(NodeNum)));
                     NodeTemp = node.Temp;
                     MassFlowRate = node.MassFlowRate;
+                    CpAir = PsyCpAirFnW(air_hum_rat);
 
                     Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                     SumSysMCp += MassFlowRate_CpAir;
@@ -6250,6 +6251,7 @@ namespace ZoneTempPredictorCorrector {
                         ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                         NodeTemp = Node(ADUInNode).Temp;
                         MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
+                        CpAir = PsyCpAirFnW(air_hum_rat);
                         Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                         SumSysMCp += MassFlowRate_CpAir;
                         SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
@@ -6258,6 +6260,7 @@ namespace ZoneTempPredictorCorrector {
                         ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
                         NodeTemp = Node(ADUOutNode).Temp;
                         MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
+                        CpAir = PsyCpAirFnW(air_hum_rat);
                         Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                         SumSysMCp += MassFlowRate_CpAir;
                         SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
@@ -6269,6 +6272,7 @@ namespace ZoneTempPredictorCorrector {
                 // Get node conditions
                 NodeTemp = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
                 MassFlowRate = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
+                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
