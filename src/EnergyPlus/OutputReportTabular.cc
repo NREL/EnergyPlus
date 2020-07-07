@@ -67,10 +67,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/Boilers.hh>
-#include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/ChillerReformulatedEIR.hh>
-#include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -5680,7 +5677,7 @@ namespace OutputReportTabular {
             WriteSourceEnergyEndUseSummary();
             WriteComponentSizing();
             WriteSurfaceShadowing();
-            WriteCompCostTable();
+            WriteCompCostTable(state.dataCostEstimateManager);
             WriteAdaptiveComfortTable();
             WriteEioTables(state.outputFiles);
             WriteLoadComponentSummaryTables();
@@ -10005,7 +10002,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteCompCostTable()
+     void WriteCompCostTable(CostEstimateManagerData &dataCostEstimateManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10211,30 +10208,30 @@ namespace OutputReportTabular {
         columnWidth = {7, 30, 16, 10, 16, 16}; // array assignment - for all columns
 
         for (item = 1; item <= NumLineItems; ++item) {
-            tableBody(1, item) = std::to_string(CostLineItem(item).LineNumber);
-            tableBody(2, item) = CostLineItem(item).LineName;
+            tableBody(1, item) = std::to_string(dataCostEstimateManager.CostLineItem(item).LineNumber);
+            tableBody(2, item) = dataCostEstimateManager.CostLineItem(item).LineName;
             if (unitsStyle == unitsStyleInchPound) {
-                LookupSItoIP(CostLineItem(item).Units, unitConvIndex, IPunitName);
+                LookupSItoIP(dataCostEstimateManager.CostLineItem(item).Units, unitConvIndex, IPunitName);
                 if (unitConvIndex != 0) {
-                    IPqty = ConvertIP(unitConvIndex, CostLineItem(item).Qty);
+                    IPqty = ConvertIP(unitConvIndex, dataCostEstimateManager.CostLineItem(item).Qty);
                     tableBody(3, item) = RealToStr(IPqty, 2);
                     tableBody(4, item) = IPunitName;
                     IPsingleValue = ConvertIP(unitConvIndex, 1.0);
                     if (IPsingleValue != 0.0) {
-                        IPvaluePer = CostLineItem(item).ValuePer / IPsingleValue;
+                        IPvaluePer = dataCostEstimateManager.CostLineItem(item).ValuePer / IPsingleValue;
                         tableBody(5, item) = RealToStr(IPvaluePer, 2);
                     }
                 } else {
-                    tableBody(3, item) = RealToStr(CostLineItem(item).Qty, 2);
-                    tableBody(4, item) = CostLineItem(item).Units;
-                    tableBody(5, item) = RealToStr(CostLineItem(item).ValuePer, 2);
+                    tableBody(3, item) = RealToStr(dataCostEstimateManager.CostLineItem(item).Qty, 2);
+                    tableBody(4, item) = dataCostEstimateManager.CostLineItem(item).Units;
+                    tableBody(5, item) = RealToStr(dataCostEstimateManager.CostLineItem(item).ValuePer, 2);
                 }
             } else {
-                tableBody(3, item) = RealToStr(CostLineItem(item).Qty, 2);
-                tableBody(4, item) = CostLineItem(item).Units;
-                tableBody(5, item) = RealToStr(CostLineItem(item).ValuePer, 2);
+                tableBody(3, item) = RealToStr(dataCostEstimateManager.CostLineItem(item).Qty, 2);
+                tableBody(4, item) = dataCostEstimateManager.CostLineItem(item).Units;
+                tableBody(5, item) = RealToStr(dataCostEstimateManager.CostLineItem(item).ValuePer, 2);
             }
-            tableBody(6, item) = RealToStr(CostLineItem(item).LineSubTotal, 2);
+            tableBody(6, item) = RealToStr(dataCostEstimateManager.CostLineItem(item).LineSubTotal, 2);
         }
         tableBody(6, NumRows) = RealToStr(CurntBldg.LineItemTot, 2);
         WriteSubtitle("Cost Line Item Details"); //: '//TRIM(RealToStr(CostEstimateTotal, 2)))

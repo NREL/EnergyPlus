@@ -86,43 +86,6 @@ namespace DataCostEstimate {
 
     // Types
 
-    struct CostLineItemStruct
-    {
-        // Members
-        std::string LineName;      // object name (needed ?)
-        std::string LineType;      // Case statement driver?
-        std::string ParentObjType; // parent reference to IDD object type
-        std::string ParentObjName; // parent instance in IDF
-        std::string ParentObjKey;  // end use key for parent object
-        int ParentObjIDinList;
-        Real64 PerSquareMeter;     // cost per square meter
-        Real64 PerEach;            // cost per each
-        Real64 PerKiloWattCap;     // cost per kW of nominal capacity
-        Real64 PerKWCapPerCOP;     // cost per kW of nominal capacity per COP
-        Real64 PerCubicMeter;      // cost per cubic meter
-        Real64 PerCubMeterPerSec;  // cost per cubic meter per second
-        Real64 PerUAinWattperDelK; // cost per (UA) in Watt/deltaK
-        //  REAL(r64)    :: AnnualMaintFract   = 0.0d0 ! cost for annual service and non energy consumables
-        //  REAL(r64)    :: MinorOverhallFract = 0.0d0 ! cost for minor overhalls
-        //  INTEGER :: MinorOverhallYears = 0   ! year interval for minor overhalls
-        //  REAL(r64)    :: MajorOverhallFract = 0.0d0 ! cost for major overhall
-        //  INTEGER :: MajorOverhallYears = 0   ! year interval for major overhalls
-        //  INTEGER :: LifeYears          = 0.0 ! expected life in years
-        //  REAL(r64)    :: ValueAtReplacement = 0.0d0 ! residual value at end of life
-        int LineNumber;      // number of line item in detail list
-        Real64 Qty;          // quantity in calculations (can be input)
-        std::string Units;   // Reported units
-        Real64 ValuePer;     // Cost used in final calculation
-        Real64 LineSubTotal; // line item total  Qty * ValuePer
-
-        // Default Constructor
-        CostLineItemStruct()
-            : ParentObjIDinList(1), PerSquareMeter(0.0), PerEach(0.0), PerKiloWattCap(0.0), PerKWCapPerCOP(0.0), PerCubicMeter(0.0),
-              PerCubMeterPerSec(0.0), PerUAinWattperDelK(0.0), LineNumber(-1), Qty(0.0), ValuePer(0.0), LineSubTotal(0.0)
-        {
-        }
-    };
-
     struct CostAdjustmentStruct
     {
         // Members
@@ -173,7 +136,6 @@ namespace DataCostEstimate {
     };
 
     // Object Data
-    extern Array1D<CostLineItemStruct> CostLineItem;
     extern CostAdjustmentStruct CurntBldg;  // holds total from line item cost calculations | holds user-defined constant cost model | holds
                                             // user-defined fraction for design fees | holds user-defined fraction for contractor fees | holds
                                             // user-defined fraction for contingencies | holds user-defined fraction for bonding costs | holds

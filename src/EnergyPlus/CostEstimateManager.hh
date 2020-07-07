@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
 
@@ -57,6 +58,36 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace CostEstimateManager {
+
+    struct CostLineItemStruct
+    {
+        // Members
+        std::string LineName;      // object name (needed ?)
+        std::string LineType;      // Case statement driver?
+        std::string ParentObjType; // parent reference to IDD object type
+        std::string ParentObjName; // parent instance in IDF
+        std::string ParentObjKey;  // end use key for parent object
+        int ParentObjIDinList;
+        Real64 PerSquareMeter;     // cost per square meter
+        Real64 PerEach;            // cost per each
+        Real64 PerKiloWattCap;     // cost per kW of nominal capacity
+        Real64 PerKWCapPerCOP;     // cost per kW of nominal capacity per COP
+        Real64 PerCubicMeter;      // cost per cubic meter
+        Real64 PerCubMeterPerSec;  // cost per cubic meter per second
+        Real64 PerUAinWattperDelK; // cost per (UA) in Watt/deltaK
+        int LineNumber;      // number of line item in detail list
+        Real64 Qty;          // quantity in calculations (can be input)
+        std::string Units;   // Reported units
+        Real64 ValuePer;     // Cost used in final calculation
+        Real64 LineSubTotal; // line item total  Qty * ValuePer
+
+        // Default Constructor
+        CostLineItemStruct()
+            : ParentObjIDinList(1), PerSquareMeter(0.0), PerEach(0.0), PerKiloWattCap(0.0), PerKWCapPerCOP(0.0), PerCubicMeter(0.0),
+              PerCubMeterPerSec(0.0), PerUAinWattperDelK(0.0), LineNumber(-1), Qty(0.0), ValuePer(0.0), LineSubTotal(0.0)
+        {
+        }
+    };
 
     void SimCostEstimate(EnergyPlusData &state);
 
@@ -67,6 +98,17 @@ namespace CostEstimateManager {
     void CalcCostEstimate(EnergyPlusData &state);
 
 } // namespace CostEstimateManager
+
+struct CostEstimateManagerData : BaseGlobalStruct {
+
+    bool GetCostInput = true;
+    Array1D<CostEstimateManager::CostLineItemStruct> CostLineItem;
+
+    void clear_state() override
+    {
+        GetCostInput = true;
+    }
+};
 
 } // namespace EnergyPlus
 

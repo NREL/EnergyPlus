@@ -66,7 +66,9 @@
 #include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
+
     // Forward declarations
+    struct CostEstimateManagerData;
     struct EnergyPlusData;
     struct ZoneTempPredictorCorrectorData;
 
@@ -811,7 +813,7 @@ namespace OutputReportTabular {
 
     void WriteDemandEndUseSummary();
 
-    void WriteCompCostTable();
+    void WriteCompCostTable(CostEstimateManagerData &dataCostEstimateManager);
 
     void WriteVeriSumTable(OutputFiles &outputFiles);
 
