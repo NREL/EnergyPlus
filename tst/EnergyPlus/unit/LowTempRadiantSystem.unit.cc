@@ -2146,7 +2146,7 @@ TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
 
     HydrRadSys.allocate(1);
     auto &thisRadSys (HydrRadSys(1));
-    
+
     // Test 1: Temperature Difference is 0-->answer should be 0.0
     offTemperature = 15.0;
     controlTemperature = 15.0;
@@ -2202,7 +2202,7 @@ TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
     expectedResult = 0.5;
     functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
     EXPECT_NEAR(expectedResult, functionResult, 0.001);
-    
+
 }
 
 TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTest)

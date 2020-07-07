@@ -76,7 +76,8 @@ namespace UFADManager {
 
     // Functions
 
-    void ManageUCSDUFModels(int const ZoneNum,      // index number for the specified zone
+    void ManageUCSDUFModels(ConvectionCoefficientsData &dataConvectionCoefficients,
+                            int const ZoneNum,      // index number for the specified zone
                             int const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
@@ -88,11 +89,11 @@ namespace UFADManager {
                     int const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void HcUCSDUF(int const ZoneNum, Real64 const FractionHeight);
+    void HcUCSDUF(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum, Real64 const FractionHeight);
 
-    void CalcUCSDUI(int const ZoneNum); // index number for the specified zone
+    void CalcUCSDUI(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // index number for the specified zone
 
-    void CalcUCSDUE(int const ZoneNum); // index number for the specified zone
+    void CalcUCSDUE(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // index number for the specified zone
 
 } // namespace UFADManager
 
