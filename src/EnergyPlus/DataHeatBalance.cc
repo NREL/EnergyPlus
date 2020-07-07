@@ -1985,7 +1985,7 @@ namespace DataHeatBalance {
                 ShowFatalError("Syntax error, optional arguments Theta and Phi must be present when optional ScreenNumber is used.");
             }
         } else {
-            ScNum = SurfaceWindow(SurfaceNum).ScreenNumber;
+            ScNum = DataSurfaces::SurfWinScreenNumber(SurfaceNum);
         }
 
         if (present(Theta)) {
@@ -2415,16 +2415,16 @@ namespace DataHeatBalance {
             if (Surface(loopSurfNum).Class != SurfaceClass_Window) continue;
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(loopSurfNum).HasShadeControl) continue;
-            if (SurfaceWindow(loopSurfNum).ShadedConstruction == 0) continue;
+            if (DataSurfaces::SurfWinShadedConstruction(loopSurfNum) == 0) continue;
 
-            ConstrNum = SurfaceWindow(loopSurfNum).ShadedConstruction;
+            ConstrNum = DataSurfaces::SurfWinShadedConstruction(loopSurfNum);
             if (dataConstruction.Construct(ConstrNum).TypeIsWindow) {
                 NumLayers = dataConstruction.Construct(ConstrNum).TotLayers;
                 for (Layer = 1; Layer <= NumLayers; ++Layer) {
                     MaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
                     if (MaterNum == 0) continue;
                     if (dataMaterial.Material(MaterNum).Group == Shade || dataMaterial.Material(MaterNum).Group == WindowBlind)
-                        SurfaceWindow(loopSurfNum).HasShadeOrBlindLayer = true;
+                        DataSurfaces::SurfWinHasShadeOrBlindLayer(loopSurfNum) = true;
                 }
             }
         }

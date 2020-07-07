@@ -1062,12 +1062,12 @@ namespace RoomAirModelUserTempPattern {
 
             if (DataZoneEquipment::ZoneEquipConfig(zoneEquipNum).ZoneHasAirFlowWindowReturn) {
                 for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                    if (SurfaceWindow(SurfNum).AirflowThisTS > 0.0 &&
-                        SurfaceWindow(SurfNum).AirflowDestination == AirFlowWindow_Destination_ReturnAir) {
-                        FlowThisTS = PsyRhoAirFnPbTdbW(OutBaroPress, SurfaceWindow(SurfNum).TAirflowGapOutlet, Node(ZoneNode).HumRat) *
-                                     SurfaceWindow(SurfNum).AirflowThisTS * Surface(SurfNum).Width;
+                    if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
+                        DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
+                        FlowThisTS = PsyRhoAirFnPbTdbW(OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
+                                     DataSurfaces::SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
                         WinGapFlowToRA += FlowThisTS;
-                        WinGapFlowTtoRA += FlowThisTS * SurfaceWindow(SurfNum).TAirflowGapOutlet;
+                        WinGapFlowTtoRA += FlowThisTS * DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum);
                     }
                 }
             }

@@ -105,9 +105,9 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
     Surface(2).Tilt = 90.0;
     Surface(2).Sides = 4;
 
-    SurfaceWindow.allocate(2);
-    SurfaceWindow(1).OriginalClass = 11;
-    SurfaceWindow(2).OriginalClass = 11;
+    SurfWinOriginalClass.allocate(2);
+    SurfWinOriginalClass(1) = 11;
+    SurfWinOriginalClass(2) = 11;
     NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements
@@ -200,9 +200,9 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     Surface(2).Tilt = 90.0;
     Surface(2).Sides = 4;
 
-    SurfaceWindow.allocate(2);
-    SurfaceWindow(1).OriginalClass = 11;
-    SurfaceWindow(2).OriginalClass = 11;
+    SurfWinOriginalClass.allocate(2);
+    SurfWinOriginalClass(1) = 11;
+    SurfWinOriginalClass(2) = 11;
     NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements

@@ -1,0 +1,21 @@
+{
+  "logger": {
+    "title": "Remote Sync"
+  },
+  "uploadOnSave": true,
+  "useAtomicWrites": false,
+  "deleteLocal": false,
+  "hostname": "srg-gpu.dhcp.lbl.gov",
+  "port": "22",
+  "target": "/home/user/Documents/energy-plus/EnergyPlus",
+  "ignore": [
+    ".remote-sync.json",
+    ".git/**",
+    "build",
+    "cmake-build-debug"
+  ],
+  "username": "user",
+  "password": "srg7066929",
+  "watch": [],
+  "transport": "scp"
+}

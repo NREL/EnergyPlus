@@ -576,7 +576,7 @@ namespace DaylightingDevices {
                     }
 
                     TDDPipe(PipeNum).Dome = SurfNum;
-                    SurfaceWindow(SurfNum).TDDPipeNum = PipeNum;
+                    DataSurfaces::SurfWinTDDPipeNum(SurfNum) = PipeNum;
                 }
 
                 // Get TDD:DIFFUSER object
@@ -592,7 +592,7 @@ namespace DaylightingDevices {
                         ErrorsFound = true;
                     }
 
-                    if (SurfaceWindow(SurfNum).OriginalClass != SurfaceClass_TDD_Diffuser) {
+                    if (DataSurfaces::SurfWinOriginalClass(SurfNum) != SurfaceClass_TDD_Diffuser) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) +
                                         " is not of surface type TubularDaylightDiffuser.");
                         ErrorsFound = true;
@@ -648,7 +648,7 @@ namespace DaylightingDevices {
                     // Window multiplier is already handled in SurfaceGeometry.cc
 
                     TDDPipe(PipeNum).Diffuser = SurfNum;
-                    SurfaceWindow(SurfNum).TDDPipeNum = PipeNum;
+                    DataSurfaces::SurfWinTDDPipeNum(SurfNum) = PipeNum;
                 }
 
                 // Construction

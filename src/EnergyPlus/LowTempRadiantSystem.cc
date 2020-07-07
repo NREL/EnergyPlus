@@ -5347,22 +5347,22 @@ namespace LowTempRadiantSystem {
             Real64 Area = Surface(surfNum).Area;
 
             if (Surface(surfNum).Class == SurfaceClass_Window) {
-                if (SurfaceWindow(surfNum).ShadingFlag == IntShadeOn || SurfaceWindow(surfNum).ShadingFlag == IntBlindOn) {
+                if (SurfWinShadingFlag(surfNum) == IntShadeOn || SurfWinShadingFlag(surfNum) == IntBlindOn) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += SurfaceWindow(surfNum).DividerArea;
+                    Area += SurfWinDividerArea(surfNum);
                 }
 
-                if (SurfaceWindow(surfNum).FrameArea > 0.0) {
+                if (SurfWinFrameArea(surfNum) > 0.0) {
                     // Window frame contribution
-                    sumHATsurf += HConvIn(surfNum) * SurfaceWindow(surfNum).FrameArea * (1.0 + SurfaceWindow(surfNum).ProjCorrFrIn) *
-                                  SurfaceWindow(surfNum).FrameTempSurfIn;
+                    sumHATsurf += HConvIn(surfNum) * SurfWinFrameArea(surfNum) * (1.0 + SurfWinProjCorrFrIn(surfNum)) *
+                                  SurfWinFrameTempSurfIn(surfNum);
                 }
 
-                if (SurfaceWindow(surfNum).DividerArea > 0.0 && SurfaceWindow(surfNum).ShadingFlag != IntShadeOn &&
-                    SurfaceWindow(surfNum).ShadingFlag != IntBlindOn) {
+                if (SurfWinDividerArea(surfNum) > 0.0 && SurfWinShadingFlag(surfNum) != IntShadeOn &&
+                    SurfWinShadingFlag(surfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    sumHATsurf += HConvIn(surfNum) * SurfaceWindow(surfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(surfNum).ProjCorrDivIn) *
-                                  SurfaceWindow(surfNum).DividerTempSurfIn;
+                    sumHATsurf += HConvIn(surfNum) * SurfWinDividerArea(surfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(surfNum)) *
+                                  SurfWinDividerTempSurfIn(surfNum);
                 }
             }
 
