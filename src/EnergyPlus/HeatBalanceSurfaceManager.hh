@@ -52,15 +52,18 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
     // Forward declarations
-    struct EnergyPlusData;
-    struct ZoneTempPredictorCorrectorData;
     struct ChilledCeilingPanelSimpleData;
+    struct ConvectionCoefficientsData;
+    struct EnergyPlusData;
+    struct WindowComplexManagerData;
+    struct WindowEquivalentLayerData; 
+    struct WindowManagerData;
+    struct ZoneTempPredictorCorrectorData;
 
 namespace DataSurfaces {
     struct SurfaceData;
@@ -98,7 +101,7 @@ namespace HeatBalanceSurfaceManager {
 
     void InitThermalAndFluxHistories();
 
-    void InitSolarHeatGains(WindowManagerData &dataWindowManager);
+    void InitSolarHeatGains(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager);
 
     void InitIntSolarDistribution();
 
@@ -148,16 +151,16 @@ namespace HeatBalanceSurfaceManager {
     void CalcHeatBalanceInsideSurf(EnergyPlusData& state,
                                    Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
-    void CalcHeatBalanceInsideSurf2(EnergyPlusData& state,
+    void CalcHeatBalanceInsideSurf2(ConvectionCoefficientsData &dataConvectionCoefficients, WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager,
                                     const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                     const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
                                     const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
                                     Optional_int_const ZoneToResimulate = _);
 
-    void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
-                                           int FirstZone,             // First zone to simulate
-                                           int LastZone,              // Last zone to simulate
+    void CalcHeatBalanceInsideSurf2CTFOnly(ConvectionCoefficientsData &dataConvectionCoefficients, WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager,
+                                           const int FirstZone,             // First zone to simulate
+                                           const int LastZone,              // Last zone to simulate
                                            const std::vector<int> &IZSurfs, // Last zone to simulate
                                            Optional_int_const ZoneToResimulate = _);
 
