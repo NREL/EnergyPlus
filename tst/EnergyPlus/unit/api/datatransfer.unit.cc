@@ -53,8 +53,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PluginManager.hh>
@@ -637,4 +639,48 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestMiscSimData)
     kindOfSim();
     currentEnvironmentNum();
     // getConstructionHandle();
+}
+
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_EMS_Override)
+{
+    // Test for #8084, should warn when getting a handle for an actuator that is actually already defined in the IDF
+
+    std::string const idf_objects = delimited_string({
+
+        "OutdoorAir:Node, Test node;",
+
+        "EnergyManagementSystem:Actuator,",
+        "TempSetpointLo,          !- Name",
+        "Test node,  !- Actuated Component Unique Name",
+        "System Node Setpoint,    !- Actuated Component Type",
+        "Temperature Minimum Setpoint;    !- Actuated Component Control Type",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    OutAirNodeManager::SetOutAirNodes();
+    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::FinishProcessingUserInput = true;
+    bool anyRan;
+    // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)
+    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EXPECT_EQ(1, DataRuntimeLanguage::numActuatorsUsed);
+
+    // no error message until now
+    EXPECT_TRUE(compare_err_stream("", true));
+
+
+    // Then try to get the actuator handle
+    int hActuator = getActuatorHandle("System Node Setpoint", "Temperature Minimum Setpoint", "Test node");
+    EXPECT_GT(hActuator, -1);
+
+    // Both the EMS one and the Plugin one point to the same handle, which is the index into the DataRuntimeLanguage::EMSActuatorAvailable array
+    EXPECT_EQ(DataRuntimeLanguage::EMSActuatorUsed(1).ActuatorVariableNum, hActuator);
+
+    std::string const expectedError = delimited_string({
+        "   ** Warning ** Data Exchange API: An EnergyManagementSystem:Actuator seems to be already defined in the EnergyPlus File and named TEMPSETPOINTLO",
+        "   **   ~~~   ** Occurred for componentType='SYSTEM NODE SETPOINT', controlType='TEMPERATURE MINIMUM SETPOINT', uniqueKey='TEST NODE'.",
+        "   **   ~~~   ** The getActuatorHandle function will still return the handle (= 2) but caller should take note that there is a risk of overwritting.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(expectedError, true));
 }
