@@ -140,6 +140,7 @@ namespace HVACSingleDuctInduc {
         int CtrlZoneNum;            // Pointer to CtrlZone data structure
         int CtrlZoneInNodeIndex;    // which controlled zone inlet node number corresponds with this unit
         int AirLoopNum;             // index to airloop that this terminal unit is connected to
+        Real64 OutdoorAirFlowRate;  // zone outdoor air volume flow rate
 
         // Default Constructor
         IndUnitData()
@@ -149,9 +150,11 @@ namespace HVACSingleDuctInduc {
               HWCoilFailNum1(0), HWCoilFailNum2(0), CCoil_Num(0), CCoil_PlantTypeNum(0), MaxVolColdWaterFlow(0.0), MaxColdWaterFlow(0.0),
               MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0),
               CWCoilFailNum1(0), CWCoilFailNum2(0), Mixer_Num(0), MaxPriAirMassFlow(0.0), MaxSecAirMassFlow(0.0), ADUNum(0), DesCoolingLoad(0.0),
-              DesHeatingLoad(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), AirLoopNum(0)
+              DesHeatingLoad(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0)
         {
         }
+        void ReportIndUnit();
+        void CalcOutdoorAirVolumeFlowRate();
     };
 
     // Object Data
