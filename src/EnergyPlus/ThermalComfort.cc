@@ -56,7 +56,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -350,7 +350,7 @@ namespace ThermalComfort {
         AngleFactorList.deallocate();
     }
 
-    void ManageThermalComfort(bool const InitializeOnly) // when called from ZTPC and calculations aren't needed
+    void ManageThermalComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, bool const InitializeOnly) // when called from ZTPC and calculations aren't needed
     {
 
         // SUBROUTINE INFORMATION:
@@ -397,7 +397,7 @@ namespace ThermalComfort {
             CalcThermalComfortPierce();
             CalcThermalComfortKSU();
             CalcThermalComfortSimpleASH55();
-            CalcIfSetPointMet();
+            CalcIfSetPointMet(dataZoneTempPredictorCorrector);
             if (ASH55Flag) CalcThermalComfortAdaptiveASH55(false);
             if (CEN15251Flag) CalcThermalComfortAdaptiveCEN15251(false);
         }
@@ -1967,7 +1967,6 @@ namespace ThermalComfort {
         //     MODIFIED       November 2017 (R Strand): Added fourth power and emissivity to calculation
 
         // Using/Aliasing
-        using DataHeatBalance::Construct;
         using DataHeatBalSurface::TH;
         using DataSurfaces::Surface;
 
@@ -1994,7 +1993,7 @@ namespace ThermalComfort {
 
         for (SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
             SurfaceTemp = TH(2, 1, thisAngFacList.SurfacePtr(SurfNum)) + KelvinConv;
-            SurfEAF = Construct(Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal * thisAngFacList.AngleFactor(SurfNum);
+            SurfEAF = dataConstruction.Construct(Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal * thisAngFacList.AngleFactor(SurfNum);
             SurfTempEmissAngleFacSummed += SurfEAF * pow_4(SurfaceTemp);
             SumSurfaceEmissAngleFactor += SurfEAF;
         }
@@ -2017,7 +2016,6 @@ namespace ThermalComfort {
         //          the modified zone MRT.
 
         // Using/Aliasing
-        using DataHeatBalance::Construct;
         using DataHeatBalSurface::TH;
         using DataSurfaces::Surface;
         using DataSurfaces::TotSurfaces;
@@ -2043,7 +2041,7 @@ namespace ThermalComfort {
             ZoneAESum = 0.0;
             for (SurfNum2 = 1; SurfNum2 <= TotSurfaces; ++SurfNum2) {
                 if (Surface(SurfNum2).HeatTransSurf) {
-                    SurfaceAE(SurfNum2) = Surface(SurfNum2).Area * Construct(Surface(SurfNum2).Construction).InsideAbsorpThermal;
+                    SurfaceAE(SurfNum2) = Surface(SurfNum2).Area * dataConstruction.Construct(Surface(SurfNum2).Construction).InsideAbsorpThermal;
                     ZoneNum2 = Surface(SurfNum2).Zone;
                     // Do NOT include the contribution of the Surface that is being surface weighted in this calculation since it will already be
                     // accounted for
@@ -2058,7 +2056,7 @@ namespace ThermalComfort {
         ZoneAESum(ZoneNum) = 0.0;
         for (SurfNum2 = Zone(ZoneNum).SurfaceFirst; SurfNum2 <= Zone(ZoneNum).SurfaceLast; ++SurfNum2) {
             if ((Surface(SurfNum2).HeatTransSurf) && (SurfNum2 != SurfNum)) {
-                SurfaceAE(SurfNum2) = Surface(SurfNum2).Area * Construct(Surface(SurfNum2).Construction).InsideAbsorpThermal;
+                SurfaceAE(SurfNum2) = Surface(SurfNum2).Area * dataConstruction.Construct(Surface(SurfNum2).Construction).InsideAbsorpThermal;
                 SumAET += SurfaceAE(SurfNum2) * TH(2, 1, SurfNum2);
                 ZoneAESum(ZoneNum) += SurfaceAE(SurfNum2);
             }
@@ -2391,7 +2389,7 @@ namespace ThermalComfort {
         TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
     }
 
-    void CalcIfSetPointMet()
+    void CalcIfSetPointMet(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -2419,7 +2417,7 @@ namespace ThermalComfort {
         using DataHVACGlobals::SingleHeatingSetPoint;
         using DataRoomAirModel::AirModel;
         using DataRoomAirModel::RoomAirModel_Mixing;
-        using ZoneTempPredictorCorrector::NumOnOffCtrZone;
+        //using ZoneTempPredictorCorrector::NumOnOffCtrZone;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SensibleLoadPredictedNoAdj;
@@ -2464,7 +2462,7 @@ namespace ThermalComfort {
                 if (AirModel(iZone).AirModelType != RoomAirModel_Mixing) {
                     deltaT = TempTstatAir(iZone) - ZoneThermostatSetPointLo(iZone);
                 } else {
-                    if (NumOnOffCtrZone > 0) {
+                    if (dataZoneTempPredictorCorrector.NumOnOffCtrZone > 0) {
                         deltaT = ZTAV(iZone) - ZoneThermostatSetPointLoAver(iZone);
                     } else {
                         deltaT = ZTAV(iZone) - ZoneThermostatSetPointLo(iZone);
@@ -2485,7 +2483,7 @@ namespace ThermalComfort {
                 if (AirModel(iZone).AirModelType != RoomAirModel_Mixing) {
                     deltaT = TempTstatAir(iZone) - ZoneThermostatSetPointHi(iZone);
                 } else {
-                    if (NumOnOffCtrZone > 0) {
+                    if (dataZoneTempPredictorCorrector.NumOnOffCtrZone > 0) {
                         deltaT = ZTAV(iZone) - ZoneThermostatSetPointHiAver(iZone);
                     } else {
                         deltaT = ZTAV(iZone) - ZoneThermostatSetPointHi(iZone);

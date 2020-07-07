@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -1324,7 +1325,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     EnergyPlus::createFacilityElectricPowerServiceObject(); // Needs to happen before InitInternalHeatGains
 
     // First time should be all good, because ZnRpt values intialize to zero
-    InternalHeatGains::InitInternalHeatGains(state, state.dataZonePlenum);
+    InternalHeatGains::InitInternalHeatGains(state);
 
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);
@@ -1336,7 +1337,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).ITEqSHI, 0);
 
     // Second time should should give the same answers, because everything should reset before accumulating
-    InternalHeatGains::InitInternalHeatGains(state, state.dataZonePlenum);
+    InternalHeatGains::InitInternalHeatGains(state);
 
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);

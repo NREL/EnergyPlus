@@ -56,13 +56,14 @@
 #include <EnergyPlus/AirTerminalUnit.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -74,6 +75,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -418,6 +420,13 @@ namespace FourPipeBeam {
                             thisBeam->name);
         SetupOutputVariable(
             "Zone Air Terminal Primary Air Flow Rate", OutputProcessor::Unit::m3_s, thisBeam->primAirFlow, "System", "Average", thisBeam->name);
+
+        SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            thisBeam->OutdoorAirFlowRate,
+                            "System",
+                            "Average",
+                            thisBeam->name);
 
         airNodeFound = false;
         for (aDUIndex = 1; aDUIndex <= NumAirDistUnits; ++aDUIndex) {
@@ -1460,6 +1469,7 @@ namespace FourPipeBeam {
             SafeCopyPlantNode(this->hWInNodeNum, this->hWOutNodeNum);
             DataLoopNode::Node(this->hWOutNodeNum).Temp = this->hWTempOut;
         }
+
     }
 
     void HVACFourPipeBeam::report() // fill out local output variables for reporting
@@ -1488,7 +1498,20 @@ namespace FourPipeBeam {
         this->supAirHeatingEnergy = this->supAirHeatingRate * ReportingConstant;
 
         this->primAirFlow = this->mDotSystemAir / DataEnvironment::StdRhoAir;
+        
+        this->CalcOutdoorAirVolumeFlowRate();
     }
+
+    void HVACFourPipeBeam::CalcOutdoorAirVolumeFlowRate()
+    {
+        // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
+        if (this->airLoopNum > 0) {
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->airOutNodeNum).MassFlowRate / DataEnvironment::StdRhoAir) * DataAirLoop::AirLoopFlow(this->airLoopNum).OAFrac;
+        } else {
+            this->OutdoorAirFlowRate = 0.0;
+        }
+    }
+
 
 } // namespace FourPipeBeam
 

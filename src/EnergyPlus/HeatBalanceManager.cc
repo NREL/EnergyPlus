@@ -59,8 +59,9 @@
 
 // EnergyPlus Headers
 #include "OutputFiles.hh"
-#include <EnergyPlus/ConductionTransferFunctionCalc.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -87,7 +88,6 @@
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -358,7 +358,7 @@ namespace HeatBalanceManager {
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(state.outputFiles);                                                                // Initialize all heat balance related parameters
+        InitHeatBalance(state.dataWindowManager, state.outputFiles);                                                                // Initialize all heat balance related parameters
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -444,7 +444,7 @@ namespace HeatBalanceManager {
 
         // FLOW:
 
-        GetProjectControlData(state.outputFiles, ErrorsFound);
+        GetProjectControlData(state, state.outputFiles, ErrorsFound);
 
         GetSiteAtmosphereData(state.outputFiles, ErrorsFound);
 
@@ -528,23 +528,23 @@ namespace HeatBalanceManager {
             for (Loop = 1; Loop <= NumObjects; ++Loop) {
                 inputProcessor->getObjectItem(ConstrObjects(ONum), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status);
                 if (ONum == 5) {
-                    CNum = UtilityRoutines::FindItemInList(cAlphaArgs(4), Construct);
+                    CNum = UtilityRoutines::FindItemInList(cAlphaArgs(4), dataConstruction.Construct);
                 } else {
-                    CNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Construct);
+                    CNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), dataConstruction.Construct);
                 }
                 if (CNum == 0) continue;
-                Construct(CNum).IsUsed = true;
+                dataConstruction.Construct(CNum).IsUsed = true;
                 if (ONum == 4 || ONum == 6) {
                     // GroundHeatExchanger:Surface or EnergyManagementSystem:ConstructionIndexVariable
                     // Include all EMS constructions since they can potentially be used by a CTF surface
-                    if (!Construct(CNum).TypeIsWindow) {
-                        Construct(CNum).IsUsedCTF = true;
+                    if (!dataConstruction.Construct(CNum).TypeIsWindow) {
+                        dataConstruction.Construct(CNum).IsUsedCTF = true;
                     }
                 }
             }
         }
         Unused =
-            TotConstructs - std::count_if(Construct.begin(), Construct.end(), [](DataHeatBalance::ConstructionData const &e) { return e.IsUsed; });
+            TotConstructs - std::count_if(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.IsUsed; });
         if (Unused > 0) {
             if (!DisplayExtraWarnings) {
                 ShowWarningError("CheckUsedConstructions: There are " + RoundSigDigits(Unused) + " nominally unused constructions in input.");
@@ -553,8 +553,8 @@ namespace HeatBalanceManager {
                 ShowWarningError("CheckUsedConstructions: There are " + RoundSigDigits(Unused) + " nominally unused constructions in input.");
                 ShowContinueError("Each Unused construction is shown.");
                 for (Loop = 1; Loop <= TotConstructs; ++Loop) {
-                    if (Construct(Loop).IsUsed) continue;
-                    ShowMessage("Construction=" + Construct(Loop).Name);
+                    if (dataConstruction.Construct(Loop).IsUsed) continue;
+                    ShowMessage("Construction=" + dataConstruction.Construct(Loop).Name);
                 }
             }
         }
@@ -623,11 +623,11 @@ namespace HeatBalanceManager {
 
         // start by setting this to 5; it will satisfy the regular window constructions (Construction) and the Window5 files
         // (Construction:WindowDataFile)
-        MaxSolidWinLayers = 7;
+        DataHeatBalance::MaxSolidWinLayers = 7;
 
         // Construction:ComplexFenestrationState have a limit of 10 layers, so set it up to 10 if they are present
         if (inputProcessor->getNumObjectsFound("Construction:ComplexFenestrationState") > 0) {
-            MaxSolidWinLayers = max(MaxSolidWinLayers, 10);
+            DataHeatBalance::MaxSolidWinLayers = max(DataHeatBalance::MaxSolidWinLayers, 10);
         }
 
         // then process the rest of the relevant constructions
@@ -646,14 +646,14 @@ namespace HeatBalanceManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             int numLayersInThisConstruct(NumAlpha - 1);
-            MaxSolidWinLayers = max(MaxSolidWinLayers, numLayersInThisConstruct);
+            DataHeatBalance::MaxSolidWinLayers = max(DataHeatBalance::MaxSolidWinLayers, numLayersInThisConstruct);
         }
 
         // construction types being ignored as they are opaque: Construction:CfactorUndergroundWall, Construction:FfactorGroundFloor,
         // Construction:InternalSource
     }
 
-    void GetProjectControlData(OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors detected during getting data
+    void GetProjectControlData(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors detected during getting data
     {
 
         // SUBROUTINE INFORMATION:
@@ -996,10 +996,11 @@ namespace HeatBalanceManager {
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_EMPD;
                     DataHeatBalance::AnyEMPD = true;
-
+                    DataHeatBalance::AllCTF = false;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
                     DataHeatBalance::AnyCondFD = true;
+                    DataHeatBalance::AllCTF = false;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Conduction Finite Difference but Number of TimeSteps in Hour < 20, Value is " +
@@ -1011,6 +1012,7 @@ namespace HeatBalanceManager {
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
                     DataHeatBalance::AnyHAMT = true;
+                    DataHeatBalance::AllCTF = false;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Combined Heat and Moisture Finite Element but Number of TimeSteps in Hour < 20, Value is " +
@@ -1206,7 +1208,7 @@ namespace HeatBalanceManager {
             AlphaName(3) = "NO";
         }
 
-        WindowManager::initWindowModel();
+        WindowManager::initWindowModel(state.dataWindowManager);
 
         static constexpr auto Format_728(
             "! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
@@ -1595,7 +1597,7 @@ namespace HeatBalanceManager {
         int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound("Construction:AirBoundary");
         if (totAirBoundaryConstructs > 0) TotMaterials += 1;
 
-        Material.allocate(TotMaterials); // Allocate the array Size to the number of materials
+        dataMaterial.Material.allocate(TotMaterials); // Allocate the array Size to the number of materials
         UniqueMaterialNames.reserve(static_cast<unsigned>(TotMaterials));
 
         NominalR.dimension(TotMaterials, 0.0);
@@ -1625,43 +1627,43 @@ namespace HeatBalanceManager {
             }
             // Load the material derived type from the input data.
             ++MaterNum;
-            Material(MaterNum).Group = RegularMaterial;
-            Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Group = RegularMaterial;
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
 
             ValidateMaterialRoughness(MaterNum, MaterialNames(2), ErrorsFound);
 
-            Material(MaterNum).Thickness = MaterialProps(1);
-            Material(MaterNum).Conductivity = MaterialProps(2);
-            Material(MaterNum).Density = MaterialProps(3);
-            Material(MaterNum).SpecHeat = MaterialProps(4);
+            dataMaterial.Material(MaterNum).Thickness = MaterialProps(1);
+            dataMaterial.Material(MaterNum).Conductivity = MaterialProps(2);
+            dataMaterial.Material(MaterNum).Density = MaterialProps(3);
+            dataMaterial.Material(MaterNum).SpecHeat = MaterialProps(4);
             // min fields is 6 -- previous four will be there
             if (MaterialNumProp >= 5) {
-                Material(MaterNum).AbsorpThermal = MaterialProps(5);
-                Material(MaterNum).AbsorpThermalInput = MaterialProps(5);
+                dataMaterial.Material(MaterNum).AbsorpThermal = MaterialProps(5);
+                dataMaterial.Material(MaterNum).AbsorpThermalInput = MaterialProps(5);
             } else {
-                Material(MaterNum).AbsorpThermal = 0.9;
-                Material(MaterNum).AbsorpThermalInput = 0.9;
+                dataMaterial.Material(MaterNum).AbsorpThermal = 0.9;
+                dataMaterial.Material(MaterNum).AbsorpThermalInput = 0.9;
             }
             if (MaterialNumProp >= 6) {
-                Material(MaterNum).AbsorpSolar = MaterialProps(6);
-                Material(MaterNum).AbsorpSolarInput = MaterialProps(6);
+                dataMaterial.Material(MaterNum).AbsorpSolar = MaterialProps(6);
+                dataMaterial.Material(MaterNum).AbsorpSolarInput = MaterialProps(6);
             } else {
-                Material(MaterNum).AbsorpSolar = 0.7;
-                Material(MaterNum).AbsorpSolarInput = 0.7;
+                dataMaterial.Material(MaterNum).AbsorpSolar = 0.7;
+                dataMaterial.Material(MaterNum).AbsorpSolarInput = 0.7;
             }
             if (MaterialNumProp >= 7) {
-                Material(MaterNum).AbsorpVisible = MaterialProps(7);
-                Material(MaterNum).AbsorpVisibleInput = MaterialProps(7);
+                dataMaterial.Material(MaterNum).AbsorpVisible = MaterialProps(7);
+                dataMaterial.Material(MaterNum).AbsorpVisibleInput = MaterialProps(7);
             } else {
-                Material(MaterNum).AbsorpVisible = 0.7;
-                Material(MaterNum).AbsorpVisibleInput = 0.7;
+                dataMaterial.Material(MaterNum).AbsorpVisible = 0.7;
+                dataMaterial.Material(MaterNum).AbsorpVisibleInput = 0.7;
             }
 
-            if (Material(MaterNum).Conductivity > 0.0) {
-                NominalR(MaterNum) = Material(MaterNum).Thickness / Material(MaterNum).Conductivity;
-                Material(MaterNum).Resistance = NominalR(MaterNum);
+            if (dataMaterial.Material(MaterNum).Conductivity > 0.0) {
+                NominalR(MaterNum) = dataMaterial.Material(MaterNum).Thickness / dataMaterial.Material(MaterNum).Conductivity;
+                dataMaterial.Material(MaterNum).Resistance = NominalR(MaterNum);
             } else {
-                ShowSevereError("Positive thermal conductivity required for material " + Material(MaterNum).Name);
+                ShowSevereError("Positive thermal conductivity required for material " + dataMaterial.Material(MaterNum).Name);
                 ErrorsFound = true;
             }
         }
@@ -1670,18 +1672,18 @@ namespace HeatBalanceManager {
         if (TotFfactorConstructs + TotCfactorConstructs >= 1) {
             ++MaterNum;
 
-            Material(MaterNum).Group = RegularMaterial;
-            Material(MaterNum).Name = "~FC_Concrete";
-            Material(MaterNum).Thickness = 0.15;    // m, 0.15m = 6 inches
-            Material(MaterNum).Conductivity = 1.95; // W/mK
-            Material(MaterNum).Density = 2240.0;    // kg/m3
-            Material(MaterNum).SpecHeat = 900.0;    // J/kgK
-            Material(MaterNum).Roughness = MediumRough;
-            Material(MaterNum).AbsorpSolar = 0.7;
-            Material(MaterNum).AbsorpThermal = 0.9;
-            Material(MaterNum).AbsorpVisible = 0.7;
-            NominalR(MaterNum) = Material(MaterNum).Thickness / Material(MaterNum).Conductivity;
-            Material(MaterNum).Resistance = NominalR(MaterNum);
+            dataMaterial.Material(MaterNum).Group = RegularMaterial;
+            dataMaterial.Material(MaterNum).Name = "~FC_Concrete";
+            dataMaterial.Material(MaterNum).Thickness = 0.15;    // m, 0.15m = 6 inches
+            dataMaterial.Material(MaterNum).Conductivity = 1.95; // W/mK
+            dataMaterial.Material(MaterNum).Density = 2240.0;    // kg/m3
+            dataMaterial.Material(MaterNum).SpecHeat = 900.0;    // J/kgK
+            dataMaterial.Material(MaterNum).Roughness = MediumRough;
+            dataMaterial.Material(MaterNum).AbsorpSolar = 0.7;
+            dataMaterial.Material(MaterNum).AbsorpThermal = 0.9;
+            dataMaterial.Material(MaterNum).AbsorpVisible = 0.7;
+            NominalR(MaterNum) = dataMaterial.Material(MaterNum).Thickness / dataMaterial.Material(MaterNum).Conductivity;
+            dataMaterial.Material(MaterNum).Resistance = NominalR(MaterNum);
 
             ++RegMat;
         }
@@ -1709,49 +1711,49 @@ namespace HeatBalanceManager {
 
             // Load the material derived type from the input data.
             ++MaterNum;
-            Material(MaterNum).Group = RegularMaterial;
-            Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Group = RegularMaterial;
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
 
             ValidateMaterialRoughness(MaterNum, MaterialNames(2), ErrorsFound);
 
-            Material(MaterNum).Resistance = MaterialProps(1);
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Resistance = MaterialProps(1);
+            dataMaterial.Material(MaterNum).ROnly = true;
             if (MaterialNumProp >= 2) {
-                Material(MaterNum).AbsorpThermal = MaterialProps(2);
-                Material(MaterNum).AbsorpThermalInput = MaterialProps(2);
+                dataMaterial.Material(MaterNum).AbsorpThermal = MaterialProps(2);
+                dataMaterial.Material(MaterNum).AbsorpThermalInput = MaterialProps(2);
             } else {
-                Material(MaterNum).AbsorpThermal = 0.9;
-                Material(MaterNum).AbsorpThermalInput = 0.9;
+                dataMaterial.Material(MaterNum).AbsorpThermal = 0.9;
+                dataMaterial.Material(MaterNum).AbsorpThermalInput = 0.9;
             }
             if (MaterialNumProp >= 3) {
-                Material(MaterNum).AbsorpSolar = MaterialProps(3);
-                Material(MaterNum).AbsorpSolarInput = MaterialProps(3);
+                dataMaterial.Material(MaterNum).AbsorpSolar = MaterialProps(3);
+                dataMaterial.Material(MaterNum).AbsorpSolarInput = MaterialProps(3);
             } else {
-                Material(MaterNum).AbsorpSolar = 0.7;
-                Material(MaterNum).AbsorpSolarInput = 0.7;
+                dataMaterial.Material(MaterNum).AbsorpSolar = 0.7;
+                dataMaterial.Material(MaterNum).AbsorpSolarInput = 0.7;
             }
             if (MaterialNumProp >= 4) {
-                Material(MaterNum).AbsorpVisible = MaterialProps(4);
-                Material(MaterNum).AbsorpVisibleInput = MaterialProps(4);
+                dataMaterial.Material(MaterNum).AbsorpVisible = MaterialProps(4);
+                dataMaterial.Material(MaterNum).AbsorpVisibleInput = MaterialProps(4);
             } else {
-                Material(MaterNum).AbsorpVisible = 0.7;
-                Material(MaterNum).AbsorpVisibleInput = 0.7;
+                dataMaterial.Material(MaterNum).AbsorpVisible = 0.7;
+                dataMaterial.Material(MaterNum).AbsorpVisibleInput = 0.7;
             }
 
-            NominalR(MaterNum) = Material(MaterNum).Resistance;
+            NominalR(MaterNum) = dataMaterial.Material(MaterNum).Resistance;
         }
 
         // Add a fictitious insulation layer for each construction defined with F or C factor method
         if (TotFfactorConstructs + TotCfactorConstructs >= 1) {
             for (Loop = 1; Loop <= TotFfactorConstructs + TotCfactorConstructs; ++Loop) {
                 ++MaterNum;
-                Material(MaterNum).Group = RegularMaterial;
-                Material(MaterNum).Name = "~FC_Insulation_" + RoundSigDigits(Loop);
-                Material(MaterNum).ROnly = true;
-                Material(MaterNum).Roughness = MediumRough;
-                Material(MaterNum).AbsorpSolar = 0.0;
-                Material(MaterNum).AbsorpThermal = 0.0;
-                Material(MaterNum).AbsorpVisible = 0.0;
+                dataMaterial.Material(MaterNum).Group = RegularMaterial;
+                dataMaterial.Material(MaterNum).Name = "~FC_Insulation_" + RoundSigDigits(Loop);
+                dataMaterial.Material(MaterNum).ROnly = true;
+                dataMaterial.Material(MaterNum).Roughness = MediumRough;
+                dataMaterial.Material(MaterNum).AbsorpSolar = 0.0;
+                dataMaterial.Material(MaterNum).AbsorpThermal = 0.0;
+                dataMaterial.Material(MaterNum).AbsorpVisible = 0.0;
             }
             RegRMat += TotFfactorConstructs + TotCfactorConstructs;
         }
@@ -1780,15 +1782,15 @@ namespace HeatBalanceManager {
 
             // Load the material derived type from the input data.
             ++MaterNum;
-            Material(MaterNum).Group = Air;
-            Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Group = Air;
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
 
-            Material(MaterNum).Roughness = MediumRough;
+            dataMaterial.Material(MaterNum).Roughness = MediumRough;
 
-            Material(MaterNum).Resistance = MaterialProps(1);
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Resistance = MaterialProps(1);
+            dataMaterial.Material(MaterNum).ROnly = true;
 
-            NominalR(MaterNum) = Material(MaterNum).Resistance;
+            NominalR(MaterNum) = dataMaterial.Material(MaterNum).Resistance;
         }
 
         CurrentModuleObject = "Material:InfraredTransparent";
@@ -1813,41 +1815,41 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = IRTMaterial;
+            dataMaterial.Material(MaterNum).Group = IRTMaterial;
 
             // Load the material derived type from the input data.
-            Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
 
             // Load data for other properties that need defaults
-            Material(MaterNum).ROnly = true;
-            Material(MaterNum).Resistance = 0.01;
-            Material(MaterNum).AbsorpThermal = 0.9999;
-            Material(MaterNum).AbsorpThermalInput = 0.9999;
-            Material(MaterNum).AbsorpSolar = 1.0;
-            Material(MaterNum).AbsorpSolarInput = 1.0;
-            Material(MaterNum).AbsorpVisible = 1.0;
-            Material(MaterNum).AbsorpVisibleInput = 1.0;
+            dataMaterial.Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Resistance = 0.01;
+            dataMaterial.Material(MaterNum).AbsorpThermal = 0.9999;
+            dataMaterial.Material(MaterNum).AbsorpThermalInput = 0.9999;
+            dataMaterial.Material(MaterNum).AbsorpSolar = 1.0;
+            dataMaterial.Material(MaterNum).AbsorpSolarInput = 1.0;
+            dataMaterial.Material(MaterNum).AbsorpVisible = 1.0;
+            dataMaterial.Material(MaterNum).AbsorpVisibleInput = 1.0;
 
-            NominalR(MaterNum) = Material(MaterNum).Resistance;
+            NominalR(MaterNum) = dataMaterial.Material(MaterNum).Resistance;
         }
 
         // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
         if (totAirBoundaryConstructs > 0) {
             ++MaterNum;
-            Material(MaterNum).Group = IRTMaterial;
-            Material(MaterNum).Name = "~AirBoundary-IRTMaterial";
-            Material(MaterNum).ROnly = true;
-            Material(MaterNum).Resistance = 0.01;
-            Material(MaterNum).AbsorpThermal = 0.9999;
-            Material(MaterNum).AbsorpThermalInput = 0.9999;
+            dataMaterial.Material(MaterNum).Group = IRTMaterial;
+            dataMaterial.Material(MaterNum).Name = "~AirBoundary-IRTMaterial";
+            dataMaterial.Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Resistance = 0.01;
+            dataMaterial.Material(MaterNum).AbsorpThermal = 0.9999;
+            dataMaterial.Material(MaterNum).AbsorpThermalInput = 0.9999;
             // Air boundaries should not participate in solar or daylighting
-            Material(MaterNum).AbsorpSolar = 0.0;
-            Material(MaterNum).AbsorpSolarInput = 0.0;
-            Material(MaterNum).AbsorpVisible = 0.0;
-            Material(MaterNum).AbsorpVisibleInput = 0.0;
-            NominalR(MaterNum) = Material(MaterNum).Resistance;
+            dataMaterial.Material(MaterNum).AbsorpSolar = 0.0;
+            dataMaterial.Material(MaterNum).AbsorpSolarInput = 0.0;
+            dataMaterial.Material(MaterNum).AbsorpVisible = 0.0;
+            dataMaterial.Material(MaterNum).AbsorpVisibleInput = 0.0;
+            NominalR(MaterNum) = dataMaterial.Material(MaterNum).Resistance;
             if (GlobalNames::VerifyUniqueInterObjectName(
-                    UniqueMaterialNames, Material(MaterNum).Name, CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+                    UniqueMaterialNames, dataMaterial.Material(MaterNum).Name, CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                 ShowContinueError("...All Material names must be unique regardless of subtype.");
                 ShowContinueError("...\"~AirBoundary-IRTMaterial\" is a reserved name used internally by Construction:AirBoundary.");
             }
@@ -1877,52 +1879,52 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = WindowGlass;
+            dataMaterial.Material(MaterNum).Group = WindowGlass;
 
             // Load the material derived type from the input data.
 
-            Material(MaterNum).Name = MaterialNames(1);
-            Material(MaterNum).Roughness = VerySmooth;
-            Material(MaterNum).ROnly = true;
-            Material(MaterNum).Thickness = MaterialProps(1);
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Roughness = VerySmooth;
+            dataMaterial.Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Thickness = MaterialProps(1);
             if (!UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) {
-                Material(MaterNum).Trans = MaterialProps(2);
-                Material(MaterNum).ReflectSolBeamFront = MaterialProps(3);
-                Material(MaterNum).ReflectSolBeamBack = MaterialProps(4);
-                Material(MaterNum).TransVis = MaterialProps(5);
-                Material(MaterNum).ReflectVisBeamFront = MaterialProps(6);
-                Material(MaterNum).ReflectVisBeamBack = MaterialProps(7);
-                Material(MaterNum).TransThermal = MaterialProps(8);
+                dataMaterial.Material(MaterNum).Trans = MaterialProps(2);
+                dataMaterial.Material(MaterNum).ReflectSolBeamFront = MaterialProps(3);
+                dataMaterial.Material(MaterNum).ReflectSolBeamBack = MaterialProps(4);
+                dataMaterial.Material(MaterNum).TransVis = MaterialProps(5);
+                dataMaterial.Material(MaterNum).ReflectVisBeamFront = MaterialProps(6);
+                dataMaterial.Material(MaterNum).ReflectVisBeamBack = MaterialProps(7);
+                dataMaterial.Material(MaterNum).TransThermal = MaterialProps(8);
             }
-            Material(MaterNum).AbsorpThermalFront = MaterialProps(9);
-            Material(MaterNum).AbsorpThermalBack = MaterialProps(10);
-            Material(MaterNum).Conductivity = MaterialProps(11);
-            Material(MaterNum).GlassTransDirtFactor = MaterialProps(12);
-            Material(MaterNum).YoungModulus = MaterialProps(13);
-            Material(MaterNum).PoissonsRatio = MaterialProps(14);
-            if (MaterialProps(12) == 0.0) Material(MaterNum).GlassTransDirtFactor = 1.0;
-            Material(MaterNum).AbsorpThermal = Material(MaterNum).AbsorpThermalBack;
+            dataMaterial.Material(MaterNum).AbsorpThermalFront = MaterialProps(9);
+            dataMaterial.Material(MaterNum).AbsorpThermalBack = MaterialProps(10);
+            dataMaterial.Material(MaterNum).Conductivity = MaterialProps(11);
+            dataMaterial.Material(MaterNum).GlassTransDirtFactor = MaterialProps(12);
+            dataMaterial.Material(MaterNum).YoungModulus = MaterialProps(13);
+            dataMaterial.Material(MaterNum).PoissonsRatio = MaterialProps(14);
+            if (MaterialProps(12) == 0.0) dataMaterial.Material(MaterNum).GlassTransDirtFactor = 1.0;
+            dataMaterial.Material(MaterNum).AbsorpThermal = dataMaterial.Material(MaterNum).AbsorpThermalBack;
 
-            if (Material(MaterNum).Conductivity > 0.0) {
-                NominalR(MaterNum) = Material(MaterNum).Thickness / Material(MaterNum).Conductivity;
-                Material(MaterNum).Resistance = NominalR(MaterNum);
+            if (dataMaterial.Material(MaterNum).Conductivity > 0.0) {
+                NominalR(MaterNum) = dataMaterial.Material(MaterNum).Thickness / dataMaterial.Material(MaterNum).Conductivity;
+                dataMaterial.Material(MaterNum).Resistance = NominalR(MaterNum);
             } else {
                 ErrorsFound = true;
-                ShowSevereError("Window glass material " + Material(MaterNum).Name + " has Conductivity = 0.0, must be >0.0, default = .9");
+                ShowSevereError("Window glass material " + dataMaterial.Material(MaterNum).Name + " has Conductivity = 0.0, must be >0.0, default = .9");
             }
 
-            Material(MaterNum).GlassSpectralDataPtr = 0;
+            dataMaterial.Material(MaterNum).GlassSpectralDataPtr = 0;
             if (TotSpectralData > 0 && !lAlphaFieldBlanks(3)) {
-                Material(MaterNum).GlassSpectralDataPtr = UtilityRoutines::FindItemInList(MaterialNames(3), SpectralData);
+                dataMaterial.Material(MaterNum).GlassSpectralDataPtr = UtilityRoutines::FindItemInList(MaterialNames(3), SpectralData);
             }
-            if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) Material(MaterNum).GlassSpectralDataPtr = 0;
+            if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) dataMaterial.Material(MaterNum).GlassSpectralDataPtr = 0;
             // No need for spectral data for BSDF either
-            if (UtilityRoutines::SameString(MaterialNames(2), "BSDF")) Material(MaterNum).GlassSpectralDataPtr = 0;
-            if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) Material(MaterNum).GlassSpectralAndAngle = true;
+            if (UtilityRoutines::SameString(MaterialNames(2), "BSDF")) dataMaterial.Material(MaterNum).GlassSpectralDataPtr = 0;
+            if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) dataMaterial.Material(MaterNum).GlassSpectralAndAngle = true;
 
-            if (Material(MaterNum).GlassSpectralDataPtr == 0 && UtilityRoutines::SameString(MaterialNames(2), "Spectral")) {
+            if (dataMaterial.Material(MaterNum).GlassSpectralDataPtr == 0 && UtilityRoutines::SameString(MaterialNames(2), "Spectral")) {
                 ErrorsFound = true;
-                ShowSevereError(CurrentModuleObject + "=\"" + Material(MaterNum).Name + "\" has " + cAlphaFieldNames(2) +
+                ShowSevereError(CurrentModuleObject + "=\"" + dataMaterial.Material(MaterNum).Name + "\" has " + cAlphaFieldNames(2) +
                                 " = Spectral but has no matching MaterialProperty:GlazingSpectralData set");
                 if (lAlphaFieldBlanks(3)) {
                     ShowContinueError("..." + cAlphaFieldNames(3) + " is blank.");
@@ -1935,7 +1937,7 @@ namespace HeatBalanceManager {
             if (!UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage") && !UtilityRoutines::SameString(MaterialNames(2), "Spectral") &&
                 !UtilityRoutines::SameString(MaterialNames(2), "BSDF") && !UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) {
                 ErrorsFound = true;
-                ShowSevereError(CurrentModuleObject + "=\"" + Material(MaterNum).Name + "\", invalid specification.");
+                ShowSevereError(CurrentModuleObject + "=\"" + dataMaterial.Material(MaterNum).Name + "\", invalid specification.");
                 ShowContinueError(cAlphaFieldNames(2) + " must be SpectralAverage, Spectral, BSDF or SpectralAndAngle, value=" + MaterialNames(2));
             }
 
@@ -2064,37 +2066,37 @@ namespace HeatBalanceManager {
             }
 
             if (MaterialNames(4) == "") {
-                Material(MaterNum).SolarDiffusing = false;
+                dataMaterial.Material(MaterNum).SolarDiffusing = false;
             } else if (MaterialNames(4) == "YES") {
-                Material(MaterNum).SolarDiffusing = true;
+                dataMaterial.Material(MaterNum).SolarDiffusing = true;
             } else if (MaterialNames(4) == "NO") {
-                Material(MaterNum).SolarDiffusing = false;
+                dataMaterial.Material(MaterNum).SolarDiffusing = false;
             } else {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(cNumericFieldNames(4) + " must be Yes or No, entered value=" + MaterialNames(4));
             }
             // Get SpectralAndAngle table names
-            if (Material(MaterNum).GlassSpectralAndAngle) {
+            if (dataMaterial.Material(MaterNum).GlassSpectralAndAngle) {
                 if (lAlphaFieldBlanks(5)) {
                     ErrorsFound = true;
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                     ShowContinueError(" Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
                 } else {
-                    Material(MaterNum).GlassSpecAngTransDataPtr = CurveManager::GetCurveIndex(MaterialNames(5));
-                    if (Material(MaterNum).GlassSpecAngTransDataPtr == 0) {
+                    dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr = CurveManager::GetCurveIndex(MaterialNames(5));
+                    if (dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr == 0) {
                         ErrorsFound = true;
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(5) + " requires a valid table object name, entered input=" + MaterialNames(5));
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngTransDataPtr, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr, // Curve index
                                                                     {2},                                         // Valid dimensions
                                                                     RoutineName,                                 // Routine name
                                                                     CurrentModuleObject,                         // Object Type
-                                                                    Material(MaterNum).Name,                     // Object Name
+                                                                    dataMaterial.Material(MaterNum).Name,                     // Object Name
                                                                     cAlphaFieldNames(5));                        // Field Name
 
-                        GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        GetCurveMinMaxValues(dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
@@ -2130,20 +2132,20 @@ namespace HeatBalanceManager {
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                     ShowContinueError(" Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
                 } else {
-                    Material(MaterNum).GlassSpecAngFRefleDataPtr = CurveManager::GetCurveIndex(MaterialNames(6));
-                    if (Material(MaterNum).GlassSpecAngFRefleDataPtr == 0) {
+                    dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr = CurveManager::GetCurveIndex(MaterialNames(6));
+                    if (dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr == 0) {
                         ErrorsFound = true;
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(6) + " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngFRefleDataPtr, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr, // Curve index
                                                                     {2},                                          // Valid dimensions
                                                                     RoutineName,                                  // Routine name
                                                                     CurrentModuleObject,                          // Object Type
-                                                                    Material(MaterNum).Name,                      // Object Name
+                                                                    dataMaterial.Material(MaterNum).Name,                      // Object Name
                                                                     cAlphaFieldNames(6));                         // Field Name
 
-                        GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        GetCurveMinMaxValues(dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
@@ -2179,20 +2181,20 @@ namespace HeatBalanceManager {
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                     ShowContinueError(" Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
                 } else {
-                    Material(MaterNum).GlassSpecAngBRefleDataPtr = CurveManager::GetCurveIndex(MaterialNames(7));
-                    if (Material(MaterNum).GlassSpecAngBRefleDataPtr == 0) {
+                    dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr = CurveManager::GetCurveIndex(MaterialNames(7));
+                    if (dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr == 0) {
                         ErrorsFound = true;
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(7) + " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngBRefleDataPtr, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr, // Curve index
                                                                     {2},                                          // Valid dimensions
                                                                     RoutineName,                                  // Routine name
                                                                     CurrentModuleObject,                          // Object Type
-                                                                    Material(MaterNum).Name,                      // Object Name
+                                                                    dataMaterial.Material(MaterNum).Name,                      // Object Name
                                                                     cAlphaFieldNames(7));                         // Field Name
 
-                        GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        GetCurveMinMaxValues(dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
@@ -2250,14 +2252,14 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = WindowGlass;
+            dataMaterial.Material(MaterNum).Group = WindowGlass;
 
             // Load the material derived type from the input data.
 
-            Material(MaterNum).Name = MaterialNames(1);
-            Material(MaterNum).Roughness = VerySmooth;
-            Material(MaterNum).Thickness = MaterialProps(1);
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Roughness = VerySmooth;
+            dataMaterial.Material(MaterNum).Thickness = MaterialProps(1);
+            dataMaterial.Material(MaterNum).ROnly = true;
 
             // Calculate solar and visible transmittance and reflectance at normal incidence from thickness,
             // index of refraction and extinction coefficient. With the alternative input the front and back
@@ -2267,29 +2269,29 @@ namespace HeatBalanceManager {
             ReflectivityVis = pow_2((MaterialProps(4) - 1.0) / (MaterialProps(4) + 1.0));
             TransmittivitySol = std::exp(-MaterialProps(3) * MaterialProps(1));
             TransmittivityVis = std::exp(-MaterialProps(5) * MaterialProps(1));
-            Material(MaterNum).Trans = TransmittivitySol * pow_2(1.0 - ReflectivitySol) / (1.0 - pow_2(ReflectivitySol * TransmittivitySol));
-            Material(MaterNum).ReflectSolBeamFront = ReflectivitySol * (1.0 + pow_2(1.0 - ReflectivitySol) * pow_2(TransmittivitySol) /
+            dataMaterial.Material(MaterNum).Trans = TransmittivitySol * pow_2(1.0 - ReflectivitySol) / (1.0 - pow_2(ReflectivitySol * TransmittivitySol));
+            dataMaterial.Material(MaterNum).ReflectSolBeamFront = ReflectivitySol * (1.0 + pow_2(1.0 - ReflectivitySol) * pow_2(TransmittivitySol) /
                                                                                   (1.0 - pow_2(ReflectivitySol * TransmittivitySol)));
-            Material(MaterNum).ReflectSolBeamBack = Material(MaterNum).ReflectSolBeamFront;
-            Material(MaterNum).TransVis = TransmittivityVis * pow_2(1.0 - ReflectivityVis) / (1.0 - pow_2(ReflectivityVis * TransmittivityVis));
+            dataMaterial.Material(MaterNum).ReflectSolBeamBack = dataMaterial.Material(MaterNum).ReflectSolBeamFront;
+            dataMaterial.Material(MaterNum).TransVis = TransmittivityVis * pow_2(1.0 - ReflectivityVis) / (1.0 - pow_2(ReflectivityVis * TransmittivityVis));
 
-            Material(MaterNum).ReflectVisBeamFront = ReflectivityVis * (1.0 + pow_2(1.0 - ReflectivityVis) * pow_2(TransmittivityVis) /
+            dataMaterial.Material(MaterNum).ReflectVisBeamFront = ReflectivityVis * (1.0 + pow_2(1.0 - ReflectivityVis) * pow_2(TransmittivityVis) /
                                                                                   (1.0 - pow_2(ReflectivityVis * TransmittivityVis)));
-            Material(MaterNum).ReflectVisBeamBack = Material(MaterNum).ReflectSolBeamFront;
-            Material(MaterNum).TransThermal = MaterialProps(6);
-            Material(MaterNum).AbsorpThermalFront = MaterialProps(7);
-            Material(MaterNum).AbsorpThermalBack = MaterialProps(7);
-            Material(MaterNum).Conductivity = MaterialProps(8);
-            Material(MaterNum).GlassTransDirtFactor = MaterialProps(9);
-            if (MaterialProps(9) == 0.0) Material(MaterNum).GlassTransDirtFactor = 1.0;
-            Material(MaterNum).AbsorpThermal = Material(MaterNum).AbsorpThermalBack;
+            dataMaterial.Material(MaterNum).ReflectVisBeamBack = dataMaterial.Material(MaterNum).ReflectSolBeamFront;
+            dataMaterial.Material(MaterNum).TransThermal = MaterialProps(6);
+            dataMaterial.Material(MaterNum).AbsorpThermalFront = MaterialProps(7);
+            dataMaterial.Material(MaterNum).AbsorpThermalBack = MaterialProps(7);
+            dataMaterial.Material(MaterNum).Conductivity = MaterialProps(8);
+            dataMaterial.Material(MaterNum).GlassTransDirtFactor = MaterialProps(9);
+            if (MaterialProps(9) == 0.0) dataMaterial.Material(MaterNum).GlassTransDirtFactor = 1.0;
+            dataMaterial.Material(MaterNum).AbsorpThermal = dataMaterial.Material(MaterNum).AbsorpThermalBack;
 
-            if (Material(MaterNum).Conductivity > 0.0) {
-                NominalR(MaterNum) = Material(MaterNum).Thickness / Material(MaterNum).Conductivity;
-                Material(MaterNum).Resistance = NominalR(MaterNum);
+            if (dataMaterial.Material(MaterNum).Conductivity > 0.0) {
+                NominalR(MaterNum) = dataMaterial.Material(MaterNum).Thickness / dataMaterial.Material(MaterNum).Conductivity;
+                dataMaterial.Material(MaterNum).Resistance = NominalR(MaterNum);
             }
 
-            Material(MaterNum).GlassSpectralDataPtr = 0;
+            dataMaterial.Material(MaterNum).GlassSpectralDataPtr = 0;
 
             if (MaterialProps(6) + MaterialProps(7) >= 1.0) {
                 ErrorsFound = true;
@@ -2298,11 +2300,11 @@ namespace HeatBalanceManager {
             }
 
             if (MaterialNames(2) == "") {
-                Material(MaterNum).SolarDiffusing = false;
+                dataMaterial.Material(MaterNum).SolarDiffusing = false;
             } else if (MaterialNames(2) == "YES") {
-                Material(MaterNum).SolarDiffusing = true;
+                dataMaterial.Material(MaterNum).SolarDiffusing = true;
             } else if (MaterialNames(2) == "NO") {
-                Material(MaterNum).SolarDiffusing = false;
+                dataMaterial.Material(MaterNum).SolarDiffusing = false;
             } else {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
@@ -2333,50 +2335,50 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = GlassEquivalentLayer;
+            dataMaterial.Material(MaterNum).Group = GlassEquivalentLayer;
 
             // Load the material derived type from the input data.
-            Material(MaterNum).Name = MaterialNames(1);
-            Material(MaterNum).Roughness = VerySmooth;
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Roughness = VerySmooth;
+            dataMaterial.Material(MaterNum).ROnly = true;
 
-            Material(MaterNum).TausFrontBeamBeam = MaterialProps(1);
-            Material(MaterNum).TausBackBeamBeam = MaterialProps(2);
-            Material(MaterNum).ReflFrontBeamBeam = MaterialProps(3);
-            Material(MaterNum).ReflBackBeamBeam = MaterialProps(4);
-            Material(MaterNum).TausFrontBeamBeamVis = MaterialProps(5);
-            Material(MaterNum).TausBackBeamBeamVis = MaterialProps(6);
-            Material(MaterNum).ReflFrontBeamBeamVis = MaterialProps(7);
-            Material(MaterNum).ReflBackBeamBeamVis = MaterialProps(8);
-            Material(MaterNum).TausFrontBeamDiff = MaterialProps(9);
-            Material(MaterNum).TausBackBeamDiff = MaterialProps(10);
-            Material(MaterNum).ReflFrontBeamDiff = MaterialProps(11);
-            Material(MaterNum).ReflBackBeamDiff = MaterialProps(12);
-            Material(MaterNum).TausFrontBeamDiffVis = MaterialProps(13);
-            Material(MaterNum).TausBackBeamDiffVis = MaterialProps(14);
-            Material(MaterNum).ReflFrontBeamDiffVis = MaterialProps(15);
-            Material(MaterNum).ReflBackBeamDiffVis = MaterialProps(16);
-            Material(MaterNum).TausDiffDiff = MaterialProps(17);
-            Material(MaterNum).ReflFrontDiffDiff = MaterialProps(18);
-            Material(MaterNum).ReflBackDiffDiff = MaterialProps(19);
-            Material(MaterNum).TausDiffDiffVis = MaterialProps(20);
-            Material(MaterNum).ReflFrontDiffDiffVis = MaterialProps(21);
-            Material(MaterNum).ReflBackDiffDiffVis = MaterialProps(22);
-            Material(MaterNum).TausThermal = MaterialProps(23);
-            Material(MaterNum).EmissThermalFront = MaterialProps(24);
-            Material(MaterNum).EmissThermalBack = MaterialProps(25);
-            Material(MaterNum).Resistance = MaterialProps(26);
-            if (Material(MaterNum).Resistance <= 0.0) Material(MaterNum).Resistance = 0.158; // equivalent to single pane of 1/4" inch standard glass
+            dataMaterial.Material(MaterNum).TausFrontBeamBeam = MaterialProps(1);
+            dataMaterial.Material(MaterNum).TausBackBeamBeam = MaterialProps(2);
+            dataMaterial.Material(MaterNum).ReflFrontBeamBeam = MaterialProps(3);
+            dataMaterial.Material(MaterNum).ReflBackBeamBeam = MaterialProps(4);
+            dataMaterial.Material(MaterNum).TausFrontBeamBeamVis = MaterialProps(5);
+            dataMaterial.Material(MaterNum).TausBackBeamBeamVis = MaterialProps(6);
+            dataMaterial.Material(MaterNum).ReflFrontBeamBeamVis = MaterialProps(7);
+            dataMaterial.Material(MaterNum).ReflBackBeamBeamVis = MaterialProps(8);
+            dataMaterial.Material(MaterNum).TausFrontBeamDiff = MaterialProps(9);
+            dataMaterial.Material(MaterNum).TausBackBeamDiff = MaterialProps(10);
+            dataMaterial.Material(MaterNum).ReflFrontBeamDiff = MaterialProps(11);
+            dataMaterial.Material(MaterNum).ReflBackBeamDiff = MaterialProps(12);
+            dataMaterial.Material(MaterNum).TausFrontBeamDiffVis = MaterialProps(13);
+            dataMaterial.Material(MaterNum).TausBackBeamDiffVis = MaterialProps(14);
+            dataMaterial.Material(MaterNum).ReflFrontBeamDiffVis = MaterialProps(15);
+            dataMaterial.Material(MaterNum).ReflBackBeamDiffVis = MaterialProps(16);
+            dataMaterial.Material(MaterNum).TausDiffDiff = MaterialProps(17);
+            dataMaterial.Material(MaterNum).ReflFrontDiffDiff = MaterialProps(18);
+            dataMaterial.Material(MaterNum).ReflBackDiffDiff = MaterialProps(19);
+            dataMaterial.Material(MaterNum).TausDiffDiffVis = MaterialProps(20);
+            dataMaterial.Material(MaterNum).ReflFrontDiffDiffVis = MaterialProps(21);
+            dataMaterial.Material(MaterNum).ReflBackDiffDiffVis = MaterialProps(22);
+            dataMaterial.Material(MaterNum).TausThermal = MaterialProps(23);
+            dataMaterial.Material(MaterNum).EmissThermalFront = MaterialProps(24);
+            dataMaterial.Material(MaterNum).EmissThermalBack = MaterialProps(25);
+            dataMaterial.Material(MaterNum).Resistance = MaterialProps(26);
+            if (dataMaterial.Material(MaterNum).Resistance <= 0.0) dataMaterial.Material(MaterNum).Resistance = 0.158; // equivalent to single pane of 1/4" inch standard glass
             // Assumes thermal emissivity is the same as thermal absorptance
-            Material(MaterNum).AbsorpThermalFront = Material(MaterNum).EmissThermalFront;
-            Material(MaterNum).AbsorpThermalBack = Material(MaterNum).EmissThermalBack;
-            Material(MaterNum).TransThermal = Material(MaterNum).TausThermal;
+            dataMaterial.Material(MaterNum).AbsorpThermalFront = dataMaterial.Material(MaterNum).EmissThermalFront;
+            dataMaterial.Material(MaterNum).AbsorpThermalBack = dataMaterial.Material(MaterNum).EmissThermalBack;
+            dataMaterial.Material(MaterNum).TransThermal = dataMaterial.Material(MaterNum).TausThermal;
 
-            if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) Material(MaterNum).GlassSpectralDataPtr = 0;
+            if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) dataMaterial.Material(MaterNum).GlassSpectralDataPtr = 0;
 
-            // IF(Material(MaterNum)%GlassSpectralDataPtr == 0 .AND. UtilityRoutines::SameString(MaterialNames(2),'Spectral')) THEN
+            // IF(dataMaterial.Material(MaterNum)%GlassSpectralDataPtr == 0 .AND. UtilityRoutines::SameString(MaterialNames(2),'Spectral')) THEN
             //  ErrorsFound = .TRUE.
-            //  CALL ShowSevereError(TRIM(CurrentModuleObject)//'="'//Trim(Material(MaterNum)%Name)// &
+            //  CALL ShowSevereError(TRIM(CurrentModuleObject)//'="'//Trim(dataMaterial.Material(MaterNum)%Name)// &
             //        '" has '//TRIM(cAlphaFieldNames(2))//' = Spectral but has no matching MaterialProperty:GlazingSpectralData set')
             //  IF (lAlphaFieldBlanks(3)) THEN
             //    CALL ShowContinueError('...'//TRIM(cAlphaFieldNames(3))//' is blank.')
@@ -2388,7 +2390,7 @@ namespace HeatBalanceManager {
 
             if (!UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) {
                 ErrorsFound = true;
-                ShowSevereError(CurrentModuleObject + "=\"" + Material(MaterNum).Name + "\", invalid specification.");
+                ShowSevereError(CurrentModuleObject + "=\"" + dataMaterial.Material(MaterNum).Name + "\", invalid specification.");
                 ShowContinueError(cAlphaFieldNames(2) + " must be SpectralAverage, value=" + MaterialNames(2));
             }
 
@@ -2418,41 +2420,41 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = WindowGas;
-            Material(MaterNum).GasType(1) = -1;
-            Material(MaterNum).NumberOfGasesInMixture = 1;
-            Material(MaterNum).GasFract(1) = 1.0;
+            dataMaterial.Material(MaterNum).Group = WindowGas;
+            dataMaterial.Material(MaterNum).GasType(1) = -1;
+            dataMaterial.Material(MaterNum).NumberOfGasesInMixture = 1;
+            dataMaterial.Material(MaterNum).GasFract(1) = 1.0;
 
             // Load the material derived type from the input data.
 
-            Material(MaterNum).Name = MaterialNames(1);
-            Material(MaterNum).NumberOfGasesInMixture = 1;
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).NumberOfGasesInMixture = 1;
             TypeOfGas = MaterialNames(2);
-            if (TypeOfGas == "AIR") Material(MaterNum).GasType(1) = 1;
-            if (TypeOfGas == "ARGON") Material(MaterNum).GasType(1) = 2;
-            if (TypeOfGas == "KRYPTON") Material(MaterNum).GasType(1) = 3;
-            if (TypeOfGas == "XENON") Material(MaterNum).GasType(1) = 4;
-            if (TypeOfGas == "CUSTOM") Material(MaterNum).GasType(1) = 0;
+            if (TypeOfGas == "AIR") dataMaterial.Material(MaterNum).GasType(1) = 1;
+            if (TypeOfGas == "ARGON") dataMaterial.Material(MaterNum).GasType(1) = 2;
+            if (TypeOfGas == "KRYPTON") dataMaterial.Material(MaterNum).GasType(1) = 3;
+            if (TypeOfGas == "XENON") dataMaterial.Material(MaterNum).GasType(1) = 4;
+            if (TypeOfGas == "CUSTOM") dataMaterial.Material(MaterNum).GasType(1) = 0;
 
-            if (Material(MaterNum).GasType(1) == -1) {
+            if (dataMaterial.Material(MaterNum).GasType(1) == -1) {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(cAlphaFieldNames(2) + " entered value=\"" + TypeOfGas + "\" should be Air, Argon, Krypton, Xenon or Custom.");
             }
 
-            Material(MaterNum).Roughness = MediumRough;
+            dataMaterial.Material(MaterNum).Roughness = MediumRough;
 
-            Material(MaterNum).Thickness = MaterialProps(1);
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Thickness = MaterialProps(1);
+            dataMaterial.Material(MaterNum).ROnly = true;
 
-            GasType = Material(MaterNum).GasType(1);
+            GasType = dataMaterial.Material(MaterNum).GasType(1);
             if (GasType >= 1 && GasType <= 4) {
-                Material(MaterNum).GasWght(1) = GasWght(GasType);
-                Material(MaterNum).GasSpecHeatRatio(1) = GasSpecificHeatRatio(GasType);
+                dataMaterial.Material(MaterNum).GasWght(1) = GasWght(GasType);
+                dataMaterial.Material(MaterNum).GasSpecHeatRatio(1) = GasSpecificHeatRatio(GasType);
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    Material(MaterNum).GasCon(ICoeff, 1) = GasCoeffsCon(ICoeff, GasType);
-                    Material(MaterNum).GasVis(ICoeff, 1) = GasCoeffsVis(ICoeff, GasType);
-                    Material(MaterNum).GasCp(ICoeff, 1) = GasCoeffsCp(ICoeff, GasType);
+                    dataMaterial.Material(MaterNum).GasCon(ICoeff, 1) = GasCoeffsCon(ICoeff, GasType);
+                    dataMaterial.Material(MaterNum).GasVis(ICoeff, 1) = GasCoeffsVis(ICoeff, GasType);
+                    dataMaterial.Material(MaterNum).GasCp(ICoeff, 1) = GasCoeffsCp(ICoeff, GasType);
                 }
             }
 
@@ -2460,31 +2462,31 @@ namespace HeatBalanceManager {
 
             if (GasType == 0) {
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    Material(MaterNum).GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
-                    Material(MaterNum).GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
-                    Material(MaterNum).GasCp(ICoeff, 1) = MaterialProps(7 + ICoeff);
+                    dataMaterial.Material(MaterNum).GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
+                    dataMaterial.Material(MaterNum).GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
+                    dataMaterial.Material(MaterNum).GasCp(ICoeff, 1) = MaterialProps(7 + ICoeff);
                 }
-                Material(MaterNum).GasWght(1) = MaterialProps(11);
-                Material(MaterNum).GasSpecHeatRatio(1) = MaterialProps(12);
+                dataMaterial.Material(MaterNum).GasWght(1) = MaterialProps(11);
+                dataMaterial.Material(MaterNum).GasSpecHeatRatio(1) = MaterialProps(12);
 
                 // Check for errors in custom gas properties
-                //      IF(Material(MaterNum)%GasCon(1,1) <= 0.0) THEN
+                //      IF(dataMaterial.Material(MaterNum)%GasCon(1,1) <= 0.0) THEN
                 //        ErrorsFound = .TRUE.
                 //        CALL ShowSevereError('Conductivity Coefficient A for custom window gas='&
                 //                 //TRIM(MaterialNames(1))//' should be > 0.')
                 //      END IF
 
-                if (Material(MaterNum).GasVis(1, 1) <= 0.0) {
+                if (dataMaterial.Material(MaterNum).GasVis(1, 1) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                     ShowContinueError(cNumericFieldNames(3 + ICoeff) + " not > 0.0");
                 }
-                if (Material(MaterNum).GasCp(1, 1) <= 0.0) {
+                if (dataMaterial.Material(MaterNum).GasCp(1, 1) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                     ShowContinueError(cNumericFieldNames(5 + ICoeff) + " not > 0.0");
                 }
-                if (Material(MaterNum).GasWght(1) <= 0.0) {
+                if (dataMaterial.Material(MaterNum).GasWght(1) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                     ShowContinueError(cNumericFieldNames(8) + " not > 0.0");
@@ -2493,9 +2495,9 @@ namespace HeatBalanceManager {
 
             // Nominal resistance of gap at room temperature
             if (!ErrorsFound) {
-                DenomRGas = (Material(MaterNum).GasCon(1, 1) + Material(MaterNum).GasCon(2, 1) * 300.0 + Material(MaterNum).GasCon(3, 1) * 90000.0);
+                DenomRGas = (dataMaterial.Material(MaterNum).GasCon(1, 1) + dataMaterial.Material(MaterNum).GasCon(2, 1) * 300.0 + dataMaterial.Material(MaterNum).GasCon(3, 1) * 90000.0);
                 if (DenomRGas > 0.0) {
-                    NominalR(MaterNum) = Material(MaterNum).Thickness / DenomRGas;
+                    NominalR(MaterNum) = dataMaterial.Material(MaterNum).Thickness / DenomRGas;
                 } else {
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                     ShowContinueError("Nominal resistance of gap at room temperature calculated at a negative Conductivity=[" +
@@ -2529,82 +2531,82 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = GapEquivalentLayer;
-            Material(MaterNum).GasType(1) = -1;
-            Material(MaterNum).NumberOfGasesInMixture = 1;
-            Material(MaterNum).GasFract(1) = 1.0;
+            dataMaterial.Material(MaterNum).Group = GapEquivalentLayer;
+            dataMaterial.Material(MaterNum).GasType(1) = -1;
+            dataMaterial.Material(MaterNum).NumberOfGasesInMixture = 1;
+            dataMaterial.Material(MaterNum).GasFract(1) = 1.0;
 
             // Load the material derived type from the input data.
 
-            Material(MaterNum).Name = MaterialNames(1);
-            Material(MaterNum).NumberOfGasesInMixture = 1;
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).NumberOfGasesInMixture = 1;
             TypeOfGas = MaterialNames(2);
-            Material(MaterNum).GasName = TypeOfGas;
-            if (TypeOfGas == "AIR") Material(MaterNum).GasType(1) = 1;
-            if (TypeOfGas == "ARGON") Material(MaterNum).GasType(1) = 2;
-            if (TypeOfGas == "KRYPTON") Material(MaterNum).GasType(1) = 3;
-            if (TypeOfGas == "XENON") Material(MaterNum).GasType(1) = 4;
-            if (TypeOfGas == "CUSTOM") Material(MaterNum).GasType(1) = 0;
+            dataMaterial.Material(MaterNum).GasName = TypeOfGas;
+            if (TypeOfGas == "AIR") dataMaterial.Material(MaterNum).GasType(1) = 1;
+            if (TypeOfGas == "ARGON") dataMaterial.Material(MaterNum).GasType(1) = 2;
+            if (TypeOfGas == "KRYPTON") dataMaterial.Material(MaterNum).GasType(1) = 3;
+            if (TypeOfGas == "XENON") dataMaterial.Material(MaterNum).GasType(1) = 4;
+            if (TypeOfGas == "CUSTOM") dataMaterial.Material(MaterNum).GasType(1) = 0;
 
-            if (Material(MaterNum).GasType(1) == -1) {
+            if (dataMaterial.Material(MaterNum).GasType(1) == -1) {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(cAlphaFieldNames(2) + " entered value=\"" + TypeOfGas + "\" should be Air, Argon, Krypton, Xenon");
             }
 
-            Material(MaterNum).Roughness = MediumRough;
+            dataMaterial.Material(MaterNum).Roughness = MediumRough;
 
-            Material(MaterNum).Thickness = MaterialProps(1);
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Thickness = MaterialProps(1);
+            dataMaterial.Material(MaterNum).ROnly = true;
 
-            GasType = Material(MaterNum).GasType(1);
+            GasType = dataMaterial.Material(MaterNum).GasType(1);
             if (GasType >= 1 && GasType <= 4) {
-                Material(MaterNum).GasWght(1) = GasWght(GasType);
-                Material(MaterNum).GasSpecHeatRatio(1) = GasSpecificHeatRatio(GasType);
+                dataMaterial.Material(MaterNum).GasWght(1) = GasWght(GasType);
+                dataMaterial.Material(MaterNum).GasSpecHeatRatio(1) = GasSpecificHeatRatio(GasType);
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    Material(MaterNum).GasCon(ICoeff, 1) = GasCoeffsCon(ICoeff, GasType);
-                    Material(MaterNum).GasVis(ICoeff, 1) = GasCoeffsVis(ICoeff, GasType);
-                    Material(MaterNum).GasCp(ICoeff, 1) = GasCoeffsCp(ICoeff, GasType);
+                    dataMaterial.Material(MaterNum).GasCon(ICoeff, 1) = GasCoeffsCon(ICoeff, GasType);
+                    dataMaterial.Material(MaterNum).GasVis(ICoeff, 1) = GasCoeffsVis(ICoeff, GasType);
+                    dataMaterial.Material(MaterNum).GasCp(ICoeff, 1) = GasCoeffsCp(ICoeff, GasType);
                 }
             }
 
             if (!lAlphaFieldBlanks(2)) {
                 // Get gap vent type
                 if (UtilityRoutines::SameString(MaterialNames(3), "Sealed")) {
-                    Material(MaterNum).GapVentType = 1;
+                    dataMaterial.Material(MaterNum).GapVentType = 1;
                 } else if (UtilityRoutines::SameString(MaterialNames(3), "VentedIndoor")) {
-                    Material(MaterNum).GapVentType = 2;
+                    dataMaterial.Material(MaterNum).GapVentType = 2;
                 } else if (UtilityRoutines::SameString(MaterialNames(3), "VentedOutdoor")) {
-                    Material(MaterNum).GapVentType = 3;
+                    dataMaterial.Material(MaterNum).GapVentType = 3;
                 } else {
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal gap vent type.");
                     ShowContinueError("Gap vent type allowed are Sealed, VentedIndoor, or VentedOutdoor." + cAlphaFieldNames(3) +
                                       " entered =" + MaterialNames(3));
-                    Material(MaterNum).GapVentType = 1;
+                    dataMaterial.Material(MaterNum).GapVentType = 1;
                     // ErrorsFound=.TRUE.
                 }
             }
 
             if (GasType == 0) {
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    Material(MaterNum).GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
-                    Material(MaterNum).GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
-                    Material(MaterNum).GasCp(ICoeff, 1) = MaterialProps(7 + ICoeff);
+                    dataMaterial.Material(MaterNum).GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
+                    dataMaterial.Material(MaterNum).GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
+                    dataMaterial.Material(MaterNum).GasCp(ICoeff, 1) = MaterialProps(7 + ICoeff);
                 }
-                Material(MaterNum).GasWght(1) = MaterialProps(11);
-                Material(MaterNum).GasSpecHeatRatio(1) = MaterialProps(12);
+                dataMaterial.Material(MaterNum).GasWght(1) = MaterialProps(11);
+                dataMaterial.Material(MaterNum).GasSpecHeatRatio(1) = MaterialProps(12);
 
-                if (Material(MaterNum).GasVis(1, 1) <= 0.0) {
+                if (dataMaterial.Material(MaterNum).GasVis(1, 1) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                     ShowContinueError(cNumericFieldNames(5) + " not > 0.0");
                 }
-                if (Material(MaterNum).GasCp(1, 1) <= 0.0) {
+                if (dataMaterial.Material(MaterNum).GasCp(1, 1) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                     ShowContinueError(cNumericFieldNames(8) + " not > 0.0");
                 }
-                if (Material(MaterNum).GasWght(1) <= 0.0) {
+                if (dataMaterial.Material(MaterNum).GasWght(1) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                     ShowContinueError(cNumericFieldNames(11) + " not > 0.0");
@@ -2613,9 +2615,9 @@ namespace HeatBalanceManager {
 
             // Nominal resistance of gap at room temperature
             if (!ErrorsFound) {
-                DenomRGas = (Material(MaterNum).GasCon(1, 1) + Material(MaterNum).GasCon(2, 1) * 300.0 + Material(MaterNum).GasCon(3, 1) * 90000.0);
+                DenomRGas = (dataMaterial.Material(MaterNum).GasCon(1, 1) + dataMaterial.Material(MaterNum).GasCon(2, 1) * 300.0 + dataMaterial.Material(MaterNum).GasCon(3, 1) * 90000.0);
                 if (DenomRGas > 0.0) {
-                    NominalR(MaterNum) = Material(MaterNum).Thickness / DenomRGas;
+                    NominalR(MaterNum) = dataMaterial.Material(MaterNum).Thickness / DenomRGas;
                 } else {
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                     ShowContinueError("Nominal resistance of gap at room temperature calculated at a negative Conductivity=[" +
@@ -2648,53 +2650,53 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = WindowGasMixture;
-            Material(MaterNum).GasType = -1;
+            dataMaterial.Material(MaterNum).Group = WindowGasMixture;
+            dataMaterial.Material(MaterNum).GasType = -1;
 
             // Load the material derived type from the input data.
 
-            Material(MaterNum).Name = cAlphaArgs(1);
+            dataMaterial.Material(MaterNum).Name = cAlphaArgs(1);
             NumGases = MaterialProps(2);
-            Material(MaterNum).NumberOfGasesInMixture = NumGases;
+            dataMaterial.Material(MaterNum).NumberOfGasesInMixture = NumGases;
             for (NumGas = 1; NumGas <= NumGases; ++NumGas) {
                 TypeOfGas = cAlphaArgs(1 + NumGas);
-                if (TypeOfGas == "AIR") Material(MaterNum).GasType(NumGas) = 1;
-                if (TypeOfGas == "ARGON") Material(MaterNum).GasType(NumGas) = 2;
-                if (TypeOfGas == "KRYPTON") Material(MaterNum).GasType(NumGas) = 3;
-                if (TypeOfGas == "XENON") Material(MaterNum).GasType(NumGas) = 4;
-                if (Material(MaterNum).GasType(NumGas) == -1) {
+                if (TypeOfGas == "AIR") dataMaterial.Material(MaterNum).GasType(NumGas) = 1;
+                if (TypeOfGas == "ARGON") dataMaterial.Material(MaterNum).GasType(NumGas) = 2;
+                if (TypeOfGas == "KRYPTON") dataMaterial.Material(MaterNum).GasType(NumGas) = 3;
+                if (TypeOfGas == "XENON") dataMaterial.Material(MaterNum).GasType(NumGas) = 4;
+                if (dataMaterial.Material(MaterNum).GasType(NumGas) == -1) {
                     ErrorsFound = true;
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", Illegal value.");
                     ShowContinueError(cAlphaFieldNames(2 + NumGas) + " entered value=\"" + TypeOfGas + "\" should be Air, Argon, Krypton, or Xenon.");
                 }
             }
 
-            Material(MaterNum).Roughness = MediumRough; // Unused
+            dataMaterial.Material(MaterNum).Roughness = MediumRough; // Unused
 
-            Material(MaterNum).Thickness = MaterialProps(1);
-            if (Material(MaterNum).Thickness <= 0.0) {
+            dataMaterial.Material(MaterNum).Thickness = MaterialProps(1);
+            if (dataMaterial.Material(MaterNum).Thickness <= 0.0) {
                 ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", Illegal value.");
                 ShowContinueError(cNumericFieldNames(1) + " must be greater than 0.");
             }
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).ROnly = true;
 
             for (NumGas = 1; NumGas <= NumGases; ++NumGas) {
-                GasType = Material(MaterNum).GasType(NumGas);
+                GasType = dataMaterial.Material(MaterNum).GasType(NumGas);
                 if (GasType >= 1 && GasType <= 4) {
-                    Material(MaterNum).GasWght(NumGas) = GasWght(GasType);
-                    Material(MaterNum).GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio(GasType);
-                    Material(MaterNum).GasFract(NumGas) = MaterialProps(2 + NumGas);
+                    dataMaterial.Material(MaterNum).GasWght(NumGas) = GasWght(GasType);
+                    dataMaterial.Material(MaterNum).GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio(GasType);
+                    dataMaterial.Material(MaterNum).GasFract(NumGas) = MaterialProps(2 + NumGas);
                     for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                        Material(MaterNum).GasCon(ICoeff, NumGas) = GasCoeffsCon(ICoeff, GasType);
-                        Material(MaterNum).GasVis(ICoeff, NumGas) = GasCoeffsVis(ICoeff, GasType);
-                        Material(MaterNum).GasCp(ICoeff, NumGas) = GasCoeffsCp(ICoeff, GasType);
+                        dataMaterial.Material(MaterNum).GasCon(ICoeff, NumGas) = GasCoeffsCon(ICoeff, GasType);
+                        dataMaterial.Material(MaterNum).GasVis(ICoeff, NumGas) = GasCoeffsVis(ICoeff, GasType);
+                        dataMaterial.Material(MaterNum).GasCp(ICoeff, NumGas) = GasCoeffsCp(ICoeff, GasType);
                     }
                 }
             }
 
             // Nominal resistance of gap at room temperature (based on first gas in mixture)
-            NominalR(MaterNum) = Material(MaterNum).Thickness / (Material(MaterNum).GasCon(1, 1) + Material(MaterNum).GasCon(2, 1) * 300.0 +
-                                                                 Material(MaterNum).GasCon(3, 1) * 90000.0);
+            NominalR(MaterNum) = dataMaterial.Material(MaterNum).Thickness / (dataMaterial.Material(MaterNum).GasCon(1, 1) + dataMaterial.Material(MaterNum).GasCon(2, 1) * 300.0 +
+                                                                 dataMaterial.Material(MaterNum).GasCon(3, 1) * 90000.0);
         }
 
         // Window Shade Materials
@@ -2721,33 +2723,33 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = Shade;
+            dataMaterial.Material(MaterNum).Group = Shade;
 
             // Load the material derived type from the input data.
 
-            Material(MaterNum).Name = MaterialNames(1);
-            Material(MaterNum).Roughness = MediumRough;
-            Material(MaterNum).Trans = MaterialProps(1);
-            Material(MaterNum).ReflectShade = MaterialProps(2);
-            Material(MaterNum).TransVis = MaterialProps(3);
-            Material(MaterNum).ReflectShadeVis = MaterialProps(4);
-            Material(MaterNum).AbsorpThermal = MaterialProps(5);
-            Material(MaterNum).AbsorpThermalInput = MaterialProps(5);
-            Material(MaterNum).TransThermal = MaterialProps(6);
-            Material(MaterNum).Thickness = MaterialProps(7);
-            Material(MaterNum).Conductivity = MaterialProps(8);
-            Material(MaterNum).AbsorpSolar = max(0.0, 1.0 - Material(MaterNum).Trans - Material(MaterNum).ReflectShade);
-            Material(MaterNum).AbsorpSolarInput = Material(MaterNum).AbsorpSolar;
-            Material(MaterNum).WinShadeToGlassDist = MaterialProps(9);
-            Material(MaterNum).WinShadeTopOpeningMult = MaterialProps(10);
-            Material(MaterNum).WinShadeBottomOpeningMult = MaterialProps(11);
-            Material(MaterNum).WinShadeLeftOpeningMult = MaterialProps(12);
-            Material(MaterNum).WinShadeRightOpeningMult = MaterialProps(13);
-            Material(MaterNum).WinShadeAirFlowPermeability = MaterialProps(14);
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Roughness = MediumRough;
+            dataMaterial.Material(MaterNum).Trans = MaterialProps(1);
+            dataMaterial.Material(MaterNum).ReflectShade = MaterialProps(2);
+            dataMaterial.Material(MaterNum).TransVis = MaterialProps(3);
+            dataMaterial.Material(MaterNum).ReflectShadeVis = MaterialProps(4);
+            dataMaterial.Material(MaterNum).AbsorpThermal = MaterialProps(5);
+            dataMaterial.Material(MaterNum).AbsorpThermalInput = MaterialProps(5);
+            dataMaterial.Material(MaterNum).TransThermal = MaterialProps(6);
+            dataMaterial.Material(MaterNum).Thickness = MaterialProps(7);
+            dataMaterial.Material(MaterNum).Conductivity = MaterialProps(8);
+            dataMaterial.Material(MaterNum).AbsorpSolar = max(0.0, 1.0 - dataMaterial.Material(MaterNum).Trans - dataMaterial.Material(MaterNum).ReflectShade);
+            dataMaterial.Material(MaterNum).AbsorpSolarInput = dataMaterial.Material(MaterNum).AbsorpSolar;
+            dataMaterial.Material(MaterNum).WinShadeToGlassDist = MaterialProps(9);
+            dataMaterial.Material(MaterNum).WinShadeTopOpeningMult = MaterialProps(10);
+            dataMaterial.Material(MaterNum).WinShadeBottomOpeningMult = MaterialProps(11);
+            dataMaterial.Material(MaterNum).WinShadeLeftOpeningMult = MaterialProps(12);
+            dataMaterial.Material(MaterNum).WinShadeRightOpeningMult = MaterialProps(13);
+            dataMaterial.Material(MaterNum).WinShadeAirFlowPermeability = MaterialProps(14);
+            dataMaterial.Material(MaterNum).ROnly = true;
 
-            if (Material(MaterNum).Conductivity > 0.0) {
-                NominalR(MaterNum) = Material(MaterNum).Thickness / Material(MaterNum).Conductivity;
+            if (dataMaterial.Material(MaterNum).Conductivity > 0.0) {
+                NominalR(MaterNum) = dataMaterial.Material(MaterNum).Thickness / dataMaterial.Material(MaterNum).Conductivity;
             } else {
                 NominalR(MaterNum) = 1.0;
             }
@@ -2797,29 +2799,29 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = ShadeEquivalentLayer;
+            dataMaterial.Material(MaterNum).Group = ShadeEquivalentLayer;
 
-            Material(MaterNum).Name = MaterialNames(1);
-            Material(MaterNum).Roughness = MediumRough;
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Roughness = MediumRough;
+            dataMaterial.Material(MaterNum).ROnly = true;
 
             //  Front side and back side have the same beam-Beam Transmittance
-            Material(MaterNum).TausFrontBeamBeam = MaterialProps(1);
-            Material(MaterNum).TausBackBeamBeam = MaterialProps(1);
-            Material(MaterNum).TausFrontBeamDiff = MaterialProps(2);
-            Material(MaterNum).TausBackBeamDiff = MaterialProps(3);
-            Material(MaterNum).ReflFrontBeamDiff = MaterialProps(4);
-            Material(MaterNum).ReflBackBeamDiff = MaterialProps(5);
-            Material(MaterNum).TausFrontBeamBeamVis = MaterialProps(6);
-            Material(MaterNum).TausFrontBeamDiffVis = MaterialProps(7);
-            Material(MaterNum).ReflFrontBeamDiffVis = MaterialProps(8);
-            Material(MaterNum).TausThermal = MaterialProps(9);
-            Material(MaterNum).EmissThermalFront = MaterialProps(10);
-            Material(MaterNum).EmissThermalBack = MaterialProps(11);
+            dataMaterial.Material(MaterNum).TausFrontBeamBeam = MaterialProps(1);
+            dataMaterial.Material(MaterNum).TausBackBeamBeam = MaterialProps(1);
+            dataMaterial.Material(MaterNum).TausFrontBeamDiff = MaterialProps(2);
+            dataMaterial.Material(MaterNum).TausBackBeamDiff = MaterialProps(3);
+            dataMaterial.Material(MaterNum).ReflFrontBeamDiff = MaterialProps(4);
+            dataMaterial.Material(MaterNum).ReflBackBeamDiff = MaterialProps(5);
+            dataMaterial.Material(MaterNum).TausFrontBeamBeamVis = MaterialProps(6);
+            dataMaterial.Material(MaterNum).TausFrontBeamDiffVis = MaterialProps(7);
+            dataMaterial.Material(MaterNum).ReflFrontBeamDiffVis = MaterialProps(8);
+            dataMaterial.Material(MaterNum).TausThermal = MaterialProps(9);
+            dataMaterial.Material(MaterNum).EmissThermalFront = MaterialProps(10);
+            dataMaterial.Material(MaterNum).EmissThermalBack = MaterialProps(11);
             // Assumes thermal emissivity is the same as thermal absorptance
-            Material(MaterNum).AbsorpThermalFront = Material(MaterNum).EmissThermalFront;
-            Material(MaterNum).AbsorpThermalBack = Material(MaterNum).EmissThermalBack;
-            Material(MaterNum).TransThermal = Material(MaterNum).TausThermal;
+            dataMaterial.Material(MaterNum).AbsorpThermalFront = dataMaterial.Material(MaterNum).EmissThermalFront;
+            dataMaterial.Material(MaterNum).AbsorpThermalBack = dataMaterial.Material(MaterNum).EmissThermalBack;
+            dataMaterial.Material(MaterNum).TransThermal = dataMaterial.Material(MaterNum).TausThermal;
 
             if (MaterialProps(1) + MaterialProps(2) + MaterialProps(4) >= 1.0) {
                 ErrorsFound = true;
@@ -2875,40 +2877,40 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = DrapeEquivalentLayer;
+            dataMaterial.Material(MaterNum).Group = DrapeEquivalentLayer;
 
-            Material(MaterNum).Name = MaterialNames(1);
-            Material(MaterNum).Roughness = MediumRough;
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Roughness = MediumRough;
+            dataMaterial.Material(MaterNum).ROnly = true;
 
             //  Front side and back side have the same properties
-            Material(MaterNum).TausFrontBeamBeam = MaterialProps(1);
-            Material(MaterNum).TausBackBeamBeam = MaterialProps(1);
+            dataMaterial.Material(MaterNum).TausFrontBeamBeam = MaterialProps(1);
+            dataMaterial.Material(MaterNum).TausBackBeamBeam = MaterialProps(1);
 
-            Material(MaterNum).TausFrontBeamDiff = MaterialProps(2);
-            Material(MaterNum).TausBackBeamDiff = MaterialProps(3);
+            dataMaterial.Material(MaterNum).TausFrontBeamDiff = MaterialProps(2);
+            dataMaterial.Material(MaterNum).TausBackBeamDiff = MaterialProps(3);
 
-            Material(MaterNum).ReflFrontBeamDiff = MaterialProps(4);
-            Material(MaterNum).ReflBackBeamDiff = MaterialProps(5);
-            Material(MaterNum).TausFrontBeamBeamVis = MaterialProps(6);
-            Material(MaterNum).TausFrontBeamDiffVis = MaterialProps(7);
-            Material(MaterNum).ReflFrontBeamDiffVis = MaterialProps(8);
-            Material(MaterNum).TausThermal = MaterialProps(9);
-            Material(MaterNum).EmissThermalFront = MaterialProps(10);
-            Material(MaterNum).EmissThermalBack = MaterialProps(11);
+            dataMaterial.Material(MaterNum).ReflFrontBeamDiff = MaterialProps(4);
+            dataMaterial.Material(MaterNum).ReflBackBeamDiff = MaterialProps(5);
+            dataMaterial.Material(MaterNum).TausFrontBeamBeamVis = MaterialProps(6);
+            dataMaterial.Material(MaterNum).TausFrontBeamDiffVis = MaterialProps(7);
+            dataMaterial.Material(MaterNum).ReflFrontBeamDiffVis = MaterialProps(8);
+            dataMaterial.Material(MaterNum).TausThermal = MaterialProps(9);
+            dataMaterial.Material(MaterNum).EmissThermalFront = MaterialProps(10);
+            dataMaterial.Material(MaterNum).EmissThermalBack = MaterialProps(11);
             // Assumes thermal emissivity is the same as thermal absorptance
-            Material(MaterNum).AbsorpThermalFront = Material(MaterNum).EmissThermalFront;
-            Material(MaterNum).AbsorpThermalBack = Material(MaterNum).EmissThermalBack;
-            Material(MaterNum).TransThermal = Material(MaterNum).TausThermal;
+            dataMaterial.Material(MaterNum).AbsorpThermalFront = dataMaterial.Material(MaterNum).EmissThermalFront;
+            dataMaterial.Material(MaterNum).AbsorpThermalBack = dataMaterial.Material(MaterNum).EmissThermalBack;
+            dataMaterial.Material(MaterNum).TransThermal = dataMaterial.Material(MaterNum).TausThermal;
 
             if (!lNumericFieldBlanks(12) && !lNumericFieldBlanks(13)) {
                 if (MaterialProps(12) != 0.0 && MaterialProps(13) != 0.0) {
-                    Material(MaterNum).PleatedDrapeWidth = MaterialProps(12);
-                    Material(MaterNum).PleatedDrapeLength = MaterialProps(13);
-                    Material(MaterNum).ISPleatedDrape = true;
+                    dataMaterial.Material(MaterNum).PleatedDrapeWidth = MaterialProps(12);
+                    dataMaterial.Material(MaterNum).PleatedDrapeLength = MaterialProps(13);
+                    dataMaterial.Material(MaterNum).ISPleatedDrape = true;
                 }
             } else {
-                Material(MaterNum).ISPleatedDrape = false;
+                dataMaterial.Material(MaterNum).ISPleatedDrape = false;
             }
             if (MaterialProps(1) + MaterialProps(2) + MaterialProps(4) >= 1.0) {
                 ErrorsFound = true;
@@ -2952,12 +2954,12 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = Screen;
+            dataMaterial.Material(MaterNum).Group = Screen;
 
             // Load the material derived type from the input data.
 
-            Material(MaterNum).Name = MaterialNames(1);
-            Material(MaterNum).ReflectanceModeling = MaterialNames(2);
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).ReflectanceModeling = MaterialNames(2);
             if (!(UtilityRoutines::SameString(MaterialNames(2), "DoNotModel") || UtilityRoutines::SameString(MaterialNames(2), "ModelAsDirectBeam") ||
                   UtilityRoutines::SameString(MaterialNames(2), "ModelAsDiffuse"))) {
                 ErrorsFound = true;
@@ -2965,38 +2967,38 @@ namespace HeatBalanceManager {
                 ShowContinueError(cAlphaFieldNames(2) + "=\"" + MaterialNames(2) +
                                   "\", must be one of DoNotModel, ModelAsDirectBeam or ModelAsDiffuse.");
             }
-            Material(MaterNum).Roughness = MediumRough;
-            Material(MaterNum).ReflectShade = MaterialProps(1);
-            if (Material(MaterNum).ReflectShade < 0.0 || Material(MaterNum).ReflectShade > 1.0) {
+            dataMaterial.Material(MaterNum).Roughness = MediumRough;
+            dataMaterial.Material(MaterNum).ReflectShade = MaterialProps(1);
+            if (dataMaterial.Material(MaterNum).ReflectShade < 0.0 || dataMaterial.Material(MaterNum).ReflectShade > 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(cNumericFieldNames(1) + " must be >= 0 and <= 1");
             }
-            Material(MaterNum).ReflectShadeVis = MaterialProps(2);
-            if (Material(MaterNum).ReflectShadeVis < 0.0 || Material(MaterNum).ReflectShadeVis > 1.0) {
+            dataMaterial.Material(MaterNum).ReflectShadeVis = MaterialProps(2);
+            if (dataMaterial.Material(MaterNum).ReflectShadeVis < 0.0 || dataMaterial.Material(MaterNum).ReflectShadeVis > 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-                ShowContinueError(cNumericFieldNames(2) + " must be >= 0 and <= 1 for material " + Material(MaterNum).Name + '.');
+                ShowContinueError(cNumericFieldNames(2) + " must be >= 0 and <= 1 for material " + dataMaterial.Material(MaterNum).Name + '.');
             }
-            Material(MaterNum).AbsorpThermal = MaterialProps(3);
-            Material(MaterNum).AbsorpThermalInput = MaterialProps(3);
-            if (Material(MaterNum).AbsorpThermal < 0.0 || Material(MaterNum).AbsorpThermal > 1.0) {
+            dataMaterial.Material(MaterNum).AbsorpThermal = MaterialProps(3);
+            dataMaterial.Material(MaterNum).AbsorpThermalInput = MaterialProps(3);
+            if (dataMaterial.Material(MaterNum).AbsorpThermal < 0.0 || dataMaterial.Material(MaterNum).AbsorpThermal > 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(cNumericFieldNames(3) + " must be >= 0 and <= 1");
             }
-            Material(MaterNum).Conductivity = MaterialProps(4);
-            Material(MaterNum).Thickness = MaterialProps(6); // thickness = diameter
+            dataMaterial.Material(MaterNum).Conductivity = MaterialProps(4);
+            dataMaterial.Material(MaterNum).Thickness = MaterialProps(6); // thickness = diameter
 
             if (MaterialProps(5) > 0.0) {
-                //      SurfaceScreens(ScNum)%ScreenDiameterToSpacingRatio = MaterialProps(6)/MaterialProps(5) or 1-SQRT(Material(MaterNum)%Trans
+                //      SurfaceScreens(ScNum)%ScreenDiameterToSpacingRatio = MaterialProps(6)/MaterialProps(5) or 1-SQRT(dataMaterial.Material(MaterNum)%Trans
                 if (MaterialProps(6) / MaterialProps(5) >= 1.0) {
                     ErrorsFound = true;
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                     ShowContinueError(cNumericFieldNames(6) + " must be less than " + cNumericFieldNames(5));
                 } else {
                     //       Calculate direct normal transmittance (open area fraction)
-                    Material(MaterNum).Trans = pow_2(1.0 - MaterialProps(6) / MaterialProps(5));
+                    dataMaterial.Material(MaterNum).Trans = pow_2(1.0 - MaterialProps(6) / MaterialProps(5));
                 }
             } else {
                 ErrorsFound = true;
@@ -3012,86 +3014,86 @@ namespace HeatBalanceManager {
             }
 
             //   Modify reflectance to account for the open area in the screen assembly
-            Material(MaterNum).ReflectShade *= (1.0 - Material(MaterNum).Trans);
-            Material(MaterNum).ReflectShadeVis *= (1.0 - Material(MaterNum).Trans);
+            dataMaterial.Material(MaterNum).ReflectShade *= (1.0 - dataMaterial.Material(MaterNum).Trans);
+            dataMaterial.Material(MaterNum).ReflectShadeVis *= (1.0 - dataMaterial.Material(MaterNum).Trans);
 
-            Material(MaterNum).WinShadeToGlassDist = MaterialProps(7);
-            if (Material(MaterNum).WinShadeToGlassDist < 0.001 || Material(MaterNum).WinShadeToGlassDist > 1.0) {
+            dataMaterial.Material(MaterNum).WinShadeToGlassDist = MaterialProps(7);
+            if (dataMaterial.Material(MaterNum).WinShadeToGlassDist < 0.001 || dataMaterial.Material(MaterNum).WinShadeToGlassDist > 1.0) {
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(cNumericFieldNames(7) + " must be greater than or equal to 0.001 and less than or equal to 1.");
             }
 
-            Material(MaterNum).WinShadeTopOpeningMult = MaterialProps(8);
-            if (Material(MaterNum).WinShadeTopOpeningMult < 0.0 || Material(MaterNum).WinShadeTopOpeningMult > 1.0) {
+            dataMaterial.Material(MaterNum).WinShadeTopOpeningMult = MaterialProps(8);
+            if (dataMaterial.Material(MaterNum).WinShadeTopOpeningMult < 0.0 || dataMaterial.Material(MaterNum).WinShadeTopOpeningMult > 1.0) {
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(cNumericFieldNames(8) + " must be greater than or equal to 0 and less than or equal to 1.");
             }
 
-            Material(MaterNum).WinShadeBottomOpeningMult = MaterialProps(9);
-            if (Material(MaterNum).WinShadeBottomOpeningMult < 0.0 || Material(MaterNum).WinShadeBottomOpeningMult > 1.0) {
+            dataMaterial.Material(MaterNum).WinShadeBottomOpeningMult = MaterialProps(9);
+            if (dataMaterial.Material(MaterNum).WinShadeBottomOpeningMult < 0.0 || dataMaterial.Material(MaterNum).WinShadeBottomOpeningMult > 1.0) {
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(cNumericFieldNames(9) + " must be greater than or equal to 0 and less than or equal to 1.");
             }
 
-            Material(MaterNum).WinShadeLeftOpeningMult = MaterialProps(10);
-            if (Material(MaterNum).WinShadeLeftOpeningMult < 0.0 || Material(MaterNum).WinShadeLeftOpeningMult > 1.0) {
+            dataMaterial.Material(MaterNum).WinShadeLeftOpeningMult = MaterialProps(10);
+            if (dataMaterial.Material(MaterNum).WinShadeLeftOpeningMult < 0.0 || dataMaterial.Material(MaterNum).WinShadeLeftOpeningMult > 1.0) {
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(cNumericFieldNames(10) + " must be greater than or equal to 0 and less than or equal to 1.");
             }
 
-            Material(MaterNum).WinShadeRightOpeningMult = MaterialProps(11);
-            if (Material(MaterNum).WinShadeRightOpeningMult < 0.0 || Material(MaterNum).WinShadeRightOpeningMult > 1.0) {
+            dataMaterial.Material(MaterNum).WinShadeRightOpeningMult = MaterialProps(11);
+            if (dataMaterial.Material(MaterNum).WinShadeRightOpeningMult < 0.0 || dataMaterial.Material(MaterNum).WinShadeRightOpeningMult > 1.0) {
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(cNumericFieldNames(11) + " must be greater than or equal to 0 and less than or equal to 1.");
             }
 
-            Material(MaterNum).ScreenMapResolution = MaterialProps(12);
-            if (Material(MaterNum).ScreenMapResolution < 0 || Material(MaterNum).ScreenMapResolution > 5 ||
-                Material(MaterNum).ScreenMapResolution == 4) {
+            dataMaterial.Material(MaterNum).ScreenMapResolution = MaterialProps(12);
+            if (dataMaterial.Material(MaterNum).ScreenMapResolution < 0 || dataMaterial.Material(MaterNum).ScreenMapResolution > 5 ||
+                dataMaterial.Material(MaterNum).ScreenMapResolution == 4) {
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(cNumericFieldNames(12) + " must be 0, 1, 2, 3, or 5.");
                 ErrorsFound = true;
             }
 
             //   Default air flow permeability to open area fraction
-            Material(MaterNum).WinShadeAirFlowPermeability = Material(MaterNum).Trans;
-            Material(MaterNum).TransThermal = Material(MaterNum).Trans;
-            Material(MaterNum).TransVis = Material(MaterNum).Trans;
+            dataMaterial.Material(MaterNum).WinShadeAirFlowPermeability = dataMaterial.Material(MaterNum).Trans;
+            dataMaterial.Material(MaterNum).TransThermal = dataMaterial.Material(MaterNum).Trans;
+            dataMaterial.Material(MaterNum).TransVis = dataMaterial.Material(MaterNum).Trans;
 
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).ROnly = true;
 
             //   Calculate absorptance accounting for the open area in the screen assembly (used only in CreateShadedWindowConstruction)
-            Material(MaterNum).AbsorpSolar = max(0.0, 1.0 - Material(MaterNum).Trans - Material(MaterNum).ReflectShade);
-            Material(MaterNum).AbsorpSolarInput = Material(MaterNum).AbsorpSolar;
-            Material(MaterNum).AbsorpVisible = max(0.0, 1.0 - Material(MaterNum).TransVis - Material(MaterNum).ReflectShadeVis);
-            Material(MaterNum).AbsorpVisibleInput = Material(MaterNum).AbsorpVisible;
-            Material(MaterNum).AbsorpThermal *= (1.0 - Material(MaterNum).Trans);
-            Material(MaterNum).AbsorpThermalInput = Material(MaterNum).AbsorpThermal;
+            dataMaterial.Material(MaterNum).AbsorpSolar = max(0.0, 1.0 - dataMaterial.Material(MaterNum).Trans - dataMaterial.Material(MaterNum).ReflectShade);
+            dataMaterial.Material(MaterNum).AbsorpSolarInput = dataMaterial.Material(MaterNum).AbsorpSolar;
+            dataMaterial.Material(MaterNum).AbsorpVisible = max(0.0, 1.0 - dataMaterial.Material(MaterNum).TransVis - dataMaterial.Material(MaterNum).ReflectShadeVis);
+            dataMaterial.Material(MaterNum).AbsorpVisibleInput = dataMaterial.Material(MaterNum).AbsorpVisible;
+            dataMaterial.Material(MaterNum).AbsorpThermal *= (1.0 - dataMaterial.Material(MaterNum).Trans);
+            dataMaterial.Material(MaterNum).AbsorpThermalInput = dataMaterial.Material(MaterNum).AbsorpThermal;
 
-            if (Material(MaterNum).Conductivity > 0.0) {
-                NominalR(MaterNum) = (1.0 - Material(MaterNum).Trans) * Material(MaterNum).Thickness / Material(MaterNum).Conductivity;
+            if (dataMaterial.Material(MaterNum).Conductivity > 0.0) {
+                NominalR(MaterNum) = (1.0 - dataMaterial.Material(MaterNum).Trans) * dataMaterial.Material(MaterNum).Thickness / dataMaterial.Material(MaterNum).Conductivity;
             } else {
                 NominalR(MaterNum) = 1.0;
                 ShowWarningError(
-                    "Conductivity for material=\"" + Material(MaterNum).Name +
+                    "Conductivity for material=\"" + dataMaterial.Material(MaterNum).Name +
                     "\" must be greater than 0 for calculating Nominal R-value, Nominal R is defaulted to 1 and the simulation continues.");
             }
 
-            if (Material(MaterNum).Trans + Material(MaterNum).ReflectShade >= 1.0) {
+            if (dataMaterial.Material(MaterNum).Trans + dataMaterial.Material(MaterNum).ReflectShade >= 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                 ShowContinueError("Calculated solar transmittance + solar reflectance not < 1.0");
                 ShowContinueError("See Engineering Reference for calculation procedure for solar transmittance.");
             }
 
-            if (Material(MaterNum).TransVis + Material(MaterNum).ReflectShadeVis >= 1.0) {
+            if (dataMaterial.Material(MaterNum).TransVis + dataMaterial.Material(MaterNum).ReflectShadeVis >= 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                 ShowContinueError("Calculated visible transmittance + visible reflectance not < 1.0");
                 ShowContinueError("See Engineering Reference for calculation procedure for visible solar transmittance.");
             }
 
-            if (Material(MaterNum).TransThermal + Material(MaterNum).AbsorpThermal >= 1.0) {
+            if (dataMaterial.Material(MaterNum).TransThermal + dataMaterial.Material(MaterNum).AbsorpThermal >= 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                 ShowSevereError("Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2 not < 1.0");
@@ -3122,30 +3124,30 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = ScreenEquivalentLayer;
+            dataMaterial.Material(MaterNum).Group = ScreenEquivalentLayer;
 
             // Load the material derived type from the input data.
             // WindowMaterial:Screen:EquivalentLayer,
-            Material(MaterNum).Name = MaterialNames(1);
-            Material(MaterNum).Roughness = MediumRough;
-            Material(MaterNum).ROnly = true;
-            Material(MaterNum).TausFrontBeamBeam = MaterialProps(1);
-            Material(MaterNum).TausBackBeamBeam = MaterialProps(1);
-            Material(MaterNum).TausFrontBeamDiff = MaterialProps(2);
-            Material(MaterNum).TausBackBeamDiff = MaterialProps(2);
-            Material(MaterNum).ReflFrontBeamDiff = MaterialProps(3);
-            Material(MaterNum).ReflBackBeamDiff = MaterialProps(3);
-            Material(MaterNum).TausFrontBeamBeamVis = MaterialProps(4);
-            Material(MaterNum).TausFrontBeamDiffVis = MaterialProps(5);
-            Material(MaterNum).ReflFrontDiffDiffVis = MaterialProps(6);
-            Material(MaterNum).TausThermal = MaterialProps(7);
-            Material(MaterNum).EmissThermalFront = MaterialProps(8);
-            Material(MaterNum).EmissThermalBack = MaterialProps(8);
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Roughness = MediumRough;
+            dataMaterial.Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).TausFrontBeamBeam = MaterialProps(1);
+            dataMaterial.Material(MaterNum).TausBackBeamBeam = MaterialProps(1);
+            dataMaterial.Material(MaterNum).TausFrontBeamDiff = MaterialProps(2);
+            dataMaterial.Material(MaterNum).TausBackBeamDiff = MaterialProps(2);
+            dataMaterial.Material(MaterNum).ReflFrontBeamDiff = MaterialProps(3);
+            dataMaterial.Material(MaterNum).ReflBackBeamDiff = MaterialProps(3);
+            dataMaterial.Material(MaterNum).TausFrontBeamBeamVis = MaterialProps(4);
+            dataMaterial.Material(MaterNum).TausFrontBeamDiffVis = MaterialProps(5);
+            dataMaterial.Material(MaterNum).ReflFrontDiffDiffVis = MaterialProps(6);
+            dataMaterial.Material(MaterNum).TausThermal = MaterialProps(7);
+            dataMaterial.Material(MaterNum).EmissThermalFront = MaterialProps(8);
+            dataMaterial.Material(MaterNum).EmissThermalBack = MaterialProps(8);
 
             // Assumes thermal emissivity is the same as thermal absorptance
-            Material(MaterNum).AbsorpThermalFront = Material(MaterNum).EmissThermalFront;
-            Material(MaterNum).AbsorpThermalBack = Material(MaterNum).EmissThermalBack;
-            Material(MaterNum).TransThermal = Material(MaterNum).TausThermal;
+            dataMaterial.Material(MaterNum).AbsorpThermalFront = dataMaterial.Material(MaterNum).EmissThermalFront;
+            dataMaterial.Material(MaterNum).AbsorpThermalBack = dataMaterial.Material(MaterNum).EmissThermalBack;
+            dataMaterial.Material(MaterNum).TransThermal = dataMaterial.Material(MaterNum).TausThermal;
 
             if (MaterialProps(3) < 0.0 || MaterialProps(3) > 1.0) {
                 ErrorsFound = true;
@@ -3156,68 +3158,68 @@ namespace HeatBalanceManager {
             if (MaterialProps(6) < 0.0 || MaterialProps(6) > 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-                ShowContinueError(cNumericFieldNames(6) + " must be >= 0 and <= 1 for material " + Material(MaterNum).Name + '.');
+                ShowContinueError(cNumericFieldNames(6) + " must be >= 0 and <= 1 for material " + dataMaterial.Material(MaterNum).Name + '.');
             }
 
             if (!lNumericFieldBlanks(9)) {
                 if (MaterialProps(9) > 0.00001) {
-                    Material(MaterNum).ScreenWireSpacing = MaterialProps(9); // screen wire spacing
+                    dataMaterial.Material(MaterNum).ScreenWireSpacing = MaterialProps(9); // screen wire spacing
                 } else {
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                     ShowContinueError(cNumericFieldNames(9) + " must be > 0.");
                     ShowContinueError("...Setting screen wire spacing to a default value of 0.025m and simulation continues.");
-                    Material(MaterNum).ScreenWireSpacing = 0.025;
+                    dataMaterial.Material(MaterNum).ScreenWireSpacing = 0.025;
                 }
             }
 
             if (!lNumericFieldBlanks(10)) {
-                if (MaterialProps(10) > 0.00001 && MaterialProps(10) < Material(MaterNum).ScreenWireSpacing) {
-                    Material(MaterNum).ScreenWireDiameter = MaterialProps(10); // screen wire spacing
+                if (MaterialProps(10) > 0.00001 && MaterialProps(10) < dataMaterial.Material(MaterNum).ScreenWireSpacing) {
+                    dataMaterial.Material(MaterNum).ScreenWireDiameter = MaterialProps(10); // screen wire spacing
                 } else {
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                     ShowContinueError(cNumericFieldNames(10) + " must be > 0.");
                     ShowContinueError("...Setting screen wire diameter to a default value of 0.005m and simulation continues.");
-                    Material(MaterNum).ScreenWireDiameter = 0.005;
+                    dataMaterial.Material(MaterNum).ScreenWireDiameter = 0.005;
                 }
             }
 
-            if (Material(MaterNum).ScreenWireSpacing > 0.0) {
-                if (Material(MaterNum).ScreenWireDiameter / Material(MaterNum).ScreenWireSpacing >= 1.0) {
+            if (dataMaterial.Material(MaterNum).ScreenWireSpacing > 0.0) {
+                if (dataMaterial.Material(MaterNum).ScreenWireDiameter / dataMaterial.Material(MaterNum).ScreenWireSpacing >= 1.0) {
                     ErrorsFound = true;
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                     ShowContinueError(cNumericFieldNames(10) + " must be less than " + cNumericFieldNames(9));
                 } else {
                     //  Calculate direct normal transmittance (open area fraction)
-                    Openness = pow_2(1.0 - Material(MaterNum).ScreenWireDiameter / Material(MaterNum).ScreenWireSpacing);
-                    if ((Material(MaterNum).TausFrontBeamBeam - Openness) / Openness > 0.01) {
+                    Openness = pow_2(1.0 - dataMaterial.Material(MaterNum).ScreenWireDiameter / dataMaterial.Material(MaterNum).ScreenWireSpacing);
+                    if ((dataMaterial.Material(MaterNum).TausFrontBeamBeam - Openness) / Openness > 0.01) {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", screen openness specified.");
                         ShowContinueError(cNumericFieldNames(1) + " is > 1.0% of the value calculated from input fields:");
                         ShowContinueError(cNumericFieldNames(9) + " and " + (cNumericFieldNames(10)));
                         ShowContinueError(" using the formula (1-diameter/spacing)**2");
                         ShowContinueError(" ...the screen diameter is recalculated from the material openness specified ");
                         ShowContinueError(" ...and wire spacing using the formula = wire spacing * (1.0 - SQRT(Opennes))");
-                        Material(MaterNum).ScreenWireDiameter =
-                            Material(MaterNum).ScreenWireSpacing * (1.0 - std::sqrt(Material(MaterNum).TausFrontBeamBeam));
+                        dataMaterial.Material(MaterNum).ScreenWireDiameter =
+                            dataMaterial.Material(MaterNum).ScreenWireSpacing * (1.0 - std::sqrt(dataMaterial.Material(MaterNum).TausFrontBeamBeam));
                         ShowContinueError(" ...Recalculated " + cNumericFieldNames(10) + '=' +
-                                          RoundSigDigits(Material(MaterNum).ScreenWireDiameter, 4) + " m");
+                                          RoundSigDigits(dataMaterial.Material(MaterNum).ScreenWireDiameter, 4) + " m");
                     }
                 }
             }
 
-            if (Material(MaterNum).TausFrontBeamBeam + Material(MaterNum).ReflFrontBeamDiff >= 1.0) {
+            if (dataMaterial.Material(MaterNum).TausFrontBeamBeam + dataMaterial.Material(MaterNum).ReflFrontBeamDiff >= 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                 ShowContinueError("Calculated solar transmittance + solar reflectance not < 1.0");
                 ShowContinueError("See Engineering Reference for calculation procedure for solar transmittance.");
             }
 
-            if (Material(MaterNum).TausFrontBeamBeamVis + Material(MaterNum).ReflFrontDiffDiffVis >= 1.0) {
+            if (dataMaterial.Material(MaterNum).TausFrontBeamBeamVis + dataMaterial.Material(MaterNum).ReflFrontDiffDiffVis >= 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                 ShowContinueError("Calculated visible transmittance + visible reflectance not < 1.0");
                 ShowContinueError("See Engineering Reference for calculation procedure for visible solar transmittance.");
             }
-            if (Material(MaterNum).TransThermal + Material(MaterNum).AbsorpThermal >= 1.0) {
+            if (dataMaterial.Material(MaterNum).TransThermal + dataMaterial.Material(MaterNum).AbsorpThermal >= 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                 ShowSevereError("Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2 not < 1.0");
@@ -3253,15 +3255,15 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = WindowBlind;
+            dataMaterial.Material(MaterNum).Group = WindowBlind;
 
             // Load the material derived type from the input data.
 
-            Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
             Blind(Loop).Name = MaterialNames(1);
-            Material(MaterNum).Roughness = Rough;
-            Material(MaterNum).BlindDataPtr = Loop;
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Roughness = Rough;
+            dataMaterial.Material(MaterNum).BlindDataPtr = Loop;
+            dataMaterial.Material(MaterNum).ROnly = true;
 
             Blind(Loop).MaterialNumber = MaterNum;
             if (UtilityRoutines::SameString(MaterialNames(2), "Horizontal")) {
@@ -3511,105 +3513,105 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = BlindEquivalentLayer;
+            dataMaterial.Material(MaterNum).Group = BlindEquivalentLayer;
 
-            Material(MaterNum).Name = MaterialNames(1);
-            Material(MaterNum).Roughness = Rough;
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Roughness = Rough;
+            dataMaterial.Material(MaterNum).ROnly = true;
 
             if (UtilityRoutines::SameString(MaterialNames(2), "Horizontal")) {
-                Material(MaterNum).SlatOrientation = Horizontal;
+                dataMaterial.Material(MaterNum).SlatOrientation = Horizontal;
             } else if (UtilityRoutines::SameString(MaterialNames(2), "Vertical")) {
-                Material(MaterNum).SlatOrientation = Vertical;
+                dataMaterial.Material(MaterNum).SlatOrientation = Vertical;
             }
-            Material(MaterNum).SlatWidth = MaterialProps(1);
-            Material(MaterNum).SlatSeparation = MaterialProps(2);
-            Material(MaterNum).SlatCrown = MaterialProps(3);
-            Material(MaterNum).SlatAngle = MaterialProps(4);
+            dataMaterial.Material(MaterNum).SlatWidth = MaterialProps(1);
+            dataMaterial.Material(MaterNum).SlatSeparation = MaterialProps(2);
+            dataMaterial.Material(MaterNum).SlatCrown = MaterialProps(3);
+            dataMaterial.Material(MaterNum).SlatAngle = MaterialProps(4);
 
-            Material(MaterNum).TausFrontBeamDiff = MaterialProps(5);
-            Material(MaterNum).TausBackBeamDiff = MaterialProps(6);
-            Material(MaterNum).ReflFrontBeamDiff = MaterialProps(7);
-            Material(MaterNum).ReflBackBeamDiff = MaterialProps(8);
+            dataMaterial.Material(MaterNum).TausFrontBeamDiff = MaterialProps(5);
+            dataMaterial.Material(MaterNum).TausBackBeamDiff = MaterialProps(6);
+            dataMaterial.Material(MaterNum).ReflFrontBeamDiff = MaterialProps(7);
+            dataMaterial.Material(MaterNum).ReflBackBeamDiff = MaterialProps(8);
 
             if (!lNumericFieldBlanks(9) && !lNumericFieldBlanks(10) && !lNumericFieldBlanks(11) && !lNumericFieldBlanks(12)) {
-                Material(MaterNum).TausFrontBeamDiffVis = MaterialProps(9);
-                Material(MaterNum).TausBackBeamDiffVis = MaterialProps(10);
-                Material(MaterNum).ReflFrontBeamDiffVis = MaterialProps(11);
-                Material(MaterNum).ReflBackBeamDiffVis = MaterialProps(12);
+                dataMaterial.Material(MaterNum).TausFrontBeamDiffVis = MaterialProps(9);
+                dataMaterial.Material(MaterNum).TausBackBeamDiffVis = MaterialProps(10);
+                dataMaterial.Material(MaterNum).ReflFrontBeamDiffVis = MaterialProps(11);
+                dataMaterial.Material(MaterNum).ReflBackBeamDiffVis = MaterialProps(12);
             }
             if (!lNumericFieldBlanks(13) && !lNumericFieldBlanks(14) && !lNumericFieldBlanks(15)) {
-                Material(MaterNum).TausDiffDiff = MaterialProps(13);
-                Material(MaterNum).ReflFrontDiffDiff = MaterialProps(14);
-                Material(MaterNum).ReflBackDiffDiff = MaterialProps(15);
+                dataMaterial.Material(MaterNum).TausDiffDiff = MaterialProps(13);
+                dataMaterial.Material(MaterNum).ReflFrontDiffDiff = MaterialProps(14);
+                dataMaterial.Material(MaterNum).ReflBackDiffDiff = MaterialProps(15);
             }
             if (!lNumericFieldBlanks(16) && !lNumericFieldBlanks(17) && !lNumericFieldBlanks(18)) {
-                Material(MaterNum).TausDiffDiffVis = MaterialProps(13);
-                Material(MaterNum).ReflFrontDiffDiffVis = MaterialProps(14);
-                Material(MaterNum).ReflBackDiffDiffVis = MaterialProps(15);
+                dataMaterial.Material(MaterNum).TausDiffDiffVis = MaterialProps(13);
+                dataMaterial.Material(MaterNum).ReflFrontDiffDiffVis = MaterialProps(14);
+                dataMaterial.Material(MaterNum).ReflBackDiffDiffVis = MaterialProps(15);
             }
             if (!lNumericFieldBlanks(19)) {
-                Material(MaterNum).TausThermal = MaterialProps(19);
+                dataMaterial.Material(MaterNum).TausThermal = MaterialProps(19);
             }
             if (!lNumericFieldBlanks(20)) {
-                Material(MaterNum).EmissThermalFront = MaterialProps(20);
+                dataMaterial.Material(MaterNum).EmissThermalFront = MaterialProps(20);
             }
             if (!lNumericFieldBlanks(21)) {
-                Material(MaterNum).EmissThermalBack = MaterialProps(21);
+                dataMaterial.Material(MaterNum).EmissThermalBack = MaterialProps(21);
             }
             // Assumes thermal emissivity is the same as thermal absorptance
-            Material(MaterNum).AbsorpThermalFront = Material(MaterNum).EmissThermalFront;
-            Material(MaterNum).AbsorpThermalBack = Material(MaterNum).EmissThermalBack;
-            Material(MaterNum).TransThermal = Material(MaterNum).TausThermal;
+            dataMaterial.Material(MaterNum).AbsorpThermalFront = dataMaterial.Material(MaterNum).EmissThermalFront;
+            dataMaterial.Material(MaterNum).AbsorpThermalBack = dataMaterial.Material(MaterNum).EmissThermalBack;
+            dataMaterial.Material(MaterNum).TransThermal = dataMaterial.Material(MaterNum).TausThermal;
 
             // By default all blinds have fixed slat angle,
             //  they are used with window shading controls that adjust slat angles like MaximizeSolar or BlockBeamSolar
             if (!lAlphaFieldBlanks(3)) {
                 if (UtilityRoutines::SameString(MaterialNames(3), "FixedSlatAngle")) {
-                    Material(MaterNum).SlatAngleType = lscNONE;
+                    dataMaterial.Material(MaterNum).SlatAngleType = lscNONE;
                 } else if (UtilityRoutines::SameString(MaterialNames(3), "MaximizeSolar")) {
-                    Material(MaterNum).SlatAngleType = lscVBPROF;
+                    dataMaterial.Material(MaterNum).SlatAngleType = lscVBPROF;
                 } else if (UtilityRoutines::SameString(MaterialNames(3), "BlockBeamSolar")) {
-                    Material(MaterNum).SlatAngleType = lscVBNOBM;
+                    dataMaterial.Material(MaterNum).SlatAngleType = lscVBNOBM;
                 } else {
-                    Material(MaterNum).SlatAngleType = 0;
+                    dataMaterial.Material(MaterNum).SlatAngleType = 0;
                 }
             } else {
-                Material(MaterNum).SlatAngleType = 0;
+                dataMaterial.Material(MaterNum).SlatAngleType = 0;
             }
-            if (Material(MaterNum).SlatWidth < Material(MaterNum).SlatSeparation) {
+            if (dataMaterial.Material(MaterNum).SlatWidth < dataMaterial.Material(MaterNum).SlatSeparation) {
                 ShowWarningError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Seperation/Width");
-                ShowContinueError(cNumericFieldNames(1) + " [" + RoundSigDigits(Material(MaterNum).SlatWidth, 2) + "] is less than " +
-                                  cNumericFieldNames(2) + " [" + RoundSigDigits(Material(MaterNum).SlatSeparation, 2) + "].");
+                ShowContinueError(cNumericFieldNames(1) + " [" + RoundSigDigits(dataMaterial.Material(MaterNum).SlatWidth, 2) + "] is less than " +
+                                  cNumericFieldNames(2) + " [" + RoundSigDigits(dataMaterial.Material(MaterNum).SlatSeparation, 2) + "].");
                 ShowContinueError("This will allow direct beam to be transmitted when Slat angle = 0.");
             }
-            if (Material(MaterNum).SlatSeparation < 0.001) {
+            if (dataMaterial.Material(MaterNum).SlatSeparation < 0.001) {
                 ShowWarningError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Seperation");
-                ShowContinueError(cNumericFieldNames(2) + " [" + RoundSigDigits(Material(MaterNum).SlatSeparation, 2) +
+                ShowContinueError(cNumericFieldNames(2) + " [" + RoundSigDigits(dataMaterial.Material(MaterNum).SlatSeparation, 2) +
                                   "]. Slate spacing must be > 0.0");
                 ShowContinueError("...Setting slate spacing to default value of 0.025 m and simulation continues.");
-                Material(MaterNum).SlatSeparation = 0.025;
+                dataMaterial.Material(MaterNum).SlatSeparation = 0.025;
             }
-            if (Material(MaterNum).SlatWidth < 0.001 || Material(MaterNum).SlatWidth >= 2.0 * Material(MaterNum).SlatSeparation) {
+            if (dataMaterial.Material(MaterNum).SlatWidth < 0.001 || dataMaterial.Material(MaterNum).SlatWidth >= 2.0 * dataMaterial.Material(MaterNum).SlatSeparation) {
                 ShowWarningError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Width");
-                ShowContinueError(cNumericFieldNames(1) + " [" + RoundSigDigits(Material(MaterNum).SlatWidth, 2) +
+                ShowContinueError(cNumericFieldNames(1) + " [" + RoundSigDigits(dataMaterial.Material(MaterNum).SlatWidth, 2) +
                                   "]. Slat width range is 0 < Width <= 2*Spacing");
                 ShowContinueError("...Setting slate width equal to slate spacing and simulation continues.");
-                Material(MaterNum).SlatWidth = Material(MaterNum).SlatSeparation;
+                dataMaterial.Material(MaterNum).SlatWidth = dataMaterial.Material(MaterNum).SlatSeparation;
             }
-            if (Material(MaterNum).SlatCrown < 0.0 || Material(MaterNum).SlatCrown >= 0.5 * Material(MaterNum).SlatWidth) {
+            if (dataMaterial.Material(MaterNum).SlatCrown < 0.0 || dataMaterial.Material(MaterNum).SlatCrown >= 0.5 * dataMaterial.Material(MaterNum).SlatWidth) {
                 ShowWarningError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Crown");
-                ShowContinueError(cNumericFieldNames(3) + " [" + RoundSigDigits(Material(MaterNum).SlatCrown, 2) +
+                ShowContinueError(cNumericFieldNames(3) + " [" + RoundSigDigits(dataMaterial.Material(MaterNum).SlatCrown, 2) +
                                   "]. Slat crwon range is 0 <= crown < 0.5*Width");
                 ShowContinueError("...Setting slate crown to 0.0 and simulation continues.");
-                Material(MaterNum).SlatCrown = 0.0;
+                dataMaterial.Material(MaterNum).SlatCrown = 0.0;
             }
-            if (Material(MaterNum).SlatAngle < -90.0 || Material(MaterNum).SlatAngle > 90.0) {
+            if (dataMaterial.Material(MaterNum).SlatAngle < -90.0 || dataMaterial.Material(MaterNum).SlatAngle > 90.0) {
                 ShowWarningError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Angle");
-                ShowContinueError(cNumericFieldNames(4) + " [" + RoundSigDigits(Material(MaterNum).SlatAngle, 2) +
+                ShowContinueError(cNumericFieldNames(4) + " [" + RoundSigDigits(dataMaterial.Material(MaterNum).SlatAngle, 2) +
                                   "]. Slat angle range is -90.0 <= Angle < 90.0");
                 ShowContinueError("...Setting slate angle to 0.0 and simulation continues.");
-                Material(MaterNum).SlatAngle = 0.0;
+                dataMaterial.Material(MaterNum).SlatAngle = 0.0;
             }
 
             if (!UtilityRoutines::SameString(MaterialNames(2), "Horizontal") && !UtilityRoutines::SameString(MaterialNames(2), "Vertical")) {
@@ -3667,24 +3669,24 @@ namespace HeatBalanceManager {
             // this part is similar to the regular material
             // Load the material derived type from the input data.
             ++MaterNum;
-            Material(MaterNum).Group = EcoRoof;
+            dataMaterial.Material(MaterNum).Group = EcoRoof;
 
             // this part is new for Ecoroof properties,
             // especially for the Plant Layer of the ecoroof
-            Material(MaterNum).HeightOfPlants = MaterialProps(1);
-            Material(MaterNum).LAI = MaterialProps(2);
-            Material(MaterNum).Lreflectivity = MaterialProps(3); // Albedo
-            Material(MaterNum).LEmissitivity = MaterialProps(4);
-            Material(MaterNum).RStomata = MaterialProps(5);
+            dataMaterial.Material(MaterNum).HeightOfPlants = MaterialProps(1);
+            dataMaterial.Material(MaterNum).LAI = MaterialProps(2);
+            dataMaterial.Material(MaterNum).Lreflectivity = MaterialProps(3); // Albedo
+            dataMaterial.Material(MaterNum).LEmissitivity = MaterialProps(4);
+            dataMaterial.Material(MaterNum).RStomata = MaterialProps(5);
 
-            Material(MaterNum).Name = MaterialNames(1);
+            dataMaterial.Material(MaterNum).Name = MaterialNames(1);
             // need to treat the A2 with is just the name of the soil(it is
             // not important)
             ValidateMaterialRoughness(MaterNum, MaterialNames(3), ErrorsFound);
             if (UtilityRoutines::SameString(MaterialNames(4), "Simple")) {
-                Material(MaterNum).EcoRoofCalculationMethod = 1;
+                dataMaterial.Material(MaterNum).EcoRoofCalculationMethod = 1;
             } else if (UtilityRoutines::SameString(MaterialNames(4), "Advanced") || lAlphaFieldBlanks(4)) {
-                Material(MaterNum).EcoRoofCalculationMethod = 2;
+                dataMaterial.Material(MaterNum).EcoRoofCalculationMethod = 2;
             } else {
                 ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value");
                 ShowContinueError(cAlphaFieldNames(4) + "=\"" + MaterialNames(4) + "\".");
@@ -3692,35 +3694,35 @@ namespace HeatBalanceManager {
                 ErrorsFound = true;
             }
 
-            Material(MaterNum).Thickness = MaterialProps(6);
-            Material(MaterNum).Conductivity = MaterialProps(7);
-            Material(MaterNum).Density = MaterialProps(8);
-            Material(MaterNum).SpecHeat = MaterialProps(9);
-            Material(MaterNum).AbsorpThermal = MaterialProps(10); // emissivity
-            Material(MaterNum).AbsorpSolar = MaterialProps(11);   // (1 - Albedo)
-            Material(MaterNum).AbsorpVisible = MaterialProps(12);
-            Material(MaterNum).Porosity = MaterialProps(13);
-            Material(MaterNum).MinMoisture = MaterialProps(14);
-            Material(MaterNum).InitMoisture = MaterialProps(15);
+            dataMaterial.Material(MaterNum).Thickness = MaterialProps(6);
+            dataMaterial.Material(MaterNum).Conductivity = MaterialProps(7);
+            dataMaterial.Material(MaterNum).Density = MaterialProps(8);
+            dataMaterial.Material(MaterNum).SpecHeat = MaterialProps(9);
+            dataMaterial.Material(MaterNum).AbsorpThermal = MaterialProps(10); // emissivity
+            dataMaterial.Material(MaterNum).AbsorpSolar = MaterialProps(11);   // (1 - Albedo)
+            dataMaterial.Material(MaterNum).AbsorpVisible = MaterialProps(12);
+            dataMaterial.Material(MaterNum).Porosity = MaterialProps(13);
+            dataMaterial.Material(MaterNum).MinMoisture = MaterialProps(14);
+            dataMaterial.Material(MaterNum).InitMoisture = MaterialProps(15);
 
-            if (Material(MaterNum).Conductivity > 0.0) {
-                NominalR(MaterNum) = Material(MaterNum).Thickness / Material(MaterNum).Conductivity;
-                Material(MaterNum).Resistance = NominalR(MaterNum);
+            if (dataMaterial.Material(MaterNum).Conductivity > 0.0) {
+                NominalR(MaterNum) = dataMaterial.Material(MaterNum).Thickness / dataMaterial.Material(MaterNum).Conductivity;
+                dataMaterial.Material(MaterNum).Resistance = NominalR(MaterNum);
             } else {
                 ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" is not defined correctly.");
                 ShowContinueError(cNumericFieldNames(7) + " is <=0.");
                 ErrorsFound = true;
             }
 
-            if (Material(MaterNum).InitMoisture > Material(MaterNum).Porosity) {
+            if (dataMaterial.Material(MaterNum).InitMoisture > dataMaterial.Material(MaterNum).Porosity) {
                 ShowWarningError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                 ShowContinueError(cNumericFieldNames(15) + " is greater than " + cNumericFieldNames(13) + ". It must be less or equal.");
-                ShowContinueError(cNumericFieldNames(13) + " = " + TrimSigDigits(Material(MaterNum).Porosity, 3) + ".");
-                ShowContinueError(cNumericFieldNames(15) + " = " + TrimSigDigits(Material(MaterNum).InitMoisture, 3) + ".");
+                ShowContinueError(cNumericFieldNames(13) + " = " + TrimSigDigits(dataMaterial.Material(MaterNum).Porosity, 3) + ".");
+                ShowContinueError(cNumericFieldNames(15) + " = " + TrimSigDigits(dataMaterial.Material(MaterNum).InitMoisture, 3) + ".");
                 ShowContinueError(cNumericFieldNames(15) +
-                                  " is reset to the maximum (saturation) value = " + TrimSigDigits(Material(MaterNum).Porosity, 3) + ".");
+                                  " is reset to the maximum (saturation) value = " + TrimSigDigits(dataMaterial.Material(MaterNum).Porosity, 3) + ".");
                 ShowContinueError("Simulation continues.");
-                Material(MaterNum).InitMoisture = Material(MaterNum).Porosity;
+                dataMaterial.Material(MaterNum).InitMoisture = dataMaterial.Material(MaterNum).Porosity;
             }
         }
 
@@ -3774,15 +3776,15 @@ namespace HeatBalanceManager {
                     TCGlazings(Loop).LayerName(iTC) = cAlphaArgs(1 + iTC);
 
                     // Find this glazing material in the material list
-                    iMat = UtilityRoutines::FindItemInList(cAlphaArgs(1 + iTC), Material);
+                    iMat = UtilityRoutines::FindItemInList(cAlphaArgs(1 + iTC), dataMaterial.Material);
                     if (iMat != 0) {
                         // TC glazing
-                        Material(iMat).SpecTemp = rNumericArgs(iTC);
-                        Material(iMat).TCParent = Loop;
+                        dataMaterial.Material(iMat).SpecTemp = rNumericArgs(iTC);
+                        dataMaterial.Material(iMat).TCParent = Loop;
                         TCGlazings(Loop).LayerPoint(iTC) = iMat;
 
                         // test that named material is of the right type
-                        if (Material(iMat).Group != WindowGlass) {
+                        if (dataMaterial.Material(iMat).Group != WindowGlass) {
                             ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" is not defined correctly.");
                             ShowContinueError("Material named: " + cAlphaArgs(1 + iTC) + " is not a window glazing ");
                             ErrorsFound = true;
@@ -3816,13 +3818,13 @@ namespace HeatBalanceManager {
                 continue;
             }
             ++MaterNum;
-            Material(MaterNum).Group = WindowSimpleGlazing;
-            Material(MaterNum).Name = cAlphaArgs(1);
-            Material(MaterNum).SimpleWindowUfactor = rNumericArgs(1);
-            Material(MaterNum).SimpleWindowSHGC = rNumericArgs(2);
+            dataMaterial.Material(MaterNum).Group = WindowSimpleGlazing;
+            dataMaterial.Material(MaterNum).Name = cAlphaArgs(1);
+            dataMaterial.Material(MaterNum).SimpleWindowUfactor = rNumericArgs(1);
+            dataMaterial.Material(MaterNum).SimpleWindowSHGC = rNumericArgs(2);
             if (!lNumericFieldBlanks(3)) {
-                Material(MaterNum).SimpleWindowVisTran = rNumericArgs(3);
-                Material(MaterNum).SimpleWindowVTinputByUser = true;
+                dataMaterial.Material(MaterNum).SimpleWindowVisTran = rNumericArgs(3);
+                dataMaterial.Material(MaterNum).SimpleWindowVTinputByUser = true;
             }
 
             SetupSimpleWindowGlazingSystem(MaterNum);
@@ -3853,22 +3855,22 @@ namespace HeatBalanceManager {
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
 
                 {
-                    auto const SELECT_CASE_var(Material(MaterNum).Group);
+                    auto const SELECT_CASE_var(dataMaterial.Material(MaterNum).Group);
                     if (SELECT_CASE_var == Air) {
-                        print(outputFiles.eio, Format_702, Material(MaterNum).Name, Material(MaterNum).Resistance);
+                        print(outputFiles.eio, Format_702, dataMaterial.Material(MaterNum).Name, dataMaterial.Material(MaterNum).Resistance);
                     } else {
                         print(outputFiles.eio,
                               Format_701,
-                              Material(MaterNum).Name,
-                              Material(MaterNum).Resistance,
-                              DisplayMaterialRoughness(Material(MaterNum).Roughness),
-                              Material(MaterNum).Thickness,
-                              Material(MaterNum).Conductivity,
-                              Material(MaterNum).Density,
-                              Material(MaterNum).SpecHeat,
-                              Material(MaterNum).AbsorpThermal,
-                              Material(MaterNum).AbsorpSolar,
-                              Material(MaterNum).AbsorpVisible);
+                              dataMaterial.Material(MaterNum).Name,
+                              dataMaterial.Material(MaterNum).Resistance,
+                              DisplayMaterialRoughness(dataMaterial.Material(MaterNum).Roughness),
+                              dataMaterial.Material(MaterNum).Thickness,
+                              dataMaterial.Material(MaterNum).Conductivity,
+                              dataMaterial.Material(MaterNum).Density,
+                              dataMaterial.Material(MaterNum).SpecHeat,
+                              dataMaterial.Material(MaterNum).AbsorpThermal,
+                              dataMaterial.Material(MaterNum).AbsorpSolar,
+                              dataMaterial.Material(MaterNum).AbsorpVisible);
                     }
                 }
             }
@@ -3879,30 +3881,30 @@ namespace HeatBalanceManager {
         if (AnyEnergyManagementSystemInModel) { // setup surface property EMS actuators
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
-                if (Material(MaterNum).Group != RegularMaterial) continue;
+                if (dataMaterial.Material(MaterNum).Group != RegularMaterial) continue;
                 SetupEMSActuator("Material",
-                                 Material(MaterNum).Name,
+                                 dataMaterial.Material(MaterNum).Name,
                                  "Surface Property Solar Absorptance",
                                  "[ ]",
-                                 Material(MaterNum).AbsorpSolarEMSOverrideOn,
-                                 Material(MaterNum).AbsorpSolarEMSOverride);
+                                 dataMaterial.Material(MaterNum).AbsorpSolarEMSOverrideOn,
+                                 dataMaterial.Material(MaterNum).AbsorpSolarEMSOverride);
                 SetupEMSActuator("Material",
-                                 Material(MaterNum).Name,
+                                 dataMaterial.Material(MaterNum).Name,
                                  "Surface Property Thermal Absorptance",
                                  "[ ]",
-                                 Material(MaterNum).AbsorpThermalEMSOverrideOn,
-                                 Material(MaterNum).AbsorpThermalEMSOverride);
+                                 dataMaterial.Material(MaterNum).AbsorpThermalEMSOverrideOn,
+                                 dataMaterial.Material(MaterNum).AbsorpThermalEMSOverride);
                 SetupEMSActuator("Material",
-                                 Material(MaterNum).Name,
+                                 dataMaterial.Material(MaterNum).Name,
                                  "Surface Property Visible Absorptance",
                                  "[ ]",
-                                 Material(MaterNum).AbsorpVisibleEMSOverrideOn,
-                                 Material(MaterNum).AbsorpVisibleEMSOverride);
+                                 dataMaterial.Material(MaterNum).AbsorpVisibleEMSOverrideOn,
+                                 dataMaterial.Material(MaterNum).AbsorpVisibleEMSOverride);
             }
         }
 
         // try assigning phase change material properties for each material, won't do anything for non pcm surfaces
-        for (auto &m : Material) {
+        for (auto &m : dataMaterial.Material) {
             m.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(m.Name);
         }
     }
@@ -3959,7 +3961,7 @@ namespace HeatBalanceManager {
         CurrentModuleObject = "MaterialProperty:GlazingSpectralData";
         TotSpectralData = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         SpectralData.allocate(TotSpectralData);
-        if (TotSpectralData > 0) SpecDataProps.allocate(MaxSpectralDataElements * 4);
+        if (TotSpectralData > 0) SpecDataProps.allocate(Construction::MaxSpectralDataElements * 4);
 
         for (Loop = 1; Loop <= TotSpectralData; ++Loop) {
 
@@ -3990,12 +3992,12 @@ namespace HeatBalanceManager {
                                   TrimSigDigits(SpecDataNumProp));
                 ShowContinueError("... remainder after div by 4 = " + TrimSigDigits(mod(SpecDataNumProp, 4)) +
                                   ", remainder items will be set to 0.0");
-                SpecDataProps({SpecDataNumProp + 1, min(SpecDataNumProp + 4, MaxSpectralDataElements * 4)}) = 0.0;
+                SpecDataProps({SpecDataNumProp + 1, min(SpecDataNumProp + 4, Construction::MaxSpectralDataElements * 4)}) = 0.0;
             }
-            if (TotLam > MaxSpectralDataElements) {
+            if (TotLam > Construction::MaxSpectralDataElements) {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid set.");
-                ShowContinueError("... More than max [" + TrimSigDigits(MaxSpectralDataElements) +
+                ShowContinueError("... More than max [" + TrimSigDigits(Construction::MaxSpectralDataElements) +
                                   "] (Wavelength,Trans,ReflFront,ReflBack) entries in set.");
                 continue;
             }
@@ -4111,16 +4113,16 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // Select the correct Number for the associated ascii name for the roughness type
-        if (UtilityRoutines::SameString(Roughness, "VeryRough")) Material(MaterNum).Roughness = VeryRough;
-        if (UtilityRoutines::SameString(Roughness, "Rough")) Material(MaterNum).Roughness = Rough;
-        if (UtilityRoutines::SameString(Roughness, "MediumRough")) Material(MaterNum).Roughness = MediumRough;
-        if (UtilityRoutines::SameString(Roughness, "MediumSmooth")) Material(MaterNum).Roughness = MediumSmooth;
-        if (UtilityRoutines::SameString(Roughness, "Smooth")) Material(MaterNum).Roughness = Smooth;
-        if (UtilityRoutines::SameString(Roughness, "VerySmooth")) Material(MaterNum).Roughness = VerySmooth;
+        if (UtilityRoutines::SameString(Roughness, "VeryRough")) dataMaterial.Material(MaterNum).Roughness = VeryRough;
+        if (UtilityRoutines::SameString(Roughness, "Rough")) dataMaterial.Material(MaterNum).Roughness = Rough;
+        if (UtilityRoutines::SameString(Roughness, "MediumRough")) dataMaterial.Material(MaterNum).Roughness = MediumRough;
+        if (UtilityRoutines::SameString(Roughness, "MediumSmooth")) dataMaterial.Material(MaterNum).Roughness = MediumSmooth;
+        if (UtilityRoutines::SameString(Roughness, "Smooth")) dataMaterial.Material(MaterNum).Roughness = Smooth;
+        if (UtilityRoutines::SameString(Roughness, "VerySmooth")) dataMaterial.Material(MaterNum).Roughness = VerySmooth;
 
         // Was it set?
-        if (Material(MaterNum).Roughness == 0) {
-            ShowSevereError("Material=" + Material(MaterNum).Name + ",Illegal Roughness=" + Roughness);
+        if (dataMaterial.Material(MaterNum).Roughness == 0) {
+            ShowSevereError("Material=" + dataMaterial.Material(MaterNum).Name + ",Illegal Roughness=" + Roughness);
             ErrorsFound = true;
         }
     }
@@ -4161,8 +4163,8 @@ namespace HeatBalanceManager {
         int ConstructNumAlpha;                                     // Number of construction alpha names being passed
         int DummyNumProp;                                          // dummy variable for properties being passed
         int IOStat;                                                // IO Status when calling get input subroutine
-        Array1D_string ConstructAlphas({0, MaxLayersInConstruct}); // Construction Alpha names defined
-        Array1D<Real64> DummyProps(4);                             // Temporary array to transfer construction properties
+        Array1D_string ConstructAlphas({0, Construction::MaxLayersInConstruct}); // Construction Alpha names defined
+        Array1D<Real64> DummyProps(5);                             // Temporary array to transfer construction properties
         int Loop;
         int TotRegConstructs; // Number of "regular" constructions (no embedded sources or sinks and
 
@@ -4210,11 +4212,11 @@ namespace HeatBalanceManager {
         NominalU.dimension(TotConstructs, 0.0);
 
         // Allocate the array to the number of constructions/initialize selected variables
-        Construct.allocate(TotConstructs);
+        dataConstruction.Construct.allocate(TotConstructs);
         UniqueConstructNames.reserve(TotConstructs);
         // Note: If TotWindow5Constructs > 0, additional constructions are created in
         // subr. SearchWindow5DataFile corresponding to those found on the data file.
-        for (auto &e : Construct) {
+        for (auto &e : dataConstruction.Construct) {
             // Initialize CTF and History terms
             e.NumCTFTerms = 0;
             e.NumHistories = 0;
@@ -4257,10 +4259,10 @@ namespace HeatBalanceManager {
 
             ++ConstrNum;
             // Assign Construction name to the Derived Type using the zeroth position of the array
-            Construct(ConstrNum).Name = ConstructAlphas(0);
+            dataConstruction.Construct(ConstrNum).Name = ConstructAlphas(0);
 
             // Set the total number of layers for the construction
-            Construct(ConstrNum).TotLayers = ConstructNumAlpha - 1;
+            dataConstruction.Construct(ConstrNum).TotLayers = ConstructNumAlpha - 1;
 
             // Loop through all of the layers of the construct to match the material names.
             // The loop index is the number minus 1
@@ -4268,47 +4270,47 @@ namespace HeatBalanceManager {
 
                 // Find the material in the list of materials
 
-                Construct(ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), Material);
+                dataConstruction.Construct(ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), dataMaterial.Material);
 
                 // count number of glass layers
-                if (Construct(ConstrNum).LayerPoint(Layer) > 0) {
-                    if (Material(Construct(ConstrNum).LayerPoint(Layer)).Group == WindowGlass) ++iMatGlass;
-                    MaterialLayerGroup = Material(Construct(ConstrNum).LayerPoint(Layer)).Group;
+                if (dataConstruction.Construct(ConstrNum).LayerPoint(Layer) > 0) {
+                    if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Group == WindowGlass) ++iMatGlass;
+                    MaterialLayerGroup = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Group;
                     if ((MaterialLayerGroup == GlassEquivalentLayer) || (MaterialLayerGroup == ShadeEquivalentLayer) ||
                         (MaterialLayerGroup == DrapeEquivalentLayer) || (MaterialLayerGroup == BlindEquivalentLayer) ||
                         (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer)) {
-                        ShowSevereError("Invalid material layer type in window " + CurrentModuleObject + " = " + Construct(ConstrNum).Name);
+                        ShowSevereError("Invalid material layer type in window " + CurrentModuleObject + " = " + dataConstruction.Construct(ConstrNum).Name);
                         ShowSevereError("Equivalent Layer material type = " + ConstructAlphas(Layer) +
                                         " is allowed only in Construction:WindowEquivalentLayer window object.");
                         ErrorsFound = true;
                     }
                 }
 
-                if (Construct(ConstrNum).LayerPoint(Layer) == 0) {
+                if (dataConstruction.Construct(ConstrNum).LayerPoint(Layer) == 0) {
                     // This may be a TC GlazingGroup
-                    Construct(ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), TCGlazings);
+                    dataConstruction.Construct(ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), TCGlazings);
 
-                    if (Construct(ConstrNum).LayerPoint(Layer) > 0) {
+                    if (dataConstruction.Construct(ConstrNum).LayerPoint(Layer) > 0) {
                         // reset layer pointer to the first glazing in the TC GlazingGroup
-                        Construct(ConstrNum).LayerPoint(Layer) = TCGlazings(Construct(ConstrNum).LayerPoint(Layer)).LayerPoint(1);
-                        Construct(ConstrNum).TCLayer = Construct(ConstrNum).LayerPoint(Layer);
-                        if (Material(Construct(ConstrNum).LayerPoint(Layer)).Group == WindowGlass) ++iMatGlass;
-                        Construct(ConstrNum).TCFlag = 1;
-                        Construct(ConstrNum).TCMasterConst = ConstrNum;
-                        Construct(ConstrNum).TCGlassID = iMatGlass; // the TC glass layer ID
-                        Construct(ConstrNum).TCLayerID = Layer;
-                        Construct(ConstrNum).TypeIsWindow = true;
+                        dataConstruction.Construct(ConstrNum).LayerPoint(Layer) = TCGlazings(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).LayerPoint(1);
+                        dataConstruction.Construct(ConstrNum).TCLayer = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
+                        if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Group == WindowGlass) ++iMatGlass;
+                        dataConstruction.Construct(ConstrNum).TCFlag = 1;
+                        dataConstruction.Construct(ConstrNum).TCMasterConst = ConstrNum;
+                        dataConstruction.Construct(ConstrNum).TCGlassID = iMatGlass; // the TC glass layer ID
+                        dataConstruction.Construct(ConstrNum).TCLayerID = Layer;
+                        dataConstruction.Construct(ConstrNum).TypeIsWindow = true;
                     }
                 }
 
-                if (Construct(ConstrNum).LayerPoint(Layer) == 0) {
-                    ShowSevereError("Did not find matching material for " + CurrentModuleObject + ' ' + Construct(ConstrNum).Name +
+                if (dataConstruction.Construct(ConstrNum).LayerPoint(Layer) == 0) {
+                    ShowSevereError("Did not find matching material for " + CurrentModuleObject + ' ' + dataConstruction.Construct(ConstrNum).Name +
                                     ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
-                    NominalRforNominalUCalculation(ConstrNum) += NominalR(Construct(ConstrNum).LayerPoint(Layer));
-                    if (Material(Construct(ConstrNum).LayerPoint(Layer)).Group == RegularMaterial &&
-                        !Material(Construct(ConstrNum).LayerPoint(Layer)).ROnly) {
+                    NominalRforNominalUCalculation(ConstrNum) += NominalR(dataConstruction.Construct(ConstrNum).LayerPoint(Layer));
+                    if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Group == RegularMaterial &&
+                        !dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).ROnly) {
                         NoRegularMaterialsUsed = false;
                     }
                 }
@@ -4369,45 +4371,48 @@ namespace HeatBalanceManager {
             }
 
             ++ConstrNum;
+            auto &thisConstruct (dataConstruction.Construct(TotRegConstructs + ConstrNum));
+
             // Assign Construction name to the Derived Type using the zeroth position of the array
-            Construct(TotRegConstructs + ConstrNum).Name = ConstructAlphas(0);
+            thisConstruct.Name = ConstructAlphas(0);
 
             // Obtain the source/sink data
-            if (DummyNumProp != 4) {
-                ShowSevereError(CurrentModuleObject + ": Wrong number of numerical inputs for " + Construct(ConstrNum).Name);
+            if (DummyNumProp != 5) {
+                ShowSevereError(CurrentModuleObject + ": Wrong number of numerical inputs for " + dataConstruction.Construct(ConstrNum).Name);
                 ErrorsFound = true;
             }
-            Construct(TotRegConstructs + ConstrNum).SourceSinkPresent = true;
-            Construct(TotRegConstructs + ConstrNum).SourceAfterLayer = int(DummyProps(1));
-            Construct(TotRegConstructs + ConstrNum).TempAfterLayer = int(DummyProps(2));
-            Construct(TotRegConstructs + ConstrNum).SolutionDimensions = int(DummyProps(3));
-            if ((Construct(TotRegConstructs + ConstrNum).SolutionDimensions < 1) ||
-                (Construct(TotRegConstructs + ConstrNum).SolutionDimensions > 2)) {
+            thisConstruct.SourceSinkPresent = true;
+            thisConstruct.SourceAfterLayer = int(DummyProps(1));
+            thisConstruct.TempAfterLayer = int(DummyProps(2));
+            thisConstruct.SolutionDimensions = int(DummyProps(3));
+            if ((thisConstruct.SolutionDimensions < 1) ||
+                (thisConstruct.SolutionDimensions > 2)) {
                 ShowWarningError("Construction:InternalSource must be either 1- or 2-D.  Reset to 1-D solution.");
-                ShowContinueError("Construction=" + Construct(TotRegConstructs + ConstrNum).Name + " is affected.");
-                Construct(TotRegConstructs + ConstrNum).SolutionDimensions = 1;
+                ShowContinueError("Construction=" + thisConstruct.Name + " is affected.");
+                thisConstruct.SolutionDimensions = 1;
             }
-            Construct(TotRegConstructs + ConstrNum).ThicknessPerpend = DummyProps(4) / 2.0;
+            thisConstruct.ThicknessPerpend = DummyProps(4) / 2.0;
+            thisConstruct.userTemperatureLocationPerpendicular = thisConstruct.setUserTemperatureLocationPerpendicular(DummyProps(5));
 
             // Set the total number of layers for the construction
-            Construct(TotRegConstructs + ConstrNum).TotLayers = ConstructNumAlpha - 1;
-            if (Construct(TotRegConstructs + ConstrNum).TotLayers <= 1) {
-                ShowSevereError("Construction " + Construct(TotRegConstructs + ConstrNum).Name +
+            thisConstruct.TotLayers = ConstructNumAlpha - 1;
+            if (thisConstruct.TotLayers <= 1) {
+                ShowSevereError("Construction " + thisConstruct.Name +
                                 " has an internal source or sink and thus must have more than a single layer");
                 ErrorsFound = true;
             }
-            if ((Construct(TotRegConstructs + ConstrNum).SourceAfterLayer >= Construct(TotRegConstructs + ConstrNum).TotLayers) ||
-                (Construct(TotRegConstructs + ConstrNum).SourceAfterLayer <= 0)) {
-                ShowWarningError("Construction " + Construct(TotRegConstructs + ConstrNum).Name + " must have a source that is between two layers");
+            if ((thisConstruct.SourceAfterLayer >= thisConstruct.TotLayers) ||
+                (thisConstruct.SourceAfterLayer <= 0)) {
+                ShowWarningError("Construction " + thisConstruct.Name + " must have a source that is between two layers");
                 ShowContinueError("The source after layer parameter has been set to one less than the number of layers.");
-                Construct(TotRegConstructs + ConstrNum).SourceAfterLayer = Construct(TotRegConstructs + ConstrNum).TotLayers - 1;
+                thisConstruct.SourceAfterLayer = thisConstruct.TotLayers - 1;
             }
-            if ((Construct(TotRegConstructs + ConstrNum).TempAfterLayer >= Construct(TotRegConstructs + ConstrNum).TotLayers) ||
-                (Construct(TotRegConstructs + ConstrNum).TempAfterLayer <= 0)) {
-                ShowWarningError("Construction " + Construct(TotRegConstructs + ConstrNum).Name +
+            if ((thisConstruct.TempAfterLayer >= thisConstruct.TotLayers) ||
+                (thisConstruct.TempAfterLayer <= 0)) {
+                ShowWarningError("Construction " + thisConstruct.Name +
                                  " must have a temperature calculation that is between two layers");
                 ShowContinueError("The temperature calculation after layer parameter has been set to one less than the number of layers.");
-                Construct(TotRegConstructs + ConstrNum).TempAfterLayer = Construct(TotRegConstructs + ConstrNum).TotLayers - 1;
+                thisConstruct.TempAfterLayer = thisConstruct.TotLayers - 1;
             }
 
             // Loop through all of the layers of the construct to match the material names.
@@ -4416,17 +4421,17 @@ namespace HeatBalanceManager {
 
                 // Find the material in the list of materials
 
-                Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), Material);
+                thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), dataMaterial.Material);
 
-                if (Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) == 0) {
-                    ShowSevereError("Did not find matching material for " + CurrentModuleObject + ' ' + Construct(ConstrNum).Name +
+                if (thisConstruct.LayerPoint(Layer) == 0) {
+                    ShowSevereError("Did not find matching material for " + CurrentModuleObject + ' ' + dataConstruction.Construct(ConstrNum).Name +
                                     ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
                     NominalRforNominalUCalculation(TotRegConstructs + ConstrNum) +=
-                        NominalR(Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer));
-                    if (Material(Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer)).Group == RegularMaterial &&
-                        !Material(Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer)).ROnly) {
+                        NominalR(thisConstruct.LayerPoint(Layer));
+                    if (dataMaterial.Material(thisConstruct.LayerPoint(Layer)).Group == RegularMaterial &&
+                        !dataMaterial.Material(thisConstruct.LayerPoint(Layer)).ROnly) {
                         NoRegularMaterialsUsed = false;
                     }
                 }
@@ -4467,12 +4472,12 @@ namespace HeatBalanceManager {
 
             ++ConstrNum;
             // Assign Construction name to the Derived Type using the zeroth position of the array
-            Construct(TotRegConstructs + ConstrNum).Name = ConstructAlphas(0);
+            dataConstruction.Construct(TotRegConstructs + ConstrNum).Name = ConstructAlphas(0);
 
             // Set the total number of layers for the construction
-            Construct(TotRegConstructs + ConstrNum).TotLayers = ConstructNumAlpha - 1;
-            if (Construct(TotRegConstructs + ConstrNum).TotLayers < 1) {
-                ShowSevereError("Construction " + Construct(TotRegConstructs + ConstrNum).Name + " must have at least a single layer");
+            dataConstruction.Construct(TotRegConstructs + ConstrNum).TotLayers = ConstructNumAlpha - 1;
+            if (dataConstruction.Construct(TotRegConstructs + ConstrNum).TotLayers < 1) {
+                ShowSevereError("Construction " + dataConstruction.Construct(TotRegConstructs + ConstrNum).Name + " must have at least a single layer");
                 ErrorsFound = true;
             }
 
@@ -4481,19 +4486,19 @@ namespace HeatBalanceManager {
             for (Layer = 1; Layer <= ConstructNumAlpha - 1; ++Layer) {
 
                 // Find the material in the list of materials
-                Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), Material);
+                dataConstruction.Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), dataMaterial.Material);
 
-                if (Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) == 0) {
-                    ShowSevereError("Did not find matching material for " + CurrentModuleObject + ' ' + Construct(ConstrNum).Name +
+                if (dataConstruction.Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) == 0) {
+                    ShowSevereError("Did not find matching material for " + CurrentModuleObject + ' ' + dataConstruction.Construct(ConstrNum).Name +
                                     ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
-                    MaterialLayerGroup = Material(Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer)).Group;
+                    MaterialLayerGroup = dataMaterial.Material(dataConstruction.Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer)).Group;
                     if (!((MaterialLayerGroup == GlassEquivalentLayer) || (MaterialLayerGroup == ShadeEquivalentLayer) ||
                           (MaterialLayerGroup == DrapeEquivalentLayer) || (MaterialLayerGroup == BlindEquivalentLayer) ||
                           (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer))) {
                         ShowSevereError("Invalid material layer type in window " + CurrentModuleObject + " = " +
-                                        Construct(TotRegConstructs + ConstrNum).Name);
+                                        dataConstruction.Construct(TotRegConstructs + ConstrNum).Name);
                         ShowContinueError("...Window layer = " + ConstructAlphas(Layer) +
                                           " is not allowed in Construction:WindowEquivalentLayer window object.");
                         ShowContinueError("Only materials of type Material:*:EquivalentLayer are allowed");
@@ -4504,13 +4509,13 @@ namespace HeatBalanceManager {
 
                     } else {
                         NominalRforNominalUCalculation(TotRegConstructs + ConstrNum) +=
-                            NominalR(Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer));
+                            NominalR(dataConstruction.Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer));
                     }
                 }
 
             } // Layer loop
-            Construct(TotRegConstructs + ConstrNum).EQLConsPtr = ConstrNum;
-            Construct(TotRegConstructs + ConstrNum).WindowTypeEQL = true;
+            dataConstruction.Construct(TotRegConstructs + ConstrNum).EQLConsPtr = ConstrNum;
+            dataConstruction.Construct(TotRegConstructs + ConstrNum).WindowTypeEQL = true;
         } // TotWinEquivLayerConstructs loop
 
         TotWinEquivLayerConstructs = ConstrNum;
@@ -4582,12 +4587,12 @@ namespace HeatBalanceManager {
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
 
             // For air boundaries, skip TypeIsAirBoundaryGroupedRadiant, process TypeIsAirBoundaryIRTSurface
-            if (Construct(ConstrNum).TypeIsAirBoundaryGroupedRadiant) continue;
+            if (dataConstruction.Construct(ConstrNum).TypeIsAirBoundaryGroupedRadiant) continue;
             if (NominalRforNominalUCalculation(ConstrNum) != 0.0) {
                 NominalU(ConstrNum) = 1.0 / NominalRforNominalUCalculation(ConstrNum);
             } else {
-                if (!Construct(ConstrNum).WindowTypeEQL) {
-                    ShowSevereError("Nominal U is zero, for construction=" + Construct(ConstrNum).Name);
+                if (!dataConstruction.Construct(ConstrNum).WindowTypeEQL) {
+                    ShowSevereError("Nominal U is zero, for construction=" + dataConstruction.Construct(ConstrNum).Name);
                     ErrorsFound = true;
                 }
             }
@@ -5154,7 +5159,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(OutputFiles &outputFiles)
+    void InitHeatBalance(WindowManagerData &dataWindowManager, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5176,7 +5181,6 @@ namespace HeatBalanceManager {
         // na
 
         // Using/Aliasing
-        using namespace ConductionTransferFunctionCalc;
         using namespace WindowManager;
         using namespace SolarShading;
         using DataLoopNode::Node;
@@ -5218,7 +5222,7 @@ namespace HeatBalanceManager {
             DisplayString("Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
-            InitWindowOpticalCalculations(outputFiles);
+            InitWindowOpticalCalculations(dataWindowManager, outputFiles);
             InitDaylightingDevices(OutputFiles::getSingleton()); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(); // Initialize the shadowing calculations
@@ -5880,9 +5884,9 @@ namespace HeatBalanceManager {
             auto &thisSurface(DataSurfaces::Surface(SurfNum));
             if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
                 auto &thisConstruct(thisSurface.Construction);
-                if (!Construct(thisConstruct).WindowTypeBSDF && !Construct(thisConstruct).TypeIsAirBoundaryInteriorWindow) {
+                if (!dataConstruction.Construct(thisConstruct).WindowTypeBSDF && !dataConstruction.Construct(thisConstruct).TypeIsAirBoundaryInteriorWindow) {
                     FenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
-                    FenLaySurfTempBack(Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
+                    FenLaySurfTempBack(dataConstruction.Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
                 }
             }
         }
@@ -6602,70 +6606,70 @@ namespace HeatBalanceManager {
 
             // reallocate Material type
 
-            Material.redimension(TotMaterials);
+            dataMaterial.Material.redimension(TotMaterials);
             NominalR.redimension(TotMaterials, 0.0);
 
             // Initialize new materials
             for (loop = TotMaterialsPrev + 1; loop <= TotMaterials; ++loop) {
-                Material(loop).Name = "";
-                Material(loop).Group = -1;
-                Material(loop).Roughness = 0;
-                Material(loop).Conductivity = 0.0;
-                Material(loop).Density = 0.0;
-                Material(loop).IsoMoistCap = 0.0;
-                Material(loop).Porosity = 0.0;
-                Material(loop).Resistance = 0.0;
-                Material(loop).SpecHeat = 0.0;
-                Material(loop).ThermGradCoef = 0.0;
-                Material(loop).Thickness = 0.0;
-                Material(loop).VaporDiffus = 0.0;
-                Material(loop).AbsorpSolar = 0.0;
-                Material(loop).AbsorpThermal = 0.0;
-                Material(loop).AbsorpVisible = 0.0;
-                Material(loop).ReflectShade = 0.0;
-                Material(loop).Trans = 0.0;
-                Material(loop).ReflectShadeVis = 0.0;
-                Material(loop).TransVis = 0.0;
-                Material(loop).GlassTransDirtFactor = 1.0;
-                Material(loop).SolarDiffusing = false;
-                Material(loop).AbsorpThermalBack = 0.0;
-                Material(loop).AbsorpThermalFront = 0.0;
-                Material(loop).ReflectSolBeamBack = 0.0;
-                Material(loop).ReflectSolBeamFront = 0.0;
-                Material(loop).ReflectSolDiffBack = 0.0;
-                Material(loop).ReflectSolDiffFront = 0.0;
-                Material(loop).ReflectVisBeamBack = 0.0;
-                Material(loop).ReflectVisBeamFront = 0.0;
-                Material(loop).ReflectVisDiffBack = 0.0;
-                Material(loop).ReflectVisDiffFront = 0.0;
-                Material(loop).TransSolBeam = 0.0;
-                Material(loop).TransThermal = 0.0;
-                Material(loop).TransVisBeam = 0.0;
-                Material(loop).GlassSpectralDataPtr = 0;
-                Material(loop).NumberOfGasesInMixture = 0;
-                Material(loop).GasCon = 0.0;
-                Material(loop).GasVis = 0.0;
-                Material(loop).GasCp = 0.0;
-                Material(loop).GasType = 0;
-                Material(loop).GasWght = 0.0;
-                Material(loop).GasSpecHeatRatio = 0.0;
-                Material(loop).GasFract = 0.0;
-                Material(loop).WinShadeToGlassDist = 0.0;
-                Material(loop).WinShadeTopOpeningMult = 0.0;
-                Material(loop).WinShadeBottomOpeningMult = 0.0;
-                Material(loop).WinShadeLeftOpeningMult = 0.0;
-                Material(loop).WinShadeRightOpeningMult = 0.0;
-                Material(loop).WinShadeAirFlowPermeability = 0.0;
-                Material(loop).BlindDataPtr = 0;
-                Material(loop).EMPDmu = 0.0;
-                Material(loop).MoistACoeff = 0.0;
-                Material(loop).MoistBCoeff = 0.0;
-                Material(loop).MoistCCoeff = 0.0;
-                Material(loop).MoistDCoeff = 0.0;
-                Material(loop).EMPDSurfaceDepth = 0.0;
-                Material(loop).EMPDDeepDepth = 0.0;
-                Material(loop).EMPDmuCoating = 0.0;
-                Material(loop).EMPDCoatingThickness = 0.0;
+                dataMaterial.Material(loop).Name = "";
+                dataMaterial.Material(loop).Group = -1;
+                dataMaterial.Material(loop).Roughness = 0;
+                dataMaterial.Material(loop).Conductivity = 0.0;
+                dataMaterial.Material(loop).Density = 0.0;
+                dataMaterial.Material(loop).IsoMoistCap = 0.0;
+                dataMaterial.Material(loop).Porosity = 0.0;
+                dataMaterial.Material(loop).Resistance = 0.0;
+                dataMaterial.Material(loop).SpecHeat = 0.0;
+                dataMaterial.Material(loop).ThermGradCoef = 0.0;
+                dataMaterial.Material(loop).Thickness = 0.0;
+                dataMaterial.Material(loop).VaporDiffus = 0.0;
+                dataMaterial.Material(loop).AbsorpSolar = 0.0;
+                dataMaterial.Material(loop).AbsorpThermal = 0.0;
+                dataMaterial.Material(loop).AbsorpVisible = 0.0;
+                dataMaterial.Material(loop).ReflectShade = 0.0;
+                dataMaterial.Material(loop).Trans = 0.0;
+                dataMaterial.Material(loop).ReflectShadeVis = 0.0;
+                dataMaterial.Material(loop).TransVis = 0.0;
+                dataMaterial.Material(loop).GlassTransDirtFactor = 1.0;
+                dataMaterial.Material(loop).SolarDiffusing = false;
+                dataMaterial.Material(loop).AbsorpThermalBack = 0.0;
+                dataMaterial.Material(loop).AbsorpThermalFront = 0.0;
+                dataMaterial.Material(loop).ReflectSolBeamBack = 0.0;
+                dataMaterial.Material(loop).ReflectSolBeamFront = 0.0;
+                dataMaterial.Material(loop).ReflectSolDiffBack = 0.0;
+                dataMaterial.Material(loop).ReflectSolDiffFront = 0.0;
+                dataMaterial.Material(loop).ReflectVisBeamBack = 0.0;
+                dataMaterial.Material(loop).ReflectVisBeamFront = 0.0;
+                dataMaterial.Material(loop).ReflectVisDiffBack = 0.0;
+                dataMaterial.Material(loop).ReflectVisDiffFront = 0.0;
+                dataMaterial.Material(loop).TransSolBeam = 0.0;
+                dataMaterial.Material(loop).TransThermal = 0.0;
+                dataMaterial.Material(loop).TransVisBeam = 0.0;
+                dataMaterial.Material(loop).GlassSpectralDataPtr = 0;
+                dataMaterial.Material(loop).NumberOfGasesInMixture = 0;
+                dataMaterial.Material(loop).GasCon = 0.0;
+                dataMaterial.Material(loop).GasVis = 0.0;
+                dataMaterial.Material(loop).GasCp = 0.0;
+                dataMaterial.Material(loop).GasType = 0;
+                dataMaterial.Material(loop).GasWght = 0.0;
+                dataMaterial.Material(loop).GasSpecHeatRatio = 0.0;
+                dataMaterial.Material(loop).GasFract = 0.0;
+                dataMaterial.Material(loop).WinShadeToGlassDist = 0.0;
+                dataMaterial.Material(loop).WinShadeTopOpeningMult = 0.0;
+                dataMaterial.Material(loop).WinShadeBottomOpeningMult = 0.0;
+                dataMaterial.Material(loop).WinShadeLeftOpeningMult = 0.0;
+                dataMaterial.Material(loop).WinShadeRightOpeningMult = 0.0;
+                dataMaterial.Material(loop).WinShadeAirFlowPermeability = 0.0;
+                dataMaterial.Material(loop).BlindDataPtr = 0;
+                dataMaterial.Material(loop).EMPDmu = 0.0;
+                dataMaterial.Material(loop).MoistACoeff = 0.0;
+                dataMaterial.Material(loop).MoistBCoeff = 0.0;
+                dataMaterial.Material(loop).MoistCCoeff = 0.0;
+                dataMaterial.Material(loop).MoistDCoeff = 0.0;
+                dataMaterial.Material(loop).EMPDSurfaceDepth = 0.0;
+                dataMaterial.Material(loop).EMPDDeepDepth = 0.0;
+                dataMaterial.Material(loop).EMPDmuCoating = 0.0;
+                dataMaterial.Material(loop).EMPDCoatingThickness = 0.0;
             }
 
             // Glass objects
@@ -6681,33 +6685,33 @@ namespace HeatBalanceManager {
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
                     ++MaterNum;
                     MaterNumSysGlass(IGlass, IGlSys) = MaterNum;
-                    Material(MaterNum).Group = WindowGlass;
+                    dataMaterial.Material(MaterNum).Group = WindowGlass;
                     {
                         IOFlags flags;
                         ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                         ReadStat = flags.ios();
                     }
                     ++FileLineCount;
-                    ObjexxFCL::gio::read(NextLine.substr(25), "*") >> Material(MaterNum).Thickness >> Material(MaterNum).Conductivity >>
-                        Material(MaterNum).Trans >> Material(MaterNum).ReflectSolBeamFront >> Material(MaterNum).ReflectSolBeamBack >>
-                        Material(MaterNum).TransVis >> Material(MaterNum).ReflectVisBeamFront >> Material(MaterNum).ReflectVisBeamBack >>
-                        Material(MaterNum).TransThermal >> Material(MaterNum).AbsorpThermalFront >> Material(MaterNum).AbsorpThermalBack >> LayerName;
-                    Material(MaterNum).Thickness *= 0.001;
-                    if (Material(MaterNum).Thickness <= 0.0) {
+                    ObjexxFCL::gio::read(NextLine.substr(25), "*") >> dataMaterial.Material(MaterNum).Thickness >> dataMaterial.Material(MaterNum).Conductivity >>
+                        dataMaterial.Material(MaterNum).Trans >> dataMaterial.Material(MaterNum).ReflectSolBeamFront >> dataMaterial.Material(MaterNum).ReflectSolBeamBack >>
+                        dataMaterial.Material(MaterNum).TransVis >> dataMaterial.Material(MaterNum).ReflectVisBeamFront >> dataMaterial.Material(MaterNum).ReflectVisBeamBack >>
+                        dataMaterial.Material(MaterNum).TransThermal >> dataMaterial.Material(MaterNum).AbsorpThermalFront >> dataMaterial.Material(MaterNum).AbsorpThermalBack >> LayerName;
+                    dataMaterial.Material(MaterNum).Thickness *= 0.001;
+                    if (dataMaterial.Material(MaterNum).Thickness <= 0.0) {
                     }
                     if (NGlSys == 1) {
-                        Material(MaterNum).Name = "W5:" + DesiredConstructionName + ":GLASS" + NumName(IGlass);
+                        dataMaterial.Material(MaterNum).Name = "W5:" + DesiredConstructionName + ":GLASS" + NumName(IGlass);
                     } else {
-                        Material(MaterNum).Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GLASS" + NumName(IGlass);
+                        dataMaterial.Material(MaterNum).Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GLASS" + NumName(IGlass);
                     }
-                    Material(MaterNum).Roughness = VerySmooth;
-                    Material(MaterNum).AbsorpThermal = Material(MaterNum).AbsorpThermalBack;
-                    if (Material(MaterNum).Thickness <= 0.0) {
-                        ShowSevereError("SearchWindow5DataFile: Material=\"" + Material(MaterNum).Name +
+                    dataMaterial.Material(MaterNum).Roughness = VerySmooth;
+                    dataMaterial.Material(MaterNum).AbsorpThermal = dataMaterial.Material(MaterNum).AbsorpThermalBack;
+                    if (dataMaterial.Material(MaterNum).Thickness <= 0.0) {
+                        ShowSevereError("SearchWindow5DataFile: Material=\"" + dataMaterial.Material(MaterNum).Name +
                                         "\" has thickness of 0.0.  Will be set to thickness = .001 but inaccuracies may result.");
                         ShowContinueError("Line being read=" + NextLine);
                         ShowContinueError("Thickness field starts at column 26=" + NextLine.substr(25));
-                        Material(MaterNum).Thickness = 0.001;
+                        dataMaterial.Material(MaterNum).Thickness = 0.001;
                     }
                 }
             }
@@ -6730,14 +6734,14 @@ namespace HeatBalanceManager {
                         ReadStat = flags.ios();
                     }
                     ++FileLineCount;
-                    ObjexxFCL::gio::read(NextLine.substr(23), "*") >> Material(MaterNum).Thickness >> NumGases(IGap, IGlSys);
+                    ObjexxFCL::gio::read(NextLine.substr(23), "*") >> dataMaterial.Material(MaterNum).Thickness >> NumGases(IGap, IGlSys);
                     if (NGlSys == 1) {
-                        Material(MaterNum).Name = "W5:" + DesiredConstructionName + ":GAP" + NumName(IGap);
+                        dataMaterial.Material(MaterNum).Name = "W5:" + DesiredConstructionName + ":GAP" + NumName(IGap);
                     } else {
-                        Material(MaterNum).Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GAP" + NumName(IGap);
+                        dataMaterial.Material(MaterNum).Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GAP" + NumName(IGap);
                     }
-                    Material(MaterNum).Thickness *= 0.001;
-                    Material(MaterNum).Roughness = MediumRough; // Unused
+                    dataMaterial.Material(MaterNum).Thickness *= 0.001;
+                    dataMaterial.Material(MaterNum).Roughness = MediumRough; // Unused
                 }
             }
 
@@ -6751,9 +6755,9 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
                     MaterNum = MaterNumSysGap(IGap, IGlSys);
-                    Material(MaterNum).NumberOfGasesInMixture = NumGases(IGap, IGlSys);
-                    Material(MaterNum).Group = WindowGas;
-                    if (NumGases(IGap, IGlSys) > 1) Material(MaterNum).Group = WindowGasMixture;
+                    dataMaterial.Material(MaterNum).NumberOfGasesInMixture = NumGases(IGap, IGlSys);
+                    dataMaterial.Material(MaterNum).Group = WindowGas;
+                    if (NumGases(IGap, IGlSys) > 1) dataMaterial.Material(MaterNum).Group = WindowGasMixture;
                     for (IGas = 1; IGas <= NumGases(IGap, IGlSys); ++IGas) {
                         {
                             IOFlags flags;
@@ -6761,13 +6765,13 @@ namespace HeatBalanceManager {
                             ReadStat = flags.ios();
                         }
                         ++FileLineCount;
-                        ObjexxFCL::gio::read(NextLine.substr(19), "*") >> GasName(IGas) >> Material(MaterNum).GasFract(IGas) >>
-                            Material(MaterNum).GasWght(IGas) >> Material(MaterNum).GasCon(_, IGas) >> Material(MaterNum).GasVis(_, IGas) >>
-                            Material(MaterNum).GasCp(_, IGas);
+                        ObjexxFCL::gio::read(NextLine.substr(19), "*") >> GasName(IGas) >> dataMaterial.Material(MaterNum).GasFract(IGas) >>
+                            dataMaterial.Material(MaterNum).GasWght(IGas) >> dataMaterial.Material(MaterNum).GasCon(_, IGas) >> dataMaterial.Material(MaterNum).GasVis(_, IGas) >>
+                            dataMaterial.Material(MaterNum).GasCp(_, IGas);
                         // Nominal resistance of gap at room temperature (based on first gas in mixture)
                         NominalR(MaterNum) =
-                            Material(MaterNum).Thickness /
-                            (Material(MaterNum).GasCon(1, 1) + Material(MaterNum).GasCon(2, 1) * 300.0 + Material(MaterNum).GasCon(3, 1) * 90000.0);
+                            dataMaterial.Material(MaterNum).Thickness /
+                            (dataMaterial.Material(MaterNum).GasCon(1, 1) + dataMaterial.Material(MaterNum).GasCon(2, 1) * 300.0 + dataMaterial.Material(MaterNum).GasCon(3, 1) * 90000.0);
                     }
                 }
             }
@@ -6776,7 +6780,7 @@ namespace HeatBalanceManager {
 
             // reallocate Construct types
             TotConstructs += NGlSys;
-            Construct.redimension(TotConstructs);
+            dataConstruction.Construct.redimension(TotConstructs);
             NominalRforNominalUCalculation.redimension(TotConstructs);
             NominalU.redimension(TotConstructs);
 
@@ -6803,81 +6807,81 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 ConstrNum = TotConstructs - NGlSys + IGlSys;
                 if (IGlSys == 1) {
-                    Construct(ConstrNum).Name = DesiredConstructionName;
+                    dataConstruction.Construct(ConstrNum).Name = DesiredConstructionName;
                 } else {
-                    Construct(ConstrNum).Name = DesiredConstructionName + ":2";
+                    dataConstruction.Construct(ConstrNum).Name = DesiredConstructionName + ":2";
                 }
-                for (loop = 1; loop <= MaxLayersInConstruct; ++loop) {
-                    Construct(ConstrNum).LayerPoint(loop) = 0;
+                for (loop = 1; loop <= Construction::MaxLayersInConstruct; ++loop) {
+                    dataConstruction.Construct(ConstrNum).LayerPoint(loop) = 0;
                 }
-                Construct(ConstrNum).InsideAbsorpSolar = 0.0;
-                Construct(ConstrNum).OutsideAbsorpSolar = 0.0;
-                Construct(ConstrNum).DayltPropPtr = 0;
-                Construct(ConstrNum).CTFCross = 0.0;
-                Construct(ConstrNum).CTFFlux = 0.0;
-                Construct(ConstrNum).CTFInside = 0.0;
-                Construct(ConstrNum).CTFOutside = 0.0;
-                Construct(ConstrNum).CTFSourceIn = 0.0;
-                Construct(ConstrNum).CTFSourceOut = 0.0;
-                Construct(ConstrNum).CTFTimeStep = 0.0;
-                Construct(ConstrNum).CTFTSourceOut = 0.0;
-                Construct(ConstrNum).CTFTSourceIn = 0.0;
-                Construct(ConstrNum).CTFTSourceQ = 0.0;
-                Construct(ConstrNum).CTFTUserOut = 0.0;
-                Construct(ConstrNum).CTFTUserIn = 0.0;
-                Construct(ConstrNum).CTFTUserSource = 0.0;
-                Construct(ConstrNum).NumHistories = 0;
-                Construct(ConstrNum).NumCTFTerms = 0;
-                Construct(ConstrNum).UValue = 0.0;
-                Construct(ConstrNum).SourceSinkPresent = false;
-                Construct(ConstrNum).SolutionDimensions = 0;
-                Construct(ConstrNum).SourceAfterLayer = 0;
-                Construct(ConstrNum).TempAfterLayer = 0;
-                Construct(ConstrNum).ThicknessPerpend = 0.0;
-                Construct(ConstrNum).AbsDiff = 0.0;
-                Construct(ConstrNum).AbsDiffBack = 0.0;
-                Construct(ConstrNum).AbsDiffShade = 0.0;
-                Construct(ConstrNum).AbsDiffBackShade = 0.0;
-                Construct(ConstrNum).ShadeAbsorpThermal = 0.0;
-                Construct(ConstrNum).AbsBeamCoef = 0.0;
-                Construct(ConstrNum).AbsBeamBackCoef = 0.0;
-                Construct(ConstrNum).AbsBeamShadeCoef = 0.0;
-                Construct(ConstrNum).AbsDiffIn = 0.0;
-                Construct(ConstrNum).AbsDiffOut = 0.0;
-                Construct(ConstrNum).TransDiff = 0.0;
-                Construct(ConstrNum).TransDiffVis = 0.0;
-                Construct(ConstrNum).ReflectSolDiffBack = 0.0;
-                Construct(ConstrNum).ReflectSolDiffFront = 0.0;
-                Construct(ConstrNum).ReflectVisDiffBack = 0.0;
-                Construct(ConstrNum).ReflectVisDiffFront = 0.0;
-                Construct(ConstrNum).TransSolBeamCoef = 0.0;
-                Construct(ConstrNum).TransVisBeamCoef = 0.0;
-                Construct(ConstrNum).ReflSolBeamFrontCoef = 0.0;
-                Construct(ConstrNum).ReflSolBeamBackCoef = 0.0;
-                Construct(ConstrNum).W5FrameDivider = 0;
-                Construct(ConstrNum).TotLayers = NGlass(IGlSys) + NGaps(IGlSys);
-                Construct(ConstrNum).TotGlassLayers = NGlass(IGlSys);
-                Construct(ConstrNum).TotSolidLayers = NGlass(IGlSys);
+                dataConstruction.Construct(ConstrNum).InsideAbsorpSolar = 0.0;
+                dataConstruction.Construct(ConstrNum).OutsideAbsorpSolar = 0.0;
+                dataConstruction.Construct(ConstrNum).DayltPropPtr = 0;
+                dataConstruction.Construct(ConstrNum).CTFCross = 0.0;
+                dataConstruction.Construct(ConstrNum).CTFFlux = 0.0;
+                dataConstruction.Construct(ConstrNum).CTFInside = 0.0;
+                dataConstruction.Construct(ConstrNum).CTFOutside = 0.0;
+                dataConstruction.Construct(ConstrNum).CTFSourceIn = 0.0;
+                dataConstruction.Construct(ConstrNum).CTFSourceOut = 0.0;
+                dataConstruction.Construct(ConstrNum).CTFTimeStep = 0.0;
+                dataConstruction.Construct(ConstrNum).CTFTSourceOut = 0.0;
+                dataConstruction.Construct(ConstrNum).CTFTSourceIn = 0.0;
+                dataConstruction.Construct(ConstrNum).CTFTSourceQ = 0.0;
+                dataConstruction.Construct(ConstrNum).CTFTUserOut = 0.0;
+                dataConstruction.Construct(ConstrNum).CTFTUserIn = 0.0;
+                dataConstruction.Construct(ConstrNum).CTFTUserSource = 0.0;
+                dataConstruction.Construct(ConstrNum).NumHistories = 0;
+                dataConstruction.Construct(ConstrNum).NumCTFTerms = 0;
+                dataConstruction.Construct(ConstrNum).UValue = 0.0;
+                dataConstruction.Construct(ConstrNum).SourceSinkPresent = false;
+                dataConstruction.Construct(ConstrNum).SolutionDimensions = 0;
+                dataConstruction.Construct(ConstrNum).SourceAfterLayer = 0;
+                dataConstruction.Construct(ConstrNum).TempAfterLayer = 0;
+                dataConstruction.Construct(ConstrNum).ThicknessPerpend = 0.0;
+                dataConstruction.Construct(ConstrNum).AbsDiff = 0.0;
+                dataConstruction.Construct(ConstrNum).AbsDiffBack = 0.0;
+                dataConstruction.Construct(ConstrNum).AbsDiffShade = 0.0;
+                dataConstruction.Construct(ConstrNum).AbsDiffBackShade = 0.0;
+                dataConstruction.Construct(ConstrNum).ShadeAbsorpThermal = 0.0;
+                dataConstruction.Construct(ConstrNum).AbsBeamCoef = 0.0;
+                dataConstruction.Construct(ConstrNum).AbsBeamBackCoef = 0.0;
+                dataConstruction.Construct(ConstrNum).AbsBeamShadeCoef = 0.0;
+                dataConstruction.Construct(ConstrNum).AbsDiffIn = 0.0;
+                dataConstruction.Construct(ConstrNum).AbsDiffOut = 0.0;
+                dataConstruction.Construct(ConstrNum).TransDiff = 0.0;
+                dataConstruction.Construct(ConstrNum).TransDiffVis = 0.0;
+                dataConstruction.Construct(ConstrNum).ReflectSolDiffBack = 0.0;
+                dataConstruction.Construct(ConstrNum).ReflectSolDiffFront = 0.0;
+                dataConstruction.Construct(ConstrNum).ReflectVisDiffBack = 0.0;
+                dataConstruction.Construct(ConstrNum).ReflectVisDiffFront = 0.0;
+                dataConstruction.Construct(ConstrNum).TransSolBeamCoef = 0.0;
+                dataConstruction.Construct(ConstrNum).TransVisBeamCoef = 0.0;
+                dataConstruction.Construct(ConstrNum).ReflSolBeamFrontCoef = 0.0;
+                dataConstruction.Construct(ConstrNum).ReflSolBeamBackCoef = 0.0;
+                dataConstruction.Construct(ConstrNum).W5FrameDivider = 0;
+                dataConstruction.Construct(ConstrNum).TotLayers = NGlass(IGlSys) + NGaps(IGlSys);
+                dataConstruction.Construct(ConstrNum).TotGlassLayers = NGlass(IGlSys);
+                dataConstruction.Construct(ConstrNum).TotSolidLayers = NGlass(IGlSys);
 
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
-                    Construct(ConstrNum).LayerPoint(2 * IGlass - 1) = MaterNumSysGlass(IGlass, IGlSys);
-                    if (IGlass < NGlass(IGlSys)) Construct(ConstrNum).LayerPoint(2 * IGlass) = MaterNumSysGap(IGlass, IGlSys);
+                    dataConstruction.Construct(ConstrNum).LayerPoint(2 * IGlass - 1) = MaterNumSysGlass(IGlass, IGlSys);
+                    if (IGlass < NGlass(IGlSys)) dataConstruction.Construct(ConstrNum).LayerPoint(2 * IGlass) = MaterNumSysGap(IGlass, IGlSys);
                 }
 
-                Construct(ConstrNum).OutsideRoughness = VerySmooth;
-                Construct(ConstrNum).InsideAbsorpThermal = Material(TotMaterialsPrev + NGlass(IGlSys)).AbsorpThermalBack;
-                Construct(ConstrNum).OutsideAbsorpThermal = Material(TotMaterialsPrev + 1).AbsorpThermalFront;
-                Construct(ConstrNum).TypeIsWindow = true;
-                Construct(ConstrNum).FromWindow5DataFile = true;
-                Construct(ConstrNum).W5FileGlazingSysHeight = WinHeight(IGlSys);
-                Construct(ConstrNum).W5FileGlazingSysWidth = WinWidth(IGlSys);
+                dataConstruction.Construct(ConstrNum).OutsideRoughness = VerySmooth;
+                dataConstruction.Construct(ConstrNum).InsideAbsorpThermal = dataMaterial.Material(TotMaterialsPrev + NGlass(IGlSys)).AbsorpThermalBack;
+                dataConstruction.Construct(ConstrNum).OutsideAbsorpThermal = dataMaterial.Material(TotMaterialsPrev + 1).AbsorpThermalFront;
+                dataConstruction.Construct(ConstrNum).TypeIsWindow = true;
+                dataConstruction.Construct(ConstrNum).FromWindow5DataFile = true;
+                dataConstruction.Construct(ConstrNum).W5FileGlazingSysHeight = WinHeight(IGlSys);
+                dataConstruction.Construct(ConstrNum).W5FileGlazingSysWidth = WinWidth(IGlSys);
                 if (UtilityRoutines::SameString(MullionOrientation, "Vertical")) {
-                    Construct(ConstrNum).W5FileMullionOrientation = Vertical;
+                    dataConstruction.Construct(ConstrNum).W5FileMullionOrientation = Vertical;
                 } else if (UtilityRoutines::SameString(MullionOrientation, "Horizontal")) {
-                    Construct(ConstrNum).W5FileMullionOrientation = Horizontal;
+                    dataConstruction.Construct(ConstrNum).W5FileMullionOrientation = Horizontal;
                 } else {
                 }
-                Construct(ConstrNum).W5FileMullionWidth = MullionWidth;
+                dataConstruction.Construct(ConstrNum).W5FileMullionWidth = MullionWidth;
 
                 // Fill Construct with system transmission, reflection and absorption properties
 
@@ -7036,27 +7040,27 @@ namespace HeatBalanceManager {
                                    " from the Window5 data file cannot be used because of above errors");
 
                 // Hemis
-                Construct(ConstrNum).TransDiff = Tsol(11);
-                Construct(ConstrNum).TransDiffVis = Tvis(11);
-                Construct(ConstrNum).ReflectSolDiffFront = Rfsol(11);
-                Construct(ConstrNum).ReflectSolDiffBack = Rbsol(11);
-                Construct(ConstrNum).ReflectVisDiffFront = Rfvis(11);
-                Construct(ConstrNum).ReflectVisDiffBack = Rbvis(11);
+                dataConstruction.Construct(ConstrNum).TransDiff = Tsol(11);
+                dataConstruction.Construct(ConstrNum).TransDiffVis = Tvis(11);
+                dataConstruction.Construct(ConstrNum).ReflectSolDiffFront = Rfsol(11);
+                dataConstruction.Construct(ConstrNum).ReflectSolDiffBack = Rbsol(11);
+                dataConstruction.Construct(ConstrNum).ReflectVisDiffFront = Rfvis(11);
+                dataConstruction.Construct(ConstrNum).ReflectVisDiffBack = Rbvis(11);
 
-                W5LsqFit(CosPhiIndepVar, Tsol, 6, 1, 10, Construct(ConstrNum).TransSolBeamCoef);
-                W5LsqFit(CosPhiIndepVar, Tvis, 6, 1, 10, Construct(ConstrNum).TransVisBeamCoef);
-                W5LsqFit(CosPhiIndepVar, Rfsol, 6, 1, 10, Construct(ConstrNum).ReflSolBeamFrontCoef);
+                W5LsqFit(CosPhiIndepVar, Tsol, 6, 1, 10, dataConstruction.Construct(ConstrNum).TransSolBeamCoef);
+                W5LsqFit(CosPhiIndepVar, Tvis, 6, 1, 10, dataConstruction.Construct(ConstrNum).TransVisBeamCoef);
+                W5LsqFit(CosPhiIndepVar, Rfsol, 6, 1, 10, dataConstruction.Construct(ConstrNum).ReflSolBeamFrontCoef);
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
-                    W5LsqFit(CosPhiIndepVar, AbsSol(_, IGlass), 6, 1, 10, Construct(ConstrNum).AbsBeamCoef(_, IGlass));
+                    W5LsqFit(CosPhiIndepVar, AbsSol(_, IGlass), 6, 1, 10, dataConstruction.Construct(ConstrNum).AbsBeamCoef(_, IGlass));
                 }
 
                 // For comparing fitted vs. input distribution in incidence angle
                 for (IPhi = 1; IPhi <= 10; ++IPhi) {
-                    tsolFit(IPhi) = POLYF(CosPhi(IPhi), Construct(ConstrNum).TransSolBeamCoef);
-                    tvisFit(IPhi) = POLYF(CosPhi(IPhi), Construct(ConstrNum).TransVisBeamCoef);
-                    rfsolFit(IPhi) = POLYF(CosPhi(IPhi), Construct(ConstrNum).ReflSolBeamFrontCoef);
+                    tsolFit(IPhi) = POLYF(CosPhi(IPhi), dataConstruction.Construct(ConstrNum).TransSolBeamCoef);
+                    tvisFit(IPhi) = POLYF(CosPhi(IPhi), dataConstruction.Construct(ConstrNum).TransVisBeamCoef);
+                    rfsolFit(IPhi) = POLYF(CosPhi(IPhi), dataConstruction.Construct(ConstrNum).ReflSolBeamFrontCoef);
                     for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
-                        solabsFit(IGlass, IPhi) = POLYF(CosPhi(IPhi), Construct(ConstrNum).AbsBeamCoef({1, 6}, IGlass));
+                        solabsFit(IGlass, IPhi) = POLYF(CosPhi(IPhi), dataConstruction.Construct(ConstrNum).AbsBeamCoef({1, 6}, IGlass));
                     }
                 }
                 // end
@@ -7065,14 +7069,14 @@ namespace HeatBalanceManager {
                 // conductivity here ignores convective effects in gap.)
                 NominalRforNominalUCalculation(ConstrNum) = 0.0;
                 for (loop = 1; loop <= NGlass(IGlSys) + NGaps(IGlSys); ++loop) {
-                    MatNum = Construct(ConstrNum).LayerPoint(loop);
-                    if (Material(MatNum).Group == WindowGlass) {
-                        NominalRforNominalUCalculation(ConstrNum) += Material(MatNum).Thickness / Material(MatNum).Conductivity;
-                    } else if (Material(MatNum).Group == WindowGas || Material(MatNum).Group == WindowGasMixture) {
+                    MatNum = dataConstruction.Construct(ConstrNum).LayerPoint(loop);
+                    if (dataMaterial.Material(MatNum).Group == WindowGlass) {
+                        NominalRforNominalUCalculation(ConstrNum) += dataMaterial.Material(MatNum).Thickness / dataMaterial.Material(MatNum).Conductivity;
+                    } else if (dataMaterial.Material(MatNum).Group == WindowGas || dataMaterial.Material(MatNum).Group == WindowGasMixture) {
                         // If mixture, use conductivity of first gas in mixture
                         NominalRforNominalUCalculation(ConstrNum) +=
-                            Material(MatNum).Thickness /
-                            (Material(MatNum).GasCon(1, 1) + Material(MatNum).GasCon(2, 1) * 300.0 + Material(MatNum).GasCon(3, 1) * 90000.0);
+                            dataMaterial.Material(MatNum).Thickness /
+                            (dataMaterial.Material(MatNum).GasCon(1, 1) + dataMaterial.Material(MatNum).GasCon(2, 1) * 300.0 + dataMaterial.Material(MatNum).GasCon(3, 1) * 90000.0);
                     }
                 }
 
@@ -7084,7 +7088,7 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 if (FrameWidth > 0.0 || DividerWidth(IGlSys) > 0.0) {
                     ++TotFrameDivider;
-                    Construct(TotConstructs - NGlSys + IGlSys).W5FrameDivider = TotFrameDivider;
+                    dataConstruction.Construct(TotConstructs - NGlSys + IGlSys).W5FrameDivider = TotFrameDivider;
                 }
             }
 
@@ -7094,7 +7098,7 @@ namespace HeatBalanceManager {
 
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 if (FrameWidth > 0.0 || DividerWidth(IGlSys) > 0.0) {
-                    FrDivNum = Construct(TotConstructs - NGlSys + IGlSys).W5FrameDivider;
+                    FrDivNum = dataConstruction.Construct(TotConstructs - NGlSys + IGlSys).W5FrameDivider;
                     FrameDivider(FrDivNum).FrameWidth = FrameWidth;
                     FrameDivider(FrDivNum).FrameProjectionOut = FrameProjectionOut;
                     FrameDivider(FrDivNum).FrameProjectionIn = FrameProjectionIn;
@@ -7287,8 +7291,8 @@ namespace HeatBalanceManager {
         int iFCConcreteLayer; // Layer pointer to the materials array
 
         // First get the concrete layer
-        iFCConcreteLayer = UtilityRoutines::FindItemInList("~FC_Concrete", Material);
-        Rcon = Material(iFCConcreteLayer).Resistance;
+        iFCConcreteLayer = UtilityRoutines::FindItemInList("~FC_Concrete", dataMaterial.Material);
+        Rcon = dataMaterial.Material(iFCConcreteLayer).Resistance;
 
         // Count number of constructions defined with Ffactor or Cfactor method
         TotFfactorConstructs = inputProcessor->getNumObjectsFound("Construction:FfactorGroundFloor");
@@ -7327,16 +7331,16 @@ namespace HeatBalanceManager {
 
             ++ConstrNum;
 
-            Construct(ConstrNum).Name = ConstructAlphas(1);
-            Construct(ConstrNum).TypeIsFfactorFloor = true;
+            dataConstruction.Construct(ConstrNum).Name = ConstructAlphas(1);
+            dataConstruction.Construct(ConstrNum).TypeIsFfactorFloor = true;
 
             Ffactor = DummyProps(1);
             Area = DummyProps(2);
             PerimeterExposed = DummyProps(3);
 
-            Construct(ConstrNum).Area = Area;
-            Construct(ConstrNum).PerimeterExposed = PerimeterExposed;
-            Construct(ConstrNum).FFactor = Ffactor;
+            dataConstruction.Construct(ConstrNum).Area = Area;
+            dataConstruction.Construct(ConstrNum).PerimeterExposed = PerimeterExposed;
+            dataConstruction.Construct(ConstrNum).FFactor = Ffactor;
 
             if (Ffactor <= 0.0) {
                 ShowSevereError(CurrentModuleObject + "=\"" + ConstructAlphas(1) + "\" has " + cNumericFieldNames(1) + " <= 0.0, must be > 0.0.");
@@ -7357,14 +7361,14 @@ namespace HeatBalanceManager {
             }
 
             // The construction has two layers which have been created in GetMaterialData
-            Construct(ConstrNum).TotLayers = 2;
+            dataConstruction.Construct(ConstrNum).TotLayers = 2;
 
             // The concrete is the inside layer
-            Construct(ConstrNum).LayerPoint(2) = iFCConcreteLayer;
+            dataConstruction.Construct(ConstrNum).LayerPoint(2) = iFCConcreteLayer;
 
             // The fictitious insulation is the outside layer
-            MaterNum = UtilityRoutines::FindItemInList("~FC_Insulation_" + RoundSigDigits(Loop), Material);
-            Construct(ConstrNum).LayerPoint(1) = MaterNum;
+            MaterNum = UtilityRoutines::FindItemInList("~FC_Insulation_" + RoundSigDigits(Loop), dataMaterial.Material);
+            dataConstruction.Construct(ConstrNum).LayerPoint(1) = MaterNum;
 
             // Calculate the thermal resistance of the fictitious insulation layer
             // effective thermal resistance excludes inside and outside air films
@@ -7381,7 +7385,7 @@ namespace HeatBalanceManager {
                 ErrorsFound = true;
             }
 
-            Material(MaterNum).Resistance = Rfic;
+            dataMaterial.Material(MaterNum).Resistance = Rfic;
             NominalR(MaterNum) = Rfic;
 
             // excluding thermal resistance of inside or outside air film
@@ -7413,14 +7417,14 @@ namespace HeatBalanceManager {
 
             ++ConstrNum;
 
-            Construct(ConstrNum).Name = ConstructAlphas(1);
-            Construct(ConstrNum).TypeIsCfactorWall = true;
+            dataConstruction.Construct(ConstrNum).Name = ConstructAlphas(1);
+            dataConstruction.Construct(ConstrNum).TypeIsCfactorWall = true;
 
             Cfactor = DummyProps(1);
             Height = DummyProps(2);
 
-            Construct(ConstrNum).Height = Height;
-            Construct(ConstrNum).CFactor = Cfactor;
+            dataConstruction.Construct(ConstrNum).Height = Height;
+            dataConstruction.Construct(ConstrNum).CFactor = Cfactor;
 
             if (Cfactor <= 0.0) {
                 ShowSevereError(CurrentModuleObject + ' ' + ConstructAlphas(1) + " has " + cNumericFieldNames(1) + " <= 0.0, must be > 0.0.");
@@ -7435,14 +7439,14 @@ namespace HeatBalanceManager {
             }
 
             // The construction has two layers which have been created in GetMaterialData
-            Construct(ConstrNum).TotLayers = 2;
+            dataConstruction.Construct(ConstrNum).TotLayers = 2;
 
             // The concrete is the inside layer
-            Construct(ConstrNum).LayerPoint(2) = iFCConcreteLayer;
+            dataConstruction.Construct(ConstrNum).LayerPoint(2) = iFCConcreteLayer;
 
             // The fictitious insulation is the outside layer
-            MaterNum = UtilityRoutines::FindItemInList("~FC_Insulation_" + RoundSigDigits(Loop + TotFfactorConstructs), Material);
-            Construct(ConstrNum).LayerPoint(1) = MaterNum;
+            MaterNum = UtilityRoutines::FindItemInList("~FC_Insulation_" + RoundSigDigits(Loop + TotFfactorConstructs), dataMaterial.Material);
+            dataConstruction.Construct(ConstrNum).LayerPoint(1) = MaterNum;
 
             // CR 8886 Rsoil should be in SI unit. From ASHRAE 90.1-2010 SI
             if (Height <= 0.25) {
@@ -7463,7 +7467,7 @@ namespace HeatBalanceManager {
                 ErrorsFound = true;
             }
 
-            Material(MaterNum).Resistance = Rfic;
+            dataMaterial.Material(MaterNum).Resistance = Rfic;
             NominalR(MaterNum) = Rfic;
 
             // Reff includes the wall itself and soil, but excluding thermal resistance of inside or outside air film
@@ -7500,7 +7504,7 @@ namespace HeatBalanceManager {
                 }
 
                 ++constrNum;
-                auto &thisConstruct = Construct(constrNum);
+                auto &thisConstruct = dataConstruction.Construct(constrNum);
 
                 thisConstruct.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 thisConstruct.TypeIsAirBoundary = true;
@@ -7542,7 +7546,7 @@ namespace HeatBalanceManager {
                     thisConstruct.TypeIsAirBoundaryIRTSurface = true;
                     thisConstruct.TotLayers = 1;
                     // Find the auto-generated special IRT material for air boundaries
-                    int materNum = UtilityRoutines::FindItemInList("~AirBoundary-IRTMaterial", DataHeatBalance::Material);
+                    int materNum = UtilityRoutines::FindItemInList("~AirBoundary-IRTMaterial", dataMaterial.Material);
                     thisConstruct.LayerPoint(1) = materNum;
                     NominalRforNominalUCalculation(constrNum) = NominalR(materNum);
                 }
@@ -7590,7 +7594,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataHeatBalance::Construct;
         using DataHeatBalance::TotConstructs;
         using DataSurfaces::FenLayAbsSSG;
         using DataSurfaces::Surface;
@@ -7670,7 +7673,7 @@ namespace HeatBalanceManager {
                 }
 
                 // Assign construction number
-                ConstrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Construct);
+                ConstrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), dataConstruction.Construct);
                 if (ConstrNum == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(3) + " has been found.");
@@ -7739,7 +7742,7 @@ namespace HeatBalanceManager {
                 }
 
                 // Assign construction number
-                ConstrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Construct);
+                ConstrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), dataConstruction.Construct);
                 if (ConstrNum == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(3) + " has been found.");
@@ -7751,7 +7754,7 @@ namespace HeatBalanceManager {
                     NumOfScheduledLayers = NumAlpha - 3;
                     NumOfLayersMatch = false;
                     // Check if number of layers in construction matches number of layers in schedule surface gains object
-                    if (NumOfScheduledLayers == Construct(ConstrNum).TotSolidLayers) {
+                    if (NumOfScheduledLayers == dataConstruction.Construct(ConstrNum).TotSolidLayers) {
                         NumOfLayersMatch = true;
                     }
 
@@ -7760,7 +7763,7 @@ namespace HeatBalanceManager {
                             RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                             ", object. Number of scheduled surface gains for each layer does not match number of layers in referenced construction.");
                         ShowContinueError(cAlphaArgs(1) + " have " + TrimSigDigits(NumOfScheduledLayers) + " scheduled layers and " + cAlphaArgs(3) +
-                                          " have " + TrimSigDigits(Construct(ConstrNum).TotSolidLayers) + " layers.");
+                                          " have " + TrimSigDigits(dataConstruction.Construct(ConstrNum).TotSolidLayers) + " layers.");
                         ErrorsFound = true;
                     }
 
@@ -7939,8 +7942,8 @@ namespace HeatBalanceManager {
 
         NumNewConst = 0;
         for (Loop = 1; Loop <= TotConstructs; ++Loop) {
-            if (Construct(Loop).TCFlag == 1) {
-                iTCG = Material(Construct(Loop).TCLayer).TCParent;
+            if (dataConstruction.Construct(Loop).TCFlag == 1) {
+                iTCG = dataMaterial.Material(dataConstruction.Construct(Loop).TCLayer).TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
                 iMat = TCGlazings(iTCG).NumGlzMat;
                 for (iTC = 1; iTC <= iMat; ++iTC) {
@@ -7952,27 +7955,27 @@ namespace HeatBalanceManager {
         if (NumNewConst == 0) return; // no need to go further
 
         // Increase Construct() and copy the extra constructions
-        Construct.redimension(TotConstructs + NumNewConst);
+        dataConstruction.Construct.redimension(TotConstructs + NumNewConst);
         NominalRforNominalUCalculation.redimension(TotConstructs + NumNewConst);
         NominalU.redimension(TotConstructs + NumNewConst);
 
         NumNewConst = TotConstructs;
         for (Loop = 1; Loop <= TotConstructs; ++Loop) {
-            if (Construct(Loop).TCFlag == 1) {
-                iTCG = Material(Construct(Loop).TCLayer).TCParent;
+            if (dataConstruction.Construct(Loop).TCFlag == 1) {
+                iTCG = dataMaterial.Material(dataConstruction.Construct(Loop).TCLayer).TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
                 iMat = TCGlazings(iTCG).NumGlzMat;
                 for (iTC = 1; iTC <= iMat; ++iTC) {
                     ++NumNewConst;
-                    Construct(NumNewConst) = Construct(Loop); // copy data
-                    Construct(NumNewConst).Name = Construct(Loop).Name + "_TC_" + RoundSigDigits(TCGlazings(iTCG).SpecTemp(iTC), 0);
-                    Construct(NumNewConst).TCLayer = TCGlazings(iTCG).LayerPoint(iTC);
-                    Construct(NumNewConst).LayerPoint(Construct(Loop).TCLayerID) = Construct(NumNewConst).TCLayer;
-                    Construct(NumNewConst).TCFlag = 1;
-                    Construct(NumNewConst).TCMasterConst = Loop;
-                    Construct(NumNewConst).TCLayerID = Construct(Loop).TCLayerID;
-                    Construct(NumNewConst).TCGlassID = Construct(Loop).TCGlassID;
-                    Construct(NumNewConst).TypeIsWindow = true;
+                    dataConstruction.Construct(NumNewConst) = dataConstruction.Construct(Loop); // copy data
+                    dataConstruction.Construct(NumNewConst).Name = dataConstruction.Construct(Loop).Name + "_TC_" + RoundSigDigits(TCGlazings(iTCG).SpecTemp(iTC), 0);
+                    dataConstruction.Construct(NumNewConst).TCLayer = TCGlazings(iTCG).LayerPoint(iTC);
+                    dataConstruction.Construct(NumNewConst).LayerPoint(dataConstruction.Construct(Loop).TCLayerID) = dataConstruction.Construct(NumNewConst).TCLayer;
+                    dataConstruction.Construct(NumNewConst).TCFlag = 1;
+                    dataConstruction.Construct(NumNewConst).TCMasterConst = Loop;
+                    dataConstruction.Construct(NumNewConst).TCLayerID = dataConstruction.Construct(Loop).TCLayerID;
+                    dataConstruction.Construct(NumNewConst).TCGlassID = dataConstruction.Construct(Loop).TCGlassID;
+                    dataConstruction.Construct(NumNewConst).TypeIsWindow = true;
                 }
             }
         }
@@ -8029,98 +8032,98 @@ namespace HeatBalanceManager {
         static Real64 RHiSide(0.0);
 
         // first fill out defaults
-        Material(MaterNum).GlassSpectralDataPtr = 0;
-        Material(MaterNum).SolarDiffusing = false;
-        Material(MaterNum).Roughness = VerySmooth;
-        Material(MaterNum).TransThermal = 0.0;
-        Material(MaterNum).AbsorpThermalBack = 0.84;
-        Material(MaterNum).AbsorpThermalFront = 0.84;
-        Material(MaterNum).AbsorpThermal = Material(MaterNum).AbsorpThermalBack;
+        dataMaterial.Material(MaterNum).GlassSpectralDataPtr = 0;
+        dataMaterial.Material(MaterNum).SolarDiffusing = false;
+        dataMaterial.Material(MaterNum).Roughness = VerySmooth;
+        dataMaterial.Material(MaterNum).TransThermal = 0.0;
+        dataMaterial.Material(MaterNum).AbsorpThermalBack = 0.84;
+        dataMaterial.Material(MaterNum).AbsorpThermalFront = 0.84;
+        dataMaterial.Material(MaterNum).AbsorpThermal = dataMaterial.Material(MaterNum).AbsorpThermalBack;
 
         // step 1. Determine U-factor without film coefficients
         // Simple window model has its own correlation for film coefficients (m2-K/W) under Winter conditions as function of U-factor
-        if (Material(MaterNum).SimpleWindowUfactor < 5.85) {
-            Riw = 1.0 / (0.359073 * std::log(Material(MaterNum).SimpleWindowUfactor) + 6.949915);
+        if (dataMaterial.Material(MaterNum).SimpleWindowUfactor < 5.85) {
+            Riw = 1.0 / (0.359073 * std::log(dataMaterial.Material(MaterNum).SimpleWindowUfactor) + 6.949915);
         } else {
-            Riw = 1.0 / (1.788041 * Material(MaterNum).SimpleWindowUfactor - 2.886625);
+            Riw = 1.0 / (1.788041 * dataMaterial.Material(MaterNum).SimpleWindowUfactor - 2.886625);
         }
-        Row = 1.0 / (0.025342 * Material(MaterNum).SimpleWindowUfactor + 29.163853);
+        Row = 1.0 / (0.025342 * dataMaterial.Material(MaterNum).SimpleWindowUfactor + 29.163853);
 
         // determine 1/U without film coefficients
-        Rlw = (1.0 / Material(MaterNum).SimpleWindowUfactor) - Riw - Row;
+        Rlw = (1.0 / dataMaterial.Material(MaterNum).SimpleWindowUfactor) - Riw - Row;
         if (Rlw <= 0.0) { // U factor of film coefficients is better than user input.
             Rlw = max(Rlw, 0.001);
-            ShowWarningError("WindowMaterial:SimpleGlazingSystem: " + Material(MaterNum).Name +
+            ShowWarningError("WindowMaterial:SimpleGlazingSystem: " + dataMaterial.Material(MaterNum).Name +
                              " has U-factor higher than that provided by surface film resistances, Check value of U-factor");
         }
 
         // Step 2. determine layer thickness.
 
         if ((1.0 / Rlw) > 7.0) {
-            Material(MaterNum).Thickness = 0.002;
+            dataMaterial.Material(MaterNum).Thickness = 0.002;
         } else {
-            Material(MaterNum).Thickness = 0.05914 - (0.00714 / Rlw);
+            dataMaterial.Material(MaterNum).Thickness = 0.05914 - (0.00714 / Rlw);
         }
 
         // Step 3. determine effective conductivity
 
-        Material(MaterNum).Conductivity = Material(MaterNum).Thickness / Rlw;
-        if (Material(MaterNum).Conductivity > 0.0) {
+        dataMaterial.Material(MaterNum).Conductivity = dataMaterial.Material(MaterNum).Thickness / Rlw;
+        if (dataMaterial.Material(MaterNum).Conductivity > 0.0) {
             NominalR(MaterNum) = Rlw;
-            Material(MaterNum).Resistance = Rlw;
+            dataMaterial.Material(MaterNum).Resistance = Rlw;
         } else {
             ErrorsFound = true;
-            ShowSevereError("WindowMaterial:SimpleGlazingSystem: " + Material(MaterNum).Name +
+            ShowSevereError("WindowMaterial:SimpleGlazingSystem: " + dataMaterial.Material(MaterNum).Name +
                             " has Conductivity <= 0.0, must be >0.0, Check value of U-factor");
         }
 
         // step 4. determine solar transmission (revised to 10-1-2009 version from LBNL.)
 
-        if (Material(MaterNum).SimpleWindowUfactor > 4.5) {
+        if (dataMaterial.Material(MaterNum).SimpleWindowUfactor > 4.5) {
 
-            if (Material(MaterNum).SimpleWindowSHGC < 0.7206) {
+            if (dataMaterial.Material(MaterNum).SimpleWindowSHGC < 0.7206) {
 
-                Material(MaterNum).Trans = 0.939998 * pow_2(Material(MaterNum).SimpleWindowSHGC) + 0.20332 * Material(MaterNum).SimpleWindowSHGC;
+                dataMaterial.Material(MaterNum).Trans = 0.939998 * pow_2(dataMaterial.Material(MaterNum).SimpleWindowSHGC) + 0.20332 * dataMaterial.Material(MaterNum).SimpleWindowSHGC;
             } else { // >= 0.7206
 
-                Material(MaterNum).Trans = 1.30415 * Material(MaterNum).SimpleWindowSHGC - 0.30515;
+                dataMaterial.Material(MaterNum).Trans = 1.30415 * dataMaterial.Material(MaterNum).SimpleWindowSHGC - 0.30515;
             }
 
-        } else if (Material(MaterNum).SimpleWindowUfactor < 3.4) {
+        } else if (dataMaterial.Material(MaterNum).SimpleWindowUfactor < 3.4) {
 
-            if (Material(MaterNum).SimpleWindowSHGC <= 0.15) {
-                Material(MaterNum).Trans = 0.41040 * Material(MaterNum).SimpleWindowSHGC;
+            if (dataMaterial.Material(MaterNum).SimpleWindowSHGC <= 0.15) {
+                dataMaterial.Material(MaterNum).Trans = 0.41040 * dataMaterial.Material(MaterNum).SimpleWindowSHGC;
             } else { // > 0.15
-                Material(MaterNum).Trans =
-                    0.085775 * pow_2(Material(MaterNum).SimpleWindowSHGC) + 0.963954 * Material(MaterNum).SimpleWindowSHGC - 0.084958;
+                dataMaterial.Material(MaterNum).Trans =
+                    0.085775 * pow_2(dataMaterial.Material(MaterNum).SimpleWindowSHGC) + 0.963954 * dataMaterial.Material(MaterNum).SimpleWindowSHGC - 0.084958;
             }
         } else { // interpolate. 3.4 <= Ufactor <= 4.5
 
-            if (Material(MaterNum).SimpleWindowSHGC < 0.7206) {
-                TsolHiSide = 0.939998 * pow_2(Material(MaterNum).SimpleWindowSHGC) + 0.20332 * Material(MaterNum).SimpleWindowSHGC;
+            if (dataMaterial.Material(MaterNum).SimpleWindowSHGC < 0.7206) {
+                TsolHiSide = 0.939998 * pow_2(dataMaterial.Material(MaterNum).SimpleWindowSHGC) + 0.20332 * dataMaterial.Material(MaterNum).SimpleWindowSHGC;
             } else { // >= 0.7206
-                TsolHiSide = 1.30415 * Material(MaterNum).SimpleWindowSHGC - 0.30515;
+                TsolHiSide = 1.30415 * dataMaterial.Material(MaterNum).SimpleWindowSHGC - 0.30515;
             }
 
-            if (Material(MaterNum).SimpleWindowSHGC <= 0.15) {
-                TsolLowSide = 0.41040 * Material(MaterNum).SimpleWindowSHGC;
+            if (dataMaterial.Material(MaterNum).SimpleWindowSHGC <= 0.15) {
+                TsolLowSide = 0.41040 * dataMaterial.Material(MaterNum).SimpleWindowSHGC;
             } else { // > 0.15
-                TsolLowSide = 0.085775 * pow_2(Material(MaterNum).SimpleWindowSHGC) + 0.963954 * Material(MaterNum).SimpleWindowSHGC - 0.084958;
+                TsolLowSide = 0.085775 * pow_2(dataMaterial.Material(MaterNum).SimpleWindowSHGC) + 0.963954 * dataMaterial.Material(MaterNum).SimpleWindowSHGC - 0.084958;
             }
 
-            Material(MaterNum).Trans = ((Material(MaterNum).SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (TsolHiSide - TsolLowSide) + TsolLowSide;
+            dataMaterial.Material(MaterNum).Trans = ((dataMaterial.Material(MaterNum).SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (TsolHiSide - TsolLowSide) + TsolLowSide;
         }
-        if (Material(MaterNum).Trans < 0.0) Material(MaterNum).Trans = 0.0;
+        if (dataMaterial.Material(MaterNum).Trans < 0.0) dataMaterial.Material(MaterNum).Trans = 0.0;
 
         // step 5.  determine solar reflectances
 
-        DeltaSHGCandTsol = Material(MaterNum).SimpleWindowSHGC - Material(MaterNum).Trans;
+        DeltaSHGCandTsol = dataMaterial.Material(MaterNum).SimpleWindowSHGC - dataMaterial.Material(MaterNum).Trans;
 
-        if (Material(MaterNum).SimpleWindowUfactor > 4.5) {
+        if (dataMaterial.Material(MaterNum).SimpleWindowUfactor > 4.5) {
 
             Ris = 1.0 / (29.436546 * pow_3(DeltaSHGCandTsol) - 21.943415 * pow_2(DeltaSHGCandTsol) + 9.945872 * DeltaSHGCandTsol + 7.426151);
             Ros = 1.0 / (2.225824 * DeltaSHGCandTsol + 20.577080);
-        } else if (Material(MaterNum).SimpleWindowUfactor < 3.4) {
+        } else if (dataMaterial.Material(MaterNum).SimpleWindowUfactor < 3.4) {
 
             Ris = 1.0 / (199.8208128 * pow_3(DeltaSHGCandTsol) - 90.639733 * pow_2(DeltaSHGCandTsol) + 19.737055 * DeltaSHGCandTsol + 6.766575);
             Ros = 1.0 / (5.763355 * DeltaSHGCandTsol + 20.541528);
@@ -8128,37 +8131,37 @@ namespace HeatBalanceManager {
             // inside first
             RLowSide = 1.0 / (199.8208128 * pow_3(DeltaSHGCandTsol) - 90.639733 * pow_2(DeltaSHGCandTsol) + 19.737055 * DeltaSHGCandTsol + 6.766575);
             RHiSide = 1.0 / (29.436546 * pow_3(DeltaSHGCandTsol) - 21.943415 * pow_2(DeltaSHGCandTsol) + 9.945872 * DeltaSHGCandTsol + 7.426151);
-            Ris = ((Material(MaterNum).SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (RLowSide - RHiSide) + RLowSide;
+            Ris = ((dataMaterial.Material(MaterNum).SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (RLowSide - RHiSide) + RLowSide;
             // then outside
             RLowSide = 1.0 / (5.763355 * DeltaSHGCandTsol + 20.541528);
             RHiSide = 1.0 / (2.225824 * DeltaSHGCandTsol + 20.577080);
-            Ros = ((Material(MaterNum).SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (RLowSide - RHiSide) + RLowSide;
+            Ros = ((dataMaterial.Material(MaterNum).SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (RLowSide - RHiSide) + RLowSide;
         }
 
         InflowFraction = (Ros + 0.5 * Rlw) / (Ros + Rlw + Ris);
 
-        SolarAbsorb = (Material(MaterNum).SimpleWindowSHGC - Material(MaterNum).Trans) / InflowFraction;
-        Material(MaterNum).ReflectSolBeamBack = 1.0 - Material(MaterNum).Trans - SolarAbsorb;
-        Material(MaterNum).ReflectSolBeamFront = Material(MaterNum).ReflectSolBeamBack;
+        SolarAbsorb = (dataMaterial.Material(MaterNum).SimpleWindowSHGC - dataMaterial.Material(MaterNum).Trans) / InflowFraction;
+        dataMaterial.Material(MaterNum).ReflectSolBeamBack = 1.0 - dataMaterial.Material(MaterNum).Trans - SolarAbsorb;
+        dataMaterial.Material(MaterNum).ReflectSolBeamFront = dataMaterial.Material(MaterNum).ReflectSolBeamBack;
 
         // step 6. determine visible properties.
-        if (Material(MaterNum).SimpleWindowVTinputByUser) {
-            Material(MaterNum).TransVis = Material(MaterNum).SimpleWindowVisTran;
-            Material(MaterNum).ReflectVisBeamBack = -0.7409 * pow_3(Material(MaterNum).TransVis) + 1.6531 * pow_2(Material(MaterNum).TransVis) -
-                                                    1.2299 * Material(MaterNum).TransVis + 0.4545;
-            if (Material(MaterNum).TransVis + Material(MaterNum).ReflectVisBeamBack >= 1.0) {
-                Material(MaterNum).ReflectVisBeamBack = 0.999 - Material(MaterNum).TransVis;
+        if (dataMaterial.Material(MaterNum).SimpleWindowVTinputByUser) {
+            dataMaterial.Material(MaterNum).TransVis = dataMaterial.Material(MaterNum).SimpleWindowVisTran;
+            dataMaterial.Material(MaterNum).ReflectVisBeamBack = -0.7409 * pow_3(dataMaterial.Material(MaterNum).TransVis) + 1.6531 * pow_2(dataMaterial.Material(MaterNum).TransVis) -
+                                                    1.2299 * dataMaterial.Material(MaterNum).TransVis + 0.4545;
+            if (dataMaterial.Material(MaterNum).TransVis + dataMaterial.Material(MaterNum).ReflectVisBeamBack >= 1.0) {
+                dataMaterial.Material(MaterNum).ReflectVisBeamBack = 0.999 - dataMaterial.Material(MaterNum).TransVis;
             }
 
-            Material(MaterNum).ReflectVisBeamFront = -0.0622 * pow_3(Material(MaterNum).TransVis) + 0.4277 * pow_2(Material(MaterNum).TransVis) -
-                                                     0.4169 * Material(MaterNum).TransVis + 0.2399;
-            if (Material(MaterNum).TransVis + Material(MaterNum).ReflectVisBeamFront >= 1.0) {
-                Material(MaterNum).ReflectVisBeamFront = 0.999 - Material(MaterNum).TransVis;
+            dataMaterial.Material(MaterNum).ReflectVisBeamFront = -0.0622 * pow_3(dataMaterial.Material(MaterNum).TransVis) + 0.4277 * pow_2(dataMaterial.Material(MaterNum).TransVis) -
+                                                     0.4169 * dataMaterial.Material(MaterNum).TransVis + 0.2399;
+            if (dataMaterial.Material(MaterNum).TransVis + dataMaterial.Material(MaterNum).ReflectVisBeamFront >= 1.0) {
+                dataMaterial.Material(MaterNum).ReflectVisBeamFront = 0.999 - dataMaterial.Material(MaterNum).TransVis;
             }
         } else {
-            Material(MaterNum).TransVis = Material(MaterNum).Trans;
-            Material(MaterNum).ReflectVisBeamBack = Material(MaterNum).ReflectSolBeamBack;
-            Material(MaterNum).ReflectVisBeamFront = Material(MaterNum).ReflectSolBeamFront;
+            dataMaterial.Material(MaterNum).TransVis = dataMaterial.Material(MaterNum).Trans;
+            dataMaterial.Material(MaterNum).ReflectVisBeamBack = dataMaterial.Material(MaterNum).ReflectSolBeamBack;
+            dataMaterial.Material(MaterNum).ReflectVisBeamFront = dataMaterial.Material(MaterNum).ReflectSolBeamFront;
         }
 
         // step 7. The dependence on incident angle is in subroutine TransAndReflAtPhi
@@ -8190,7 +8193,6 @@ namespace HeatBalanceManager {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::Material;
         using General::RoundSigDigits;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8305,13 +8307,13 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = ComplexWindowGap;
-            Material(MaterNum).Roughness = Rough;
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Group = ComplexWindowGap;
+            dataMaterial.Material(MaterNum).Roughness = Rough;
+            dataMaterial.Material(MaterNum).ROnly = true;
 
-            Material(MaterNum).Name = cAlphaArgs(1);
+            dataMaterial.Material(MaterNum).Name = cAlphaArgs(1);
 
-            Material(MaterNum).Thickness = rNumericArgs(1);
+            dataMaterial.Material(MaterNum).Thickness = rNumericArgs(1);
             if (rNumericArgs(1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(1) +
@@ -8319,7 +8321,7 @@ namespace HeatBalanceManager {
                 ShowContinueError(cNumericFieldNames(1) + " must be > 0, entered " + RoundSigDigits(rNumericArgs(1), 2));
             }
 
-            Material(MaterNum).Pressure = rNumericArgs(2);
+            dataMaterial.Material(MaterNum).Pressure = rNumericArgs(2);
             if (rNumericArgs(2) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(2) +
@@ -8328,17 +8330,17 @@ namespace HeatBalanceManager {
             }
 
             if (!lAlphaFieldBlanks(2)) {
-                Material(MaterNum).GasPointer = UtilityRoutines::FindItemInList(cAlphaArgs(2), Material);
+                dataMaterial.Material(MaterNum).GasPointer = UtilityRoutines::FindItemInList(cAlphaArgs(2), dataMaterial.Material);
             } else {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cAlphaFieldNames(1) +
                                 " has been found.");
                 ShowContinueError(cCurrentModuleObject + " does not have assigned WindowMaterial:Gas or WindowMaterial:GasMixutre.");
             }
             if (!lAlphaFieldBlanks(3)) {
-                Material(MaterNum).DeflectionStatePtr = UtilityRoutines::FindItemInList(cAlphaArgs(3), DeflectionState);
+                dataMaterial.Material(MaterNum).DeflectionStatePtr = UtilityRoutines::FindItemInList(cAlphaArgs(3), DeflectionState);
             }
             if (!lAlphaFieldBlanks(4)) {
-                Material(MaterNum).SupportPillarPtr = UtilityRoutines::FindItemInList(cAlphaArgs(4), SupportPillar);
+                dataMaterial.Material(MaterNum).SupportPillarPtr = UtilityRoutines::FindItemInList(cAlphaArgs(4), SupportPillar);
             }
         }
 
@@ -8370,14 +8372,14 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            Material(MaterNum).Group = ComplexWindowShade;
-            Material(MaterNum).Roughness = Rough;
-            Material(MaterNum).ROnly = true;
+            dataMaterial.Material(MaterNum).Group = ComplexWindowShade;
+            dataMaterial.Material(MaterNum).Roughness = Rough;
+            dataMaterial.Material(MaterNum).ROnly = true;
 
             // Assign pointer to ComplexShade
-            Material(MaterNum).ComplexShadePtr = Loop;
+            dataMaterial.Material(MaterNum).ComplexShadePtr = Loop;
 
-            Material(MaterNum).Name = cAlphaArgs(1);
+            dataMaterial.Material(MaterNum).Name = cAlphaArgs(1);
             ComplexShade(Loop).Name = cAlphaArgs(1);
 
             {
@@ -8405,9 +8407,9 @@ namespace HeatBalanceManager {
             }
 
             ComplexShade(Loop).Thickness = rNumericArgs(1);
-            Material(MaterNum).Thickness = rNumericArgs(1);
+            dataMaterial.Material(MaterNum).Thickness = rNumericArgs(1);
             ComplexShade(Loop).Conductivity = rNumericArgs(2);
-            Material(MaterNum).Conductivity = rNumericArgs(2);
+            dataMaterial.Material(MaterNum).Conductivity = rNumericArgs(2);
             ComplexShade(Loop).IRTransmittance = rNumericArgs(3);
             ComplexShade(Loop).FrontEmissivity = rNumericArgs(4);
             ComplexShade(Loop).BackEmissivity = rNumericArgs(5);
@@ -8415,9 +8417,9 @@ namespace HeatBalanceManager {
             // Simon: in heat balance radiation exchange routines AbsorpThermal is used
             // and program will crash if value is not assigned.  Not sure if this is correct
             // or some additional calculation is necessary. Simon TODO
-            Material(MaterNum).AbsorpThermal = rNumericArgs(5);
-            Material(MaterNum).AbsorpThermalFront = rNumericArgs(4);
-            Material(MaterNum).AbsorpThermalBack = rNumericArgs(5);
+            dataMaterial.Material(MaterNum).AbsorpThermal = rNumericArgs(5);
+            dataMaterial.Material(MaterNum).AbsorpThermalFront = rNumericArgs(4);
+            dataMaterial.Material(MaterNum).AbsorpThermalBack = rNumericArgs(5);
 
             ComplexShade(Loop).TopOpeningMultiplier = rNumericArgs(6);
             ComplexShade(Loop).BottomOpeningMultiplier = rNumericArgs(7);
@@ -8432,8 +8434,8 @@ namespace HeatBalanceManager {
             ComplexShade(Loop).SlatConductivity = rNumericArgs(15);
             ComplexShade(Loop).SlatCurve = rNumericArgs(16);
 
-            // IF (Material(MaterNum)%Conductivity > 0.0) THEN
-            //  NominalR(MaterNum)=Material(MaterNum)%Thickness/Material(MaterNum)%Conductivity
+            // IF (dataMaterial.Material(MaterNum)%Conductivity > 0.0) THEN
+            //  NominalR(MaterNum)=dataMaterial.Material(MaterNum)%Thickness/dataMaterial.Material(MaterNum)%Conductivity
             // ELSE
             //  NominalR(MaterNum)=1.0
             // ENDIF
@@ -8761,12 +8763,12 @@ namespace HeatBalanceManager {
             // Simon TODO: This is to be confirmed.  If this is just initial value, then we might want to make better guess
             NominalRforNominalUCalculation(ConstrNum) = 0.1;
             // Simon TODO: If I do not put this, then it is considered that surface is NOT window
-            Construct(ConstrNum).TransDiff = 0.1; // This is a place holder to flag
+            dataConstruction.Construct(ConstrNum).TransDiff = 0.1; // This is a place holder to flag
             // the construction as a window until
             // the correct value is entered in WindowComplexManager
 
             // Now override the deraults as appropriate
-            Construct(ConstrNum).Name = locAlphaArgs(1);
+            dataConstruction.Construct(ConstrNum).Name = locAlphaArgs(1);
 
             //    ALLOCATE(Construct(ConstrNum)%BSDFInput)
 
@@ -8775,9 +8777,9 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(locAlphaArgs(2)); // Basis Type Keyword
                 if (SELECT_CASE_var == "LBNLWINDOW") {
-                    Construct(ConstrNum).BSDFInput.BasisType = BasisType_WINDOW;
+                    dataConstruction.Construct(ConstrNum).BSDFInput.BasisType = BasisType_WINDOW;
                 } else if (SELECT_CASE_var == "USERDEFINED") {
-                    Construct(ConstrNum).BSDFInput.BasisType = BasisType_Custom;
+                    dataConstruction.Construct(ConstrNum).BSDFInput.BasisType = BasisType_Custom;
                 } else {
                     // throw error
                     ErrorsFound = true;
@@ -8790,9 +8792,9 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(locAlphaArgs(3)); // Basis Symmetry Keyword
                 if (SELECT_CASE_var == "AXISYMMETRIC") {
-                    Construct(ConstrNum).BSDFInput.BasisSymmetryType = BasisSymmetry_Axisymmetric;
+                    dataConstruction.Construct(ConstrNum).BSDFInput.BasisSymmetryType = BasisSymmetry_Axisymmetric;
                 } else if (SELECT_CASE_var == "NONE") {
-                    Construct(ConstrNum).BSDFInput.BasisSymmetryType = BasisSymmetry_None;
+                    dataConstruction.Construct(ConstrNum).BSDFInput.BasisSymmetryType = BasisSymmetry_None;
                 } else {
                     // throw error
                     ErrorsFound = true;
@@ -8810,16 +8812,16 @@ namespace HeatBalanceManager {
                 ShowContinueError(locAlphaFieldNames(4) + " entered value = \"" + locAlphaArgs(4) +
                                   "\" no corresponding thermal model (WindowThermalModel:Params) found in the input file.");
             } else {
-                Construct(ConstrNum).BSDFInput.ThermalModel = ThermalModelNum;
+                dataConstruction.Construct(ConstrNum).BSDFInput.ThermalModel = ThermalModelNum;
             }
 
             // ***************************************************************************************
             // Basis matrix
             // ***************************************************************************************
-            Construct(ConstrNum).BSDFInput.BasisMatIndex = MatrixIndex(locAlphaArgs(5));
-            Get2DMatrixDimensions(Construct(ConstrNum).BSDFInput.BasisMatIndex, NumRows, NumCols);
-            Construct(ConstrNum).BSDFInput.BasisMatNrows = NumRows;
-            Construct(ConstrNum).BSDFInput.BasisMatNcols = NumCols;
+            dataConstruction.Construct(ConstrNum).BSDFInput.BasisMatIndex = MatrixIndex(locAlphaArgs(5));
+            Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.BasisMatIndex, NumRows, NumCols);
+            dataConstruction.Construct(ConstrNum).BSDFInput.BasisMatNrows = NumRows;
+            dataConstruction.Construct(ConstrNum).BSDFInput.BasisMatNcols = NumCols;
 
             if (NumCols != 2 && NumCols != 1) {
                 ErrorsFound = true;
@@ -8828,19 +8830,19 @@ namespace HeatBalanceManager {
                 ShowContinueError(locAlphaFieldNames(5) + " entered value=\"" + locAlphaArgs(5) +
                                   "\" invalid matrix dimensions.  Basis matrix dimension can only be 2 x 1.");
             }
-            Construct(ConstrNum).BSDFInput.BasisMat.allocate(NumCols, NumRows);
-            Get2DMatrix(Construct(ConstrNum).BSDFInput.BasisMatIndex, Construct(ConstrNum).BSDFInput.BasisMat);
-            if (Construct(ConstrNum).BSDFInput.BasisType == BasisType_WINDOW)
-                CalculateBasisLength(Construct(ConstrNum).BSDFInput, ConstrNum, Construct(ConstrNum).BSDFInput.NBasis);
+            dataConstruction.Construct(ConstrNum).BSDFInput.BasisMat.allocate(NumCols, NumRows);
+            Get2DMatrix(dataConstruction.Construct(ConstrNum).BSDFInput.BasisMatIndex, dataConstruction.Construct(ConstrNum).BSDFInput.BasisMat);
+            if (dataConstruction.Construct(ConstrNum).BSDFInput.BasisType == BasisType_WINDOW)
+                CalculateBasisLength(dataConstruction.Construct(ConstrNum).BSDFInput, ConstrNum, dataConstruction.Construct(ConstrNum).BSDFInput.NBasis);
 
             // determine number of layers and optical layers
             NumOfTotalLayers = (NumAlphas - 9) / 3;
-            Construct(ConstrNum).TotLayers = NumOfTotalLayers;
+            dataConstruction.Construct(ConstrNum).TotLayers = NumOfTotalLayers;
 
             NumOfOpticalLayers = NumOfTotalLayers / 2 + 1;
 
-            Construct(ConstrNum).BSDFInput.NumLayers = NumOfOpticalLayers;
-            Construct(ConstrNum).BSDFInput.Layer.allocate(NumOfOpticalLayers);
+            dataConstruction.Construct(ConstrNum).BSDFInput.NumLayers = NumOfOpticalLayers;
+            dataConstruction.Construct(ConstrNum).BSDFInput.Layer.allocate(NumOfOpticalLayers);
 
             // check for incomplete field set
             if (mod((NumAlphas - 9), 3) != 0) {
@@ -8850,18 +8852,18 @@ namespace HeatBalanceManager {
                 ShowContinueError(locAlphaArgs(1) + " is missing some of the layers or/and gaps.");
             }
 
-            if (Construct(ConstrNum).BSDFInput.BasisSymmetryType == BasisSymmetry_None) {
+            if (dataConstruction.Construct(ConstrNum).BSDFInput.BasisSymmetryType == BasisSymmetry_None) {
                 // Non-Symmetric basis
 
-                NBasis = Construct(ConstrNum).BSDFInput.NBasis;
+                NBasis = dataConstruction.Construct(ConstrNum).BSDFInput.NBasis;
 
                 // *******************************************************************************
                 // Solar front transmittance
                 // *******************************************************************************
-                Construct(ConstrNum).BSDFInput.SolFrtTransIndex = MatrixIndex(locAlphaArgs(6));
-                Get2DMatrixDimensions(Construct(ConstrNum).BSDFInput.SolFrtTransIndex, NumRows, NumCols);
-                Construct(ConstrNum).BSDFInput.SolFrtTransNrows = NumRows;
-                Construct(ConstrNum).BSDFInput.SolFrtTransNcols = NumCols;
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex = MatrixIndex(locAlphaArgs(6));
+                Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex, NumRows, NumCols);
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransNrows = NumRows;
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransNcols = NumCols;
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
@@ -8878,28 +8880,28 @@ namespace HeatBalanceManager {
                     ShowContinueError("Solar front transmittance matrix \"" + locAlphaArgs(6) + "\" must have the same number of rows and columns.");
                 }
 
-                if (Construct(ConstrNum).BSDFInput.BasisType == BasisType_Custom) {
-                    Construct(ConstrNum).BSDFInput.NBasis = NumRows; // For custom basis, no rows in transmittance
+                if (dataConstruction.Construct(ConstrNum).BSDFInput.BasisType == BasisType_Custom) {
+                    dataConstruction.Construct(ConstrNum).BSDFInput.NBasis = NumRows; // For custom basis, no rows in transmittance
                                                                      // matrix defines the basis length
                 }
 
-                Construct(ConstrNum).BSDFInput.SolFrtTrans.allocate(NumCols, NumRows);
-                if (Construct(ConstrNum).BSDFInput.SolFrtTransIndex == 0) {
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTrans.allocate(NumCols, NumRows);
+                if (dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Solar front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(6) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(Construct(ConstrNum).BSDFInput.SolFrtTransIndex, Construct(ConstrNum).BSDFInput.SolFrtTrans);
+                    Get2DMatrix(dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex, dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTrans);
                 }
 
                 // *******************************************************************************
                 // Solar back reflectance
                 // *******************************************************************************
-                Construct(ConstrNum).BSDFInput.SolBkReflIndex = MatrixIndex(locAlphaArgs(7));
-                Get2DMatrixDimensions(Construct(ConstrNum).BSDFInput.SolBkReflIndex, NumRows, NumCols);
-                Construct(ConstrNum).BSDFInput.SolBkReflNrows = NumRows;
-                Construct(ConstrNum).BSDFInput.SolBkReflNcols = NumCols;
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex = MatrixIndex(locAlphaArgs(7));
+                Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex, NumRows, NumCols);
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflNrows = NumRows;
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflNcols = NumCols;
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
@@ -8916,23 +8918,23 @@ namespace HeatBalanceManager {
                     ShowContinueError("Solar bakc reflectance matrix \"" + locAlphaArgs(7) + "\" must have the same number of rows and columns.");
                 }
 
-                Construct(ConstrNum).BSDFInput.SolBkRefl.allocate(NumCols, NumRows);
-                if (Construct(ConstrNum).BSDFInput.SolBkReflIndex == 0) {
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolBkRefl.allocate(NumCols, NumRows);
+                if (dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(7) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(Construct(ConstrNum).BSDFInput.SolBkReflIndex, Construct(ConstrNum).BSDFInput.SolBkRefl);
+                    Get2DMatrix(dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex, dataConstruction.Construct(ConstrNum).BSDFInput.SolBkRefl);
                 }
 
                 // *******************************************************************************
                 // Visible front transmittance
                 // *******************************************************************************
-                Construct(ConstrNum).BSDFInput.VisFrtTransIndex = MatrixIndex(locAlphaArgs(8));
-                Get2DMatrixDimensions(Construct(ConstrNum).BSDFInput.VisFrtTransIndex, NumRows, NumCols);
-                Construct(ConstrNum).BSDFInput.VisFrtTransNrows = NumRows;
-                Construct(ConstrNum).BSDFInput.VisFrtTransNcols = NumCols;
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex = MatrixIndex(locAlphaArgs(8));
+                Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex, NumRows, NumCols);
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransNrows = NumRows;
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransNcols = NumCols;
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
@@ -8950,24 +8952,24 @@ namespace HeatBalanceManager {
                                       "\" must have the same number of rows and columns.");
                 }
 
-                Construct(ConstrNum).BSDFInput.VisFrtTrans.allocate(NumCols, NumRows);
-                if (Construct(ConstrNum).BSDFInput.VisFrtTransIndex == 0) {
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTrans.allocate(NumCols, NumRows);
+                if (dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(8) +
                                       "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(Construct(ConstrNum).BSDFInput.VisFrtTransIndex, Construct(ConstrNum).BSDFInput.VisFrtTrans);
+                    Get2DMatrix(dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex, dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTrans);
                 }
 
                 // *******************************************************************************
                 // Visible back reflectance
                 // *******************************************************************************
-                Construct(ConstrNum).BSDFInput.VisBkReflIndex = MatrixIndex(locAlphaArgs(9));
-                Get2DMatrixDimensions(Construct(ConstrNum).BSDFInput.VisBkReflIndex, NumRows, NumCols);
-                Construct(ConstrNum).BSDFInput.VisBkReflNrows = NumRows;
-                Construct(ConstrNum).BSDFInput.VisBkReflNcols = NumCols;
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex = MatrixIndex(locAlphaArgs(9));
+                Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex, NumRows, NumCols);
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflNrows = NumRows;
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflNcols = NumCols;
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
@@ -8984,33 +8986,33 @@ namespace HeatBalanceManager {
                     ShowContinueError("Visible back reflectance \"" + locAlphaArgs(9) + "\" must have the same number of rows and columns.");
                 }
 
-                Construct(ConstrNum).BSDFInput.VisBkRefl.allocate(NumCols, NumRows);
-                if (Construct(ConstrNum).BSDFInput.VisBkReflIndex == 0) {
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisBkRefl.allocate(NumCols, NumRows);
+                if (dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Visble back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(9) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(Construct(ConstrNum).BSDFInput.VisBkReflIndex, Construct(ConstrNum).BSDFInput.VisBkRefl);
+                    Get2DMatrix(dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex, dataConstruction.Construct(ConstrNum).BSDFInput.VisBkRefl);
                 }
 
                 // ALLOCATE(Construct(ConstrNum)%BSDFInput%Layer(NumOfOpticalLayers))
-                for (Layer = 1; Layer <= Construct(ConstrNum).TotLayers; ++Layer) {
+                for (Layer = 1; Layer <= dataConstruction.Construct(ConstrNum).TotLayers; ++Layer) {
                     AlphaIndex = 9 + (Layer * 3) - 2;
                     currentOpticalLayer = int(Layer / 2) + 1;
                     // Material info is contained in the thermal construct
-                    Construct(ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(locAlphaArgs(AlphaIndex), Material);
+                    dataConstruction.Construct(ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(locAlphaArgs(AlphaIndex), dataMaterial.Material);
 
                     // Simon: Load only if optical layer
                     if (mod(Layer, 2) != 0) {
-                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).MaterialIndex = Construct(ConstrNum).LayerPoint(Layer);
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).MaterialIndex = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
 
                         ++AlphaIndex;
                         // *******************************************************************************
                         // Front absorptance matrix
                         // *******************************************************************************
-                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex = MatrixIndex(locAlphaArgs(AlphaIndex));
-                        Get2DMatrixDimensions(Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex, NumRows, NumCols);
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex = MatrixIndex(locAlphaArgs(AlphaIndex));
+                        Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
@@ -9031,25 +9033,25 @@ namespace HeatBalanceManager {
                                               RoundSigDigits(NBasis) + " number of columns.");
                         }
 
-                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).AbsNcols = NumCols;
-                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbs.allocate(NumCols, NumRows);
-                        if (Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex == 0) {
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).AbsNcols = NumCols;
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbs.allocate(NumCols, NumRows);
+                        if (dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex == 0) {
                             ErrorsFound = true;
                             ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                             ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                             ShowContinueError("Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) + " is missing from the input file.");
                         } else {
-                            Get2DMatrix(Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex,
-                                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbs);
+                            Get2DMatrix(dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex,
+                                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbs);
                         }
 
                         ++AlphaIndex;
                         // *******************************************************************************
                         // Back absorptance matrix
                         // *******************************************************************************
-                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex = MatrixIndex(locAlphaArgs(AlphaIndex));
-                        Get2DMatrixDimensions(Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex, NumRows, NumCols);
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex = MatrixIndex(locAlphaArgs(AlphaIndex));
+                        Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
@@ -9070,31 +9072,31 @@ namespace HeatBalanceManager {
                                               RoundSigDigits(NBasis) + " number of columns.");
                         }
 
-                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbs.allocate(NumCols, NumRows);
-                        if (Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex == 0) {
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbs.allocate(NumCols, NumRows);
+                        if (dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex == 0) {
                             ErrorsFound = true;
                             ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                             ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                             ShowContinueError("Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) + " is missing from the input file.");
                         } else {
-                            Get2DMatrix(Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex,
-                                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbs);
+                            Get2DMatrix(dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex,
+                                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbs);
                         }
                     } // if (Mod(Layer, 2) <> 0) then
                 }
             } else {
                 // Axisymmetric basis
-                NBasis = Construct(ConstrNum).BSDFInput.NBasis; // Basis length has already been calculated
+                NBasis = dataConstruction.Construct(ConstrNum).BSDFInput.NBasis; // Basis length has already been calculated
                 BSDFTempMtrx.allocate(NBasis, 1);
 
                 // *******************************************************************************
                 // Solar front transmittance
                 // *******************************************************************************
-                Construct(ConstrNum).BSDFInput.SolFrtTransIndex = MatrixIndex(locAlphaArgs(6));
-                Get2DMatrixDimensions(Construct(ConstrNum).BSDFInput.SolFrtTransIndex, NumRows, NumCols);
-                Construct(ConstrNum).BSDFInput.SolFrtTransNrows = NBasis;
-                Construct(ConstrNum).BSDFInput.SolFrtTransNcols = NBasis;
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex = MatrixIndex(locAlphaArgs(6));
+                Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex, NumRows, NumCols);
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransNrows = NBasis;
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransNcols = NBasis;
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
@@ -9111,28 +9113,28 @@ namespace HeatBalanceManager {
                     ShowContinueError("Solar front transmittance matrix \"" + locAlphaArgs(6) + "\" must have the same number of rows and columns.");
                 }
 
-                Construct(ConstrNum).BSDFInput.SolFrtTrans.allocate(NBasis, NBasis);
-                if (Construct(ConstrNum).BSDFInput.SolFrtTransIndex == 0) {
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTrans.allocate(NBasis, NBasis);
+                if (dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Solar front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(6) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(Construct(ConstrNum).BSDFInput.SolFrtTransIndex, BSDFTempMtrx);
+                    Get2DMatrix(dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex, BSDFTempMtrx);
 
-                    Construct(ConstrNum).BSDFInput.SolFrtTrans = 0.0;
+                    dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTrans = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
-                        Construct(ConstrNum).BSDFInput.SolFrtTrans(I, I) = BSDFTempMtrx(I, 1);
+                        dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTrans(I, I) = BSDFTempMtrx(I, 1);
                     }
                 }
 
                 // *******************************************************************************
                 // Solar back reflectance
                 // *******************************************************************************
-                Construct(ConstrNum).BSDFInput.SolBkReflIndex = MatrixIndex(locAlphaArgs(7));
-                Get2DMatrixDimensions(Construct(ConstrNum).BSDFInput.SolBkReflIndex, NumRows, NumCols);
-                Construct(ConstrNum).BSDFInput.SolBkReflNrows = NBasis;
-                Construct(ConstrNum).BSDFInput.SolBkReflNcols = NBasis;
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex = MatrixIndex(locAlphaArgs(7));
+                Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex, NumRows, NumCols);
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflNrows = NBasis;
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflNcols = NBasis;
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
@@ -9149,27 +9151,27 @@ namespace HeatBalanceManager {
                     ShowContinueError("Solar back reflectance matrix \"" + locAlphaArgs(7) + "\" must have the same number of rows and columns.");
                 }
 
-                Construct(ConstrNum).BSDFInput.SolBkRefl.allocate(NBasis, NBasis);
-                if (Construct(ConstrNum).BSDFInput.SolBkReflIndex == 0) {
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolBkRefl.allocate(NBasis, NBasis);
+                if (dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(7) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(Construct(ConstrNum).BSDFInput.SolBkReflIndex, BSDFTempMtrx);
-                    Construct(ConstrNum).BSDFInput.SolBkRefl = 0.0;
+                    Get2DMatrix(dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex, BSDFTempMtrx);
+                    dataConstruction.Construct(ConstrNum).BSDFInput.SolBkRefl = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
-                        Construct(ConstrNum).BSDFInput.SolBkRefl(I, I) = BSDFTempMtrx(I, 1);
+                        dataConstruction.Construct(ConstrNum).BSDFInput.SolBkRefl(I, I) = BSDFTempMtrx(I, 1);
                     }
                 }
 
                 // *******************************************************************************
                 // Visible front transmittance
                 // *******************************************************************************
-                Construct(ConstrNum).BSDFInput.VisFrtTransIndex = MatrixIndex(locAlphaArgs(8));
-                Get2DMatrixDimensions(Construct(ConstrNum).BSDFInput.VisFrtTransIndex, NumRows, NumCols);
-                Construct(ConstrNum).BSDFInput.VisFrtTransNrows = NBasis;
-                Construct(ConstrNum).BSDFInput.VisFrtTransNcols = NBasis;
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex = MatrixIndex(locAlphaArgs(8));
+                Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex, NumRows, NumCols);
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransNrows = NBasis;
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransNcols = NBasis;
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
@@ -9187,28 +9189,28 @@ namespace HeatBalanceManager {
                                       "\" must have the same number of rows and columns.");
                 }
 
-                Construct(ConstrNum).BSDFInput.VisFrtTrans.allocate(NBasis, NBasis);
-                if (Construct(ConstrNum).BSDFInput.VisFrtTransIndex == 0) {
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTrans.allocate(NBasis, NBasis);
+                if (dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(8) +
                                       "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(Construct(ConstrNum).BSDFInput.VisFrtTransIndex, BSDFTempMtrx);
-                    Construct(ConstrNum).BSDFInput.VisFrtTrans = 0.0;
+                    Get2DMatrix(dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex, BSDFTempMtrx);
+                    dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTrans = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
-                        Construct(ConstrNum).BSDFInput.VisFrtTrans(I, I) = BSDFTempMtrx(I, 1);
+                        dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTrans(I, I) = BSDFTempMtrx(I, 1);
                     }
                 }
 
                 // *******************************************************************************
                 // Visible back reflectance
                 // *******************************************************************************
-                Construct(ConstrNum).BSDFInput.VisBkReflIndex = MatrixIndex(locAlphaArgs(9));
-                Get2DMatrixDimensions(Construct(ConstrNum).BSDFInput.VisBkReflIndex, NumRows, NumCols);
-                Construct(ConstrNum).BSDFInput.VisBkReflNrows = NBasis;
-                Construct(ConstrNum).BSDFInput.VisBkReflNcols = NBasis;
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex = MatrixIndex(locAlphaArgs(9));
+                Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex, NumRows, NumCols);
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflNrows = NBasis;
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflNcols = NBasis;
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
@@ -9225,17 +9227,17 @@ namespace HeatBalanceManager {
                     ShowContinueError("Visible back reflectance matrix \"" + locAlphaArgs(9) + "\" must have the same number of rows and columns.");
                 }
 
-                Construct(ConstrNum).BSDFInput.VisBkRefl.allocate(NBasis, NBasis);
-                if (Construct(ConstrNum).BSDFInput.VisBkReflIndex == 0) {
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisBkRefl.allocate(NBasis, NBasis);
+                if (dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex == 0) {
                     ErrorsFound = true;
                     ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Visible back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(9) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(Construct(ConstrNum).BSDFInput.VisBkReflIndex, BSDFTempMtrx);
-                    Construct(ConstrNum).BSDFInput.VisBkRefl = 0.0;
+                    Get2DMatrix(dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex, BSDFTempMtrx);
+                    dataConstruction.Construct(ConstrNum).BSDFInput.VisBkRefl = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
-                        Construct(ConstrNum).BSDFInput.VisBkRefl(I, I) = BSDFTempMtrx(I, 1);
+                        dataConstruction.Construct(ConstrNum).BSDFInput.VisBkRefl(I, I) = BSDFTempMtrx(I, 1);
                     }
                 }
 
@@ -9250,21 +9252,21 @@ namespace HeatBalanceManager {
                 // ENDIF
 
                 // ALLOCATE(Construct(ConstrNum)%BSDFInput%Layer(NumOfOpticalLayers))
-                for (Layer = 1; Layer <= Construct(ConstrNum).TotLayers; ++Layer) {
+                for (Layer = 1; Layer <= dataConstruction.Construct(ConstrNum).TotLayers; ++Layer) {
                     AlphaIndex = 9 + (Layer * 3) - 2;
                     currentOpticalLayer = int(Layer / 2) + 1;
 
-                    Construct(ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(locAlphaArgs(AlphaIndex), Material);
+                    dataConstruction.Construct(ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(locAlphaArgs(AlphaIndex), dataMaterial.Material);
 
                     if (mod(Layer, 2) != 0) {
-                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).MaterialIndex = Construct(ConstrNum).LayerPoint(Layer);
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).MaterialIndex = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
 
                         // *******************************************************************************
                         // Front absorptance matrix
                         // *******************************************************************************
                         ++AlphaIndex;
-                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex = MatrixIndex(locAlphaArgs(AlphaIndex));
-                        Get2DMatrixDimensions(Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex, NumRows, NumCols);
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex = MatrixIndex(locAlphaArgs(AlphaIndex));
+                        Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
@@ -9285,26 +9287,26 @@ namespace HeatBalanceManager {
                                               RoundSigDigits(NBasis) + " number of columns.");
                         }
 
-                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).AbsNcols = NumCols;
-                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbs.allocate(NumCols, NumRows);
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).AbsNcols = NumCols;
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbs.allocate(NumCols, NumRows);
 
-                        if (Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex == 0) {
+                        if (dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex == 0) {
                             ErrorsFound = true;
                             ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                             ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                             ShowContinueError("Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) + " is missing from the input file.");
                         } else {
-                            Get2DMatrix(Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex,
-                                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbs);
+                            Get2DMatrix(dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex,
+                                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbs);
                         }
 
                         // *******************************************************************************
                         // Back absorptance matrix
                         // *******************************************************************************
                         ++AlphaIndex;
-                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex = MatrixIndex(locAlphaArgs(AlphaIndex));
-                        Get2DMatrixDimensions(Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex, NumRows, NumCols);
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex = MatrixIndex(locAlphaArgs(AlphaIndex));
+                        Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
@@ -9325,25 +9327,25 @@ namespace HeatBalanceManager {
                                               RoundSigDigits(NBasis) + " number of columns.");
                         }
 
-                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbs.allocate(NumCols, NumRows);
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbs.allocate(NumCols, NumRows);
 
-                        if (Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex == 0) {
+                        if (dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex == 0) {
                             ErrorsFound = true;
                             ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                             ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                             ShowContinueError("Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) + " is missing from the input file.");
                         } else {
-                            Get2DMatrix(Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex,
-                                        Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbs);
+                            Get2DMatrix(dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex,
+                                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbs);
                         }
                     } // if (Mod(Layer, 2) <> 0) then
                 }
 
                 BSDFTempMtrx.deallocate();
             }
-            Construct(ConstrNum).TypeIsWindow = true;
-            Construct(ConstrNum).WindowTypeBSDF = true;
+            dataConstruction.Construct(ConstrNum).TypeIsWindow = true;
+            dataConstruction.Construct(ConstrNum).WindowTypeBSDF = true;
         }
 
         // Do not forget to deallocate localy allocated variables
@@ -9355,6 +9357,39 @@ namespace HeatBalanceManager {
         if (allocated(locNumericArgs)) locNumericArgs.deallocate();
 
         if (ErrorsFound) ShowFatalError("Error in complex fenestration input.");
+    }
+
+    void InitConductionTransferFunctions(OutputFiles &outputFiles)
+    {
+        static bool ErrorsFound(false); // Flag for input error condition
+        bool DoCTFErrorReport(false);
+        for (auto & construction : dataConstruction.Construct) {
+            construction.calculateTransferFunction(ErrorsFound, DoCTFErrorReport);
+        }
+
+        bool DoReport;
+        General::ScanForReports("Constructions", DoReport, "Constructions");
+        if (DoReport || DoCTFErrorReport) {
+            print(outputFiles.eio,
+                  "! <Construction CTF>,Construction Name,Index,#Layers,#CTFs,Time Step {{hours}},ThermalConductance "
+                  "{{w/m2-K}},OuterThermalAbsorptance,InnerThermalAbsorptance,OuterSolarAbsorptance,InnerSolarAbsorptance,Roughness\n");
+            print(outputFiles.eio,
+                  "! <Material CTF Summary>,Material Name,Thickness {{m}},Conductivity {{w/m-K}},Density {{kg/m3}},Specific Heat "
+                  "{{J/kg-K}},ThermalResistance {{m2-K/w}}\n");
+            print(outputFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
+            print(outputFiles.eio, "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\n");
+
+            int cCounter = 0; // just used to keep construction index in output report
+            for (auto & construction : dataConstruction.Construct) {
+                cCounter++;
+                if (!construction.IsUsedCTF) continue;
+                construction.reportTransferFunction(outputFiles, cCounter);
+            }
+        }
+
+        if (ErrorsFound) {
+            ShowFatalError("Program terminated for reasons listed (InitConductionTransferFunctions)");
+        }
     }
 
 } // namespace HeatBalanceManager

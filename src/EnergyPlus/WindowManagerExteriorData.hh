@@ -48,13 +48,20 @@
 #ifndef WindowManagerExteriorData_hh_INCLUDED
 #define WindowManagerExteriorData_hh_INCLUDED
 
+// C++ Headers
 #include <map>
 #include <memory>
 #include <vector>
 
+// EnergyPlus Headers
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Vectors.hh>
 
 namespace EnergyPlus {
+
+    //forward declaration
+    struct EnergyPlusData;
+
 namespace DataHeatBalance {
     struct MaterialProperties;
 }
@@ -89,6 +96,8 @@ class CMultiLayerScattered;
 } // namespace MultiLayerOptics
 
 namespace EnergyPlus {
+    //forward declaration
+    struct WindowManagerData;
 
 namespace WindowManager {
 
@@ -118,9 +127,9 @@ namespace WindowManager {
     public:
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(int const t_SampleDataPtr);
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData>
-        getSpectralSample(DataHeatBalance::MaterialProperties const &t_MaterialProperties);
-        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultSolarRadiationSpectrum();
-        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultVisiblePhotopicResponse();
+        getSpectralSample(Material::MaterialProperties const &t_MaterialProperties);
+        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultSolarRadiationSpectrum(WindowManagerData &dataWindowManager);
+        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultVisiblePhotopicResponse(WindowManagerData &dataWindowManager);
     };
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -136,7 +145,7 @@ namespace WindowManager {
                        int const t_ConstrNum,
                        std::shared_ptr<SingleLayerOptics::CScatteringLayer> const &t_Layer);
 
-        std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> getEquivalentLayer(FenestrationCommon::WavelengthRange const t_Range,
+        std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> getEquivalentLayer(WindowManagerData &dataWindowManager, FenestrationCommon::WavelengthRange const t_Range,
                                                                                    int const t_ConstrNum);
 
         static void clearState();

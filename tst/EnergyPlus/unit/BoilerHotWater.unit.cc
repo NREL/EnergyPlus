@@ -72,7 +72,6 @@ using namespace EnergyPlus::Psychrometrics;
 TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
 {
     // unit test for autosizing boiler nominal capacity in Boiler:HotWater
-    EnergyPlusData state;
     state.dataBoilers.Boiler.allocate(1);
     // Hardsized Hot Water Boiler
     state.dataBoilers.Boiler(1).LoopNum = 1;
@@ -118,7 +117,6 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
 {
     // unit test for checking hot water temperature for autosizing
     // boiler nominal capacity in Boiler:HotWater
-    EnergyPlusData state;
     state.dataBoilers.Boiler.allocate(1);
     // Autosized Hot Water Boiler
     state.dataBoilers.Boiler(1).LoopNum = 1;
