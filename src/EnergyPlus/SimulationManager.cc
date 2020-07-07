@@ -684,9 +684,9 @@ namespace SimulationManager {
 
         WriteTabularReports(state); //     Create the tabular reports at completion of each
 
-        WriteTabularTariffReports();
+        WriteTabularTariffReports(state.dataCostEstimateManager);
 
-        ComputeLifeCycleCostAndReport(); // must be after WriteTabularReports and WriteTabularTariffReports
+        ComputeLifeCycleCostAndReport(state.dataCostEstimateManager); // must be after WriteTabularReports and WriteTabularTariffReports
 
         CloseOutputTabularFile();
 

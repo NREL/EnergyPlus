@@ -59,33 +59,6 @@ namespace EnergyPlus {
 
 namespace DataCostEstimate {
 
-    // Using/Aliasing
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // CurntBldg holds results for current bldg. cost estimate
-    // RefrnceBldg holds user input for comparison.
-
-    extern int NumLineItems;    // number of cost estimate line items
-    extern bool DoCostEstimate; // set to true if any cost estimating needed
-
-    extern int numMonetaryUnit;
-    extern int selectedMonetaryUnit;
-
-    // Types
-
     struct CostAdjustmentStruct
     {
         // Members

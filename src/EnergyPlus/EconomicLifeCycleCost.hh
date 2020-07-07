@@ -58,6 +58,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct CostEstimateManagerData;
+
 namespace EconomicLifeCycleCost {
 
     // Using/Aliasing
@@ -171,8 +174,8 @@ namespace EconomicLifeCycleCost {
     extern Array1D_string const MonthNames;
 
     // arrays related to escalated energy costs
-    extern Array1D<Real64> EscalatedTotEnergy; 
-    extern Array2D<Real64> EscalatedEnergy; 
+    extern Array1D<Real64> EscalatedTotEnergy;
+    extern Array2D<Real64> EscalatedEnergy;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
@@ -283,7 +286,7 @@ namespace EconomicLifeCycleCost {
 
     void GetInputForLifeCycleCost();
 
-    void ComputeLifeCycleCostAndReport();
+    void ComputeLifeCycleCostAndReport(CostEstimateManagerData &dataCostEstimateManager);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -329,7 +332,7 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularLifeCycleCostReport();
+    void WriteTabularLifeCycleCostReport(CostEstimateManagerData &dataCostEstimateManager);
 
     void clear_state();
 

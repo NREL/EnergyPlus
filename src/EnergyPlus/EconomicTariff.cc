@@ -47,7 +47,6 @@
 
 // C++ Headers
 #include <cassert>
-#include <cmath>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -56,11 +55,11 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/DataCostEstimate.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/General.hh>
@@ -83,7 +82,6 @@ namespace EconomicTariff {
 
     //    Compute utility bills for a building based on energy
     //    use estimate.
-    using namespace DataPrecisionGlobals;
     using ScheduleManager::GetScheduleIndex;
 
     // ECONOMCIS:TARIFF enumerated lists
@@ -321,7 +319,7 @@ namespace EconomicTariff {
 
     // Functions
 
-    void UpdateUtilityBills()
+    void UpdateUtilityBills(CostEstimateManagerData &dataCostEstimateManager)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   September 2003
@@ -340,7 +338,7 @@ namespace EconomicTariff {
         if (Update_GetInput) {
             GetInputEconomicsTariff(ErrorsFound);
             // do rest of GetInput only if at least one tariff is defined.
-            GetInputEconomicsCurrencyType(ErrorsFound);
+            GetInputEconomicsCurrencyType(dataCostEstimateManager, ErrorsFound);
             if (numTariff >= 1) {
                 if (!ErrorsFound && displayEconomicResultSummary) AddTOCEntry("Economics Results Summary Report", "Entire Facility");
                 CreateCategoryNativeVariables();
@@ -1333,7 +1331,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsCurrencyType(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsCurrencyType(CostEstimateManagerData &dataCostEstimateManager, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2008
@@ -1355,11 +1353,11 @@ namespace EconomicTariff {
         int IOStat; // IO Status when calling get input subroutine
         int i;
 
-        initializeMonetaryUnit();
+        initializeMonetaryUnit(dataCostEstimateManager);
         NumCurrencyType = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        selectedMonetaryUnit = 0; // invalid
+        dataCostEstimateManager.selectedMonetaryUnit = 0; // invalid
         if (NumCurrencyType == 0) {
-            selectedMonetaryUnit = 1; // USD - U.S. Dollar
+            dataCostEstimateManager.selectedMonetaryUnit = 1; // USD - U.S. Dollar
         } else if (NumCurrencyType == 1) {
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           1,
@@ -1373,20 +1371,20 @@ namespace EconomicTariff {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             // Monetary Unit
-            for (i = 1; i <= numMonetaryUnit; ++i) {
+            for (i = 1; i <= dataCostEstimateManager.numMonetaryUnit; ++i) {
                 if (UtilityRoutines::SameString(cAlphaArgs(1), monetaryUnit(i).code)) {
-                    selectedMonetaryUnit = i;
+                    dataCostEstimateManager.selectedMonetaryUnit = i;
                     break;
                 }
             }
-            if (selectedMonetaryUnit == 0) {
+            if (dataCostEstimateManager.selectedMonetaryUnit == 0) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data.");
                 ShowContinueError("... invalid " + cAlphaFieldNames(1) + '.');
                 ErrorsFound = true;
             }
         } else if (NumCurrencyType > 1) {
             ShowWarningError(RoutineName + CurrentModuleObject + " Only one instance of this object is allowed. USD will be used.");
-            selectedMonetaryUnit = 1; // USD - U.S. Dollar
+            dataCostEstimateManager.selectedMonetaryUnit = 1; // USD - U.S. Dollar
         }
     }
 
@@ -1507,7 +1505,7 @@ namespace EconomicTariff {
         }
     }
 
-    void initializeMonetaryUnit()
+    void initializeMonetaryUnit(CostEstimateManagerData &dataCostEstimateManager)
     {
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2008
@@ -1521,8 +1519,8 @@ namespace EconomicTariff {
 
         using namespace DataCostEstimate;
 
-        numMonetaryUnit = 111;
-        monetaryUnit.allocate(numMonetaryUnit);
+        dataCostEstimateManager.numMonetaryUnit = 111;
+        monetaryUnit.allocate(dataCostEstimateManager.numMonetaryUnit);
         monetaryUnit(1).code = "USD";
         monetaryUnit(2).code = "AFN";
         monetaryUnit(3).code = "ALL";
@@ -4179,7 +4177,7 @@ namespace EconomicTariff {
         }
     }
 
-    void WriteTabularTariffReports()
+    void WriteTabularTariffReports(CostEstimateManagerData &dataCostEstimateManager)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
@@ -4300,7 +4298,7 @@ namespace EconomicTariff {
                 }
                 columnWidth = 14; // array assignment - same for all columns
                 WriteSubtitle("Annual Cost");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
@@ -4357,7 +4355,7 @@ namespace EconomicTariff {
                 }
                 columnWidth = 14; // array assignment - same for all columns
                 WriteSubtitle("Tariff Summary");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
@@ -4438,7 +4436,7 @@ namespace EconomicTariff {
                     }
                     columnWidth = 14; // array assignment - same for all columns
                     WriteSubtitle("General");
-                    WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                    WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "Tariff Report", tariff(iTariff).tariffName, "General");
@@ -4463,7 +4461,7 @@ namespace EconomicTariff {
                     econVar(tariff(iTariff).ptSubtotal).activeNow = true;
                     econVar(tariff(iTariff).ptTaxes).activeNow = true;
                     econVar(tariff(iTariff).ptTotal).activeNow = true;
-                    ReportEconomicVariable("Categories", false, true, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(dataCostEstimateManager, "Categories", false, true, tariff(iTariff).tariffName);
                     //---- Charges
                     for (auto &e : econVar)
                         e.activeNow = false;
@@ -4474,7 +4472,7 @@ namespace EconomicTariff {
                             }
                         }
                     }
-                    ReportEconomicVariable("Charges", true, true, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(dataCostEstimateManager, "Charges", true, true, tariff(iTariff).tariffName);
                     //---- Sources for Charges
                     for (auto &e : econVar)
                         e.activeNow = false;
@@ -4492,7 +4490,7 @@ namespace EconomicTariff {
                             }
                         }
                     }
-                    ReportEconomicVariable("Corresponding Sources for Charges", false, false, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(dataCostEstimateManager, "Corresponding Sources for Charges", false, false, tariff(iTariff).tariffName);
                     //---- Rachets
                     for (auto &e : econVar)
                         e.activeNow = false;
@@ -4503,7 +4501,7 @@ namespace EconomicTariff {
                             }
                         }
                     }
-                    ReportEconomicVariable("Ratchets", false, false, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(dataCostEstimateManager, "Ratchets", false, false, tariff(iTariff).tariffName);
                     //---- Qualifies
                     for (auto &e : econVar)
                         e.activeNow = false;
@@ -4514,14 +4512,14 @@ namespace EconomicTariff {
                             }
                         }
                     }
-                    ReportEconomicVariable("Qualifies", false, false, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(dataCostEstimateManager, "Qualifies", false, false, tariff(iTariff).tariffName);
                     //---- Native Variables
                     for (auto &e : econVar)
                         e.activeNow = false;
                     for (kVar = tariff(iTariff).firstNative; kVar <= tariff(iTariff).lastNative; ++kVar) {
                         econVar(kVar).activeNow = true;
                     }
-                    ReportEconomicVariable("Native Variables", false, false, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(dataCostEstimateManager, "Native Variables", false, false, tariff(iTariff).tariffName);
                     //---- Other Variables
                     for (auto &e : econVar)
                         e.activeNow = false;
@@ -4532,7 +4530,7 @@ namespace EconomicTariff {
                             }
                         }
                     }
-                    ReportEconomicVariable("Other Variables", false, false, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(dataCostEstimateManager, "Other Variables", false, false, tariff(iTariff).tariffName);
                     //---- Computation
                     if (computation(iTariff).isUserDef) {
                         WriteTextLine("Computation -  User Defined", true);
@@ -4675,7 +4673,7 @@ namespace EconomicTariff {
     }
 
     void
-    ReportEconomicVariable(std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString)
+    ReportEconomicVariable(CostEstimateManagerData &dataCostEstimateManager, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
@@ -4818,7 +4816,7 @@ namespace EconomicTariff {
         }
         columnWidth = 14; // array assignment - same for all columns
         WriteSubtitle(titleString);
-        WriteTable(tableBody, rowHead, columnHead, columnWidth);
+        WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
         if (sqlite) {
             sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
         }

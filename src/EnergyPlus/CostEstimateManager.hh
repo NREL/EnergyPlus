@@ -102,11 +102,20 @@ namespace CostEstimateManager {
 struct CostEstimateManagerData : BaseGlobalStruct {
 
     bool GetCostInput = true;
+    int NumLineItems = 0 ;        // number of cost estimate line items
+    bool DoCostEstimate = false;  // set to true if any cost estimating needed
+    int numMonetaryUnit = 0;
+    int selectedMonetaryUnit = 0;
+
     Array1D<CostEstimateManager::CostLineItemStruct> CostLineItem;
 
     void clear_state() override
     {
         GetCostInput = true;
+        NumLineItems = 0;
+        DoCostEstimate = false;
+        numMonetaryUnit = 0;
+        selectedMonetaryUnit = 0;
     }
 };
 

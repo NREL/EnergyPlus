@@ -114,8 +114,7 @@ namespace CostEstimateManager {
 
         if (KickOffSimulation) return;
 
-        if (DoCostEstimate) {
-
+        if (state.dataCostEstimateManager.DoCostEstimate) {
             CalcCostEstimate(state);
         }
     }
@@ -137,30 +136,30 @@ namespace CostEstimateManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item; // Item to be "gotten"
-        int NumCostAdjust(0);
-        int NumRefAdjust(0);
+        int NumCostAdjust;
+        int NumRefAdjust;
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
-        NumLineItems = inputProcessor->getNumObjectsFound("ComponentCost:LineItem");
+        state.dataCostEstimateManager.NumLineItems = inputProcessor->getNumObjectsFound("ComponentCost:LineItem");
 
-        if (NumLineItems == 0) {
-            DoCostEstimate = false;
+        if (state.dataCostEstimateManager.NumLineItems == 0) {
+            state.dataCostEstimateManager.DoCostEstimate = false;
             return;
         } else {
-            DoCostEstimate = true;
+            state.dataCostEstimateManager.DoCostEstimate = true;
             //    WriteTabularFiles = .TRUE.
         }
 
         if (!allocated(state.dataCostEstimateManager.CostLineItem)) {
-            state.dataCostEstimateManager.CostLineItem.allocate(NumLineItems);
+            state.dataCostEstimateManager.CostLineItem.allocate(state.dataCostEstimateManager.NumLineItems);
         }
 
         cCurrentModuleObject = "ComponentCost:LineItem";
 
-        for (Item = 1; Item <= NumLineItems; ++Item) {
+        for (Item = 1; Item <= state.dataCostEstimateManager.NumLineItems; ++Item) {
             inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
             state.dataCostEstimateManager.CostLineItem(Item).LineName = cAlphaArgs(1);
             state.dataCostEstimateManager.CostLineItem(Item).LineType = cAlphaArgs(2);
@@ -255,17 +254,12 @@ namespace CostEstimateManager {
 
         std::string ThisConstructStr;
 
-        //  LOGICAL,ALLOCATABLE, DIMENSION(:) :: uniqueSurfMask !
-        //  REAL(r64), ALLOCATABLE, DIMENSION(:)   :: SurfMultipleARR
-        //  INTEGER             :: surf ! do-loop counter for checking for surfaces for uniqueness
         int thisCoil; // index of named coil in its derived type
-        bool WildcardObjNames;
         int thisChil;
         int thisPV;
-        Real64 Multipliers;
 
         // Setup working data structure for line items
-        for (Item = 1; Item <= NumLineItems; ++Item) { // Loop thru cost line items
+        for (Item = 1; Item <= state.dataCostEstimateManager.NumLineItems; ++Item) { // Loop thru cost line items
 
             state.dataCostEstimateManager.CostLineItem(Item).LineNumber = Item;
 
@@ -296,8 +290,6 @@ namespace CostEstimateManager {
                     }
 
                 } else if ((SELECT_CASE_var == "COIL:DX") || (SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED")) {
-                    WildcardObjNames = false;
-                    thisCoil = 0;
                     // test if too many pricing methods are set in user input
                     if ((state.dataCostEstimateManager.CostLineItem(Item).PerKiloWattCap > 0.0) && (state.dataCostEstimateManager.CostLineItem(Item).PerEach > 0.0)) {
                         ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager.CostLineItem(Item).LineName +
@@ -316,7 +308,6 @@ namespace CostEstimateManager {
                     }
                     //  check for wildcard * in object name..
                     if (state.dataCostEstimateManager.CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
-                        WildcardObjNames = true;
 
                     } else if (state.dataCostEstimateManager.CostLineItem(Item).ParentObjName == "") {
                         ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager.CostLineItem(Item).LineName +
@@ -334,8 +325,6 @@ namespace CostEstimateManager {
 
                 } else if (SELECT_CASE_var == "COIL:HEATING:FUEL") {
 
-                    WildcardObjNames = false;
-                    thisCoil = 0;
                     // test if too many pricing methods are set in user input
                     if ((state.dataCostEstimateManager.CostLineItem(Item).PerKiloWattCap > 0.0) && (state.dataCostEstimateManager.CostLineItem(Item).PerEach > 0.0)) {
                         ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager.CostLineItem(Item).LineName +
@@ -354,7 +343,6 @@ namespace CostEstimateManager {
                     }
                     //  check for wildcard * in object name..
                     if (state.dataCostEstimateManager.CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
-                        WildcardObjNames = true;
 
                     } else if (state.dataCostEstimateManager.CostLineItem(Item).ParentObjName == "") {
                         ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager.CostLineItem(Item).LineName +
@@ -393,10 +381,8 @@ namespace CostEstimateManager {
                     }
 
                 } else if (SELECT_CASE_var == "DAYLIGHTING:CONTROLS") {
-                    WildcardObjNames = false;
 
                     if (state.dataCostEstimateManager.CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
-                        WildcardObjNames = true;
                     } else if (state.dataCostEstimateManager.CostLineItem(Item).ParentObjName == "") {
                         ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager.CostLineItem(Item).LineName +
                                         "\", Daylighting:Controls, need to specify a Reference Object Name");
@@ -466,12 +452,6 @@ namespace CostEstimateManager {
                         if (state.dataCostEstimateManager.CostLineItem(Item).ParentObjName != "") {
                             thisPV = UtilityRoutines::FindItem(state.dataCostEstimateManager.CostLineItem(Item).ParentObjName, PVarray);
                             if (thisPV > 0) {
-                                ThisZoneID = UtilityRoutines::FindItem(Surface(PVarray(thisPV).SurfacePtr).ZoneName, Zone);
-                                if (ThisZoneID == 0) {
-                                    Multipliers = 1.0;
-                                } else {
-                                    Multipliers = Zone(ThisZoneID).Multiplier * Zone(ThisZoneID).ListMultiplier;
-                                }
                                 if (PVarray(thisPV).PVModelType != iSimplePVModel) {
                                     ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager.CostLineItem(Item).LineName +
                                                     "\", Generator:Photovoltaic, only available for model type PhotovoltaicPerformance:Simple");
@@ -547,7 +527,7 @@ namespace CostEstimateManager {
         Real64 Multipliers;
 
         // Setup working data structure for line items
-        for (Item = 1; Item <= NumLineItems; ++Item) { // Loop thru cost line items
+        for (Item = 1; Item <= state.dataCostEstimateManager.NumLineItems; ++Item) { // Loop thru cost line items
 
             state.dataCostEstimateManager.CostLineItem(Item).LineNumber = Item;
 
@@ -731,10 +711,8 @@ namespace CostEstimateManager {
                     }
 
                 } else if (SELECT_CASE_var == "DAYLIGHTING:CONTROLS") {
-                    WildcardObjNames = false;
 
                     if (state.dataCostEstimateManager.CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
-                        WildcardObjNames = true;
                         state.dataCostEstimateManager.CostLineItem(Item).Qty = sum(ZoneDaylight, &ZoneDaylightCalc::TotalDaylRefPoints);
                     } else if (state.dataCostEstimateManager.CostLineItem(Item).ParentObjName != "") {
                         ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager.CostLineItem(Item).ParentObjName, Zone);
