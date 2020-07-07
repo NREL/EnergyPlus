@@ -5377,6 +5377,31 @@ namespace OutputProcessor {
 
         EXPECT_EQ(" [swamps/county]", unitStringFromDDitem(9));
     }
+
+    TEST_F(EnergyPlusFixture, OutputProcessor_GetCustomMeterInput)
+    {
+        std::string const idf_objects = delimited_string({
+            "Meter:Custom,",
+            "FuelOilNo1CustomMeter,      !- Name",
+            "FuelOilNo1,                 !- Fuel Type",
+            ",                           !- Key Name 1",
+            "FuelOilNo1:Facility;        !- Variable or Meter 1 Name",
+            
+            "Meter:Custom,",
+            "FuelOilNo2CustomMeter,      !- Name",
+            "FuelOilNo2,                 !- Fuel Type",
+            ",                           !- Key Name 1",
+            "FuelOilNo2:Facility;        !- Variable or Meter 1 Name",
+            });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+
+        bool errors_found = false;
+
+        GetCustomMeterInput(errors_found);
+
+        EXPECT_FALSE(errors_found);
+    }
 } // namespace OutputProcessor
 
 } // namespace EnergyPlus
