@@ -79,8 +79,8 @@ namespace WindTurbine {
         // Members
         std::string Name;        // The component name
         std::string Schedule;    // Available schedule
-        RotorType RotorType;           // Rotor type (HAWT or VAWT)
-        ControlType ControlType;         // Control type
+        RotorType rotorType;           // Rotor type (HAWT or VAWT)
+        ControlType controlType;         // Control type
         int SchedPtr;            // Schedule
         int NumOfBlade;          // Blade number
         Real64 RatedRotorSpeed;  // Rated rotor speed in m/s

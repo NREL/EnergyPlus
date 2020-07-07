@@ -273,9 +273,9 @@ namespace WindTurbine {
             {
                 auto const SELECT_CASE_var(cAlphaArgs(3));
                 if ((SELECT_CASE_var == "HORIZONTALAXISWINDTURBINE") || (SELECT_CASE_var == "")) {
-                    dataWindTurbine.WindTurbineSys(WindTurbineNum).RotorType = RotorType::HAWT;
+                    dataWindTurbine.WindTurbineSys(WindTurbineNum).rotorType = RotorType::HAWT;
                 } else if (SELECT_CASE_var == "VERTICALAXISWINDTURBINE") {
-                    dataWindTurbine.WindTurbineSys(WindTurbineNum).RotorType = RotorType::VAWT;
+                    dataWindTurbine.WindTurbineSys(WindTurbineNum).rotorType = RotorType::VAWT;
                 } else {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
@@ -286,13 +286,13 @@ namespace WindTurbine {
             {
                 auto const SELECT_CASE_var(cAlphaArgs(4));
                 if (SELECT_CASE_var == "FIXEDSPEEDFIXEDPITCH") {
-                    dataWindTurbine.WindTurbineSys(WindTurbineNum).ControlType = ControlType::FSFP;
+                    dataWindTurbine.WindTurbineSys(WindTurbineNum).controlType = ControlType::FSFP;
                 } else if (SELECT_CASE_var == "FIXEDSPEEDVARIABLEPITCH") {
-                    dataWindTurbine.WindTurbineSys(WindTurbineNum).ControlType = ControlType::FSVP;
+                    dataWindTurbine.WindTurbineSys(WindTurbineNum).controlType = ControlType::FSVP;
                 } else if (SELECT_CASE_var == "VARIABLESPEEDFIXEDPITCH") {
-                    dataWindTurbine.WindTurbineSys(WindTurbineNum).ControlType = ControlType::VSFP;
+                    dataWindTurbine.WindTurbineSys(WindTurbineNum).controlType = ControlType::VSFP;
                 } else if ((SELECT_CASE_var == "VARIABLESPEEDVARIABLEPITCH") || (SELECT_CASE_var == "")) {
-                    dataWindTurbine.WindTurbineSys(WindTurbineNum).ControlType = ControlType::VSVP;
+                    dataWindTurbine.WindTurbineSys(WindTurbineNum).controlType = ControlType::VSVP;
                 } else {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(4) + "=\"" + cAlphaArgs(4) + "\".");
                     ErrorsFound = true;
@@ -421,7 +421,7 @@ namespace WindTurbine {
             }
 
             dataWindTurbine.WindTurbineSys(WindTurbineNum).MaxPowerCoeff = rNumericArgs(11); // Maximum power coefficient
-            if (dataWindTurbine.WindTurbineSys(WindTurbineNum).RotorType == RotorType::HAWT && dataWindTurbine.WindTurbineSys(WindTurbineNum).MaxPowerCoeff == 0.0) {
+            if (dataWindTurbine.WindTurbineSys(WindTurbineNum).rotorType == RotorType::HAWT && dataWindTurbine.WindTurbineSys(WindTurbineNum).MaxPowerCoeff == 0.0) {
                 if (lNumericBlanks(11)) {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(11) +
                                     " is required but input is blank.");
@@ -469,7 +469,7 @@ namespace WindTurbine {
             }
 
             dataWindTurbine.WindTurbineSys(WindTurbineNum).ChordArea = rNumericArgs(14); // Chord area of a single blade for VAWTs
-            if (dataWindTurbine.WindTurbineSys(WindTurbineNum).RotorType == RotorType::VAWT && dataWindTurbine.WindTurbineSys(WindTurbineNum).ChordArea == 0.0) {
+            if (dataWindTurbine.WindTurbineSys(WindTurbineNum).rotorType == RotorType::VAWT && dataWindTurbine.WindTurbineSys(WindTurbineNum).ChordArea == 0.0) {
                 if (lNumericBlanks(14)) {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(14) +
                                     " is required but input is blank.");
@@ -481,7 +481,7 @@ namespace WindTurbine {
             }
 
             dataWindTurbine.WindTurbineSys(WindTurbineNum).DragCoeff = rNumericArgs(15); // Blade drag coefficient
-            if (dataWindTurbine.WindTurbineSys(WindTurbineNum).RotorType == RotorType::VAWT && dataWindTurbine.WindTurbineSys(WindTurbineNum).DragCoeff == 0.0) {
+            if (dataWindTurbine.WindTurbineSys(WindTurbineNum).rotorType == RotorType::VAWT && dataWindTurbine.WindTurbineSys(WindTurbineNum).DragCoeff == 0.0) {
                 if (lNumericBlanks(15)) {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(15) +
                                     " is required but input is blank.");
@@ -493,7 +493,7 @@ namespace WindTurbine {
             }
 
             dataWindTurbine.WindTurbineSys(WindTurbineNum).LiftCoeff = rNumericArgs(16); // Blade lift coefficient
-            if (dataWindTurbine.WindTurbineSys(WindTurbineNum).RotorType == RotorType::VAWT && dataWindTurbine.WindTurbineSys(WindTurbineNum).LiftCoeff == 0.0) {
+            if (dataWindTurbine.WindTurbineSys(WindTurbineNum).rotorType == RotorType::VAWT && dataWindTurbine.WindTurbineSys(WindTurbineNum).LiftCoeff == 0.0) {
                 if (lNumericBlanks(16)) {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(16) +
                                     " is required but input is blank.");
@@ -576,7 +576,7 @@ namespace WindTurbine {
                                 "Average",
                                 dataWindTurbine.WindTurbineSys(WindTurbineNum).Name);
             {
-                auto const SELECT_CASE_var(dataWindTurbine.WindTurbineSys(WindTurbineNum).RotorType);
+                auto const SELECT_CASE_var(dataWindTurbine.WindTurbineSys(WindTurbineNum).rotorType);
                 if (SELECT_CASE_var == RotorType::HAWT) {
                     SetupOutputVariable("Generator Turbine Power Coefficient",
                                         OutputProcessor::Unit::None,
@@ -861,7 +861,7 @@ namespace WindTurbine {
             }
 
             {
-                auto const SELECT_CASE_var(dataWindTurbine.WindTurbineSys(WindTurbineNum).RotorType);
+                auto const SELECT_CASE_var(dataWindTurbine.WindTurbineSys(WindTurbineNum).rotorType);
                 if (SELECT_CASE_var == RotorType::HAWT) { // Horizontal axis wind turbine
 
                     MaxPowerCoeff = dataWindTurbine.WindTurbineSys(WindTurbineNum).MaxPowerCoeff;
