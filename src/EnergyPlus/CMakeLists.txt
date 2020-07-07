@@ -746,6 +746,7 @@ SET( API_HEADERS
   api/func.h
   api/runtime.h
   api/datatransfer.h
+  api/autosizing.h
   api/EnergyPlusPgm.hh
   api/EnergyPlusAPI.h
   api/TypeDefs.h
@@ -754,6 +755,7 @@ SET( API_CORE_SRC
   api/func.cc
   api/runtime.cc
   api/datatransfer.cc
+  api/autosizing.cc
   api/EnergyPlusPgm.cc)
 
 if(APPLE OR UNIX)
@@ -913,6 +915,12 @@ if( BUILD_TESTING )
   target_link_libraries( TestAPI_DataTransfer_C energyplusapi )
   add_test(NAME "API.TestDataTransferC" COMMAND TestAPI_DataTransfer_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
 
+  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing")
+  file(MAKE_DIRECTORY ${TEST_DIR})
+  add_executable( TestAPI_Autosizing_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestAutosizing.c )
+  target_link_libraries( TestAPI_Autosizing_C energyplusapi )
+  add_test(NAME "API.TestAutosizingC" COMMAND TestAPI_Autosizing_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+
   # This is tricky, the test scripts should be copied into the Products/<config> directory, but add_test has to be
   # called so early, it's hard to figure that out ahead of time.  I dunno.  Just skipping these on MSVC builds for now.
   if(NOT MSVC)
@@ -935,6 +943,13 @@ if( BUILD_TESTING )
     configure_file( "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestDataTransfer.py" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" )
     add_test(NAME "API.TestDataTransferPython"
             COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
+            WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+
+    set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing_python")
+    file(MAKE_DIRECTORY ${TEST_DIR})
+    configure_file( "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestAutosizing.py" "${API_TEST_TARGET_DIR}/TestAutosizing.py" )
+    add_test(NAME "API.TestAutosizingPython"
+            COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestAutosizing.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
     set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/plugin_tester_tester")

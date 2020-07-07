@@ -5,6 +5,7 @@ import sys
 from pyenergyplus.func import Functional
 from pyenergyplus.datatransfer import DataExchange
 from pyenergyplus.runtime import Runtime
+from pyenergyplus.autosizing import Autosizing
 
 
 def api_path() -> str:
@@ -81,6 +82,8 @@ class EnergyPlusAPI:
         self.exchange = DataExchange(self.api, running_as_python_plugin)
         # self.runtime provides access to a runtime API class, instantiated and ready to go
         self.runtime = Runtime(self.api)
+        # self.autosizing provides access to the autosizing API class, instantiated and ready to go
+        self.autosizing = Autosizing(self.api)
 
     @staticmethod
     def api_version() -> str:
