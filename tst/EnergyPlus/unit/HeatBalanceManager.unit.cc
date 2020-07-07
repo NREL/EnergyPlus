@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDaylighting.hh>
@@ -61,18 +62,16 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -335,15 +334,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     bool ErrorsFound(false); // If errors detected in input
 
     TotMaterials = 3;
-    Material.allocate(TotMaterials);
-    Material(1).Name = "GLASS";
-    Material(2).Name = "AIRGAP";
-    Material(3).Name = "GLASS";
+    dataMaterial.Material.allocate(TotMaterials);
+    dataMaterial.Material(1).Name = "GLASS";
+    dataMaterial.Material(2).Name = "AIRGAP";
+    dataMaterial.Material(3).Name = "GLASS";
 
     // Material layer group index
-    Material(1).Group = 3; // WindowGlass
-    Material(2).Group = 4; // WindowGas
-    Material(3).Group = 3; // WindowGlass
+    dataMaterial.Material(1).Group = 3; // WindowGlass
+    dataMaterial.Material(2).Group = 4; // WindowGas
+    dataMaterial.Material(3).Group = 3; // WindowGlass
 
     NominalRforNominalUCalculation.allocate(1);
     NominalRforNominalUCalculation(1) = 0.0;
@@ -359,7 +358,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     EXPECT_FALSE(ErrorsFound);
 
     // Clear shared arrays that were allocated in GetConstructData
-    Construct.deallocate();
+    dataConstruction.Construct.deallocate();
 
     // call to get invalid window material type
     //		Material( 2 ).Group = 16; // BlindEquivalentLayer, this layer is invalid in plain windows
@@ -394,7 +393,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(ZoneAirMassFlow.BalanceMixing);
@@ -457,7 +456,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     // call to process input
     ProcessScheduleInput(state.outputFiles);
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -604,7 +603,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -664,7 +663,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     NumOfZones = 2;
     ZoneReOrder.allocate(NumOfZones);
@@ -714,11 +713,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
     EXPECT_FALSE(ErrorsFound);
 
     // check the "Material:RoofVegetation" names
-    EXPECT_EQ(Material(1).Name, "THICKSOIL");
+    EXPECT_EQ(dataMaterial.Material(1).Name, "THICKSOIL");
     // check maximum (saturated) moisture content
-    EXPECT_EQ(0.4, Material(1).Porosity);
+    EXPECT_EQ(0.4, dataMaterial.Material(1).Porosity);
     // check initial moisture Content was reset
-    EXPECT_EQ(0.4, Material(1).InitMoisture); // reset from 0.45 to 0.4 during get input
+    EXPECT_EQ(0.4, dataMaterial.Material(1).InitMoisture); // reset from 0.45 to 0.4 during get input
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
@@ -824,8 +823,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
         "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
-
-        "  Output:DebuggingData,0,0;",
 
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
@@ -1210,7 +1207,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 
     ScheduleManager::ProcessScheduleInput(state.outputFiles);
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1275,7 +1272,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_DOUBLE_EQ(0.012611481326656135, DataLoopNode::Node(1).HumRat);
     EXPECT_DOUBLE_EQ(57247.660939392081, DataLoopNode::Node(1).Enthalpy);
 
-    InitHeatBalance(state.outputFiles);
+    InitHeatBalance(state.dataWindowManager, state.outputFiles);
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
@@ -1293,7 +1290,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataEnvironment::WindSpeed = 1.5;
     DataEnvironment::WindDir = 90.0;
 
-    InitHeatBalance(state.outputFiles);
+    InitHeatBalance(state.dataWindowManager, state.outputFiles);
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
@@ -1330,7 +1327,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "REGULAFALSITHENBISECTION");
 }
@@ -1360,7 +1357,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi");
 }
@@ -1581,7 +1578,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     HeatBalanceManager::ManageHeatBalance(state);
     // Find the fenestration surface
     int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
-    int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", DataHeatBalance::Construct);
+    int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", dataConstruction.Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win1ConstNum);
     Real64 transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
     EXPECT_GT(transSol, 0.8);
@@ -1596,7 +1593,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     HeatBalanceManager::ManageHeatBalance(state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
     HeatBalanceManager::ManageHeatBalance(state);
-    int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", DataHeatBalance::Construct);
+    int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", dataConstruction.Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
     transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
     EXPECT_LT(transSol, 0.2);
@@ -1618,7 +1615,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1645,7 +1642,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1671,7 +1668,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_TRUE(DataHeatBalance::AnyEMPD);
@@ -1694,7 +1691,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1717,7 +1714,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsfound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1769,7 +1766,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
     HeatBalanceManager::GetMaterialData(state.outputFiles, errorsfound);
 
     EXPECT_FALSE(errorsfound);
-    EXPECT_NEAR(DataHeatBalance::Material(1).Resistance,0.158,0.0001);
+    EXPECT_NEAR(dataMaterial.Material(1).Resistance,0.158,0.0001);
 
 }
 
@@ -1815,17 +1812,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHeatBalance::TotMaterials, 1);
     int MaterNum = 1;
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).Group, DataHeatBalance::IRTMaterial);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).Name, "~AirBoundary-IRTMaterial");
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).ROnly, true);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).Resistance, 0.01);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).AbsorpThermal, 0.9999);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).AbsorpThermalInput, 0.9999);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).AbsorpSolar, 0.0);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).AbsorpSolarInput, 0.0);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).AbsorpVisible, 0.0);
-    EXPECT_EQ(DataHeatBalance::Material(MaterNum).AbsorpVisibleInput, 0.0);
-    EXPECT_EQ(DataHeatBalance::NominalR(MaterNum), Material(MaterNum).Resistance);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).Group, DataHeatBalance::IRTMaterial);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).Name, "~AirBoundary-IRTMaterial");
+    EXPECT_EQ(dataMaterial.Material(MaterNum).ROnly, true);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).Resistance, 0.01);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpThermal, 0.9999);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpThermalInput, 0.9999);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpSolar, 0.0);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpSolarInput, 0.0);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpVisible, 0.0);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpVisibleInput, 0.0);
+    EXPECT_EQ(DataHeatBalance::NominalR(MaterNum), dataMaterial.Material(MaterNum).Resistance);
 
     // get constructions
     ErrorsFound = false;
@@ -1834,48 +1831,48 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
 
     EXPECT_EQ(DataHeatBalance::TotConstructs, 3);
 
-    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Non-Grouped Air Boundary"), DataHeatBalance::Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Non-Grouped Air Boundary"));
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).TotLayers, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Material(DataHeatBalance::Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.5); // Default value from IDD
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, -1);
+    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Non-Grouped Air Boundary"), dataConstruction.Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataConstruction.Construct(constrNum).Name, "Non-Grouped Air Boundary"));
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).IsUsedCTF);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).TotLayers, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataMaterial.Material(dataConstruction.Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryACH, 0.5); // Default value from IDD
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryMixingSched, -1);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.01);
 
-    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Grouped Air Boundary"), DataHeatBalance::Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Grouped Air Boundary"));
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).TotLayers, 0);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.0); // Not processed for GroupedZone mixing option
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, 0);
+    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Grouped Air Boundary"), dataConstruction.Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataConstruction.Construct(constrNum).Name, "Grouped Air Boundary"));
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).IsUsedCTF);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).TotLayers, 0);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryACH, 0.0); // Not processed for GroupedZone mixing option
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryMixingSched, 0);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
 
-    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Good Mixing Schedule"), DataHeatBalance::Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).TotLayers, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Material(DataHeatBalance::Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.4);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, 1);
+    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Good Mixing Schedule"), dataConstruction.Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataConstruction.Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).IsUsedCTF);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).TotLayers, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataMaterial.Material(dataConstruction.Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryACH, 0.4);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryMixingSched, 1);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.01);
 
 }
@@ -1921,18 +1918,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 
     EXPECT_EQ(DataHeatBalance::TotConstructs, 1);
 
-    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Bad Mixing Schedule"), DataHeatBalance::Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).TotLayers, 0);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.1);
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, 0);
+    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Bad Mixing Schedule"), dataConstruction.Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(dataConstruction.Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).IsUsedCTF);
+    EXPECT_FALSE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_TRUE(dataConstruction.Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).TotLayers, 0);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryACH, 0.1);
+    EXPECT_EQ(dataConstruction.Construct(constrNum).AirBoundaryMixingSched, 0);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
 
 }
@@ -1954,14 +1951,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
 
     int MaterNum = 1;
 
-    EXPECT_EQ(Material(MaterNum).ROnly, true);
-    EXPECT_NEAR(Material(MaterNum).Resistance, 0.01, 0.00001);
-    EXPECT_NEAR(Material(MaterNum).AbsorpThermal, 0.9999, 0.00001);
-    EXPECT_NEAR(Material(MaterNum).AbsorpThermalInput, 0.9999, 0.00001);
-    EXPECT_NEAR(Material(MaterNum).AbsorpSolar, 1.0, 0.00001);
-    EXPECT_NEAR(Material(MaterNum).AbsorpSolarInput, 1.0, 0.00001);
-    EXPECT_NEAR(Material(MaterNum).AbsorpVisible, 1.0, 0.00001);
-    EXPECT_NEAR(Material(MaterNum).AbsorpVisibleInput, 1.0, 0.00001);
+    EXPECT_EQ(dataMaterial.Material(MaterNum).ROnly, true);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).Resistance, 0.01, 0.00001);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpThermal, 0.9999, 0.00001);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpThermalInput, 0.9999, 0.00001);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpSolar, 1.0, 0.00001);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpSolarInput, 1.0, 0.00001);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpVisible, 1.0, 0.00001);
+    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpVisibleInput, 1.0, 0.00001);
 
 }
 
@@ -1971,7 +1968,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     DataSurfaces::TotSurfaces = 3;
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataHeatBalance::TotConstructs = 3;
-    DataHeatBalance::Construct.allocate( DataHeatBalance::TotConstructs);
+    dataConstruction.Construct.allocate( DataHeatBalance::TotConstructs);
 
     DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Wall;
     DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
@@ -1979,17 +1976,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     DataSurfaces::Surface(1).Construction = 1;
     DataSurfaces::Surface(2).Construction = 2;
     DataSurfaces::Surface(3).Construction = 3;
-    DataHeatBalance::Construct(1).WindowTypeBSDF = false;
-    DataHeatBalance::Construct(2).WindowTypeBSDF = false;
-    DataHeatBalance::Construct(3).WindowTypeBSDF = true;
+    dataConstruction.Construct(1).WindowTypeBSDF = false;
+    dataConstruction.Construct(2).WindowTypeBSDF = false;
+    dataConstruction.Construct(3).WindowTypeBSDF = true;
     int SurfsForRegWindow = 3;
-    DataHeatBalance::Construct(1).TotLayers = 1;
-    DataHeatBalance::Construct(2).TotLayers = SurfsForRegWindow;
-    DataHeatBalance::Construct(3).TotLayers = 1;
+    dataConstruction.Construct(1).TotLayers = 1;
+    dataConstruction.Construct(2).TotLayers = SurfsForRegWindow;
+    dataConstruction.Construct(3).TotLayers = 1;
 
     FenLaySurfTempFront.dimension(10, DataSurfaces::TotSurfaces, 0.0);
     FenLaySurfTempBack.dimension(10, DataSurfaces::TotSurfaces, 0.0);
-    DataHeatBalSurface::TH.dimension(2, MaxCTFTerms, DataSurfaces::TotSurfaces, 0.0);
+    DataHeatBalSurface::TH.dimension(2, Construction::MaxCTFTerms, DataSurfaces::TotSurfaces, 0.0);
 
     DataHeatBalSurface::TH(1,1,1) = 21.0;
     DataHeatBalSurface::TH(1,1,2) = 22.0;
@@ -2042,7 +2039,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisec
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "BISECTION");
 }
@@ -2246,7 +2243,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     SimulationManager::ManageSimulation(state);
-    EXPECT_EQ(DataSurfaces::Surface(2).Construction, DataSurfaces::Surface(2).EMSConstructionOverrideValue);
+ 
+    int surfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
+    EXPECT_EQ(DataSurfaces::Surface(surfNum).Construction, DataSurfaces::Surface(surfNum).EMSConstructionOverrideValue);
+    EXPECT_TRUE(DataSurfaces::Surface(surfNum).EMSConstructionOverrideON);
 }
 
 } // namespace EnergyPlus

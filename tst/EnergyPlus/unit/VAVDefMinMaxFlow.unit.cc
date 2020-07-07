@@ -250,7 +250,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment();
+    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     GetSysInput(state);
     ZoneSizingRunDone = true;
     CurZoneEqNum = 1;
@@ -430,7 +430,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment();
+    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     GetSysInput(state);
     ZoneSizingRunDone = true;
     CurZoneEqNum = 1;
@@ -609,7 +609,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment();
+    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     GetSysInput(state);
     ZoneSizingRunDone = true;
     CurZoneEqNum = 1;
@@ -790,7 +790,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment();
+    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     GetSysInput(state);
     ZoneSizingRunDone = false;
     CurZoneEqNum = 1;
@@ -940,7 +940,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment();
+    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     GetSysInput(state);
     ZoneSizingRunDone = true;
     CurZoneEqNum = 1;

@@ -2237,7 +2237,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -2377,13 +2377,18 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     ReportAirflowNetwork();
 
-    EXPECT_NEAR(35.0349959, AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
+    // Original results
+    // EXPECT_NEAR(34.3673036, AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
+    // EXPECT_NEAR(36.7133377, AirflowNetwork::AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
+    // EXPECT_NEAR(89.3450925, AirflowNetwork::AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
+    // revised based #7844
+    EXPECT_NEAR(35.3319353, AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
     EXPECT_NEAR(38.1554377, AirflowNetwork::AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
-    EXPECT_NEAR(91.0809002, AirflowNetwork::AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
+    EXPECT_NEAR(91.8528571, AirflowNetwork::AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
 
     Real64 hg = Psychrometrics::PsyHgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(1), DataHeatBalFanSys::MAT(1));
     Real64 hzone = Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1));
-    Real64 hamb =  Psychrometrics::PsyHFnTdbW(0.0, DataEnvironment::OutHumRat);
+    Real64 hamb = Psychrometrics::PsyHFnTdbW(0.0, DataEnvironment::OutHumRat);
     Real64 hdiff = AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 * (hzone - hamb);
     Real64 sum =
         AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW - AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW;
@@ -3735,7 +3740,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
         "    4.2672,                  !- Vertex 4 Y-coordinate {m}",
         "    4.5034;                  !- Vertex 4 Z-coordinate {m}",
 
-        "  ZoneProperty:UserViewFactors:bySurfaceName,",
+        "  ZoneProperty:UserViewFactors:BySurfaceName,",
         "    ATTIC ZONE,              !- Zone Name",
         "    Attic Floor,		!=From Surface 1",
         "    Attic Floor,		!=To Surface 1",
@@ -4413,8 +4418,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    SimulationManager::GetProjectData(state, state.outputFiles);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -9065,8 +9070,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    SimulationManager::GetProjectData(state, state.outputFiles);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -9620,8 +9625,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
-
-        "  Output:DebuggingData,0,0;",
 
         "  ZoneCapacitanceMultiplier:ResearchSpecial,",
         "    Multiplier,              !- Name",
@@ -13086,15 +13089,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "  20.44,                                                   !- November Ground Temperature",
         "  20.20;                                                   !- December Ground Temperature",
 
-        "Output:Diagnostics,DisplayExtraWarnings;",
-
-        "Output:Diagnostics,DisplayUnusedSchedules;"});
+        "Output:Diagnostics,DisplayExtraWarnings,DisplayUnusedSchedules;"
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -13206,13 +13208,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     ReportAirflowNetwork();
 
     EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW, 95.89575, 0.001);
-    EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatLossW, 0.954879, 0.001);
+    EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatLossW, 0.969147, 0.001);
 
     AirflowNetwork::AirflowNetworkCompData(AirflowNetwork::AirflowNetworkLinkageData(2).CompNum).CompTypeNum = 1;
     ReportAirflowNetwork();
 
     EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneVentSenLossW, 95.89575, 0.001);
-    EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneVentLatLossW, 0.954879, 0.001);
+    EXPECT_NEAR(AirflowNetwork::AirflowNetworkReportData(1).MultiZoneVentLatLossW, 0.969147, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
@@ -13245,6 +13247,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
 TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
 {
     std::string const idf_objects = delimited_string(
+        //{"Version,9.3;",
         {"SimulationControl,",
          "  No,                      !- Do Zone Sizing Calculation",
          "  No,                      !- Do System Sizing Calculation",
@@ -13704,8 +13707,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
-
-        "  Output:DebuggingData,0,0;",
 
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
@@ -15568,7 +15569,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -16468,7 +16469,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
         "    4.2672,                  !- Vertex 4 Y-coordinate {m}",
         "    4.5034;                  !- Vertex 4 Z-coordinate {m}",
 
-        "  ZoneProperty:UserViewFactors:bySurfaceName,",
+        "  ZoneProperty:UserViewFactors:BySurfaceName,",
         "    ATTIC ZONE,              !- Zone Name",
         "    Attic Floor,		!=From Surface 1",
         "    Attic Floor,		!=To Surface 1",
@@ -17146,8 +17147,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    SimulationManager::GetProjectData(state, state.outputFiles);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -17186,6 +17187,27 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetwork_SenLatLoadsConservation_Test)
+{
+    // Issue 7891
+    Real64 T1 = 25.0;
+    Real64 W1 = 0.01;
+    Real64 T2 = 15.0;
+    Real64 W2 = 0.005;
+    Real64 hdiff = Psychrometrics::PsyHFnTdbW(T1, W1) - Psychrometrics::PsyHFnTdbW(T2, W2);
+    Real64 sen = Psychrometrics::PsyCpAirFnW(W1) * (T1 - T2);
+    Real64 lat = Psychrometrics::PsyHgAirFnWTdb(W2, T2) * (W1 - W2);
+    Real64 sen1 = Psychrometrics::PsyCpAirFnW((W1 + W2) / 2.0) * (T1 - T2);
+    Real64 lat1 = Psychrometrics::PsyHgAirFnWTdb(W2, (T2 + T1) / 2.0) * (W1 - W2);
+    Real64 sum = sen + lat;
+    // single value
+    EXPECT_NEAR(hdiff, sum, 0.0001);
+    // Average value
+    sum = sen1 + lat1;
+    EXPECT_NEAR(hdiff, sum, 0.0001);
+
 }
 
 TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
@@ -19904,7 +19926,7 @@ std::string const idf_objects = delimited_string({
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -19974,7 +19996,7 @@ std::string const idf_objects = delimited_string({
     DataHeatBalFanSys::ZoneAirHumRat(5) = 0.001;
 
     DataZoneEquipment::GetZoneEquipmentData(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     SimAirServingZones::GetAirPathData(state);
 
     // Read AirflowNetwork inputs

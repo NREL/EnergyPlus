@@ -56,8 +56,10 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
     // Forward declarations
     struct EnergyPlusData;
+    struct ZonePlenumData;
     class OutputFiles;
 
 void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,               // the component Name
