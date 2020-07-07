@@ -316,7 +316,7 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ExpressAsCashFlows();
+    void ExpressAsCashFlows(CostEstimateManagerData &dataCostEstimateManager);
 
     void ComputeEscalatedEnergyCosts();
 

@@ -55,7 +55,6 @@
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataCostEstimate.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -91,7 +90,6 @@ namespace CostEstimateManager {
 
     // Using/Aliasing
     using DataGlobals::KickOffSimulation;
-    using namespace DataCostEstimate;
 
     void SimCostEstimate(EnergyPlusData &state)
     {
@@ -182,13 +180,13 @@ namespace CostEstimateManager {
         NumCostAdjust = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (NumCostAdjust == 1) {
             inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
-            CurntBldg.MiscCostperSqMeter = rNumericArgs(1);
-            CurntBldg.DesignFeeFrac = rNumericArgs(2);
-            CurntBldg.ContractorFeeFrac = rNumericArgs(3);
-            CurntBldg.ContingencyFrac = rNumericArgs(4);
-            CurntBldg.BondCostFrac = rNumericArgs(5);
-            CurntBldg.CommissioningFrac = rNumericArgs(6);
-            CurntBldg.RegionalModifier = rNumericArgs(7);
+            state.dataCostEstimateManager.CurntBldg.MiscCostperSqMeter = rNumericArgs(1);
+            state.dataCostEstimateManager.CurntBldg.DesignFeeFrac = rNumericArgs(2);
+            state.dataCostEstimateManager.CurntBldg.ContractorFeeFrac = rNumericArgs(3);
+            state.dataCostEstimateManager.CurntBldg.ContingencyFrac = rNumericArgs(4);
+            state.dataCostEstimateManager.CurntBldg.BondCostFrac = rNumericArgs(5);
+            state.dataCostEstimateManager.CurntBldg.CommissioningFrac = rNumericArgs(6);
+            state.dataCostEstimateManager.CurntBldg.RegionalModifier = rNumericArgs(7);
 
         } else if (NumCostAdjust > 1) {
             ShowSevereError(cCurrentModuleObject + ": Only one instance of this object is allowed.");
@@ -199,14 +197,14 @@ namespace CostEstimateManager {
         NumRefAdjust = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (NumRefAdjust == 1) {
             inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
-            RefrncBldg.LineItemTot = rNumericArgs(1);
-            RefrncBldg.MiscCostperSqMeter = rNumericArgs(2);
-            RefrncBldg.DesignFeeFrac = rNumericArgs(3);
-            RefrncBldg.ContractorFeeFrac = rNumericArgs(4);
-            RefrncBldg.ContingencyFrac = rNumericArgs(5);
-            RefrncBldg.BondCostFrac = rNumericArgs(6);
-            RefrncBldg.CommissioningFrac = rNumericArgs(7);
-            RefrncBldg.RegionalModifier = rNumericArgs(8);
+            state.dataCostEstimateManager.RefrncBldg.LineItemTot = rNumericArgs(1);
+            state.dataCostEstimateManager.RefrncBldg.MiscCostperSqMeter = rNumericArgs(2);
+            state.dataCostEstimateManager.RefrncBldg.DesignFeeFrac = rNumericArgs(3);
+            state.dataCostEstimateManager.RefrncBldg.ContractorFeeFrac = rNumericArgs(4);
+            state.dataCostEstimateManager.RefrncBldg.ContingencyFrac = rNumericArgs(5);
+            state.dataCostEstimateManager.RefrncBldg.BondCostFrac = rNumericArgs(6);
+            state.dataCostEstimateManager.RefrncBldg.CommissioningFrac = rNumericArgs(7);
+            state.dataCostEstimateManager.RefrncBldg.RegionalModifier = rNumericArgs(8);
 
         } else if (NumRefAdjust > 1) {
             ShowSevereError(cCurrentModuleObject + " : Only one instance of this object is allowed.");
@@ -792,7 +790,7 @@ namespace CostEstimateManager {
 
         // now sum up the line items, result for the current building
 
-        CurntBldg.LineItemTot = sum(state.dataCostEstimateManager.CostLineItem, &CostLineItemStruct::LineSubTotal);
+        state.dataCostEstimateManager.CurntBldg.LineItemTot = sum(state.dataCostEstimateManager.CostLineItem, &CostLineItemStruct::LineSubTotal);
     }
 
 } // namespace CostEstimateManager

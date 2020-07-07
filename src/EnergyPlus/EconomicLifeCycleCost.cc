@@ -54,7 +54,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CostEstimateManager.hh>
-#include <EnergyPlus/DataCostEstimate.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -102,7 +101,6 @@ namespace EconomicLifeCycleCost {
 
     // Using/Aliasing
     using namespace DataGlobalConstants;
-    using namespace DataCostEstimate;
     using namespace DataIPShortCuts;
 
     // Data
@@ -331,7 +329,7 @@ namespace EconomicLifeCycleCost {
 
         if (LCCparamPresent) {
             DisplayString("Computing Life Cycle Costs and Reporting");
-            ExpressAsCashFlows();
+            ExpressAsCashFlows(dataCostEstimateManager);
             ComputePresentValue();
             ComputeEscalatedEnergyCosts();
             ComputeTaxAndDepreciation();
@@ -1206,7 +1204,7 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ExpressAsCashFlows()
+    void ExpressAsCashFlows(CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -1269,12 +1267,12 @@ namespace EconomicLifeCycleCost {
         ExpressAsCashFlows_serviceMonths1900 = (serviceDateYear - 1900) * 12 + serviceDateMonth;
         monthsBaseToService = ExpressAsCashFlows_serviceMonths1900 - ExpressAsCashFlows_baseMonths1900;
         // if ComponentCost:LineItem exist, the grand total of all costs are another non-recurring cost
-        if (CurntBldg.GrandTotal > 0.0) { // from DataCostEstimate and computed in WriteCompCostTable within OutputReportTabular
+        if (dataCostEstimateManager.CurntBldg.GrandTotal > 0.0) { // from DataCostEstimate and computed in WriteCompCostTable within OutputReportTabular
             ++numNonrecurringCost;
             NonrecurringCost(numNonrecurringCost).name = "Total of ComponentCost:*";
             NonrecurringCost(numNonrecurringCost).lineItem = "";
             NonrecurringCost(numNonrecurringCost).category = costCatConstruction;
-            NonrecurringCost(numNonrecurringCost).cost = CurntBldg.GrandTotal;
+            NonrecurringCost(numNonrecurringCost).cost = dataCostEstimateManager.CurntBldg.GrandTotal;
             NonrecurringCost(numNonrecurringCost).startOfCosts = startBasePeriod;
             NonrecurringCost(numNonrecurringCost).yearsFromStart = 0;
             NonrecurringCost(numNonrecurringCost).monthsFromStart = 0;
