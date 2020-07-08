@@ -266,4 +266,15 @@ bool BaseSizer::isValidCoilType(std::string const &compType)
     }
     return false;
 }
+
+Real64 BaseSizer::unInitialized(bool &errorsFound)
+{
+    this->errorType = AutoSizingResultType::ErrorType2;
+    this->autoSizedValue = 0.0;
+    errorsFound = true;
+    ShowSevereError("Developer Error: sizing of " + this->sizingString + " failed.");
+    ShowContinueError("Occurs in " + this->compType + this->compName);
+    return this->autoSizedValue;
+}
+
 } // namespace EnergyPlus

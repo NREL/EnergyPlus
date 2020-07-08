@@ -398,14 +398,11 @@ namespace ReportSizingManager {
         Real64 CoilDesWaterDeltaT;                 // water coil delta T used for sizing [C]
         Real64 Cp;                                 // water loop fluid specific heat [J/kgK]
         Real64 rho;                                // water loop fluid density [kg/m3]
-        Real64 DesSatEnthAtWaterInTemp;            // temp variable used for warning messages
-        Real64 DesHumRatAtWaterInTemp;             // temp variable used for warning messages
         Real64 T1Out;                              // water coil air outlet temperature [C]
         Real64 T2Out;                              // water coil water outlet temperature [C]
         Real64 UA0;                                // lower bound of UA for autosizing
         Real64 UA1;                                // upper bound of UA for autosizing
         Real64 MinFlowFrac;                        // minimum flow fraction from terminal unit []
-        Real64 TDpIn;                              // coil inlet air dew point temperature [C]
         int SupFanNum;                             // index to supply fan
         int RetFanNum;                             // index to return fan
         Real64 SupFanDT;                           // supply air fan delta temperature [C]

@@ -73,12 +73,7 @@ void CoolingWaterDesAirInletHumRatSizer::initializeWithinEP(EnergyPlusData &stat
 Real64 CoolingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &errorsFound)
 {
     if (this->isNotInitialized) {
-        this->errorType = AutoSizingResultType::ErrorType2;
-        this->autoSizedValue = 0.0;
-        errorsFound = true;
-        ShowSevereError("Developer Error: autosizing of water cooling coil design air inlet humidity ratio failed.");
-        ShowContinueError("Occurs in water cooling coil object= " + this->compName);
-        return this->autoSizedValue;
+        return this->unInitialized(errorsFound);
     }
     this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 

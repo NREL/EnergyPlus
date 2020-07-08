@@ -147,6 +147,8 @@ struct BaseSizer
 
     bool isValidCoilType(std::string const &compType);
 
+    Real64 unInitialized(bool &errorsFound);
+
     static void clear_state();
 };
 
