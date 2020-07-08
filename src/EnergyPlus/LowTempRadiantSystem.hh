@@ -58,6 +58,7 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
+    struct ConvectionCoefficientsData;
     struct ZoneTempPredictorCorrectorData;
 
     // Forward Declarations
@@ -289,11 +290,11 @@ namespace LowTempRadiantSystem {
                   ScaledHeatingCapacity(0.0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0)
             {
             }
-        
+
         void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet);
-        
+
         void calculateLowTemperatureRadiantSystemComponents(EnergyPlusData &state, Real64 &LoadMet);
-        
+
         void updateLowTemperatureRadiantSystem();
 
         void reportLowTemperatureRadiantSystem();
@@ -362,7 +363,7 @@ namespace LowTempRadiantSystem {
         }
 
         void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet);
-        
+
         void calculateLowTemperatureRadiantSystemComponents(EnergyPlusData &state, int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
                                                             bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
                                                             Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
@@ -400,7 +401,7 @@ namespace LowTempRadiantSystem {
             : MaxElecPower(0.0), ThrottlRange(0.0), SetptSchedPtr(0), ElecPower(0.0), ElecEnergy(0.0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
         {
         }
-        
+
         void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet);
 
         void updateLowTemperatureRadiantSystem();
