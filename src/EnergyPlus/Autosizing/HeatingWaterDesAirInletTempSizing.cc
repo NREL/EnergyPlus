@@ -51,9 +51,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/api/TypeDefs.h>
-
 #include <EnergyPlus/ReportSizingManager.hh>
 
 namespace EnergyPlus {
@@ -75,9 +73,7 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
     if (this->isNotInitialized) {
         return this->unInitialized(errorsFound);
     }
-    this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
-    this->errorType = EnergyPlus::AutoSizingResultType::NoError;
     this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
@@ -139,16 +135,11 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
             }
         }
     }
-    this->selectSizerOutput();
+    this->selectSizerOutput(errorsFound);
     // report not written for OA coils and needs to be corrected
     if (this->curSysNum <= this->numPrimaryAirSys) {
         if (this->getCoilReportObject)
             coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
-    }
-    if (this->errorType != AutoSizingResultType::NoError) {
-        ShowSevereError("Developer Error: autosizing of water heating coil design air inlet temperature failed.");
-        ShowContinueError("Occurs in water heating coil object= " + this->compName);
-        errorsFound = true;
     }
     return this->autoSizedValue;
 }

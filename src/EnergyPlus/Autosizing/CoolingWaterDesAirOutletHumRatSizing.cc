@@ -47,7 +47,6 @@
 
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
@@ -56,7 +55,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/api/TypeDefs.h>
 
-#include <EnergyPlus/ReportSizingManager.hh>
+//#include <EnergyPlus/ReportSizingManager.hh>
 
 namespace EnergyPlus {
 
@@ -79,9 +78,7 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &er
     if (this->isNotInitialized) {
         return this->unInitialized(errorsFound);
     }
-    this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
-    this->errorType = EnergyPlus::AutoSizingResultType::NoError;
     this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
@@ -157,13 +154,8 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &er
         }
     }
 
-    this->selectSizerOutput();
+    this->selectSizerOutput(errorsFound);
     if (this->getCoilReportObject) coilSelectionReportObj->setCoilLvgAirHumRat(this->compName, this->compType, this->autoSizedValue);
-    if (this->errorType != AutoSizingResultType::NoError) {
-        ShowSevereError("Developer Error: autosizing of water cooling coil design air outlet humidity ratio failed.");
-        ShowContinueError("Occurs in water cooling coil object= " + this->compName);
-        errorsFound = true;
-    }
     return this->autoSizedValue;
 }
 

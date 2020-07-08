@@ -47,15 +47,9 @@
 
 #include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/api/TypeDefs.h>
-
-#include <EnergyPlus/ReportSizingManager.hh>
 
 namespace EnergyPlus {
 
@@ -75,9 +69,7 @@ Real64 CoolingWaterDesWaterInletTempSizer::size(Real64 _originalValue, bool &err
     if (this->isNotInitialized) {
         return this->unInitialized(errorsFound);
     }
-    this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
-    this->errorType = EnergyPlus::AutoSizingResultType::NoError;
     this->preSize(_originalValue);
     if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || DataSizing::PlantSizData.size() == 0)) {
         this->autoSizedValue = _originalValue;
@@ -88,13 +80,8 @@ Real64 CoolingWaterDesWaterInletTempSizer::size(Real64 _originalValue, bool &err
     } else {
         this->errorType = AutoSizingResultType::ErrorType1;
     }
-    this->selectSizerOutput();
+    this->selectSizerOutput(errorsFound);
     if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->autoSizedValue);
-    if (this->errorType != AutoSizingResultType::NoError) {
-        ShowSevereError("Developer Error: autosizing of water cooling coil design water inlet temperature failed.");
-        ShowContinueError("Occurs in water cooling coil object= " + this->compName);
-        errorsFound = true;
-    }
     return this->autoSizedValue;
 }
 
