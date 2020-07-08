@@ -65,7 +65,7 @@ void HeatingAirflowUASizer::initializeWithinEP(EnergyPlusData &state,
     this->sizingString = "Heating Coil Airflow For UA";
 }
 
-Real64 HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 HeatingAirflowUASizer::size(Real64 _originalValue, bool &errorsFound)
 {
     if (this->isNotInitialized) {
         this->errorType = AutoSizingResultType::ErrorType2;
@@ -78,7 +78,7 @@ Real64 HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue,
     this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
     this->errorType = EnergyPlus::AutoSizingResultType::NoError;
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -110,7 +110,7 @@ Real64 HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue,
             if (this->curOASysNum > 0) {
                 if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                     this->autoSizedValue =
-                        state.dataAirLoopHVACDOAS.airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
+                        this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
                         DataEnvironment::StdRhoAir;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;

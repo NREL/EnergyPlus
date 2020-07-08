@@ -109,7 +109,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     }
 }
 
-void BaseSizer::preSize(EnergyPlusData &EP_UNUSED(state), Real64 const _originalValue)
+void BaseSizer::preSize(Real64 const _originalValue)
 {
     if (this->sizingType == AutoSizingType::Unknown) {
         ShowSevereError("Sizing Library Base Class: preSize");

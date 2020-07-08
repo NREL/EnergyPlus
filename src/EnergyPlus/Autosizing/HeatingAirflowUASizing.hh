@@ -69,7 +69,7 @@ struct HeatingAirflowUASizer : BaseSizer
                             bool const &_printWarningFlag,
                             std::string const &_callingRoutine) override;
 
-    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
 };
 
 } // namespace EnergyPlus

@@ -70,7 +70,7 @@ void CoolingWaterDesWaterInletTempSizer::initializeWithinEP(EnergyPlusData &stat
     this->dataPltSizCoolNum = DataSizing::DataPltSizCoolNum;
 }
 
-Real64 CoolingWaterDesWaterInletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 CoolingWaterDesWaterInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
 {
     if (this->isNotInitialized) {
         this->errorType = AutoSizingResultType::ErrorType2;
@@ -83,7 +83,7 @@ Real64 CoolingWaterDesWaterInletTempSizer::size(EnergyPlusData &state, Real64 _o
     this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
     this->errorType = EnergyPlus::AutoSizingResultType::NoError;
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || DataSizing::PlantSizData.size() == 0)) {
         this->autoSizedValue = _originalValue;
     } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {

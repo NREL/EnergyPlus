@@ -70,7 +70,7 @@ void CoolingWaterDesAirInletHumRatSizer::initializeWithinEP(EnergyPlusData &stat
     this->dataFlowUsedForSizing = DataSizing::DataFlowUsedForSizing;
 }
 
-Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 CoolingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &errorsFound)
 {
     if (this->isNotInitialized) {
         this->errorType = AutoSizingResultType::ErrorType2;
@@ -83,7 +83,7 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _o
     this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
     this->errorType = EnergyPlus::AutoSizingResultType::NoError;
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -108,7 +108,7 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _o
             if (this->curOASysNum > 0) { // coil is in OA stream
                 if (DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                     this->autoSizedValue =
-                        state.dataAirLoopHVACDOAS.airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
+                        this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).OutHumRatAtCoolPeak;
                 }

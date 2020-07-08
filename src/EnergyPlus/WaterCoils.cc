@@ -2213,7 +2213,7 @@ namespace WaterCoils {
                 }
                 CoolingWaterDesAirInletHumRatSizer sizerCWDesInHumRat;
                 sizerCWDesInHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                DataDesInletAirHumRat = sizerCWDesInHumRat.size(state, TempSize, ErrorsFound);
+                DataDesInletAirHumRat = sizerCWDesInHumRat.size(TempSize, ErrorsFound);
 
                 TempSize = AutoSize;
                 RequestSizing(state, CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName);
@@ -2251,7 +2251,7 @@ namespace WaterCoils {
                 }
                 CoolingWaterDesWaterInletTempSizer sizerCWDesWaterInTemp;
                 sizerCWDesWaterInTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                WaterCoil(CoilNum).DesInletWaterTemp = sizerCWDesWaterInTemp.size(state, TempSize, ErrorsFound);
+                WaterCoil(CoilNum).DesInletWaterTemp = sizerCWDesWaterInTemp.size(TempSize, ErrorsFound);
 
                 if (CurZoneEqNum > 0) { // zone equipment use air inlet humrat to calculate design outlet air temperature
                     if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
@@ -2265,7 +2265,7 @@ namespace WaterCoils {
                         SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [kgWater/kgDryAir]";
                     }
                     sizerCWDesInHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).DesInletAirHumRat = sizerCWDesInHumRat.size(state, TempSize, ErrorsFound);
+                    WaterCoil(CoilNum).DesInletAirHumRat = sizerCWDesInHumRat.size(TempSize, ErrorsFound);
                 }
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
@@ -2297,7 +2297,7 @@ namespace WaterCoils {
                         SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [kgWater/kgDryAir]";
                     }
                     sizerCWDesInHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).DesInletAirHumRat = sizerCWDesInHumRat.size(state, TempSize, ErrorsFound);
+                    WaterCoil(CoilNum).DesInletAirHumRat = sizerCWDesInHumRat.size(TempSize, ErrorsFound);
                 }
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
@@ -2312,7 +2312,7 @@ namespace WaterCoils {
                 }
                 CoolingWaterDesAirOutletHumRatSizer sizerCWDesOutHumRat;
                 sizerCWDesOutHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                WaterCoil(CoilNum).DesOutletAirHumRat = sizerCWDesOutHumRat.size(state, TempSize, ErrorsFound);
+                WaterCoil(CoilNum).DesOutletAirHumRat = sizerCWDesOutHumRat.size(TempSize, ErrorsFound);
                 DataDesOutletAirHumRat = WaterCoil(CoilNum).DesOutletAirHumRat;
 
                 TempSize = AutoSize;
@@ -2619,7 +2619,7 @@ namespace WaterCoils {
                 } else {
                     HeatingWaterDesAirInletTempSizer sizerHWDesInTemp;
                     sizerHWDesInTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).InletAirTemp = sizerHWDesInTemp.size(state, DataSizing::AutoSize, ErrorsFound);
+                    WaterCoil(CoilNum).InletAirTemp = sizerHWDesInTemp.size(DataSizing::AutoSize, ErrorsFound);
 
                     TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
                     RequestSizing(state, CompType, CompName, HeatingWaterDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
@@ -2628,7 +2628,7 @@ namespace WaterCoils {
 
                     HeatingAirflowUASizer sizerHWAirFlowUA;
                     sizerHWAirFlowUA.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).DesAirMassFlowRate = sizerHWAirFlowUA.size(state, DataSizing::AutoSize, ErrorsFound);
+                    WaterCoil(CoilNum).DesAirMassFlowRate = sizerHWAirFlowUA.size(DataSizing::AutoSize, ErrorsFound);
                     WaterCoil(CoilNum).InletAirMassFlowRate = WaterCoil(CoilNum).DesAirMassFlowRate;
                 }
 

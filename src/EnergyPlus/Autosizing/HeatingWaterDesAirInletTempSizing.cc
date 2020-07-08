@@ -70,7 +70,7 @@ void HeatingWaterDesAirInletTempSizer::initializeWithinEP(EnergyPlusData &state,
     this->totalSystemAirVolumeFlowRate = DataSizing::DataFlowUsedForSizing;
 }
 
-Real64 HeatingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
+Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
 {
     if (this->isNotInitialized) {
         this->errorType = AutoSizingResultType::ErrorType2;
@@ -83,7 +83,7 @@ Real64 HeatingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _ori
     this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
     this->errorType = EnergyPlus::AutoSizingResultType::NoError;
-    this->preSize(state, _originalValue);
+    this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -137,7 +137,7 @@ Real64 HeatingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _ori
                                        (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
             } else if (this->curOASysNum > 0 && DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                 this->autoSizedValue =
-                    state.dataAirLoopHVACDOAS.airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
+                    this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
             } else {
                 this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).HeatOutTemp +
                                        (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
