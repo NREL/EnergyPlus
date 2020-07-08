@@ -49,7 +49,8 @@
 #include <EnergyPlus/api/autosizing.h>
 
 int main() {
-    Sizer s = sizerNew(0.0);
+    Sizer s = sizerNew();
+    sizerInitialize(s, 2.0);
     int status = sizerCalculate(s);
     if (status == 0) {
         Real64 val = sizerValue(s);

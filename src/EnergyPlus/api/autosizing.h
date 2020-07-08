@@ -66,18 +66,26 @@ extern "C" {
 ENERGYPLUSLIB_API typedef void * Sizer;
 /// \brief Returns a new reference to a Sizer class
 /// \details The sizer class allows access to sizer stuff.
-/// \param[in] temperature The fluid temperature for property evaluation, in degrees Celsius.
 /// \returns This functions allocates a new sizer class and returns a Sizer, which is a pointer to that new instance.
 /// \remark In API applications, when the calling script is done with the sizer instance, call `sizerDelete` to clean up the instance.
 /// \see Sizer
 /// \see sizerDelete
-ENERGYPLUSLIB_API Sizer sizerNew(Real64 temperature);
+ENERGYPLUSLIB_API Sizer sizerNew();
 /// \brief Deletes an instance of a Sizer class
 /// \details When an instance of a Sizer class is created using `sizerNew`, it should be cleaned up when totally done with it.
 /// \param[in] sizer An instance of a Sizer class to be deleted.  The Sizer class is initially created by calling `sizerNew`.
 /// \see Sizer
 /// \see sizerNew
 ENERGYPLUSLIB_API void sizerDelete(Sizer sizer);
+/// \brief Initializes the sizer class
+/// \details All required data for setting up the sizer is passed in as arguments to this function.
+/// \param[in] sizer An instance of a Sizer class, which can be created by calling `sizerNew`.
+/// \param[in] temperature The fluid temperature for property evaluation, in degrees Celsius.
+/// \remark This must be called prior to each call to sizerCalculate
+/// \see Sizer
+/// \see sizerCalculate
+/// \see sizerDelete
+ENERGYPLUSLIB_API void sizerInitialize(Sizer sizer, Real64 temperature);
 /// \brief Does calculation of the sizer
 /// \param[in] sizer An instance of a Sizer class, which can be created by calling `sizerNew`.
 /// \returns This function returns true (0) if the autosizing calculation was successful, or false (1) if not.

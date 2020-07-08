@@ -7,20 +7,30 @@ class ThisSizer:
     This sizer class wraps the internal HeatingAirflowUASizer class
     """
 
-    def __init__(self, api: cdll, temperature: float):
+    def __init__(self, api: cdll):
         self.api = api
-        self.api.sizerNew.argtypes = [RealEP]
+        self.api.sizerNew.argtypes = []
         self.api.sizerNew.restype = c_void_p
+        self.api.sizerInitialize.argtypes = [c_void_p, RealEP]
+        self.api.sizerInitialize.restype = c_void_p
         self.api.sizerDelete.argtypes = [c_void_p]
         self.api.sizerDelete.restype = c_void_p
         self.api.sizerCalculate.argtypes = [c_void_p]
         self.api.sizerCalculate.restype = int
         self.api.sizerValue.argtypes = [c_void_p]
         self.api.sizerValue.restype = RealEP
-        self.instance = self.api.sizerNew(temperature)
+        self.instance = self.api.sizerNew()
 
     def __del__(self):
         self.api.sizerDelete(self.instance)
+
+    def initialize(self, temperature: float) -> None:
+        """
+        Performs initialization of the sizer, eventually it will have lots of args
+
+        :return: Nothing
+        """
+        self.api.sizerInitialize(self.instance, temperature)
 
     def calculate(self) -> bool:
         """
@@ -47,5 +57,5 @@ class Autosizing:
     def __init__(self, api: cdll):
         self.api = api
 
-    def heating_airflow_ua_sizer(self, temperature: float) -> ThisSizer:
-        return ThisSizer(self.api, temperature)
+    def heating_airflow_ua_sizer(self) -> ThisSizer:
+        return ThisSizer(self.api)

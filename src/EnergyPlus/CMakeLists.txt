@@ -810,6 +810,7 @@ set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 add_custom_command(
         TARGET energyplusapi
         POST_BUILD
+        DEPENDS "${PROJECT_SOURCE_DIR}/src/EnergyPlus/api"
         COMMAND ${CMAKE_COMMAND}
         -DREPO_ROOT=${PROJECT_SOURCE_DIR}
         -DEXECUTABLE_PATH=$<TARGET_FILE:energyplusapi>

@@ -48,16 +48,20 @@
 #include <EnergyPlus/api/autosizing.h>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 
-Sizer sizerNew(Real64 temperature) {
+Sizer sizerNew() {
     auto sizer = new EnergyPlus::HeatingAirflowUASizer();
     return reinterpret_cast<Sizer>(sizer);
 }
 void sizerDelete(Sizer sizer) {
     delete reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
 }
+void sizerInitialize(Sizer sizer, Real64 temperature) {
+    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
+    s->originalValue = temperature;
+}
 int sizerCalculate(Sizer sizer) {
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
-    //s->size();
+    s->autoSizedValue = s->originalValue * 2;
     return 0;
 }
 Real64 sizerValue(Sizer sizer) {
