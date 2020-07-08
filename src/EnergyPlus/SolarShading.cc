@@ -9920,8 +9920,6 @@ namespace SolarShading {
             if (SurfWinWindowModelType(ISurf) == WindowEQLModel) {
                 int EQLNum = dataConstruction.Construct(Surface(ISurf).Construction).EQLConsPtr;
                 if (CFS(EQLNum).VBLayerPtr > 0) {
-                    if (CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL == lscNONE) {
-                        SurfWinSlatAngThisTSDeg(ISurf) = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
                     if (CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL == dataWindowEquivalentLayer.lscNONE) {
                         SurfWinSlatAngThisTSDeg(ISurf) = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
                     } else {
