@@ -49,15 +49,15 @@
 #include <EnergyPlus/api/autosizing.h>
 
 int main() {
-    Sizer s = sizerNew();
-    sizerInitialize(s, 2.0);
-    int status = sizerCalculate(s);
+    Sizer s = sizerHeatingAirflowUANew();
+    sizerHeatingAirflowUAInitialize(s, 2.0);
+    int status = sizerHeatingAirflowUACalculate(s);
     if (status == 0) {
-        Real64 val = sizerValue(s);
+        Real64 val = sizerHeatingAirflowUAValue(s);
         printf("Calculated successfully!  Value = %8.4f\n", val);
     } else {
         printf("Autosizing failed!\n");
     }
-    sizerDelete(s);
+    sizerHeatingAirflowUADelete(s);
     return status;
 }
