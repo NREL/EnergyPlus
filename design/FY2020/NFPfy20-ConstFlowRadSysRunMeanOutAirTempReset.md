@@ -44,8 +44,11 @@ Theta(RM) = (1-alpha)*Theta(ED-1)+(alpha)Theta(RM-1)
 where:
 
 Theta(RM) is the running mean outdoor air temperature for today
+
 Theta(RM-1) is the running mean outdoor air temperature from yesterday
-Theta(RM-1) is the average outdoor air temperature from yesterday
+
+Theta(ED-1) is the average outdoor air temperature from yesterday
+
 alpha is a weighting coefficient that is typically set to 0.8 but will be a new user input that is added to the constant flow radiant system existing input (must be between 0.0 and 1.0).
 
 Since Theta(RM-1) includes the effect of previous days’ outdoor air temperature, the impact of not just yesterday’s weather is taken into account but also previous days.

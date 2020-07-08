@@ -84,6 +84,7 @@
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
@@ -193,6 +194,7 @@ namespace LowTempRadiantSystem {
     int MaxCloNumOfSurfaces(0);           // Used to set allocate size in CalcClo routine
     bool VarOffCond(false);               // Set to true when in cooling for constant flow system + variable off condensation predicted
     bool FirstTimeInit(true);             // Set to true for first pass through init routine then set to false
+    bool anyRadiantSystemUsingRunningMeanAverage(false);    // Set to true when there is at least one constant flow radiant system that uses the running mean average
     Real64 LoopReqTemp(0.0);              // Temperature required at the inlet of the pump (from the loop) to meet control logic
     Array1D<Real64> QRadSysSrcAvg;        // Average source over the time step for a particular radiant surface
     Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
@@ -230,6 +232,7 @@ namespace LowTempRadiantSystem {
         MaxCloNumOfSurfaces = 0;
         VarOffCond = false;
         FirstTimeInit = true;
+        anyRadiantSystemUsingRunningMeanAverage = false;
         LoopReqTemp = 0.0;
         QRadSysSrcAvg.deallocate();
         ZeroSourceSumHATsurf.deallocate();
@@ -587,7 +590,7 @@ namespace LowTempRadiantSystem {
             thisRadSys.TubeLength = Numbers(2);
 
             // Process the temperature control type
-            thisRadSys.ControlType = thisRadSys.processRadiantSystemControlInput(Alphas(5),cAlphaFields(5));
+            thisRadSys.ControlType = thisRadSys.processRadiantSystemControlInput(Alphas(5),cAlphaFields(5),HydronicSystem);
             
             // Process the setpoint type
             thisRadSys.SetpointType = thisRadSys.processRadiantSystemSetpointInput(Alphas(6),cAlphaFields(6));
@@ -915,10 +918,11 @@ namespace LowTempRadiantSystem {
             thisCFloSys.TubeLength = Numbers(2);
 
             // Process the temperature control type
-            thisCFloSys.ControlType = thisCFloSys.processRadiantSystemControlInput(Alphas(5),cAlphaFields(5));
+            thisCFloSys.ControlType = thisCFloSys.processRadiantSystemControlInput(Alphas(5),cAlphaFields(5),ConstantFlowSystem);
+            thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = Numbers(3);
 
             // Process pump input for constant flow (hydronic) radiant system
-            thisCFloSys.WaterVolFlowMax = Numbers(3);
+            thisCFloSys.WaterVolFlowMax = Numbers(4);
             thisCFloSys.VolFlowSched = Alphas(6);
             thisCFloSys.VolFlowSchedPtr = GetScheduleIndex(Alphas(6));
             if ((thisCFloSys.VolFlowSchedPtr == 0) && (!lAlphaBlanks(6))) {
@@ -926,10 +930,10 @@ namespace LowTempRadiantSystem {
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
-            thisCFloSys.NomPumpHead = Numbers(4);
-            thisCFloSys.NomPowerUse = Numbers(5);
-            thisCFloSys.MotorEffic = Numbers(6);
-            thisCFloSys.FracMotorLossToFluid = Numbers(7);
+            thisCFloSys.NomPumpHead = Numbers(5);
+            thisCFloSys.NomPowerUse = Numbers(6);
+            thisCFloSys.MotorEffic = Numbers(7);
+            thisCFloSys.FracMotorLossToFluid = Numbers(8);
 
             // Heating user input data
             thisCFloSys.HotWaterInNode = GetOnlySingleNode(
@@ -1027,7 +1031,7 @@ namespace LowTempRadiantSystem {
                 thisCFloSys.CondCtrlType = CondCtrlSimpleOff;
             }
 
-            thisCFloSys.CondDewPtDeltaT = Numbers(8);
+            thisCFloSys.CondDewPtDeltaT = Numbers(9);
 
             if (UtilityRoutines::SameString(Alphas(20), OnePerSurf)) {
                 thisCFloSys.NumCircCalcMethod = OneCircuit;
@@ -1037,7 +1041,7 @@ namespace LowTempRadiantSystem {
                 thisCFloSys.NumCircCalcMethod = OneCircuit;
             }
 
-            thisCFloSys.CircLength = Numbers(9);
+            thisCFloSys.CircLength = Numbers(10);
         }
 
         // Obtain all of the user data related to electric low temperature radiant systems...
@@ -1214,7 +1218,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Process the temperature control type
-            thisElecSys.ControlType = thisElecSys.processRadiantSystemControlInput(Alphas(6),cAlphaFields(6));
+            thisElecSys.ControlType = thisElecSys.processRadiantSystemControlInput(Alphas(6),cAlphaFields(6),ElectricSystem);
             
             // Process the setpoint type
             thisElecSys.SetpointType = thisElecSys.processRadiantSystemSetpointInput(Alphas(7),cAlphaFields(7));
@@ -1549,6 +1553,24 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Sum",
                                 thisCFloSys.Name);
+            SetupOutputVariable("Constant Flow Running Mean Outdoor Air Temperature",
+                                OutputProcessor::Unit::C,
+                                thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature,
+                                "System",
+                                "Average",
+                                thisCFloSys.Name);
+            SetupOutputVariable("Constant Flow Previous Day Running Mean Outdoor Air Temperature",
+                                OutputProcessor::Unit::C,
+                                thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature,
+                                "System",
+                                "Average",
+                                thisCFloSys.Name);
+            SetupOutputVariable("Constant Flow Previous Day Average Outdoor Air Temperature",
+                                OutputProcessor::Unit::C,
+                                thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature,
+                                "System",
+                                "Average",
+                                thisCFloSys.Name);
             if (AnyEnergyManagementSystemInModel) {
                 SetupEMSInternalVariable(
                     "Constant Flow Low Temp Radiant Design Water Mass Flow Rate", thisCFloSys.Name, "[m3/s]", thisCFloSys.WaterVolFlowMax);
@@ -1597,7 +1619,8 @@ namespace LowTempRadiantSystem {
     }
 
     LowTempRadiantControlTypes RadiantSystemBaseData::processRadiantSystemControlInput(std::string const& controlInput,
-                                                                std::string const& controlInputField)
+                                                                std::string const& controlInputField,
+                                                                int const& typeOfRadiantSystem)
     {
         if (UtilityRoutines::SameString(controlInput, "MeanAirTemperature")) {
             return LowTempRadiantControlTypes::MATControl;
@@ -1613,6 +1636,9 @@ namespace LowTempRadiantSystem {
             return LowTempRadiantControlTypes::SurfFaceTempControl;
         } else if (UtilityRoutines::SameString(controlInput, "SurfaceInteriorTemperature")) {
              return LowTempRadiantControlTypes::SurfIntTempControl;
+        } else if (UtilityRoutines::SameString(controlInput, "RunningMeanOutdoorAirTemperature") && typeOfRadiantSystem == ConstantFlowSystem) {
+            anyRadiantSystemUsingRunningMeanAverage = true;
+            return LowTempRadiantControlTypes::RunningMeanODBControl;
         } else {
             ShowWarningError("Invalid " + controlInputField + " = " + controlInput);
             ShowContinueError("Occurs in Low Temperature Radiant System = " + this->Name);
@@ -2073,6 +2099,15 @@ namespace LowTempRadiantSystem {
             }
         } // NumOfCFloLowTempRadSys > 0
         if (!BeginEnvrnFlag && SystemType == ConstantFlowSystem) MyEnvrnFlagCFlo(RadSysNum) = true;
+        
+        if (DataGlobals::BeginDayFlag && SystemType == ConstantFlowSystem &&
+            anyRadiantSystemUsingRunningMeanAverage && CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
+            CFloRadSys(RadSysNum).calculateRunningMeanAverageTemperature();
+            CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay = false; // only set these once per system
+        } else if (!DataGlobals::BeginDayFlag && SystemType == ConstantFlowSystem &&
+                   anyRadiantSystemUsingRunningMeanAverage && !CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
+            CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay = true;  // reset so that the next time BeginDayFlag is true this can get set
+        }
 
         if (SystemType == ElectricSystem) {
             if (BeginEnvrnFlag && MyEnvrnFlagElec(RadSysNum)) {
@@ -4699,6 +4734,40 @@ namespace LowTempRadiantSystem {
 
     }
 
+    void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature()
+    {
+        if (DataGlobals::DayOfSim == 1 && DataGlobals::WarmupFlag) {
+            // there is no "history" here--assume everything that came before was the same (this applies to design days also--weather is always the same
+            this->todayAverageOutdoorDryBulbTemperature = this->calculateCurrentDailyAverageODB();
+            this->yesterdayAverageOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
+            this->todayRunningMeanOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
+            this->yesterdayRunningMeanOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
+        } else if (!DataGlobals::WarmupFlag && DataGlobals::NumOfDayInEnvrn > 1) {
+            // This is an environment with more than one day (non-design day) so...
+            // First update yesterday's information using what was previously calculated for "today"
+            this->yesterdayAverageOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
+            this->yesterdayRunningMeanOutdoorDryBulbTemperature = this->todayRunningMeanOutdoorDryBulbTemperature;
+            // Now update the running mean and average outdoor air temperatures
+            //NOTES: ALPHA COULD BE DIFFERENT FOR EACH SYSTEM BECAUSE IT WILL BE A FACTOR OF EACH SYSTEM--NEED TO CHANGE LOCATION OF SOME OF THESE VARIABLES
+            //       AS A RESULT (RUNNING MEAN TEMPERATURES).  alpha WILL NEED TO BE REPLACED BY APPROPRIATE TERM IN CONSTANT FLOW DATA AND STILL NEED TO READ
+            //       THIS VALUE IN IN THE GET ROUTINE (AND MODIFY IDD, INPUT FILES, TRANSITION, ETC.)
+            this->todayRunningMeanOutdoorDryBulbTemperature = (1.0 - this->runningMeanOutdoorAirTemperatureWeightingFactor) * this->yesterdayAverageOutdoorDryBulbTemperature
+                                                              + this->runningMeanOutdoorAirTemperatureWeightingFactor * this->yesterdayRunningMeanOutdoorDryBulbTemperature;
+            this->todayAverageOutdoorDryBulbTemperature = this->calculateCurrentDailyAverageODB();
+        }
+    }
+
+    Real64 ConstantFlowRadiantSystemData::calculateCurrentDailyAverageODB()
+    {
+        int const firstTimeStepIndex = 1;
+        Real64 sum = 0.0;
+        for (int hourNumber = 1; hourNumber <= DataGlobals::HoursInDay; ++hourNumber) {
+            sum += WeatherManager::TodayOutDryBulbTemp(firstTimeStepIndex,hourNumber);
+        }
+        return sum/double(DataGlobals::HoursInDay);
+    }
+    
+
     void ElectricRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet)  // load met by the radiant system, in Watts
     {
 
@@ -5080,6 +5149,8 @@ namespace LowTempRadiantSystem {
             return DataHeatBalSurface::TempSurfIn(this->SurfacePtr(1));   // Grabs the inside face temperature of the first surface in the list
         case LowTempRadiantControlTypes::SurfIntTempControl:
             return DataHeatBalSurface::TempUserLoc(this->SurfacePtr(1));   // Grabs the temperature inside the slab at the location specified by the user
+        case LowTempRadiantControlTypes::RunningMeanODBControl:
+            return this->todayRunningMeanOutdoorDryBulbTemperature;
         default:
             ShowSevereError("Illegal control type in low temperature radiant system: " + this->Name);
             ShowFatalError("Preceding condition causes termination.");
