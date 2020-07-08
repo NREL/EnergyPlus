@@ -145,7 +145,7 @@ struct BaseSizer
 
     void selectSizerOutput();
 
-    bool isValidCoilType(std::string const &compType);
+    static bool isValidCoilType(std::string const &compType);
 
     static void clear_state();
 };
