@@ -154,7 +154,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     Surface(2).Tilt = 90.0;
     Surface(2).Sides = 4;
 
-    SurfWinOriginalClass.allocate(2);
+    SurfaceGeometry::AllocateSurfaceWindows(2);
     SurfWinOriginalClass(1) = 11;
     SurfWinOriginalClass(2) = 11;
     NumOfZones = 1;
@@ -277,7 +277,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     Surface(3).Vertex(2).z = 1.0;
     Surface(3).Vertex(3).z = 1.0;
 
-    SurfWinOriginalClass.allocate(3);
+    SurfaceGeometry::AllocateSurfaceWindows(3);
     SurfWinOriginalClass(1) = 11;
     SurfWinOriginalClass(2) = 11;
     SurfWinOriginalClass(3) = 11;
@@ -2426,7 +2426,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
     Surface(2).Tilt = 90.0;
     Surface(2).Sides = 4;
 
-    SurfWinOriginalClass.allocate(2);
+    SurfaceGeometry::AllocateSurfaceWindows(2);
     SurfWinOriginalClass(1) = 11;
     SurfWinOriginalClass(2) = 11;
     NumOfZones = 1;
@@ -2843,7 +2843,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
     Surface(11).Vertex(2).z = 2.4384;
     Surface(11).Vertex(3).z = 2.4384;
 
-    SurfWinOriginalClass.allocate(14);
+    SurfaceGeometry::AllocateSurfaceWindows(14);
     SurfWinOriginalClass(4) = 11;
     SurfWinOriginalClass(5) = 11;
     SurfWinOriginalClass(6) = 11;

@@ -348,7 +348,7 @@ namespace SurfaceGeometry {
         SurfWinVentingAvailabilityRep.dimension(NumSurfaces, 0);
         SurfWinSkyGndSolarInc.dimension(NumSurfaces, 0);
         SurfWinBmGndSolarInc.dimension(NumSurfaces, 0);
-        SurfWinLightWellEff.dimension(NumSurfaces, 0);
+        SurfWinLightWellEff.dimension(NumSurfaces, 1);
         SurfWinSolarDiffusing.dimension(NumSurfaces, 0);
         SurfWinFrameHeatGain.dimension(NumSurfaces, 0);
         SurfWinFrameHeatLoss.dimension(NumSurfaces, 0);

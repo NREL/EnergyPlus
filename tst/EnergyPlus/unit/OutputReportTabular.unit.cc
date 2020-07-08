@@ -89,6 +89,7 @@
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -7432,6 +7433,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     DataSurfaces::TotSurfaces = 2 * nTests ;
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
+    SurfaceGeometry::AllocateSurfaceWindows(DataSurfaces::TotSurfaces);
 
     for (int i = 1; i <= nTests * 2; ++i) {
 

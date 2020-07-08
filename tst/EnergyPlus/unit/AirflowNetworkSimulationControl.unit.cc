@@ -105,7 +105,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
     Surface(2).Tilt = 90.0;
     Surface(2).Sides = 4;
 
-    SurfWinOriginalClass.allocate(2);
+    SurfaceGeometry::AllocateSurfaceWindows(2);
     SurfWinOriginalClass(1) = 11;
     SurfWinOriginalClass(2) = 11;
     NumOfZones = 1;
@@ -172,7 +172,6 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     Zone.deallocate();
     Surface.deallocate();
-    SurfaceWindow.deallocate();
     People.deallocate();
 }
 
@@ -200,7 +199,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     Surface(2).Tilt = 90.0;
     Surface(2).Sides = 4;
 
-    SurfWinOriginalClass.allocate(2);
+    SurfaceGeometry::AllocateSurfaceWindows(2);
     SurfWinOriginalClass(1) = 11;
     SurfWinOriginalClass(2) = 11;
     NumOfZones = 1;
@@ -269,7 +268,6 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     Zone.deallocate();
     Surface.deallocate();
-    SurfaceWindow.deallocate();
     People.deallocate();
 }
 

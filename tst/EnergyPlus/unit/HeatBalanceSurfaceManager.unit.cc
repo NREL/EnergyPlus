@@ -265,6 +265,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
+    SurfaceGeometry::AllocateSurfaceWindows(DataSurfaces::TotSurfaces);
     dataConstruction.Construct.allocate(DataHeatBalance::TotConstructs);
     dataMaterial.Material.allocate(DataHeatBalance::TotMaterials);
 
