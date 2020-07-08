@@ -55,8 +55,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/api/TypeDefs.h>
 
-//#include <EnergyPlus/ReportSizingManager.hh>
-
 namespace EnergyPlus {
 
 void CoolingWaterDesAirOutletHumRatSizer::initializeWithinEP(EnergyPlusData &state,
