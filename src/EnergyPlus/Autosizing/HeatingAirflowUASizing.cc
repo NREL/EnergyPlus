@@ -60,9 +60,91 @@ void HeatingAirflowUASizer::initializeWithinEP(EnergyPlusData &state,
                                                bool const &_printWarningFlag,
                                                std::string const &_callingRoutine)
 {
+
     BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
     this->sizingString = "Heating Coil Airflow For UA";
 }
+
+void HeatingAirflowUASizer::initializeFromAPI() {
+    this->isNotInitialized = false;
+    this->compType = "API_component_type";
+    this->compName = "API_component_name";
+    this->printWarningFlag = false;
+    this->callingRoutine = "called_from_API";
+
+    this->sysSizingRunDone = true;
+    this->doSystemSizing = true;
+    this->curSysNum = 1;
+    this->numPrimaryAirSys = 1;
+    this->sysSizingInputData.clear();
+    this->sysSizingInputData.allocate(1);
+    this->sysSizingInputData(1).AirLoopNum = 1;
+    this->numSysSizInput = 1;
+
+    this->unitarySysEqSizing.allocate(1);
+    this->unitarySysEqSizing(1).CoolingCapacity = true;
+    this->unitarySysEqSizing(1).HeatingCapacity = true;
+
+    this->curOASysNum = 1;
+    this->oaSysEqSizing.allocate(1);
+    this->oaSysEqSizing(1).CoolingCapacity = true;
+    this->oaSysEqSizing(1).HeatingCapacity = true;
+
+    this->doZoneSizing = true;
+    this->curZoneEqNum = 1;
+    this->zoneEqSizing.allocate(1);
+    this->zoneEqSizing(1).DesignSizeFromParent = true;
+    this->zoneSizingRunDone = true;
+    this->zoneSizingInput.allocate(1);
+    this->zoneSizingInput(1).ZoneNum = 1;
+    this->numZoneSizingInput = 1;
+
+    this->termUnitSingDuct = true;
+    this->curTermUnitSizingNum = 1;
+    this->termUnitSizing.allocate(1);
+    this->termUnitSizing(1).AirVolFlow = 1000;
+//
+//    int const systemType = 1;
+//    if (systemType == 1) {
+//        this->curSysNum = 1;
+//        this->numSysSizInput = 1;
+//        this->sysSizingInputData.clear();
+//        this->sysSizingInputData.allocate(1);
+//        this->sysSizingInputData(1).DesCoolAirFlow = 1000;
+//        this->finalSysSizing = DataSizing::FinalSysSizing;
+//    } else if (systemType == 2) {
+//        this->curOASysNum = 1;
+//        this->oaSysEqSizing = DataSizing::OASysEqSizing;
+//        this->outsideAirSys = DataAirLoop::OutsideAirSys;
+//    } else if (systemType == 3) {
+//        this->curZoneEqNum = 1;
+//        this->numZoneSizingInput = 1;
+//        this->zoneSizingInput = DataSizing::ZoneSizingInput;
+//        this->zoneEqSizing = DataSizing::ZoneEqSizing;
+//    } else if (systemType == 4) {
+//        this->airloopDOAS = state.dataAirLoopHVACDOAS.airloopDOAS;
+//    }
+//
+//    this->curDuctType = DataSizing::CurDuctType;
+//    this->numPrimaryAirSys = DataHVACGlobals::NumPrimaryAirSys;
+//
+//    this->curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
+//    this->termUnitSingDuct = DataSizing::TermUnitSingDuct;
+//    this->termUnitPIU = DataSizing::TermUnitPIU;
+//    this->termUnitIU = DataSizing::TermUnitIU;
+//    this->zoneEqFanCoil = DataSizing::ZoneEqFanCoil;
+//    this->otherEqType = !(this->termUnitSingDuct || this->termUnitPIU || this->termUnitIU || this->zoneEqFanCoil);
+//    this->unitarySysEqSizing = DataSizing::UnitarySysEqSizing;
+//
+//    this->termUnitSizing = DataSizing::TermUnitSizing;
+//    this->finalZoneSizing = DataSizing::FinalZoneSizing;
+//
+//
+//    if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if coilType is not one of DataHVACGlobals::cAllCoilTypes
+//        this->getCoilReportObject = true;
+//    }
+}
+
 
 Real64 HeatingAirflowUASizer::size(Real64 _originalValue, bool &errorsFound)
 {

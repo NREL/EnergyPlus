@@ -5,7 +5,7 @@ from pyenergyplus.api import EnergyPlusAPI
 api = EnergyPlusAPI()
 
 heating_ua_sizer = api.autosizing.heating_airflow_ua_sizer()
-heating_ua_sizer.initialize(1.0)
+heating_ua_sizer.initialize()
 success = heating_ua_sizer.calculate()
 if success:
     value = heating_ua_sizer.autosized_value()

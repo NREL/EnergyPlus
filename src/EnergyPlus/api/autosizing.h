@@ -81,12 +81,11 @@ ENERGYPLUSLIB_API void sizerHeatingAirflowUADelete(Sizer sizer);
 /// \brief Initializes the HeatingAirflowUA sizer class
 /// \details All required data for setting up the HeatingAirflowUA sizer is passed in as arguments to this function.
 /// \param[in] sizer An instance of a Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
-/// \param[in] temperature The fluid temperature for property evaluation, in degrees Celsius.
 /// \remark This must be called prior to each call to sizerHeatingAirflowUACalculate
 /// \see Sizer
 /// \see sizerHeatingAirflowUACalculate
 /// \see sizerHeatingAirflowUADelete
-ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitialize(Sizer sizer, Real64 temperature);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitialize(Sizer sizer);
 /// \brief Does calculation of the HeatingAirflowUA sizer
 /// \param[in] sizer An instance of a HeatingAirflowUA Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
 /// \returns This function returns true (0) if the autosizing calculation was successful, or false (1) if not.

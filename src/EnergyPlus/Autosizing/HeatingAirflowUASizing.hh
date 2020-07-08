@@ -69,6 +69,8 @@ struct HeatingAirflowUASizer : BaseSizer
                             bool const &_printWarningFlag,
                             std::string const &_callingRoutine) override;
 
+    void initializeFromAPI();
+
     Real64 size(Real64 originalValue, bool &errorsFound) override;
 };
 

@@ -11,7 +11,7 @@ class HeatingAirflowUASizer:
         self.api = api
         self.api.sizerHeatingAirflowUANew.argtypes = []
         self.api.sizerHeatingAirflowUANew.restype = c_void_p
-        self.api.sizerHeatingAirflowUAInitialize.argtypes = [c_void_p, RealEP]
+        self.api.sizerHeatingAirflowUAInitialize.argtypes = [c_void_p]
         self.api.sizerHeatingAirflowUAInitialize.restype = c_void_p
         self.api.sizerHeatingAirflowUADelete.argtypes = [c_void_p]
         self.api.sizerHeatingAirflowUADelete.restype = c_void_p
@@ -24,13 +24,13 @@ class HeatingAirflowUASizer:
     def __del__(self):
         self.api.sizerHeatingAirflowUADelete(self.instance)
 
-    def initialize(self, temperature: float) -> None:
+    def initialize(self) -> None:
         """
         Performs initialization of the sizer, eventually it will have lots of args
 
         :return: Nothing
         """
-        self.api.sizerHeatingAirflowUAInitialize(self.instance, temperature)
+        self.api.sizerHeatingAirflowUAInitialize(self.instance)
 
     def calculate(self) -> bool:
         """

@@ -50,7 +50,7 @@
 
 int main() {
     Sizer s = sizerHeatingAirflowUANew();
-    sizerHeatingAirflowUAInitialize(s, 2.0);
+    sizerHeatingAirflowUAInitialize(s);
     int status = sizerHeatingAirflowUACalculate(s);
     if (status == 0) {
         Real64 val = sizerHeatingAirflowUAValue(s);
