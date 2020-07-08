@@ -216,7 +216,7 @@ namespace CoolTower {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         int CoolTowerNum;               // Cooltower number
         int NumAlphas;                  // Number of Alphas for each GetobjectItem call
         int NumNumbers;                 // Number of Numbers for each GetobjectItem call
