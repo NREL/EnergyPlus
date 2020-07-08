@@ -160,10 +160,8 @@ namespace CostEstimateManager {
         for (Item = 1; Item <= state.dataCostEstimateManager.NumLineItems; ++Item) {
             inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
             state.dataCostEstimateManager.CostLineItem(Item).LineName = cAlphaArgs(1);
-            state.dataCostEstimateManager.CostLineItem(Item).LineType = cAlphaArgs(2);
             state.dataCostEstimateManager.CostLineItem(Item).ParentObjType = cAlphaArgs(3);
             state.dataCostEstimateManager.CostLineItem(Item).ParentObjName = cAlphaArgs(4);
-            state.dataCostEstimateManager.CostLineItem(Item).ParentObjKey = cAlphaArgs(5);
             state.dataCostEstimateManager.CostLineItem(Item).PerEach = rNumericArgs(1);
             state.dataCostEstimateManager.CostLineItem(Item).PerSquareMeter = rNumericArgs(2);
             state.dataCostEstimateManager.CostLineItem(Item).PerKiloWattCap = rNumericArgs(3);

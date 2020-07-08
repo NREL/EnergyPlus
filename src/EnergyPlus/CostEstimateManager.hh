@@ -63,10 +63,8 @@ namespace CostEstimateManager {
     {
         // Members
         std::string LineName;      // object name (needed ?)
-        std::string LineType;      // Case statement driver?
         std::string ParentObjType; // parent reference to IDD object type
         std::string ParentObjName; // parent instance in IDF
-        std::string ParentObjKey;  // end use key for parent object
         int ParentObjIDinList;
         Real64 PerSquareMeter;     // cost per square meter
         Real64 PerEach;            // cost per each
@@ -103,7 +101,9 @@ namespace CostEstimateManager {
         Real64 GrandTotal;         // = 0.0 ! the Grand Total of all line items plus all other costs
 
         // Default Constructor
-        CostAdjustmentStruct()
+        CostAdjustmentStruct() :
+              LineItemTot(0.0), MiscCostperSqMeter(0.0), DesignFeeFrac(0.0), ContractorFeeFrac(0.0), ContingencyFrac(0.0), BondCostFrac(0.0),
+              CommissioningFrac(0.0), RegionalModifier(0.0), GrandTotal(0.0)
         {
         }
 
@@ -133,7 +133,8 @@ namespace CostEstimateManager {
         std::string html; // representation for HTML file - contains unicode references
 
         // Default Constructor
-        monetaryUnitType()
+        monetaryUnitType() :
+            code(std::string()), txt(std::string()), html(std::string())
         {
         }
     };
