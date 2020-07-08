@@ -276,7 +276,7 @@ namespace WaterUse {
         }
 
         // Default Constructor
-        WaterUseData() : getWaterUseInputFlag(true), numWaterEquipment(0), numWaterConnections(0)
+        WaterUseData() : numWaterEquipment(0), numWaterConnections(0), getWaterUseInputFlag(true)
         {
         }
     };
