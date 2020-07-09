@@ -52,9 +52,6 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include "Fixtures/EnergyPlusFixture.hh"
-#include "Fixtures/SQLiteFixture.hh"
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
@@ -92,6 +89,9 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+#include "Fixtures/SQLiteFixture.hh"
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataGlobalConstants;
@@ -107,6 +107,20 @@ using namespace EnergyPlus::OutputReportTabular;
 using namespace EnergyPlus::OutputProcessor;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
+
+class OutputReportTabularTest : public EnergyPlusFixture
+{
+protected:
+    virtual void SetUp()
+    {
+        EnergyPlusFixture::SetUp();
+    }
+
+    virtual void TearDown()
+    {
+        EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+    };
+};
 
 TEST(OutputReportTabularTest, ConfirmSetUnitsStyleFromString)
 {
@@ -6494,7 +6508,7 @@ TEST(OutputReportTabularTest, CollectPeakZoneConditions_test)
     Zone(1).FloorArea = 12.;
 
 //BLB 
-   // state.dataWeatherManager.DesDayInput.allocate(1);
+    state.dataWeatherManager.DesDayInput.allocate(1);
    // state.dataWeatherManager.DesDayInput(1).Month = 5;
    // state.dataWeatherManager.DesDayInput(1).DayOfMonth = 21;
 
