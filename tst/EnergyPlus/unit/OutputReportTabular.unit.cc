@@ -55,6 +55,9 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+#include "Fixtures/SQLiteFixture.hh"
+
 // EnergyPlus Headers
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/Construction.hh>
@@ -89,9 +92,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
-#include "Fixtures/EnergyPlusFixture.hh"
-#include "Fixtures/SQLiteFixture.hh"
-
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataGlobalConstants;
@@ -108,21 +108,7 @@ using namespace EnergyPlus::OutputProcessor;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
 
-class OutputReportTabularTest : public EnergyPlusFixture
-{
-protected:
-    virtual void SetUp()
-    {
-        EnergyPlusFixture::SetUp();
-    }
-
-    virtual void TearDown()
-    {
-        EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
-    };
-};
-
-TEST(OutputReportTabularTest, ConfirmSetUnitsStyleFromString)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmSetUnitsStyleFromString)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, ConfirmSetUnitsStyleFromString");
 
@@ -143,7 +129,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_Basic)
     EXPECT_FALSE(warningAboutKeyNotFound(100, 1, "moduleName"));
 }
 
-TEST(OutputReportTabularTest, RealToStr)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_RealToStr)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, RealToStr");
     EXPECT_EQ("       0.001", RealToStr(0.0011, 3));
@@ -172,7 +158,7 @@ TEST(OutputReportTabularTest, RealToStr)
     EXPECT_EQ("0.123457E+06", RealToStr(123456.789, 5));
 }
 
-TEST(OutputReportTabularTest, isNumber)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_isNumber)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, isNumber");
     EXPECT_TRUE(isNumber("0"));
@@ -192,7 +178,7 @@ TEST(OutputReportTabularTest, isNumber)
     EXPECT_TRUE(isNumber(" 0.12E01 "));
 }
 
-TEST(OutputReportTabularTest, digitsAferDecimal)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_digitsAferDecimal)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, digitsAferDecimal");
     EXPECT_EQ(0, digitsAferDecimal("0"));
@@ -207,7 +193,7 @@ TEST(OutputReportTabularTest, digitsAferDecimal)
     EXPECT_EQ(2, digitsAferDecimal("-6.12E-09"));
 }
 
-TEST(OutputReportTabularTest, splitCommaString)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_splitCommaString)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, splitCommaString");
     std::vector<std::string> actual;
@@ -222,7 +208,7 @@ TEST(OutputReportTabularTest, splitCommaString)
     EXPECT_EQ(actual, splitCommaString(" part1 , part2 , part3 "));
 }
 
-TEST(OutputReportTabularTest, unitsFromHeading)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_unitsFromHeading)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, unitsFromHeading");
 
@@ -265,7 +251,7 @@ TEST(OutputReportTabularTest, unitsFromHeading)
     EXPECT_EQ(0.0, curConversionOffset);
 }
 
-TEST(OutputReportTabularTest, ConfirmResourceWarning)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmResourceWarning)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, ConfirmResourceWarning");
 
@@ -290,7 +276,7 @@ TEST(OutputReportTabularTest, ConfirmResourceWarning)
               ResourceWarningMessage("Electricity [kWh]"));
 }
 
-TEST(OutputReportTabularTest, ConfirmWaterConversion)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmWaterConversion)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, ConfirmWaterConversion");
 
@@ -451,7 +437,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH)
     EXPECT_EQ("Electricty [kWh/m2]", curUnits);
 }
 
-TEST(OutputReportTabularTest, GetColumnUsingTabs)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetColumnUsingTabs)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, GetColumnUsingTabs");
     {
@@ -667,7 +653,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
     // EXPECT_EQ( surfDelaySeq.size(), 3360u );
 }
 
-TEST(OutputReportTabularTest, ConfirmConvertToEscaped)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConvertToEscaped)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, ConfirmConvertToEscaped");
     EXPECT_EQ("", ConvertToEscaped(""));
@@ -691,7 +677,7 @@ TEST(OutputReportTabularTest, ConfirmConvertToEscaped)
     EXPECT_ANY_THROW(ConvertToEscaped(R"(String with \x in it)"));
 }
 
-TEST(OutputReportTabularTest, ConvertUnicodeToUTF8)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConvertUnicodeToUTF8)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, ConvertUnicodeToUTF8");
 
@@ -709,7 +695,7 @@ TEST(OutputReportTabularTest, ConvertUnicodeToUTF8)
     EXPECT_EQ("", ConvertUnicodeToUTF8(std::stoul("0x1FFFFF", nullptr, 16)));
 }
 
-TEST(OutputReportTabularTest, GetUnitSubStringTest)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitSubStringTest)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, GetUnitSubStringTest");
     EXPECT_EQ("", GetUnitSubString(""));
@@ -6074,7 +6060,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTableRowMatchingTest
     EXPECT_EQ("2000.00", RetrievePreDefTableEntry(pdchLeedPerfElEneUse, "EXTERIOR LIGHTING"));
 }
 
-TEST(OutputReportTabularTest, GetUnitSubstring_Test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitSubstring_Test)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, GetUnitSubstring_Test");
     EXPECT_EQ("", GetUnitSubString(""));
@@ -6490,7 +6476,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
     EXPECT_TRUE(isInvalidAggregationOrder());
 }
 
-TEST(OutputReportTabularTest, CollectPeakZoneConditions_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, CollectPeakZoneConditions_test");
 
@@ -6507,10 +6493,9 @@ TEST(OutputReportTabularTest, CollectPeakZoneConditions_test)
     Zone(1).ListMultiplier = 1;
     Zone(1).FloorArea = 12.;
 
-//BLB 
     state.dataWeatherManager.DesDayInput.allocate(1);
-   // state.dataWeatherManager.DesDayInput(1).Month = 5;
-   // state.dataWeatherManager.DesDayInput(1).DayOfMonth = 21;
+    state.dataWeatherManager.DesDayInput(1).Month = 5;
+    state.dataWeatherManager.DesDayInput(1).DayOfMonth = 21;
 
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
@@ -6533,8 +6518,8 @@ TEST(OutputReportTabularTest, CollectPeakZoneConditions_test)
 
     FinalZoneSizing.allocate(1);
     FinalZoneSizing(1).DesCoolLoad = 600.;
- //BLB
- //   CollectPeakZoneConditions(state.dataWeatherManager, compLoad, 1, timeOfMax, zoneIndex, isCooling);
+
+    CollectPeakZoneConditions(state.dataWeatherManager, compLoad, 1, timeOfMax, zoneIndex, isCooling);
 
     EXPECT_EQ(compLoad.peakDateHrMin, "5/21 15:45:00");
     EXPECT_EQ(compLoad.outsideDryBulb, 38.);
@@ -6551,7 +6536,7 @@ TEST(OutputReportTabularTest, CollectPeakZoneConditions_test)
     EXPECT_NEAR(compLoad.areaPerTotCap, 12. / 600., 0.0001);
 }
 
-TEST(OutputReportTabularTest, ComputeEngineeringChecks_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ComputeEngineeringChecks_test)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, ComputeEngineeringChecks_test");
 
@@ -6571,7 +6556,7 @@ TEST(OutputReportTabularTest, ComputeEngineeringChecks_test)
     EXPECT_EQ(compLoad.areaPerTotCap, 13. / 800.);
 }
 
-TEST(OutputReportTabularTest, GetZoneComponentAreas_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetZoneComponentAreas_test)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, GetZoneComponentAreas_test");
 
@@ -6677,7 +6662,7 @@ TEST(OutputReportTabularTest, GetZoneComponentAreas_test)
     EXPECT_EQ(29., areas(1).door);
 }
 
-TEST(OutputReportTabularTest, CombineLoadCompResults_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_CombineLoadCompResults_test)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, CombineLoadCompResults_test");
 
@@ -6710,7 +6695,7 @@ TEST(OutputReportTabularTest, CombineLoadCompResults_test)
     EXPECT_EQ(33., compLoadTotal.diffDesignPeak);
 }
 
-TEST(OutputReportTabularTest, AddTotalRowsForLoadSummary_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_AddTotalRowsForLoadSummary_test)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, AddTotalRowsForLoadSummary_test");
 
@@ -6744,7 +6729,7 @@ TEST(OutputReportTabularTest, AddTotalRowsForLoadSummary_test)
     EXPECT_EQ(24. / 5., compLoad.cells(cPerArea, rRefrig));
 }
 
-TEST(OutputReportTabularTest, LoadSummaryUnitConversion_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_LoadSummaryUnitConversion_test)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, LoadSummaryUnitConversion_test");
 
@@ -6784,7 +6769,7 @@ TEST(OutputReportTabularTest, LoadSummaryUnitConversion_test)
     EXPECT_EQ(0.15 * powerConversion / areaConversion, compLoad.totCapPerArea);
 }
 
-TEST(OutputReportTabularTest, CreateListOfZonesForAirLoop_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_CreateListOfZonesForAirLoop_test)
 {
     ShowMessage("Begin Test: OutputReportTabularTest, CreateListOfZonesForAirLoop_test");
 
@@ -6839,7 +6824,7 @@ TEST(OutputReportTabularTest, CreateListOfZonesForAirLoop_test)
     EXPECT_EQ(0, compLoad.zoneIndices(5));
 }
 
-TEST(OutputReportTabularTest, GetDelaySequencesTwice_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
 {
 
     int coolDesSelected = 1;
@@ -8041,7 +8026,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     EXPECT_EQ((int)StatLineType::KoppenLine, (int)lineTypeReturn);
 }
 
-TEST(OutputReportTabularTest, GetDelaySequencesSurfaceOrder_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_test)
 {
 
     int coolDesSelected = 1;
