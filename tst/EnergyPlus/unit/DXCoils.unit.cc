@@ -4086,8 +4086,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     ;
     // check against local calculation
     Real64 results_totaloutput = Coil.InletAirMassFlowRate * (PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) - PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
-    Real64 results_sensibleoutput = Coil.InletAirMassFlowRate * (1.00484e3 + 0.5 * (AirInletNode.HumRat + AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
-    Real64 results_latentoutput = Coil.InletAirMassFlowRate * (2.50094e6 + 0.5 * (AirInletNode.Temp + AirOutletNode.Temp) * 1.85895e3) * (AirInletNode.HumRat - AirOutletNode.HumRat);
+    Real64 results_sensibleoutput = Coil.InletAirMassFlowRate * (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
+    Real64 results_latentoutput = results_totaloutput - results_sensibleoutput;
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
@@ -4105,15 +4105,15 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     // run coil at full capacity
     CalcDoe2DXCoil(DXCoilNum, CompOp, true, PartLoadRatio, FanOpMode, _, AirFlowRatio);
     EXPECT_NEAR(17580.0, Coil.TotalCoolingEnergyRate, 0.0001); // equals fully capacity
-    EXPECT_NEAR(13125.569308142116, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate
-    EXPECT_NEAR(4454.4306918578841, Coil.LatCoolingEnergyRate, 0.0001); // latent cooling rate
+    EXPECT_NEAR(13104.577807007219, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate
+    EXPECT_NEAR(4475.4221929927808, Coil.LatCoolingEnergyRate, 0.0001); // latent cooling rate
     EXPECT_DOUBLE_EQ(0.0100, AirInletNode.HumRat); // input check
     EXPECT_NEAR(0.0082418676694790537, AirOutletNode.HumRat, 0.00001); // cooling and dehumidification
     ;
     // check against hand calculation
     results_totaloutput = Coil.InletAirMassFlowRate * (PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) - PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
-    results_sensibleoutput = Coil.InletAirMassFlowRate * (1.00484e3 + 0.5 * (AirInletNode.HumRat + AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
-    results_latentoutput = Coil.InletAirMassFlowRate * (2.50094e6 + 0.5 * (AirInletNode.Temp + AirOutletNode.Temp) * 1.85895e3) * (AirInletNode.HumRat - AirOutletNode.HumRat);
+    results_sensibleoutput = Coil.InletAirMassFlowRate * (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
+    results_latentoutput = results_totaloutput - results_sensibleoutput;
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
