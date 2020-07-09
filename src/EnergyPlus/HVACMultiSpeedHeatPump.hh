@@ -304,6 +304,8 @@ namespace HVACMultiSpeedHeatPump {
 
     // Functions
 
+    void clear_state();
+
     void SimMSHeatPump(EnergyPlusData &state, std::string const &CompName,   // Name of the unitary engine driven heat pump system
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
                        int const AirLoopNum,          // air loop index
