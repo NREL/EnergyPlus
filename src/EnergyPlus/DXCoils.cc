@@ -6541,7 +6541,7 @@ namespace DXCoils {
             if (DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                 if (DXCoil(DXCoilNum).SupplyFanIndex > -1) {
                     coilSelectionReportObj->setCoilSupplyFanInfo(state,
-					                                             DXCoil(DXCoilNum).Name,																							  
+                                                                 DXCoil(DXCoilNum).Name,
                                                                  DXCoil(DXCoilNum).DXCoilType,
                                                                  DXCoil(DXCoilNum).SupplyFanName,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
@@ -6551,7 +6551,7 @@ namespace DXCoils {
             } else {
                 if (DXCoil(DXCoilNum).SupplyFanIndex > 0) {
                     coilSelectionReportObj->setCoilSupplyFanInfo(state,
-					                                             DXCoil(DXCoilNum).Name,																								 
+                                                                 DXCoil(DXCoilNum).Name,
                                                                  DXCoil(DXCoilNum).DXCoilType,
                                                                  DXCoil(DXCoilNum).SupplyFanName,
                                                                  DataAirSystems::structArrayLegacyFanModels,
@@ -13567,14 +13567,14 @@ namespace DXCoils {
             LowerBoundMassFlowRate = 0.01 * DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
 
             TempSolveRoot::SolveRoot(state,
-			          AccuracyTolerance,												
-                      MaximumIterations,
-                      SolverFlag,
-                      PartLoadAirMassFlowRate,
-                      CalcTwoSpeedDXCoilIEERResidual,
-                      LowerBoundMassFlowRate,
-                      DXCoil(DXCoilNum).RatedAirMassFlowRate(1),
-                      Par);
+                                     AccuracyTolerance,
+                                     MaximumIterations,
+                                     SolverFlag,
+                                     PartLoadAirMassFlowRate,
+                                     CalcTwoSpeedDXCoilIEERResidual,
+                                     LowerBoundMassFlowRate,
+                                     DXCoil(DXCoilNum).RatedAirMassFlowRate(1),
+                                     Par);
 
             if (SolverFlag == -1) {
 
@@ -13743,15 +13743,27 @@ namespace DXCoils {
           }
         }();
 
-        print(state.outputFiles.eio, Format_891
-            , "Coil:Cooling:DX:TwoSpeed" , DXCoil(DXCoilNum).Name , fan_type_name.first, fan_type_name.second
-            , NetCoolingCapRated , (NetCoolingCapRated * ConvFromSIToIP),
-			  IEER
-            , EER_TestPoint_SI(1) , EER_TestPoint_SI(2) , EER_TestPoint_SI(3)
-            , EER_TestPoint_SI(4) , EER_TestPoint_IP(1) , EER_TestPoint_IP(2)
-            , EER_TestPoint_IP(3) , EER_TestPoint_IP(4) , SupAirMdot_TestPoint(1)
-            , SupAirMdot_TestPoint(2) , SupAirMdot_TestPoint(3)
-            , SupAirMdot_TestPoint(4));
+        print(state.outputFiles.eio,
+              Format_891,
+              "Coil:Cooling:DX:TwoSpeed",
+              DXCoil(DXCoilNum).Name,
+              fan_type_name.first,
+              fan_type_name.second,
+              NetCoolingCapRated,
+              (NetCoolingCapRated * ConvFromSIToIP),
+              IEER,
+              EER_TestPoint_SI(1),
+              EER_TestPoint_SI(2),
+              EER_TestPoint_SI(3),
+              EER_TestPoint_SI(4),
+              EER_TestPoint_IP(1),
+              EER_TestPoint_IP(2),
+              EER_TestPoint_IP(3),
+              EER_TestPoint_IP(4),
+              SupAirMdot_TestPoint(1),
+              SupAirMdot_TestPoint(2),
+              SupAirMdot_TestPoint(3),
+              SupAirMdot_TestPoint(4));
 
         PreDefTableEntry(pdchDXCoolCoilType, DXCoil(DXCoilNum).Name, "Coil:Cooling:DX:TwoSpeed");
         // W to tons
@@ -14365,7 +14377,7 @@ namespace DXCoils {
     int getCoilInNodeIndex(int const &CoilIndex, // coil index
                            bool &ErrorsFound     // set to true if problem
     )
-	{
+    {
 
         int NodeNumber; // returned node number of matched coil
 
@@ -14429,7 +14441,7 @@ namespace DXCoils {
     int getCoilOutNodeIndex(int const &CoilIndex, // must match coil types in this module
                             bool &ErrorsFound     // set to true if problem
     )
-	{
+    {
 
         int NodeNumber; // returned node number of matched coil
 
