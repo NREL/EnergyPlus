@@ -4261,8 +4261,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     ;
     // check against hand calculation at low speed
     Real64 results_totaloutput = MSHPMassFlowRateLow * (PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) - PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
-    Real64 results_sensibleoutput = MSHPMassFlowRateLow * (1.00484e3 + 0.5 * (AirInletNode.HumRat + AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
-    Real64 results_latentoutput = MSHPMassFlowRateLow * (2.50094e6 + 0.5 * (AirInletNode.Temp + AirOutletNode.Temp) * 1.85895e3) * (AirInletNode.HumRat - AirOutletNode.HumRat);
+    Real64 results_sensibleoutput = MSHPMassFlowRateLow * (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
+    Real64 results_latentoutput = results_totaloutput - results_sensibleoutput;
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
@@ -4277,8 +4277,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     ;
     // check against hand calculation
     results_totaloutput = MSHPMassFlowRateHigh * (PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) - PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
-    results_sensibleoutput = MSHPMassFlowRateHigh * (1.00484e3 + 0.5 * (AirInletNode.HumRat + AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
-    results_latentoutput = MSHPMassFlowRateHigh * (2.50094e6 + 0.5 * (AirInletNode.Temp + AirOutletNode.Temp) * 1.85895e3) * (AirInletNode.HumRat - AirOutletNode.HumRat);
+    results_sensibleoutput = MSHPMassFlowRateHigh * (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
+    results_latentoutput = results_totaloutput - results_sensibleoutput;
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
@@ -4296,15 +4296,15 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     CycRatio = 1.0;
     CalcMultiSpeedDXCoilCooling(DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(10710.0, Coil.TotalCoolingEnergyRate, 0.0001); // equals low speed cooling capacity
-    EXPECT_NEAR(7943.4924695047976, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at low speed 
-    EXPECT_NEAR(2766.5075304952024, Coil.LatCoolingEnergyRate, 0.0001); // latent cooling rate at low speed 
+    EXPECT_NEAR(7930.3412059184047, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at low speed 
+    EXPECT_NEAR(2779.6587940815953, Coil.LatCoolingEnergyRate, 0.0001); // latent cooling rate at low speed 
     EXPECT_DOUBLE_EQ(0.0100, AirInletNode.HumRat); // input check
     EXPECT_NEAR(0.0081800569931542392, AirOutletNode.HumRat, 0.00001); // cooling and dehumidification
     ;
     // check against hand calculation at low speed
     results_totaloutput = MSHPMassFlowRateLow * (PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) - PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
-    results_sensibleoutput = MSHPMassFlowRateLow * (1.00484e3 + 0.5 * (AirInletNode.HumRat + AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
-    results_latentoutput = MSHPMassFlowRateLow * (2.50094e6 + 0.5 * (AirInletNode.Temp + AirOutletNode.Temp) * 1.85895e3) * (AirInletNode.HumRat - AirOutletNode.HumRat);
+    results_sensibleoutput = MSHPMassFlowRateLow * (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
+    results_latentoutput = results_totaloutput - results_sensibleoutput;
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
@@ -4313,15 +4313,15 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     SpeedRatio = 1.0;
     CalcMultiSpeedDXCoilCooling(DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
     EXPECT_NEAR(17850.0, Coil.TotalCoolingEnergyRate, 0.0001); // total capacity at high speed
-    EXPECT_NEAR(13239.154115841329, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at high speed
-    EXPECT_NEAR(4610.8458841586707, Coil.LatCoolingEnergyRate, 0.0001); // latent cooling rate at high speed
+    EXPECT_NEAR(13217.235343197342, Coil.SensCoolingEnergyRate, 0.0001); // sensible cooling rate at high speed
+    EXPECT_NEAR(4632.7646568026576, Coil.LatCoolingEnergyRate, 0.0001); // latent cooling rate at high speed
     EXPECT_DOUBLE_EQ(0.0100, AirInletNode.HumRat); // input check
     EXPECT_NEAR(0.0081800569931542392, AirOutletNode.HumRat, 0.00001); // cooling and dehumidification
     ;
     // check against hand calculation
     results_totaloutput = MSHPMassFlowRateHigh * (PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) - PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
-    results_sensibleoutput = MSHPMassFlowRateHigh * (1.00484e3 + 0.5 * (AirInletNode.HumRat + AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
-    results_latentoutput = MSHPMassFlowRateHigh * (2.50094e6 + 0.5 * (AirInletNode.Temp + AirOutletNode.Temp) * 1.85895e3) * (AirInletNode.HumRat - AirOutletNode.HumRat);
+    results_sensibleoutput = MSHPMassFlowRateHigh * (1.00484e3 + min(AirInletNode.HumRat, AirOutletNode.HumRat) * 1.85895e3) * (AirInletNode.Temp - AirOutletNode.Temp);
+    results_latentoutput = results_totaloutput - results_sensibleoutput;
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
