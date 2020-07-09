@@ -243,7 +243,7 @@ namespace WaterUse {
 
         void ReportWaterUse(WaterUseData &dataWaterUse);
 
-        void setupOutputVars(WaterUseData &dataWaterUse);
+        void setupOutputVars(WaterUseData &EP_UNUSED(dataWaterUse));
     };
 
     void SimulateWaterUse(BranchInputManagerData &dataBranchInputManager, WaterUseData &dataWaterUse, bool FirstHVACIteration);

@@ -712,7 +712,7 @@ namespace WaterUse {
         }
     }
 
-    void WaterConnectionsType::setupOutputVars(WaterUseData &dataWaterUse)
+    void WaterConnectionsType::setupOutputVars(WaterUseData &EP_UNUSED(dataWaterUse))
     {
         SetupOutputVariable(
             "Water Use Connections Hot Water Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HotMassFlowRate, "System", "Average", this->Name);
