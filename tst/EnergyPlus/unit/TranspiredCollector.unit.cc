@@ -206,7 +206,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     DataGlobals::MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state.files);
 
-    GetProjectControlData(state.files, ErrorsFound); // read project control data
+    GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneData(ErrorsFound);

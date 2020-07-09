@@ -334,7 +334,7 @@ namespace SimulationManager {
         AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state.files);
-        GetProjectData(state.dataZoneTempPredictorCorrector, state.files);
+        GetProjectData(state);
         CheckForMisMatchedEnvironmentSpecifications(state.files);
         CheckForRequestedReporting();
         SetPredefinedTables();
@@ -712,7 +712,7 @@ namespace SimulationManager {
         }
     }
 
-    void GetProjectData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles)
+    void GetProjectData(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -755,8 +755,6 @@ namespace SimulationManager {
         int Num;
         int Which;
         bool ErrorsFound;
-        int Num1;
-        int NumA;
         int NumRunControl;
         static std::string VersionID;
         std::string CurrentModuleObject;
@@ -1034,71 +1032,106 @@ namespace SimulationManager {
         EvenDuringWarmup = false;
         CurrentModuleObject = "Output:DebuggingData";
         NumDebugOut = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (NumDebugOut > 1) {
+            ShowWarningError(CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
+        }
         if (NumDebugOut > 0) {
             inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat);
-            if (int(Number(1)) == 1) {
-                DebugOutput = true;
+            if (NumAlpha >= 1) {
+                DebugOutput = UtilityRoutines::SameString(Alphas(1), "Yes");
             }
-            if (int(Number(2)) == 1) {
-                EvenDuringWarmup = true;
+            if (NumAlpha >= 2) {
+                EvenDuringWarmup = UtilityRoutines::SameString(Alphas(2), "Yes");
             }
         }
 
-        CurrentModuleObject = "Output:Diagnostics";
-        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        for (Num1 = 1; Num1 <= Num; ++Num1) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Num1, Alphas, NumAlpha, Number, NumNumber, IOStat);
-            for (NumA = 1; NumA <= NumAlpha; ++NumA) {
-                if (UtilityRoutines::SameString(Alphas(NumA), "DisplayExtraWarnings")) {
-                    DisplayExtraWarnings = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayAdvancedReportVariables")) {
-                    DisplayAdvancedReportVariables = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayAllWarnings")) {
-                    DisplayAllWarnings = true;
-                    DisplayExtraWarnings = true;
-                    DisplayUnusedObjects = true;
-                    DisplayUnusedSchedules = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayUnusedObjects")) {
-                    DisplayUnusedObjects = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayUnusedSchedules")) {
-                    DisplayUnusedSchedules = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayZoneAirHeatBalanceOffBalance")) {
-                    DisplayZoneAirHeatBalanceOffBalance = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DoNotMirrorDetachedShading")) {
-                    MakeMirroredDetachedShading = false;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DoNotMirrorAttachedShading")) {
-                    MakeMirroredAttachedShading = false;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "ReportDuringWarmup")) {
-                    ReportDuringWarmup = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayWeatherMissingDataWarnings")) {
-                    DisplayWeatherMissingDataWarnings = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "IgnoreSolarRadiation")) {
-                    IgnoreSolarRadiation = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "IgnoreBeamRadiation")) {
-                    IgnoreBeamRadiation = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "IgnoreDiffuseRadiation")) {
-                    IgnoreDiffuseRadiation = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DeveloperFlag")) {
-                    DeveloperFlag = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "TimingFlag")) {
-                    TimingFlag = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "ReportDetailedWarmupConvergence")) {
-                    ReportDetailedWarmupConvergence = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "ReportDuringHVACSizingSimulation")) {
-                    ReportDuringHVACSizingSimulation = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "CreateMinimalSurfaceVariables")) {
-                    continue;
-                    //        CreateMinimalSurfaceVariables=.TRUE.
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "CreateNormalSurfaceVariables")) {
-                    continue;
-                    //        IF (CreateMinimalSurfaceVariables) THEN
-                    //          CALL ShowWarningError('GetProjectData: '//TRIM(CurrentModuleObject)//'=''//  &
-                    //             TRIM(Alphas(NumA))//'', prior set=true for this condition reverts to false.')
-                    //        ENDIF
-                    //        CreateMinimalSurfaceVariables=.FALSE.
-                } else if (!Alphas(NumA).empty()) {
-                    ShowWarningError("GetProjectData: " + CurrentModuleObject + "=\"" + Alphas(NumA) +
-                                     "\", Invalid value for field, entered value ignored.");
+        {
+            CurrentModuleObject = "Output:Diagnostics";
+            Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+            if (Num > 1) {
+                // Let it slide, but warn
+                // ErrorsFound = true;
+                ShowWarningError(CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
+            }
+            auto const instances = inputProcessor->epJSON.find(CurrentModuleObject);
+
+            if (instances != inputProcessor->epJSON.end()) {
+                auto &instancesValue = instances.value();
+                for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                    auto const &fields = instance.value();
+                    auto const &thisObjectName = instance.key();
+                    inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
+
+                    auto diagnosticsExtensibles = fields.find("diagnostics");
+                    if (diagnosticsExtensibles != fields.end()) {
+                        auto diagnosticsExtensiblesArray = diagnosticsExtensibles.value();
+                        for (auto diagnosticsExtensible : diagnosticsExtensiblesArray) {
+
+                            // We want to avoid cryptic failures such as this one: "[json.exception.out_of_range.403] key 'key' not found"
+                            // Which happens if you put an "empty" entry in the extensible portion
+                            auto it = diagnosticsExtensible.find("key");
+                            if (it == diagnosticsExtensible.end()) {
+                                ShowWarningError(CurrentModuleObject + ": empty key found, consider removing it to avoid this warning.");
+                                continue;
+                            }
+                            std::string diagnosticName = *it;
+
+                            if (UtilityRoutines::SameString(diagnosticName, "DisplayExtraWarnings")) {
+                                DisplayExtraWarnings = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayAdvancedReportVariables")) {
+                                DisplayAdvancedReportVariables = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayAllWarnings")) {
+                                DisplayAllWarnings = true;
+                                DisplayExtraWarnings = true;
+                                DisplayUnusedObjects = true;
+                                DisplayUnusedSchedules = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayUnusedObjects")) {
+                                DisplayUnusedObjects = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayUnusedSchedules")) {
+                                DisplayUnusedSchedules = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayZoneAirHeatBalanceOffBalance")) {
+                                DisplayZoneAirHeatBalanceOffBalance = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorDetachedShading")) {
+                                MakeMirroredDetachedShading = false;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorAttachedShading")) {
+                                MakeMirroredAttachedShading = false;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringWarmup")) {
+                                ReportDuringWarmup = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayWeatherMissingDataWarnings")) {
+                                DisplayWeatherMissingDataWarnings = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreSolarRadiation")) { // TODO: Not a valid key choice
+                                IgnoreSolarRadiation = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreBeamRadiation")) { // TODO: Not a valid key choice
+                                IgnoreBeamRadiation = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreDiffuseRadiation")) { // TODO: Not a valid key choice
+                                IgnoreDiffuseRadiation = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DeveloperFlag")) { // TODO: Not a valid key choice
+                                DeveloperFlag = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "TimingFlag")) { // TODO: Not a valid key choice
+                                TimingFlag = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "ReportDetailedWarmupConvergence")) {
+                                ReportDetailedWarmupConvergence = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringHVACSizingSimulation")) {
+                                ReportDuringHVACSizingSimulation = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "CreateMinimalSurfaceVariables")) { // TODO: Not a valid key choice
+                                continue;
+                                //        CreateMinimalSurfaceVariables=.TRUE.
+                            } else if (UtilityRoutines::SameString(diagnosticName, "CreateNormalSurfaceVariables")) { // TODO: Not a valid key choice
+                                continue;
+                                //        IF (CreateMinimalSurfaceVariables) THEN
+                                //          CALL ShowWarningError('GetProjectData: '//TRIM(CurrentModuleObject)//'=''//  &
+                                //             TRIM(diagnosticName)//'', prior set=true for this condition reverts to false.')
+                                //        ENDIF
+                                //        CreateMinimalSurfaceVariables=.FALSE.
+                            } else if (!diagnosticName.empty()) {
+                                ShowWarningError("GetProjectData: " + CurrentModuleObject + "=\"" + diagnosticName +
+                                                 "\", Invalid value for field, entered value ignored.");
+                            }
+                        }
+                    }
+
+                    // Don't process the duplicate ones
+                    break;
                 }
             }
         }
@@ -1196,7 +1229,7 @@ namespace SimulationManager {
                 bool overrideMinNumWarmupDays(false);
                 bool overrideBeginEnvResetSuppress(false);
                 bool overrideMaxZoneTempDiff(false);
-                dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
+                state.dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
                     if (overrideModeValue == "NORMAL") {
@@ -1280,21 +1313,21 @@ namespace SimulationManager {
             ShowFatalError("Errors found getting Project Input");
         }
 
-        print(ioFiles.eio, "{}\n", "! <Version>, Version ID");
+        print(state.files.eio, "{}\n", "! <Version>, Version ID");
         static constexpr auto Format_721(" Version, {}\n");
-        print(ioFiles.eio, Format_721, VersionID);
+        print(state.files.eio, Format_721, VersionID);
 
-        print(ioFiles.eio, "{}\n", "! <Timesteps per Hour>, #TimeSteps, Minutes per TimeStep {minutes}");
+        print(state.files.eio, "{}\n", "! <Timesteps per Hour>, #TimeSteps, Minutes per TimeStep {minutes}");
         static constexpr auto Format_731(" Timesteps per Hour, {:2}, {:2}\n");
-        print(ioFiles.eio, Format_731, NumOfTimeStepInHour, MinutesPerTimeStep);
+        print(state.files.eio, Format_731, NumOfTimeStepInHour, MinutesPerTimeStep);
 
-        print(ioFiles.eio,
+        print(state.files.eio,
               "{}\n",
               "! <System Convergence Limits>, Minimum System TimeStep {minutes}, Max HVAC Iterations, Minimum Plant "
               "Iterations, Maximum Plant Iterations");
         MinInt = MinTimeStepSys * 60.0;
         static constexpr auto Format_733(" System Convergence Limits, {}, {}, {}, {}\n");
-        print(ioFiles.eio,
+        print(state.files.eio,
               Format_733,
               RoundSigDigits(MinInt),
               RoundSigDigits(MaxIter),
@@ -1335,15 +1368,15 @@ namespace SimulationManager {
             Alphas(6) = "No";
         }
 
-        print(ioFiles.eio,
+        print(state.files.eio,
               "{}\n",
               "! <Simulation Control>, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather "
               "Simulation, Do HVAC Sizing Simulation");
-        print(ioFiles.eio, " Simulation Control");
+        print(state.files.eio, " Simulation Control");
         for (Num = 1; Num <= 6; ++Num) {
-            print(ioFiles.eio, ", {}", Alphas(Num));
+            print(state.files.eio, ", {}", Alphas(Num));
         }
-        print(ioFiles.eio, "\n");
+        print(state.files.eio, "\n");
 
         // Performance Precision Tradeoffs
         if (DataGlobals::DoCoilDirectSolutions) {
@@ -1376,20 +1409,20 @@ namespace SimulationManager {
                                 "Zone Radiant Exchange Algorithm, Override Mode, Number of Timestep In Hour, "
                                 "Force Euler Method, Minimum Number of Warmup Days, Force Suppress All Begin Environment Resets, "
                                 "MaxZoneTempDiff";
-        print(ioFiles.eio, "{}\n", pptHeader);
-        print(ioFiles.eio, " Performance Precision Tradeoffs");
+        print(state.files.eio, "{}\n", pptHeader);
+        print(state.files.eio, " Performance Precision Tradeoffs");
         for (Num = 1; Num <= 8; ++Num) {
-            print(ioFiles.eio, ", {}", Alphas(Num));
+            print(state.files.eio, ", {}", Alphas(Num));
         }
-        print(ioFiles.eio, "\n");
+        print(state.files.eio, "\n");
 
-        print(ioFiles.eio,
+        print(state.files.eio,
               "{}\n",
               "! <Output Reporting Tolerances>, Tolerance for Time Heating Setpoint Not Met, Tolerance for Zone Cooling Setpoint Not Met Time");
         // Formats
         static constexpr auto Format_751(" Output Reporting Tolerances, {:.3R}, {:.3R}, \n");
 
-        print(ioFiles.eio, Format_751, std::abs(deviationFromSetPtThresholdHtg), deviationFromSetPtThresholdClg);
+        print(state.files.eio, Format_751, std::abs(deviationFromSetPtThresholdHtg), deviationFromSetPtThresholdClg);
 
         //  IF (DisplayExtraWarnings) THEN
         //    Write(OutputFileInits,740)
@@ -3095,7 +3128,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
         // Surface simulation
         InitSurfaceHeatBalance(state);
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
-        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state.dataZoneTempPredictorCorrector);
+        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
         // Air simulation
         InitAirHeatBalance();

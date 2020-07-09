@@ -803,7 +803,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
 
     bool foundErrors = false;
 
-    HeatBalanceManager::GetProjectControlData(state.files, foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
     HeatBalanceManager::GetMaterialData(state.files, foundErrors); // read material data
@@ -1316,7 +1316,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     DataEnvironment::HolidayIndex = 0;
 
     bool foundErrors = false;
-    HeatBalanceManager::GetProjectControlData(state.files, foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
     HeatBalanceManager::GetMaterialData(state.files, foundErrors); // read material data
@@ -2077,7 +2077,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
 
     bool foundErrors = false;
 
-    HeatBalanceManager::GetProjectControlData(state.files, foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
     HeatBalanceManager::GetMaterialData(state.files, foundErrors); // read material data

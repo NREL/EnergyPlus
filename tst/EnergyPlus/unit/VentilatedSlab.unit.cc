@@ -2302,7 +2302,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     ProcessScheduleInput(state.files);  // read schedule data
 
     ErrorsFound = false;
-    HeatBalanceManager::GetProjectControlData(state.files, ErrorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;

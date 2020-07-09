@@ -54,7 +54,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -67,6 +67,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PluginManager.hh>
@@ -1797,7 +1798,6 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::Construct;
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
@@ -1854,7 +1854,7 @@ namespace EMSManager {
             } else {
                 if (WindowShadingControl(Surface(loopSurfNum).WindowShadingControlPtr).ShadingType != WSC_ST_SwitchableGlazing) {
                     ShowSevereError("Missing shade or blind layer in window construction name = '" +
-                                    Construct(SurfaceWindow(loopSurfNum).ShadedConstruction).Name + "', surface name = '" +
+                                    dataConstruction.Construct(SurfaceWindow(loopSurfNum).ShadedConstruction).Name + "', surface name = '" +
                                     Surface(loopSurfNum).Name + "'.");
                     ShowContinueError("...'Control Status' or 'Slat Angle' EMS Actuator cannot be set for a construction that does not have a shade "
                                       "or a blind layer.");

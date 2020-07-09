@@ -68,6 +68,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -2739,7 +2740,7 @@ namespace ScheduleManager {
         // na
 
         // Using/Aliasing
-        
+
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -2836,6 +2837,12 @@ namespace ScheduleManager {
             thisHour -= 24;
             thisDayOfWeek = DataEnvironment::DayOfWeekTomorrow;
             thisHolidayIndex = DataEnvironment::HolidayIndexTomorrow;
+        }
+
+        // In the case where DST is applied on 12/31 at 24:00, which is the case for a Southern Hemisphere location for eg
+        // (DayOfYear_Schedule is a bit weird, ScheduleManager always assumes LeapYear)
+        if (thisDayOfYear == 367) {
+            thisDayOfYear = 1;
         }
 
         int WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(thisDayOfYear);

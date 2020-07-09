@@ -62,6 +62,7 @@
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -6621,7 +6622,6 @@ namespace AirflowNetworkBalanceManager {
         using DataEnvironment::OutHumRat;
         using DataGlobals::KelvinConv;
         using DataGlobals::StefanBoltzmann;
-        using DataHeatBalance::Construct;
         using DataHeatBalFanSys::QRadSurfAFNDuct;
         using DataHeatBalSurface::TH;
         using DataHVACGlobals::TimeStepSys;
@@ -6804,7 +6804,7 @@ namespace AirflowNetworkBalanceManager {
                             Real64 TSurfj = TH(1, 1, ZoneSurfNum);
                             Real64 TSurfj_K = TSurfj + KelvinConv;
 
-                            Real64 ZoneSurfEmissivity = Construct(Surface(ZoneSurfNum).Construction).InsideAbsorpThermal;
+                            Real64 ZoneSurfEmissivity = dataConstruction.Construct(Surface(ZoneSurfNum).Construction).InsideAbsorpThermal;
                             Real64 ZoneSurfArea = Surface(ZoneSurfNum).Area;
 
                             Real64 DuctEmissivity = VFObj.DuctEmittance;

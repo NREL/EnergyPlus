@@ -61,6 +61,7 @@
 #include <functional>
 
 namespace EnergyPlus {
+
     // Forward declarations
     struct EnergyPlusData;
     class InputOutputFile;

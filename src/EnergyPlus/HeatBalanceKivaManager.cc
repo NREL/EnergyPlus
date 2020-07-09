@@ -57,6 +57,7 @@
 #endif
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -72,9 +73,10 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/ThermalComfort.hh> // MRT Weighting
+#include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -644,8 +646,8 @@ namespace HeatBalanceKivaManager {
         readWeatherData(ioFiles);
 
         auto &Surfaces = DataSurfaces::Surface;
-        auto &Constructs = DataHeatBalance::Construct;
-        auto &Materials = DataHeatBalance::Material;
+        auto &Constructs = dataConstruction.Construct;
+        auto &Materials = dataMaterial.Material;
 
         int inst = 0;
         int surfNum = 1;
@@ -1059,7 +1061,7 @@ namespace HeatBalanceKivaManager {
             if (kv.constructionNum == 0) {
                 constructionName = "<Default Footing Wall Construction>";
             } else {
-                constructionName = DataHeatBalance::Construct(kv.constructionNum).Name;
+                constructionName = dataConstruction.Construct(kv.constructionNum).Name;
             }
 
             std::string wallSurfaceString = "";

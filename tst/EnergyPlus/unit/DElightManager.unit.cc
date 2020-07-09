@@ -303,7 +303,7 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
 
     bool foundErrors = false;
 
-    HeatBalanceManager::GetProjectControlData(state.files, foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
     HeatBalanceManager::GetMaterialData(state.files, foundErrors); // read material data

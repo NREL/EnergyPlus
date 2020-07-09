@@ -1111,13 +1111,13 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     ProcessScheduleInput(state.files);  // read schedule data
 
     ErrorsFound = false;
-    HeatBalanceManager::GetProjectControlData(state.files, ErrorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData(state.dataZoneTempPredictorCorrector, state.files);
+    GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
 

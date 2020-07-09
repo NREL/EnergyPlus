@@ -12310,8 +12310,8 @@ namespace OutputReportTabular {
                   "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36\n");
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
-                ZoneData &zd(Zone(iZone));
-                for (int kSurf = zd.SurfaceFirst; kSurf <= zd.SurfaceLast; ++kSurf) {
+                for (int kSurf : DataSurfaces::AllSurfaceListReportOrder) {
+                    if (Surface(kSurf).Zone != iZone) continue;
                     print(ioFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
                         print(ioFiles.eio, ",{:6.3F}", decayCurveCool(jTime, kSurf));
@@ -12320,7 +12320,8 @@ namespace OutputReportTabular {
                     print(ioFiles.eio, "\n");
                 }
 
-                for (int kSurf = zd.SurfaceFirst; kSurf <= zd.SurfaceLast; ++kSurf) {
+                for (int kSurf : DataSurfaces::AllSurfaceListReportOrder) {
+                    if (Surface(kSurf).Zone != iZone) continue;
                     print(ioFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
                         print(ioFiles.eio, ",{:6.3F}", decayCurveHeat(jTime, kSurf));

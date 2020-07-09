@@ -76,12 +76,15 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+
+#include <unordered_map>
 #include <string>
 #include <unordered_map>
 
@@ -114,6 +117,7 @@ namespace EnergyPlus {
 
         IOFiles files;
 
+        WindowManagerData dataWindowManager;
         ZoneAirLoopEquipmentManagerData dataZoneAirLoopEquipmentManager;
         ZoneContaminantPredictorCorrectorData dataZoneContaminantPredictorCorrector;
         ZoneDehumidifierData dataZoneDehumidifier;
@@ -154,6 +158,7 @@ namespace EnergyPlus {
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataWindowManager.clear_state();
             dataZoneAirLoopEquipmentManager.clear_state();
             dataZoneContaminantPredictorCorrector.clear_state();
             dataZoneDehumidifier.clear_state();

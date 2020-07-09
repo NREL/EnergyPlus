@@ -268,7 +268,7 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.files, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
@@ -559,7 +559,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.files, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;

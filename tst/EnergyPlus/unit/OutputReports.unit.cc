@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool foundErrors(false);
-    HeatBalanceManager::GetProjectControlData(state.files, foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
     HeatBalanceManager::GetMaterialData(state.files, foundErrors); // read material data

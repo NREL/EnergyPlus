@@ -2341,7 +2341,7 @@ namespace DualDuct {
 
     void DualDuctAirTerminal::CalcOutdoorAirVolumeFlowRate()
     {
-        // calculates the amount of outdoor air volume flow rate using the supply air flow rate and OA fraction
+        // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
             this->OutdoorAirFlowRate = (this->dd_airterminalOutlet.AirMassFlowRate / StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {

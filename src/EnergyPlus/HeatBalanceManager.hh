@@ -56,8 +56,10 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
+    // Forward Declarations
     struct EnergyPlusData;
+    struct WindowManagerData;
+    class IOFiles;
 
 namespace HeatBalanceManager {
 
@@ -155,7 +157,7 @@ namespace HeatBalanceManager {
 
     void SetPreConstructionInputParameters();
 
-    void GetProjectControlData(IOFiles &ioFiles, bool &ErrorsFound); // Set to true if errors detected during getting data
+    void GetProjectControlData(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors detected during getting data
 
     void GetSiteAtmosphereData(EnergyPlus::IOFiles &ioFiles, bool &ErrorsFound);
 
@@ -195,7 +197,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(IOFiles &ioFiles);
+    void InitHeatBalance(WindowManagerData &dataWindowManager, IOFiles &ioFiles);
 
     void AllocateHeatBalArrays();
 
@@ -258,6 +260,8 @@ namespace HeatBalanceManager {
 
     void SetupComplexFenestrationStateInput(int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound);
+
+    void InitConductionTransferFunctions(IOFiles &ioFiles);
 
 } // namespace HeatBalanceManager
 

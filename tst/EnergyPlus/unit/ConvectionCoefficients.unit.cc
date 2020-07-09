@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BaseboardElectric.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -435,7 +436,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.files, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
@@ -596,14 +597,14 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     DataSurfaces::TotSurfaces = 1;
     DataGlobals::NumOfZones = 1;
     DataSurfaces::Surface.allocate( 1 );
-    DataHeatBalance::Construct.allocate( 1 );
+    dataConstruction.Construct.allocate( 1 );
     DataHeatBalance::Zone.allocate( 1 );
     DataLoopNode::Node.allocate( 1 );
 
     DataSurfaces::Surface( SurfNum ).Zone = 1;
     DataSurfaces::Surface( SurfNum ).Construction = 1;
     DataSurfaces::Surface(SurfNum).TAirRef = 0;
-    DataHeatBalance::Construct( 1 ).TypeIsWindow = false;
+    dataConstruction.Construct( 1 ).TypeIsWindow = false;
     DataHeatBalance::Zone( 1 ).SystemZoneNodeNumber = 1;
     DataHeatBalance::Zone( 1 ).Multiplier = 1.0;
     DataHeatBalance::Zone( 1 ).ListMultiplier = 1.0;
@@ -910,7 +911,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.files, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
@@ -967,7 +968,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.files, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
@@ -1024,7 +1025,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.files, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
@@ -1081,7 +1082,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.files, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
@@ -1138,7 +1139,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.files, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
@@ -1195,7 +1196,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.files, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;

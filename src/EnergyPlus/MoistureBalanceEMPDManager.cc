@@ -53,7 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -65,6 +65,8 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -140,7 +142,7 @@ namespace MoistureBalanceEMPDManager {
     }
 
     Real64 CalcDepthFromPeriod(Real64 const period,          // in seconds
-                               MaterialProperties const &mat // material
+                               Material::MaterialProperties const &mat // material
     )
     {
 
@@ -228,7 +230,7 @@ namespace MoistureBalanceEMPDManager {
                                           cNumericFieldNames);
 
             // Load the material derived type from the input data.
-            MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), Material);
+            MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), dataMaterial.Material);
             if (MaterNum == 0) {
                 ShowSevereError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
                                 ", must match to a valid Material name.");
@@ -238,26 +240,26 @@ namespace MoistureBalanceEMPDManager {
 
             // See if Material was defined with R only.  (No density is defined then and not applicable for EMPD).
             //  What about materials other than "regular materials" (e.g. Glass, Air, etc)
-            if (Material(MaterNum).Group == RegularMaterial && MaterialProps(1) > 0.0) {
-                if (Material(MaterNum).ROnly) {
-                    //        CALL ShowSevereError('EMPD base material = "'//TRIM(Material(MaterNum)%Name)//  &
+            if (dataMaterial.Material(MaterNum).Group == RegularMaterial && MaterialProps(1) > 0.0) {
+                if (dataMaterial.Material(MaterNum).ROnly) {
+                    //        CALL ShowSevereError('EMPD base material = "'//TRIM(dataMaterial.Material(MaterNum)%Name)//  &
                     //                             '" was Material:NoMass. It cannot be used for EMPD calculations.')
                     ShowContinueError("..Only Material base materials are allowed to have EMPD properties.");
                     ShowSevereError(cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" +
-                                    Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
+                                    dataMaterial.Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
                     ErrorsFound = true;
                 }
             }
-            if (Material(MaterNum).Group != RegularMaterial) {
+            if (dataMaterial.Material(MaterNum).Group != RegularMaterial) {
                 //      CALL ShowSevereError('GetMoistureBalanceEMPDInput: Only Material:Regular base materials are allowed '// &
-                //                           'to have EMPD properties, material = '// TRIM(Material(MaterNum)%Name))
+                //                           'to have EMPD properties, material = '// TRIM(dataMaterial.Material(MaterNum)%Name))
                 ShowSevereError(cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" +
-                                Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
+                                dataMaterial.Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
                 ErrorsFound = true;
             }
 
             // Once the material derived type number is found then load the additional moisture material properties
-            auto &material(Material(MaterNum));
+            auto &material(dataMaterial.Material(MaterNum));
             material.EMPDmu = MaterialProps(1);
             material.MoistACoeff = MaterialProps(2);
             material.MoistBCoeff = MaterialProps(3);
@@ -289,8 +291,8 @@ namespace MoistureBalanceEMPDManager {
                 continue; // Heat transfer surface only and not a window
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD) continue;
             ConstrNum = Surface(SurfNum).Construction;
-            MatNum = Construct(ConstrNum).LayerPoint(Construct(ConstrNum).TotLayers);
-            if (Material(MatNum).EMPDmu > 0.0 && Surface(SurfNum).Zone > 0) {
+            MatNum = dataConstruction.Construct(ConstrNum).LayerPoint(dataConstruction.Construct(ConstrNum).TotLayers);
+            if (dataMaterial.Material(MatNum).EMPDmu > 0.0 && Surface(SurfNum).Zone > 0) {
                 EMPDzone(Surface(SurfNum).Zone) = true;
             } else {
                 ++ErrCount;
@@ -301,25 +303,25 @@ namespace MoistureBalanceEMPDManager {
                 if (DisplayExtraWarnings) {
                     ShowMessage("GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer in Surface=" +
                                 Surface(SurfNum).Name);
-                    ShowContinueError("with Construction=" + Construct(ConstrNum).Name);
+                    ShowContinueError("with Construction=" + dataConstruction.Construct(ConstrNum).Name);
                 }
             }
-            if (Construct(ConstrNum).TotLayers == 1) { // One layer construction
+            if (dataConstruction.Construct(ConstrNum).TotLayers == 1) { // One layer construction
                 continue;
             } else { // Multiple layer construction
-                if (Material(Construct(ConstrNum).LayerPoint(1)).EMPDMaterialProps &&
+                if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).EMPDMaterialProps &&
                     Surface(SurfNum).ExtBoundCond <= 0) { // The external layer is not exposed to zone
                     ShowSevereError("GetMoistureBalanceEMPDInput: EMPD properties are assigned to the outside layer in Construction=" +
-                                    Construct(ConstrNum).Name);
-                    ShowContinueError("..Outside layer material with EMPD properties = " + Material(Construct(ConstrNum).LayerPoint(1)).Name);
+                                    dataConstruction.Construct(ConstrNum).Name);
+                    ShowContinueError("..Outside layer material with EMPD properties = " + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Name);
                     ShowContinueError("..A material with EMPD properties must be assigned to the inside layer of a construction.");
                     ErrorsFound = true;
                 }
-                for (Layer = 2; Layer <= Construct(ConstrNum).TotLayers - 1; ++Layer) {
-                    if (Material(Construct(ConstrNum).LayerPoint(Layer)).EMPDMaterialProps) {
+                for (Layer = 2; Layer <= dataConstruction.Construct(ConstrNum).TotLayers - 1; ++Layer) {
+                    if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).EMPDMaterialProps) {
                         ShowSevereError("GetMoistureBalanceEMPDInput: EMPD properties are assigned to a middle layer in Construction=" +
-                                        Construct(ConstrNum).Name);
-                        ShowContinueError("..Middle layer material with EMPD properties = " + Material(Construct(ConstrNum).LayerPoint(Layer)).Name);
+                                        dataConstruction.Construct(ConstrNum).Name);
+                        ShowContinueError("..Middle layer material with EMPD properties = " + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(Layer)).Name);
                         ShowContinueError("..A material with EMPD properties must be assigned to the inside layer of a construction.");
                         ErrorsFound = true;
                     }
@@ -545,9 +547,9 @@ namespace MoistureBalanceEMPDManager {
             return;
         }
         ConstrNum = surface.Construction;
-        MatNum = Construct(ConstrNum).LayerPoint(Construct(ConstrNum).TotLayers); // Then find the material pointer
+        MatNum = dataConstruction.Construct(ConstrNum).LayerPoint(dataConstruction.Construct(ConstrNum).TotLayers); // Then find the material pointer
 
-        auto const &material(Material(MatNum));
+        auto const &material(dataMaterial.Material(MatNum));
         if (material.EMPDmu <= 0.0) {
             rv_surface = PsyRhovFnTdbWPb(TempZone, ZoneAirHumRat(surface.Zone), OutBaroPress);
             return;
@@ -795,24 +797,24 @@ namespace MoistureBalanceEMPDManager {
               "Coating Thickness {m}\n");
 
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
-            if (Construct(ConstrNum).TypeIsWindow) continue;
-            MatNum = Construct(ConstrNum).LayerPoint(Construct(ConstrNum).TotLayers);
-            if (Material(MatNum).EMPDMaterialProps) {
+            if (dataConstruction.Construct(ConstrNum).TypeIsWindow) continue;
+            MatNum = dataConstruction.Construct(ConstrNum).LayerPoint(dataConstruction.Construct(ConstrNum).TotLayers);
+            if (dataMaterial.Material(MatNum).EMPDMaterialProps) {
                 static constexpr auto Format_700(
                     " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
                 print(ioFiles.eio,
                       Format_700,
-                      Construct(ConstrNum).Name,
-                      Material(MatNum).Name,
-                      Material(MatNum).EMPDmu,
-                      Material(MatNum).MoistACoeff,
-                      Material(MatNum).MoistBCoeff,
-                      Material(MatNum).MoistCCoeff,
-                      Material(MatNum).MoistDCoeff,
-                      Material(MatNum).EMPDSurfaceDepth,
-                      Material(MatNum).EMPDDeepDepth,
-                      Material(MatNum).EMPDmuCoating,
-                      Material(MatNum).EMPDCoatingThickness);
+                      dataConstruction.Construct(ConstrNum).Name,
+                      dataMaterial.Material(MatNum).Name,
+                      dataMaterial.Material(MatNum).EMPDmu,
+                      dataMaterial.Material(MatNum).MoistACoeff,
+                      dataMaterial.Material(MatNum).MoistBCoeff,
+                      dataMaterial.Material(MatNum).MoistCCoeff,
+                      dataMaterial.Material(MatNum).MoistDCoeff,
+                      dataMaterial.Material(MatNum).EMPDSurfaceDepth,
+                      dataMaterial.Material(MatNum).EMPDDeepDepth,
+                      dataMaterial.Material(MatNum).EMPDmuCoating,
+                      dataMaterial.Material(MatNum).EMPDCoatingThickness);
             }
         }
     }
