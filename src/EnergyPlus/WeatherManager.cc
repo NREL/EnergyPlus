@@ -118,7 +118,6 @@ namespace WeatherManager {
     int const JulianToGregorian(2); // JGDate argument for Julian to Gregorian Date conversion
 
     Real64 const Sigma(5.6697e-8);    // Stefan-Boltzmann constant
-    Real64 const TKelvin(DataGlobals::KelvinConv); // conversion from Kelvin to Celsius
 
     static std::string const BlankString;
     Array1D_string const DaysOfWeek(7, {"SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"});
@@ -3136,7 +3135,7 @@ namespace WeatherManager {
 
                     ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
                     if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
-                        TomorrowHorizIRSky(CurTimeStep, Hour) = ESky * Sigma * pow_4(DryBulb + TKelvin);
+                        TomorrowHorizIRSky(CurTimeStep, Hour) = ESky * Sigma * pow_4(DryBulb + DataGlobals::KelvinConv);
                     } else {
                         TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
                     }
@@ -3145,10 +3144,10 @@ namespace WeatherManager {
                         // Calculate sky temperature, use IRHoriz if not missing
                         if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
                             // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
-                            SkyTemp = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
+                            SkyTemp = (DryBulb + DataGlobals::KelvinConv) * root_4(ESky) - DataGlobals::KelvinConv;
                         } else {
                             // Valid IR from weather files
-                            SkyTemp = root_4(IRHoriz / Sigma) - TKelvin;
+                            SkyTemp = root_4(IRHoriz / Sigma) - DataGlobals::KelvinConv;
                         }
                     } else {
                         SkyTemp = 0.0; // dealt with later
@@ -3401,12 +3400,12 @@ namespace WeatherManager {
             ESky = 0.618 + 0.056 * pow(PartialPress, 0.5);
         } else if (ESkyCalcType == EmissivityCalcType::IdsoModel) {
             double const PartialPress = RelHum * Psychrometrics::PsyPsatFnTemp(DryBulb) * 0.01;
-            ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + TKelvin));
+            ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + DataGlobals::KelvinConv));
         } else if (ESkyCalcType == EmissivityCalcType::BerdahlMartinModel) {
             double const TDewC = min(DryBulb, DewPoint);
             ESky = 0.758 + 0.521 * (TDewC / 100) + 0.625 * pow_2(TDewC / 100);
         } else {
-            ESky = 0.787 + 0.764 * std::log((min(DryBulb, DewPoint) + TKelvin) / TKelvin);
+            ESky = 0.787 + 0.764 * std::log((min(DryBulb, DewPoint) + DataGlobals::KelvinConv) / DataGlobals::KelvinConv);
         }
         ESky = ESky * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
         return ESky;
@@ -4126,11 +4125,11 @@ namespace WeatherManager {
                 double DryBulb = TomorrowOutDryBulbTemp(TS, Hour);
                 double RelHum = TomorrowOutRelHum(TS, Hour) * 0.01;
                 ESky = CalcSkyEmissivity(Environment(EnvrnNum).SkyTempModel, OSky, DryBulb, TomorrowOutDewPointTemp(TS, Hour), RelHum);
-                TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(DryBulb + TKelvin);
+                TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(DryBulb + DataGlobals::KelvinConv);
 
                 if (Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::BruntModel || Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::IdsoModel || Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::BerdahlMartinModel || Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA || Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
                     // Design day not scheduled
-                    TomorrowSkyTemp(TS, Hour) = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
+                    TomorrowSkyTemp(TS, Hour) = (DryBulb + DataGlobals::KelvinConv) * root_4(ESky) - DataGlobals::KelvinConv;
                 }
                 // Generate solar values for timestep
                 //    working results = BeamRad and DiffRad
