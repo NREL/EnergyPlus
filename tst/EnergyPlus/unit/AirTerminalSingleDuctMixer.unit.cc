@@ -8173,7 +8173,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
     Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     EXPECT_NEAR(QZnReq, QUnitOut, 3.0);
-    EXPECT_NEAR(thisFanCoil.PLR, 0.187, 0.00001);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.187, 0.001);
     EXPECT_NEAR(Node(thisFanCoil.AirInNode).MassFlowRate, thisFanCoil.PLR * Node(thisFanCoil.AirInNode).MassFlowRateMax, 0.000001);
 }
 
