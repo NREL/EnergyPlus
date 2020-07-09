@@ -135,8 +135,8 @@ TEST_F(EnergyPlusFixture, CalcTotalSensibleLatentOutputTest)
     CoilInletHumRat = 0.00850;
     CoilOutletHumRat = 0.00750;
     results_totaloutput = MassFlowRate * (Psychrometrics::PsyHFnTdbW(CoilOutletTemp, CoilOutletHumRat) - Psychrometrics::PsyHFnTdbW(CoilInletTemp, CoilInletHumRat));
-    results_sensibleoutput = MassFlowRate * (1.00484e3 + 0.5 * (CoilInletHumRat + CoilOutletHumRat) * 1.85895e3) * (CoilOutletTemp - CoilInletTemp);
-    results_latentoutput = MassFlowRate * (2.50094e6 + 0.5 * (CoilInletTemp + CoilOutletTemp) * 1.85895e3) * (CoilOutletHumRat - CoilInletHumRat);
+    results_sensibleoutput = MassFlowRate * (1.00484e3 + min(CoilInletHumRat, CoilOutletHumRat) * 1.85895e3) * (CoilOutletTemp - CoilInletTemp);
+    results_latentoutput = results_totaloutput - results_sensibleoutput;
     CalcTotalSensibleLatentOutput(MassFlowRate, CoilOutletTemp, CoilOutletHumRat, CoilInletTemp, CoilInletHumRat, totaloutput, sensibleoutput, latentoutput);
     EXPECT_DOUBLE_EQ(results_totaloutput, totaloutput);
     EXPECT_DOUBLE_EQ(results_sensibleoutput, sensibleoutput);
@@ -148,8 +148,8 @@ TEST_F(EnergyPlusFixture, CalcTotalSensibleLatentOutputTest)
     CoilInletHumRat = 0.00750;
     CoilOutletHumRat = 0.00750;
     results_totaloutput = MassFlowRate * (Psychrometrics::PsyHFnTdbW(CoilOutletTemp, CoilOutletHumRat) - Psychrometrics::PsyHFnTdbW(CoilInletTemp, CoilInletHumRat));
-    results_sensibleoutput = MassFlowRate * (1.00484e3 + 0.5 * (CoilInletHumRat + CoilOutletHumRat) * 1.85895e3) * (CoilOutletTemp - CoilInletTemp);
-    results_latentoutput = MassFlowRate * (2.50094e6 + 0.5 * (CoilInletTemp + CoilOutletTemp) * 1.85895e3) * (CoilOutletHumRat - CoilInletHumRat);
+    results_sensibleoutput = MassFlowRate * (1.00484e3 + min(CoilInletHumRat, CoilOutletHumRat) * 1.85895e3) * (CoilOutletTemp - CoilInletTemp);
+    results_latentoutput = results_totaloutput - results_sensibleoutput;
     CalcTotalSensibleLatentOutput(MassFlowRate, CoilOutletTemp, CoilOutletHumRat, CoilInletTemp, CoilInletHumRat, totaloutput, sensibleoutput, latentoutput);
     EXPECT_DOUBLE_EQ(results_totaloutput, totaloutput);
     EXPECT_DOUBLE_EQ(results_sensibleoutput, sensibleoutput);
