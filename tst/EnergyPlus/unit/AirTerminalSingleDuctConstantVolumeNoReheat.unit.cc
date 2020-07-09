@@ -1077,7 +1077,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
     EXPECT_EQ(1.0, MassFlowRateMaxAvail);
     // calculate sensible output provided by the air terminal unit
-    Real64 CpAir = PsyCpAirFnW(0.5 * (Node(OutletNode).HumRat + Node(ZoneAirNodeNum).HumRat));
+    Real64 CpAir = PsyCpAirFnW(min(Node(OutletNode).HumRat, Node(ZoneAirNodeNum).HumRat));
     Real64 SensHeatRateProvided = MassFlowRateMaxAvail * CpAir * (Node(OutletNode).Temp - Node(ZoneAirNodeNum).Temp);
     // run SimulateSingleDuct() function
     SimZoneAirLoopEquipment(state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr, ZonePtr);
@@ -1123,7 +1123,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
     EXPECT_EQ(1.0, MassFlowRateMaxAvail);
     // calculate sensible output provided by the air terminal unit
-    CpAir = PsyCpAirFnW(0.5 * (Node(OutletNode).HumRat + Node(ZoneAirNodeNum).HumRat));
+    CpAir = PsyCpAirFnW(min(Node(OutletNode).HumRat, Node(ZoneAirNodeNum).HumRat));
     Real64 SensCoolRateProvided = MassFlowRateMaxAvail * CpAir * (Node(OutletNode).Temp - Node(ZoneAirNodeNum).Temp);
     // run SimulateSingleDuct() function
     SimZoneAirLoopEquipment(state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr, ZonePtr);
