@@ -1040,11 +1040,10 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
     EXPECT_NEAR(TomorrowHorizIRSky(1, 1), expected_IRHorizSky, 0.001);
 }
 
-// Test for Issue 8030, interpolate some weather input first before output values
+// Test for Issue 7957: add new sky cover weather output values;
+// and test for Issue 8030: interpolate some weather input first before output values.
 TEST_F(EnergyPlusFixture, InterpolateWeatherInputOutputTest)
 {
-    // Test interpolate some weather input first before output values
-
     std::string const idf_objects = delimited_string({
         "Timestep,4;"
 
@@ -1104,6 +1103,21 @@ TEST_F(EnergyPlusFixture, InterpolateWeatherInputOutputTest)
     EnergyPlus::DataGlobals::BeginSimFlag = true;
     WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
 
+    // Test get output variables for Total Sky Cover and Opaque Sky Cover
+    EXPECT_EQ("Site Outdoor Air Drybulb Temperature", OutputProcessor::RVariableTypes(1).VarNameOnly);
+    EXPECT_EQ("Environment:Site Outdoor Air Drybulb Temperature", OutputProcessor::RVariableTypes(1).VarName);
+    EXPECT_EQ("Site Wind Speed", OutputProcessor::RVariableTypes(2).VarNameOnly);
+    EXPECT_EQ("Environment:Site Wind Speed", OutputProcessor::RVariableTypes(2).VarName);
+    EXPECT_EQ("Site Total Sky Cover", OutputProcessor::RVariableTypes(3).VarNameOnly);
+    EXPECT_EQ("Environment:Site Total Sky Cover", OutputProcessor::RVariableTypes(3).VarName);
+    EXPECT_EQ("Site Opaque Sky Cover", OutputProcessor::RVariableTypes(4).VarNameOnly);
+    EXPECT_EQ("Environment:Site Opaque Sky Cover", OutputProcessor::RVariableTypes(4).VarName);
+
+    EXPECT_EQ(7, OutputProcessor::RVariableTypes(1).ReportID);
+    EXPECT_EQ(8, OutputProcessor::RVariableTypes(2).ReportID);
+    EXPECT_EQ(9, OutputProcessor::RVariableTypes(3).ReportID);
+    EXPECT_EQ(10, OutputProcessor::RVariableTypes(4).ReportID);
+
     WeatherManager::Envrn = 1;
 
     DataGlobals::NumOfTimeStepInHour =4;
@@ -1118,6 +1132,7 @@ TEST_F(EnergyPlusFixture, InterpolateWeatherInputOutputTest)
     OpenWeatherFile(ErrorsFound);
     ReadWeatherForDay(1, 1, true);
 
-    Real64 expected_SkyTemp = -20.818853829586516;
+    // Test the feature of interpolating some weather inputs to calc sky temp
+    Real64 expected_SkyTemp = -20.8188538296;
     EXPECT_NEAR(TomorrowSkyTemp(2, 1), expected_SkyTemp, 1e-6);
 }
