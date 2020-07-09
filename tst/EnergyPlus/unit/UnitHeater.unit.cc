@@ -2468,7 +2468,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     // check the reheat coil outputis the full capacity
     EXPECT_NEAR(HeatingCoils::HeatingCoil(1).HeatingCoilRate, 17542.3, 1.0);
     // check the unit heater heating coil is handling the remaining load
-    EXPECT_NEAR(HeatingCoils::HeatingCoil(2).HeatingCoilRate, 203.1, 1.0);
+    EXPECT_NEAR(HeatingCoils::HeatingCoil(2).HeatingCoilRate, 213.9, 1.0);
     // finaly check that RemaingingOutputRequired is zero
     EXPECT_EQ(ZoneSysEnergyDemand(1).RemainingOutputRequired, 0.0);
 }
