@@ -8280,7 +8280,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     EXPECT_GT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxNoCoolHeatAirMassFlow); // air flow higher than low speed fan flow
     EXPECT_LT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow);       // air flow lower than high speed fan flow
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0661, 0.0001); // heating coil water flow ratio, heating coil is on
+    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0667, 0.0001); // heating coil water flow ratio, heating coil is on
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);    // cooling coil water flow ratio, cooling coil is off
     EXPECT_NEAR(thisSys->FanPartLoadRatio,
                 0.6198,
@@ -8317,7 +8317,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 10.0); // Watts
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);        // inlet = outlet flow rate
-    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.2463, 0.001); // heating coil water flow ratio, heating coil is on
+    EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.2532, 0.001); // heating coil water flow ratio, heating coil is on
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.0, 0.0001);   // cooling coil water flow ratio, cooling coil is off
     EXPECT_EQ(thisSys->FanPartLoadRatio, 1.0);                   // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
     EXPECT_GT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature exceeds max limit
@@ -8351,7 +8351,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
 
     // test model performance
     EXPECT_GT(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys);   // Watts - system CANNOT meet load
-    EXPECT_NEAR(Qsens_sys, 11368.88, 0.1);                                                                      // system maxed out on capacity
+    EXPECT_NEAR(Qsens_sys, 11316.64, 0.1);                                                                      // system maxed out on capacity
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);  // inlet = outlet flow rate
     EXPECT_EQ(DataLoopNode::Node(thisSys->HeatCoilFluidInletNode).MassFlowRate, thisSys->MaxHeatCoilFluidFlow); // water coil water flow rate at max
     EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio,
@@ -8441,9 +8441,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     EXPECT_LT(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);       // air flow lower than high speed fan flow
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
     EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);                            // heating coil water flow ratio, heating coil is off
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.394, 0.001);                           // cooling coil water flow ratio, cooling coil is on
+    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.396, 0.001);                           // cooling coil water flow ratio, cooling coil is on
     EXPECT_NEAR(thisSys->FanPartLoadRatio, 0.5117, 0.0001);                               // fan PLR above minimum speed
-    EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp, 0.05); // outlet temperature modulated to meet max limit
+    EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp, 0.09); // outlet temperature modulated to meet max limit
 
     // test with 0 water flow rate to ensure divide by 0 does not happen (plant off, size = 0, etc.)
     Real64 saveSystemCoolWaterFlowRate = thisSys->MaxCoolCoilFluidFlow;
@@ -8503,7 +8503,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     EXPECT_EQ(DataLoopNode::Node(InletNode).MassFlowRate, thisSys->MaxCoolAirMassFlow);                        // air flow at high speed fan flow
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate); // inlet = outlet flow rate
     EXPECT_NEAR(thisSys->HeatCoilWaterFlowRatio, 0.0, 0.0001);                    // heating coil water flow ratio, heating coil is off
-    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.799, 0.001);                   // cooling coil water flow ratio, cooling coil is on
+    EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.803, 0.001);                   // cooling coil water flow ratio, cooling coil is on
     EXPECT_NEAR(thisSys->FanPartLoadRatio, 1.0, 0.0001);                          // fan PLR at maximum speed
     EXPECT_LT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature below minimum temperature limit
 
@@ -9990,7 +9990,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
                       sensOut,
                       latOut);
 
-    EXPECT_NEAR(0.9608, thisSys->m_CycRatio, 0.0001); // cycling ratio
+    EXPECT_NEAR(0.9684, thisSys->m_CycRatio, 0.0001); // cycling ratio
     EXPECT_EQ(2, thisSys->m_CoolingSpeedNum);
     EXPECT_EQ(1.0, thisSys->m_CoolingSpeedRatio);
 
@@ -10020,7 +10020,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
                       ZoneEquipment,
                       sensOut,
                       latOut);
-    EXPECT_NEAR(0.1603, thisSys->m_CycRatio, 0.0001); // cycling ratio
+    EXPECT_NEAR(0.16177, thisSys->m_CycRatio, 0.0001); // cycling ratio
     EXPECT_EQ(1, thisSys->m_HeatingSpeedNum);
     EXPECT_EQ(0.0, thisSys->m_HeatingSpeedRatio);
 
@@ -10046,7 +10046,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
                       ZoneEquipment,
                       sensOut,
                       latOut);
-    EXPECT_NEAR(0.9115, thisSys->m_CycRatio, 0.0001); // cycling ratio
+    EXPECT_NEAR(0.920083, thisSys->m_CycRatio, 0.0001); // cycling ratio
     EXPECT_EQ(3, thisSys->m_HeatingSpeedNum);
     EXPECT_EQ(1.0, thisSys->m_HeatingSpeedRatio);
 }
@@ -14052,7 +14052,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 1.0);
     EXPECT_NEAR(thisSys->CoilSHR, thisSys->LoadSHR, 0.001);
     EXPECT_NEAR(SenOutput, -227.705, 0.1);
-    EXPECT_NEAR(LatOutput, -744.615, 0.1);
+    EXPECT_NEAR(LatOutput, -751.3286, 0.1);
 
     // OperatingMode 3 with mode ratio < 1
     thisSys->m_ZoneSequenceCoolingNum = 0;
@@ -14085,7 +14085,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_NEAR(thisSys->LoadSHR, 0.57154, 0.001);
     EXPECT_NEAR(thisSys->CoilSHR, 0.44704, 0.001);
     EXPECT_NEAR(SenOutput, -397.162, 0.1);
-    EXPECT_NEAR(LatOutput, -520.397, 0.1);
+    EXPECT_NEAR(LatOutput, -524.583, 0.1);
 
     // OperatingMode 2
     thisSys->m_ZoneSequenceCoolingNum = 0;
@@ -14109,7 +14109,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_NEAR(thisSys->LoadSHR, 0.98533, 0.001);
     EXPECT_NEAR(thisSys->CoilSHR, 0.97600, 0.001);
     EXPECT_NEAR(SenOutput, -2000.0, 0.5);
-    EXPECT_NEAR(LatOutput, -328.996, 0.1);
+    EXPECT_NEAR(LatOutput, -330.95, 0.1);
 }
 // This issue tests for GetInput with respect to Autosizing, especially for issue #7771 where
 // 'Minimum Supply Air Temperature' == 'Autosize' produces a crash
