@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -67,7 +68,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -188,7 +188,7 @@ namespace ElectricBaseboardRadiator {
 
             if (SELECT_CASE_var == BaseboardRadiator_Electric) { // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC'
                 // Simulate baseboard
-                CalcElectricBaseboard(BaseboardNum, ControlledZoneNum);
+                CalcElectricBaseboard(state, BaseboardNum, ControlledZoneNum);
 
             } else {
                 ShowSevereError("SimElecBaseboard: Errors in Baseboard=" + ElecBaseboard(BaseboardNum).EquipName);
@@ -749,7 +749,7 @@ namespace ElectricBaseboardRadiator {
         }
     }
 
-    void CalcElectricBaseboard(int const BaseboardNum, int const EP_UNUSED(ControlledZoneNum))
+    void CalcElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const EP_UNUSED(ControlledZoneNum))
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -818,8 +818,8 @@ namespace ElectricBaseboardRadiator {
                 // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
                 DistributeBBElecRadGains();
                 // Now "simulate" the system by recalculating the heat balances
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                 // Here an assumption is made regarding radiant heat transfer to people.
                 // While the radiant heat transfer to people array will be used by the thermal comfort
                 // routines, the energy transfer to people would get lost from the perspective
@@ -843,14 +843,14 @@ namespace ElectricBaseboardRadiator {
                     Real64 TempZeroSourceSumHATsurf;
                     QBBElecRadSource(BaseboardNum) = 0.0;
                     DistributeBBElecRadGains();
-                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     TempZeroSourceSumHATsurf = SumHATsurf(ZoneNum);
                     // Now, turn it back on:
                     QBBElecRadSource(BaseboardNum) = RadHeat;
                     DistributeBBElecRadGains();
-                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Recalculate LoadMet with new ZeroSource... term and see if it is positive now.  If not, shut it down.
                     LoadMet = (SumHATsurf(ZoneNum) - TempZeroSourceSumHATsurf) + (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) +
                               (RadHeat * ElecBaseboard(BaseboardNum).FracDistribPerson);

@@ -48,11 +48,16 @@
 #ifndef CommandLineInterface_hh_INCLUDED
 #define CommandLineInterface_hh_INCLUDED
 
-#include <EnergyPlus/api/EnergyPlusAPI.h>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+// C++ Headers
 #include <string>
 
+// EnergyPlus Headers
+#include <EnergyPlus/api/EnergyPlusAPI.h>
+
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    class OutputFiles;
 
 namespace CommandLineInterface {
 

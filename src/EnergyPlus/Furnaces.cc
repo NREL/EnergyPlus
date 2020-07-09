@@ -4917,7 +4917,8 @@ namespace Furnaces {
                 if (Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWater) {
 
                     errFlag = false;
-                    ScanPlantLoopsForObject(Furnace(FurnaceNum).HeatingCoilName,
+                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                            Furnace(FurnaceNum).HeatingCoilName,
                                             TypeOf_CoilWaterSimpleHeating,
                                             Furnace(FurnaceNum).LoopNum,
                                             Furnace(FurnaceNum).LoopSide,
@@ -4944,7 +4945,8 @@ namespace Furnaces {
                 } else if (Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingSteam) {
 
                     errFlag = false;
-                    ScanPlantLoopsForObject(Furnace(FurnaceNum).HeatingCoilName,
+                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                            Furnace(FurnaceNum).HeatingCoilName,
                                             TypeOf_CoilSteamAirHeating,
                                             Furnace(FurnaceNum).LoopNum,
                                             Furnace(FurnaceNum).LoopSide,
@@ -4986,7 +4988,8 @@ namespace Furnaces {
 
                 if (Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                     errFlag = false;
-                    ScanPlantLoopsForObject(Furnace(FurnaceNum).SuppHeatCoilName,
+                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                            Furnace(FurnaceNum).SuppHeatCoilName,
                                             TypeOf_CoilWaterSimpleHeating,
                                             Furnace(FurnaceNum).LoopNumSupp,
                                             Furnace(FurnaceNum).LoopSideSupp,
@@ -5012,7 +5015,8 @@ namespace Furnaces {
                     }
                 } else if (Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                     errFlag = false;
-                    ScanPlantLoopsForObject(Furnace(FurnaceNum).SuppHeatCoilName,
+                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                            Furnace(FurnaceNum).SuppHeatCoilName,
                                             TypeOf_CoilSteamAirHeating,
                                             Furnace(FurnaceNum).LoopNumSupp,
                                             Furnace(FurnaceNum).LoopSideSupp,
@@ -6430,7 +6434,7 @@ namespace Furnaces {
                 PartLoadRatio = 0.0;
                 SetAverageAirFlow(FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
 
-                CalcFurnaceOutput(state, 
+                CalcFurnaceOutput(state,
                     FurnaceNum, FirstHVACIteration, OpMode, On, 0.0, 0.0, 0.0, 0.0, NoSensibleOutput, NoLatentOutput, OnOffAirFlowRatio, false);
 
                 Node(FurnaceInletNode).MassFlowRate = Furnace(FurnaceNum).MdotFurnace;
@@ -8616,7 +8620,7 @@ namespace Furnaces {
                               CoolPartLoadRatio,
                               OnOffAirFlowRatio);
                 }
-                SimDXCoil(state, 
+                SimDXCoil(state,
                     BlankString, CompOp, FirstHVACIteration, Furnace(FurnaceNum).HeatingCoilIndex, FanOpMode, HeatPartLoadRatio, OnOffAirFlowRatio);
                 SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
             }
@@ -8632,7 +8636,7 @@ namespace Furnaces {
                                          OnOffAirFlowRatio,
                                          EconomizerFlag);
             } else {
-                SimDXCoil(state, 
+                SimDXCoil(state,
                     BlankString, CompOp, FirstHVACIteration, Furnace(FurnaceNum).CoolingCoilIndex, FanOpMode, CoolPartLoadRatio, OnOffAirFlowRatio);
             }
             SimDXCoil(state, BlankString, CompOp, FirstHVACIteration, Furnace(FurnaceNum).HeatingCoilIndex, FanOpMode, HeatPartLoadRatio, OnOffAirFlowRatio);
@@ -8733,7 +8737,8 @@ namespace Furnaces {
                 SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
             }
             //    Simulate the cooling and heating coils
-            SimWatertoAirHP(BlankString,
+            SimWatertoAirHP(state.dataBranchInputManager,
+                            BlankString,
                             Furnace(FurnaceNum).CoolingCoilIndex,
                             Furnace(FurnaceNum).DesignMassFlowRate,
                             FanOpMode,
@@ -8748,7 +8753,8 @@ namespace Furnaces {
                             CompOp,
                             CoolPartLoadRatio);
             Dummy = 0.0;
-            SimWatertoAirHP(BlankString,
+            SimWatertoAirHP(state.dataBranchInputManager,
+                            BlankString,
                             Furnace(FurnaceNum).HeatingCoilIndex,
                             Furnace(FurnaceNum).DesignMassFlowRate,
                             FanOpMode,
@@ -10228,7 +10234,7 @@ namespace Furnaces {
                 Par(9) = CompOp;
                 Par(10) = 1.0;
                 // Check whether the low speed coil can meet the load or not
-                CalcVarSpeedHeatPump(state, 
+                CalcVarSpeedHeatPump(state,
                     FurnaceNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, LatOutput, QZnReq, QLatReq, OnOffAirFlowRatio, SupHeaterLoad);
                 if ((QZnReq > SmallLoad && QZnReq <= LowOutput) || (QZnReq < (-1.0 * SmallLoad) && QZnReq >= LowOutput)) {
                     // Calculate the part load fraction

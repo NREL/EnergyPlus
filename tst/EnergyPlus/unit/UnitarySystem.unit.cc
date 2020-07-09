@@ -523,7 +523,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     EXPECT_EQ(20.0, WaterCoils::WaterCoil(CoilNum).DesInletAirTemp); // coil inlet does not include fan heat
     // heating coil in UnitarySystem sized at higher air flow rate, i.e., not using SysAirMinFlowRat
     EXPECT_NEAR(3848.0, WaterCoils::WaterCoil(2).DesWaterHeatingCoilRate, 1.0);
-    // note size of heating coil on branch is smaller than heating coil in UnitarySystem minus 10 W 
+    // note size of heating coil on branch is smaller than heating coil in UnitarySystem minus 10 W
     EXPECT_LT(coil2HeatingCoilRate, 3838.0);
     // heating flow rate of coil in UnitarySystem NOT adjusted by FinalSysSizing(1).SysAirMinFlowRat = 0.3
     EXPECT_NEAR(0.159, WaterCoils::WaterCoil(CoilNum).DesAirVolFlowRate, 0.00001);
@@ -7400,7 +7400,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     createFacilityElectricPowerServiceObject();
     DataGlobals::BeginSimFlag = true;
     DataGlobals::DoingSizing = true;
@@ -9042,7 +9042,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     createFacilityElectricPowerServiceObject();
     DataGlobals::BeginSimFlag = true;
     DataGlobals::DoingSizing = true;
@@ -9828,10 +9828,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read zone equipment configuration and list objects
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     SingleDuct::GetSysInput(state);
 
-    BranchInputManager::ManageBranchInput(); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
     DataAirSystems::PrimaryAirSystem.allocate(1);
@@ -10927,7 +10927,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilHeatRecoveryHandlin
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     createFacilityElectricPowerServiceObject();
 
     DataGlobals::BeginSimFlag = true;
@@ -11275,7 +11275,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerInlet)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -11424,7 +11424,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerSupply)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -11550,7 +11550,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
 
     // call the UnitarySystem factory
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -11681,7 +11681,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipmentBlankCtrlZone)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     UnitarySys thisSys;
 
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -13946,13 +13946,13 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -13961,7 +13961,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
@@ -13975,7 +13975,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     ScheduleManager::Schedule(7).MinValue = 4.0; // Enable schedule without calling schedule manager
     ScheduleManager::Schedule(7).MaxValue = 4.0; // Enable schedule without calling schedule manager
     ScheduleManager::Schedule(7).MaxMinSet = true;
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.outputFiles);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.outputFiles);
 
     std::string compName = "SYS 1 FURNACE DX COOL UNITARY SYSTEM";
     bool zoneEquipment = false;

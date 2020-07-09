@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -226,7 +227,7 @@ namespace HVACSingleDuctInduc {
 
         DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(IndUnit(IUNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
-        InitIndUnit(IUNum, FirstHVACIteration);
+        InitIndUnit(state.dataBranchInputManager, IUNum, FirstHVACIteration);
 
         TermUnitIU = true;
 
@@ -250,10 +251,10 @@ namespace HVACSingleDuctInduc {
         // the tasks usually done by the Update and Report routines are not required in a compound terminal unit.
 
         // Update the current unit's outlet nodes. No update needed
-        // CALL UpdateIndUnit(IUNum)
+        // CALL UpdateIndUnit(IUNum);
 
         // Fill the report variables. There are no report variables
-        // CALL ReportIndUnit(IUNum)
+        IndUnit(IUNum).ReportIndUnit();
     }
 
     void GetIndUnits()
@@ -475,6 +476,13 @@ namespace HVACSingleDuctInduc {
                     ErrorsFound = true;
                 }
             }
+            // report variable for all single duct air terminals
+            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                IndUnit(IUNum).OutdoorAirFlowRate,
+                                "System",
+                                "Average",
+                                IndUnit(IUNum).Name);
         }
 
         Alphas.deallocate();
@@ -488,7 +496,8 @@ namespace HVACSingleDuctInduc {
         }
     }
 
-    void InitIndUnit(int const IUNum,              // number of the current induction unit being simulated
+    void InitIndUnit(BranchInputManagerData &dataBranchInputManager,
+                     int const IUNum,              // number of the current induction unit being simulated
                      bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
     {
@@ -555,7 +564,8 @@ namespace HVACSingleDuctInduc {
         if (MyPlantScanFlag(IUNum) && allocated(PlantLoop)) {
             if (IndUnit(IUNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) {
                 errFlag = false;
-                ScanPlantLoopsForObject(IndUnit(IUNum).HCoil,
+                ScanPlantLoopsForObject(dataBranchInputManager,
+                                        IndUnit(IUNum).HCoil,
                                         IndUnit(IUNum).HCoil_PlantTypeNum,
                                         IndUnit(IUNum).HWLoopNum,
                                         IndUnit(IUNum).HWLoopSide,
@@ -574,7 +584,8 @@ namespace HVACSingleDuctInduc {
             if (IndUnit(IUNum).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling ||
                 IndUnit(IUNum).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling) {
                 errFlag = false;
-                ScanPlantLoopsForObject(IndUnit(IUNum).CCoil,
+                ScanPlantLoopsForObject(dataBranchInputManager,
+                                        IndUnit(IUNum).CCoil,
                                         IndUnit(IUNum).CCoil_PlantTypeNum,
                                         IndUnit(IUNum).CWLoopNum,
                                         IndUnit(IUNum).CWLoopSide,
@@ -1587,6 +1598,24 @@ namespace HVACSingleDuctInduc {
         }
 
         return YesNo;
+    }
+
+    void IndUnitData::ReportIndUnit()
+    {
+        // Purpose: this subroutine for reporting
+
+        // set zone OA volume flow rate
+        this->CalcOutdoorAirVolumeFlowRate();
+    }
+
+    void IndUnitData::CalcOutdoorAirVolumeFlowRate()
+    {
+        // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
+        if (this->AirLoopNum > 0) {
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+        } else {
+            this->OutdoorAirFlowRate = 0.0;
+        }
     }
 
 } // namespace HVACSingleDuctInduc

@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -232,7 +233,7 @@ namespace PoweredInductionUnits {
 
         DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
-        InitPIU(PIUNum, FirstHVACIteration);
+        InitPIU(state.dataBranchInputManager, PIUNum, FirstHVACIteration);
 
         TermUnitPIU = true;
 
@@ -736,10 +737,13 @@ namespace PoweredInductionUnits {
                 "Zone Air Terminal Sensible Cooling Rate", OutputProcessor::Unit::W, PIU(PIUNum).SensCoolRate, "System", "Average", PIU(PIUNum).Name);
             SetupOutputVariable(
                 "Zone Air Terminal Sensible Cooling Energy", OutputProcessor::Unit::J, PIU(PIUNum).SensCoolEnergy, "System", "Sum", PIU(PIUNum).Name);
+            SetupOutputVariable(
+                "Zone Air Terminal Outdoor Air Volume Flow Rate", OutputProcessor::Unit::m3_s, PIU(PIUNum).OutdoorAirFlowRate, "System", "Average", PIU(PIUNum).Name);
         }
     }
 
-    void InitPIU(int const PIUNum,             // number of the current fan coil unit being simulated
+    void InitPIU(BranchInputManagerData &dataBranchInputManager,
+                 int const PIUNum,             // number of the current fan coil unit being simulated
                  bool const FirstHVACIteration // TRUE if first zone equip this HVAC step
     )
     {
@@ -803,7 +807,8 @@ namespace PoweredInductionUnits {
         if (MyPlantScanFlag(PIUNum) && allocated(PlantLoop)) {
             if ((PIU(PIUNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) || (PIU(PIUNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(PIU(PIUNum).HCoil,
+                ScanPlantLoopsForObject(dataBranchInputManager,
+                                        PIU(PIUNum).HCoil,
                                         PIU(PIUNum).HCoil_PlantTypeNum,
                                         PIU(PIUNum).HWLoopNum,
                                         PIU(PIUNum).HWLoopSide,
@@ -2081,6 +2086,9 @@ namespace PoweredInductionUnits {
 
         PIU(PIUNum).HeatingEnergy = PIU(PIUNum).HeatingRate * TimeStepSys * SecInHour;
         PIU(PIUNum).SensCoolEnergy = PIU(PIUNum).SensCoolRate * TimeStepSys * SecInHour;
+
+        // set zone OA Volume flow rate
+        PIU(PIUNum).CalcOutdoorAirVolumeFlowRate();
     }
 
     // ===================== Utilities =====================================
@@ -2144,6 +2152,16 @@ namespace PoweredInductionUnits {
                 PIU(PIUIndex).InducesPlenumAir = true;
                 break;
             }
+        }
+    }
+
+    void PowIndUnitData::CalcOutdoorAirVolumeFlowRate()
+    {
+        // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
+        if (this->AirLoopNum > 0) {
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+        } else {
+            this->OutdoorAirFlowRate = 0.0;
         }
     }
 
