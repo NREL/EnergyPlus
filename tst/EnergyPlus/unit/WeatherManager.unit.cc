@@ -1042,7 +1042,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
 // Test for Issue 7957: add new sky cover weather output values;
 // and test for Issue 8030: interpolate some weather input first before output values.
-TEST_F(EnergyPlusFixture, InterpolateWeatherInputOutputTest)
+TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
 {
     std::string const idf_objects = delimited_string({
         "Timestep,4;"
