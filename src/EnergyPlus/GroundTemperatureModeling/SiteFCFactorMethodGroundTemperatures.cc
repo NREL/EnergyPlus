@@ -153,7 +153,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(WeatherManagerData &dataWeathe
 
 //******************************************************************************
 
-Real64 SiteFCFactorMethodGroundTemps::getGroundTemp(WeatherManagerData &dataWeatherManager)
+Real64 SiteFCFactorMethodGroundTemps::getGroundTemp(WeatherManagerData &EP_UNUSED(dataWeatherManager))
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell

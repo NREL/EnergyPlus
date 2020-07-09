@@ -141,7 +141,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(OutputFiles &outputFil
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp(WeatherManagerData &dataWeatherManager)
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp(WeatherManagerData &EP_UNUSED(dataWeatherManager))
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell

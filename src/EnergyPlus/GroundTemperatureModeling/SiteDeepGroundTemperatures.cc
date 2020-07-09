@@ -134,7 +134,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(OutputF
 
 //******************************************************************************
 
-Real64 SiteDeepGroundTemps::getGroundTemp(WeatherManagerData &dataWeatherManager)
+Real64 SiteDeepGroundTemps::getGroundTemp(WeatherManagerData &EP_UNUSED(dataWeatherManager))
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell

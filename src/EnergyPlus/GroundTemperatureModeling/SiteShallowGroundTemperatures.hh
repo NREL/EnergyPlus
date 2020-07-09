@@ -79,7 +79,7 @@ public:
 
     static std::shared_ptr<SiteShallowGroundTemps> ShallowGTMFactory(OutputFiles &outputFiles, int objectType, std::string objectName);
 
-    Real64 getGroundTemp(WeatherManagerData &dataWeatherManager) override;
+    Real64 getGroundTemp(WeatherManagerData &EP_UNUSED(dataWeatherManager)) override;
 
     Real64 getGroundTempAtTimeInSeconds(WeatherManagerData &dataWeatherManager, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 

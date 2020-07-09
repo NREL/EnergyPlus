@@ -133,7 +133,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
 
 //******************************************************************************
 
-Real64 SiteShallowGroundTemps::getGroundTemp(WeatherManagerData &dataWeatherManager)
+Real64 SiteShallowGroundTemps::getGroundTemp(WeatherManagerData &EP_UNUSED(dataWeatherManager))
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
