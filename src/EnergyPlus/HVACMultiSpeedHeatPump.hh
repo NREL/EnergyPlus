@@ -246,6 +246,12 @@ namespace HVACMultiSpeedHeatPump {
         Array1D<Real64> FullOutput;    // Full output for different speed
         Real64 MinOATCompressorCooling; // min OAT from multispeed cooling coil object
         Real64 MinOATCompressorHeating; // min OAT from multispeed heating coil object
+        bool MyEnvrnFlag;
+        bool MySizeFlag;
+        bool MyCheckFlag;
+        bool MyFlowFracFlag;
+        bool MyPlantScantFlag;
+        bool MyStagedFlag;
 
         // Default Constructor
         MSHeatPumpData()
@@ -266,7 +272,9 @@ namespace HVACMultiSpeedHeatPump {
               LoopSide(0), BranchNum(0), CompNum(0), SuppLoopNum(0), SuppLoopSide(0), SuppBranchNum(0), SuppCompNum(0), HotWaterLoopNum(0),
               HotWaterLoopSide(0), HotWaterBranchNum(0), HotWaterCompNum(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), StageNum(0),
               Staged(false), CoolCountAvail(0), CoolIndexAvail(0), HeatCountAvail(0), HeatIndexAvail(0), FirstPass(true),
-              MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0)
+              MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0), MyEnvrnFlag(true), MySizeFlag(true), MyCheckFlag(true), MyFlowFracFlag(true),
+              MyPlantScantFlag(true), MyStagedFlag(true)
+
         {
         }
     };
