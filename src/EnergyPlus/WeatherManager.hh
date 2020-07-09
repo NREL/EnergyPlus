@@ -205,9 +205,8 @@ namespace WeatherManager {
     extern Array2D<Real64> TodayDifSolarRad;     // Sky diffuse horizontal solar irradiance
     extern Array2D<Real64> TodayAlbedo;          // Albedo
     extern Array2D<Real64> TodayLiquidPrecip;    // Liquid Precipitation Depth (mm)
-
-    extern Array2D<Real64> TodayTotalSkyCover;  // Total Sky Cover
-    extern Array2D<Real64> TodayOpaqueSkyCover; // Opaque Sky Cover
+    extern Array2D<Real64> TodayTotalSkyCover;   // Total Sky Cover
+    extern Array2D<Real64> TodayOpaqueSkyCover;  // Opaque Sky Cover
 
     extern Array2D_bool TomorrowIsRain;             // Rain indicator, true=rain
     extern Array2D_bool TomorrowIsSnow;             // Snow indicator, true=snow
@@ -225,9 +224,8 @@ namespace WeatherManager {
     extern Array2D<Real64> TomorrowDifSolarRad;     // Sky diffuse horizontal solar irradiance
     extern Array2D<Real64> TomorrowAlbedo;          // Albedo
     extern Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth
-
-    extern Array2D<Real64> TomorrowTotalSkyCover;  // Total Sky Cover
-    extern Array2D<Real64> TomorrowOpaqueSkyCover; // Opaque Sky Cover
+    extern Array2D<Real64> TomorrowTotalSkyCover;   // Total Sky Cover
+    extern Array2D<Real64> TomorrowOpaqueSkyCover;  // Opaque Sky Cover
 
     extern Array3D<Real64> DDDBRngModifier;  // Design Day Dry-bulb Temperature Range Modifier
     extern Array3D<Real64> DDHumIndModifier; // Design Day relative humidity values

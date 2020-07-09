@@ -282,9 +282,8 @@ namespace WeatherManager {
     Array2D<Real64> TodayDifSolarRad;     // Sky diffuse horizontal solar irradiance
     Array2D<Real64> TodayAlbedo;          // Albedo
     Array2D<Real64> TodayLiquidPrecip;    // Liquid Precipitation Depth (mm)
-
-    Array2D<Real64> TodayTotalSkyCover; // Total Sky Cover
-    Array2D<Real64> TodayOpaqueSkyCover; // Opaque Sky Cover
+    Array2D<Real64> TodayTotalSkyCover;   // Total Sky Cover
+    Array2D<Real64> TodayOpaqueSkyCover;  // Opaque Sky Cover
 
     Array2D_bool TomorrowIsRain;             // Rain indicator, true=rain
     Array2D_bool TomorrowIsSnow;             // Snow indicator, true=snow
@@ -302,9 +301,8 @@ namespace WeatherManager {
     Array2D<Real64> TomorrowDifSolarRad;     // Sky diffuse horizontal solar irradiance
     Array2D<Real64> TomorrowAlbedo;          // Albedo
     Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth
-
-    Array2D<Real64> TomorrowTotalSkyCover;  // Total Sky Cover
-    Array2D<Real64> TomorrowOpaqueSkyCover; // Opaque Sky Cover
+    Array2D<Real64> TomorrowTotalSkyCover;   // Total Sky Cover
+    Array2D<Real64> TomorrowOpaqueSkyCover;  // Opaque Sky Cover
 
     Array3D<Real64> DDDBRngModifier;  // Design Day Dry-bulb Temperature Range Modifier
     Array3D<Real64> DDHumIndModifier; // Design Day relative humidity values
@@ -470,10 +468,8 @@ namespace WeatherManager {
         TodayDifSolarRad.deallocate();        // Sky diffuse horizontal solar irradiance
         TodayAlbedo.deallocate();             // Albedo
         TodayLiquidPrecip.deallocate();       // Liquid Precipitation Depth (mm)
-
         TodayTotalSkyCover.deallocate();       // Total Sky Cover
         TodayOpaqueSkyCover.deallocate();      // Opaque Sky Cover
-
         TomorrowIsRain.deallocate();          // Rain indicator, true=rain
         TomorrowIsSnow.deallocate();          // Snow indicator, true=snow
         TomorrowRainAmount.deallocate();      // ficitious indicator of Rain
@@ -490,10 +486,8 @@ namespace WeatherManager {
         TomorrowDifSolarRad.deallocate();     // Sky diffuse horizontal solar irradiance
         TomorrowAlbedo.deallocate();          // Albedo
         TomorrowLiquidPrecip.deallocate();    // Liquid Precipitation Depth
-
         TomorrowTotalSkyCover.deallocate();      // Total Sky Cover
         TomorrowOpaqueSkyCover.deallocate();     // Opaque Sky Cover
-
         DDDBRngModifier.deallocate();         // Design Day Dry-bulb Temperature Range Modifier
         DDHumIndModifier.deallocate();        // Design Day relative humidity values
         DDBeamSolarValues.deallocate();       // Design Day Beam Solar Values
@@ -932,11 +926,8 @@ namespace WeatherManager {
             SetupOutputVariable("Site Daylighting Model Sky Clearness", OutputProcessor::Unit::None, SkyClearness, "Zone", "Average", "Environment");
             SetupOutputVariable(
                 "Site Daylighting Model Sky Brightness", OutputProcessor::Unit::None, SkyBrightness, "Zone", "Average", "Environment");
-            
             SetupOutputVariable("Site Total Sky Cover", OutputProcessor::Unit::None, TotalCloudCover, "Zone", "Average", "Environment");
-            SetupOutputVariable(
-                "Site Opaque Sky Cover", OutputProcessor::Unit::None, OpaqueCloudCover, "Zone", "Average", "Environment");
-            
+            SetupOutputVariable("Site Opaque Sky Cover", OutputProcessor::Unit::None, OpaqueCloudCover, "Zone", "Average", "Environment");            
             SetupOutputVariable("Site Daylight Saving Time Status", OutputProcessor::Unit::None, DSTIndicator, "Zone", "State", "Environment");
             SetupOutputVariable("Site Day Type Index", OutputProcessor::Unit::None, RptDayType, "Zone", "State", "Environment");
             SetupOutputVariable("Site Mains Water Temperature", OutputProcessor::Unit::C, WaterMainsTemp, "Zone", "Average", "Environment");
@@ -2468,7 +2459,6 @@ namespace WeatherManager {
         TodayBeamSolarRad = TomorrowBeamSolarRad;
         TodayDifSolarRad = TomorrowDifSolarRad;
         TodayLiquidPrecip = TomorrowLiquidPrecip;
-
         TodayTotalSkyCover = TomorrowTotalSkyCover;
         TodayOpaqueSkyCover = TomorrowOpaqueSkyCover;
 
@@ -2655,7 +2645,6 @@ namespace WeatherManager {
         BeamSolarRad = TodayBeamSolarRad(TimeStep, HourOfDay);
         if (EMSBeamSolarRadOverrideOn) BeamSolarRad = EMSBeamSolarRadOverrideValue;
         LiquidPrecipitation = TodayLiquidPrecip(TimeStep, HourOfDay) / 1000.0; // convert from mm to m
-
         TotalCloudCover = TodayTotalSkyCover(TimeStep, HourOfDay);
         OpaqueCloudCover = TodayOpaqueSkyCover(TimeStep, HourOfDay);
 
@@ -2859,10 +2848,8 @@ namespace WeatherManager {
         static Real64 LastHrDifSolarRad;
         static Real64 LastHrAlbedo;
         static Real64 LastHrLiquidPrecip;
-
         static Real64 LastHrTotalSkyCover;
         static Real64 LastHrOpaqueSkyCover;
-
         static Real64 NextHrBeamSolarRad;
         static Real64 NextHrDifSolarRad;
         static Real64 NextHrLiquidPrecip;
@@ -2885,9 +2872,8 @@ namespace WeatherManager {
             Array1D<Real64> DifSolarRad;     // Hourly sky diffuse horizontal solar irradiance
             Array1D<Real64> Albedo;          // Albedo
             Array1D<Real64> LiquidPrecip;    // Liquid Precipitation
-
-            Array1D<Real64> TotalSkyCover; // Total Sky Cover
-            Array1D<Real64> OpaqueSkyCover; // Opaque Sky Cover            
+            Array1D<Real64> TotalSkyCover;   // Total Sky Cover
+            Array1D<Real64> OpaqueSkyCover;  // Opaque Sky Cover            
 
             // Default Constructor
             HourlyWeatherData()
@@ -3202,10 +3188,8 @@ namespace WeatherManager {
             TomorrowDifSolarRad = 0.0;
             TomorrowAlbedo = 0.0;
             TomorrowLiquidPrecip = 0.0;
-
             TomorrowTotalSkyCover = 0.0;
-            TomorrowOpaqueSkyCover = 0.0; 
-
+            TomorrowOpaqueSkyCover = 0.0;
             TomorrowIsRain = false;
             TomorrowIsSnow = false;
 
@@ -3526,7 +3510,6 @@ namespace WeatherManager {
                     TomorrowWindSpeed(CurTimeStep, Hour) = WindSpeed;
                     TomorrowWindDir(CurTimeStep, Hour) = WindDir;
                     TomorrowLiquidPrecip(CurTimeStep, Hour) = LiquidPrecip;
-
                     TomorrowTotalSkyCover(CurTimeStep, Hour) = TotalSkyCover;
                     TomorrowOpaqueSkyCover(CurTimeStep, Hour) = OpaqueSkyCover;
 
@@ -3645,7 +3628,6 @@ namespace WeatherManager {
                 Wthr.IsSnow(Hour) = TomorrowIsSnow(1, Hour);
                 Wthr.Albedo(Hour) = TomorrowAlbedo(1, Hour);
                 Wthr.LiquidPrecip(Hour) = TomorrowLiquidPrecip(1, Hour);
-
                 Wthr.TotalSkyCover(Hour) = TomorrowTotalSkyCover(1, Hour);
                 Wthr.OpaqueSkyCover(Hour) = TomorrowOpaqueSkyCover(1, Hour);
             }
@@ -3665,7 +3647,6 @@ namespace WeatherManager {
                 LastHrDifSolarRad = Wthr.DifSolarRad(24);
                 LastHrAlbedo = Wthr.Albedo(24);
                 LastHrLiquidPrecip = Wthr.LiquidPrecip(24);
-
                 LastHrTotalSkyCover = Wthr.TotalSkyCover(24);
                 LastHrOpaqueSkyCover = Wthr.OpaqueSkyCover(24);
 
@@ -3726,7 +3707,6 @@ namespace WeatherManager {
 
                     TomorrowLiquidPrecip(TS, Hour) = LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip(Hour) * WtNow;
                     TomorrowLiquidPrecip(TS, Hour) /= double(NumOfTimeStepInHour);
-
                     TomorrowTotalSkyCover(TS, Hour) = LastHrTotalSkyCover * WtPrevHour + Wthr.TotalSkyCover(Hour) * WtNow;
                     TomorrowOpaqueSkyCover(TS, Hour) = LastHrOpaqueSkyCover * WtPrevHour + Wthr.OpaqueSkyCover(Hour) * WtNow;
                     // Trial 2: Might be better to try this for the interpolated sky e input
@@ -3779,7 +3759,6 @@ namespace WeatherManager {
                 LastHrDifSolarRad = Wthr.DifSolarRad(Hour);
                 LastHrAlbedo = Wthr.Albedo(Hour);
                 LastHrLiquidPrecip = Wthr.LiquidPrecip(Hour);
-
                 LastHrTotalSkyCover = Wthr.TotalSkyCover(Hour);
                 LastHrOpaqueSkyCover = Wthr.OpaqueSkyCover(Hour);
             } // End of Hour Loop
@@ -5022,7 +5001,6 @@ namespace WeatherManager {
         TodayAlbedo = 0.0;
         TodayLiquidPrecip.allocate(NumOfTimeStepInHour, 24);
         TodayLiquidPrecip = 0.0;
-
         TodayTotalSkyCover.allocate(NumOfTimeStepInHour, 24);
         TodayTotalSkyCover = 0.0;
         TodayOpaqueSkyCover.allocate(NumOfTimeStepInHour, 24);
@@ -5056,7 +5034,6 @@ namespace WeatherManager {
         TomorrowAlbedo = 0.0;
         TomorrowLiquidPrecip.allocate(NumOfTimeStepInHour, 24);
         TomorrowLiquidPrecip = 0.0;
-
         TomorrowTotalSkyCover.allocate(NumOfTimeStepInHour, 24);
         TomorrowTotalSkyCover = 0.0;
         TomorrowOpaqueSkyCover.allocate(NumOfTimeStepInHour, 24);
