@@ -5884,10 +5884,6 @@ namespace HeatBalanceManager {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger record keeping events.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataSystemVariables::ReportDuringWarmup; // added for FMI
         using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
         using EconomicTariff::UpdateUtilityBills; // added for computing annual utility costs
@@ -5904,7 +5900,7 @@ namespace HeatBalanceManager {
             CalcMoreNodeInfo();
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
-                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state.dataWeatherManager);
             }
 
             UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
@@ -5947,13 +5943,13 @@ namespace HeatBalanceManager {
             CalcMoreNodeInfo();
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
-                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state.dataWeatherManager);
             }
 
         } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
-                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state.dataWeatherManager);
             }
         }
         // There is no hourly reporting in the heat balance.

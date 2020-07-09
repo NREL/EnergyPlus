@@ -60,6 +60,7 @@
 namespace EnergyPlus {
     struct ZoneTempPredictorCorrectorData;
     class OutputFiles;
+    struct WeatherManagerData;
     
 namespace HeatBalanceKivaManager {
 
@@ -106,7 +107,7 @@ namespace HeatBalanceKivaManager {
         int zoneControlType; // Uncontrolled=0, Temperature=1, Operative=2, Comfort=3, HumidityAndTemperature=4
         int zoneControlNum;
         Real64 zoneAssumedTemperature;
-        void initGround(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather);
+        void initGround(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager, const KivaWeatherData &kivaWeather);
         void setInitialBoundaryConditions(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
         void setBoundaryConditions();
         void plotDomain();
@@ -127,9 +128,9 @@ namespace HeatBalanceKivaManager {
     public:
         KivaManager();
         virtual ~KivaManager();
-        void readWeatherData();
-        bool setupKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles);
-        void initKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+        void readWeatherData(WeatherManagerData &dataWeatherManager);
+        bool setupKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager, OutputFiles &outputFiles);
+        void initKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager);
         void calcKivaInstances();
         void defineDefaultFoundation();
         void addDefaultFoundation();

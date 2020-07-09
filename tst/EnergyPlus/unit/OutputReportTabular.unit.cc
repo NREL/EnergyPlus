@@ -62,6 +62,7 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -75,7 +76,6 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -6493,9 +6493,10 @@ TEST(OutputReportTabularTest, CollectPeakZoneConditions_test)
     Zone(1).ListMultiplier = 1;
     Zone(1).FloorArea = 12.;
 
-    WeatherManager::DesDayInput.allocate(1);
-    WeatherManager::DesDayInput(1).Month = 5;
-    WeatherManager::DesDayInput(1).DayOfMonth = 21;
+//BLB 
+   // state.dataWeatherManager.DesDayInput.allocate(1);
+   // state.dataWeatherManager.DesDayInput(1).Month = 5;
+   // state.dataWeatherManager.DesDayInput(1).DayOfMonth = 21;
 
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
@@ -6518,8 +6519,8 @@ TEST(OutputReportTabularTest, CollectPeakZoneConditions_test)
 
     FinalZoneSizing.allocate(1);
     FinalZoneSizing(1).DesCoolLoad = 600.;
-
-    CollectPeakZoneConditions(compLoad, 1, timeOfMax, zoneIndex, isCooling);
+ //BLB
+ //   CollectPeakZoneConditions(state.dataWeatherManager, compLoad, 1, timeOfMax, zoneIndex, isCooling);
 
     EXPECT_EQ(compLoad.peakDateHrMin, "5/21 15:45:00");
     EXPECT_EQ(compLoad.outsideDryBulb, 38.);
@@ -6939,7 +6940,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
 
-    WriteLoadComponentSummaryTables();
+    WriteLoadComponentSummaryTables(state.dataWeatherManager);
 
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
@@ -6977,11 +6978,11 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int numDesDays = 2;
     DataEnvironment::TotDesDays = numDesDays;
     DataEnvironment::TotRunDesPersDays = 0;
-    WeatherManager::DesDayInput.allocate(2);
-    WeatherManager::DesDayInput(1).Month = 7;
-    WeatherManager::DesDayInput(1).DayOfMonth = 21;
-    WeatherManager::DesDayInput(2).Month = 1;
-    WeatherManager::DesDayInput(2).DayOfMonth = 21;
+    state.dataWeatherManager.DesDayInput.allocate(2);
+    state.dataWeatherManager.DesDayInput(1).Month = 7;
+    state.dataWeatherManager.DesDayInput(1).DayOfMonth = 21;
+    state.dataWeatherManager.DesDayInput(2).Month = 1;
+    state.dataWeatherManager.DesDayInput(2).DayOfMonth = 21;
 
 
     DataGlobals::NumOfTimeStepInHour = 4;
@@ -7091,7 +7092,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     AllocateLoadComponentArrays();
-    WriteLoadComponentSummaryTables();
+    WriteLoadComponentSummaryTables(state.dataWeatherManager);
 
     // TableName, ReportName, value
     std::vector<std::tuple<std::string, std::string, std::string>> results_strings({

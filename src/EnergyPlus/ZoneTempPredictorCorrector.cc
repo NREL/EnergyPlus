@@ -208,7 +208,7 @@ namespace ZoneTempPredictorCorrector {
         // temperature setpoint for each zone from the schedule manager.
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.outputFiles);
+            GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.dataWeatherManager, state.outputFiles);
             GetZoneAirStatsInputFlag = false;
         }
 
@@ -218,7 +218,7 @@ namespace ZoneTempPredictorCorrector {
             auto const SELECT_CASE_var(UpdateType);
 
             if (SELECT_CASE_var == iGetZoneSetPoints) {
-                CalcZoneAirTempSetPoints(state.dataZoneTempPredictorCorrector);
+                CalcZoneAirTempSetPoints(state.dataZoneTempPredictorCorrector, state.dataWeatherManager);
 
             } else if (SELECT_CASE_var == iPredictStep) {
                 PredictSystemLoads(state, state.dataZoneTempPredictorCorrector, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
@@ -238,7 +238,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void GetZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles)
+    void GetZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -264,7 +264,6 @@ namespace ZoneTempPredictorCorrector {
         using ScheduleManager::GetScheduleIndex;
         using ScheduleManager::GetScheduleMaxValue;
         using ScheduleManager::GetScheduleMinValue;
-        using WeatherManager::NumDaysInYear;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetZoneAirSetpoints: ");
@@ -1831,10 +1830,10 @@ namespace ZoneTempPredictorCorrector {
                                     TempControlledZone(TempControlledZoneNum).AdaptiveComfortModelTypeIndex =
                                         UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
                                     if (!dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.initialized) {
-                                        Array1D<Real64> runningAverageASH(NumDaysInYear, 0.0);
-                                        Array1D<Real64> runningAverageCEN(NumDaysInYear, 0.0);
-                                        CalculateMonthlyRunningAverageDryBulb(runningAverageASH, runningAverageCEN);
-                                        CalculateAdaptiveComfortSetPointSchl(dataZoneTempPredictorCorrector, runningAverageASH, runningAverageCEN);
+                                        Array1D<Real64> runningAverageASH(dataWeatherManager.NumDaysInYear, 0.0);
+                                        Array1D<Real64> runningAverageCEN(dataWeatherManager.NumDaysInYear, 0.0);
+                                        CalculateMonthlyRunningAverageDryBulb(dataWeatherManager, runningAverageASH, runningAverageCEN);
+                                        CalculateAdaptiveComfortSetPointSchl(dataZoneTempPredictorCorrector, dataWeatherManager, runningAverageASH, runningAverageCEN);
                                     }
                                 }
                             }
@@ -1923,10 +1922,10 @@ namespace ZoneTempPredictorCorrector {
                                     TempControlledZone(TempControlledZoneNum).AdaptiveComfortModelTypeIndex =
                                         UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
                                     if (!dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.initialized) {
-                                        Array1D<Real64> runningAverageASH(NumDaysInYear, 0.0);
-                                        Array1D<Real64> runningAverageCEN(NumDaysInYear, 0.0);
-                                        CalculateMonthlyRunningAverageDryBulb(runningAverageASH, runningAverageCEN);
-                                        CalculateAdaptiveComfortSetPointSchl(dataZoneTempPredictorCorrector, runningAverageASH, runningAverageCEN);
+                                        Array1D<Real64> runningAverageASH(dataWeatherManager.NumDaysInYear, 0.0);
+                                        Array1D<Real64> runningAverageCEN(dataWeatherManager.NumDaysInYear, 0.0);
+                                        CalculateMonthlyRunningAverageDryBulb(dataWeatherManager, runningAverageASH, runningAverageCEN);
+                                        CalculateAdaptiveComfortSetPointSchl(dataZoneTempPredictorCorrector, dataWeatherManager, runningAverageASH, runningAverageCEN);
                                     }
                                 }
                             }
@@ -2349,7 +2348,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalculateMonthlyRunningAverageDryBulb(Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN)
+    void CalculateMonthlyRunningAverageDryBulb(WeatherManagerData &dataWeatherManager, Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xuan Luo
@@ -2364,7 +2363,6 @@ namespace ZoneTempPredictorCorrector {
         using DataStringGlobals::inStatFileName;
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
-        using WeatherManager::NumDaysInYear;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
@@ -2389,8 +2387,8 @@ namespace ZoneTempPredictorCorrector {
         std::string::size_type pos;
         int ind, i, j;
 
-        Array1D<Real64> adaptiveTemp(NumDaysInYear, 0.0);
-        Array1D<Real64> dailyDryTemp(NumDaysInYear, 0.0);
+        Array1D<Real64> adaptiveTemp(dataWeatherManager.NumDaysInYear, 0.0);
+        Array1D<Real64> dailyDryTemp(dataWeatherManager.NumDaysInYear, 0.0);
 
         readStat = 0;
         {
@@ -2418,7 +2416,7 @@ namespace ZoneTempPredictorCorrector {
                     readStat = flags.ios();
                 }
             }
-            for (i = 1; i <= NumDaysInYear; ++i) {
+            for (i = 1; i <= dataWeatherManager.NumDaysInYear; ++i) {
                 avgDryBulb = 0.0;
                 for (j = 1; j <= 24; ++j) {
                     {
@@ -2440,7 +2438,7 @@ namespace ZoneTempPredictorCorrector {
 
             // Calculate monthly running average dry bulb temperature.
             int dayOfYear = 0;
-            while (dayOfYear < NumDaysInYear) {
+            while (dayOfYear < dataWeatherManager.NumDaysInYear) {
                 dayOfYear++;
                 calcEndDay = dayOfYear - 1;
                 calcStartDayASH = calcEndDay - 30;
@@ -2453,12 +2451,12 @@ namespace ZoneTempPredictorCorrector {
                     }
                     runningAverageASH(dayOfYear) /= 30;
                 } else { // Do special things for wrapping the epw
-                    calcStartDayASH += NumDaysInYear;
+                    calcStartDayASH += dataWeatherManager.NumDaysInYear;
                     for (i = 1; i <= calcEndDay; i++) {
                         avgDryBulb = dailyDryTemp(i);
                         runningAverageASH(dayOfYear) = runningAverageASH(dayOfYear) + avgDryBulb;
                     }
-                    for (i = calcStartDayASH; i < NumDaysInYear; i++) {
+                    for (i = calcStartDayASH; i < dataWeatherManager.NumDaysInYear; i++) {
                         avgDryBulb = dailyDryTemp(i);
                         runningAverageASH(dayOfYear) = runningAverageASH(dayOfYear) + avgDryBulb;
                     }
@@ -2472,12 +2470,12 @@ namespace ZoneTempPredictorCorrector {
                     }
                     runningAverageCEN(dayOfYear) /= 7;
                 } else { // Do special things for wrapping the epw
-                    calcStartDayCEN += NumDaysInYear;
+                    calcStartDayCEN += dataWeatherManager.NumDaysInYear;
                     for (i = 1; i <= calcEndDay; i++) {
                         avgDryBulb = dailyDryTemp(i);
                         runningAverageCEN(dayOfYear) = runningAverageCEN(dayOfYear) + avgDryBulb;
                     }
-                    for (i = calcStartDayCEN; i < NumDaysInYear; i++) {
+                    for (i = calcStartDayCEN; i < dataWeatherManager.NumDaysInYear; i++) {
                         avgDryBulb = dailyDryTemp(i);
                         runningAverageCEN(dayOfYear) = runningAverageCEN(dayOfYear) + avgDryBulb;
                     }
@@ -2489,7 +2487,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalculateAdaptiveComfortSetPointSchl(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN)
+    void CalculateAdaptiveComfortSetPointSchl(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xuan Luo
@@ -2500,17 +2498,15 @@ namespace ZoneTempPredictorCorrector {
         // This subroutine calculate the zone operative temperature setpoint using adaptive comfort model.
 
         // Using/Aliasing
-        using WeatherManager::DesDayInput;
-        using WeatherManager::NumDaysInYear;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int const summerDesignDayTypeIndex(9);
         Real64 GrossApproxAvgDryBulbDesignDay(0.0);
 
-        for (size_t i = 1; i <= DesDayInput.size(); i++) {
+        for (size_t i = 1; i <= dataWeatherManager.DesDayInput.size(); i++) {
             // Summer design day
-            if (DesDayInput(i).DayType == summerDesignDayTypeIndex) {
-                GrossApproxAvgDryBulbDesignDay = (DesDayInput(i).MaxDryBulb + (DesDayInput(i).MaxDryBulb - DesDayInput(i).DailyDBRange)) / 2.0;
+            if (dataWeatherManager.DesDayInput(i).DayType == summerDesignDayTypeIndex) {
+                GrossApproxAvgDryBulbDesignDay = (dataWeatherManager.DesDayInput(i).MaxDryBulb + (dataWeatherManager.DesDayInput(i).MaxDryBulb - dataWeatherManager.DesDayInput(i).DailyDBRange)) / 2.0;
                 if (GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 33.5) {
                     dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(1) = 0.31 * GrossApproxAvgDryBulbDesignDay + 17.8;
                     dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(2) = 0.31 * GrossApproxAvgDryBulbDesignDay + 20.3;
@@ -2528,16 +2524,16 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central.allocate(NumDaysInYear);
-        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90.allocate(NumDaysInYear);
-        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80.allocate(NumDaysInYear);
-        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central.allocate(NumDaysInYear);
-        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I.allocate(NumDaysInYear);
-        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.allocate(NumDaysInYear);
-        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.allocate(NumDaysInYear);
+        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central.allocate(dataWeatherManager.NumDaysInYear);
+        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90.allocate(dataWeatherManager.NumDaysInYear);
+        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80.allocate(dataWeatherManager.NumDaysInYear);
+        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central.allocate(dataWeatherManager.NumDaysInYear);
+        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I.allocate(dataWeatherManager.NumDaysInYear);
+        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.allocate(dataWeatherManager.NumDaysInYear);
+        dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.allocate(dataWeatherManager.NumDaysInYear);
 
         // Calculate the set points based on different models, set flag as -1 when running average temperature is not in the range.
-        for (int day = 1; day <= NumDaysInYear; day++) {
+        for (int day = 1; day <= dataWeatherManager.NumDaysInYear; day++) {
             if (runningAverageASH(day) > 10 && runningAverageASH(day) < 33.5) {
                 dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(day) = 0.31 * runningAverageASH(day) + 17.8;
                 dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(day) = 0.31 * runningAverageASH(day) + 20.3;
@@ -3713,7 +3709,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalcZoneAirTempSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
+    void CalcZoneAirTempSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3802,7 +3798,7 @@ namespace ZoneTempPredictorCorrector {
                     // Added Jan 17 (X. Luo)
                     // Adjust operative temperature based on adaptive comfort model
                     if ((TempControlledZone(RelativeZoneNum).AdaptiveComfortTempControl)) {
-                        AdjustOperativeSetPointsforAdapComfort(dataZoneTempPredictorCorrector, RelativeZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
+                        AdjustOperativeSetPointsforAdapComfort(dataZoneTempPredictorCorrector, dataWeatherManager, RelativeZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
                         AdapComfortCoolingSetPoint(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
                     }
 
@@ -3824,7 +3820,7 @@ namespace ZoneTempPredictorCorrector {
                     // Added Jan 17 (X. Luo)
                     // Adjust operative temperature based on adaptive comfort model
                     if ((TempControlledZone(RelativeZoneNum).AdaptiveComfortTempControl)) {
-                        AdjustOperativeSetPointsforAdapComfort(dataZoneTempPredictorCorrector, RelativeZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
+                        AdjustOperativeSetPointsforAdapComfort(dataZoneTempPredictorCorrector, dataWeatherManager, RelativeZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
                         AdapComfortCoolingSetPoint(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
                     }
 
@@ -3866,7 +3862,7 @@ namespace ZoneTempPredictorCorrector {
                     // Added Jan 17 (X. Luo)
                     // Adjust operative temperature based on adaptive comfort model
                     if ((TempControlledZone(RelativeZoneNum).AdaptiveComfortTempControl)) {
-                        AdjustOperativeSetPointsforAdapComfort(dataZoneTempPredictorCorrector, RelativeZoneNum, ZoneThermostatSetPointHi(ActualZoneNum));
+                        AdjustOperativeSetPointsforAdapComfort(dataZoneTempPredictorCorrector, dataWeatherManager, RelativeZoneNum, ZoneThermostatSetPointHi(ActualZoneNum));
                         AdapComfortCoolingSetPoint(ActualZoneNum) = ZoneThermostatSetPointHi(ActualZoneNum);
                     }
 
@@ -6726,7 +6722,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, std::string const &ZoneName) // Zone to verify
+    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager, std::string const &ZoneName) // Zone to verify
     {
 
         // FUNCTION INFORMATION:
@@ -6743,7 +6739,7 @@ namespace ZoneTempPredictorCorrector {
         bool HasThermostat; // True if does, false if not.
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints(dataZoneTempPredictorCorrector, OutputFiles::getSingleton());
+            GetZoneAirSetPoints(dataZoneTempPredictorCorrector, dataWeatherManager, OutputFiles::getSingleton());
             GetZoneAirStatsInputFlag = false;
         }
         if (NumTempControlledZones > 0) {
@@ -6963,7 +6959,7 @@ namespace ZoneTempPredictorCorrector {
         ZoneAirSetPoint = (ZoneAirSetPoint - thisMRTFraction * thisMRT) / (1.0 - thisMRTFraction);
     }
 
-    void AdjustOperativeSetPointsforAdapComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const TempControlledZoneID, Real64 &ZoneAirSetPoint)
+    void AdjustOperativeSetPointsforAdapComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager, int const TempControlledZoneID, Real64 &ZoneAirSetPoint)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xuan Luo
@@ -6976,9 +6972,6 @@ namespace ZoneTempPredictorCorrector {
 
         // Using/Aliasing
         using DataEnvironment::DayOfYear;
-        using WeatherManager::DesDayInput;
-        using WeatherManager::Environment;
-        using WeatherManager::Envrn;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int originZoneAirSetPoint = ZoneAirSetPoint;
@@ -6987,7 +6980,7 @@ namespace ZoneTempPredictorCorrector {
         // FLOW:
         // adjust zone operative setpoint
         if (!(TempControlledZone(TempControlledZoneID).AdaptiveComfortTempControl)) return; // do nothing to setpoint
-        if ((Environment(Envrn).KindOfEnvrn != ksDesignDay) && (Environment(Envrn).KindOfEnvrn != ksHVACSizeDesignDay)) {
+        if ((dataWeatherManager.Environment(dataWeatherManager.Envrn).KindOfEnvrn != ksDesignDay) && (dataWeatherManager.Environment(dataWeatherManager.Envrn).KindOfEnvrn != ksHVACSizeDesignDay)) {
             // Adjust run period cooling set point
             switch (AdaptiveComfortModelTypeIndex) {
             case static_cast<int>(AdaptiveComfortModel::ASH55_CENTRAL):
@@ -7014,10 +7007,10 @@ namespace ZoneTempPredictorCorrector {
             default:;
             }
         } else {
-            int const envrnDayNum(Environment(Envrn).DesignDayNum);
+            int const envrnDayNum(dataWeatherManager.Environment(dataWeatherManager.Envrn).DesignDayNum);
             int const summerDesignDayTypeIndex(9);
             // Adjust summer design day set point
-            if (DesDayInput(envrnDayNum).DayType == summerDesignDayTypeIndex) {
+            if (dataWeatherManager.DesDayInput(envrnDayNum).DayType == summerDesignDayTypeIndex) {
                 ZoneAirSetPoint = dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(AdaptiveComfortModelTypeIndex - 1);
             }
         }
@@ -7673,7 +7666,7 @@ namespace ZoneTempPredictorCorrector {
     }
 
     // add values to the LEED tabular report related to schedules used by the thermostat objects
-    void FillPredefinedTableOnThermostatSetpoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
+    void FillPredefinedTableOnThermostatSetpoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager)
     {
         // J.Glazer - Aug 2017
         using namespace OutputReportPredefined;
@@ -7695,12 +7688,12 @@ namespace ZoneTempPredictorCorrector {
                                  dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).Name);
 
                 std::tie(setPointAt11, numDays, monthAssumed) =
-                    temperatureAndCountInSch(dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex, false, wednesday, 11);
+                    temperatureAndCountInSch(dataWeatherManager, dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex, false, wednesday, 11);
                 PreDefTableEntry(pdchLeedSchStPt11amWednesday, dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, setPointAt11);
                 PreDefTableEntry(pdchLeedSchStPt11amWedCnt, dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
-                    temperatureAndCountInSch(dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex, false, wednesday, 23);
+                    temperatureAndCountInSch(dataWeatherManager, dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex, false, wednesday, 23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWednesday, dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, setPointAt23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, numDays);
 
@@ -7715,12 +7708,12 @@ namespace ZoneTempPredictorCorrector {
                                  dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).Name);
 
                 std::tie(setPointAt11, numDays, monthAssumed) =
-                    temperatureAndCountInSch(dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex, true, wednesday, 11);
+                    temperatureAndCountInSch(dataWeatherManager, dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex, true, wednesday, 11);
                 PreDefTableEntry(pdchLeedSchStPt11amWednesday, dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, setPointAt11);
                 PreDefTableEntry(pdchLeedSchStPt11amWedCnt, dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
-                    temperatureAndCountInSch(dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex, true, wednesday, 23);
+                    temperatureAndCountInSch(dataWeatherManager, dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex, true, wednesday, 23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWednesday, dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, setPointAt23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, numDays);
 
@@ -7736,23 +7729,23 @@ namespace ZoneTempPredictorCorrector {
 
                 std::string schNm = dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName + " (summer)";
                 std::tie(setPointAt11, numDays, monthAssumed) =
-                    temperatureAndCountInSch(dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, true, wednesday, 11);
+                    temperatureAndCountInSch(dataWeatherManager, dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, true, wednesday, 11);
                 PreDefTableEntry(pdchLeedSchStPt11amWednesday, schNm, setPointAt11);
                 PreDefTableEntry(pdchLeedSchStPt11amWedCnt, schNm, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
-                    temperatureAndCountInSch(dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, true, wednesday, 23);
+                    temperatureAndCountInSch(dataWeatherManager, dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, true, wednesday, 23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWednesday, schNm, setPointAt23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, schNm, numDays);
 
                 schNm = dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName + " (winter)";
                 std::tie(setPointAt11, numDays, monthAssumed2) =
-                    temperatureAndCountInSch(dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, false, wednesday, 11);
+                    temperatureAndCountInSch(dataWeatherManager, dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, false, wednesday, 11);
                 PreDefTableEntry(pdchLeedSchStPt11amWednesday, schNm, setPointAt11);
                 PreDefTableEntry(pdchLeedSchStPt11amWedCnt, schNm, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed2) =
-                    temperatureAndCountInSch(dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, false, wednesday, 23);
+                    temperatureAndCountInSch(dataWeatherManager, dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, false, wednesday, 23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWednesday, schNm, setPointAt23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, schNm, numDays);
 
@@ -7769,12 +7762,12 @@ namespace ZoneTempPredictorCorrector {
                                  dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).Name);
 
                 std::tie(setPointAt11, numDays, monthAssumed) =
-                    temperatureAndCountInSch(dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex, false, wednesday, 11);
+                    temperatureAndCountInSch(dataWeatherManager, dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex, false, wednesday, 11);
                 PreDefTableEntry(pdchLeedSchStPt11amWednesday, dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, setPointAt11);
                 PreDefTableEntry(pdchLeedSchStPt11amWedCnt, dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
-                    temperatureAndCountInSch(dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex, false, wednesday, 23);
+                    temperatureAndCountInSch(dataWeatherManager, dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex, false, wednesday, 23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWednesday, dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, setPointAt23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, numDays);
 
@@ -7787,12 +7780,12 @@ namespace ZoneTempPredictorCorrector {
                                  dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).Name);
 
                 std::tie(setPointAt11, numDays, monthAssumed) =
-                    temperatureAndCountInSch(dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex, true, wednesday, 11);
+                    temperatureAndCountInSch(dataWeatherManager, dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex, true, wednesday, 11);
                 PreDefTableEntry(pdchLeedSchStPt11amWednesday, dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, setPointAt11);
                 PreDefTableEntry(pdchLeedSchStPt11amWedCnt, dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
-                    temperatureAndCountInSch(dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex, true, wednesday, 23);
+                    temperatureAndCountInSch(dataWeatherManager, dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex, true, wednesday, 23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWednesday, dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, setPointAt23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, numDays);
 
@@ -7803,7 +7796,7 @@ namespace ZoneTempPredictorCorrector {
 
     // returns the temperature value from a schedule at a certain time for the first day of the week in either January or July
     std::tuple<Real64, int, std::string>
-    temperatureAndCountInSch(int const &scheduleIndex, bool const &isSummer, int const &dayOfWeek, int const &hourOfDay)
+    temperatureAndCountInSch(WeatherManagerData &dataWeatherManager, int const &scheduleIndex, bool const &isSummer, int const &dayOfWeek, int const &hourOfDay)
     {
         // J.Glazer - Aug 2017
 
@@ -7842,7 +7835,7 @@ namespace ZoneTempPredictorCorrector {
         // should adjust date if lands on a holiday but for now assume that it does not
 
         // adjust time of day for daylight savings time
-        int hourSelect = hourOfDay + WeatherManager::DSTIndex(jdateSelect);
+        int hourSelect = hourOfDay + dataWeatherManager.DSTIndex(jdateSelect);
 
         // get the value at the selected time
         int const firstTimeStep = 1;

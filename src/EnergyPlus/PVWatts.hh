@@ -62,6 +62,8 @@
 
 namespace EnergyPlus {
 
+    struct WeatherManagerData;
+
 namespace PVWatts {
 
     enum class ModuleType
@@ -193,7 +195,7 @@ namespace PVWatts {
         void setCellTemperature(Real64 cellTemp);
         void setPlaneOfArrayIrradiance(Real64 poa);
 
-        void calc();
+        void calc(WeatherManagerData &dataWeatherManager);
 
         void getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy);
 

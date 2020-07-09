@@ -60,25 +60,26 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -410,7 +411,7 @@ namespace GroundHeatExchangers {
 
     void GLHEBase::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initGLHESimVars(state.dataBranchInputManager);
+        this->initGLHESimVars(state.dataBranchInputManager, state.dataWeatherManager);
     }
 
     //******************************************************************************
@@ -422,9 +423,9 @@ namespace GroundHeatExchangers {
     {
 
         if (DataGlobals::KickOffSimulation) {
-            this->initGLHESimVars(state.dataBranchInputManager);
+            this->initGLHESimVars(state.dataBranchInputManager, state.dataWeatherManager);
         } else {
-            this->initGLHESimVars(state.dataBranchInputManager);
+            this->initGLHESimVars(state.dataBranchInputManager, state.dataWeatherManager);
             this->calcGroundHeatExchanger();
             this->updateGHX();
         }
@@ -3281,7 +3282,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEVert::initGLHESimVars(BranchInputManagerData &dataBranchInputManager)
+    void GLHEVert::initGLHESimVars(BranchInputManagerData &dataBranchInputManager, WeatherManagerData &dataWeatherManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -3370,11 +3371,11 @@ namespace GroundHeatExchangers {
 
         tempGround = 0;
 
-        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(minDepth, currTime);
-        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(maxDepth, currTime);
-        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(oneQuarterDepth, currTime);
-        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(halfDepth, currTime);
-        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(threeQuarterDepth, currTime);
+        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(dataWeatherManager, minDepth, currTime);
+        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(dataWeatherManager, maxDepth, currTime);
+        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(dataWeatherManager, oneQuarterDepth, currTime);
+        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(dataWeatherManager, halfDepth, currTime);
+        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(dataWeatherManager, threeQuarterDepth, currTime);
 
         tempGround /= 5;
 
@@ -3388,7 +3389,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHESlinky::initGLHESimVars(BranchInputManagerData &dataBranchInputManager)
+    void GLHESlinky::initGLHESimVars(BranchInputManagerData &dataBranchInputManager, WeatherManagerData &dataWeatherManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -3396,16 +3397,6 @@ namespace GroundHeatExchangers {
         //       MODIFIED         Arun Murugappan
         //       RE-ENGINEERED    na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_GrndHtExchgSlinky;
         using FluidProperties::GetDensityGlycol;
@@ -3415,19 +3406,8 @@ namespace GroundHeatExchangers {
         using PlantUtilities::SetComponentFlowRate;
         using namespace GroundTemperatureManager;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("initGLHESimVars");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 fluidDensity;
         bool errFlag;
         Real64 CurTime;
@@ -3454,8 +3434,8 @@ namespace GroundHeatExchangers {
             InitComponentNodes(0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
             lastQnSubHr = 0.0;
-            Node(inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(coilDepth, CurTime);
-            Node(outletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(coilDepth, CurTime);
+            Node(inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(dataWeatherManager, coilDepth, CurTime);
+            Node(outletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(dataWeatherManager, coilDepth, CurTime);
 
             // zero out all history arrays
 
@@ -3469,7 +3449,7 @@ namespace GroundHeatExchangers {
             prevHour = 1;
         }
 
-        tempGround = this->groundTempModel->getGroundTempAtTimeInSeconds(coilDepth, CurTime);
+        tempGround = this->groundTempModel->getGroundTempAtTimeInSeconds(dataWeatherManager, coilDepth, CurTime);
 
         massFlowRate = RegulateCondenserCompFlowReqOp(loopNum, loopSideNum, branchNum, compNum, designMassFlow);
 

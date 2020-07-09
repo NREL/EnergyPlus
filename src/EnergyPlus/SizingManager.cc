@@ -51,6 +51,7 @@
 
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
@@ -65,7 +66,6 @@
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -285,7 +285,7 @@ namespace SizingManager {
 
             ShowMessage("Beginning Zone Sizing Calculations");
 
-            ResetEnvironmentCounter();
+            ResetEnvironmentCounter(state.dataWeatherManager);
             KickOffSizing = true;
             SetupZoneSizing(state, ErrorsFound); // Should only be done ONCE
             KickOffSizing = false;
@@ -302,12 +302,12 @@ namespace SizingManager {
 
                 Available = true;
 
-                ResetEnvironmentCounter();
+                ResetEnvironmentCounter(state.dataWeatherManager);
                 CurOverallSimDay = 0;
                 NumSizingPeriodsPerformed = 0;
                 while (Available) { // loop over environments
 
-                    GetNextEnvironment(state, Available, ErrorsFound); // get an environment
+                    GetNextEnvironment(state, state.dataWeatherManager, Available, ErrorsFound); // get an environment
 
                     if (!Available) break;
                     if (ErrorsFound) break;
@@ -320,7 +320,7 @@ namespace SizingManager {
                     ++NumSizingPeriodsPerformed;
 
                     BeginEnvrnFlag = true;
-                    if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                    if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager.DesDayInput(state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum).suppressBegEnvReset)) {
                         // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
                         // more easily converge fewer warmup days are allowed
                         DisplayString("Suppressing Initialization of New Environment Parameters");
@@ -391,7 +391,7 @@ namespace SizingManager {
                                 // set flag for pulse used in load component reporting
                                 doLoadComponentPulseNow = CalcdoLoadComponentPulseNow(isPulseZoneSizing,WarmupFlag,HourOfDay,TimeStep,KindOfSim,DayOfSim);
 
-                                ManageWeather();
+                                ManageWeather(state.dataWeatherManager);
 
                                 if (!WarmupFlag) {
                                     TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
@@ -488,14 +488,14 @@ namespace SizingManager {
             ManageZoneEquipment(state, true, SimZoneEquip, SimAir);
             ManageAirLoops(state, true, SimAir, SimZoneEquip);
             SizingManager::UpdateTermUnitFinalZoneSizing(); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
-            SimAirServingZones::SizeSysOutdoorAir();        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
-            ResetEnvironmentCounter();
+            SimAirServingZones::SizeSysOutdoorAir(state.dataWeatherManager);        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
+            ResetEnvironmentCounter(state.dataWeatherManager);
             CurEnvirNumSimDay = 0;
             CurOverallSimDay = 0;
             NumSizingPeriodsPerformed = 0;
             while (Available) { // loop over environments
 
-                GetNextEnvironment(state, Available, ErrorsFound); // get an environment
+                GetNextEnvironment(state, state.dataWeatherManager, Available, ErrorsFound); // get an environment
 
                 // check that environment is one of the design days
                 if (KindOfSim == ksRunPeriodWeather) {
@@ -508,7 +508,7 @@ namespace SizingManager {
                 ++NumSizingPeriodsPerformed;
 
                 BeginEnvrnFlag = true;
-                if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager.DesDayInput(state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum).suppressBegEnvReset)) {
                     // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                     // easily converge fewer warmup days are allowed
                     DisplayString("Suppressing Initialization of New Environment Parameters");
@@ -567,7 +567,7 @@ namespace SizingManager {
                                 }
                             }
 
-                            ManageWeather();
+                            ManageWeather(state.dataWeatherManager);
 
                             UpdateSysSizing(state.outputFiles, DuringDay);
 
@@ -1889,7 +1889,7 @@ namespace SizingManager {
         } // loop over air loops for table writing
     }
 
-    void DetermineSystemPopulationDiversity()
+    void DetermineSystemPopulationDiversity(WeatherManagerData &dataWeatherManager)
     {
         // determine Pz sum, Ps, and D for each air system for standard 62.1
 
@@ -1933,9 +1933,9 @@ namespace SizingManager {
         // now march through all zone timesteps for entire year to find the concurrent max
         int DaysInYear(366);  // assume leap year
         int dayOfWeekType(1); // assume year starts on Sunday
-        WeatherManager::CalcSpecialDayTypes();
+        CalcSpecialDayTypes(dataWeatherManager);
         for (int DayLoop = 1; DayLoop <= DaysInYear; ++DayLoop) { // loop over all days in year
-            DataEnvironment::HolidayIndex = WeatherManager::SpecialDayTypes(DayLoop);
+            DataEnvironment::HolidayIndex = dataWeatherManager.SpecialDayTypes(DayLoop);
             DataEnvironment::DayOfYear_Schedule = DayLoop;
             DataEnvironment::DayOfWeek = dayOfWeekType;
             ++dayOfWeekType;
@@ -3883,7 +3883,7 @@ namespace SizingManager {
         CurOverallSimDay = 0;
         while (Available) { // do for each environment
 
-            GetNextEnvironment(state, Available, ErrorsFound);
+            GetNextEnvironment(state, state.dataWeatherManager, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -3915,7 +3915,7 @@ namespace SizingManager {
 
             BeginTimeStepFlag = true;
 
-            ManageWeather();
+            ManageWeather(state.dataWeatherManager);
 
             ManageHeatBalance(state);
 
@@ -3926,7 +3926,7 @@ namespace SizingManager {
             BeginFullSimFlag = false;
 
             //          ! do another timestep=1
-            ManageWeather();
+            ManageWeather(state.dataWeatherManager);
 
             ManageHeatBalance(state);
 
@@ -3936,7 +3936,7 @@ namespace SizingManager {
             TimeStep = NumOfTimeStepInHour;
             EndEnvrnFlag = true;
 
-            ManageWeather();
+            ManageWeather(state.dataWeatherManager);
 
             ManageHeatBalance(state);
 

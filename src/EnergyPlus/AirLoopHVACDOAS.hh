@@ -55,8 +55,9 @@
 
 namespace EnergyPlus {
 
-// forward declarations
-struct EnergyPlusData;
+    // forward declarations
+    struct EnergyPlusData;
+    struct WeatherManagerData;
 
 namespace AirLoopHVACDOAS {
 
@@ -194,7 +195,7 @@ namespace AirLoopHVACDOAS {
 
         void SizingAirLoopDOAS(EnergyPlusData &state);
 
-        void GetDesignDayConditions();
+        void GetDesignDayConditions(WeatherManagerData &dataWeatherManager);
     };
 
     int getAirLoopMixerIndex(EnergyPlusData &state, std::string const &objectName);

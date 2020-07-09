@@ -69,6 +69,7 @@ namespace EnergyPlus {
 
     // Forward declarations
     struct EnergyPlusData;
+    struct WeatherManagerData;
     struct ZonePlenumData;
     struct ZoneTempPredictorCorrectorData;
 
@@ -185,7 +186,7 @@ namespace ZoneTempPredictorCorrector {
                               Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void GetZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles);
+    void GetZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager, OutputFiles &outputFiles);
 
     void InitZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
 
@@ -194,11 +195,11 @@ namespace ZoneTempPredictorCorrector {
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void CalcZoneAirTempSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+    void CalcZoneAirTempSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager);
 
-    void CalculateMonthlyRunningAverageDryBulb(Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN);
+    void CalculateMonthlyRunningAverageDryBulb(WeatherManagerData &dataWeatherManager, Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN);
 
-    void CalculateAdaptiveComfortSetPointSchl(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
+    void CalculateAdaptiveComfortSetPointSchl(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
 
     void CalcPredictedSystemLoad(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const ZoneNum, Real64 RAFNFrac);
 
@@ -304,7 +305,7 @@ namespace ZoneTempPredictorCorrector {
                                    Real64 &SumEnthalpyH      // Zone sum of phase change material freezing enthalpy
         );
 
-    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, std::string const &ZoneName); // Zone to verify
+    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager, std::string const &ZoneName); // Zone to verify
 
     bool VerifyControlledZoneForThermostat(std::string const &ZoneName); // Zone to verify
 
@@ -312,7 +313,7 @@ namespace ZoneTempPredictorCorrector {
 
     void AdjustAirSetPointsforOpTempCntrl(int const TempControlledZoneID, int const ActualZoneNum, Real64 &ZoneAirSetPoint);
 
-    void AdjustOperativeSetPointsforAdapComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const TempControlledZoneID, Real64 &ZoneAirSetPoint);
+    void AdjustOperativeSetPointsforAdapComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager, int const TempControlledZoneID, Real64 &ZoneAirSetPoint);
 
     void CalcZoneAirComfortSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
 
@@ -332,10 +333,10 @@ namespace ZoneTempPredictorCorrector {
 
     void OverrideAirSetPointsforEMSCntrl();
 
-    void FillPredefinedTableOnThermostatSetpoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+    void FillPredefinedTableOnThermostatSetpoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager);
 
     std::tuple<Real64, int, std::string>
-    temperatureAndCountInSch(int const &scheduleIndex, bool const &isSummer, int const &dayOfWeek, int const &hourOfDay);
+    temperatureAndCountInSch(WeatherManagerData &dataWeatherManager, int const &scheduleIndex, bool const &isSummer, int const &dayOfWeek, int const &hourOfDay);
 
 } // namespace ZoneTempPredictorCorrector
 

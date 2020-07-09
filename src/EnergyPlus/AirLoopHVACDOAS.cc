@@ -933,7 +933,7 @@ namespace AirLoopHVACDOAS {
             }
         }
         this->SizingMassFlow = sizingMassFlow;
-        this->GetDesignDayConditions();
+        this->GetDesignDayConditions(state.dataWeatherManager);
 
         if (this->m_FanIndex > -1 && this->m_FanTypeNum == SimAirServingZones::Fan_System_Object) {
             HVACFan::fanObjs[this->m_FanIndex]->designAirVolFlowRate = sizingMassFlow / DataEnvironment::StdRhoAir;
@@ -964,40 +964,37 @@ namespace AirLoopHVACDOAS {
         }
     }
 
-    void AirLoopDOAS::GetDesignDayConditions()
+    void AirLoopDOAS::GetDesignDayConditions(WeatherManagerData &dataWeatherManager)
     {
-        // Using/Aliasing
-        using WeatherManager::DesDayInput;
-
         int const summerDesignDayTypeIndex(9);
         int const winterDesignDayTypeIndex(10);
         bool static SummerDesignDayFlag = true;
         bool static WinterDesignDayFlag = true;
 
-        for (size_t i = 1; i <= DesDayInput.size(); i++) {
+        for (size_t i = 1; i <= dataWeatherManager.DesDayInput.size(); i++) {
             // Summer design day
-            if (DesDayInput(i).DayType == summerDesignDayTypeIndex && SummerDesignDayFlag) {
-                this->SizingCoolOATemp = DesDayInput(i).MaxDryBulb;
-                if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_WetBulb) { // wet bulb temperature
+            if (dataWeatherManager.DesDayInput(i).DayType == summerDesignDayTypeIndex && SummerDesignDayFlag) {
+                this->SizingCoolOATemp = dataWeatherManager.DesDayInput(i).MaxDryBulb;
+                if (dataWeatherManager.DesDayInput(i).HumIndType == dataWeatherManager.DDHumIndType_WetBulb) { // wet bulb temperature
                     this->SizingCoolOAHumRat =
-                        Psychrometrics::PsyWFnTdbTwbPb(this->SizingCoolOATemp, DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_DewPoint) { // dewpoint
-                    this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_HumRatio) {
-                    this->SizingCoolOAHumRat = DesDayInput(i).HumIndValue;
+                        Psychrometrics::PsyWFnTdbTwbPb(this->SizingCoolOATemp, dataWeatherManager.DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                } else if (dataWeatherManager.DesDayInput(i).HumIndType == dataWeatherManager.DDHumIndType_DewPoint) { // dewpoint
+                    this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(dataWeatherManager.DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                } else if (dataWeatherManager.DesDayInput(i).HumIndType == dataWeatherManager.DDHumIndType_HumRatio) {
+                    this->SizingCoolOAHumRat = dataWeatherManager.DesDayInput(i).HumIndValue;
                 } // else { // What about other cases?
                 SummerDesignDayFlag = false;
             }
             // Winter design day
-            if (DesDayInput(i).DayType == winterDesignDayTypeIndex && WinterDesignDayFlag) {
-                this->HeatOutTemp = DesDayInput(i).MaxDryBulb;
-                if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_WetBulb) { // wet bulb temperature
+            if (dataWeatherManager.DesDayInput(i).DayType == winterDesignDayTypeIndex && WinterDesignDayFlag) {
+                this->HeatOutTemp = dataWeatherManager.DesDayInput(i).MaxDryBulb;
+                if (dataWeatherManager.DesDayInput(i).HumIndType == dataWeatherManager.DDHumIndType_WetBulb) { // wet bulb temperature
                     this->HeatOutHumRat =
-                        Psychrometrics::PsyWFnTdbTwbPb(this->HeatOutTemp, DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_DewPoint) { // dewpoint
-                    this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_HumRatio) {
-                    this->HeatOutHumRat = DesDayInput(i).HumIndValue;
+                        Psychrometrics::PsyWFnTdbTwbPb(this->HeatOutTemp, dataWeatherManager.DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                } else if (dataWeatherManager.DesDayInput(i).HumIndType == dataWeatherManager.DDHumIndType_DewPoint) { // dewpoint
+                    this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(dataWeatherManager.DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                } else if (dataWeatherManager.DesDayInput(i).HumIndType == dataWeatherManager.DDHumIndType_HumRatio) {
+                    this->HeatOutHumRat = dataWeatherManager.DesDayInput(i).HumIndValue;
                 } // else { // What about other cases?
                 WinterDesignDayFlag = false;
             }

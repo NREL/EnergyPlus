@@ -5791,7 +5791,7 @@ namespace HeatBalanceSurfaceManager {
 
             // Initialize Kiva instances ground temperatures
             if (DataHeatBalance::AnyKiva) {
-                SurfaceGeometry::kivaManager.initKivaInstances(state.dataZoneTempPredictorCorrector);
+                SurfaceGeometry::kivaManager.initKivaInstances(state.dataZoneTempPredictorCorrector, state.dataWeatherManager);
             }
         }
         if (!BeginEnvrnFlag) {

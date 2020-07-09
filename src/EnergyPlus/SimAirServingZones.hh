@@ -59,6 +59,7 @@ namespace EnergyPlus {
 
     // Forward declarations
     struct EnergyPlusData;
+    struct WeatherManagerData;
     struct ZonePlenumData;
 
 namespace SimAirServingZones {
@@ -192,7 +193,7 @@ namespace SimAirServingZones {
 
     void SetUpSysSizingArrays();
 
-    void SizeSysOutdoorAir();
+    void SizeSysOutdoorAir(WeatherManagerData &dataWeatherManager);
 
     void UpdateSysSizing(OutputFiles &outputFiles, int const CallIndicator);
 

@@ -58,6 +58,8 @@
 
 namespace EnergyPlus {
 
+    struct WeatherManagerData;
+
 class SystemTimestepObject
 {
 public:
@@ -142,15 +144,15 @@ class SizingLoggerFramework
 public:
     std::vector<SizingLog> logObjs;
 
-    int SetupVariableSizingLog(Real64 &rVariable, int stepsInAverage);
+    int SetupVariableSizingLog(WeatherManagerData &dataWeatherManager, Real64 &rVariable, int stepsInAverage);
 
-    ZoneTimestepObject PrepareZoneTimestepStamp();
+    ZoneTimestepObject PrepareZoneTimestepStamp(WeatherManagerData &dataWeatherManager);
 
-    void UpdateSizingLogValuesZoneStep();
+    void UpdateSizingLogValuesZoneStep(WeatherManagerData &dataWeatherManager);
 
-    void UpdateSizingLogValuesSystemStep();
+    void UpdateSizingLogValuesSystemStep(WeatherManagerData &dataWeatherManager);
 
-    void SetupSizingLogsNewEnvironment();
+    void SetupSizingLogsNewEnvironment(WeatherManagerData &dataWeatherManager);
 
     void IncrementSizingPeriodSet();
 
@@ -182,7 +184,7 @@ public:
 
     PlantCoinicidentAnalysis(std::string loopName, int loopIndex, int nodeNum, Real64 density, Real64 cp, int numStepsInAvg, int sizingIndex);
 
-    void ResolveDesignFlowRate(OutputFiles &outputFiles, int const HVACSizingIterCount);
+    void ResolveDesignFlowRate(WeatherManagerData &dataWeatherManager, OutputFiles &outputFiles, int const HVACSizingIterCount);
 
 private:
     std::string name = "";                // name of analysis object

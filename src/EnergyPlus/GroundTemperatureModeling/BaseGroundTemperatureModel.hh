@@ -55,6 +55,8 @@
 
 namespace EnergyPlus {
 
+    struct WeatherManagerData;
+
 // Base class
 class BaseGroundTempsModel
 {
@@ -76,11 +78,11 @@ public:
     }
 
     // Virtual method for retrieving the ground temp
-    virtual Real64 getGroundTemp() = 0;
+    virtual Real64 getGroundTemp(WeatherManagerData &dataWeatherManager) = 0;
 
-    virtual Real64 getGroundTempAtTimeInSeconds(Real64 const, Real64 const) = 0;
+    virtual Real64 getGroundTempAtTimeInSeconds(WeatherManagerData &dataWeatherManager, Real64 const, Real64 const) = 0;
 
-    virtual Real64 getGroundTempAtTimeInMonths(Real64 const, int const) = 0;
+    virtual Real64 getGroundTempAtTimeInMonths(WeatherManagerData &dataWeatherManager, Real64 const, int const) = 0;
 
 protected:
     static void write_ground_temps(OutputFile &os, const std::string &name, const Array1D<Real64> &data)

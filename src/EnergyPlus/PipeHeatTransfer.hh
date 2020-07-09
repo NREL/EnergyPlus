@@ -64,9 +64,10 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct EnergyPlusData;
-struct BranchInputManagerData;
+    // Forward declarations
+    struct EnergyPlusData;
+    struct BranchInputManagerData;
+    struct WeatherManagerData;
 
 namespace PipeHeatTransfer {
 
@@ -249,10 +250,10 @@ namespace PipeHeatTransfer {
 
         void PushInnerTimeStepArrays();
 
-        void InitPipesHeatTransfer(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // component number
+        void InitPipesHeatTransfer(BranchInputManagerData &dataBranchInputManager, WeatherManagerData &dataWeatherManager, bool const FirstHVACIteration // component number
         );
 
-        Real64 TBND(Real64 const z,       // Current Depth
+        Real64 TBND(WeatherManagerData &dataWeatherManager, Real64 const z,       // Current Depth
                     Real64 const DayOfSim // Current Simulation Day
         );
 

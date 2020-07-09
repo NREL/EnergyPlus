@@ -1075,7 +1075,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state.dataWeatherManager);
     SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
@@ -1085,7 +1085,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state, state.dataWeatherManager, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -1135,7 +1135,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                         }
                     }
 
-                    WeatherManager::ManageWeather();
+                    WeatherManager::ManageWeather(state.dataWeatherManager);
 
                     HeatBalanceManager::ManageHeatBalance(state);
 
@@ -2166,7 +2166,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state.dataWeatherManager);
     SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
@@ -2176,7 +2176,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state, state.dataWeatherManager, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -2226,7 +2226,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                         }
                     }
 
-                    WeatherManager::ManageWeather();
+                    WeatherManager::ManageWeather(state.dataWeatherManager);
 
                     HeatBalanceManager::ManageHeatBalance(state);
 

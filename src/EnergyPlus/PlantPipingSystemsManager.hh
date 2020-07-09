@@ -67,6 +67,7 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
+    struct WeatherManagerData;
 
     namespace PlantPipingSystemsManager {
 
@@ -877,13 +878,13 @@ namespace EnergyPlus {
 
             void DoEndOfIterationOperations(bool &Finished);
 
-            void DoOneTimeInitializations(Circuit * thisCircuit);
+            void DoOneTimeInitializations(WeatherManagerData &dataWeatherManager, Circuit * thisCircuit);
 
             void DoStartOfTimeStepInitializations();
 
             void DoStartOfTimeStepInitializations(Circuit * thisCircuit);
 
-            Real64 GetFarfieldTemp(CartesianCell const &cell);
+            Real64 GetFarfieldTemp(WeatherManagerData &dataWeatherManager, CartesianCell const &cell);
 
             void PreparePipeCircuitSimulation(Circuit * thisCircuit);
 
@@ -894,26 +895,26 @@ namespace EnergyPlus {
 
             void SimulateRadialToCartesianInterface(CartesianCell &ThisCell);
 
-            void PerformTemperatureFieldUpdate();
+            void PerformTemperatureFieldUpdate(WeatherManagerData &dataWeatherManager);
 
             Real64 EvaluateFieldCellTemperature(CartesianCell &ThisCell);
 
-            Real64 EvaluateGroundSurfaceTemperature(CartesianCell &cell);
+            Real64 EvaluateGroundSurfaceTemperature(WeatherManagerData &dataWeatherManager, CartesianCell &cell);
 
             Real64 EvaluateBasementCellTemperature(CartesianCell &cell);
 
             Real64 EvaluateZoneInterfaceTemperature(CartesianCell &cell);
 
-            Real64 EvaluateFarfieldBoundaryTemperature(CartesianCell &cell);
+            Real64 EvaluateFarfieldBoundaryTemperature(WeatherManagerData &dataWeatherManager, CartesianCell &cell);
 
-            void EvaluateFarfieldCharacteristics(CartesianCell &cell, Direction direction, Real64 &neighbortemp,
+            void EvaluateFarfieldCharacteristics(WeatherManagerData &dataWeatherManager, CartesianCell &cell, Direction direction, Real64 &neighbortemp,
                                                  Real64 &resistance, Real64 &adiabaticMultiplier);
 
-            void PerformIterationLoop();
+            void PerformIterationLoop(WeatherManagerData &dataWeatherManager);
 
-            void PerformIterationLoop(Circuit * thisCircuit);
+            void PerformIterationLoop(WeatherManagerData &dataWeatherManager, Circuit * thisCircuit);
 
-            void InitPipingSystems(BranchInputManagerData &dataBranchInputManager, Circuit * thisCircuit);
+            void InitPipingSystems(BranchInputManagerData &dataBranchInputManager, WeatherManagerData &dataWeatherManager, Circuit * thisCircuit);
 
             void UpdatePipingSystems(Circuit * thisCircuit);
 

@@ -68,6 +68,7 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
+    struct WeatherManagerData;
     struct ZoneTempPredictorCorrectorData;
 
 namespace OutputReportTabular {
@@ -843,7 +844,7 @@ namespace OutputReportTabular {
 
     void GatherComponentLoadsHVAC();
 
-    void WriteLoadComponentSummaryTables();
+    void WriteLoadComponentSummaryTables(WeatherManagerData &dataWeatherManager);
 
     void GetDelaySequences(int const &desDaySelected,
                            bool const &isCooling,
@@ -873,7 +874,7 @@ namespace OutputReportTabular {
                                         Array3D<Real64> const &feneCondInstantSeqLoc,
                                         Array2D<Real64> const &surfDelaySeq);
 
-    void CollectPeakZoneConditions(
+    void CollectPeakZoneConditions(WeatherManagerData &dataWeatherManager, 
         CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling);
 
     void ComputeEngineeringChecks(CompLoadTablesType &compLoad);

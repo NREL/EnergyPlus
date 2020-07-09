@@ -74,11 +74,11 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
+    struct WeatherManagerData;
 
 class HVACSizingSimulationManager
 {
@@ -89,14 +89,14 @@ public:
     SizingLoggerFramework sizingLogger;
 
     void DetermineSizingAnalysesNeeded();
-    void SetupSizingAnalyses();
+    void SetupSizingAnalyses(WeatherManagerData &dataWeatherManager);
 
     void RedoKickOffAndResize(EnergyPlusData &state);
     void PostProcessLogs();
-    void ProcessCoincidentPlantSizeAdjustments(int const HVACSizingIterCount);
+    void ProcessCoincidentPlantSizeAdjustments(WeatherManagerData &dataWeatherManager, int const HVACSizingIterCount);
 
-    void UpdateSizingLogsZoneStep();
-    void UpdateSizingLogsSystemStep();
+    void UpdateSizingLogsZoneStep(WeatherManagerData &dataWeatherManager);
+    void UpdateSizingLogsSystemStep(WeatherManagerData &dataWeatherManager);
 
 private:
     void CreateNewCoincidentPlantAnalysisObject(std::string const &PlantLoopName, int const PlantSizingIndex);

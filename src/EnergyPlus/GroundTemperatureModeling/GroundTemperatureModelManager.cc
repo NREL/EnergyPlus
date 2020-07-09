@@ -148,7 +148,7 @@ namespace GroundTemperatureManager {
         } else if (objectType == objectType_SiteDeepGroundTemp) {
             return SiteDeepGroundTemps::DeepGTMFactory(state.outputFiles, objectType, objectName);
         } else if (objectType == objectType_SiteFCFactorMethodGroundTemp) {
-            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state.outputFiles, objectType, objectName);
+            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state.dataWeatherManager, state.outputFiles, objectType, objectName);
         } else if (objectType == objectType_XingGroundTemp) {
             return XingGroundTempsModel::XingGTMFactory(objectType, objectName);
         } else {

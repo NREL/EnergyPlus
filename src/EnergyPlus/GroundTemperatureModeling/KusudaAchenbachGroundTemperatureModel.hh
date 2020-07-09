@@ -59,6 +59,7 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
+    struct WeatherManagerData;
 
 // Derived class for Kusuda-Achenbach model
 class KusudaGroundTempsModel : public BaseGroundTempsModel
@@ -74,11 +75,11 @@ public:
 
     static std::shared_ptr<KusudaGroundTempsModel> KusudaGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
 
-    Real64 getGroundTemp() override;
+    Real64 getGroundTemp(WeatherManagerData &dataWeatherManager) override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim) override;
+    Real64 getGroundTempAtTimeInSeconds(WeatherManagerData &dataWeatherManager, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim) override;
+    Real64 getGroundTempAtTimeInMonths(WeatherManagerData &dataWeatherManager, Real64 const depth, int const monthOfSim) override;
 };
 
 } // namespace EnergyPlus

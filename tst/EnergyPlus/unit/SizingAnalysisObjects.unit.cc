@@ -97,27 +97,27 @@ public:
         TimeStepZone = 0.25;
 
         // setup weather manager state needed
-        NumOfEnvrn = 2;
-        Environment.allocate(NumOfEnvrn);
-        Environment(1).KindOfEnvrn = ksDesignDay;
-        Environment(1).DesignDayNum = 1;
+        state.dataWeatherManager.NumOfEnvrn = 2;
+        state.dataWeatherManager.Environment.allocate(state.dataWeatherManager.NumOfEnvrn);
+        state.dataWeatherManager.Environment(1).KindOfEnvrn = ksDesignDay;
+        state.dataWeatherManager.Environment(1).DesignDayNum = 1;
 
-        Environment(2).KindOfEnvrn = ksDesignDay;
-        Environment(2).DesignDayNum = 2;
+        state.dataWeatherManager.Environment(2).KindOfEnvrn = ksDesignDay;
+        state.dataWeatherManager.Environment(2).DesignDayNum = 2;
 
         averagingWindow = 1;
-        logIndex = sizingLoggerFrameObj.SetupVariableSizingLog(LogVal, averagingWindow);
+        logIndex = sizingLoggerFrameObj.SetupVariableSizingLog(state.dataWeatherManager, LogVal, averagingWindow);
 
-        NumOfEnvrn = 4;
-        Environment.redimension(NumOfEnvrn);
+        state.dataWeatherManager.NumOfEnvrn = 4;
+        state.dataWeatherManager.Environment.redimension(state.dataWeatherManager.NumOfEnvrn);
 
-        Environment(3).KindOfEnvrn = ksHVACSizeDesignDay;
-        Environment(3).DesignDayNum = 1;
-        Environment(3).SeedEnvrnNum = 1;
+        state.dataWeatherManager.Environment(3).KindOfEnvrn = ksHVACSizeDesignDay;
+        state.dataWeatherManager.Environment(3).DesignDayNum = 1;
+        state.dataWeatherManager.Environment(3).SeedEnvrnNum = 1;
 
-        Environment(4).KindOfEnvrn = ksHVACSizeDesignDay;
-        Environment(4).DesignDayNum = 2;
-        Environment(4).SeedEnvrnNum = 2;
+        state.dataWeatherManager.Environment(4).KindOfEnvrn = ksHVACSizeDesignDay;
+        state.dataWeatherManager.Environment(4).DesignDayNum = 2;
+        state.dataWeatherManager.Environment(4).SeedEnvrnNum = 2;
 
         OutputProcessor::SetupTimePointers("ZONE", TimeStepZone);
         OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
@@ -149,7 +149,7 @@ public:
         TotNumLoops = 0;
         PlantLoop(1).LoopSide.deallocate();
         PlantLoop.deallocate();
-        Environment.deallocate();
+        state.dataWeatherManager.Environment.deallocate();
         PlantSizData.deallocate();
         TimeValue.clear();
     }
@@ -166,13 +166,13 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
     KindOfSim = 4;
     DayOfSim = 1;
     HourOfDay = 1;
-    Envrn = 3;
-    Environment(Envrn).DesignDayNum = 1;
-    sizingLoggerFrameObj.SetupSizingLogsNewEnvironment();
+    state.dataWeatherManager.Envrn = 3;
+    state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum = 1;
+    sizingLoggerFrameObj.SetupSizingLogsNewEnvironment(state.dataWeatherManager);
     DataGlobals::TimeStep = 1;
 
     LogVal = lowLogVal;
-    sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep();
+    sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep(state.dataWeatherManager);
 
     EXPECT_DOUBLE_EQ(lowLogVal, sizingLoggerFrameObj.logObjs[logIndex].ztStepObj[0].logDataValue);
 
@@ -180,18 +180,18 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
     HourOfDay = 24;
     DataGlobals::TimeStep = 4;
     LogVal = hiLogVal;
-    sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep();
+    sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep(state.dataWeatherManager);
 
     EXPECT_DOUBLE_EQ(hiLogVal, sizingLoggerFrameObj.logObjs[logIndex].ztStepObj[95].logDataValue);
 
     // first step of second design day
     HourOfDay = 1;
     DataGlobals::TimeStep = 1;
-    Envrn = 4;
-    Environment(Envrn).DesignDayNum = 2;
-    sizingLoggerFrameObj.SetupSizingLogsNewEnvironment();
+    state.dataWeatherManager.Envrn = 4;
+    state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum = 2;
+    sizingLoggerFrameObj.SetupSizingLogsNewEnvironment(state.dataWeatherManager);
     LogVal = midLogVal;
-    sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep();
+    sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep(state.dataWeatherManager);
 
     EXPECT_DOUBLE_EQ(midLogVal, sizingLoggerFrameObj.logObjs[logIndex].ztStepObj[96].logDataValue);
 }
@@ -370,7 +370,7 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest)
 
     EXPECT_DOUBLE_EQ(0.002, PlantLoop(1).MaxVolFlowRate); //  m3/s
 
-    TestAnalysisObj.ResolveDesignFlowRate(state.outputFiles, 1);
+    TestAnalysisObj.ResolveDesignFlowRate(state.dataWeatherManager, state.outputFiles, 1);
 
     EXPECT_DOUBLE_EQ(0.0015, PlantLoop(1).MaxVolFlowRate); //  m3/s
     EXPECT_DOUBLE_EQ(1.5, PlantLoop(1).MaxMassFlowRate);   //  m3/s
@@ -526,7 +526,7 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTestNullMassFlowRateTim
 
     EXPECT_DOUBLE_EQ(0.002, PlantLoop(1).MaxVolFlowRate); //  m3/s
 
-    TestAnalysisObj.ResolveDesignFlowRate(state.outputFiles, 1);
+    TestAnalysisObj.ResolveDesignFlowRate(state.dataWeatherManager, state.outputFiles, 1);
 
     EXPECT_NEAR(0.00015, PlantLoop(1).MaxVolFlowRate, 0.00001); //  m3/s
     EXPECT_NEAR(0.15, PlantLoop(1).MaxMassFlowRate, 0.001);     //  m3/s

@@ -59,6 +59,7 @@ namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
     class OutputFiles;
+    struct WeatherManagerData;
 
 namespace SizingManager {
 
@@ -108,7 +109,7 @@ namespace SizingManager {
 
     void ManageSystemVentilationAdjustments();
 
-    void DetermineSystemPopulationDiversity();
+    void DetermineSystemPopulationDiversity(WeatherManagerData &dataWeatherManager);
 
     void GetOARequirements();
 

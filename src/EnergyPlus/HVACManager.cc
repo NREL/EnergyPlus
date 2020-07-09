@@ -234,9 +234,6 @@ namespace HVACManager {
         //  manage calls to Predictor and Corrector and other updates in ZoneTempPredictorCorrector
         //  manage variable time step and when zone air histories are updated.
 
-        // REFERENCES:
-
-        // Using/Aliasing
         using DataConvergParams::MaxZoneTempDiff;
         using DataConvergParams::MinTimeStepSys; // =0.0166667     != 1 minute | 0.3 C = (1% OF 300 C) =max allowable diff between ZoneAirTemp at
                                                  // Time=T & T-1
@@ -292,24 +289,10 @@ namespace HVACManager {
         using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
         using ZoneEquipmentManager::CalcAirFlowSimple;
         using ZoneEquipmentManager::UpdateZoneSizing;
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr auto EndOfHeaderString("End of Data Dictionary");          // End of data dictionary marker
         static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
 
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 PriorTimeStep;       // magnitude of time step for previous history terms
         Real64 ZoneTempChange(0.0); // change in zone air temperature from timestep t-1 to t
         int NodeNum;
@@ -533,7 +516,7 @@ namespace HVACManager {
                     ReportMaxVentilationLoads(state);
                     UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                     if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
-                        if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
+                        if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state.dataWeatherManager);
                     }
                     UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 }
@@ -579,7 +562,7 @@ namespace HVACManager {
                 CalcMoreNodeInfo();
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
-                    if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
+                    if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state.dataWeatherManager);
                 }
             } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
                 if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {

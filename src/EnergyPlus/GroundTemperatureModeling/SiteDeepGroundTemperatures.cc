@@ -134,7 +134,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(OutputF
 
 //******************************************************************************
 
-Real64 SiteDeepGroundTemps::getGroundTemp()
+Real64 SiteDeepGroundTemps::getGroundTemp(WeatherManagerData &dataWeatherManager)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -150,7 +150,7 @@ Real64 SiteDeepGroundTemps::getGroundTemp()
 
 //******************************************************************************
 
-Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds(Real64 const EP_UNUSED(_depth), Real64 const _seconds)
+Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds(WeatherManagerData &dataWeatherManager, Real64 const EP_UNUSED(_depth), Real64 const _seconds)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -163,10 +163,9 @@ Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds(Real64 const EP_UNUSED(
 
     // USE STATEMENTS:
     using DataGlobals::SecsInDay;
-    using WeatherManager::NumDaysInYear;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = NumDaysInYear * SecsInDay / 12;
+    Real64 secPerMonth = dataWeatherManager.NumDaysInYear * SecsInDay / 12;
 
     // Convert secs to months
     int month = ceil(_seconds / secPerMonth);
@@ -178,12 +177,12 @@ Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds(Real64 const EP_UNUSED(
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(dataWeatherManager);
 }
 
 //******************************************************************************
 
-Real64 SiteDeepGroundTemps::getGroundTempAtTimeInMonths(Real64 const EP_UNUSED(_depth), int const _month)
+Real64 SiteDeepGroundTemps::getGroundTempAtTimeInMonths(WeatherManagerData &dataWeatherManager, Real64 const EP_UNUSED(_depth), int const _month)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -202,7 +201,7 @@ Real64 SiteDeepGroundTemps::getGroundTempAtTimeInMonths(Real64 const EP_UNUSED(_
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(dataWeatherManager);
 }
 
 //******************************************************************************

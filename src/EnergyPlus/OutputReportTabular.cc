@@ -5683,7 +5683,7 @@ namespace OutputReportTabular {
             WriteCompCostTable();
             WriteAdaptiveComfortTable();
             WriteEioTables(state.outputFiles);
-            WriteLoadComponentSummaryTables();
+            WriteLoadComponentSummaryTables(state.dataWeatherManager);
             WriteHeatEmissionTable();
 
             coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
@@ -6802,7 +6802,7 @@ namespace OutputReportTabular {
             }
         }
         // fill the LEED setpoint table
-        ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints(state.dataZoneTempPredictorCorrector);
+        ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints(state.dataZoneTempPredictorCorrector, state.dataWeatherManager);
     }
 
     void WriteMonthlyTables()
@@ -12526,7 +12526,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteLoadComponentSummaryTables()
+    void WriteLoadComponentSummaryTables(WeatherManagerData &dataWeatherManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -12779,7 +12779,7 @@ namespace OutputReportTabular {
                                                    feneSolarDelaySeqCool,
                                                    feneCondInstantSeq,
                                                    surfDelaySeqCool);
-                    CollectPeakZoneConditions(ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                    CollectPeakZoneConditions(dataWeatherManager, ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                     // send latent load info to coil summary report
                     coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
 
@@ -12812,7 +12812,7 @@ namespace OutputReportTabular {
                                                    feneSolarDelaySeqHeat,
                                                    feneCondInstantSeq,
                                                    surfDelaySeqHeat);
-                    CollectPeakZoneConditions(ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                    CollectPeakZoneConditions(dataWeatherManager, ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
 
                     // send latent load info to coil summary report
                     coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
@@ -12931,7 +12931,7 @@ namespace OutputReportTabular {
                                                        feneSolarDelaySeqCool,
                                                        feneCondInstantSeq,
                                                        surfDelaySeqCool);
-                        CollectPeakZoneConditions(AirLoopZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                        CollectPeakZoneConditions(dataWeatherManager, AirLoopZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables(iZone));
                     }
                     if (displayZoneComponentLoadSummary &&
@@ -12966,7 +12966,7 @@ namespace OutputReportTabular {
                                                        feneSolarDelaySeqHeat,
                                                        feneCondInstantSeq,
                                                        surfDelaySeqHeat);
-                        CollectPeakZoneConditions(AirLoopZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                        CollectPeakZoneConditions(dataWeatherManager, AirLoopZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesHeatCompLoadTables(iZone));
                     }
                 }
@@ -13046,7 +13046,7 @@ namespace OutputReportTabular {
                                                    feneSolarDelaySeqCool,
                                                    feneCondInstantSeq,
                                                    surfDelaySeqCool);
-                    CollectPeakZoneConditions(FacilityZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                    CollectPeakZoneConditions(dataWeatherManager, FacilityZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                     AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesCoolCompLoadTables(iZone));
                 }
                 FacilityZonesCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
@@ -13081,7 +13081,7 @@ namespace OutputReportTabular {
                                                    feneSolarDelaySeqHeat,
                                                    feneCondInstantSeq,
                                                    surfDelaySeqHeat);
-                    CollectPeakZoneConditions(FacilityZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                    CollectPeakZoneConditions(dataWeatherManager, FacilityZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
                     AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesHeatCompLoadTables(iZone));
                 }
                 FacilityZonesHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
@@ -13483,7 +13483,7 @@ namespace OutputReportTabular {
     }
 
     // for the load summary report add values the peak conditions subtable
-    void CollectPeakZoneConditions(
+    void CollectPeakZoneConditions(WeatherManagerData &dataWeatherManager, 
         CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling)
     {
         using DataHeatBalance::People;
@@ -13503,9 +13503,9 @@ namespace OutputReportTabular {
 
             if (isCooling) {
                 // Time of Peak Load
-                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
-                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                if ((size_t)desDaySelected <= dataWeatherManager.DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(dataWeatherManager.DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(dataWeatherManager.DesDayInput(desDaySelected).DayOfMonth) + " " +
                                              coilSelectionReportObj->getTimeText(timeOfMax);
                 } else {
                     compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
@@ -13556,9 +13556,9 @@ namespace OutputReportTabular {
 
             } else {
                 // Time of Peak Load
-                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
-                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                if ((size_t)desDaySelected <= dataWeatherManager.DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(dataWeatherManager.DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(dataWeatherManager.DesDayInput(desDaySelected).DayOfMonth) + " " +
                                              coilSelectionReportObj->getTimeText(timeOfMax);
                 } else {
                     compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);

@@ -64,6 +64,7 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+struct WeatherManagerData;
 
 class CoilSelectionData
 // data object, one for each unique coil in simulation
@@ -326,7 +327,7 @@ public: // methods
                              Real64 const lvgAirHumRat    //
     );
 
-    void setCoilCoolingCapacity(std::string const &coilName,    // user-defined name of the coil
+    void setCoilCoolingCapacity(WeatherManagerData &dataWeatherManager,std::string const &coilName,    // user-defined name of the coil
                                 std::string const &coilType,    // idf input object class name of coil
                                 Real64 const totalCoolingCap,   // {W} coil cooling capacity
                                 bool const isAutoSize,          // true if value was autosized
@@ -339,7 +340,7 @@ public: // methods
                                 Real64 const DXFlowPerCapMaxRatio  // non dimensional ratio, capacity adjustment ratio max
     );
 
-    void setCoilHeatingCapacity(std::string const &coilName,    // user-defined name of the coil
+    void setCoilHeatingCapacity(WeatherManagerData &dataWeatherManager, std::string const &coilName,    // user-defined name of the coil
                                 std::string const &coilType,    // idf input object class name of coil
                                 Real64 const totalHeatingCap,   // {W} coil Heating capacity
                                 bool const isAutoSize,          // true if value was autosized

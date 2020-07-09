@@ -396,7 +396,7 @@ namespace SimulationManager {
         DisplayString("Initializing Simulation");
         KickOffSimulation = true;
 
-        ResetEnvironmentCounter();
+        ResetEnvironmentCounter(state.dataWeatherManager);
         SetupSimulation(state, ErrorsFound);
 
         CheckAndReadFaults(state);
@@ -481,14 +481,14 @@ namespace SimulationManager {
         ShowMessage("Beginning Simulation");
         DisplayString("Beginning Primary Simulation");
 
-        ResetEnvironmentCounter();
+        ResetEnvironmentCounter(state.dataWeatherManager);
 
         EnvCount = 0;
         WarmupFlag = true;
 
         while (Available) {
 
-            GetNextEnvironment(state, Available, ErrorsFound);
+            GetNextEnvironment(state, state.dataWeatherManager, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -511,7 +511,7 @@ namespace SimulationManager {
             DisplayString("Initializing New Environment Parameters");
 
             BeginEnvrnFlag = true;
-            if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+            if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager.DesDayInput(state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum).suppressBegEnvReset)) {
                 // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                 // easily converge fewer warmup days are allowed
                 DisplayString("Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
@@ -593,7 +593,7 @@ namespace SimulationManager {
                         }
 
                         if (AnyUnderwaterBoundaries) {
-                            WeatherManager::UpdateUnderwaterBoundaries();
+                            WeatherManager::UpdateUnderwaterBoundaries(state.dataWeatherManager);
                         }
 
                         if (DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 ||
@@ -621,14 +621,14 @@ namespace SimulationManager {
                             }
                         }
 
-                        ManageWeather();
+                        ManageWeather(state.dataWeatherManager);
 
                         ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
                         ManageHeatBalance(state);
 
                         if (oneTimeUnderwaterBoundaryCheck) {
-                            AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
+                            AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries(state.dataWeatherManager);
                             oneTimeUnderwaterBoundaryCheck = false;
                         }
 
@@ -2085,7 +2085,7 @@ namespace SimulationManager {
 
         while (Available) { // do for each environment
 
-            GetNextEnvironment(state, Available, ErrorsFound);
+            GetNextEnvironment(state, state.dataWeatherManager, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -2111,7 +2111,7 @@ namespace SimulationManager {
 
             BeginTimeStepFlag = true;
 
-            ManageWeather();
+            ManageWeather(state.dataWeatherManager);
 
             ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
@@ -2126,7 +2126,7 @@ namespace SimulationManager {
             //          ! do another timestep=1
             if (DeveloperFlag) DisplayString("Initializing Simulation - 2nd timestep 1:" + EnvironmentName);
 
-            ManageWeather();
+            ManageWeather(state.dataWeatherManager);
 
             ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
@@ -2139,7 +2139,7 @@ namespace SimulationManager {
             EndEnvrnFlag = true;
 
             if (DeveloperFlag) DisplayString("Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);
-            ManageWeather();
+            ManageWeather(state.dataWeatherManager);
 
             ManageExteriorEnergyUse(state.exteriorEnergyUse);
 

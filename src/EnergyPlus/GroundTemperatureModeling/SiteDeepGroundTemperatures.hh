@@ -59,7 +59,9 @@
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
-class OutputFiles;
+
+    class OutputFiles;
+    struct WeatherManagerData;
 
 // Derived class for Site:GroundTemperature:Deep
 class SiteDeepGroundTemps : public BaseGroundTempsModel
@@ -75,11 +77,11 @@ public:
 
     static std::shared_ptr<SiteDeepGroundTemps> DeepGTMFactory(OutputFiles &outputFiles, int objectType, std::string objectName);
 
-    Real64 getGroundTemp() override;
+    Real64 getGroundTemp(WeatherManagerData &dataWeatherManager) override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim) override;
+    Real64 getGroundTempAtTimeInSeconds(WeatherManagerData &dataWeatherManager, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim) override;
+    Real64 getGroundTempAtTimeInMonths(WeatherManagerData &dataWeatherManager, Real64 const depth, int const monthOfSim) override;
 };
 
 } // namespace EnergyPlus

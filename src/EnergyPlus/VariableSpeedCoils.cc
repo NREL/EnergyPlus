@@ -3821,19 +3821,9 @@ namespace VariableSpeedCoils {
         // Locals
         Real64 QLoadTotal; // placeholder for calculating SHR
 
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeVarSpeedCoil");
         static std::string const RoutineNameAlt("SizeHVACWaterToAir");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 rhoair;
         Real64 MixTemp = -999.0;
         Real64 MixHumRat = -999.0;
@@ -4240,7 +4230,7 @@ namespace VariableSpeedCoils {
             coilSelectionReportObj->setCoilEntAirHumRat(VarSpeedCoil(DXCoilNum).Name, VarSpeedCoil(DXCoilNum).VarSpeedCoilType, MixHumRat);
             coilSelectionReportObj->setCoilLvgAirTemp(VarSpeedCoil(DXCoilNum).Name, VarSpeedCoil(DXCoilNum).VarSpeedCoilType, SupTemp);
             coilSelectionReportObj->setCoilLvgAirHumRat(VarSpeedCoil(DXCoilNum).Name, VarSpeedCoil(DXCoilNum).VarSpeedCoilType, SupHumRat);
-            coilSelectionReportObj->setCoilCoolingCapacity(VarSpeedCoil(DXCoilNum).Name,
+            coilSelectionReportObj->setCoilCoolingCapacity(state.dataWeatherManager, VarSpeedCoil(DXCoilNum).Name,
                                                            VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                                                            RatedCapCoolTotalDes,
                                                            RatedCapCoolTotalAutoSized,
@@ -4284,7 +4274,7 @@ namespace VariableSpeedCoils {
             if (RatedCapHeatDes < SmallLoad) {
                 RatedCapHeatDes = 0.0;
             }
-            coilSelectionReportObj->setCoilHeatingCapacity(VarSpeedCoil(DXCoilNum).Name,
+            coilSelectionReportObj->setCoilHeatingCapacity(state.dataWeatherManager, VarSpeedCoil(DXCoilNum).Name,
                                                            VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                                                            RatedCapHeatDes,
                                                            RatedCapHeatAutoSized,

@@ -1147,10 +1147,6 @@ namespace WaterToAirHeatPumpSimple {
         // and heating capacities of a DX heat pump system will be identical. In real life the ARI
         // heating and cooling capacities are close but not identical.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using namespace Psychrometrics;
         using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::SmallAirVolFlow;
@@ -1165,20 +1161,9 @@ namespace WaterToAirHeatPumpSimple {
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeWaterToAirCoil");
         static std::string const RoutineNameAlt("SizeHVACWaterToAir");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 rhoair;
         Real64 MixTemp;
         Real64 MixHumRat;
@@ -1774,7 +1759,7 @@ namespace WaterToAirHeatPumpSimple {
                     }
                 }
             }
-            coilSelectionReportObj->setCoilCoolingCapacity(SimpleWatertoAirHP(HPNum).Name,
+            coilSelectionReportObj->setCoilCoolingCapacity(state.dataWeatherManager, SimpleWatertoAirHP(HPNum).Name,
                                                            CompType,
                                                            SimpleWatertoAirHP(HPNum).RatedCapCoolTotal,
                                                            RatedCapCoolTotalAutoSized,
@@ -1975,7 +1960,7 @@ namespace WaterToAirHeatPumpSimple {
                 }
             }
 
-            coilSelectionReportObj->setCoilHeatingCapacity(SimpleWatertoAirHP(HPNum).Name,
+            coilSelectionReportObj->setCoilHeatingCapacity(state.dataWeatherManager, SimpleWatertoAirHP(HPNum).Name,
                                                            CompType,
                                                            SimpleWatertoAirHP(HPNum).RatedCapHeat,
                                                            IsAutoSize,

@@ -192,7 +192,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     DataGlobals::MinutesPerTimeStep = 60;       // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state.outputFiles);    // read schedules
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.dataWeatherManager, state.outputFiles);
 
     ScheduleManager::Schedule(DataZoneControls::TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand;
 

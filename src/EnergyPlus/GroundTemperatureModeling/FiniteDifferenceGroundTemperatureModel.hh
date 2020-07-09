@@ -63,6 +63,7 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
+    struct WeatherManagerData;
 
 // Derived class for Finite-Difference Model
 class FiniteDiffGroundTempsModel : public BaseGroundTempsModel
@@ -137,7 +138,7 @@ public:
 
     void developMesh();
 
-    void performSimulation();
+    void performSimulation(WeatherManagerData &dataWeatherManager);
 
     void updateSurfaceCellTemperature();
 
@@ -145,7 +146,7 @@ public:
 
     void updateBottomCellTemperature();
 
-    void initDomain();
+    void initDomain(WeatherManagerData &dataWeatherManager);
 
     bool checkFinalTemperatureConvergence();
 
@@ -157,11 +158,11 @@ public:
 
     void doStartOfTimeStepInits();
 
-    Real64 getGroundTemp() override;
+    Real64 getGroundTemp(WeatherManagerData &dataWeatherManager) override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim) override;
+    Real64 getGroundTempAtTimeInSeconds(WeatherManagerData &dataWeatherManager, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim) override;
+    Real64 getGroundTempAtTimeInMonths(WeatherManagerData &dataWeatherManager, Real64 const depth, int const monthOfSim) override;
 
     void evaluateSoilRhoCp(Optional<int const> cell = _, Optional_bool_const InitOnly = _);
 

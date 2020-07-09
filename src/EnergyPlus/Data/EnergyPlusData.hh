@@ -77,6 +77,7 @@
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/WaterUse.hh>
+#include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowAC.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
@@ -126,6 +127,7 @@ namespace EnergyPlus {
         OutputFiles outputFiles;
 
         WaterUseData dataWaterUse;
+        WeatherManagerData dataWeatherManager;
         WindowACData dataWindowAC;
         WindowComplexManagerData dataWindowComplexManager;
         WindowEquivalentLayerData dataWindowEquivalentLayer;
@@ -171,6 +173,7 @@ namespace EnergyPlus {
             pipes.clear_state();
             dataPlantChillers.clear_state();
             dataWaterUse.clear_state();
+            dataWeatherManager.clear_state();
             dataWindowAC.clear_state();
             dataWindowComplexManager.clear_state();
             dataWindowEquivalentLayer.clear_state();

@@ -123,7 +123,7 @@ std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(int o
 
 //******************************************************************************
 
-Real64 XingGroundTempsModel::getGroundTemp()
+Real64 XingGroundTempsModel::getGroundTemp(WeatherManagerData &dataWeatherManager)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -136,11 +136,10 @@ Real64 XingGroundTempsModel::getGroundTemp()
 
     // USE STATEMENTS:
     using DataGlobals::Pi;
-    using WeatherManager::NumDaysInYear;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int n;
-    Real64 static tp(NumDaysInYear); // Period of soil temperature cycle
+    Real64 static tp(dataWeatherManager.NumDaysInYear); // Period of soil temperature cycle
     Real64 Ts_1;                     // Amplitude of surface temperature
     Real64 Ts_2;                     // Amplitude of surface temperature
     Real64 PL_1;                     // Phase shift of surface temperature
@@ -177,7 +176,7 @@ Real64 XingGroundTempsModel::getGroundTemp()
 
 //******************************************************************************
 
-Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(Real64 _depth, int _month)
+Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(WeatherManagerData &dataWeatherManager, Real64 _depth, int _month)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -189,10 +188,9 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(Real64 _depth, int _mon
     // Returns ground temperature when input time is in months
 
     // USE STATEMENTS:
-    using WeatherManager::NumDaysInYear;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 const aveDaysInMonth = NumDaysInYear / 12;
+    Real64 const aveDaysInMonth = dataWeatherManager.NumDaysInYear / 12;
 
     depth = _depth;
 
@@ -205,12 +203,12 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(Real64 _depth, int _mon
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(dataWeatherManager);
 }
 
 //******************************************************************************
 
-Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(Real64 _depth, Real64 seconds)
+Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(WeatherManagerData &dataWeatherManager, Real64 _depth, Real64 seconds)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -223,7 +221,6 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(Real64 _depth, Real64 
 
     // USE STATEMENTS:
     using DataGlobals::SecsInDay;
-    using WeatherManager::NumDaysInYear;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -231,11 +228,11 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(Real64 _depth, Real64 
 
     simTimeInDays = seconds / SecsInDay;
 
-    if (simTimeInDays > NumDaysInYear) {
-        simTimeInDays = remainder(simTimeInDays, NumDaysInYear);
+    if (simTimeInDays > dataWeatherManager.NumDaysInYear) {
+        simTimeInDays = remainder(simTimeInDays, dataWeatherManager.NumDaysInYear);
     }
 
-    return getGroundTemp();
+    return getGroundTemp(dataWeatherManager);
 }
 
 //******************************************************************************

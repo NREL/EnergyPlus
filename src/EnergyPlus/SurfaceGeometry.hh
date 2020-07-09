@@ -65,6 +65,7 @@ namespace EnergyPlus {
 
     // Forward declarations
     struct EnergyPlusData;
+    struct WeatherManagerData;
     struct ZoneTempPredictorCorrectorData;
     class OutputFiles;
 
@@ -129,7 +130,7 @@ namespace SurfaceGeometry {
 
     void AllocateModuleArrays();
 
-    void GetSurfaceData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles, bool &ErrorsFound); // If errors found in input
+    void GetSurfaceData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager, OutputFiles &outputFiles, bool &ErrorsFound); // If errors found in input
 
     void checkSubSurfAzTiltNorm(SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
@@ -151,7 +152,7 @@ namespace SurfaceGeometry {
                                   int const TotRectDetachedBldg   // Number of Building Detached Shading Surfaces to obtain
     );
 
-    void GetHTSurfaceData(OutputFiles &outputFiles,
+    void GetHTSurfaceData(WeatherManagerData &dataWeatherManager, OutputFiles &outputFiles,
                           bool &ErrorsFound,                // Error flag indicator (true if errors found)
                           int &SurfNum,                     // Count of Current SurfaceNumber
                           int const TotHTSurfs,             // Number of Heat Transfer Base Surfaces to obtain
@@ -262,7 +263,7 @@ namespace SurfaceGeometry {
 
     void GetHTSurfExtVentedCavityData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
-    void GetSurfaceHeatTransferAlgorithmOverrides(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles, bool &ErrorsFound);
+    void GetSurfaceHeatTransferAlgorithmOverrides(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, WeatherManagerData &dataWeatherManager, OutputFiles &outputFiles, bool &ErrorsFound);
 
     class ExposedFoundationPerimeter
     {
