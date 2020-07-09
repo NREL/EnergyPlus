@@ -12074,7 +12074,7 @@ namespace DXCoils {
                 } else {
                     if (FanOpMode == ContFanCycCoil) {
                         // average latent heat of vaporization, {J/kg} that maintains correct sensible/latent split;
-                        Hfg = Psychrometrics::PsyHfgAvgFnTdb2Tdb1(HSOutletAirDryBulbTemp * SpeedRatio + (1.0 - SpeedRatio) * LSOutletAirDryBulbTemp, InletAirDryBulbTemp); 
+                        Real64 MinAirHumRat = min(InletAirHumRat, SpeedRatio * HSOutletAirHumRat + (1.0 - SpeedRatio) * LSOutletAirHumRat);
                         // Average outlet HR
                         OutletAirHumRat = InletAirHumRat - DXCoil(DXCoilNum).LatCoolingEnergyRate / Hfg / DXCoil(DXCoilNum).InletAirMassFlowRate;
                     } else {
