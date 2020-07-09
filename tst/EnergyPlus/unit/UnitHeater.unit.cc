@@ -2440,7 +2440,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     EXPECT_EQ(state.dataZoneEquipmentManager.PrioritySimOrder(2).EquipName, "UNITHEATER");
     EXPECT_EQ(HeatingCoils::HeatingCoil(2).Name, "UNITHEATER_ELECTRICHEATER");
     // check the reheat coil output
-    EXPECT_NEAR(HeatingCoils::HeatingCoil(1).HeatingCoilRate, 7033.8, 1.0);
+    EXPECT_NEAR(HeatingCoils::HeatingCoil(1).HeatingCoilRate, 7028.9, 1.0);
     // check the unit heater heating coil output
     EXPECT_EQ(HeatingCoils::HeatingCoil(2).HeatingCoilRate, 0.0);
 
