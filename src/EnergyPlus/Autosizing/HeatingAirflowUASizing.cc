@@ -49,7 +49,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/api/TypeDefs.h>
 
 namespace EnergyPlus {
@@ -149,16 +148,9 @@ void HeatingAirflowUASizer::initializeFromAPI() {
 Real64 HeatingAirflowUASizer::size(Real64 _originalValue, bool &errorsFound)
 {
     if (this->isNotInitialized) {
-        this->errorType = AutoSizingResultType::ErrorType2;
-        this->autoSizedValue = 0.0;
-        errorsFound = true;
-        ShowSevereError("Developer Error: autosizing of water heating coil air flow used for UA failed.");
-        ShowContinueError("Occurs in water heating coil object= " + this->compName);
-        return this->autoSizedValue;
+        return this->unInitialized(errorsFound);
     }
-    this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
-    this->errorType = EnergyPlus::AutoSizingResultType::NoError;
     this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
@@ -221,12 +213,7 @@ Real64 HeatingAirflowUASizer::size(Real64 _originalValue, bool &errorsFound)
         }
     }
     if (this->autoSizedValue < DataHVACGlobals::SmallAirVolFlow) this->autoSizedValue = 0.0;
-    this->selectSizerOutput();
-    if (this->errorType != AutoSizingResultType::NoError) {
-        ShowSevereError("Developer Error: autosizing of water heating coil air flow used for UA failed.");
-        ShowContinueError("Occurs in water heating coil object= " + this->compName);
-        errorsFound = true;
-    }
+    this->selectSizerOutput(errorsFound);
     return this->autoSizedValue;
 }
 

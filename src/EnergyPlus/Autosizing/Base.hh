@@ -143,9 +143,11 @@ struct BaseSizer
                                   Optional_string_const UsrDesc = _,
                                   Optional<Real64 const> UsrValue = _);
 
-    void selectSizerOutput();
+    void selectSizerOutput(bool &errorsFound);
 
     static bool isValidCoilType(std::string const &compType);
+
+    Real64 unInitialized(bool &errorsFound);
 
     static void clear_state();
 };

@@ -115,6 +115,8 @@ void BaseSizer::preSize(Real64 const _originalValue)
         ShowFatalError("Developer Error: SizingType not defined.");
     }
     this->originalValue = _originalValue;
+    this->errorType = EnergyPlus::AutoSizingResultType::NoError;
+    this->isNotInitialized = true; // force use of Init then Size in subsequent calls
     this->hardSizeNoDesignRun = !(this->sysSizingRunDone || this->zoneSizingRunDone);
 
     if (this->curSysNum > 0 && this->curSysNum <= this->numPrimaryAirSys) {
@@ -218,7 +220,7 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
     }
 }
 
-void BaseSizer::selectSizerOutput()
+void BaseSizer::selectSizerOutput(bool &errorsFound)
 {
     if (this->printWarningFlag) {
         if (!this->wasAutoSized && (this->autoSizedValue == this->originalValue)) { // no sizing run done
@@ -251,9 +253,16 @@ void BaseSizer::selectSizerOutput()
         } else {
             ShowSevereError(this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.");
             ShowContinueError("SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->originalValue, 1));
+            this->errorType = AutoSizingResultType::ErrorType1;
         }
     } else if (!this->wasAutoSized) {
         this->autoSizedValue = this->originalValue;
+    }
+
+    if ( this->errorType != AutoSizingResultType::NoError ) {
+        ShowSevereError("Developer Error: sizing of " + this->sizingString + " failed.");
+        ShowContinueError("Occurs in " + this->compType + " " + this->compName);
+        errorsFound = true;
     }
 }
 bool BaseSizer::isValidCoilType(std::string const &_compType)
@@ -265,4 +274,15 @@ bool BaseSizer::isValidCoilType(std::string const &_compType)
     }
     return false;
 }
+
+Real64 BaseSizer::unInitialized(bool &errorsFound)
+{
+    this->errorType = AutoSizingResultType::ErrorType2;
+    this->autoSizedValue = 0.0;
+    errorsFound = true;
+    ShowSevereError("Developer Error: sizing of " + this->sizingString + " failed.");
+    ShowContinueError("Occurs in " + this->compType + " " + this->compName);
+    return this->autoSizedValue;
+}
+
 } // namespace EnergyPlus

@@ -47,7 +47,6 @@
 
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
@@ -55,8 +54,6 @@
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/api/TypeDefs.h>
-
-#include <EnergyPlus/ReportSizingManager.hh>
 
 namespace EnergyPlus {
 
@@ -77,16 +74,9 @@ void CoolingWaterDesAirOutletHumRatSizer::initializeWithinEP(EnergyPlusData &sta
 Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &errorsFound)
 {
     if (this->isNotInitialized) {
-        this->errorType = AutoSizingResultType::ErrorType2;
-        this->autoSizedValue = 0.0;
-        errorsFound = true;
-        ShowSevereError("Developer Error: autosizing of water cooling coil design air inlet humidity ratio failed.");
-        ShowContinueError("Occurs in water cooling coil object= " + this->compName);
-        return this->autoSizedValue;
+        return this->unInitialized(errorsFound);
     }
-    this->isNotInitialized = true; // force use of Init then Size in subsequent calls
 
-    this->errorType = EnergyPlus::AutoSizingResultType::NoError;
     this->preSize(_originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
@@ -111,9 +101,9 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &er
             if (this->curOASysNum > 0) { // coil is in OA stream
                 if (DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                     this->autoSizedValue =
-                        this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
+                        this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].PrecoolHumRat;
                 } else {
-                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).OutHumRatAtCoolPeak;
+                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).PrecoolHumRat;
                 }
             } else if (this->dataDesOutletAirHumRat > 0.0) {
                 this->autoSizedValue = this->dataDesOutletAirHumRat;
@@ -129,8 +119,8 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &er
              UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
             ShowWarningError(this->callingRoutine + ":" + " Coil=\"" + this->compName +
                              "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.");
-            ShowContinueError("    Wair,in =  " + General::RoundSigDigits(this->dataDesInletAirHumRat, 6));
-            ShowContinueError("    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6));
+            ShowContinueError("    Wair,in =  " + General::RoundSigDigits(this->dataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]");
+            ShowContinueError("    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6) + " [kgWater/kgDryAir]");
             if (this->dataDesInletAirHumRat > 0.016) {
                 this->autoSizedValue = 0.5 * this->dataDesInletAirHumRat;
             } else {
@@ -149,7 +139,7 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &er
                  UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
                 ShowWarningError(this->callingRoutine + ":" + " Coil=\"" + this->compName +
                                  "\", Cooling Coil is running dry for sizing and has minimum humidity ratio at saturation for inlet chilled water "
-                                 "temperature > coil entering air humidity ratio.");
+                                 "temperature > design air entering humidity ratio.");
                 ShowContinueError("    Wair,in =  " + General::RoundSigDigits(this->dataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]");
                 ShowContinueError("    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6) + " [kgWater/kgDryAir]");
                 ShowContinueError("    Inlet chilled water temperature = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3) + " [C]");
@@ -162,13 +152,8 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &er
         }
     }
 
-    this->selectSizerOutput();
+    this->selectSizerOutput(errorsFound);
     if (this->getCoilReportObject) coilSelectionReportObj->setCoilLvgAirHumRat(this->compName, this->compType, this->autoSizedValue);
-    if (this->errorType != AutoSizingResultType::NoError) {
-        ShowSevereError("Developer Error: autosizing of water cooling coil design air outlet humidity ratio failed.");
-        ShowContinueError("Occurs in water cooling coil object= " + this->compName);
-        errorsFound = true;
-    }
     return this->autoSizedValue;
 }
 
