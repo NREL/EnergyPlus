@@ -45,44 +45,37 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#ifndef HeatingWaterDesAirInletHumRatSizing_hh_INCLUDED
+#define HeatingWaterDesAirInletHumRatSizing_hh_INCLUDED
+
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/api/TypeDefs.h>
+#include <ObjexxFCL/Array1D.hh>
 
 namespace EnergyPlus {
 
-void CoolingWaterDesWaterInletTempSizer::initializeWithinEP(EnergyPlusData &state,
-                                                            std::string const &_compType,
-                                                            std::string const &_compName,
-                                                            bool const &_printWarningFlag,
-                                                            std::string const &_callingRoutine)
+struct HeatingWaterDesAirInletHumRatSizer : BaseSizer
 {
-    BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
-    this->sizingString = "Design Inlet Water Temperature [C]";
-    this->dataPltSizCoolNum = DataSizing::DataPltSizCoolNum;
-}
 
-Real64 CoolingWaterDesWaterInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
-{
-    if (this->isNotInitialized) {
-        return this->unInitialized(errorsFound);
-    }
-    this->preSize(_originalValue);
+    Array1D<DataSizing::ZoneSizingData> termUnitFinalZoneSizing;
 
-    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || DataSizing::PlantSizData.size() == 0)) {
-        this->autoSizedValue = _originalValue;
-    } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
-        this->autoSizedValue = DataSizing::PlantSizData(this->dataPltSizCoolNum).ExitTemp;
-    } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
-        this->autoSizedValue = DataSizing::PlantSizData(this->dataPltSizCoolNum).ExitTemp;
-    } else {
-        this->errorType = AutoSizingResultType::ErrorType1;
+    Real64 dataFlowUsedForSizing = 0.0;
+
+    HeatingWaterDesAirInletHumRatSizer()
+    {
+        this->sizingType = AutoSizingType::HeatingWaterDesAirInletHumRatSizing;
     }
-    this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->autoSizedValue);
-    return this->autoSizedValue;
-}
+    ~HeatingWaterDesAirInletHumRatSizer() = default;
+
+    void initializeWithinEP(EnergyPlusData &state,
+                            std::string const &_compType,
+                            std::string const &_compName,
+                            bool const &_printWarningFlag,
+                            std::string const &_callingRoutine) override;
+
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
+};
 
 } // namespace EnergyPlus
+
+#endif

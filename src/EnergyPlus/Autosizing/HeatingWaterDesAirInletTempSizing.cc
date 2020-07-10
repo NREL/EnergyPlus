@@ -73,8 +73,8 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
     if (this->isNotInitialized) {
         return this->unInitialized(errorsFound);
     }
-
     this->preSize(_originalValue);
+
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
