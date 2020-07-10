@@ -7716,14 +7716,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     SecondaryAirMassFlowRate = Node(thisFanCoil.AirInNode).MassFlowRate - PrimaryAirMassFlowRate;
     // check results in heating mode operation
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-    EXPECT_NEAR(thisFanCoil.PLR, 0.18762, 0.00001);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.18700, 0.00001);
     // check mass flow rates
     EXPECT_NEAR(PrimaryAirMassFlowRate, 0.1, 0.0001); // user input
-    EXPECT_NEAR(SecondaryAirMassFlowRate, 0.035573, 0.000001);
+    EXPECT_NEAR(SecondaryAirMassFlowRate, 0.035129, 0.000001);
     EXPECT_NEAR(Node(thisFanCoil.AirInNode).MassFlowRate, thisFan.InletAirMassFlowRate, 0.000001);
     EXPECT_NEAR(Node(thisFanCoil.ATMixerPriNode).MassFlowRate, 0.1, 0.000001);
-    EXPECT_NEAR(Node(thisFanCoil.ATMixerSecNode).MassFlowRate, 0.035573, 0.000001);
-    EXPECT_NEAR(Node(thisFanCoil.ATMixerOutNode).MassFlowRate, 0.135573, 0.000001);
+    EXPECT_NEAR(Node(thisFanCoil.ATMixerSecNode).MassFlowRate, 0.035129, 0.000001);
+    EXPECT_NEAR(Node(thisFanCoil.ATMixerOutNode).MassFlowRate, 0.135129, 0.000001);
 
     // set zone air node conditions
     Node(zoneEquipConfig.ZoneNode).Temp = 24.0;
@@ -7759,14 +7759,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     SecondaryAirMassFlowRate = Node(thisFanCoil.AirInNode).MassFlowRate - PrimaryAirMassFlowRate;
     // check results in cooling mode operation
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
-    EXPECT_NEAR(thisFanCoil.PLR, 0.83951, 0.00001);
+    EXPECT_NEAR(thisFanCoil.PLR, 0.83865, 0.00001);
     // check mass flow rates
     EXPECT_NEAR(PrimaryAirMassFlowRate, 0.2, 0.000001);
-    EXPECT_NEAR(SecondaryAirMassFlowRate, 0.406619, 0.000001);
+    EXPECT_NEAR(SecondaryAirMassFlowRate, 0.405995, 0.000001);
     EXPECT_NEAR(Node(thisFanCoil.AirInNode).MassFlowRate, thisFan.InletAirMassFlowRate, 0.000001);
     EXPECT_NEAR(Node(thisFanCoil.ATMixerPriNode).MassFlowRate, 0.2, 0.0001);
-    EXPECT_NEAR(Node(thisFanCoil.ATMixerSecNode).MassFlowRate, 0.406619, 0.000001);
-    EXPECT_NEAR(Node(thisFanCoil.ATMixerOutNode).MassFlowRate, 0.606619, 0.000001);
+    EXPECT_NEAR(Node(thisFanCoil.ATMixerSecNode).MassFlowRate, 0.405995, 0.000001);
+    EXPECT_NEAR(Node(thisFanCoil.ATMixerOutNode).MassFlowRate, 0.605995, 0.000001);
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
