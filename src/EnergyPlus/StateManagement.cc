@@ -218,7 +218,6 @@
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/WindowAC.hh>
 
 void EnergyPlus::clearThisState(EnergyPlusData &state)
 {
@@ -395,6 +394,5 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     WaterUse::clear_state();
     WeatherManager::clear_state();
-    WindowAC::clear_state();
     ResultsFramework::clear_state();
 }
