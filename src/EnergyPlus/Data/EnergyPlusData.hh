@@ -69,16 +69,26 @@
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/CostEstimateManager.hh>
+#include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/WindowAC.hh>
+#include <EnergyPlus/WindowComplexManager.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
+#include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+
 #include <unordered_map>
 #include <string>
 
@@ -100,7 +110,10 @@ namespace EnergyPlus {
         ChillerIndirectAbsoprtionData dataChillerIndirectAbsorption;
         ChillerGasAbsorptionData dataChillerGasAbsorption;
         ChillerReformulatedEIRData dataChillerReformulatedEIR;
+        ConvectionCoefficientsData dataConvectionCoefficients;
         CondenserLoopTowersData dataCondenserLoopTowers;
+        CostEstimateManagerData dataCostEstimateManager;
+        CoolTowerData dataCoolTower;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
@@ -114,6 +127,12 @@ namespace EnergyPlus {
         // after we've plumbed enough of the functions to allow
         OutputFiles outputFiles;
 
+        WindowACData dataWindowAC;
+        WindowComplexManagerData dataWindowComplexManager;
+        WindowEquivalentLayerData dataWindowEquivalentLayer;
+        WindowManagerData dataWindowManager;
+        ZoneAirLoopEquipmentManagerData dataZoneAirLoopEquipmentManager;
+        ZoneContaminantPredictorCorrectorData dataZoneContaminantPredictorCorrector;
         ZoneDehumidifierData dataZoneDehumidifier;
         ZoneEquipmentManagerData dataZoneEquipmentManager;
         ZonePlenumData dataZonePlenum;
@@ -143,13 +162,22 @@ namespace EnergyPlus {
             dataChillerGasAbsorption.clear_state();
             dataChillerIndirectAbsorption.clear_state();
             dataChillerReformulatedEIR.clear_state();
+            dataConvectionCoefficients.clear_state();
             dataCondenserLoopTowers.clear_state();
+            dataCostEstimateManager.clear_state();
+            dataCoolTower.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
             fans.clear_state();
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataWindowAC.clear_state();
+            dataWindowComplexManager.clear_state();
+            dataWindowEquivalentLayer.clear_state();
+            dataWindowManager.clear_state();
+            dataZoneAirLoopEquipmentManager.clear_state();
+            dataZoneContaminantPredictorCorrector.clear_state();
             dataZoneDehumidifier.clear_state();
             dataZoneEquipmentManager.clear_state();
             dataZonePlenum.clear_state();

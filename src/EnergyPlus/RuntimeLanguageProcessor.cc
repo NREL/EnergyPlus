@@ -55,16 +55,15 @@
 #include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/char.functions.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/random.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
@@ -2471,7 +2470,6 @@ namespace RuntimeLanguageProcessor {
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
         using DataGlobals::TimeStepZone;
-        using DataHeatBalance::Construct;
         using General::TrimSigDigits;
 
         // Locals
@@ -2814,7 +2812,7 @@ namespace RuntimeLanguageProcessor {
                         continue;
                     }
 
-                    ConstructNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Construct);
+                    ConstructNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), dataConstruction.Construct);
 
                     if (ConstructNum == 0) {
                         if (lAlphaFieldBlanks(2)) {

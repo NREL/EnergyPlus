@@ -99,6 +99,8 @@ namespace General {
 
     // Functions
 
+    void clear_state();
+
     void SolveRoot(Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status

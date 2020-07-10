@@ -113,6 +113,14 @@ namespace HVACDuct {
 
     // Object Data
     Array1D<DuctData> Duct;
+    bool GetInputFlag(true); // First time, input is "gotten"
+
+    void clear_state() {
+        NumDucts = 0;
+        CheckEquipName.clear();
+        Duct.clear();
+        GetInputFlag = true; // First time, input is "gotten"
+    }
 
     // Functions
 
@@ -135,7 +143,6 @@ namespace HVACDuct {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true); // First time, input is "gotten"
         int DuctNum;                    // index of duct being simulated
 
         if (GetInputFlag) {

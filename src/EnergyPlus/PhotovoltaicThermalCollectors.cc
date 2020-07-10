@@ -153,7 +153,7 @@ namespace PhotovoltaicThermalCollectors {
 
         this->initialize(state.dataBranchInputManager, FirstHVACIteration);
         this->control();
-        this->calculate();
+        this->calculate(state.dataConvectionCoefficients);
         this->update();
     }
 
@@ -844,7 +844,7 @@ namespace PhotovoltaicThermalCollectors {
         }
     }
 
-    void PVTCollectorStruct::calculate()
+    void PVTCollectorStruct::calculate(ConvectionCoefficientsData &dataConvectionCoefficients)
     {
 
         // SUBROUTINE INFORMATION:
@@ -947,7 +947,8 @@ namespace PhotovoltaicThermalCollectors {
                 Real64 HcExt(0.0);
                 Real64 HrSky(0.0);
 
-                ConvectionCoefficients::InitExteriorConvectionCoeff(this->SurfNum,
+                ConvectionCoefficients::InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                                                                    this->SurfNum,
                                                                     0.0,
                                                                     DataHeatBalance::VerySmooth,
                                                                     this->Simple.SurfEmissivity,

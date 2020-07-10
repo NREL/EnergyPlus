@@ -333,7 +333,7 @@ namespace SimulationManager {
         AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state.outputFiles);
-        GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+        GetProjectData(state, state.outputFiles);
         CheckForMisMatchedEnvironmentSpecifications();
         CheckForRequestedReporting();
         SetPredefinedTables();
@@ -684,9 +684,9 @@ namespace SimulationManager {
 
         WriteTabularReports(state); //     Create the tabular reports at completion of each
 
-        WriteTabularTariffReports();
+        WriteTabularTariffReports(state.dataCostEstimateManager);
 
-        ComputeLifeCycleCostAndReport(); // must be after WriteTabularReports and WriteTabularTariffReports
+        ComputeLifeCycleCostAndReport(state.dataCostEstimateManager); // must be after WriteTabularReports and WriteTabularTariffReports
 
         CloseOutputTabularFile();
 
@@ -711,7 +711,7 @@ namespace SimulationManager {
         }
     }
 
-    void GetProjectData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles)
+    void GetProjectData(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -754,8 +754,6 @@ namespace SimulationManager {
         int Num;
         int Which;
         bool ErrorsFound;
-        int Num1;
-        int NumA;
         int NumRunControl;
         static std::string VersionID;
         std::string CurrentModuleObject;
@@ -1033,71 +1031,106 @@ namespace SimulationManager {
         EvenDuringWarmup = false;
         CurrentModuleObject = "Output:DebuggingData";
         NumDebugOut = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (NumDebugOut > 1) {
+            ShowWarningError(CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
+        }
         if (NumDebugOut > 0) {
             inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat);
-            if (int(Number(1)) == 1) {
-                DebugOutput = true;
+            if (NumAlpha >= 1) {
+                DebugOutput = UtilityRoutines::SameString(Alphas(1), "Yes");
             }
-            if (int(Number(2)) == 1) {
-                EvenDuringWarmup = true;
+            if (NumAlpha >= 2) {
+                EvenDuringWarmup = UtilityRoutines::SameString(Alphas(2), "Yes");
             }
         }
 
-        CurrentModuleObject = "Output:Diagnostics";
-        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        for (Num1 = 1; Num1 <= Num; ++Num1) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Num1, Alphas, NumAlpha, Number, NumNumber, IOStat);
-            for (NumA = 1; NumA <= NumAlpha; ++NumA) {
-                if (UtilityRoutines::SameString(Alphas(NumA), "DisplayExtraWarnings")) {
-                    DisplayExtraWarnings = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayAdvancedReportVariables")) {
-                    DisplayAdvancedReportVariables = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayAllWarnings")) {
-                    DisplayAllWarnings = true;
-                    DisplayExtraWarnings = true;
-                    DisplayUnusedObjects = true;
-                    DisplayUnusedSchedules = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayUnusedObjects")) {
-                    DisplayUnusedObjects = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayUnusedSchedules")) {
-                    DisplayUnusedSchedules = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayZoneAirHeatBalanceOffBalance")) {
-                    DisplayZoneAirHeatBalanceOffBalance = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DoNotMirrorDetachedShading")) {
-                    MakeMirroredDetachedShading = false;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DoNotMirrorAttachedShading")) {
-                    MakeMirroredAttachedShading = false;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "ReportDuringWarmup")) {
-                    ReportDuringWarmup = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayWeatherMissingDataWarnings")) {
-                    DisplayWeatherMissingDataWarnings = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "IgnoreSolarRadiation")) {
-                    IgnoreSolarRadiation = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "IgnoreBeamRadiation")) {
-                    IgnoreBeamRadiation = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "IgnoreDiffuseRadiation")) {
-                    IgnoreDiffuseRadiation = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DeveloperFlag")) {
-                    DeveloperFlag = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "TimingFlag")) {
-                    TimingFlag = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "ReportDetailedWarmupConvergence")) {
-                    ReportDetailedWarmupConvergence = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "ReportDuringHVACSizingSimulation")) {
-                    ReportDuringHVACSizingSimulation = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "CreateMinimalSurfaceVariables")) {
-                    continue;
-                    //        CreateMinimalSurfaceVariables=.TRUE.
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "CreateNormalSurfaceVariables")) {
-                    continue;
-                    //        IF (CreateMinimalSurfaceVariables) THEN
-                    //          CALL ShowWarningError('GetProjectData: '//TRIM(CurrentModuleObject)//'=''//  &
-                    //             TRIM(Alphas(NumA))//'', prior set=true for this condition reverts to false.')
-                    //        ENDIF
-                    //        CreateMinimalSurfaceVariables=.FALSE.
-                } else if (!Alphas(NumA).empty()) {
-                    ShowWarningError("GetProjectData: " + CurrentModuleObject + "=\"" + Alphas(NumA) +
-                                     "\", Invalid value for field, entered value ignored.");
+        {
+            CurrentModuleObject = "Output:Diagnostics";
+            Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+            if (Num > 1) {
+                // Let it slide, but warn
+                // ErrorsFound = true;
+                ShowWarningError(CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
+            }
+            auto const instances = inputProcessor->epJSON.find(CurrentModuleObject);
+
+            if (instances != inputProcessor->epJSON.end()) {
+                auto &instancesValue = instances.value();
+                for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                    auto const &fields = instance.value();
+                    auto const &thisObjectName = instance.key();
+                    inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
+
+                    auto diagnosticsExtensibles = fields.find("diagnostics");
+                    if (diagnosticsExtensibles != fields.end()) {
+                        auto diagnosticsExtensiblesArray = diagnosticsExtensibles.value();
+                        for (auto diagnosticsExtensible : diagnosticsExtensiblesArray) {
+
+                            // We want to avoid cryptic failures such as this one: "[json.exception.out_of_range.403] key 'key' not found"
+                            // Which happens if you put an "empty" entry in the extensible portion
+                            auto it = diagnosticsExtensible.find("key");
+                            if (it == diagnosticsExtensible.end()) {
+                                ShowWarningError(CurrentModuleObject + ": empty key found, consider removing it to avoid this warning.");
+                                continue;
+                            }
+                            std::string diagnosticName = *it;
+
+                            if (UtilityRoutines::SameString(diagnosticName, "DisplayExtraWarnings")) {
+                                DisplayExtraWarnings = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayAdvancedReportVariables")) {
+                                DisplayAdvancedReportVariables = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayAllWarnings")) {
+                                DisplayAllWarnings = true;
+                                DisplayExtraWarnings = true;
+                                DisplayUnusedObjects = true;
+                                DisplayUnusedSchedules = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayUnusedObjects")) {
+                                DisplayUnusedObjects = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayUnusedSchedules")) {
+                                DisplayUnusedSchedules = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayZoneAirHeatBalanceOffBalance")) {
+                                DisplayZoneAirHeatBalanceOffBalance = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorDetachedShading")) {
+                                MakeMirroredDetachedShading = false;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorAttachedShading")) {
+                                MakeMirroredAttachedShading = false;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringWarmup")) {
+                                ReportDuringWarmup = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayWeatherMissingDataWarnings")) {
+                                DisplayWeatherMissingDataWarnings = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreSolarRadiation")) { // TODO: Not a valid key choice
+                                IgnoreSolarRadiation = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreBeamRadiation")) { // TODO: Not a valid key choice
+                                IgnoreBeamRadiation = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreDiffuseRadiation")) { // TODO: Not a valid key choice
+                                IgnoreDiffuseRadiation = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DeveloperFlag")) { // TODO: Not a valid key choice
+                                DeveloperFlag = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "TimingFlag")) { // TODO: Not a valid key choice
+                                TimingFlag = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "ReportDetailedWarmupConvergence")) {
+                                ReportDetailedWarmupConvergence = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringHVACSizingSimulation")) {
+                                ReportDuringHVACSizingSimulation = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "CreateMinimalSurfaceVariables")) { // TODO: Not a valid key choice
+                                continue;
+                                //        CreateMinimalSurfaceVariables=.TRUE.
+                            } else if (UtilityRoutines::SameString(diagnosticName, "CreateNormalSurfaceVariables")) { // TODO: Not a valid key choice
+                                continue;
+                                //        IF (CreateMinimalSurfaceVariables) THEN
+                                //          CALL ShowWarningError('GetProjectData: '//TRIM(CurrentModuleObject)//'=''//  &
+                                //             TRIM(diagnosticName)//'', prior set=true for this condition reverts to false.')
+                                //        ENDIF
+                                //        CreateMinimalSurfaceVariables=.FALSE.
+                            } else if (!diagnosticName.empty()) {
+                                ShowWarningError("GetProjectData: " + CurrentModuleObject + "=\"" + diagnosticName +
+                                                 "\", Invalid value for field, entered value ignored.");
+                            }
+                        }
+                    }
+
+                    // Don't process the duplicate ones
+                    break;
                 }
             }
         }
@@ -1195,7 +1228,7 @@ namespace SimulationManager {
                 bool overrideMinNumWarmupDays(false);
                 bool overrideBeginEnvResetSuppress(false);
                 bool overrideMaxZoneTempDiff(false);
-                dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
+                state.dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
                     if (overrideModeValue == "NORMAL") {
@@ -3117,8 +3150,8 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
     if (ResimHB) {
         // Surface simulation
         InitSurfaceHeatBalance(state);
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
-        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state.dataZoneTempPredictorCorrector);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
         // Air simulation
         InitAirHeatBalance();
@@ -3131,10 +3164,10 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
     if (ResimHVAC) {
         // HVAC simulation
         ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state.dataZonePlenum, iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0);
+        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0);
         CalcAirFlowSimple(state, 0, ZoneAirMassFlow.EnforceZoneMassBalance);
         ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state.dataZonePlenum, iPredictStep, false, UseZoneTimeStepHistory, 0.0);
+        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);
 
         ++DemandManagerHVACIterations;
