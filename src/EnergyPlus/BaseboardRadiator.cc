@@ -137,7 +137,6 @@ namespace BaseboardRadiator {
         using PlantUtilities::SetActuatedBranchFlowRate;
 
         int BaseboardNum;               // index of unit in baseboard array
-        static bool GetInputFlag(true); // one time get input flag
         Real64 QZnReq;                  // zone load not yet satisfied
         Real64 MaxWaterFlow;
         Real64 MinWaterFlow;
@@ -145,9 +144,9 @@ namespace BaseboardRadiator {
 
         auto &baseboard = state.dataBaseboardRadiator;
 
-        if (GetInputFlag) {
+        if (baseboard.getInputFlag) {
             GetBaseboardInput(baseboard);
-            GetInputFlag = false;
+            baseboard.getInputFlag = false;
         }
 
         // Find the correct Baseboard Equipment
@@ -282,7 +281,7 @@ namespace BaseboardRadiator {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
 
         cCurrentModuleObject = cCMO_BBRadiator_Water;
 
@@ -524,10 +523,7 @@ namespace BaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
         int ZoneNode;
-        static bool MyOneTimeFlag(true);
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
-        static Array1D_bool MyEnvrnFlag;
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
         bool errFlag;
@@ -536,13 +532,6 @@ namespace BaseboardRadiator {
 
         if (baseboard.Baseboard(BaseboardNum).ZonePtr <= 0) baseboard.Baseboard(BaseboardNum).ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
-        // Do the one time initializations
-        if (MyOneTimeFlag) {
-            // initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(baseboard.NumBaseboards);
-            MyEnvrnFlag = true;
-            MyOneTimeFlag = false;
-        }
         if (baseboard.Baseboard(BaseboardNum).SetLoopIndexFlag && allocated(PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(state.dataBranchInputManager,
@@ -564,8 +553,8 @@ namespace BaseboardRadiator {
             baseboard.Baseboard(BaseboardNum).SetLoopIndexFlag = false;
         }
         // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
-            ZoneEquipmentListChecked = true;
+        if (!baseboard.ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+            baseboard.ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= baseboard.NumBaseboards; ++Loop) {
                 if (CheckZoneEquipmentList(cCMO_BBRadiator_Water, baseboard.Baseboard(Loop).EquipID)) continue;
                 ShowSevereError("InitBaseboard: Unit=[" + cCMO_BBRadiator_Water + ',' + baseboard.Baseboard(Loop).EquipID +
@@ -581,7 +570,7 @@ namespace BaseboardRadiator {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum) && !baseboard.Baseboard(BaseboardNum).SetLoopIndexFlag) {
+        if (BeginEnvrnFlag && baseboard.Baseboard(BaseboardNum).MyEnvrnFlag && !baseboard.Baseboard(BaseboardNum).SetLoopIndexFlag) {
             WaterInletNode = baseboard.Baseboard(BaseboardNum).WaterInletNode;
             rho = GetDensityGlycol(PlantLoop(baseboard.Baseboard(BaseboardNum).LoopNum).FluidName,
                                    DataGlobals::HWInitConvTemp,
@@ -609,11 +598,11 @@ namespace BaseboardRadiator {
             if (baseboard.Baseboard(BaseboardNum).AirMassFlowRate <= 0.0) {
                 baseboard.Baseboard(BaseboardNum).AirMassFlowRate = 2.0 * baseboard.Baseboard(BaseboardNum).WaterMassFlowRateMax;
             }
-            MyEnvrnFlag(BaseboardNum) = false;
+            baseboard.Baseboard(BaseboardNum).MyEnvrnFlag = false;
         }
 
         if (!BeginEnvrnFlag) {
-            MyEnvrnFlag(BaseboardNum) = true;
+            baseboard.Baseboard(BaseboardNum).MyEnvrnFlag = true;
         }
 
         // Do the every time step initializations

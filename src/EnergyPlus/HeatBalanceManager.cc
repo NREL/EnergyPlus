@@ -5904,7 +5904,7 @@ namespace HeatBalanceManager {
             }
 
             UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
-            UpdateUtilityBills();
+            UpdateUtilityBills(state.dataCostEstimateManager);
         } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
             if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                 PrintEnvrnStampWarmup = true;

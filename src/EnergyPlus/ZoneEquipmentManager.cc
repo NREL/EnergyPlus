@@ -4758,7 +4758,7 @@ namespace ZoneEquipmentManager {
         }
 
         ManageEarthTube();
-        ManageCoolTower();
+        ManageCoolTower(state.dataCoolTower);
         ManageThermalChimney();
 
         // Assign zone air temperature
