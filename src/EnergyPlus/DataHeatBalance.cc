@@ -1928,7 +1928,7 @@ namespace DataHeatBalance {
         using DataSurfaces::ModelAsDiffuse;
         using DataSurfaces::ModelAsDirectBeam;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceWindow;
+//        using DataSurfaces::SurfaceWindow;
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -2387,7 +2387,7 @@ namespace DataHeatBalance {
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
-        using DataSurfaces::SurfaceWindow;
+//        using DataSurfaces::SurfaceWindow;
         using DataSurfaces::TotSurfaces;
 
         // Locals

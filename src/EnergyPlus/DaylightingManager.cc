@@ -2104,9 +2104,9 @@ namespace DaylightingManager {
 
             // Copy several values from the diffuser so that DayltgInterReflectedIllum works correctly
             // These are specific to the interior.
-            SurfWinRhoCeilingWall(IWin2) = SurfWinRhoCeilingWall(IWin2);
-            SurfWinRhoFloorWall(IWin2) = SurfWinRhoFloorWall(IWin2);
-            SurfWinFractionUpgoing(IWin2) = SurfWinFractionUpgoing(IWin2);
+            SurfWinRhoCeilingWall(IWin2) = SurfWinRhoCeilingWall(IWin);
+            SurfWinRhoFloorWall(IWin2) = SurfWinRhoFloorWall(IWin);
+            SurfWinFractionUpgoing(IWin2) = SurfWinFractionUpgoing(IWin);
             SurfWinGlazedFrac(IWin2) = SurfWinGlazedFrac(IWin);
 
         } else {
