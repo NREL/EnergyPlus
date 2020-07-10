@@ -9165,7 +9165,7 @@ namespace WeatherManager {
         bool epwFileExists;
         bool epwHasLeapYear(false);
 
-        if (!OADryBulbAverage.OADryBulbWeatherDataProcessed) {
+        if (!this->OADryBulbWeatherDataProcessed) {
             {
                 {
                     IOFlags flags;
@@ -9225,10 +9225,10 @@ namespace WeatherManager {
                     MonthlyDailyDryBulbMax = max(MonthlyDailyDryBulbMax, MonthlyAverageDryBulbTemp(i));
                     AnnualNumberOfDays += EndDayOfMonth(i);
                 }
-                OADryBulbAverage.AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
-                OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
-                OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
-                OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
+                this->AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
+                this->MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
+                this->MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
+                this->OADryBulbWeatherDataProcessed = true;
             } else if (epwFileExists) {
                 epwFile = GetNewUnitNumber();
                 {
@@ -9298,10 +9298,10 @@ namespace WeatherManager {
                 // outdoor air temperature maximum difference
                 AnnualNumberOfDays = 365;
                 if (epwHasLeapYear) AnnualNumberOfDays = AnnualNumberOfDays + 1;
-                OADryBulbAverage.AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
-                OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
-                OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
-                OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
+                this->AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
+                this->MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
+                this->MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
+                this->OADryBulbWeatherDataProcessed = true;
             } else {
                 ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exist.");
                 ShowContinueError("Weather file: " + DataStringGlobals::inputWeatherFileName + ".");
