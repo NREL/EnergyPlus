@@ -51,7 +51,6 @@
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -111,17 +110,21 @@
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Furnaces.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
 #include <EnergyPlus/HVACControllers.hh>
+#include <EnergyPlus/HVACCooledBeam.hh>
+#include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
@@ -160,6 +163,7 @@
 #include <EnergyPlus/PVWatts.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/Pipes.hh>
@@ -224,7 +228,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     using namespace EnergyPlus;
     // A to Z order
     CoilCoolingDX::clear_state();
-    CoolTower::clear_state();
     CrossVentMgr::clear_state();
     CTElectricGenerator::clear_state();
     CurveManager::clear_state();
@@ -285,6 +288,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     FluidCoolers::clear_state();
     FluidProperties::clear_state();
     Furnaces::clear_state();
+    General::clear_state();
     GlobalNames::clear_state();
     GroundHeatExchangers::clear_state();
     GroundTemperatureManager::clear_state();
@@ -301,11 +305,14 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     HighTempRadiantSystem::clear_state();
     Humidifiers::clear_state();
     HVACControllers::clear_state();
+    HVACCooledBeam::clear_state();
+    HVACDuct::clear_state();
     HVACDXHeatPumpSystem::clear_state();
     HVACDXSystem::clear_state();
     HVACHXAssistedCoolingCoil::clear_state();
     HVACFan::clearHVACFanObjects();
     HVACManager::clear_state();
+    HVACMultiSpeedHeatPump::clear_state();
     HVACSingleDuctInduc::clear_state();
     HVACStandAloneERV::clear_state();
     HVACUnitaryBypassVAV::clear_state();
@@ -331,6 +338,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();
     PackagedTerminalHeatPump::clear_state();
+    Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
     Pipes::clear_state();
     PipeHeatTransfer::clear_state();
