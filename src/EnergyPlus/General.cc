@@ -120,6 +120,11 @@ namespace General {
     // PUBLIC  ErfFunction
 
     // Functions
+    static bool GetReportInput(true);
+
+    void clear_state() {
+        GetReportInput = true;
+    }
 
     void SolveRoot(Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
@@ -3219,7 +3224,6 @@ namespace General {
         static std::string VarDictOption2;
         //  LOGICAL,SAVE :: SchRpt = .FALSE.
         //  CHARACTER(len=MaxNameLength) :: SchRptOption
-        static bool GetReportInput(true);
 
         if (GetReportInput) {
 
