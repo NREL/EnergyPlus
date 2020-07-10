@@ -543,9 +543,9 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
     NonrecurringCost(1).startOfCosts = startServicePeriod;
     NonrecurringCost(1).totalMonthsFromStart = 10;
 
-    ExpressAsCashFlows();
+    ExpressAsCashFlows(state.dataCostEstimateManager);
 
-    EXPECT_NEAR(CashFlow(17).mnAmount(47), 123456., 0.001);  // 36 months plus 10 months plus one month 
+    EXPECT_NEAR(CashFlow(17).mnAmount(47), 123456., 0.001);  // 36 months plus 10 months plus one month
 
     // first year
     EXPECT_NEAR(CashFlow(18).mnAmount(37), 101., 0.001);
