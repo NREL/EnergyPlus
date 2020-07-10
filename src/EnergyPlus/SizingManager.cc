@@ -661,6 +661,24 @@ namespace SizingManager {
                     PreDefTableEntry(pdchZnClPkOAHum, curName, HumRatAtPeak, 5);
                     PreDefTableEntry(pdchZnClPkOAMinFlow, curName, FinalZoneSizing(CtrlZoneNum).MinOA, 3);
                     PreDefTableEntry(pdchZnClPkDOASHeatGain, curName, DOASHeatGainRateAtClPk);
+                } else {
+                    curName = FinalZoneSizing(CtrlZoneNum).ZoneName;
+                    PreDefTableEntry(pdchZnClCalcDesLd, curName, 0.0);
+                    PreDefTableEntry(pdchZnClUserDesLd, curName, 0.0);
+                    if (Zone(ZoneNum).FloorArea != 0.0) {
+                        PreDefTableEntry(pdchZnClUserDesLdPerArea, curName, 0.0);
+                    }
+                    PreDefTableEntry(pdchZnClCalcDesAirFlow, curName, 0.0, 3);
+                    PreDefTableEntry(pdchZnClUserDesAirFlow, curName, 0.0, 3);
+                    PreDefTableEntry(pdchZnClDesDay, curName, FinalZoneSizing(CtrlZoneNum).CoolDesDay);
+                    PreDefTableEntry(pdchZnClPkTime, curName, "00/00 00:00:00");
+                    PreDefTableEntry(pdchZnClPkTstatTemp, curName, 0.0);
+                    PreDefTableEntry(pdchZnClPkIndTemp, curName, 0.0);
+                    PreDefTableEntry(pdchZnClPkIndHum, curName, 0.0, 5);
+                    PreDefTableEntry(pdchZnClPkOATemp, curName, 0.0);
+                    PreDefTableEntry(pdchZnClPkOAHum, curName, 0.0, 5);
+                    PreDefTableEntry(pdchZnClPkOAMinFlow, curName, 0.0, 3);
+                    PreDefTableEntry(pdchZnClPkDOASHeatGain, curName, 0.0);
                 }
                 if (FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow > 0.0) {
                     TimeStepAtPeak = FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
