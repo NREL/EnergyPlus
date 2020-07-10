@@ -54,30 +54,27 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
 
-// (ref: Object: COOLTOWER:SHOWER)
+// Forward declarations
+struct CoolTowerData;
 
 namespace CoolTower {
 
-    // Using/Aliasing
+    enum class FlowCtrlEnum
+    {
+        Unassigned,
+        FlowSchedule,
+        WindDriven
+    };
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern int const WaterSupplyFromMains;
-    extern int const WaterSupplyFromTank;
-    extern int const WaterFlowSchedule;
-    extern int const WindDrivenFlow;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLES DECLARATIONS:
-    extern int NumCoolTowers; // Total cooltower statements in inputs
-
-    // Subroutine Specifications for the Heat Balance Module
-
-    // Types
+    enum class WaterSupplyMode
+    {
+        FromMains,
+        FromTank
+    };
 
     struct CoolTowerParams
     {
@@ -86,12 +83,11 @@ namespace CoolTower {
         std::string CompType;             // Type of component
         std::string Schedule;             // Available schedule
         std::string ZoneName;             // Name of zone the component is serving
-        std::string PumpSchedName;        // Available schedule of the water pump
         int SchedPtr;                     // Index to schedule
         int ZonePtr;                      // Point to this zone
         int PumpSchedPtr;                 // Index to schedule for water pump
-        int FlowCtrlType;                 // Type of cooltower operation
-        int CoolTWaterSupplyMode;         // Type of water source
+        FlowCtrlEnum FlowCtrlType;        // Type of cooltower operation
+        WaterSupplyMode CoolTWaterSupplyMode;  // Type of water source
         std::string CoolTWaterSupplyName; // Name of water source
         int CoolTWaterSupTankID;          // Index to water storage tank
         int CoolTWaterTankDemandARRID;    // Index to water storage demand
@@ -129,37 +125,42 @@ namespace CoolTower {
 
         // Default Constructor
         CoolTowerParams()
-            : SchedPtr(0), ZonePtr(0), PumpSchedPtr(0), FlowCtrlType(0), CoolTWaterSupplyMode(WaterSupplyFromMains), CoolTWaterSupTankID(0),
-              CoolTWaterTankDemandARRID(0), TowerHeight(0.0), OutletArea(0.0), OutletVelocity(0.0), MaxAirVolFlowRate(0.0), AirMassFlowRate(0.0),
-              CoolTAirMass(0.0), MinZoneTemp(0.0), FracWaterLoss(0.0), FracFlowSched(0.0), MaxWaterFlowRate(0.0), ActualWaterFlowRate(0.0),
-              RatedPumpPower(0.0), SenHeatLoss(0.0), SenHeatPower(0.0), LatHeatLoss(0.0), LatHeatPower(0.0), AirVolFlowRate(0.0),
-              AirVolFlowRateStd(0.0), CoolTAirVol(0.0), ActualAirVolFlowRate(0.0), InletDBTemp(0.0), InletWBTemp(0.0), InletHumRat(0.0),
-              OutletTemp(0.0), OutletHumRat(0.0), CoolTWaterConsumpRate(0.0), CoolTWaterStarvMakeupRate(0.0), CoolTWaterStarvMakeup(0.0),
-              CoolTWaterConsump(0.0), PumpElecPower(0.0), PumpElecConsump(0.0)
+            : SchedPtr(0), ZonePtr(0), PumpSchedPtr(0), FlowCtrlType(FlowCtrlEnum::Unassigned), CoolTWaterSupplyMode(WaterSupplyMode::FromMains),
+              CoolTWaterSupTankID(0), CoolTWaterTankDemandARRID(0), TowerHeight(0.0), OutletArea(0.0), OutletVelocity(0.0), MaxAirVolFlowRate(0.0),
+              AirMassFlowRate(0.0), CoolTAirMass(0.0), MinZoneTemp(0.0), FracWaterLoss(0.0), FracFlowSched(0.0), MaxWaterFlowRate(0.0),
+              ActualWaterFlowRate(0.0), RatedPumpPower(0.0), SenHeatLoss(0.0), SenHeatPower(0.0), LatHeatLoss(0.0), LatHeatPower(0.0),
+              AirVolFlowRate(0.0), AirVolFlowRateStd(0.0), CoolTAirVol(0.0), ActualAirVolFlowRate(0.0), InletDBTemp(0.0), InletWBTemp(0.0),
+              InletHumRat(0.0), OutletTemp(0.0), OutletHumRat(0.0), CoolTWaterConsumpRate(0.0), CoolTWaterStarvMakeupRate(0.0),
+              CoolTWaterStarvMakeup(0.0), CoolTWaterConsump(0.0), PumpElecPower(0.0), PumpElecConsump(0.0)
         {
         }
     };
 
-    // Object Data
-    extern Array1D<CoolTowerParams> CoolTowerSys;
+    void ManageCoolTower(CoolTowerData &dataCoolTower);
 
-    // Functions
+    void GetCoolTower(CoolTowerData &dataCoolTower);
 
-    void clear_state();
+    void CalcCoolTower(CoolTowerData &dataCoolTower);
 
-    void ManageCoolTower();
+    void UpdateCoolTower(CoolTowerData &dataCoolTower);
 
-    void GetCoolTower();
-
-    void CalcCoolTower();
-
-    void UpdateCoolTower();
-
-    void ReportCoolTower();
-
-    //*****************************************************************************************
+    void ReportCoolTower(CoolTowerData &dataCoolTower);
 
 } // namespace CoolTower
+
+struct CoolTowerData : BaseGlobalStruct {
+
+    bool GetInputFlag = true;
+    int NumCoolTowers = 0;
+    Array1D<CoolTower::CoolTowerParams> CoolTowerSys;
+
+    void clear_state() override
+    {
+        GetInputFlag = true;
+        NumCoolTowers = 0;
+        CoolTowerSys.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

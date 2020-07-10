@@ -72,6 +72,7 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CostEstimateManager.hh>
+#include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -111,6 +112,7 @@ namespace EnergyPlus {
         ConvectionCoefficientsData dataConvectionCoefficients;
         CondenserLoopTowersData dataCondenserLoopTowers;
         CostEstimateManagerData dataCostEstimateManager;
+        CoolTowerData dataCoolTower;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
@@ -161,6 +163,7 @@ namespace EnergyPlus {
             dataConvectionCoefficients.clear_state();
             dataCondenserLoopTowers.clear_state();
             dataCostEstimateManager.clear_state();
+            dataCoolTower.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
             fans.clear_state();
