@@ -115,8 +115,6 @@ SET( SRC
   DataConvergParams.hh
   DataConversions.cc
   DataConversions.hh
-  DataCostEstimate.cc
-  DataCostEstimate.hh
   DataDElight.cc
   DataDElight.hh
   DataDaylighting.cc
