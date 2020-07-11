@@ -78,6 +78,10 @@ ENERGYPLUSLIB_API Sizer sizerHeatingAirflowUANew();
 /// \see Sizer
 /// \see sizerHeatingAirflowUANew
 ENERGYPLUSLIB_API void sizerHeatingAirflowUADelete(Sizer sizer);
+
+// TODO: These need work.  Need to decide if they should be more/less specific, and we need to test all of them
+// TODO: Also, some of the code paths appear to want a mass flow rate while others want a volume flow rate, need to verify that
+
 /// \brief Initializes the HeatingAirflowUA sizer class
 /// \details All required data for setting up the HeatingAirflowUA sizer is passed in as arguments to this function.
 /// \param[in] sizer An instance of a Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
@@ -86,7 +90,6 @@ ENERGYPLUSLIB_API void sizerHeatingAirflowUADelete(Sizer sizer);
 /// \see Sizer
 /// \see sizerHeatingAirflowUACalculate
 /// \see sizerHeatingAirflowUADelete
-// ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitialize(Sizer sizer, Real64 elevation);
 
 ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSingleDuctZoneTerminal(Sizer sizer, Real64 elevation, Real64 mainFlowRate);
 ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForZoneInductionUnit(Sizer sizer, Real64 elevation, Real64 mainFlowRate, Real64 reheatMultiplier);
@@ -96,8 +99,6 @@ ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemMainDuct(Sizer si
 ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemCoolingDuct(Sizer sizer, Real64 elevation);
 ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemHeatingDuct(Sizer sizer, Real64 elevation);
 ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemOtherDuct(Sizer sizer, Real64 elevation);
-
-
 
 /// \brief Does calculation of the HeatingAirflowUA sizer
 /// \param[in] sizer An instance of a HeatingAirflowUA Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
