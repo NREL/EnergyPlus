@@ -52,7 +52,6 @@
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
-#include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -230,7 +229,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     // A to Z order
     CoilCoolingDX::clear_state();
     CrossVentMgr::clear_state();
-    CTElectricGenerator::clear_state();
     CurveManager::clear_state();
     AirflowNetwork::clear_state();
     dataAirflowNetworkBalanceManager.clear_state();
