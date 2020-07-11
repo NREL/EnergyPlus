@@ -76,6 +76,8 @@ enum class AutoSizingResultType
 struct BaseSizer
 {
 
+    Real64 stdRhoAir = 0.0;
+
     bool getCoilReportObject = false; // provides access to coil reporting
     bool isNotInitialized = true;     // indicates initializeWithinEP was called
     AutoSizingResultType errorType;
@@ -132,9 +134,14 @@ struct BaseSizer
                                     bool const &_printWarningFlag,
                                     std::string const &_callingRoutine);
 
-    void preSize(Real64 originalValue);
-
     virtual Real64 size(Real64 originalValue, bool &errorsFound) = 0;
+
+    static void clear_state();
+
+protected:
+    void initializeFromAPI(Real64 elevation); // don't accidentally call this direct component from outside
+
+    void preSize(Real64 originalValue);
 
     static void reportSizerOutput(std::string const &CompType,
                                   std::string const &CompName,
@@ -149,7 +156,6 @@ struct BaseSizer
 
     Real64 unInitialized(bool &errorsFound);
 
-    static void clear_state();
 };
 
 extern bool oneTimeCompRptHeaderFlag;

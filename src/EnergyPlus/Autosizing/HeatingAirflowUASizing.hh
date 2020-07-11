@@ -69,7 +69,14 @@ struct HeatingAirflowUASizer : BaseSizer
                             bool const &_printWarningFlag,
                             std::string const &_callingRoutine) override;
 
-    void initializeFromAPI();
+    void initializeForSingleDuctZoneTerminal(Real64 elevation, Real64 mainFlowRate);
+    void initializeForZoneInductionUnit(Real64 elevation, Real64 mainFlowRate, Real64 reheatMultiplier);
+    void initializeForZoneFanCoil(Real64 elevation, Real64 designHeatVolumeFlowRate);
+    void initializeForSystemOutdoorAir(Real64 elevation, Real64 overallSystemMassFlowRate, bool DOAS);
+    void initializeForSystemMainDuct(Real64 elevation, Real64 overallSystemVolFlow, Real64 minFlowRateRatio);
+    void initializeForSystemCoolingDuct(Real64 elevation);
+    void initializeForSystemHeatingDuct(Real64 elevation);
+    void initializeForSystemOtherDuct(Real64 elevation);
 
     Real64 size(Real64 originalValue, bool &errorsFound) override;
 };

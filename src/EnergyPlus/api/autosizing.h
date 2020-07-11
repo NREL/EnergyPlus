@@ -81,11 +81,24 @@ ENERGYPLUSLIB_API void sizerHeatingAirflowUADelete(Sizer sizer);
 /// \brief Initializes the HeatingAirflowUA sizer class
 /// \details All required data for setting up the HeatingAirflowUA sizer is passed in as arguments to this function.
 /// \param[in] sizer An instance of a Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
+/// \param[in] elevation The elevation above sea level for evaluating fluid properties, in m
 /// \remark This must be called prior to each call to sizerHeatingAirflowUACalculate
 /// \see Sizer
 /// \see sizerHeatingAirflowUACalculate
 /// \see sizerHeatingAirflowUADelete
-ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitialize(Sizer sizer);
+// ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitialize(Sizer sizer, Real64 elevation);
+
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSingleDuctZoneTerminal(Sizer sizer, Real64 elevation, Real64 mainFlowRate);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForZoneInductionUnit(Sizer sizer, Real64 elevation, Real64 mainFlowRate, Real64 reheatMultiplier);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForZoneFanCoil(Sizer sizer, Real64 elevation, Real64 designHeatVolumeFlowRate);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemOutdoorAir(Sizer sizer, Real64 elevation, Real64 overallSystemMassFlowRate, int DOAS);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemMainDuct(Sizer sizer, Real64 elevation, Real64 overallSystemVolFlow, Real64 minFlowRateRatio);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemCoolingDuct(Sizer sizer, Real64 elevation);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemHeatingDuct(Sizer sizer, Real64 elevation);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemOtherDuct(Sizer sizer, Real64 elevation);
+
+
+
 /// \brief Does calculation of the HeatingAirflowUA sizer
 /// \param[in] sizer An instance of a HeatingAirflowUA Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
 /// \returns This function returns true (0) if the autosizing calculation was successful, or false (1) if not.
@@ -94,7 +107,7 @@ ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitialize(Sizer sizer);
 ENERGYPLUSLIB_API int sizerHeatingAirflowUACalculate(Sizer sizer);
 /// \brief Returns the resulting autosized value after sizerHeatingAirflowUACalculate() is called.
 /// \param[in] sizer An instance of a HeatingAirflowUA Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
-/// \returns Autosized Heating Airflow Value, in m3/s // TODO: I'm guessing
+/// \returns Autosized Heating Air Mass Flow Rate, in kg/s
 /// \see Sizer
 /// \see sizerHeatingAirflowUANew
 /// \see sizerHeatingAirflowUACalculate

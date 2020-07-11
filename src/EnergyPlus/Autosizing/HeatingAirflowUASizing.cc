@@ -48,173 +48,170 @@
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/api/TypeDefs.h>
 
 namespace EnergyPlus {
 
-void HeatingAirflowUASizer::initializeWithinEP(EnergyPlusData &state,
-                                               std::string const &_compType,
-                                               std::string const &_compName,
-                                               bool const &_printWarningFlag,
-                                               std::string const &_callingRoutine)
-{
+    void HeatingAirflowUASizer::initializeWithinEP(EnergyPlusData &state,
+                                                   std::string const &_compType,
+                                                   std::string const &_compName,
+                                                   bool const &_printWarningFlag,
+                                                   std::string const &_callingRoutine) {
 
-    BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
-    this->sizingString = "Heating Coil Airflow For UA";
-}
-
-void HeatingAirflowUASizer::initializeFromAPI() {
-    this->isNotInitialized = false;
-    this->compType = "API_component_type";
-    this->compName = "API_component_name";
-    this->printWarningFlag = false;
-    this->callingRoutine = "called_from_API";
-
-    this->sysSizingRunDone = true;
-    this->doSystemSizing = true;
-    this->curSysNum = 1;
-    this->numPrimaryAirSys = 1;
-    this->sysSizingInputData.clear();
-    this->sysSizingInputData.allocate(1);
-    this->sysSizingInputData(1).AirLoopNum = 1;
-    this->numSysSizInput = 1;
-
-    this->unitarySysEqSizing.allocate(1);
-    this->unitarySysEqSizing(1).CoolingCapacity = true;
-    this->unitarySysEqSizing(1).HeatingCapacity = true;
-
-    this->curOASysNum = 1;
-    this->oaSysEqSizing.allocate(1);
-    this->oaSysEqSizing(1).CoolingCapacity = true;
-    this->oaSysEqSizing(1).HeatingCapacity = true;
-
-    this->doZoneSizing = true;
-    this->curZoneEqNum = 1;
-    this->zoneEqSizing.allocate(1);
-    this->zoneEqSizing(1).DesignSizeFromParent = true;
-    this->zoneSizingRunDone = true;
-    this->zoneSizingInput.allocate(1);
-    this->zoneSizingInput(1).ZoneNum = 1;
-    this->numZoneSizingInput = 1;
-
-    this->termUnitSingDuct = true;
-    this->curTermUnitSizingNum = 1;
-    this->termUnitSizing.allocate(1);
-    this->termUnitSizing(1).AirVolFlow = 1000;
-//
-//    int const systemType = 1;
-//    if (systemType == 1) {
-//        this->curSysNum = 1;
-//        this->numSysSizInput = 1;
-//        this->sysSizingInputData.clear();
-//        this->sysSizingInputData.allocate(1);
-//        this->sysSizingInputData(1).DesCoolAirFlow = 1000;
-//        this->finalSysSizing = DataSizing::FinalSysSizing;
-//    } else if (systemType == 2) {
-//        this->curOASysNum = 1;
-//        this->oaSysEqSizing = DataSizing::OASysEqSizing;
-//        this->outsideAirSys = DataAirLoop::OutsideAirSys;
-//    } else if (systemType == 3) {
-//        this->curZoneEqNum = 1;
-//        this->numZoneSizingInput = 1;
-//        this->zoneSizingInput = DataSizing::ZoneSizingInput;
-//        this->zoneEqSizing = DataSizing::ZoneEqSizing;
-//    } else if (systemType == 4) {
-//        this->airloopDOAS = state.dataAirLoopHVACDOAS.airloopDOAS;
-//    }
-//
-//    this->curDuctType = DataSizing::CurDuctType;
-//    this->numPrimaryAirSys = DataHVACGlobals::NumPrimaryAirSys;
-//
-//    this->curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
-//    this->termUnitSingDuct = DataSizing::TermUnitSingDuct;
-//    this->termUnitPIU = DataSizing::TermUnitPIU;
-//    this->termUnitIU = DataSizing::TermUnitIU;
-//    this->zoneEqFanCoil = DataSizing::ZoneEqFanCoil;
-//    this->otherEqType = !(this->termUnitSingDuct || this->termUnitPIU || this->termUnitIU || this->zoneEqFanCoil);
-//    this->unitarySysEqSizing = DataSizing::UnitarySysEqSizing;
-//
-//    this->termUnitSizing = DataSizing::TermUnitSizing;
-//    this->finalZoneSizing = DataSizing::FinalZoneSizing;
-//
-//
-//    if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if coilType is not one of DataHVACGlobals::cAllCoilTypes
-//        this->getCoilReportObject = true;
-//    }
-}
-
-
-Real64 HeatingAirflowUASizer::size(Real64 _originalValue, bool &errorsFound)
-{
-    if (this->isNotInitialized) {
-        return this->unInitialized(errorsFound);
+        BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
+        this->sizingString = "Heating Coil Airflow For UA"; // TODO: We should make this a constexpr so we don't need this overridden function in each class just for this one line
     }
 
-    this->preSize(_originalValue);
-    if (this->curZoneEqNum > 0) {
-        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
-            this->autoSizedValue = _originalValue;
+
+    void HeatingAirflowUASizer::initializeForSingleDuctZoneTerminal(Real64 const elevation, Real64 mainFlowRate) {
+        this->initializeFromAPI(elevation);
+        this->zoneSizingRunDone = true;
+        this->curZoneEqNum = 1;
+        this->termUnitSingDuct = true;
+        this->curTermUnitSizingNum = 1;
+        this->termUnitSizing.allocate(1);
+        this->termUnitSizing(1).AirVolFlow = mainFlowRate;
+    }
+
+    void HeatingAirflowUASizer::initializeForZoneInductionUnit(Real64 const elevation, Real64 mainFlowRate,
+                                                               Real64 reheatMultiplier) {
+        this->initializeFromAPI(elevation);
+        this->zoneSizingRunDone = true;
+        this->curZoneEqNum = 1;
+        this->termUnitIU = true;
+        this->termUnitPIU = true; // probably don't need to set both, but whatever
+        this->curTermUnitSizingNum = 1;
+        this->termUnitSizing.allocate(1);
+        this->termUnitSizing(1).AirVolFlow = mainFlowRate;
+        this->termUnitSizing(1).ReheatAirFlowMult = reheatMultiplier;
+    }
+
+    void HeatingAirflowUASizer::initializeForZoneFanCoil(Real64 const elevation, Real64 designHeatVolumeFlowRate) {
+        this->initializeFromAPI(elevation);
+        this->zoneSizingRunDone = true;
+        this->zoneEqFanCoil = true;
+        this->curZoneEqNum = 1;
+        this->finalZoneSizing.allocate(1);
+        this->finalZoneSizing(1).DesHeatVolFlow = designHeatVolumeFlowRate;
+    }
+
+    // TODO: What would the zone otherTypeEq include?
+
+    void HeatingAirflowUASizer::initializeForSystemOutdoorAir(Real64 const elevation, Real64 overallSystemMassFlowRate,
+                                                              bool DOAS) {
+        this->initializeFromAPI(elevation);
+        this->curSysNum = 1;
+        this->curOASysNum = 1;
+        if (DOAS) {
+            this->outsideAirSys(1).AirLoopDOASNum = 0;  // the DOAS structure is a zero-based vector, w00t!
+            this->airloopDOAS.emplace_back();
+            this->airloopDOAS[0].SizingMassFlow = overallSystemMassFlowRate;
         } else {
-            if (this->termUnitSingDuct && (this->curTermUnitSizingNum > 0)) {
-                this->autoSizedValue = DataEnvironment::StdRhoAir * this->termUnitSizing(this->curTermUnitSizingNum).AirVolFlow;
-            } else if ((this->termUnitPIU || this->termUnitIU) && (this->curTermUnitSizingNum > 0)) {
-                this->autoSizedValue = DataEnvironment::StdRhoAir * this->termUnitSizing(this->curTermUnitSizingNum).AirVolFlow *
-                                       this->termUnitSizing(this->curTermUnitSizingNum).ReheatAirFlowMult;
-            } else if (this->zoneEqFanCoil) {
-                this->autoSizedValue = DataEnvironment::StdRhoAir * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
-            } else if (this->otherEqType) {
-                if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
-                    this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
-                } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
-                    this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
-                } else {
-                    this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
-                }
-            } else {
-                this->errorType = AutoSizingResultType::ErrorType1;
-                errorsFound = true;
-            }
+            this->finalSysSizing.allocate(1);
+            this->finalSysSizing(1).DesOutAirVolFlow = 0.0; // TODO: what do I do here?
+            this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
         }
-    } else if (this->curSysNum > 0) {
-        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
-            this->autoSizedValue = _originalValue;
-        } else {
-            if (this->curOASysNum > 0) {
-                if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                    this->autoSizedValue =
-                        this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
-                        DataEnvironment::StdRhoAir;
-                } else {
-                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
-                }
+    }
+
+    // TODO: Probably need a reset() call to reinitialize all the flags back to zero/false/etc., call from each initialize method
+
+    void HeatingAirflowUASizer::initializeForSystemMainDuct(Real64 const elevation, Real64 overallSystemVolFlow,
+                                                            Real64 minFlowRateRatio) {
+        this->initializeFromAPI(elevation);
+        this->curSysNum = 1;
+        this->curDuctType = DataHVACGlobals::Main;
+        this->finalSysSizing.allocate(1);
+        this->finalSysSizing(1).SysAirMinFlowRat = minFlowRateRatio;
+        this->finalSysSizing(1).DesMainVolFlow = overallSystemVolFlow;
+    }
+
+    void HeatingAirflowUASizer::initializeForSystemCoolingDuct(Real64 const elevation) {
+        this->initializeFromAPI(elevation);
+        this->curSysNum = 1;
+
+    }
+
+    void HeatingAirflowUASizer::initializeForSystemHeatingDuct(Real64 const elevation) {
+        this->initializeFromAPI(elevation);
+        this->curSysNum = 1;
+
+    }
+
+    void HeatingAirflowUASizer::initializeForSystemOtherDuct(Real64 const elevation) {
+        this->initializeFromAPI(elevation);
+        this->curSysNum = 1;
+    }
+
+    Real64 HeatingAirflowUASizer::size(Real64 _originalValue, bool &errorsFound) {
+        if (this->isNotInitialized) {
+            return this->unInitialized(errorsFound);
+        }
+        this->preSize(_originalValue);
+        if (this->curZoneEqNum > 0) {
+            if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
+                this->autoSizedValue = _originalValue;
             } else {
-                if (this->curDuctType == DataHVACGlobals::Main) {
-                    if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0) {
+                if (this->termUnitSingDuct && (this->curTermUnitSizingNum > 0)) {
+                    this->autoSizedValue =
+                            this->stdRhoAir * this->termUnitSizing(this->curTermUnitSizingNum).AirVolFlow;
+                } else if ((this->termUnitPIU || this->termUnitIU) && (this->curTermUnitSizingNum > 0)) {
+                    this->autoSizedValue =
+                            this->stdRhoAir * this->termUnitSizing(this->curTermUnitSizingNum).AirVolFlow *
+                            this->termUnitSizing(this->curTermUnitSizingNum).ReheatAirFlowMult;
+                } else if (this->zoneEqFanCoil) {
+                    this->autoSizedValue = this->stdRhoAir * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
+                } else if (this->otherEqType) {
+                    if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
+                        this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * this->stdRhoAir;
+                    } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         this->autoSizedValue =
-                            this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesMainVolFlow;
+                                this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * this->stdRhoAir;
+                    } else {
+                        this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
+                    }
+                } else {
+                    this->errorType = AutoSizingResultType::ErrorType1;
+                    errorsFound = true;
+                }
+            }
+        } else if (this->curSysNum > 0) {
+            if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+                this->autoSizedValue = _originalValue;
+            } else {
+                if (this->curOASysNum > 0) {
+                    if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
+                        this->autoSizedValue = this->airloopDOAS[DataAirLoop::OutsideAirSys(
+                                this->curOASysNum).AirLoopDOASNum].SizingMassFlow / this->stdRhoAir;
+                    } else {
+                        this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
+                    }
+                } else {
+                    if (this->curDuctType == DataHVACGlobals::Main) {
+                        if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0) {
+                            this->autoSizedValue = this->finalSysSizing(this->curSysNum).SysAirMinFlowRat *
+                                                   this->finalSysSizing(this->curSysNum).DesMainVolFlow;
+                        } else {
+                            this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
+                        }
+                    } else if (this->curDuctType == DataHVACGlobals::Cooling) {
+                        if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0) {
+                            this->autoSizedValue = this->finalSysSizing(this->curSysNum).SysAirMinFlowRat *
+                                                   this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
+                        } else {
+                            this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
+                        }
+                    } else if (this->curDuctType == DataHVACGlobals::Heating) {
+                        this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
                     } else {
                         this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                     }
-                } else if (this->curDuctType == DataHVACGlobals::Cooling) {
-                    if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0) {
-                        this->autoSizedValue =
-                            this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
-                    } else {
-                        this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
-                    }
-                } else if (this->curDuctType == DataHVACGlobals::Heating) {
-                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
-                } else {
-                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                 }
+                this->autoSizedValue *= this->stdRhoAir;
             }
-            this->autoSizedValue *= DataEnvironment::StdRhoAir;
         }
+        if (this->autoSizedValue < DataHVACGlobals::SmallAirVolFlow) this->autoSizedValue = 0.0;
+        this->selectSizerOutput(errorsFound);
+        return this->autoSizedValue;
     }
-    if (this->autoSizedValue < DataHVACGlobals::SmallAirVolFlow) this->autoSizedValue = 0.0;
-    this->selectSizerOutput(errorsFound);
-    return this->autoSizedValue;
-}
 
 } // namespace EnergyPlus
