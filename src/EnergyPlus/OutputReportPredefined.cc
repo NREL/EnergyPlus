@@ -207,6 +207,16 @@ namespace OutputReportPredefined {
     int pdchOpAzimuth;
     int pdchOpTilt;
     int pdchOpDir;
+    int pdstIntOpaque;
+    int pdchIntOpCons;
+    int pdchIntOpRefl;
+    int pdchIntOpUfactFilm;
+    int pdchIntOpUfactNoFilm;
+    int pdchIntOpGrArea;
+    int pdchIntOpNetArea;
+    int pdchIntOpAzimuth;
+    int pdchIntOpTilt;
+    int pdchIntOpDir;
     int pdstFen;
     int pdchFenCons;
     int pdchFenAreaOf1;
@@ -230,6 +240,12 @@ namespace OutputReportPredefined {
     int pdchDrUfactNoFilm;
     int pdchDrGrArea;
     int pdchDrParent;
+    int pdstIntDoor;
+    int pdchIntDrCons;
+    int pdchIntDrUfactFilm;
+    int pdchIntDrUfactNoFilm;
+    int pdchIntDrGrArea;
+    int pdchIntDrParent;
     int pdstIntFen;
     int pdchIntFenCons;
     int pdchIntFenAreaOf1;
@@ -1025,6 +1041,16 @@ namespace OutputReportPredefined {
         pdchOpAzimuth = 0;
         pdchOpTilt = 0;
         pdchOpDir = 0;
+        pdstIntOpaque = 0;
+        pdchIntOpCons = 0;
+        pdchIntOpRefl = 0;
+        pdchIntOpUfactFilm = 0;
+        pdchIntOpUfactNoFilm = 0;
+        pdchIntOpGrArea = 0;
+        pdchIntOpNetArea = 0;
+        pdchIntOpAzimuth = 0;
+        pdchIntOpTilt = 0;
+        pdchIntOpDir = 0;
         pdstFen = 0;
         pdchFenCons = 0;
         pdchFenAreaOf1 = 0;
@@ -1048,6 +1074,12 @@ namespace OutputReportPredefined {
         pdchDrUfactNoFilm = 0;
         pdchDrGrArea = 0;
         pdchDrParent = 0;
+        pdstIntDoor = 0;
+        pdchIntDrCons = 0;
+        pdchIntDrUfactFilm = 0;
+        pdchIntDrUfactNoFilm = 0;
+        pdchIntDrGrArea = 0;
+        pdchIntDrParent = 0;
         pdstIntFen = 0;
         pdchIntFenCons = 0;
         pdchIntFenAreaOf1 = 0;
@@ -1704,6 +1736,18 @@ namespace OutputReportPredefined {
         pdchOpTilt = newPreDefColumn(pdstOpaque, "Tilt [deg]");
         pdchOpDir = newPreDefColumn(pdstOpaque, "Cardinal Direction");
 
+        pdstIntOpaque = newPreDefSubTable(pdrEnvelope, "Opaque Interior");
+
+        pdchIntOpCons = newPreDefColumn(pdstIntOpaque, "Construction");
+        pdchIntOpRefl = newPreDefColumn(pdstIntOpaque, "Reflectance");
+        pdchIntOpUfactFilm = newPreDefColumn(pdstIntOpaque, "U-Factor with Film [W/m2-K]");
+        pdchIntOpUfactNoFilm = newPreDefColumn(pdstIntOpaque, "U-Factor no Film [W/m2-K]");
+        pdchIntOpGrArea = newPreDefColumn(pdstIntOpaque, "Gross Area [m2]");
+        pdchIntOpNetArea = newPreDefColumn(pdstIntOpaque, "Net Area [m2]");
+        pdchIntOpAzimuth = newPreDefColumn(pdstIntOpaque, "Azimuth [deg]");
+        pdchIntOpTilt = newPreDefColumn(pdstIntOpaque, "Tilt [deg]");
+        pdchIntOpDir = newPreDefColumn(pdstIntOpaque, "Cardinal Direction");
+
         pdstFen = newPreDefSubTable(pdrEnvelope, "Exterior Fenestration");
 
         pdchFenCons = newPreDefColumn(pdstFen, "Construction");
@@ -1745,6 +1789,14 @@ namespace OutputReportPredefined {
         pdchDrUfactNoFilm = newPreDefColumn(pdstDoor, "U-Factor no Film [W/m2-K]");
         pdchDrGrArea = newPreDefColumn(pdstDoor, "Gross Area [m2]");
         pdchDrParent = newPreDefColumn(pdstDoor, "Parent Surface");
+
+        pdstIntDoor = newPreDefSubTable(pdrEnvelope, "Interior Door");
+
+        pdchIntDrCons = newPreDefColumn(pdstIntDoor, "Construction");
+        pdchIntDrUfactFilm = newPreDefColumn(pdstIntDoor, "U-Factor with Film [W/m2-K]");
+        pdchIntDrUfactNoFilm = newPreDefColumn(pdstIntDoor, "U-Factor no Film [W/m2-K]");
+        pdchIntDrGrArea = newPreDefColumn(pdstIntDoor, "Gross Area [m2]");
+        pdchIntDrParent = newPreDefColumn(pdstIntDoor, "Parent Surface");
 
         // Shading Report
         pdrShading = newPreDefReport("ShadingSummary", "Shade", "Shading Summary");

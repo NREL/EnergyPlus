@@ -1170,8 +1170,35 @@ namespace HeatBalanceSurfaceManager {
                 }
             } else {
                 isExterior = false;
+                if((Surface(iSurf).Class == SurfaceClass_Wall) || (Surface(iSurf).Class == SurfaceClass_Floor) || (Surface(iSurf).Class == SurfaceClass_Roof)) {
+                    surfName = Surface(iSurf).Name;
+                    curCons = Surface(iSurf).Construction;
+                    PreDefTableEntry(pdchIntOpCons, surfName, dataConstruction.Construct(curCons).Name);
+                    PreDefTableEntry(pdchIntOpRefl, surfName, 1 - dataConstruction.Construct(curCons).OutsideAbsorpSolar);
+                    PreDefTableEntry(pdchIntOpUfactNoFilm, surfName, NominalU(Surface(iSurf).Construction), 3);
+                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
+                    PreDefTableEntry(pdchIntOpGrArea, surfName, Surface(iSurf).GrossArea * mult);
+                    computedNetArea(iSurf) += Surface(iSurf).GrossArea * mult;
+                    curAzimuth = Surface(iSurf).Azimuth;
+                    // Round to two decimals, like the display in tables
+                    // (PreDefTableEntry uses a fortran style write, that rounds rather than trim)
+                    curAzimuth = round(curAzimuth * 100.0) / 100.0;
+                    PreDefTableEntry(pdchIntOpAzimuth, surfName, curAzimuth);
+                    curTilt = Surface(iSurf).Tilt;
+                    PreDefTableEntry(pdchIntOpTilt, surfName, curTilt);
+                    if ((curTilt >= 60.0) && (curTilt < 180.0)) {
+                        if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
+                            PreDefTableEntry(pdchIntOpDir, surfName, "N");
+                        } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
+                            PreDefTableEntry(pdchIntOpDir, surfName, "E");
+                        } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
+                            PreDefTableEntry(pdchIntOpDir, surfName, "S");
+                        } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
+                            PreDefTableEntry(pdchIntOpDir, surfName, "W");
+                        }
+                    }
                 // interior window report
-                if (Surface(iSurf).Class == SurfaceClass_Window && !dataConstruction.Construct(Surface(iSurf).Construction).TypeIsAirBoundaryInteriorWindow) {
+                }else if (Surface(iSurf).Class == SurfaceClass_Window || (Surface(iSurf).Class == SurfaceClass_TDD_Dome) && !dataConstruction.Construct(Surface(iSurf).Construction).TypeIsAirBoundaryInteriorWindow) {
                     if (!has_prefix(Surface(iSurf).Name, "iz-")) { // don't count created interzone surfaces that are mirrors of other surfaces
                         surfName = Surface(iSurf).Name;
                         curCons = Surface(iSurf).Construction;
@@ -1189,6 +1216,7 @@ namespace HeatBalanceSurfaceManager {
                         windowAreaWMult = windowArea * mult;
                         PreDefTableEntry(pdchIntFenAreaOf1, surfName, windowArea);
                         PreDefTableEntry(pdchIntFenArea, surfName, windowAreaWMult);
+                        computedNetArea(Surface(iSurf).BaseSurf) -= windowAreaWMult;
                         nomUfact = NominalU(Surface(iSurf).Construction);
                         PreDefTableEntry(pdchIntFenUfact, surfName, nomUfact, 3);
                         // if the construction report is requested the SummerSHGC is already calculated
@@ -1210,6 +1238,15 @@ namespace HeatBalanceSurfaceManager {
                         intShgcArea += SHGCSummer * windowAreaWMult;
                         intVistranArea += TransVisNorm * windowAreaWMult;
                     }
+                }else if (Surface(iSurf).Class == SurfaceClass_Door) {
+                    surfName = Surface(iSurf).Name;
+                    curCons = Surface(iSurf).Construction;
+                    PreDefTableEntry(pdchIntDrCons, surfName, dataConstruction.Construct(curCons).Name);
+                    PreDefTableEntry(pdchIntDrUfactNoFilm, surfName, NominalU(Surface(iSurf).Construction), 3);
+                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
+                    PreDefTableEntry(pdchIntDrGrArea, surfName, Surface(iSurf).GrossArea * mult);
+                    PreDefTableEntry(pdchIntDrParent, surfName, Surface(iSurf).BaseSurfName);
+                    computedNetArea(Surface(iSurf).BaseSurf) -= Surface(iSurf).GrossArea * mult;
                 }
             }
             if ((Surface(iSurf).Class <= 20) && (Surface(iSurf).Class >= 1)) {
@@ -1238,16 +1275,18 @@ namespace HeatBalanceSurfaceManager {
         // go through all the surfaces again and this time insert the net area results
         for (int iSurf : DataSurfaces::AllSurfaceListReportOrder) {
             zonePt = Surface(iSurf).Zone;
-            // only exterior surfaces including underground
+            auto const SurfaceClass(Surface(iSurf).Class);
+            // exterior surfaces including underground
             if ((Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (Surface(iSurf).ExtBoundCond == Ground) ||
                 (Surface(iSurf).ExtBoundCond == GroundFCfactorMethod) || (Surface(iSurf).ExtBoundCond == KivaFoundation)) {
-                isExterior = true;
-                {
-                    auto const SELECT_CASE_var(Surface(iSurf).Class);
-                    if ((SELECT_CASE_var == SurfaceClass_Wall) || (SELECT_CASE_var == SurfaceClass_Floor) || (SELECT_CASE_var == SurfaceClass_Roof)) {
-                        surfName = Surface(iSurf).Name;
-                        PreDefTableEntry(pdchOpNetArea, surfName, computedNetArea(iSurf));
-                    }
+                if ((SurfaceClass == SurfaceClass_Wall) || (SurfaceClass == SurfaceClass_Floor) || (SurfaceClass == SurfaceClass_Roof)) {
+                    surfName = Surface(iSurf).Name;
+                    PreDefTableEntry(pdchOpNetArea, surfName, computedNetArea(iSurf));
+                }
+            }else {
+                if ((SurfaceClass == SurfaceClass_Wall) || (SurfaceClass == SurfaceClass_Floor) || (SurfaceClass == SurfaceClass_Roof)) {
+                    surfName = Surface(iSurf).Name;
+                    PreDefTableEntry(pdchIntOpNetArea, surfName, computedNetArea(iSurf));
                 }
             }
         }
