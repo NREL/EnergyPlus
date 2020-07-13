@@ -195,6 +195,8 @@ namespace VentilatedSlab {
     Array1D_bool CheckEquipName;
 
     // Autosizing variables
+    bool GetInputFlag(true);
+    bool MyOneTimeFlag(true);
     Array1D_bool MySizeFlag;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE VentilatedSlab
@@ -208,6 +210,8 @@ namespace VentilatedSlab {
 
     void clear_state()
     {
+        MyOneTimeFlag = true;
+        GetInputFlag = true;
         HCoilOn = false;
         NumOfVentSlabs = 0;
         OAMassFlowRate = 0.0;
@@ -251,7 +255,6 @@ namespace VentilatedSlab {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;                       // index of ventilated slab being simulated
-        static bool GetInputFlag(true); // First time, input is "gotten"
 
         // FLOW:
         if (GetInputFlag) {
@@ -1415,7 +1418,6 @@ namespace VentilatedSlab {
 
         int AirRelNode;  // relief air node number in Ventilated Slab loop
         int ColdConNode; // cold water control node number in Ventilated Slab loop
-        static bool MyOneTimeFlag(true);
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyPlantScanFlag;

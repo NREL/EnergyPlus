@@ -218,8 +218,29 @@ namespace PackagedTerminalHeatPump {
     void clear_state()
     {
         MyOneTimeFlag = true;
+        CheckEquipName.clear();
+        SupHeaterLoad = 0.0;
+        NumPTHP = 0;
+        NumPTAC = 0;
+        NumPTWSHP = 0;
+        NumPTUs = 0;
+        CompOnMassFlow = 0.0;
+        OACompOnMassFlow = 0.0;
+        CompOffMassFlow = 0.0;
+        OACompOffMassFlow = 0.0;
+        CompOnFlowRatio = 0.0;
+        CompOffFlowRatio = 0.0;
+        FanSpeedRatio = 0.0;
+        GetPTUnitInputFlag = true;
+        SaveCompressorPLR = 0.0;
+        SteamDensity = 0.0;
+        HeatingLoad = false;
+        CoolingLoad = false;
+        MinWaterFlow = 0.0;
+        TempSteamIn = 100.0;
         PTUnitUniqueNames.clear();
         PTUnit.deallocate();
+        PTUnitUNumericFields.clear();
     }
 
     void SimPackagedTerminalUnit(EnergyPlusData &state, std::string const &CompName,   // name of the packaged terminal heat pump
@@ -3781,6 +3802,7 @@ namespace PackagedTerminalHeatPump {
             MyPlantScanFlag = true;
             MyZoneEqFlag = true;
             MyOneTimeFlag = false;
+            ZoneEquipmentListNotChecked = true;
         }
 
         if (allocated(ZoneComp)) {

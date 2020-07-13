@@ -147,6 +147,18 @@ namespace DualDuct {
     Array1D<DualDuctAirTerminal> dd_airterminal;
     std::unordered_map<std::string, std::string> UniqueDualDuctAirTerminalNames;
 
+    void clear_state() {
+        CheckEquipName.clear();
+        NumDDAirTerminal = 0;
+        NumDualDuctConstVolDampers = 0;
+        NumDualDuctVarVolDampers = 0;
+        NumDualDuctVarVolOA = 0;
+        MassFlowSetToler = 0.0;
+        GetDualDuctInputFlag = true;
+        dd_airterminal.clear();
+        UniqueDualDuctAirTerminalNames.clear();
+    }
+
     void SimulateDualDuct(std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
     {
 
@@ -2351,12 +2363,6 @@ namespace DualDuct {
 
     //        End of Reporting subroutines for the Damper Module
     // *****************************************************************************
-
-    void clear_state()
-    {
-        UniqueDualDuctAirTerminalNames.clear();
-        dd_airterminal.deallocate();
-    }
 
 } // namespace DualDuct
 

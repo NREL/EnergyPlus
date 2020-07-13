@@ -110,7 +110,7 @@ namespace SolarCollectors {
     {
         NumOfCollectors = 0;
         NumOfParameters = 0;
-        GetInputFlag = false;
+        GetInputFlag = true;
         Parameters.deallocate();
         Collector.deallocate();
         UniqueCollectorNames.clear();

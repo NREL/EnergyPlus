@@ -210,6 +210,7 @@
 #include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #ifdef _WIN32
@@ -383,6 +384,9 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         EnergyPlus::inputProcessor->reportOrphanRecordObjects();
         FluidProperties::ReportOrphanFluids();
         ScheduleManager::ReportOrphanSchedules();
+        if (EnergyPlus::sqlite) {
+            EnergyPlus::sqlite.reset();
+        }
 
         if (DataGlobals::runReadVars) {
             int status = CommandLineInterface::runReadVarsESO(state.outputFiles);
