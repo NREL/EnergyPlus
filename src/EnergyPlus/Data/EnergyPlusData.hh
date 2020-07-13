@@ -71,11 +71,14 @@
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/CostEstimateManager.hh>
+#include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/WindowAC.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
@@ -109,6 +112,8 @@ namespace EnergyPlus {
         ChillerReformulatedEIRData dataChillerReformulatedEIR;
         ConvectionCoefficientsData dataConvectionCoefficients;
         CondenserLoopTowersData dataCondenserLoopTowers;
+        CostEstimateManagerData dataCostEstimateManager;
+        CoolTowerData dataCoolTower;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
@@ -122,6 +127,7 @@ namespace EnergyPlus {
         // after we've plumbed enough of the functions to allow
         OutputFiles outputFiles;
 
+        WindowACData dataWindowAC;
         WindowComplexManagerData dataWindowComplexManager;
         WindowEquivalentLayerData dataWindowEquivalentLayer;
         WindowManagerData dataWindowManager;
@@ -158,12 +164,15 @@ namespace EnergyPlus {
             dataChillerReformulatedEIR.clear_state();
             dataConvectionCoefficients.clear_state();
             dataCondenserLoopTowers.clear_state();
+            dataCostEstimateManager.clear_state();
+            dataCoolTower.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
             fans.clear_state();
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataWindowAC.clear_state();
             dataWindowComplexManager.clear_state();
             dataWindowEquivalentLayer.clear_state();
             dataWindowManager.clear_state();
