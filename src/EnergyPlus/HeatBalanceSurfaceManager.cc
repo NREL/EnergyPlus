@@ -1169,6 +1169,7 @@ namespace HeatBalanceSurfaceManager {
                     }
                 }
             } else {
+                // interior surfaces
                 isExterior = false;
                 if((Surface(iSurf).Class == SurfaceClass_Wall) || (Surface(iSurf).Class == SurfaceClass_Floor) || (Surface(iSurf).Class == SurfaceClass_Roof)) {
                     surfName = Surface(iSurf).Name;
@@ -1198,7 +1199,7 @@ namespace HeatBalanceSurfaceManager {
                         }
                     }
                 // interior window report
-                }else if (Surface(iSurf).Class == SurfaceClass_Window || (Surface(iSurf).Class == SurfaceClass_TDD_Dome) && !dataConstruction.Construct(Surface(iSurf).Construction).TypeIsAirBoundaryInteriorWindow) {
+                }else if ((Surface(iSurf).Class == SurfaceClass_Window) || (Surface(iSurf).Class == SurfaceClass_TDD_Dome) && (!dataConstruction.Construct(Surface(iSurf).Construction).TypeIsAirBoundaryInteriorWindow)) {
                     if (!has_prefix(Surface(iSurf).Name, "iz-")) { // don't count created interzone surfaces that are mirrors of other surfaces
                         surfName = Surface(iSurf).Name;
                         curCons = Surface(iSurf).Construction;
@@ -1288,7 +1289,7 @@ namespace HeatBalanceSurfaceManager {
                     surfName = Surface(iSurf).Name;
                     PreDefTableEntry(pdchIntOpNetArea, surfName, computedNetArea(iSurf));
                 }
-            }
+            }// interior surfaces
         }
         // total
         PreDefTableEntry(pdchFenArea, "Total or Average", fenTotArea);

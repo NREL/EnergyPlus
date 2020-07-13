@@ -593,7 +593,7 @@ namespace SurfaceGeometry {
             // only exterior surfaces including underground
             auto const SurfaceClass(Surface(SurfNum).Class);
             if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == Ground) ||
-                (Surface(SurfNum).ExtBoundCond == KivaFoundation)) {
+                (Surface(SurfNum).ExtBoundCond == KivaFoundation) || (Surface(SurfNum).ExtBoundCond == GroundFCfactorMethod)) {
                 if ((SurfaceClass == SurfaceClass_Wall) || (SurfaceClass == SurfaceClass_Floor) || (SurfaceClass == SurfaceClass_Roof)) {
                     PreDefTableEntry(pdchOpUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
                 } else if (SurfaceClass == SurfaceClass_Door) {
