@@ -53,6 +53,7 @@
 
 namespace EnergyPlus {
     // Forward declarations
+    struct CostEstimateManagerData;
     struct EnergyPlusData;
     struct ZoneTempPredictorCorrectorData;
     class OutputFiles;

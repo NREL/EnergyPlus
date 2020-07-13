@@ -102,12 +102,11 @@ namespace BaseboardElectric {
         using General::TrimSigDigits;
 
         int BaseboardNum;               // index of unit in baseboard array
-        static bool GetInputFlag(true); // one time get input flag
         Real64 QZnReq;                  // zone load not yet satisfied
 
-        if (GetInputFlag) {
+        if (state.dataBaseboardElectric.getInputFlag) {
             GetBaseboardInput(state.dataBaseboardElectric);
-            GetInputFlag = false;
+            state.dataBaseboardElectric.getInputFlag = false;
         }
 
         auto &baseboard = state.dataBaseboardElectric;

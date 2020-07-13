@@ -162,6 +162,8 @@ namespace HVACCooledBeam {
 
     // Functions
 
+    void clear_state();
+
     void SimCoolBeam(BranchInputManagerData &dataBranchInputManager,
                      std::string const &CompName,   // name of the cooled beam unit
                      bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
