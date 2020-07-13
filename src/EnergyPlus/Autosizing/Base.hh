@@ -79,7 +79,7 @@ struct BaseSizer
     Real64 stdRhoAir = 0.0;
 
     bool getCoilReportObject = false; // provides access to coil reporting
-    bool isNotInitialized = true;     // indicates initializeWithinEP was called
+    bool initialized = false;     // indicates initializeWithinEP was called
     AutoSizingResultType errorType;
     AutoSizingType sizingType = AutoSizingType::Unknown;
     std::string sizingString = "";
@@ -115,6 +115,9 @@ struct BaseSizer
     bool zoneEqFanCoil = false;    // fan coil zone equipment
     bool otherEqType = false;      // this covers the ELSE type switch
 
+    // error message handling
+    std::string getLastErrorMessages();
+
     bool printWarningFlag = false;
     std::string callingRoutine = "";
     Array1D<DataSizing::SystemSizingInputData> sysSizingInputData;
@@ -139,6 +142,9 @@ struct BaseSizer
     static void clear_state();
 
 protected:
+
+    std::string lastErrorMessages = "";
+
     void initializeFromAPI(Real64 elevation); // don't accidentally call this direct component from outside
 
     void preSize(Real64 originalValue);
@@ -154,7 +160,7 @@ protected:
 
     static bool isValidCoilType(std::string const &compType);
 
-    Real64 unInitialized(bool &errorsFound);
+    bool checkInitialized();
 
 };
 

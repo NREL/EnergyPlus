@@ -61,6 +61,8 @@ struct CoolingWaterDesWaterInletTempSizer : BaseSizer
     CoolingWaterDesWaterInletTempSizer()
     {
         this->sizingType = AutoSizingType::CoolingWaterDesWaterInletTempSizing;
+        this->sizingString = "Design Inlet Water Temperature [C]";
+
     }
     ~CoolingWaterDesWaterInletTempSizer() = default;
 

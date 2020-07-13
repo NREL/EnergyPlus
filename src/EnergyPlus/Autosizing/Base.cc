@@ -73,7 +73,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
                                    bool const &_printWarningFlag,
                                    std::string const &_callingRoutine)
 {
-    this->isNotInitialized = false;
+    this->initialized = true;
     this->compType = _compType;
     this->compName = _compName;
     this->printWarningFlag = _printWarningFlag;
@@ -112,7 +112,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
 }
 
 void BaseSizer::initializeFromAPI(Real64 const elevation) {
-    this->isNotInitialized = false;
+    this->initialized = true;
     this->compType = "API_component_type";
     this->compName = "API_component_name";
     this->printWarningFlag = false;
@@ -122,15 +122,23 @@ void BaseSizer::initializeFromAPI(Real64 const elevation) {
     this->getCoilReportObject = false;
 }
 
+std::string BaseSizer::getLastErrorMessages() {
+    std::string s(this->lastErrorMessages);
+    this->lastErrorMessages = "";
+    return s;
+}
+
 void BaseSizer::preSize(Real64 const _originalValue)
 {
     if (this->sizingType == AutoSizingType::Unknown) {
-        ShowSevereError("Sizing Library Base Class: preSize");
-        ShowFatalError("Developer Error: SizingType not defined.");
+        std::string msg = "Sizing Library Base Class: preSize, SizingType not defined.";
+        this->lastErrorMessages.append(msg);
+        ShowSevereError(msg);
+        ShowFatalError("Sizing type causes fatal error.");
     }
     this->originalValue = _originalValue;
     this->errorType = EnergyPlus::AutoSizingResultType::NoError;
-    this->isNotInitialized = true; // force use of Init then Size in subsequent calls
+    this->initialized = false; // force use of Init then Size in subsequent calls
     this->hardSizeNoDesignRun = !(this->sysSizingRunDone || this->zoneSizingRunDone);
 
     if (this->curSysNum > 0 && this->curSysNum <= this->numPrimaryAirSys) {
@@ -170,12 +178,18 @@ void BaseSizer::preSize(Real64 const _originalValue)
         hardSizeNoDesignRun = false;
         if (!this->sizingDesRunThisAirSys && this->curSysNum > 0 && this->sizingType != AutoSizingType::AutoCalculate) {
             if (!this->sysSizingRunDone) {
-                ShowSevereError("For autosizing of " + this->compType + ' ' + this->compName + ", a system sizing run must be done.");
+                std::string msg = "For autosizing of " + this->compType + ' ' + this->compName + ", a system sizing run must be done.";
+                this->lastErrorMessages.append(msg);
+                ShowSevereError(msg);
                 if (this->numSysSizInput == 0) {
-                    ShowContinueError("No \"Sizing:System\" objects were entered.");
+                    std::string msg2 = "No \"Sizing:System\" objects were entered.";
+                    this->lastErrorMessages.append(msg2);
+                    ShowContinueError(msg2);
                 }
                 if (!this->doSystemSizing) {
-                    ShowContinueError(R"(The "SimulationControl" object did not have the field "Do System Sizing Calculation" set to Yes.)");
+                    std::string msg2 = R"(The "SimulationControl" object did not have the field "Do System Sizing Calculation" set to Yes.)";
+                    this->lastErrorMessages.append(msg2);
+                    ShowContinueError(msg2);
                 }
                 ShowFatalError("Program terminates due to previously shown condition(s).");
             }
@@ -183,12 +197,18 @@ void BaseSizer::preSize(Real64 const _originalValue)
         if (!this->sizingDesRunThisZone && this->curZoneEqNum > 0 && !this->sizingDesValueFromParent &&
             this->sizingType != AutoSizingType::AutoCalculate) {
             if (!this->zoneSizingRunDone) {
-                ShowSevereError("For autosizing of " + this->compType + ' ' + this->compName + ", a zone sizing run must be done.");
+                std::string msg = "For autosizing of " + this->compType + ' ' + this->compName + ", a zone sizing run must be done.";
+                this->lastErrorMessages.append(msg);
+                ShowSevereError(msg);
                 if (this->numZoneSizingInput == 0) {
-                    ShowContinueError("No \"Sizing:Zone\" objects were entered.");
+                    std::string msg2 = "No \"Sizing:Zone\" objects were entered.";
+                    this->lastErrorMessages.append(msg2);
+                    ShowContinueError(msg2);
                 }
                 if (!this->doZoneSizing) {
-                    ShowContinueError(R"(The "SimulationControl" object did not have the field "Do Zone Sizing Calculation" set to Yes.)");
+                    std::string msg2 = R"(The "SimulationControl" object did not have the field "Do Zone Sizing Calculation" set to Yes.)";
+                    this->lastErrorMessages.append(msg2);
+                    ShowContinueError(msg2);
                 }
                 ShowFatalError("Program terminates due to previously shown condition(s).");
             }
@@ -289,14 +309,15 @@ bool BaseSizer::isValidCoilType(std::string const &_compType)
     return false;
 }
 
-Real64 BaseSizer::unInitialized(bool &errorsFound)
-{
-    this->errorType = AutoSizingResultType::ErrorType2;
-    this->autoSizedValue = 0.0;
-    errorsFound = true;
-    ShowSevereError("Developer Error: sizing of " + this->sizingString + " failed.");
-    ShowContinueError("Occurs in " + this->compType + " " + this->compName);
-    return this->autoSizedValue;
+bool BaseSizer::checkInitialized() {
+    if (!this->initialized) {
+        this->errorType = AutoSizingResultType::ErrorType2;
+        this->autoSizedValue = 0.0;
+        ShowSevereError("Developer Error: sizing of " + this->sizingString + " failed.");
+        ShowContinueError("Occurs in " + this->compType + " " + this->compName);
+        return false;
+    }
+    return true;
 }
 
 } // namespace EnergyPlus

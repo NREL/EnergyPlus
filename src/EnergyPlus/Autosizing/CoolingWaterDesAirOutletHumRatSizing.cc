@@ -64,7 +64,6 @@ void CoolingWaterDesAirOutletHumRatSizer::initializeWithinEP(EnergyPlusData &sta
                                                              std::string const &_callingRoutine)
 {
     BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
-    this->sizingString = "Design Outlet Air Humidity Ratio [kgWater/kgDryAir]";
     this->dataDesInletAirHumRat = DataSizing::DataDesInletAirHumRat;
     this->dataDesOutletAirHumRat = DataSizing::DataDesOutletAirHumRat;
     this->dataDesOutletAirTemp = DataSizing::DataDesOutletAirTemp;
@@ -73,8 +72,8 @@ void CoolingWaterDesAirOutletHumRatSizer::initializeWithinEP(EnergyPlusData &sta
 
 Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (this->isNotInitialized) {
-        return this->unInitialized(errorsFound);
+    if (!this->checkInitialized()) {
+        return 0.0;
     }
 
     this->preSize(_originalValue);

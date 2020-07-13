@@ -63,6 +63,7 @@ struct HeatingWaterDesAirInletTempSizer : BaseSizer
     HeatingWaterDesAirInletTempSizer()
     {
         this->sizingType = AutoSizingType::HeatingWaterDesAirInletTempSizing;
+        this->sizingString = "Rated Inlet Air Temperature";
     }
     ~HeatingWaterDesAirInletTempSizer() = default;
 
