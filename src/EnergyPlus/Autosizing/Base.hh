@@ -61,7 +61,9 @@ enum class AutoSizingType
     CoolingWaterDesAirInletHumRatSizing,
     CoolingWaterDesAirOutletHumRatSizing,
     CoolingWaterDesWaterInletTempSizing,
+    CoolingWaterNumofTubesPerRowSizing,
     HeatingAirflowUASizing,
+    HeatingWaterDesAirInletHumRatSizing,
     HeatingWaterDesAirInletTempSizing,
     Unknown
 };

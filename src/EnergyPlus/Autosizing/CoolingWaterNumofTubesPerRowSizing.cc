@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingWaterNumofTubesPerRowSizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
@@ -53,33 +53,37 @@
 
 namespace EnergyPlus {
 
-void CoolingWaterDesWaterInletTempSizer::initializeWithinEP(EnergyPlusData &state,
-                                                            std::string const &_compType,
-                                                            std::string const &_compName,
-                                                            bool const &_printWarningFlag,
-                                                            std::string const &_callingRoutine)
+void CoolingWaterNumofTubesPerRowSizer::initializeWithinEP(EnergyPlusData &state,
+                                                           std::string const &_compType,
+                                                           std::string const &_compName,
+                                                           bool const &_printWarningFlag,
+                                                           std::string const &_callingRoutine)
 {
     BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
+    this->sizingString = "Number of Tubes per Row";
     this->dataPltSizCoolNum = DataSizing::DataPltSizCoolNum;
+    this->dataWaterFlowUsedForSizing = DataSizing::DataWaterFlowUsedForSizing;
 }
 
-Real64 CoolingWaterDesWaterInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 CoolingWaterNumofTubesPerRowSizer::size(Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized()) {
         return 0.0;
     }
     this->preSize(_originalValue);
-    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || DataSizing::PlantSizData.empty())) {
+
+    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || DataSizing::PlantSizData.size() == 0)) {
         this->autoSizedValue = _originalValue;
     } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
-        this->autoSizedValue = DataSizing::PlantSizData(this->dataPltSizCoolNum).ExitTemp;
+        // result will be integerized external to this routine , add 0.5 to existing calc to round the result
+        this->autoSizedValue = int(max(3.0, 13750.0 * this->dataWaterFlowUsedForSizing + 1.0));
     } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
-        this->autoSizedValue = DataSizing::PlantSizData(this->dataPltSizCoolNum).ExitTemp;
+        // result will be integerized external to this routine , add 0.5 to existing calc to round the result
+        this->autoSizedValue = int(max(3.0, 13750.0 * this->dataWaterFlowUsedForSizing + 1.0));
     } else {
         this->errorType = AutoSizingResultType::ErrorType1;
     }
     this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 

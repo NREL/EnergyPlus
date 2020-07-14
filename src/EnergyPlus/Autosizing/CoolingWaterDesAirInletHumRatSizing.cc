@@ -71,8 +71,8 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &err
     if (!this->checkInitialized()) {
         return 0.0;
     }
-
     this->preSize(_originalValue);
+
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;

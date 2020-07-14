@@ -45,42 +45,35 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#ifndef CoolingWaterNumofTubesPerRowSizing_hh_INCLUDED
+#define CoolingWaterNumofTubesPerRowSizing_hh_INCLUDED
+
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/api/TypeDefs.h>
+#include <ObjexxFCL/Array1D.hh>
 
 namespace EnergyPlus {
 
-void CoolingWaterDesWaterInletTempSizer::initializeWithinEP(EnergyPlusData &state,
-                                                            std::string const &_compType,
-                                                            std::string const &_compName,
-                                                            bool const &_printWarningFlag,
-                                                            std::string const &_callingRoutine)
+struct CoolingWaterNumofTubesPerRowSizer : BaseSizer
 {
-    BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
-    this->dataPltSizCoolNum = DataSizing::DataPltSizCoolNum;
-}
+    Real64 dataPltSizCoolNum = 0.0;
+    Real64 dataWaterFlowUsedForSizing = 0.0;
 
-Real64 CoolingWaterDesWaterInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
-{
-    if (!this->checkInitialized()) {
-        return 0.0;
+    CoolingWaterNumofTubesPerRowSizer()
+    {
+        this->sizingType = AutoSizingType::CoolingWaterNumofTubesPerRowSizing;
     }
-    this->preSize(_originalValue);
-    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || DataSizing::PlantSizData.empty())) {
-        this->autoSizedValue = _originalValue;
-    } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
-        this->autoSizedValue = DataSizing::PlantSizData(this->dataPltSizCoolNum).ExitTemp;
-    } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
-        this->autoSizedValue = DataSizing::PlantSizData(this->dataPltSizCoolNum).ExitTemp;
-    } else {
-        this->errorType = AutoSizingResultType::ErrorType1;
-    }
-    this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->autoSizedValue);
-    return this->autoSizedValue;
-}
+    ~CoolingWaterNumofTubesPerRowSizer() = default;
+
+    void initializeWithinEP(EnergyPlusData &state,
+                            std::string const &_compType,
+                            std::string const &_compName,
+                            bool const &_printWarningFlag,
+                            std::string const &_callingRoutine) override;
+
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
+};
 
 } // namespace EnergyPlus
+
+#endif

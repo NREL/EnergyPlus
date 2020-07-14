@@ -45,29 +45,31 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/Autosizing/HeatingWaterDesAirInletTempSizing.hh>
+#include <EnergyPlus/Autosizing/HeatingWaterDesAirInletHumRatSizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/api/TypeDefs.h>
 
 namespace EnergyPlus {
 
-void HeatingWaterDesAirInletTempSizer::initializeWithinEP(EnergyPlusData &state,
-                                                          std::string const &_compType,
-                                                          std::string const &_compName,
-                                                          bool const &_printWarningFlag,
-                                                          std::string const &_callingRoutine)
+void HeatingWaterDesAirInletHumRatSizer::initializeWithinEP(EnergyPlusData &state,
+                                                            std::string const &_compType,
+                                                            std::string const &_compName,
+                                                            bool const &_printWarningFlag,
+                                                            std::string const &_callingRoutine)
 {
     BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
+    this->sizingString = "Design Inlet Air Humidity Ratio [kgWater/kgDryAir]";
     this->termUnitFinalZoneSizing = DataSizing::TermUnitFinalZoneSizing;
-    this->totalSystemAirVolumeFlowRate = DataSizing::DataFlowUsedForSizing;
+
+    this->dataFlowUsedForSizing = DataSizing::DataFlowUsedForSizing;
 }
 
-Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 HeatingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized()) {
         return 0.0;
@@ -80,28 +82,23 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
         } else {
             if (this->termUnitPIU && (this->curTermUnitSizingNum > 0)) {
                 Real64 MinFlowFrac = this->termUnitSizing(this->curTermUnitSizingNum).MinFlowFrac;
-                if (this->termUnitSizing(this->curTermUnitSizingNum).InducesPlenumAir) {
-                    this->autoSizedValue = (this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac) +
-                                           (this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneRetTempAtHeatPeak * (1.0 - MinFlowFrac));
-                } else {
-                    this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac +
-                                           this->finalZoneSizing(this->curZoneEqNum).ZoneTempAtHeatPeak * (1.0 - MinFlowFrac);
-                }
+                this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInHumRatTU * MinFlowFrac +
+                                       this->finalZoneSizing(this->curZoneEqNum).ZoneHumRatAtHeatPeak * (1.0 - MinFlowFrac);
             } else if (this->termUnitIU && (this->curTermUnitSizingNum > 0)) {
-                this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneTempAtHeatPeak;
+                this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneHumRatAtHeatPeak;
             } else if (this->termUnitSingDuct && (this->curTermUnitSizingNum > 0)) {
-                this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU;
+                this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInHumRatTU;
             } else {
-                Real64 DesMassFlow;
+                Real64 desMassFlow = 0.0;
                 if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
-                    DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
+                    desMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
                 } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
-                    DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
+                    desMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
                 } else {
-                    DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
+                    desMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                 }
-                this->autoSizedValue = ReportSizingManager::setHeatCoilInletTempForZoneEqSizing(
-                    ReportSizingManager::setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                this->autoSizedValue = ReportSizingManager::setHeatCoilInletHumRatForZoneEqSizing(
+                    ReportSizingManager::setOAFracForZoneEqSizing(desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                     this->zoneEqSizing(this->curZoneEqNum),
                     this->finalZoneSizing(this->curZoneEqNum));
             }
@@ -114,32 +111,25 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
             if (this->curOASysNum > 0) {
                 OutAirFrac = 1.0;
             } else if (this->finalSysSizing(this->curSysNum).HeatOAOption == DataSizing::MinOA) {
-                if (this->totalSystemAirVolumeFlowRate > 0.0) {
-                    OutAirFrac = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow / this->totalSystemAirVolumeFlowRate;
-                } else {
-                    OutAirFrac = 1.0;
+                if (this->dataFlowUsedForSizing > 0.0) {
+                    OutAirFrac = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow / this->dataFlowUsedForSizing;
+                    OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                 }
-                OutAirFrac = min(1.0, max(0.0, OutAirFrac));
             }
-            // coil inlet temperature
+            // coil inlet humidity ratio
             if (this->curOASysNum == 0 && DataAirSystems::PrimaryAirSystem(this->curSysNum).NumOAHeatCoils > 0) {
-                this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).PreheatTemp +
-                                       (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
+                this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).PreheatHumRat +
+                                       (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetHumRat;
             } else if (this->curOASysNum > 0 && DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                this->autoSizedValue =
-                    this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
+                this->autoSizedValue = this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutHumRat;
             } else {
-                this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).HeatOutTemp +
-                                       (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
+                this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).HeatOutHumRat +
+                                       (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetHumRat;
             }
         }
     }
     this->selectSizerOutput(errorsFound);
-    // report not written for OA coils and needs to be corrected
-    if (this->curSysNum <= this->numPrimaryAirSys) {
-        if (this->getCoilReportObject)
-            coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
-    }
+    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 
