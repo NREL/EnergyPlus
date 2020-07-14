@@ -2854,6 +2854,7 @@ namespace WeatherManager {
         static Real64 NextHrDifSolarRad;
         static Real64 NextHrLiquidPrecip;
         bool RecordDateMatch;
+        Array1D<Real64> HrIRHoriz_Weather(24, 0.0);
 
         struct HourlyWeatherData
         {
@@ -3512,6 +3513,7 @@ namespace WeatherManager {
                     TomorrowLiquidPrecip(CurTimeStep, Hour) = LiquidPrecip;
                     TomorrowTotalSkyCover(CurTimeStep, Hour) = TotalSkyCover;
                     TomorrowOpaqueSkyCover(CurTimeStep, Hour) = OpaqueSkyCover;
+                    HrIRHoriz_Weather(Hour) = IRHoriz;
 
                     ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
                     if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
@@ -3682,7 +3684,6 @@ namespace WeatherManager {
                     TomorrowOutRelHum(TS, Hour) = LastHrOutRelHum * WtPrevHour + Wthr.OutRelHum(Hour) * WtNow;
                     TomorrowWindSpeed(TS, Hour) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed(Hour) * WtNow;
                     TomorrowWindDir(TS, Hour) = interpolateWindDirection(LastHrWindDir, Wthr.WindDir(Hour), WtNow);
-                    TomorrowHorizIRSky(TS, Hour) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(Hour) * WtNow;
                     TomorrowDifSolarRad(TS, Hour) =
                         LastHrDifSolarRad * WgtPrevHour + Wthr.DifSolarRad(Hour) * WgtHourNow + NextHrDifSolarRad * WgtNextHour;
                     TomorrowBeamSolarRad(TS, Hour) =
@@ -3697,22 +3698,20 @@ namespace WeatherManager {
                     Real64 InterpDryBulb = TomorrowOutDryBulbTemp(TS, Hour); 
                     Real64 InterpDewPoint = TomorrowOutDewPointTemp(TS, Hour); 
                     Real64 InterpRelHumDeci = TomorrowOutRelHum(TS, Hour) * 0.01; 
-                    // Real64 InterpIRHoriz = TomorrowHorizIRSky(TS, Hour); 
-                    Real64 HrIRHoriz = Wthr.HorizIRSky(Hour); 
 
                     // Sky emissivity now takes interpolated timestep inputs rather than interpolated calcation esky results
-                    if (!Environment(Envrn).UseWeatherFileHorizontalIR || HrIRHoriz >= 9999.0) {
+                    if (!Environment(Envrn).UseWeatherFileHorizontalIR || HrIRHoriz_Weather(Hour) >= 9999.0) {
                         ESky =
                             CalcSkyEmissivity(Environment(Envrn).SkyTempModel, InterpOpaqueSkyCover, InterpDryBulb, InterpDewPoint, InterpRelHumDeci);
                         TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(InterpDryBulb + TKelvin);
                     } else {
-                        // TomorrowHorizIRSky(TS, Hour) = TomorrowHorizIRSky(TS, Hour);
+                        TomorrowHorizIRSky(TS, Hour) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(Hour) * WtNow;
                     }
 
                     // Sky temperature now takes interpolated timestep inputs rather than interpolated calcation esky results
                     if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
                         // Calculate sky temperature, use IRHoriz if not missing
-                        if (!Environment(Envrn).UseWeatherFileHorizontalIR || HrIRHoriz >= 9999.0) {
+                        if (!Environment(Envrn).UseWeatherFileHorizontalIR || HrIRHoriz_Weather(Hour) >= 9999.0) {
                             // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
                             SkyTemp = (InterpDryBulb + TKelvin) * root_4(ESky) - TKelvin;
                         } else {
