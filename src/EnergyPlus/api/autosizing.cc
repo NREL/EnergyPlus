@@ -49,6 +49,17 @@
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/DataSizing.hh>
 
+char * getLastErrorMessages(Sizer sizer) {
+    auto s = reinterpret_cast<EnergyPlus::BaseSizer *>(sizer);
+    std::string const msg = s->getLastErrorMessages();
+    // note that we cannot just return a c_str to the local string, as the string will be destructed upon leaving
+    // this function, and undefined behavior will occur.
+    // instead make a deep copy, and the user must manage the new char * pointer
+    char *p = new char[std::strlen(msg.c_str())];
+    std::strcpy(p, msg.c_str());
+    return p;
+}
+
 Sizer sizerHeatingAirflowUANew() {
     auto sizer = new EnergyPlus::HeatingAirflowUASizer();
     return reinterpret_cast<Sizer>(sizer);

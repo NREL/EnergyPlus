@@ -1,5 +1,24 @@
-from ctypes import cdll, c_int, c_void_p
+from ctypes import cdll, c_char_p, c_int, c_void_p
 from pyenergyplus.common import RealEP
+
+
+class BaseSizerWorker:
+    """
+    This class provides utility functions that are common to all sizer types, each sizer just needs one of these.
+    """
+
+    def __init__(self, api: cdll):
+        api.getLastErrorMessages.argtypes = [c_void_p]
+        api.getLastErrorMessages.restype = c_char_p
+
+    @staticmethod
+    def get_error_messages(api: cdll, instance: c_void_p) -> bytes:
+        """
+        Lists out any error messages during sizing for this sizer, and clears the error buffer.
+
+        :return: Returns a raw byte string of error messages.
+        """
+        return api.getLastErrorMessages(instance)
 
 
 class HeatingAirflowUASizer:
@@ -33,19 +52,14 @@ class HeatingAirflowUASizer:
         self.api.sizerHeatingAirflowUACalculate.restype = int
         self.api.sizerHeatingAirflowUAValue.argtypes = [c_void_p]
         self.api.sizerHeatingAirflowUAValue.restype = RealEP
+        self.base_worker = BaseSizerWorker(self.api)
         self.instance = self.api.sizerHeatingAirflowUANew()
 
     def __del__(self):
         self.api.sizerHeatingAirflowUADelete(self.instance)
 
-    def initialize(self, elevation: float = 0.0) -> None:
-        """
-        Performs initialization of the sizer, eventually it will have lots of args
-
-        :param elevation: Elevation above sea level for evaluating fluid properties, in meters, default zero
-        :return: Nothing
-        """
-        self.api.sizerHeatingAirflowUAInitialize(self.instance, elevation)
+    def get_last_error_messages(self):
+        return self.base_worker.get_error_messages(self.api, self.instance)
 
     def initialize_for_zone_terminal_single_duct(self, elevation: float, main_flow_rate: float) -> None:
         self.api.sizerHeatingAirflowUAInitializeForSingleDuctZoneTerminal(self.instance, elevation, main_flow_rate)

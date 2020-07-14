@@ -65,6 +65,13 @@ extern "C" {
 ///          sizer***New() function
 ENERGYPLUSLIB_API typedef void * Sizer;
 
+/// \brief Gets warning and error messages from the autosizing process.
+/// \details This function returns a char * which points to a string of error messages, or blank if none have been reported.
+///          This function also clears the message buffer so a subsequent call will get only new messages.
+/// \param[in] sizer An instance of a Sizer class, it works for any sizer type.
+/// \return A char * pointing to a string of error messages, or blank if none have been reported.
+ENERGYPLUSLIB_API char * getLastErrorMessages(Sizer sizer);
+
 /// \brief Returns a new reference to a HeatingAirflowUA Sizer class
 /// \details The sizer class allows access to sizer stuff.
 /// \returns This functions allocates a new sizer class and returns a Sizer, which is a pointer to that new instance.
