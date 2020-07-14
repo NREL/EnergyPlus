@@ -402,7 +402,6 @@ namespace ReportSizingManager {
         Real64 T2Out;                              // water coil water outlet temperature [C]
         Real64 UA0;                                // lower bound of UA for autosizing
         Real64 UA1;                                // upper bound of UA for autosizing
-        Real64 MinFlowFrac;                        // minimum flow fraction from terminal unit []
         int SupFanNum;                             // index to supply fan
         int RetFanNum;                             // index to return fan
         Real64 SupFanDT;                           // supply air fan delta temperature [C]
