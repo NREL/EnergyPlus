@@ -60,18 +60,16 @@ void CoolingWaterDesWaterInletTempSizer::initializeWithinEP(EnergyPlusData &stat
                                                             std::string const &_callingRoutine)
 {
     BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
-    this->sizingString = "Design Inlet Water Temperature [C]";
     this->dataPltSizCoolNum = DataSizing::DataPltSizCoolNum;
 }
 
 Real64 CoolingWaterDesWaterInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (this->isNotInitialized) {
-        return this->unInitialized(errorsFound);
+    if (!this->checkInitialized()) {
+        return 0.0;
     }
     this->preSize(_originalValue);
-
-    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || DataSizing::PlantSizData.size() == 0)) {
+    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || DataSizing::PlantSizData.empty())) {
         this->autoSizedValue = _originalValue;
     } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
         this->autoSizedValue = DataSizing::PlantSizData(this->dataPltSizCoolNum).ExitTemp;

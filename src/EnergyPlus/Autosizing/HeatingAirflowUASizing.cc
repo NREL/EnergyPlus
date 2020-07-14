@@ -47,21 +47,9 @@
 
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/api/TypeDefs.h>
 
 namespace EnergyPlus {
-
-    void HeatingAirflowUASizer::initializeWithinEP(EnergyPlusData &state,
-                                                   std::string const &_compType,
-                                                   std::string const &_compName,
-                                                   bool const &_printWarningFlag,
-                                                   std::string const &_callingRoutine) {
-
-        BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
-        this->sizingString = "Heating Coil Airflow For UA"; // TODO: We should make this a constexpr so we don't need this overridden function in each class just for this one line
-    }
-
 
     void HeatingAirflowUASizer::initializeForSingleDuctZoneTerminal(Real64 const elevation, Real64 mainFlowRate) {
         this->initializeFromAPI(elevation);
@@ -143,8 +131,8 @@ namespace EnergyPlus {
     }
 
     Real64 HeatingAirflowUASizer::size(Real64 _originalValue, bool &errorsFound) {
-        if (this->isNotInitialized) {
-            return this->unInitialized(errorsFound);
+        if (!this->checkInitialized()) {
+            return 0.0;
         }
         this->preSize(_originalValue);
         if (this->curZoneEqNum > 0) {

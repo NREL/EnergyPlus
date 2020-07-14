@@ -60,14 +60,9 @@ struct HeatingAirflowUASizer : BaseSizer
     HeatingAirflowUASizer()
     {
         this->sizingType = AutoSizingType::HeatingAirflowUASizing;
+        this->sizingString = "Heating Coil Airflow For UA";
     }
     ~HeatingAirflowUASizer() = default;
-
-    void initializeWithinEP(EnergyPlusData &state,
-                            std::string const &_compType,
-                            std::string const &_compName,
-                            bool const &_printWarningFlag,
-                            std::string const &_callingRoutine) override;
 
     void initializeForSingleDuctZoneTerminal(Real64 elevation, Real64 mainFlowRate);
     void initializeForZoneInductionUnit(Real64 elevation, Real64 mainFlowRate, Real64 reheatMultiplier);
@@ -77,6 +72,14 @@ struct HeatingAirflowUASizer : BaseSizer
     void initializeForSystemCoolingDuct(Real64 elevation);
     void initializeForSystemHeatingDuct(Real64 elevation);
     void initializeForSystemOtherDuct(Real64 elevation);
+
+    void initializeWithinEP(EnergyPlusData &state,
+                            std::string const &_compType,
+                            std::string const &_compName,
+                            bool const &_printWarningFlag,
+                            std::string const &_callingRoutine) override {
+        BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
+    }
 
     Real64 size(Real64 originalValue, bool &errorsFound) override;
 };

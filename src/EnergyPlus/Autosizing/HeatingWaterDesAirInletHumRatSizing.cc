@@ -71,8 +71,8 @@ void HeatingWaterDesAirInletHumRatSizer::initializeWithinEP(EnergyPlusData &stat
 
 Real64 HeatingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (this->isNotInitialized) {
-        return this->unInitialized(errorsFound);
+    if (!this->checkInitialized()) {
+        return 0.0;
     }
     this->preSize(_originalValue);
 

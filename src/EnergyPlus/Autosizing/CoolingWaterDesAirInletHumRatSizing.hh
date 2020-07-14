@@ -63,6 +63,8 @@ struct CoolingWaterDesAirInletHumRatSizer : BaseSizer
     CoolingWaterDesAirInletHumRatSizer()
     {
         this->sizingType = AutoSizingType::CoolingWaterDesAirInletHumRatSizing;
+        this->sizingString = "Design Inlet Air Humidity Ratio [kgWater/kgDryAir]";
+
     }
     ~CoolingWaterDesAirInletHumRatSizer() = default;
 

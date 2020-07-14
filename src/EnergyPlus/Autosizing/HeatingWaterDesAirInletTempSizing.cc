@@ -63,15 +63,14 @@ void HeatingWaterDesAirInletTempSizer::initializeWithinEP(EnergyPlusData &state,
                                                           std::string const &_callingRoutine)
 {
     BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
-    this->sizingString = "Rated Inlet Air Temperature";
     this->termUnitFinalZoneSizing = DataSizing::TermUnitFinalZoneSizing;
     this->totalSystemAirVolumeFlowRate = DataSizing::DataFlowUsedForSizing;
 }
 
 Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (this->isNotInitialized) {
-        return this->unInitialized(errorsFound);
+    if (!this->checkInitialized()) {
+        return 0.0;
     }
     this->preSize(_originalValue);
 
@@ -93,7 +92,7 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
             } else if (this->termUnitSingDuct && (this->curTermUnitSizingNum > 0)) {
                 this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU;
             } else {
-                Real64 DesMassFlow = 0.0;
+                Real64 DesMassFlow;
                 if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
                     DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
                 } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
