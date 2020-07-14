@@ -61,44 +61,58 @@ extern "C" {
 ///          for cases where the actual size of components and systems are not known ahead of time.
 
 /// \brief This typedef is a convenient pointer to an internal sizer class.
-/// \details This should be described further
-/// \see sizerNew
+/// \details Just one is declared here as any sizer object can fit in it.  An instance can be found by calling any
+///          sizer***New() function
 ENERGYPLUSLIB_API typedef void * Sizer;
-/// \brief Returns a new reference to a Sizer class
+
+/// \brief Returns a new reference to a HeatingAirflowUA Sizer class
 /// \details The sizer class allows access to sizer stuff.
 /// \returns This functions allocates a new sizer class and returns a Sizer, which is a pointer to that new instance.
-/// \remark In API applications, when the calling script is done with the sizer instance, call `sizerDelete` to clean up the instance.
+/// \remark In API applications, when the calling script is done with the sizer instance, call `sizerHeatingAirflowUADelete` to clean up the instance.
 /// \see Sizer
-/// \see sizerDelete
-ENERGYPLUSLIB_API Sizer sizerNew();
-/// \brief Deletes an instance of a Sizer class
-/// \details When an instance of a Sizer class is created using `sizerNew`, it should be cleaned up when totally done with it.
-/// \param[in] sizer An instance of a Sizer class to be deleted.  The Sizer class is initially created by calling `sizerNew`.
+/// \see sizerHeatingAirflowUADelete
+ENERGYPLUSLIB_API Sizer sizerHeatingAirflowUANew();
+/// \brief Deletes an instance of a HeatingAirflowUA Sizer class
+/// \details When an instance of a Sizer class is created using `sizerHeatingAirflowUANew`, it should be cleaned up when totally done with it.
+/// \param[in] sizer An instance of a Sizer class to be deleted.  The Sizer class is initially created by calling `sizerHeatingAirflowUANew`.
 /// \see Sizer
-/// \see sizerNew
-ENERGYPLUSLIB_API void sizerDelete(Sizer sizer);
-/// \brief Initializes the sizer class
-/// \details All required data for setting up the sizer is passed in as arguments to this function.
-/// \param[in] sizer An instance of a Sizer class, which can be created by calling `sizerNew`.
-/// \param[in] temperature The fluid temperature for property evaluation, in degrees Celsius.
-/// \remark This must be called prior to each call to sizerCalculate
+/// \see sizerHeatingAirflowUANew
+ENERGYPLUSLIB_API void sizerHeatingAirflowUADelete(Sizer sizer);
+
+// TODO: These need work.  Need to decide if they should be more/less specific, and we need to test all of them
+// TODO: Also, some of the code paths appear to want a mass flow rate while others want a volume flow rate, need to verify that
+
+/// \brief Initializes the HeatingAirflowUA sizer class
+/// \details All required data for setting up the HeatingAirflowUA sizer is passed in as arguments to this function.
+/// \param[in] sizer An instance of a Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
+/// \param[in] elevation The elevation above sea level for evaluating fluid properties, in m
+/// \remark This must be called prior to each call to sizerHeatingAirflowUACalculate
 /// \see Sizer
-/// \see sizerCalculate
-/// \see sizerDelete
-ENERGYPLUSLIB_API void sizerInitialize(Sizer sizer, Real64 temperature);
-/// \brief Does calculation of the sizer
-/// \param[in] sizer An instance of a Sizer class, which can be created by calling `sizerNew`.
+/// \see sizerHeatingAirflowUACalculate
+/// \see sizerHeatingAirflowUADelete
+
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSingleDuctZoneTerminal(Sizer sizer, Real64 elevation, Real64 mainFlowRate);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForZoneInductionUnit(Sizer sizer, Real64 elevation, Real64 mainFlowRate, Real64 reheatMultiplier);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForZoneFanCoil(Sizer sizer, Real64 elevation, Real64 designHeatVolumeFlowRate);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemOutdoorAir(Sizer sizer, Real64 elevation, Real64 overallSystemMassFlowRate, int DOAS);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemMainDuct(Sizer sizer, Real64 elevation, Real64 overallSystemVolFlow, Real64 minFlowRateRatio);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemCoolingDuct(Sizer sizer, Real64 elevation);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemHeatingDuct(Sizer sizer, Real64 elevation);
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemOtherDuct(Sizer sizer, Real64 elevation);
+
+/// \brief Does calculation of the HeatingAirflowUA sizer
+/// \param[in] sizer An instance of a HeatingAirflowUA Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
 /// \returns This function returns true (0) if the autosizing calculation was successful, or false (1) if not.
 /// \see Sizer
-/// \see sizerNew
-ENERGYPLUSLIB_API int sizerCalculate(Sizer sizer);
-/// \brief Returns the resulting autosized value after sizerCalculate() is called.
-/// \param[in] sizer An instance of a Sizer class, which can be created by calling `sizerNew`.
-/// \returns Autosized value, in J/kgK
+/// \see sizerHeatingAirflowUANew
+ENERGYPLUSLIB_API int sizerHeatingAirflowUACalculate(Sizer sizer);
+/// \brief Returns the resulting autosized value after sizerHeatingAirflowUACalculate() is called.
+/// \param[in] sizer An instance of a HeatingAirflowUA Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
+/// \returns Autosized Heating Air Mass Flow Rate, in kg/s
 /// \see Sizer
-/// \see sizerNew
-/// \see sizerCalculate
-ENERGYPLUSLIB_API Real64 sizerValue(Sizer sizer);
+/// \see sizerHeatingAirflowUANew
+/// \see sizerHeatingAirflowUACalculate
+ENERGYPLUSLIB_API Real64 sizerHeatingAirflowUAValue(Sizer sizer);
 
 #ifdef __cplusplus
 }

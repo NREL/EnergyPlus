@@ -47,23 +47,56 @@
 
 #include <EnergyPlus/api/autosizing.h>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
+#include <EnergyPlus/DataSizing.hh>
 
-Sizer sizerNew() {
+Sizer sizerHeatingAirflowUANew() {
     auto sizer = new EnergyPlus::HeatingAirflowUASizer();
     return reinterpret_cast<Sizer>(sizer);
 }
-void sizerDelete(Sizer sizer) {
+void sizerHeatingAirflowUADelete(Sizer sizer) {
     delete reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
 }
-void sizerInitialize(Sizer sizer, Real64 temperature) {
+void sizerHeatingAirflowUAInitializeForSingleDuctZoneTerminal(Sizer sizer, Real64 elevation, Real64 mainFlowRate) {
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
-    s->originalValue = temperature;
+    s->initializeForSingleDuctZoneTerminal(elevation, mainFlowRate);
 }
-int sizerCalculate(Sizer sizer) {
+void sizerHeatingAirflowUAInitializeForZoneInductionUnit(Sizer sizer, Real64 elevation, Real64 mainFlowRate, Real64 reheatMultiplier) {
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
-    s->autoSizedValue = s->originalValue * 2;
+    s->initializeForZoneInductionUnit(elevation, mainFlowRate, reheatMultiplier);
+}
+void sizerHeatingAirflowUAInitializeForZoneFanCoil(Sizer sizer, Real64 elevation, Real64 designHeatVolumeFlowRate) {
+    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
+    s->initializeForZoneFanCoil(elevation, designHeatVolumeFlowRate);
+}
+void sizerHeatingAirflowUAInitializeForSystemOutdoorAir(Sizer sizer, Real64 elevation, Real64 overallSystemMassFlowRate, int DOAS) {
+    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
+    s->initializeForSystemOutdoorAir(elevation, overallSystemMassFlowRate, DOAS == 1); // TODO: Verify true/false 0/1 status here
+}
+void sizerHeatingAirflowUAInitializeForSystemMainDuct(Sizer sizer, Real64 elevation, Real64 overallSystemVolFlow, Real64 minFlowRateRatio) {
+    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
+    s->initializeForSystemMainDuct(elevation, overallSystemVolFlow, minFlowRateRatio);
+}
+void sizerHeatingAirflowUAInitializeForSystemCoolingDuct(Sizer sizer, Real64 elevation) {
+    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
+    s->initializeForSystemCoolingDuct(elevation);
+}
+void sizerHeatingAirflowUAInitializeForSystemHeatingDuct(Sizer sizer, Real64 elevation) {
+    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
+    s->initializeForSystemHeatingDuct(elevation);
+}
+void sizerHeatingAirflowUAInitializeForSystemOtherDuct(Sizer sizer, Real64 elevation) {
+    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
+    s->initializeForSystemOtherDuct(elevation);
+}
+int sizerHeatingAirflowUACalculate(Sizer sizer) {
+    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
+    bool errorsFound = false;
+    s->size(EnergyPlus::DataSizing::AutoSize, errorsFound);
+    if (errorsFound) {
+        return 1;
+    }
     return 0;
 }
-Real64 sizerValue(Sizer sizer) {
+Real64 sizerHeatingAirflowUAValue(Sizer sizer) {
     return reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer)->autoSizedValue;
 }

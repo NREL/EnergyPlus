@@ -47,11 +47,12 @@
 
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -77,6 +78,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->compName = _compName;
     this->printWarningFlag = _printWarningFlag;
     this->callingRoutine = _callingRoutine;
+    this->stdRhoAir = DataEnvironment::StdRhoAir;
     this->sysSizingRunDone = DataSizing::SysSizingRunDone;
     this->zoneSizingRunDone = DataSizing::ZoneSizingRunDone;
     this->curSysNum = DataSizing::CurSysNum;
@@ -104,9 +106,20 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->sysSizingInputData = DataSizing::SysSizInput;
     this->finalSysSizing = DataSizing::FinalSysSizing;
     this->airloopDOAS = state.dataAirLoopHVACDOAS.airloopDOAS;
-    if (this->isValidCoilType(this->compType)) { // coil reports fail if coilType is not one of DataHVACGlobals::cAllCoilTypes
+    if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if coilType is not one of DataHVACGlobals::cAllCoilTypes
         this->getCoilReportObject = true;
     }
+}
+
+void BaseSizer::initializeFromAPI(Real64 const elevation) {
+    this->isNotInitialized = false;
+    this->compType = "API_component_type";
+    this->compName = "API_component_name";
+    this->printWarningFlag = false;
+    this->callingRoutine = "called_from_API";
+    Real64 barometricPressure = DataEnvironment::StdPressureSeaLevel * std::pow(1.0 - 2.25577e-05 * elevation, 5.2559);
+    this->stdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(barometricPressure, 20.0, 0.0);
+    this->getCoilReportObject = false;
 }
 
 void BaseSizer::preSize(Real64 const _originalValue)
@@ -266,10 +279,10 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
         errorsFound = true;
     }
 }
-bool BaseSizer::isValidCoilType(std::string const &compType)
+bool BaseSizer::isValidCoilType(std::string const &_compType)
 {
     for (auto const &coilType : DataHVACGlobals::cAllCoilTypes) {
-        if (UtilityRoutines::SameString(compType, coilType)) {
+        if (UtilityRoutines::SameString(_compType, coilType)) {
             return true;
         }
     }
