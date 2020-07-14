@@ -20,6 +20,7 @@ set( test_src
   Autosizing/CoolingWaterDesAirInletHumRatSizing.unit.cc
   Autosizing/CoolingWaterDesAirOutletHumRatSizing.unit.cc
   Autosizing/CoolingWaterDesWaterInletTempSizing.unit.cc
+  Autosizing/CoolingWaterNumofTubesPerRowSizing.unit.cc
   Autosizing/HeatingAirflowUASizing.unit.cc
   Autosizing/HeatingWaterDesAirInletHumRatSizing.unit.cc
   Autosizing/HeatingWaterDesAirInletTempSizing.unit.cc

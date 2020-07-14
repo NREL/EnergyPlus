@@ -33,6 +33,8 @@ SET( SRC
   Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh
   Autosizing/CoolingWaterDesWaterInletTempSizing.cc
   Autosizing/CoolingWaterDesWaterInletTempSizing.hh
+  Autosizing/CoolingWaterNumofTubesPerRowSizing.cc
+  Autosizing/CoolingWaterNumofTubesPerRowSizing.hh
   Autosizing/HeatingAirflowUASizing.cc
   Autosizing/HeatingAirflowUASizing.hh
   Autosizing/HeatingWaterDesAirInletHumRatSizing.cc

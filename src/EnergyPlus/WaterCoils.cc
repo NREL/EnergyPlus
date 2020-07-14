@@ -56,7 +56,9 @@
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingWaterNumofTubesPerRowSizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
+#include <EnergyPlus/Autosizing/HeatingWaterDesAirInletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletTempSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -2366,8 +2368,9 @@ namespace WaterCoils {
                     // Auto size detailed cooling coil number of tubes per row = int( 13750.0 * WaterCoil( CoilNum ).MaxWaterVolFlowRate ) + 1
                     DataFlowUsedForSizing = WaterCoil(CoilNum).MaxWaterVolFlowRate;
                     TempSize = float(WaterCoil(CoilNum).NumOfTubesPerRow);
-                    RequestSizing(state, CompType, CompName, CoolingWaterNumofTubesPerRowSizing, SizingString, TempSize, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).NumOfTubesPerRow = int(TempSize);
+                    CoolingWaterNumofTubesPerRowSizer sizerCWNumofTubesPerRow;
+                    sizerCWNumofTubesPerRow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    WaterCoil(CoilNum).NumOfTubesPerRow = sizerCWNumofTubesPerRow.size(TempSize, ErrorsFound);
 
                     FieldNum = 7; //  N7 , \field Fin Diameter
                     SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m]";
@@ -2622,9 +2625,10 @@ namespace WaterCoils {
                     WaterCoil(CoilNum).InletAirTemp = sizerHWDesInTemp.size(DataSizing::AutoSize, ErrorsFound);
 
                     TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-                    RequestSizing(state, CompType, CompName, HeatingWaterDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).DesInletAirHumRat = TempSize; // coil report
-                    WaterCoil(CoilNum).InletAirHumRat = TempSize;
+                    HeatingWaterDesAirInletHumRatSizer sizerHWAirInHumRat;
+                    sizerHWAirInHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    WaterCoil(CoilNum).DesInletAirHumRat = sizerHWAirInHumRat.size(DataSizing::AutoSize, ErrorsFound);
+                    WaterCoil(CoilNum).InletAirHumRat = WaterCoil(CoilNum).DesInletAirHumRat;
 
                     HeatingAirflowUASizer sizerHWAirFlowUA;
                     sizerHWAirFlowUA.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
