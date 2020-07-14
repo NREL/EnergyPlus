@@ -1100,7 +1100,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     EXPECT_FALSE(localErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.outputFiles, localErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
     HeatBalanceManager::GetConstructData(localErrorsFound);
     EXPECT_FALSE(localErrorsFound);

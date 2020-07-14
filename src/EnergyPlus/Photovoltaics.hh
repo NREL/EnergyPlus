@@ -70,17 +70,7 @@ namespace Photovoltaics {
 
     extern Array1D_bool CheckEquipName;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Photovoltaics
-
-    // The following subroutines are used for the SIMPLE model
-
-    // The following subroutines and functions are used for only the EQUIVALENT ONE-DIODE model
-
-    // The following subroutines and functions are used for the Sandia model.
-
-    //  OO get set methods for coupling to exterior vented baffle cavity mounting configurations
-
-    // Functions
+    void clear_state();
 
     void SimPVGenerator(int const GeneratorType,          // type of Generator !unused1208
                         std::string const &GeneratorName, // user specified name of Generator

@@ -212,7 +212,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     GetZoneData(ErrorsFound);
     GetZoneEquipmentData(state);
 
-    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data
