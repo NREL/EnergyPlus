@@ -184,7 +184,6 @@ namespace WeatherManager {
     bool IDFDaylightSaving(false);      // True if a DaylightSaving Time Period is input (IDF files)
     bool DaylightSavingIsActive(false); // True if a DaylightSavingPeriod should be used for Environment
     bool WFAllowsLeapYears(false);      // True if the Weather File (WF) header has "Yes" for Leap Years
-    // Indicator for current Weather file "Leap Year", used in DayOfYear calculations and others.
     int curSimDayForEndOfRunPeriod(0);  // normal=number days in sim, but different when repeating runperiods or multi-year files
     int Envrn(0);                       // Counter for environments
     int NumOfEnvrn(0);                  // Number of environments to be simulated
