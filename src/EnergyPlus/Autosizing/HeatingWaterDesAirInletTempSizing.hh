@@ -56,22 +56,12 @@ namespace EnergyPlus {
 
 struct HeatingWaterDesAirInletTempSizer : BaseSizer
 {
-
-    Array1D<DataSizing::ZoneSizingData> termUnitFinalZoneSizing;
-    Real64 totalSystemAirVolumeFlowRate = 0.0;
-
     HeatingWaterDesAirInletTempSizer()
     {
         this->sizingType = AutoSizingType::HeatingWaterDesAirInletTempSizing;
         this->sizingString = "Rated Inlet Air Temperature";
     }
     ~HeatingWaterDesAirInletTempSizer() = default;
-
-    void initializeWithinEP(EnergyPlusData &state,
-                            std::string const &_compType,
-                            std::string const &_compName,
-                            bool const &_printWarningFlag,
-                            std::string const &_callingRoutine) override;
 
     Real64 size(Real64 originalValue, bool &errorsFound) override;
 };

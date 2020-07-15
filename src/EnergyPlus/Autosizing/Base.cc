@@ -102,6 +102,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->outsideAirSys = DataAirLoop::OutsideAirSys;
     this->termUnitSizing = DataSizing::TermUnitSizing;
     this->finalZoneSizing = DataSizing::FinalZoneSizing;
+    this->termUnitFinalZoneSizing = DataSizing::TermUnitFinalZoneSizing;
     this->zoneEqSizing = DataSizing::ZoneEqSizing;
     this->sysSizingInputData = DataSizing::SysSizInput;
     this->finalSysSizing = DataSizing::FinalSysSizing;
@@ -109,6 +110,16 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if coilType is not one of DataHVACGlobals::cAllCoilTypes
         this->getCoilReportObject = true;
     }
+
+    // global Data* sizing constants
+    this->dataPltSizCoolNum = DataSizing::DataPltSizCoolNum;
+
+    this->dataDesInletAirHumRat = DataSizing::DataDesInletAirHumRat;
+    this->dataDesOutletAirHumRat = DataSizing::DataDesOutletAirHumRat;
+    this->dataDesOutletAirTemp = DataSizing::DataDesOutletAirTemp;
+    this->dataDesInletWaterTemp = DataSizing::DataDesInletWaterTemp;
+    this->dataFlowUsedForSizing = DataSizing::DataFlowUsedForSizing;
+    this->dataWaterFlowUsedForSizing = DataSizing::DataWaterFlowUsedForSizing;
 }
 
 void BaseSizer::initializeFromAPI(Real64 const elevation) {
@@ -309,8 +320,9 @@ bool BaseSizer::isValidCoilType(std::string const &_compType)
     return false;
 }
 
-bool BaseSizer::checkInitialized() {
+bool BaseSizer::checkInitialized(bool &errorsFound) {
     if (!this->initialized) {
+        errorsFound = true;
         this->errorType = AutoSizingResultType::ErrorType2;
         this->autoSizedValue = 0.0;
         ShowSevereError("Developer Error: sizing of " + this->sizingString + " failed.");

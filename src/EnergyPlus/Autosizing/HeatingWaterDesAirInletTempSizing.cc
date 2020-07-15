@@ -56,20 +56,9 @@
 
 namespace EnergyPlus {
 
-void HeatingWaterDesAirInletTempSizer::initializeWithinEP(EnergyPlusData &state,
-                                                          std::string const &_compType,
-                                                          std::string const &_compName,
-                                                          bool const &_printWarningFlag,
-                                                          std::string const &_callingRoutine)
-{
-    BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
-    this->termUnitFinalZoneSizing = DataSizing::TermUnitFinalZoneSizing;
-    this->totalSystemAirVolumeFlowRate = DataSizing::DataFlowUsedForSizing;
-}
-
 Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized()) {
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
     this->preSize(_originalValue);
@@ -114,8 +103,8 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
             if (this->curOASysNum > 0) {
                 OutAirFrac = 1.0;
             } else if (this->finalSysSizing(this->curSysNum).HeatOAOption == DataSizing::MinOA) {
-                if (this->totalSystemAirVolumeFlowRate > 0.0) {
-                    OutAirFrac = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow / this->totalSystemAirVolumeFlowRate;
+                if (this->dataFlowUsedForSizing > 0.0) {
+                    OutAirFrac = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow / this->dataFlowUsedForSizing;
                 } else {
                     OutAirFrac = 1.0;
                 }

@@ -131,7 +131,7 @@ namespace EnergyPlus {
     }
 
     Real64 HeatingAirflowUASizer::size(Real64 _originalValue, bool &errorsFound) {
-        if (!this->checkInitialized()) {
+        if (!this->checkInitialized(errorsFound)) {
             return 0.0;
         }
         this->preSize(_originalValue);

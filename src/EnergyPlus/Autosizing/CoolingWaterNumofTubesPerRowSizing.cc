@@ -53,21 +53,9 @@
 
 namespace EnergyPlus {
 
-void CoolingWaterNumofTubesPerRowSizer::initializeWithinEP(EnergyPlusData &state,
-                                                           std::string const &_compType,
-                                                           std::string const &_compName,
-                                                           bool const &_printWarningFlag,
-                                                           std::string const &_callingRoutine)
-{
-    BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
-    this->sizingString = "Number of Tubes per Row";
-    this->dataPltSizCoolNum = DataSizing::DataPltSizCoolNum;
-    this->dataWaterFlowUsedForSizing = DataSizing::DataWaterFlowUsedForSizing;
-}
-
 Real64 CoolingWaterNumofTubesPerRowSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized()) {
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
     this->preSize(_originalValue);

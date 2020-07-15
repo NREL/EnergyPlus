@@ -120,6 +120,25 @@ struct BaseSizer
     // error message handling
     std::string getLastErrorMessages();
 
+    // global Data* sizing constants
+    // CoolingWaterDesWaterInletTempSizer, CoolingWaterNumofTubesPerRowSizer
+    Real64 dataPltSizCoolNum = 0.0;
+
+    // CoolingWaterDesAirInletHumRatSizer, CoolingWaterDesAirOutletHumRatSizer
+    Real64 dataDesInletAirHumRat = 0.0;
+
+    // CoolingWaterDesAirInletHumRatSizer, HeatingWaterDesAirInletHumRatSizer,
+    // HeatingWaterDesAirInletTempSizer
+    Real64 dataFlowUsedForSizing = 0.0;
+
+    // CoolingWaterDesAirOutletHumRatSizer
+    Real64 dataDesOutletAirHumRat = 0.0;
+    Real64 dataDesInletWaterTemp = 0.0;
+    Real64 dataDesOutletAirTemp = 0.0;
+
+    // CoolingWaterNumofTubesPerRowSizer
+    Real64 dataWaterFlowUsedForSizing = 0.0;
+
     bool printWarningFlag = false;
     std::string callingRoutine = "";
     Array1D<DataSizing::SystemSizingInputData> sysSizingInputData;
@@ -129,6 +148,7 @@ struct BaseSizer
     Array1D<DataSizing::ZoneEqSizingData> zoneEqSizing;
     Array1D<DataAirLoop::OutsideAirSysProps> outsideAirSys;
     Array1D<DataSizing::TermUnitSizingData> termUnitSizing;
+    Array1D<DataSizing::ZoneSizingData> termUnitFinalZoneSizing;
     Array1D<DataSizing::ZoneSizingData> finalZoneSizing;
     Array1D<DataSizing::SystemSizingData> finalSysSizing;
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
@@ -162,7 +182,7 @@ protected:
 
     static bool isValidCoilType(std::string const &compType);
 
-    bool checkInitialized();
+    bool checkInitialized(bool &errorsFound);
 
 };
 
