@@ -20,7 +20,9 @@ The other ``older'' option for creating data for EnergyPlus is to use the ``Ener
 
 Please note that there is a bug in WINDOW 5 that causes two of the lines in the EnergyPlus data file to be joined. This bug is fixed in versions of Window 5.02 (and above). To be sure, you can check the data file for a line that looks like:
 
-GLAZING SYSTEM OPTICAL DATAAngle~~~~ 0~~~ 10~~~ 20~~~ 30~~~ 40~~~ 50~~~ 60~~~ 70~~~ 80~~~ 90 Hemis
+GLAZING SYSTEM OPTICAL DATA
+
+Angle~~~~ 0~~~ 10~~~ 20~~~ 30~~~ 40~~~ 50~~~ 60~~~ 70~~~ 80~~~ 90 Hemis
 
 The fixed version of the program will not show the above line; rather, there will be two lines such as shown below. If you have the above condition, with an editor you would break this into two lines:
 
@@ -327,7 +329,7 @@ System1, System2: separate characteristics are given if the window has a mullion
 
 \textbf{\emph{Rbvis}}~~~~ = back visible reflectance vs.~angle of incidence
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 *Standard conditions are
 

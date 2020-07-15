@@ -59,6 +59,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace UserDefinedComponents {
 
     extern int NumUserPlantComps;
@@ -195,13 +199,13 @@ namespace UserDefinedComponents {
 
         static PlantComponent *factory(std::string const &objectName);
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void initialize(int LoopNum, Real64 MyLoad);
+        void initialize(BranchInputManagerData &dataBranchInputManager, int LoopNum, Real64 MyLoad);
 
         void report(int LoopNum);
     };
@@ -227,7 +231,7 @@ namespace UserDefinedComponents {
         {
         }
 
-        void initialize();
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void report();
     };
@@ -259,7 +263,7 @@ namespace UserDefinedComponents {
         {
         }
 
-        void initialize(int ZoneNum);
+        void initialize(BranchInputManagerData &dataBranchInputManager, int ZoneNum);
 
         void report();
     };
@@ -293,7 +297,7 @@ namespace UserDefinedComponents {
         {
         }
 
-        void initialize(int ZoneNum);
+        void initialize(BranchInputManagerData &dataBranchInputManager, int ZoneNum);
 
         void report();
     };
@@ -306,20 +310,23 @@ namespace UserDefinedComponents {
 
     void clear_state();
 
-    void SimCoilUserDefined(std::string const &EquipName, // user name for component
+    void SimCoilUserDefined(BranchInputManagerData &dataBranchInputManager,
+                            std::string const &EquipName, // user name for component
                             int &CompIndex,
                             int AirLoopNum,
                             bool &HeatingActive,
                             bool &CoolingActive);
 
-    void SimZoneAirUserDefined(std::string const &CompName,    // name of the packaged terminal heat pump
+    void SimZoneAirUserDefined(BranchInputManagerData &dataBranchInputManager,
+                               std::string const &CompName,    // name of the packaged terminal heat pump
                                int ZoneNum,                    // number of zone being served
                                Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
                                int &CompIndex                  // index to zone hvac unit
     );
 
-    void SimAirTerminalUserDefined(std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
+    void SimAirTerminalUserDefined(BranchInputManagerData &dataBranchInputManager,
+                                   std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
     void GetUserDefinedPlantComponents();
 

@@ -1679,7 +1679,7 @@ namespace PlantUtilities {
     }
 
     // In-Place Right Shift by 1 of Array Elements
-    void rshift1(Array1<Real64> &a, Real64 const a_l)
+    void rshift1(Array1D<Real64> &a, Real64 const a_l)
     {
         assert(a.size_bounded());
         for (int i = a.u(), e = a.l(); i > e; --i) {
@@ -1734,7 +1734,8 @@ namespace PlantUtilities {
         }
     }
 
-    void ScanPlantLoopsForObject(std::string const &CompName,
+    void ScanPlantLoopsForObject(BranchInputManagerData &dataBranchInputManager,
+                                 std::string const &CompName,
                                  int const CompType,
                                  int &LoopNum,
                                  int &LoopSideNum,
@@ -1839,7 +1840,7 @@ namespace PlantUtilities {
                 if (!present(SingleLoopSearch)) {
                     ShowSevereError("Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + CompName +
                                     "\" was not found on any plant loops.");
-                    AuditBranches(true, DataPlant::ccSimPlantEquipTypes(CompType), CompName);
+                    AuditBranches(dataBranchInputManager, true, DataPlant::ccSimPlantEquipTypes(CompType), CompName);
                 } else {
                     ShowSevereError("Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + CompName +
                                     "\" was not found on plant loop=\"" + DataPlant::PlantLoop(SingleLoopSearch).Name + "\".");

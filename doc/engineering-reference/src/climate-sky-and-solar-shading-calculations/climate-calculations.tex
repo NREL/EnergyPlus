@@ -44,86 +44,106 @@ Since this default temperature profile may not be applicable to all locations, t
 
 \subsection{Sky Radiation Modeling}\label{sky-radiation-modeling}
 
-EnergyPlus calculates the Horizontal Infrared Radiation Intensity in Wh/m\(^{2,}\) if it is missing on the weather file or for design days, from the Opaque Sky Cover field as shown in the following explanation.
+EnergyPlus calculates the Horizontal Infrared Radiation Intensity ($IR_H$), if it is missing in the weather file or for design days, from the Dry Bulb Temperature, Dewpoint Temperature or Partial Pressure of Water Vapor, and Opaque Cloud Cover as described below. Regardless of whether or not $IR_H$ is present in the weather file, it can be specified in the \textbf{WeatherProperty:SkyTemperature} object to ignore the reported value of $IR_H$ and instead calculate it from the specified sky emissivity model as described below.
+
+$IR_H$ is defined as the rate of infrared radiation emitted from the sky falling on a horizontal upward-facing surface, in \si{\watt\per\m\squared}.
 
 \begin{equation}
-Horizontal\_IR = Sk{y_{emissivity}}\cdot Sigma\cdot Temperature_{drybulb}^4
+IR_H = \sigma T_{sky}^4
 \end{equation}
 
-where
+\noindent where:
+\newline
 
-Horizontal\_IR = horizontal IR intensity \{W/m\(^{2}\)\}
+$\sigma$ = Stefan-Boltzmann constant = \SI{5.6697e-8}{\watt\per\meter\squared\per\kelvin\tothe{4}}
 
-Sky\(_{emissivity}\) = sky emissivity
+$T_{sky}$ = Effective mean sky temperature, or sky radiative temperature, \si{\kelvin}.
+\newline
 
-Sigma = Stefan-Boltzmann constant = 5.6697e-8 \{W/m\(^{2}\)-K\(^{4}\)\}
-
-Temperature\(_{drybulb}\) = drybulb temperature \{K\}
-
-By default, the clear sky emissivity is calculated by the Clark \& Allen (1978) model as
+Over the years authors have proposed a fictitious quantity called the Sky Emissivity ($\epsilon_{sky}$) such that the following energy balance is satisfied:
 
 \begin{equation}
-Sky_{clear-sky-emissivity} = 0.787 + 0.764\cdot \ln \frac {T_{dewpoint}}{T_{Kelvin}}
+IR_H = \epsilon_{sky} \cdot \sigma \cdot T_{db}^4
 \end{equation}
 
-where, T\(_{dewpoint}\) = dewpoint temperature \{K\}.
+$\epsilon_{sky}$ = sky emissivity
 
-Alternatively, the clear sky emissivity can also be calculated using different models set by the user from options using the \textbf{WeatherProperty:SkyTemperature} object, including the calibrated version of the Berdahl and Martin, Brunt and Idso models (2017), listed as follows.
+$T_{db}$ = drybulb temperature, \si{\kelvin}
+\newline
 
-Calibrated Berdahl and Martin model:
+Four correlations for $\epsilon_{sky}$ under clear-sky conditions, proposed by four sets of authors, are available in EnergyPlus. The default correlation is from Clark \& Allen (1978):
+
+\begin{table}[hbtp]
+\centering
+\begin{tabular}{cl}
+\textbf{Author}   & $\epsilon_{sky, clear}$ \\ \\
+Clark \& Allen    & $= 0.787 + 0.764 \ln\left(T_{dp}/273\right)$ \\ \\
+Martin \& Berdahl & $= 0.758 + 0.521 \left(T_{dp}/100\right) + 0.625  \left(T_{dp} / 100\right)^2$ \\ \\
+Brunt             & $= 0.618 + 0.056 \left(P_{wv}\right)^{0.5}$ \\ \\
+Idso              & $= 0.685 + 3.2\times10^{-5} \left(P_{wv}\right) e^{1699/T_{db}} $
+\end{tabular}
+\end{table}
+
+\noindent where:
+\newline
+
+$\epsilon_{sky, clear}$ = $\epsilon_{sky}$ under clear-sky conditions
+\newline
+
+$T_{dp}$ = dewpoint temperature, in \si{\kelvin} for Clark \& Allen, in \si{\celsius} for Martin \& Berdahl
+\newline
+
+$P_{wv}$ = partial pressure of water vapor, in \si{\hecto\pascal}
+\newline
+
+The clear sky emissivity is modified for partially-cloudy conditions using the correlation from Walton (1983) which uses the opaque cloud cover fraction:
 
 \begin{equation}
-Sky_{clear-sky-emissivity} = 0.711 + 0.56\cdot(T_{dewpoint} / 100) + 0.73\cdot{T_{dewpoint} / 100}^2.
+\epsilon_{sky} = \epsilon_{sky, clear} \left(1 + 0.0224  N - 0.0035  N^2 + 0.00028  N^3\right)
 \end{equation}
 
-Calibrated Brunt model:
+\noindent where:
+\newline
 
-\begin{equation}
-Sky_{clear-sky-emissivity} = 0.52 + 0.065\cdot(P_{water-vapor})^{0.5},
-\end{equation}
+$N$ = opaque sky cover, in tenths.
+\newline
 
-where, P\(_{water-vapor}\) = partial water vapor pressure \{hPa\}.
+\noindent Example:
+\newline
 
-Calibrated Idso model:
+Clear sky ($N=0$), $T_{db} = 20 + 273.15 = \SI{293.15}{\kelvin}$, $T_{dp} = 10 + 273.15 = \SI{283.15}{\kelvin}$
+\newline
 
-\begin{equation}
-Sky_{clear-sky-emissivity} = 0.70 + 5.95\cdot10E-5\cdot(P_{water-vapor} \cdot exp(1500/T_{drybulb})).
-\end{equation}
+$\epsilon_{sky} = \left(0.787 + 0.764  \ln\left(283.15/273\right)\right)  \left(1 + 0.0224  N - 0.0035  N^2 + 0.00028  N^3 \right) = 0.815$
+\newline
 
+$IR_H = 0.815  5.6697E-8  293.15^4 = \SI{341.2}{\watt\per\meter\squared}$
+\newline
 
-Then the sky emissivity is given by:
-
-\begin{equation}
-Sky_{emissivity} = Sky_{clear-sky-emissivity} \cdot \left( {1. + .0224N - .0035{N^2} + .00028{N^3}} \right)
-\end{equation}
-
-where, N = opaque sky cover \{tenths\}
-
-Example: Clear sky (N = 0), Temperature\(_{drybulb}\) = 273+20 = 293 K, Temperature\(_{dewpoint}\) = 273+10 = 283 K:
-
-Sky\(_{emissivity}\) = 0.787 + 0.764*0.036 = 0.815
-
-Horizontal\_IR = 0.815*5.6697e-8*(293**4) = 340.6 W/m\(^{2}\)
-
-If specified in \textbf{WeatherProperty:SkyTemperature} object, Horizontal Infrared Radiation Intensity from the weather files can also be ignored and the values can be calculated directly from the specified sky emissivity model.
-
-References for these calculations are contained in the references subsection at the end of this section and include Walton (1983), Clark and Allen (1978), and Li et al (2017).
+References for these calculations are contained in the references section at the end of this list of fields. (Walton, 1983) (Clark \& Allen, 1978), (Li et al, 2017).
 
 \subsection{EnergyPlus Sky Temperature Calculation}\label{energyplus-sky-temperature-calculation}
 
-The default calculation for sky temperature is:
+By default the Sky Temperature ($T_{sky}$) is calculated from the Horizontal Infrared Radiation Intensity ($IR_H$):
 
 \begin{equation}
-Sk{y_{Temperature}} = {\left( {\frac{{Horizontal\_IR}}{{Sigma}}} \right)^{.25}} - Temperatur{e_{Kelvin}}
+T_{sky} = \left(IR_H / \sigma\right)^{0.25} - 273.15
 \end{equation}
 
-Where
+\noindent where:
+\newline
 
-Sky\(_{Temperature}\) = Sky radiative temperature \{C\}
+$T_{sky}$ = Effective mean sky temperature, or sky radiative temperature, in \si{\celsius}.
+\newline
 
-Horiizontal\_IR = Horizontal Infrared Radiation Intensity as described in the previous section \{Wh/m\(^{2}\)\}
+$IR_H$ = rate of infrared radiation emitted from the sky falling on a horizontal upward-facing surface, in \si{\watt\per\meter\squared}.
+\newline
 
-Temperature\(_{Kelvin}\) = Temperature conversion from Kelvin to C, i.e.~273.15
+$\sigma$ = Stefan-Boltzmann constant = \SI{5.6697e-8}{\watt\per\meter\squared\per\kelvin\tothe{4}}
+\newline
+
+(Note: T\{\si{\celsius}\} = T\{\si{\kelvin}\} - 273.15)
+\newline
 
 The Sky Temperature can also be set by the user from several options using the~\textbf{WeatherProperty:SkyTemperature} object.
 
@@ -153,13 +173,13 @@ Values of A and B vary during the year because of seasonal changes in the dust a
 % table 20
 \begin{longtable}[c]{p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
 \caption{Extraterrestrial Solar Irradiance and Related Data Note: Data are for 21st day of each month during the base year of 1964. \label{table:extraterrestrial-solar-irradiance-and-related}}\\
-\toprule 
+\toprule
 ~ & I\(_{o}\)\{W/m\(^{2}\)\} & Equation of Time \{minutes\} & Declination \{degrees\} & A \{W/m\(^{2}\)\} & B \{\} & C \{\} \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Extraterrestrial Solar Irradiance and Related Data Note: Data are for 21st day of each month during the base year of 1964.} \tabularnewline
-\toprule 
+\toprule
 ~ & I\(_{o}\)\{W/m\(^{2}\)\} & Equation of Time \{minutes\} & Declination \{degrees\} & A \{W/m\(^{2}\)\} & B \{\} & C \{\} \tabularnewline
 \midrule
 \endhead
@@ -241,7 +261,7 @@ ab = 1.454 - 0.406 \cdot {\tau_b} - 0.268 \cdot {\tau_d} + 0.021 \cdot {\tau_b} 
 ad = 0.507 + 0.205 \cdot {\tau_b} - 0.080 \cdot {\tau_d} - 0.190 \cdot {\tau_b} \cdot {\tau_d}
 \end{equation}
 
-The empirical equations coefficients of the 2017 ASHRAE HOF are also valid for the 2013 ASHRAE HOF hence the $\tau$\(_{b}\) and $\tau$\(_{d}\) values from the 2013 ASHRAE HOF can be used with ASHRAETau2017 solar model indicator if needed. 
+The empirical equations coefficients of the 2017 ASHRAE HOF are also valid for the 2013 ASHRAE HOF hence the $\tau$\(_{b}\) and $\tau$\(_{d}\) values from the 2013 ASHRAE HOF can be used with ASHRAETau2017 solar model indicator if needed.
 
 Studies done as part of ASHRAE research projects show that the revised tau model produces more physically plausible irradiance values than does the traditional clear sky model.~ In particular, diffuse irradiance values are more realistic.
 
@@ -298,7 +318,7 @@ Walton, G. N. 1983. Thermal Analysis Research Program Reference Manual. NBSSIR 8
 
 Clark, G. and C. Allen, ``The Estimation of Atmospheric Radiation for Clear and Cloudy Skies,'' Proceedings 2nd National Passive Solar Conference (AS/ISES), 1978, pp.~675-678.
 
-Li, M., Jiang, Y. and Coimbra, C. F. M. 2017. On the determination of atmospheric longwave irradiance under all-sky conditions. Solar Energy 144,  40–48, 
+Li, M., Jiang, Y. and Coimbra, C. F. M. 2017. On the determination of atmospheric longwave irradiance under all-sky conditions. Solar Energy 144,  40-48,
 
 Watanabe, T., Urano, Y., and Hayashi, T. 1983. ``Procedures for Separating Direct and Diffuse Insolation on a Horizontal Surface and Prediction of Insolation on Tilted Surfaces'' (in Japanese), Transactions, No. 330, Architectural Institute of Japan, Tokyo, Japan.
 

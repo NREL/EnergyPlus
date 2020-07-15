@@ -254,7 +254,7 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 auto found_index = idf.find_first_of('\n', beginning_of_line_index);
                 std::string line;
                 if (found_index != std::string::npos) {
-                    line = idf.substr(beginning_of_line_index, index - beginning_of_line_index);
+                    line = idf.substr(beginning_of_line_index, found_index - beginning_of_line_index);
                 }
                 errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) +
                                      " - Error parsing \"" + obj_name + "\". Error in following line.");
@@ -269,7 +269,7 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 auto const &name_iter = obj.find("name");
                 // If you find a name field, use that
                 if (name_iter != obj.end()) {
-                    name = name_iter.value();
+                    name = name_iter.value().get<std::string>();
                     obj.erase(name_iter);
                 } else {
                     // Otherwise, see if it should have a name field
@@ -328,7 +328,7 @@ json IdfParser::parse_object(
             success = false;
             return root;
         }
-        extension_key = key.value();
+        extension_key = key.value().get<std::string>();
         schema_obj_extensions = &schema_obj_props[extension_key]["items"]["properties"];
     }
 
@@ -389,13 +389,15 @@ json IdfParser::parse_object(
             eat_comment(idf, index);
         } else if (legacy_idd_index >= legacy_idd_fields_array.size()) {
             if (legacy_idd_extensibles_iter == legacy_idd.end()) {
+                errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) +
+                                     " - Object contains more field values than maximum number of IDD fields and is not extensible.");
                 success = false;
                 return root;
             }
             auto const &legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
             auto const size = legacy_idd_extensibles_array.size();
             std::string const &field_name = legacy_idd_extensibles_array[extensible_index % size];
-            auto const val = parse_value(idf, index, success, schema_obj_extensions->at(field_name));
+            auto val = parse_value(idf, index, success, schema_obj_extensions->at(field_name));
             if (!success) return root;
             extensible[field_name] = std::move(val);
             was_value_parsed = true;
@@ -525,12 +527,18 @@ json IdfParser::parse_value(std::string const &idf, size_t &index, bool &success
             }
         } else if (icompare(parsed_string, "Autosize") || icompare(parsed_string, "Autocalculate")) {
             auto const &default_it = field_loc.find("default");
+            auto const &anyOf_it = field_loc.find("anyOf");
+
+            if (anyOf_it == field_loc.end()) {
+                errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) + " - Field cannot be Autosize or Autocalculate");
+                return parsed_string;
+            }
             // The following is hacky because it abuses knowing the consistent generated structure
             // in the future this might not hold true for the array indexes.
             if (default_it != field_loc.end()) {
-                return field_loc["anyOf"][1]["enum"][1];
+                return field_loc.at("anyOf")[1]["enum"][1];
             } else {
-                return field_loc["anyOf"][1]["enum"][0];
+                return field_loc.at("anyOf")[1]["enum"][0];
             }
         }
         return parsed_string;

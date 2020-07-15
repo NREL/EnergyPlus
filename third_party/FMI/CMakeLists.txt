@@ -1,7 +1,7 @@
 
-INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat/lib")
-INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/")
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/zlib )
+INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/third_party/Expat/lib")
+INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/third_party/")
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/zlib )
 
 SET(SRC
   main.h
@@ -24,10 +24,8 @@ SET(SRC
 
 ADD_LIBRARY( epfmiimport STATIC ${SRC} )
 
-IF( MSVC )
-  ADD_DEFINITIONS( "/w" )
-ELSE()
-  ADD_DEFINITIONS( "-w -fPIC" )
+IF (UNIX)
+  ADD_DEFINITIONS("-fPIC")
 ENDIF()
 
 TARGET_LINK_LIBRARIES( epfmiimport epexpat miniziplib )

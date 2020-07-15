@@ -67,10 +67,12 @@ class Runtime:
         self.api.callbackEndOfSystemSizing.restype = c_void_p
         self.api.callbackEndOfAfterComponentGetInput.argtypes = [self.py_empty_callback_type]
         self.api.callbackEndOfAfterComponentGetInput.restype = c_void_p
-        self.api.callbackUserDefinedComponentModel.argtypes = [self.py_empty_callback_type]
-        self.api.callbackUserDefinedComponentModel.restype = c_void_p
+        # self.api.callbackUserDefinedComponentModel.argtypes = [self.py_empty_callback_type]
+        # self.api.callbackUserDefinedComponentModel.restype = c_void_p
         self.api.callbackUnitarySystemSizing.argtypes = [self.py_empty_callback_type]
         self.api.callbackUnitarySystemSizing.restype = c_void_p
+        self.api.cClearAllStates.argtypes = []
+        self.api.cClearAllStates.restype = c_void_p
 
     def run_energyplus(self, command_line_args: List[Union[str, bytes]]) -> int:
         """
@@ -80,15 +82,7 @@ class Runtime:
         program name is not passed in as an argument, rather only the command line options.
 
         An example call:
-        run_energyplus(
-            [
-                '-d',
-                '/path/to/output/directory',
-                '-w',
-                '/path/to/weather.epw',
-                '/path/to/input.idf'
-            ]
-        )
+        run_energyplus(['-d', '/path/to/output/directory', '-w', '/path/to/weather.epw', '/path/to/input.idf'])
 
         :param command_line_args: The command line arguments that would be passed into EnergyPlus if executing directly
                                   from the EnergyPlus executable.
@@ -119,16 +113,60 @@ class Runtime:
         return self.api.energyplus(len(args_with_program_name), cli_args)
 
     def issue_warning(self, message: Union[str, bytes]) -> None:
+        """
+        This function allows a script to issue a warning through normal EnergyPlus methods.  The message will be listed
+        in the standard EnergyPlus error file once the simulation is complete.  This function has limited usefulness
+        when calling EnergyPlus as a library, as errors can be handled by the calling client, however, in a
+        PythonPlugin workflow, this can be an important tool to alert the user of issues once EnergyPlus(.exe) has
+        finished running.
+
+        Note that the argument passed in here can be either a string or a bytes object, as this wrapper handles
+        conversion as needed.
+
+        :param message: The warning message to be listed in the error file.
+        :return: Nothing
+        """
         if isinstance(message, str):
             message = message.encode('utf-8')
         self.api.issueWarning(message)
 
     def issue_severe(self, message: Union[str, bytes]) -> None:
+        """
+        This function allows a script to issue an error through normal EnergyPlus methods.  The message will be listed
+        in the standard EnergyPlus error file once the simulation is complete.  This function has limited usefulness
+        when calling EnergyPlus as a library, as errors can be handled by the calling client, however, in a
+        PythonPlugin workflow, this can be an important tool to alert the user of issues once EnergyPlus(.exe) has
+        finished running.
+
+        Note the severe errors tend to lead to EnergyPlus terminating with a Fatal Error.  This can be accomplished
+        in PythonPlugin workflows by issuing a severe error, followed by returning 1 from the plugin function.
+        EnergyPlus will interpret this return value as a signal to terminate with a fatal error.
+
+        Note that the argument passed in here can be either a string or a bytes object, as this wrapper handles
+        conversion as needed.
+
+        :param message: The error message to be listed in the error file.
+        :return: Nothing
+        """
         if isinstance(message, str):
             message = message.encode('utf-8')
         self.api.issueSevere(message)
 
     def issue_text(self, message: Union[str, bytes]) -> None:
+        """
+        This function allows a script to issue a message through normal EnergyPlus methods.  The message will be listed
+        in the standard EnergyPlus error file once the simulation is complete.  This function can be used alongside the
+        warning and error issuance functions to provide further context to the situation. This function has limited
+        usefulness when calling EnergyPlus as a library, as errors can be handled by the calling client, however, in a
+        PythonPlugin workflow, this can be an important tool to alert the user of issues once EnergyPlus(.exe) has
+        finished running.
+
+        Note that the argument passed in here can be either a string or a bytes object, as this wrapper handles
+        conversion as needed.
+
+        :param message: The message to be listed in the error file.
+        :return: Nothing
+        """
         if isinstance(message, str):
             message = message.encode('utf-8')
         self.api.issueText(message)
@@ -339,17 +377,8 @@ class Runtime:
         all_callbacks.append(cb_ptr)
         self.api.callbackEndOfAfterComponentGetInput(cb_ptr)
 
-    def callback_user_defined_component_model(self, f: FunctionType) -> None:
-        """
-        This function allows a client to register a function to be called back by EnergyPlus inside the user defined
-        component model.
-
-        :param f: A python function which takes no arguments and returns nothing
-        :return: Nothing
-        """
-        cb_ptr = self.py_empty_callback_type(f)
-        all_callbacks.append(cb_ptr)
-        self.api.callbackUserDefinedComponentModel(cb_ptr)
+    # user defined component callbacks are not allowed, they are coupled directly to a specific EMS manager/PythonPlugin
+    # def callback_user_defined_component_model(self, f: FunctionType) -> None:
 
     def callback_unitary_system_sizing(self, f: FunctionType) -> None:
         """
@@ -362,13 +391,21 @@ class Runtime:
         all_callbacks.append(cb_ptr)
         self.api.callbackUnitarySystemSizing(cb_ptr)
 
+    def clear_all_states(self) -> None:
+        """
+        This function allows a client to clear the state of EnergyPlus in between subsequent calls to run_energyplus
+
+        :return: Nothing
+        """
+        self.api.cClearAllStates()
+
     @staticmethod
     def clear_callbacks() -> None:
         """
-        This function is only used if you are running this script continually making many calls into the E+ library in
-        one thread, each with new and different callbacks, and you need to clean up.
+        This function is used if you are running this script continually making multiple calls into the E+ library in
+        one thread.  EnergyPlus should be cleaned up between runs.
 
-        Note this will affect all current Runtime instances in this thread, so use carefully!
+        Note this will clean all registered callbacks, so functions must be registered again prior to the next run.
 
         :return: Nothing
         """

@@ -53,6 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -318,4 +319,42 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test5)
     EXPECT_EQ(thisFluidCooler.PerformanceInputMethod_Num, PerfInputMethod::NOMINAL_CAPACITY);
     // UA value is reset to zero if nominal capacity is specified and input method is "NOMINAL_CAPACITY"
     EXPECT_EQ(thisFluidCooler.HighSpeedFluidCoolerUA, 0.0);
+}
+
+TEST_F(EnergyPlusFixture, SizeFunctionTestWhenPlantSizingIndexIsZero)
+{  
+    int FluidCoolerNum(1);
+        
+    std::string const idf_objects = delimited_string({
+        "   FluidCooler:SingleSpeed,",
+        "     Dry Cooler,              !- Name",
+        "     Dry Cooler Inlet Node,   !- Water Inlet Node Name",
+        "     Dry Cooler Outlet Node,  !- Water Outlet Node Name",
+        "     NominalCapacity,         !- Performance Input Method",
+        "     ,                        !- Design Air Flow Rate U-factor Times Area Value {W/K}",
+        "     58601,                   !- Nominal Capacity {W}",
+        "     50,                      !- Design Entering Water Temperature {C}",
+        "     35,                      !- Design Entering Air Temperature {C}",
+        "     25,                      !- Design Entering Air Wetbulb Temperature {C}",
+        "     0.001262,                !- Design Water Flow Rate {m3/s}",
+        "     2.124,                   !- Design Air Flow Rate {m3/s}",
+        "     1491;                    !- Design Air Flow Rate Fan Power {W}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetFluidCoolerInput();
+    
+    auto &thisFluidCooler = FluidCoolers::SimpleFluidCooler(FluidCoolerNum);
+
+    DataPlant::PlantLoop.allocate(FluidCoolerNum);
+    SimpleFluidCooler.allocate(FluidCoolerNum);
+    SimpleFluidCooler(FluidCoolerNum).LoopNum = 1;
+    DataPlant::PlantLoop(FluidCoolerNum).PlantSizNum = 0;
+    
+    EXPECT_FALSE(thisFluidCooler.HighSpeedFanPowerWasAutoSized);
+    EXPECT_FALSE(thisFluidCooler.HighSpeedAirFlowRateWasAutoSized);
+    EXPECT_FALSE(thisFluidCooler.HighSpeedFluidCoolerUAWasAutoSized);
+
+    thisFluidCooler.size();
 }

@@ -33,13 +33,13 @@ Solar HourAngle (\emph{H}) gives the apparent solar time for the current time pe
 % table 23
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Relationship of Angles (degrees) to Time \label{table:relationship-of-angles-degrees-to-time}} \tabularnewline
-\toprule 
+\toprule
 Unit of Angle & Equivalent time \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Relationship of Angles (degrees) to Time} \tabularnewline
-\toprule 
+\toprule
 Unit of Angle & Equivalent time \tabularnewline
 \midrule
 \endhead
@@ -173,11 +173,11 @@ EnergyPlus provides four methods for calculating sunlit fractions:
 \begin{enumerate}
     \item Polygon Clipping: The shadow algorithm is based on coordinate transformation methods similar to Groth and Lokmanhekim and the shadow overlap method of Walton.
     \item Pixel Counting: GPU-rendering based calculations based on the method developed by Jones et al 2011.
-    \item Scheduled: Pre-calculated sunlit fractions are input through a schedule in the \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} object.
-    \item Imported: Pre-calculated sunlit fractions are input through a \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object.
+    \item Scheduled: Pre-calculated sunlit fractions are input through a schedule in the \textbf{SurfaceProperty:LocalEnvironment} object.
+    \item Imported: Pre-calculated sunlit fractions are input through a \textbf{Schedule:File:Shading} object.
 \end{enumerate}
 
-The remaining description in this section describes the Polygon Clipping method. For information on the Pixel Counting method, refer to Jones et al 2011.
+\subsection{Polygon Clipping}
 
 All architectural forms are represented by plane polygons. This can give good accuracy even for curved surfaces: a sphere can be approximated by the 20 nodes of an icosahedron with only 3 percent error in the shadow area cast by the sphere. Consider how a solid object, which is composed of a set of enclosing plane polygons, casts a shadow. Figure~\ref{fig:basic-shadowing-concept-structure} shows a box shaped structure on a horizontal surface. The structure consists of a top (surface 1) and four vertical surfaces (2 and 3 visible to the observer and 4 and 5 not visible). The sun is positioned behind and to the right of the structure and a shadow is cast onto the horizontal surface (the ground).
 
@@ -247,7 +247,7 @@ More explicitly, a casting surface -- a shadow casting surface or general castin
 
 Note that the resolution on surfaces/shadowing is 1 mm -- using resolution beyond that will result in truncation of the shadowing.
 
-\subsection{Homogeneous Coordinates}\label{homogeneous-coordinates}
+\subsubsection{Homogeneous Coordinates}\label{homogeneous-coordinates}
 
 Two-dimensional homogeneous coordinate techniques are used to determine the vertices of shadow overlaps. In homogeneous coordinates, points and lines are represented by a single form that allows simple vector operations between those forms {[}Newman-Sproul{]}.~ A point (X, Y) is represented by a three element vector (x, y, w) where x = w*X, y = w*Y, and w is any real number except zero. A line is also represented by a three element vector (a, b, c). The directed line (a, b, c) from point (x\(_{1}\), y\(_{1}\), w\(_{1}\)) to point (x\(_{2}\), y\(_{2}\), w\(_{2}\)) is given by:
 
@@ -275,7 +275,7 @@ the point is to the left of the line.~ If it is less than zero, the point is to 
 
 Note that the use of homogeneous coordinates as outlined above provides a consistent method and notation for defining points and lines, for determining intercepts, and for determining whether a point lies to the left, to the right, or on a line.~ Normalization provides the means for transforming to and from homogeneous notation and Cartesian coordinates.~ Thus, if (X, Y) is a Cartesian coordinate pair, its homogeneous coordinates are (X, Y, 1).~ Similarly, the homogeneous coordinates (x, y, w) can be transformed to the Cartesian point with coordinates (x/w, y/w).
 
-\subsection{Polygon Clipping Algorithms}\label{polygon-clipping-algorithms}
+\subsubsection{Polygon Clipping Algorithms}\label{polygon-clipping-algorithms}
 
 Three methods for polygon clipping (treating of overlapping shadows) are currently in use in EnergyPlus.
 
@@ -347,7 +347,7 @@ The Slater-Barsky algorithm uses space subdivision to reduce the number of pre-e
 
 With this method, calculating deltas and plugging in the final parametric equations can be skipped if the subject line obeys certain conditions. For example, if the line begins in region (0) and ends in region (6), then no new endpoints need to be calculated.
 
-\subsection{Overlapping Shadows}\label{overlapping-shadows}
+\subsubsection{Overlapping Shadows}\label{overlapping-shadows}
 
 After transforming the shadows onto the plane of the receiving surface, the basic job of the shadow algorithm is to determine the area of the overlap between the polygons representing the shadows and the polygon representing the receiving surface. Concave surfaces are supported only for exterior wall heat transfer surfaces, when using SutherlandHodgman option. Concave shading devices are not supported by the this option. Neither concave shading devices nor concave exterior wall heat transfer surfaces are supported by the ConvexWeilerAtherton clipping routine.
 
@@ -413,13 +413,13 @@ The following convention was adopted:
 % table 24
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Surface / Area Characteristic / Convention \label{table:surface-area-characteristic-convention}} \tabularnewline
-\toprule 
+\toprule
 Surface Characteristic & Area Convention \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Surface / Area Characteristic / Convention} \tabularnewline
-\toprule 
+\toprule
 Surface Characteristic & Area Convention \tabularnewline
 \midrule
 \endhead
@@ -443,6 +443,18 @@ Partially transparent shadowing surfaces can also be modeled by giving a transpa
 It is easy to determine the sunlit area of a window once all the shadow and overlap vertices on the wall have been computed. Consider wall 2 of Figure~\ref{fig:overall-shadowing-scheme-depiction}. First, the wall is considered a simple rectangle and the window on it is ignored. The shadow overlapping is performed and the sunlit portion of the gross wall area is computed. Then the window rectangle is overlapped with the shadow to determine its sunlit area. The sunlit area of the window is subtracted from the gross wall sunlit area to determine the net wall sunlit area. During this calculation it is not necessary to recompute the shadows, because they were precisely determined on the wall.
 
 When the SutherlandHodgman option is selected, the overlap is computed using the Sutherland-Hodgman algorithm for polygon clipping when. Let X be a polygon called the ``subject polygon'' (SP) and Y be a polygon called the ``clipping polygon'' (CP). The method performs the computation by iterating over the edges of the CP and removing points from the SP that fall in the clipping plane, i.e.~points that fall to the left of the edge of the CP. If it is to the left of any edge, it the point does not overlap with the CP. Intersections between the clip edge and the edges of the SP are added appropriately, and points falling outside of the clipping plane, i.e.~to the right of the edge of the CP, are added the output polygon as well. This resultant polygon is stored and the process is repeated for the rest of the clip edges in CP. The process is analogous to cutting off pieces of the SP one-by-one with respect to each edge of the CP. Note that the SP may be concave, but the CP may not. This means that the exterior wall surfaces may be concave, while shading devices may not be concave.
+
+\subsection{Pixel Counting}
+
+Determination of surface shading is a common task performed by modern graphics processors. Digital graphic rendering generates a depth map for each pixel in a scene to determine the portion of each polygon that is visible within a single view of the scene. When a scene is rendered from the perspective of the sun along the direction of its beams, visible pixels represent the sunlit portions of a surface. This is the same technique used to determine and render shadows within video games and other graphics applications. The application of this technique was originally applied to building energy simulation by Jones et al (2011). They refer to the method as ``Pixel Counting'' because the number of pixels of a given surface is a proxy for the sunlit area of that surface:
+
+\begin{equation}
+A_s \approx \frac{N \cdot A_p}{\cos{\theta}} = \frac{PSSA}{\cos{\theta}}
+\end{equation}
+
+Where, $A_s$ = Sunlit area, $N$ = Number of visible pixels, $A_p$ = the projected area of a single pixel, $\theta$ = solar incidence angle of the surface, and $PSSA$ = Projected Sunlit Surface Area. The approximation is limited by the resolution of the rendering.
+
+For more information on the Pixel Counting method, refer to Jones et al 2011.
 
 \subsection{Solar Gains}\label{solar-gains-000}
 
@@ -526,7 +538,7 @@ This case is the same interior distribution as the preceding option but uses ext
 
 \subsection{Details of the Interior Solar Distribution Calculation}\label{details-of-the-interior-solar-distribution-calculation}
 
-EnergyPlus calculates the distribution of short-wave radiation in the interior of each thermal zone. This radiation consists of beam solar radiation, diffuse solar radiation, and short-wave radiation from electric lights. The program determines the amount of this radiation that is (1) absorbed on the inside face of opaque surfaces, (2) absorbed in the glass and shading device layers of the zone's exterior and interior windows, (3) transmitted through the zone's interior windows to adjacent zones, and (4) transmitted back out of the exterior windows. The effects of movable shading devices on the exterior windows are taken into account; \emph{the program does not allow shading devices on interior windows}. Most of this calculation is done in subroutine CalcInteriorSolarDistribution in the SolarShading module.
+EnergyPlus calculates the distribution of short-wave radiation in the interior of each thermal zone. This radiation consists of beam solar radiation, diffuse solar radiation, and short-wave radiation from electric lights. The program determines the amount of this radiation that is (1) absorbed on the inside face of opaque surfaces, (2) absorbed in the glass and shading device layers of the zone's exterior and interior windows, (3) transmitted through the zone's interior windows to adjacent zones, and (4) transmitted back out of the exterior windows. The effects of movable shading devices on the exterior windows are taken into account; \emph{the program does not allow shading devices on interior windows}. Most of this calculation is done in subroutine CalcInteriorSolarDistribution in the SolarShading module. EnergyPlus will use either Polygon Clipping or Pixel Counting--depending on the method of shading algorithm selected by the user--to determine interior solar distibution if full interior solar distribution is requested.
 
 \subsubsection{Initial Distribution of Diffuse Solar Transmitted through Exterior and Interior Windows}\label{initial-distribution-of-diffuse-solar-transmitted-through-exterior-and-interior-windows}
 

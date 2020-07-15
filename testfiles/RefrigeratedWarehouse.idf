@@ -193,7 +193,7 @@
 !
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -201,7 +201,7 @@
     Refridgerated Warehouse, !- Name
     90.0,                    !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -14406,13 +14406,9 @@
     AllSummary;              !- Report 1 Name
 
   Output:Diagnostics,
-    DisplayUnusedSchedules;  !- Key 1
-
-  Output:Diagnostics,
-    DisplayZoneAirHeatBalanceOffBalance;  !- Key 1
-
-  Output:Diagnostics,
-    DisplayAdvancedReportVariables;  !- Key 1
+    DisplayUnusedSchedules,  !- Key 1
+    DisplayZoneAirHeatBalanceOffBalance,  !- Key 2
+    DisplayAdvancedReportVariables;  !- Key 3
 
   Output:SQLite,
     Simple;                  !- Option Type

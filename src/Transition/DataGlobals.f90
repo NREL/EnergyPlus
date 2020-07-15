@@ -37,7 +37,7 @@ DOUBLE PRECISION, PARAMETER    :: Pi = 3.141592653589793D0   ! Pi 3.141592653589
 DOUBLE PRECISION, PARAMETER    :: PiOvr2 = Pi/2.D0          ! Pi/2
 DOUBLE PRECISION, PARAMETER    :: DegToRadians = Pi/180.D0  ! Conversion for Degrees to Radians
 DOUBLE PRECISION, PARAMETER    :: SecInHour = 3600.0D0      ! Conversion for hours to seconds
-INTEGER, PARAMETER :: MaxNameLength = 100     ! Maximum Name Length in Characters -- should be the same
+INTEGER, PARAMETER :: MaxNameLength = 500     ! Maximum Name Length in Characters -- should be the same
                                               ! as MaxAlphaArgLength in InputProcessor module
 
 REAL, PARAMETER    :: KelvinConv = 273.15     ! Conversion factor for C to K and K to C

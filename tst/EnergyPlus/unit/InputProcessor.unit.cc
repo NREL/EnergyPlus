@@ -181,47 +181,53 @@ namespace EnergyPlus {
 
 TEST_F(InputProcessorFixture, decode_encode_1)
 {
-    auto const idf = delimited_string({"Building,",
-                                       "  Ref Bldg Medium Office New2004_v1.3_5.0,",
-                                       "  0.0,",
-                                       "  City,",
-                                       "  0.04,",
-                                       "  0.2,",
-                                       "  FullInteriorAndExterior,",
-                                       "  25.0,",
-                                       "  6.0;",
-                                       "",
-                                       "BuildingSurface:Detailed,",
-                                       "  Zn009:Flr001,",
-                                       "  Floor,",
-                                       "  FLOOR38,",
-                                       "  SCWINDOW,",
-                                       "  Surface,",
-                                       "  Zn009:Flr001,",
-                                       "  NoSun,",
-                                       "  NoWind,",
-                                       "  1.0,",
-                                       "  4.0,",
-                                       "  10.0,",
-                                       "  0.0,",
-                                       "  0.0,",
-                                       "  0.0,",
-                                       "  0.0,",
-                                       "  0.0,",
-                                       "  0.0,",
-                                       "  10.0,",
-                                       "  0.0,",
-                                       "  10.0,",
-                                       "  10.0,",
-                                       "  0.0;",
-                                       "",
-                                       "GlobalGeometryRules,",
-                                       "  UpperLeftCorner,",
-                                       "  Counterclockwise,",
-                                       "  Relative,",
-                                       "  Relative,",
-                                       "  Relative;",
-                                       ""});
+    auto const idf = delimited_string({
+        "Building,",
+        "  Ref Bldg Medium Office New2004_v1.3_5.0,",
+        "  0.0,",
+        "  City,",
+        "  0.04,",
+        "  0.2,",
+        "  FullInteriorAndExterior,",
+        "  25.0,",
+        "  6.0;",
+        "",
+        "BuildingSurface:Detailed,",
+        "  Zn009:Flr001,",
+        "  Floor,",
+        "  FLOOR38,",
+        "  SCWINDOW,",
+        "  Surface,",
+        "  Zn009:Flr001,",
+        "  NoSun,",
+        "  NoWind,",
+        "  1.0,",
+        "  4.0,",
+        "  10.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  10.0,",
+        "  0.0,",
+        "  10.0,",
+        "  10.0,",
+        "  0.0;",
+        "",
+        "GlobalGeometryRules,",
+        "  UpperLeftCorner,",
+        "  Counterclockwise,",
+        "  Relative,",
+        "  Relative,",
+        "  Relative;",
+        "",
+        "Version,",
+        "  " + DataStringGlobals::MatchVersion + ";",
+        ""
+    });
+
     ASSERT_TRUE(process_idf(idf));
     std::string encoded = encodeIDF();
     EXPECT_EQ(idf, encoded);
@@ -246,38 +252,43 @@ TEST_F(InputProcessorFixture, decode_encode_2)
         "  Yes;",
     }));
 
-    auto const expected(delimited_string({"Building,",
-                                          "  Bldg,",
-                                          "  0.0,",
-                                          "  Suburbs,",
-                                          "  0.04,",
-                                          "  0.4,",
-                                          "  FullExterior,",
-                                          "  25.0,",
-                                          "  6.0;",
-                                          "",
-                                          "GlobalGeometryRules,",
-                                          "  UpperLeftCorner,",
-                                          "  Counterclockwise,",
-                                          "  Relative,",
-                                          "  Relative,",
-                                          "  Relative;",
-                                          "",
-                                          "Zone,",
-                                          "  Core_mid,",
-                                          "  0.0,",
-                                          "  0.0,",
-                                          "  0.0,",
-                                          "  0.0,",
-                                          "  1.0,",
-                                          "  1.0,",
-                                          "  ,",
-                                          "  ,",
-                                          "  Autocalculate,",
-                                          "  ,",
-                                          "  ,",
-                                          "  Yes;",
-                                          ""}));
+    auto const expected(delimited_string({
+        "Building,",
+        "  Bldg,",
+        "  0.0,",
+        "  Suburbs,",
+        "  0.04,",
+        "  0.4,",
+        "  FullExterior,",
+        "  25.0,",
+        "  6.0;",
+        "",
+        "GlobalGeometryRules,",
+        "  UpperLeftCorner,",
+        "  Counterclockwise,",
+        "  Relative,",
+        "  Relative,",
+        "  Relative;",
+        "",
+        "Version,",
+        "  " + DataStringGlobals::MatchVersion + ";",
+        "",
+        "Zone,",
+        "  Core_mid,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  1.0,",
+        "  1.0,",
+        "  ,",
+        "  ,",
+        "  Autocalculate,",
+        "  ,",
+        "  ,",
+        "  Yes;",
+        ""
+    }));
 
     ASSERT_TRUE(process_idf(idf));
     std::string encoded = encodeIDF();
@@ -327,6 +338,9 @@ TEST_F(InputProcessorFixture, decode_encode_3)
       "  Comma,",
       "  ,",
       "  10.0;",
+      "",
+      "Version,",
+      "  " + DataStringGlobals::MatchVersion + ";",
       ""
     }));
 
@@ -340,29 +354,32 @@ TEST_F(InputProcessorFixture, byte_order_mark)
     auto const idf(delimited_string(
             {
                     "\xEF\xBB\xBF Building,Bldg,0,Suburbs,0.04,0.4,FullExterior,25,6;",
-                    "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative,Relative,Relative;"
+                    "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative,Relative,Relative;",
+                    "Version," + DataStringGlobals::MatchVersion + ";"
             }));
 
-    auto const expected(delimited_string(
-            {
-                    "Building,",
-                    "  Bldg,",
-                    "  0.0,",
-                    "  Suburbs,",
-                    "  0.04,",
-                    "  0.4,",
-                    "  FullExterior,",
-                    "  25.0,",
-                    "  6.0;",
-                    "",
-                    "GlobalGeometryRules,",
-                    "  UpperLeftCorner,",
-                    "  Counterclockwise,",
-                    "  Relative,",
-                    "  Relative,",
-                    "  Relative;",
-                    ""
-            }));
+    auto const expected(delimited_string({
+        "Building,",
+        "  Bldg,",
+        "  0.0,",
+        "  Suburbs,",
+        "  0.04,",
+        "  0.4,",
+        "  FullExterior,",
+        "  25.0,",
+        "  6.0;",
+        "",
+        "GlobalGeometryRules,",
+        "  UpperLeftCorner,",
+        "  Counterclockwise,",
+        "  Relative,",
+        "  Relative,",
+        "  Relative;",
+        "",
+        "Version,",
+        "  " + DataStringGlobals::MatchVersion + ";",
+        ""
+    }));
 
     ASSERT_TRUE(process_idf(idf));
     std::string encoded = encodeIDF();
@@ -495,6 +512,12 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_1)
           "\"starting_vertex_position\":\"UpperLeftCorner\","
           "\"vertex_entry_direction\":\"Counterclockwise\""
         "}"
+      "},"
+      "\"Version\":{"
+        "\"\":{"
+          "\"idf_order\":0,"
+          "\"version_identifier\":\"" + DataStringGlobals::MatchVersion + "\""
+        "}"
       "}}"
     );
 
@@ -534,6 +557,12 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_2)
           "\"rectangular_surface_coordinate_system\":\"Relative\","
           "\"starting_vertex_position\":\"UpperLeftCorner\","
           "\"vertex_entry_direction\":\"Counterclockwise\""
+        "}"
+      "},"
+      "\"Version\":{"
+        "\"\":{"
+          "\"idf_order\":0,"
+          "\"version_identifier\":\"" + DataStringGlobals::MatchVersion + "\""
         "}"
       "}}"
     );
@@ -577,6 +606,12 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
           "\"starting_vertex_position\":\"UpperLeftCorner\","
           "\"vertex_entry_direction\":\"Counterclockwise\""
         "}"
+      "},"
+      "\"Version\":{"
+        "\"\":{"
+          "\"idf_order\":0,"
+          "\"version_identifier\":\"" + DataStringGlobals::MatchVersion + "\""
+        "}"
       "}}"
     );
 
@@ -586,6 +621,79 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
     auto const input_file = epJSON.dump(-1, ' ', false, json::error_handler_t::replace);
 
     EXPECT_EQ( expected, input_file );
+}
+
+TEST_F(InputProcessorFixture, parse_latin1_json)
+{
+
+    // Test for #7388 -  Non UTF-8 characters throwing false blank name error
+
+    std::string const idf(delimited_string({
+        "  Construction,",
+        "    \x31\xB0\x70\x69\x61\x6E\x6F,  !- Name",
+        "    intonaco int calce;      !- Outside Layer"
+    }));
+
+    EXPECT_FALSE(process_idf(idf, false)); // No assertions
+    const std::string error_string = delimited_string({
+        "   ** Severe  ** <root>[Construction] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: '1\xB0piano'.",
+        "   ** Severe  ** <root>[Construction] - Object name is required and cannot be blank or whitespace, and must be UTF-8 encoded"
+    });
+    compare_err_stream(error_string, true);
+
+    auto const &errors = validationErrors();
+    EXPECT_EQ(errors.size(), 2ul);
+    EXPECT_EQ("<root>[Construction] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: '1\xB0piano'.", errors[0]);
+    EXPECT_EQ("<root>[Construction] - Object name is required and cannot be blank or whitespace, and must be UTF-8 encoded", errors[1]);
+
+
+    json &epJSON = getEpJSON();
+
+    auto it = epJSON.find("Construction");
+    ASSERT_NE(it, epJSON.end());
+    auto iit = it->begin();
+    EXPECT_EQ("1\xB0piano", iit.key());
+}
+
+
+TEST_F(InputProcessorFixture, parse_malformed_idf)
+{
+    std::string const idf(delimited_string({
+        "Connector:Splitter,",
+        " Chiled Water Loop CndW Supply Splitter,                  !- Name",
+        " Chiled Water Loop CndW Supply Inlet Branch,              !- Inlet Branch Name",
+        " Chiled Water Loop CndW Supply Bypass Branch,             !- Outlet Branch Name",
+        "",
+        "Connector:Mixer,",
+        " Chiled Water Loop CndW Supply Mixer,                     !- Name",
+        " Chiled Water Loop CndW Supply Outlet Branch,             !- Outlet Branch Name",
+        " Chiled Water Loop CndW Supply Bypass Branch,             !- Inlet Branch Name",
+        "",
+        "! Pump part load coefficients are linear to represent condenser pumps dedicated to each chiller.",
+        "Pump:VariableSpeed,",
+        " Chiled Water Loop CndW Supply Pump,                      !- Name",
+        " Chiled Water Loop CndW Supply Inlet,                     !- Inlet Node Name",
+        " Chiled Water Loop CndW Pump Outlet,                      !- Outlet Node Name",
+        " autosize,                                                !- Rated Volumetric Flow Rate {m3/s}",
+        " 179352,                                                  !- Rated Pump Head {Pa}",
+        " autosize,                                                !- Rated Power Consumption {W}",
+        " 0.9,                                                     !- Motor Efficiency",
+        " 0,                                                       !- Fraction of Motor Inefficiencies to Fluid Stream",
+        " 0,                                                       !- Coefficient 1 of the Part Load Performance Curve",
+        " 0,                                                       !- Coefficient 2 of the Part Load Performance Curve",
+        " 1,                                                       !- Coefficient 3 of the Part Load Performance Curve",
+        " 0,                                                       !- Coefficient 4 of the Part Load Performance Curve",
+        " 0,                                                       !- Min Flow Rate while operating in variable flow capacity {m3/s}",
+        " Intermittent,                                            !- Pump Control Type",
+        " ;                                                        !- Pump Flow Rate Schedule Name",
+    }));
+
+    EXPECT_FALSE(process_idf(idf, false));
+    EXPECT_TRUE(compare_err_stream(delimited_string({
+        "   ** Severe  ** Line: 16 Index: 9 - Field cannot be Autosize or Autocalculate",
+        "   ** Severe  ** Line: 18 Index: 9 - Field cannot be Autosize or Autocalculate",
+        "   ** Severe  ** <root>[Connector:Splitter][Chiled Water Loop CndW Supply Splitter][branches][20] - Missing required property 'outlet_branch_name'."
+    })));
 }
 
 TEST_F(InputProcessorFixture, parse_two_RunPeriod)
@@ -793,7 +901,10 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
                          {"temperature_convergence_tolerance_value", 0.4000},
                          {"solar_distribution", "FullExterior"},
                          {"maximum_number_of_warmup_days", 25},
-                         {"minimum_number_of_warmup_days", 6}}}}}};
+                         {"minimum_number_of_warmup_days", 6}}}}},
+                     {"Version",
+                      {{"",
+                        {{"version_identifier", DataStringGlobals::MatchVersion}}}}}};
 
     auto const expected_idf(delimited_string({"Building,",
                                               "  Bldg,",
@@ -832,6 +943,9 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
                                               "  Relative,",
                                               "  Relative,",
                                               "  Relative;",
+                                              "",
+                                              "Version,",
+                                              "  " + DataStringGlobals::MatchVersion + ";",
                                               ""}));
 
     EXPECT_TRUE(process_idf(idf));
@@ -3908,6 +4022,182 @@ TEST_F(InputProcessorFixture, clean_epjson)
 
     EXPECT_EQ(expected, cleanstring);
 }
+
+TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
+{
+    std::string const idf_objects = delimited_string({
+
+        // 1 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Version,",
+        "  9.4;", // Has a default
+
+        // 8 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 1 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Building,",
+        "  ,  !- Name",                                                                     // Has a default   - DEFAULTED - Special case (name)
+        "  0,                       !- North Axis {deg}",                                   // Has a default
+        "  Suburbs,                 !- Terrain",                                            // Has a default
+        "  0.001,                   !- Loads Convergence Tolerance Value",                  // Has a default
+        "  0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}",   // Has a default
+        "  FullInteriorAndExterior, !- Solar Distribution",                                 // Has a default
+        "  25,                      !- Maximum Number of Warmup Days",                      // Has a default
+        "  6;                       !- Minimum Number of Warmup Days",                      // Has a default
+
+        // 2 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "  GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    Relative,                !- Coordinate System",
+        "    Relative,                !- Daylighting Reference Point Coordinate System", // Has a default
+        "    Relative;                !- Rectangular Surface Coordinate System",         // Has a default
+
+        // SUBTOTAL:
+        // 11 fields with defaults, 0 Autosizable, 0 Autocalculatable
+        // 1 fields defaulted     , 0 Autosized  , 0 Autocalculated
+
+
+
+        // 23 fields with default, 6 Autosizable, 3 Autocalculatable
+        // 10 fields defaulted   , 4 Autosized  , 2 Autocalculated
+        "CoolingTower:SingleSpeed,",
+        "  CT Single Speed,                        !- Name",                                                      // No Default
+        "  CT Single Speed Inlet Node,             !- Water Inlet Node Name",                                     // No Default
+        "  CT Single Speed Outlet Node,            !- Water Outlet Node Name",                                    // No Default
+        "  AutosiZe,                               !- Design Water Flow Rate {m3/s}",                             // Autosizable, no default (testing casing too)
+        "  Autosize,                               !- Design Air Flow Rate {m3/s}",                               // Autosizable, no default, required
+        "  10000,                                  !- Design Fan Power {W}",                                      // Autosizable, no default, required
+        "  Autosize,                               !- Design U-Factor Times Area Value {W/K}",                    // Autosizable, no default
+        "  AutoSIze,                               !- Free Convection Air Flow Rate {m3/s}",                      // Autocalculatable, default numeric: NOTE, using "Autosize" and not "Autocalculate
+        "  0.1,                                    !- Free Convection Air Flow Rate Sizing Factor",               // Has numeric default
+        "  AutocAlcUlate,                          !- Free Convection U-Factor Times Area Value {W/K}",           // Autocalculatable, default numeric
+        "  ,                                       !- Free Convection U-Factor Times Area Value Sizing Factor",   // Has numeric default - DEFAULTED
+        "  UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",                                  // Has default (UFactorTimesAreaAndDesignWaterFlowRate)
+        "  1.25,                                   !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio", // Has numeric default
+        "  ,                                       !- Nominal Capacity {W}",                                      // No default
+        "  0,                                      !- Free Convection Capacity {W}",                              // Autocalculatable, no default
+        "  ,                                       !- Free Convection Nominal Capacity Sizing Factor",            // Has numeric default - DEFAULTED
+        "  ,                                       !- Design Inlet Air Dry-Bulb Temperature {C}",                 // Has numeric default - DEFAULTED
+        "  25.6,                                   !- Design Inlet Air Wet-Bulb Temperature {C}",                 // Has numeric default
+        "  ,                                       !- Design Approach Temperature {deltaC}",                      // Autosizable, default Autosize - DEFAULTED
+        "  10,                                     !- Design Range Temperature {deltaC}",                         // Autosizable, default Autosize
+        "  0,                                      !- Basin Heater Capacity {W/K}",                               // Has numeric default
+        "  ,                                       !- Basin Heater Setpoint Temperature {C}",                     // Has numeric default - DEFAULTED
+        "  ,                                       !- Basin Heater Operating Schedule Name",                      // No default
+        "  LossFactor,                             !- Evaporation Loss Mode",                                     // No default
+        "  0.2,                                    !- Evaporation Loss Factor {percent/K}",                       // Has numeric default
+        "  ,                                       !- Drift Loss Percent {percent}",                              // Has numeric default - DEFAULTED
+        "  ConcentrationRatio,                     !- Blowdown Calculation Mode",                                 // No default
+        "  3,                                      !- Blowdown Concentration Ratio",                              // Has numeric default
+        "  ,                                       !- Blowdown Makeup Water Usage Schedule Name",                 // No default
+        "  ,                                       !- Supply Water Storage Tank Name",                            // No default
+        "  ,                                       !- Outdoor Air Inlet Node Name",                               // No default
+        "  FanCycling,                             !- Capacity Control",                                          // Has default
+        "  1,                                      !- Number of Cells",                                           // Has numeric default
+        "  ,                                       !- Cell Control",                                              // Has default - DEFAULTED
+        "  0.33,                                   !- Cell Minimum  Water Flow Rate Fraction",                    // Has numeric default
+        "  ;                                       !- Cell Maximum Water Flow Rate Fraction",                     // Has numeric default - DEFAULTED
+     // "  ,                                       !- Sizing Factor",                                             // Has numeric default - DEFAULTED by ommission
+     // "  ;                                       !- End-Use Subcategory",                                       // Has default - DEFAULTED by ommission
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    inputProcessor->reportIDFRecordsStats();
+
+    // TOTAL:
+    // 34 fields with defaults, 6 Autosizable, 3 Autocalculatable
+    // 11 fields defaulted    , 4 Autosized  , 2 Autocalculated
+
+    EXPECT_EQ(4,  DataOutputs::iNumberOfRecords);             // Number of IDF Records (=Objects)
+
+    EXPECT_EQ(34, DataOutputs::iTotalFieldsWithDefaults);     // Total number of fields that could be defaulted
+    EXPECT_EQ(6,  DataOutputs::iTotalAutoSizableFields);      // Total number of autosizeable fields
+    EXPECT_EQ(3,  DataOutputs::iTotalAutoCalculatableFields); // Total number of autocalculatable fields
+
+    EXPECT_EQ(11, DataOutputs::iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
+    EXPECT_EQ(4,  DataOutputs::iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
+    EXPECT_EQ(2,  DataOutputs::iNumberOfAutoCalcedFields);    // Number of autocalculated fields
+}
+
+TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        // 1 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Version,",
+        "  9.4;", // Has a default
+
+        // 8 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 1 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "Building,",
+        "  ,  !- Name",                                                                     // Has a default   - DEFAULTED - Special case (name)
+        "  0,                       !- North Axis {deg}",                                   // Has a default
+        "  Suburbs,                 !- Terrain",                                            // Has a default
+        "  0.001,                   !- Loads Convergence Tolerance Value",                  // Has a default
+        "  0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}",   // Has a default
+        "  FullInteriorAndExterior, !- Solar Distribution",                                 // Has a default
+        "  25,                      !- Maximum Number of Warmup Days",                      // Has a default
+        "  6;                       !- Minimum Number of Warmup Days",                      // Has a default
+
+        // 2 fields with default, 0 Autosizable, 0 Autocalculatable
+        // 0 fields defaulted   , 0 Autosized  , 0 Autocalculated
+        "  GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    Relative,                !- Coordinate System",
+        "    Relative,                !- Daylighting Reference Point Coordinate System", // Has a default
+        "    Relative;                !- Rectangular Surface Coordinate System",         // Has a default
+
+        // SUBTOTAL:
+        // 11 fields with defaults, 0 Autosizable, 0 Autocalculatable
+        // 1 fields defaulted     , 0 Autosized  , 0 Autocalculated
+
+        // Object with extensible fields, one of which actually has a default. Given that it uses 2 extensible groups
+        // 4 fields with defaults, 0 Autosizable, 0 Autocalculatable
+        // 1 fields defaulted    , 0 Autosizable, 0 Autocalculatable
+        "SurfaceProperty:SurroundingSurfaces,",
+        "  SrdSurfs:Living:East,        !- Name",
+        "  0.3,                         !- Sky View Factor",                             // Has numeric default
+        "  ,                            !- Sky Temperature Schedule Name",
+        "  0.1,                         !- Ground View Factor",                          // Has numeric default
+        "  ,                            !- Ground Temperature Schedule Name",
+        "  SurroundingSurface1,         !- Surrounding Surface 1 Name",                  // (begin extensible)
+        "  0.6,                         !- Surrounding Surface 1 View Factor",           // Has numeric default
+        "  Surrounding Temp Sch 1,      !- Surrounding Surface 1 Temperature Schedule Name",
+        "  SurroundingSurface2,         !- Surrounding Surface 2 Name",
+        "  ,                            !- Surrounding Surface 2 View Factor",           //  Has numeric default - DEFAULTED
+        "  Surrounding Temp Sch 1;      !- Surrounding Surface 2 Temperature Schedule Name",
+
+    });
+
+    // Not really happy about the processing of the SurfaceProperty object (needs a SurfaceProperty:LocalEnvironment, a surface itself, etc)
+    // but that's not what I'm trying to test so power through.
+    bool use_assertions = false;
+    process_idf(idf_objects, use_assertions);
+
+    inputProcessor->reportIDFRecordsStats();
+
+    // TOTAL:
+    // 15 fields with defaults, 0 Autosizable, 0 Autocalculatable
+    // 2  fields defaulted    , 0 Autosized  , 0 Autocalculated
+
+    EXPECT_EQ(4,  DataOutputs::iNumberOfRecords);             // Number of IDF Records (=Objects)
+
+    EXPECT_EQ(15, DataOutputs::iTotalFieldsWithDefaults);     // Total number of fields that could be defaulted
+    EXPECT_EQ(0,  DataOutputs::iTotalAutoSizableFields);      // Total number of autosizeable fields
+    EXPECT_EQ(0,  DataOutputs::iTotalAutoCalculatableFields); // Total number of autocalculatable fields
+
+    EXPECT_EQ(2,  DataOutputs::iNumberOfDefaultedFields);     // Number of defaulted fields in IDF
+    EXPECT_EQ(0,  DataOutputs::iNumberOfAutoSizedFields);     // Number of autosized fields in IDF
+    EXPECT_EQ(0,  DataOutputs::iNumberOfAutoCalcedFields);    // Number of autocalculated fields
+
+}
+
 
 /*
    TEST_F( InputProcessorFixture, processIDF_json )

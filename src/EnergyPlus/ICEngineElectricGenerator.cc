@@ -61,6 +61,7 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -286,41 +287,14 @@ namespace ICEngineElectricGenerator {
                 }
             }
 
-            // Fuel Type Case Statement
-            {
-                auto const SELECT_CASE_var(AlphArray(10));
-                if (is_blank(SELECT_CASE_var)) { // If blank then the default is Diesel
-                    ICEngineGenerator(genNum).FuelType = "Diesel";
-
-                } else if (SELECT_CASE_var == "NATURALGAS") {
-                    ICEngineGenerator(genNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "DIESEL") {
-                    ICEngineGenerator(genNum).FuelType = "Diesel";
-
-                } else if (SELECT_CASE_var == "GASOLINE") {
-                    ICEngineGenerator(genNum).FuelType = "Gasoline";
-
-                } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    ICEngineGenerator(genNum).FuelType = "FuelOil#1";
-
-                } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    ICEngineGenerator(genNum).FuelType = "FuelOil#2";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    ICEngineGenerator(genNum).FuelType = "Propane";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    ICEngineGenerator(genNum).FuelType = "OtherFuel1";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    ICEngineGenerator(genNum).FuelType = "OtherFuel2";
-
-                } else {
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + AlphArray(10));
-                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                    ErrorsFound = true;
-                }
+            // Validate fuel type input
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(AlphArray(10), ICEngineGenerator(genNum).FuelType, FuelTypeError);
+            if (FuelTypeError) {
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + AlphArray(10));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+                ErrorsFound = true;
+                FuelTypeError = false;
             }
 
             ICEngineGenerator(genNum).HeatRecMaxTemp = NumArray(11);
@@ -441,7 +415,7 @@ namespace ICEngineElectricGenerator {
         OptLoad = 0.0;
     }
 
-    void ICEngineGeneratorSpecs::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
+    void ICEngineGeneratorSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
                                           bool FirstHVACIteration,
                                           Real64 &EP_UNUSED(CurLoad),
                                           bool EP_UNUSED(RunFlag))
@@ -738,7 +712,7 @@ namespace ICEngineElectricGenerator {
         this->HeatRecMdotActual = HeatRecMdot;
     }
 
-    void ICEngineGeneratorSpecs::InitICEngineGenerators(bool const RunFlag, bool const FirstHVACIteration)
+    void ICEngineGeneratorSpecs::InitICEngineGenerators(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -764,7 +738,8 @@ namespace ICEngineElectricGenerator {
 
         if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_Generator_ICEngine,
                                                     this->HRLoopNum,
                                                     this->HRLoopSideNum,

@@ -45,27 +45,33 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <ObjexxFCL/gio.hh>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/OutputFiles.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification& input_data)
+void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
 {
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
@@ -105,9 +111,18 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
         this->unitStatic = input_data.unit_internal_static_air_pressure;
     }
 
-    if (!input_data.alternate_operating_mode_name.empty()) {
-        this->hasAlternateMode = true;
+    if (!input_data.alternate_operating_mode_name.empty() && input_data.alternate_operating_mode2_name.empty()) {
+        this->hasAlternateMode = coilEnhancedMode;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode_name);
+    }
+
+    if (!input_data.alternate_operating_mode2_name.empty() && !input_data.alternate_operating_mode_name.empty()) {
+        this->hasAlternateMode = coilSubcoolReheatMode;
+        this->alternateMode = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode_name);
+        this->alternateMode2 = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode2_name);
+        setOperMode(this->normalMode, 1);
+        setOperMode(this->alternateMode, 2);
+        setOperMode(this->alternateMode2, 3);
     }
 
     if (errorsFound) {
@@ -115,7 +130,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
     }
 }
 
-CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::string& name_to_find)
+CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::string &name_to_find)
 {
     int numPerformances = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
@@ -150,6 +165,9 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
         if (!lAlphaFieldBlanks(6)) {
             input_specs.alternate_operating_mode_name = cAlphaArgs(6);
         }
+        if (!lAlphaFieldBlanks(7)) {
+            input_specs.alternate_operating_mode2_name = cAlphaArgs(7);
+        }
 
         this->instantiateFromInputSpec(input_specs);
         break;
@@ -162,27 +180,134 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
 
 void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &inletNode,
                                                 DataLoopNode::NodeData &outletNode,
-                                                bool useAlternateMode,
+                                                int useAlternateMode,
                                                 Real64 &PLR,
                                                 int &speedNum,
                                                 Real64 &speedRatio,
                                                 int &fanOpMode,
                                                 DataLoopNode::NodeData &condInletNode,
-                                                DataLoopNode::NodeData &condOutletNode)
+                                                DataLoopNode::NodeData &condOutletNode,
+                                                Real64 LoadSHR)
 {
-    if (useAlternateMode) {
+    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+
+    if (useAlternateMode == coilSubcoolReheatMode) {
+        Real64 totalCoolingRate;
+        Real64 sensNorRate;
+        Real64 sensSubRate;
+        Real64 sensRehRate;
+        Real64 SysNorSHR;
+        Real64 SysSubSHR;
+        Real64 SysRehSHR;
+        Real64 minAirHumRat;
+        Real64 HumRatNorOut;
+        Real64 TempNorOut;
+        Real64 EnthalpyNorOut;
+        Real64 modeRatio;
+
+        this->recoveredEnergyRate = 0.0;
+        this->NormalSHR = 0.0;
+        this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+
+        //this->OperatingMode = 1;
+        totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
+        minAirHumRat = min(inletNode.HumRat, outletNode.HumRat);
+        sensNorRate = outletNode.MassFlowRate *
+                      (Psychrometrics::PsyHFnTdbW(inletNode.Temp, minAirHumRat) - Psychrometrics::PsyHFnTdbW(outletNode.Temp, minAirHumRat));
+        if (totalCoolingRate > 1.0E-10) {
+            this->OperatingMode = 1;
+            this->NormalSHR = sensNorRate / totalCoolingRate;
+        }
+
+        if (PLR == 0.0) return;
+        if (LoadSHR == 0.0) return;
+
+        if (totalCoolingRate == 0.0) {
+            SysNorSHR = 1.0;
+        } else {
+            SysNorSHR = sensNorRate / totalCoolingRate;
+        }
+        HumRatNorOut = outletNode.HumRat;
+        TempNorOut = outletNode.Temp;
+        EnthalpyNorOut = outletNode.Enthalpy;
+        this->recoveredEnergyRate = sensNorRate;
+
+        if (LoadSHR < SysNorSHR) {
+            outletNode.MassFlowRate = inletNode.MassFlowRate;
+            this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+            totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
+            minAirHumRat = min(inletNode.HumRat, outletNode.HumRat);
+            sensSubRate = outletNode.MassFlowRate *
+                          (Psychrometrics::PsyHFnTdbW(inletNode.Temp, minAirHumRat) - Psychrometrics::PsyHFnTdbW(outletNode.Temp, minAirHumRat));
+            SysSubSHR = sensSubRate / totalCoolingRate;
+            if (LoadSHR < SysSubSHR) {
+                outletNode.MassFlowRate = inletNode.MassFlowRate;
+                this->calculate(this->alternateMode2, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+                totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
+                minAirHumRat = min(inletNode.HumRat, outletNode.HumRat);
+                sensRehRate = outletNode.MassFlowRate *
+                              (Psychrometrics::PsyHFnTdbW(inletNode.Temp, minAirHumRat) - Psychrometrics::PsyHFnTdbW(outletNode.Temp, minAirHumRat));
+                SysRehSHR = sensRehRate / totalCoolingRate;
+                if (LoadSHR > SysRehSHR) {
+                    modeRatio = (LoadSHR - SysNorSHR) / (SysRehSHR - SysNorSHR);
+                    this->OperatingMode = 3;
+                    outletNode.HumRat = HumRatNorOut * (1.0 - modeRatio) + modeRatio * outletNode.HumRat;
+                    outletNode.Enthalpy = EnthalpyNorOut * (1.0 - modeRatio) + modeRatio * outletNode.Enthalpy;
+                    outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
+                    this->ModeRatio = modeRatio;
+                    // update other reporting terms
+                    this->powerUse = this->normalMode.OpModePower * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModePower;
+                    this->RTF = this->normalMode.OpModeRTF * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeRTF;
+                    this->electricityConsumption = this->powerUse * reportingConstant;
+                    this->wasteHeatRate = this->normalMode.OpModeWasteHeat * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeWasteHeat;
+                    this->recoveredEnergyRate = (this->recoveredEnergyRate - sensRehRate) * this->ModeRatio;
+                    return;
+                } else {
+                    this->ModeRatio = 1.0;
+                    this->OperatingMode = 3;
+                    this->recoveredEnergyRate = (this->recoveredEnergyRate - sensRehRate) * this->ModeRatio;
+                    return;
+                }
+            } else {
+                modeRatio = (LoadSHR - SysNorSHR) / (SysSubSHR - SysNorSHR);
+                this->OperatingMode = 2;
+                // process outlet conditions and total output
+                outletNode.HumRat = HumRatNorOut * (1.0 - modeRatio) + modeRatio * outletNode.HumRat;
+                outletNode.Enthalpy = EnthalpyNorOut * (1.0 - modeRatio) + modeRatio * outletNode.Enthalpy;
+                outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
+                this->ModeRatio = modeRatio;
+                // update other reporting terms
+                this->powerUse = this->normalMode.OpModePower * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModePower;
+                this->RTF = this->normalMode.OpModeRTF * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeRTF;
+                this->electricityConsumption = this->powerUse * reportingConstant;
+                this->wasteHeatRate = this->normalMode.OpModeWasteHeat * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeWasteHeat;
+                this->recoveredEnergyRate = (this->recoveredEnergyRate - sensSubRate) * this->ModeRatio;
+                return;
+            }
+        } else {
+            this->ModeRatio = 0.0;
+            this->OperatingMode = 1;
+            this->recoveredEnergyRate = 0.0;
+            return;
+        }
+
+    } else if (useAlternateMode == coilEnhancedMode) {
         this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     } else {
         this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::size()
+void CoilCoolingDXCurveFitPerformance::size(EnergyPlusData &state)
 {
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
-        this->normalMode.size();
-        if (this->hasAlternateMode) {
-            this->alternateMode.size();
+        this->normalMode.size(state);
+        if (this->hasAlternateMode == coilEnhancedMode) {
+            this->alternateMode.size(state);
+        }
+        if (this->hasAlternateMode == coilSubcoolReheatMode) {
+            this->alternateMode.size(state);
+            this->alternateMode2.size(state);
         }
         this->mySizeFlag = false;
     }
@@ -236,13 +361,14 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
 
 }
 
+void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, OutputFiles &outputFiles) {
 
-void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, OutputFiles &outputFiles) {
-
+    using General::SolveRoot;
+    using TempSolveRoot::SolveRoot;
     // If fan index hasn't been set, we can't do anything
     if (supplyFanIndex == -1) { // didn't find VAV fan, do not rate this coil
-        ShowWarningError("CalcTwoSpeedDXCoilStandardRating: Did not find an appropriate fan associated with DX coil named = \"" +
-                         this->name + "\". Standard Ratings will not be calculated.");
+        ShowWarningError("CalcTwoSpeedDXCoilStandardRating: Did not find an appropriate fan associated with DX coil named = \"" + this->name +
+                         "\". Standard Ratings will not be calculated.");
         return;
     }
 
@@ -253,11 +379,6 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
             "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
             "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')\n");
     print(outputFiles.eio, Format_890);
-
-//    static ObjexxFCL::gio::Fmt Format_891(
-//            "(' VAV DX Cooling Coil Standard Rating Information, "
-//            "',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,'"
-//            ",',A)");
 
     std::string const RoutineName = "CoilCoolingDXCurveFitPerformance::calcStandardRatings";
 
@@ -270,7 +391,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
 
     // Calculate the Indoor fan electric power consumption.  The electric power consumption is estimated
     // using either user supplied or AHRI default value for fan power per air volume flow rate
-    Real64 const AirMassFlowRatioRated(1.0); // AHRI test is at the design flow rate
+    Real64 const AirMassFlowRatioRated(1.0);                // AHRI test is at the design flow rate
     Real64 const CoolingCoilInletAirWetBulbTempRated(19.4); // 19.44C (67F)
     Real64 const CoolingCoilInletAirDryBulbTempRated(26.7);
     Real64 const OutdoorUnitInletAirDryBulbTempRated(35.0); // 35.00C (95F)
@@ -288,7 +409,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
 
     if (this->unitStatic > 0.0) {
         totCapFlowModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFFF, AirMassFlowRatioRated);
-        totCapTempModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+        totCapTempModFac = CurveManager::CurveValue(
+            this->normalMode.speeds.back().indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
         for (int Iter = 1; Iter <= 4; ++Iter) { // iterative solution in the event that net capacity is near a threshold for external static
             // Obtain external static pressure from Table 5 in ANSI/AHRI Std. 340/360-2007
             if (NetCoolingCapRated <= 21000.0) {
@@ -315,22 +437,23 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
                 fanInletNode = HVACFan::fanObjs[supplyFanIndex]->inletNodeNum;
                 fanOutletNode = HVACFan::fanObjs[supplyFanIndex]->outletNodeNum;
             } else { // TODO: Are there other fan types to be considered here??
-                fanInletNode = Fans::GetFanInletNode("FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
-                fanOutletNode = Fans::GetFanOutletNode("FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
+                fanInletNode = Fans::GetFanInletNode(state.fans, "FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
+                fanOutletNode = Fans::GetFanOutletNode(state.fans, "FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
             }
 
             // set node state variables in preparation for fan model.
             DataLoopNode::Node(fanInletNode).MassFlowRate = this->normalMode.ratedEvapAirFlowRate;
             DataLoopNode::Node(fanOutletNode).MassFlowRate = this->normalMode.ratedEvapAirFlowRate;
             DataLoopNode::Node(fanInletNode).Temp = CoolingCoilInletAirDryBulbTempRated;
-            DataLoopNode::Node(fanInletNode).HumRat =
-                    Psychrometrics::PsyWFnTdbTwbPb(CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, DataEnvironment::OutBaroPress, RoutineName);
-            DataLoopNode::Node(fanInletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, DataLoopNode::Node(fanInletNode).HumRat);
+            DataLoopNode::Node(fanInletNode).HumRat = Psychrometrics::PsyWFnTdbTwbPb(
+                CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, DataEnvironment::OutBaroPress, RoutineName);
+            DataLoopNode::Node(fanInletNode).Enthalpy =
+                Psychrometrics::PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, DataLoopNode::Node(fanInletNode).HumRat);
             if (supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[supplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
+                HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
                 fanPowerCorrection = HVACFan::fanObjs[supplyFanIndex]->fanPower();
             } else {
-                Fans::SimulateFanComponents(supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
+                Fans::SimulateFanComponents(state, supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
                 fanPowerCorrection = Fans::GetFanPower(supplyFanIndex);
             }
 
@@ -343,7 +466,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
         fanPowerCorrection = DefaultFanPowerPerEvapAirFlowRate * this->normalMode.ratedEvapAirFlowRate;
         fanHeatCorrection = DefaultFanPowerPerEvapAirFlowRate * this->normalMode.ratedEvapAirFlowRate;
         totCapFlowModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFFF, AirMassFlowRatioRated);
-        totCapTempModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+        totCapTempModFac = CurveManager::CurveValue(
+            this->normalMode.speeds.back().indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
         NetCoolingCapRated = this->normalMode.ratedGrossTotalCap * totCapTempModFac * totCapFlowModFac - fanHeatCorrection;
     }
 
@@ -356,7 +480,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
     SupAirMdot_TestPoint[0] = this->normalMode.ratedEvapAirMassFlowRate;
 
     // Calculate Energy Efficiency Ratio (EER) at (19.44C WB and 35.0C DB ), ANSI/AHRI Std. 340/360
-    Real64 EIRTempModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+    Real64 EIRTempModFac =
+        CurveManager::CurveValue(this->normalMode.speeds.back().indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
     Real64 EIRFlowModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexEIRFFF, AirMassFlowRatioRated);
     Real64 EIR = 0.0;
     if (this->normalMode.speeds.back().ratedCOP > 0.0) {
@@ -399,7 +524,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
     // IEER - part load test points ***************************************************
     for (int PartLoadTestPoint = 1; PartLoadTestPoint <= 3; ++PartLoadTestPoint) {
         // determine minimum unloading capacity fraction at point B conditions.
-        Real64 heldOutdoorDB = DataEnvironment::OutDryBulbTemp; // TODO: Ugly, shared, potential race condition, blah. Shouldn't we just get from the condInletNode!?
+        Real64 heldOutdoorDB =
+            DataEnvironment::OutDryBulbTemp; // TODO: Ugly, shared, potential race condition, blah. Shouldn't we just get from the condInletNode!?
         if (condInletNodeIndex != 0) {
             DataLoopNode::Node(condInletNodeIndex).Temp = OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1];
         } else {
@@ -436,17 +562,17 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
         Real64 const AccuracyTolerance(0.2); // tolerance in AHRI 340/360 Table 6 note 1
         int const MaximumIterations(1000);
         Real64 PartLoadAirMassFlowRate = 0.0;
-        auto f = std::bind(&CoilCoolingDXCurveFitPerformance::calcIEERResidual, this, std::placeholders::_1, std::placeholders::_2);
-        General::SolveRoot(AccuracyTolerance,
-                  MaximumIterations,
-                  SolverFlag,
-                  PartLoadAirMassFlowRate,
-                  f,
-                  LowerBoundMassFlowRate,
-                  this->normalMode.ratedEvapAirMassFlowRate,
-                  par);
+        auto f = std::bind(&CoilCoolingDXCurveFitPerformance::calcIEERResidual, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        TempSolveRoot::SolveRoot(state, AccuracyTolerance,
+                           MaximumIterations,
+                           SolverFlag,
+                           PartLoadAirMassFlowRate,
+                           f,
+                           LowerBoundMassFlowRate,
+                           this->normalMode.ratedEvapAirMassFlowRate,
+                           par);
 
-        //reset outdoor dry bulb, this is gross
+        // reset outdoor dry bulb, this is gross
         DataEnvironment::OutDryBulbTemp = heldOutdoorDB;
 
         if (SolverFlag == -1) {
@@ -467,7 +593,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
             // now we have the supply air flow rate
             SupAirMdot_TestPoint[PartLoadTestPoint] = PartLoadAirMassFlowRate;
             Real64 AirMassFlowRatio = PartLoadAirMassFlowRate / this->normalMode.ratedEvapAirMassFlowRate;
-            Real64 const SupplyAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, DataEnvironment::OutBaroPress, RoutineName);
+            Real64 const SupplyAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(
+                CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, DataEnvironment::OutBaroPress, RoutineName);
 
             if (this->unitStatic > 0.0) {
                 FanStaticPressureRise = this->unitStatic + (ExternalStatic * pow_2(AirMassFlowRatio));
@@ -477,10 +604,10 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
                 DataLoopNode::Node(fanInletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
 
                 if (supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[supplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
+                    HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
                     fanPowerCorrection = HVACFan::fanObjs[supplyFanIndex]->fanPower();
                 } else {
-                    Fans::SimulateFanComponents(supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
+                    Fans::SimulateFanComponents(state, supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
                     fanPowerCorrection = Fans::GetFanPower(supplyFanIndex);
                 }
 
@@ -493,13 +620,14 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
 
             totCapFlowModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFFF, AirMassFlowRatio);
             totCapTempModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFT,
-                                          CoolingCoilInletAirWetBulbTempRated,
-                                          OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint-1]);
+                                                        CoolingCoilInletAirWetBulbTempRated,
+                                                        OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1]);
             Real64 HighSpeedTotCoolingCap = this->normalMode.ratedGrossTotalCap * totCapTempModFac * totCapFlowModFac;
             Real64 HighSpeedNetCoolingCap = HighSpeedTotCoolingCap - fanHeatCorrection;
 
-            EIRTempModFac = CurveManager::CurveValue(
-                    this->normalMode.speeds.back().indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1]);
+            EIRTempModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexEIRFT,
+                                                     CoolingCoilInletAirWetBulbTempRated,
+                                                     OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1]);
             EIRFlowModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexEIRFFF, AirMassFlowRatio);
             Real64 EIR_HighSpeed = 0.0;
             if (this->normalMode.speeds.back().ratedCOP > 0.0) {
@@ -508,13 +636,15 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
             }
 
             totCapFlowModFac = CurveManager::CurveValue(this->normalMode.speeds[0].indexCapFFF, AirMassFlowRatio);
-            totCapTempModFac = CurveManager::CurveValue(
-                    this->normalMode.speeds[0].indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1]);
+            totCapTempModFac = CurveManager::CurveValue(this->normalMode.speeds[0].indexCapFT,
+                                                        CoolingCoilInletAirWetBulbTempRated,
+                                                        OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1]);
             Real64 const LowSpeedTotCoolingCap = this->normalMode.speeds[0].rated_total_capacity * totCapTempModFac * totCapFlowModFac;
             Real64 const LowSpeedNetCoolingCap = LowSpeedTotCoolingCap - fanHeatCorrection;
 
-            EIRTempModFac = CurveManager::CurveValue(
-                    this->normalMode.speeds[0].indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1]);
+            EIRTempModFac = CurveManager::CurveValue(this->normalMode.speeds[0].indexEIRFT,
+                                                     CoolingCoilInletAirWetBulbTempRated,
+                                                     OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1]);
             EIRFlowModFac = CurveManager::CurveValue(this->normalMode.speeds[0].indexEIRFFF, AirMassFlowRatio);
             Real64 EIR_LowSpeed = 0.0;
             if (this->normalMode.speeds[0].ratedCOP > 0.0) {
@@ -557,47 +687,65 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
     if (this->oneTimeEIOHeaderWrite) {
         print(outputFiles.eio, Format_890); // TODO: Verify this works
         this->oneTimeEIOHeaderWrite = false;
-        OutputReportPredefined::pdstVAVDXCoolCoil = OutputReportPredefined::newPreDefSubTable(OutputReportPredefined::pdrEquip, "VAV DX Cooling Standard Rating Details");
-        OutputReportPredefined::pdchVAVDXCoolCoilType = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "DX Cooling Coil Type");
-        OutputReportPredefined::pdchVAVDXFanName = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Assocated Fan");
-        OutputReportPredefined::pdchVAVDXCoolCoilNetCapSI = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Net Cooling Capacity [W]");
-        OutputReportPredefined::pdchVAVDXCoolCoilCOP = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "COP [W/W]");
-        OutputReportPredefined::pdchVAVDXCoolCoilEERIP = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "EER [Btu/W-h]");
-        OutputReportPredefined::pdchVAVDXCoolCoilIEERIP = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "IEER [Btu/W-h]");
-        OutputReportPredefined::pdchVAVDXCoolCoilMdotA = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Supply Air Flow 100% [kg/s]");
-        OutputReportPredefined::pdchVAVDXCoolCoilCOP_B = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "COP 75% Capacity [W/W]");
-        OutputReportPredefined::pdchVAVDXCoolCoilEER_B_IP = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "EER 75% Capacity [Btu/W-h]");
-        OutputReportPredefined::pdchVAVDXCoolCoilMdotB = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Supply Air Flow 75% [kg/s]");
-        OutputReportPredefined::pdchVAVDXCoolCoilCOP_C = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "COP 50% Capacity [W/W]");
-        OutputReportPredefined::pdchVAVDXCoolCoilEER_C_IP = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "EER 50% Capacity [Btu/W-h]");
-        OutputReportPredefined::pdchVAVDXCoolCoilMdotC = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Supply Air Flow 50% [kg/s]");
-        OutputReportPredefined::pdchVAVDXCoolCoilCOP_D = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "COP 25% Capacity [W/W]");
-        OutputReportPredefined::pdchVAVDXCoolCoilEER_D_IP = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "EER 25% Capacity [Btu/W-h]");
-        OutputReportPredefined::pdchVAVDXCoolCoilMdotD = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Supply Air Flow 25% [kg/s]");
+        OutputReportPredefined::pdstVAVDXCoolCoil =
+            OutputReportPredefined::newPreDefSubTable(OutputReportPredefined::pdrEquip, "VAV DX Cooling Standard Rating Details");
+        OutputReportPredefined::pdchVAVDXCoolCoilType =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "DX Cooling Coil Type");
+        OutputReportPredefined::pdchVAVDXFanName =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Assocated Fan");
+        OutputReportPredefined::pdchVAVDXCoolCoilNetCapSI =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Net Cooling Capacity [W]");
+        OutputReportPredefined::pdchVAVDXCoolCoilCOP =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "COP [W/W]");
+        OutputReportPredefined::pdchVAVDXCoolCoilEERIP =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "EER [Btu/W-h]");
+        OutputReportPredefined::pdchVAVDXCoolCoilIEERIP =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "IEER [Btu/W-h]");
+        OutputReportPredefined::pdchVAVDXCoolCoilMdotA =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Supply Air Flow 100% [kg/s]");
+        OutputReportPredefined::pdchVAVDXCoolCoilCOP_B =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "COP 75% Capacity [W/W]");
+        OutputReportPredefined::pdchVAVDXCoolCoilEER_B_IP =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "EER 75% Capacity [Btu/W-h]");
+        OutputReportPredefined::pdchVAVDXCoolCoilMdotB =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Supply Air Flow 75% [kg/s]");
+        OutputReportPredefined::pdchVAVDXCoolCoilCOP_C =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "COP 50% Capacity [W/W]");
+        OutputReportPredefined::pdchVAVDXCoolCoilEER_C_IP =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "EER 50% Capacity [Btu/W-h]");
+        OutputReportPredefined::pdchVAVDXCoolCoilMdotC =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Supply Air Flow 50% [kg/s]");
+        OutputReportPredefined::pdchVAVDXCoolCoilCOP_D =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "COP 25% Capacity [W/W]");
+        OutputReportPredefined::pdchVAVDXCoolCoilEER_D_IP =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "EER 25% Capacity [Btu/W-h]");
+        OutputReportPredefined::pdchVAVDXCoolCoilMdotD =
+            OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Supply Air Flow 25% [kg/s]");
 
         // determine footnote content
         // TODO: This may be slightly incorrect if all the parent objects haven't created coils yet
         // Once we move to a factory approach, all the coils should've been interpreted, so this will be "OK"
         // BUT actually, the performance object can't go get info about the coils so I'm not sure what to do here yet
-    //        int countStaticInputs = 0;
-    //        for (auto & thisCoil : ) {
-    //            if (DXCoil(index).RateWithInternalStaticAndFanObject && DXCoil(index).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
-    //                ++countStaticInputs;
-    //            }
-    //        }
-    //
-    //        if (countStaticInputs == NumDXMulSpeedCoils) {
-    //            OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstVAVDXCoolCoil, "Packaged VAV unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2");
-    //        } else if (countStaticInputs == 0) {
-    //            OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstVAVDXCoolCoil,
-    //                                "Indoor-coil-only unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2, with "
-    //                                "supply fan specific power at 365 {W/1000cfm} (773.3 {W/(m3/s)})");
-    //        } else { // both
-    //            OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstVAVDXCoolCoil,
-    //                                "Packaged VAV unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2, "
-    //                                "indoor-coil-only units with supply fan specific power at 365 {W/1000cfm} (773.3 {W/(m3/s)})");
-    //        }
-   }
+        //        int countStaticInputs = 0;
+        //        for (auto & thisCoil : ) {
+        //            if (DXCoil(index).RateWithInternalStaticAndFanObject && DXCoil(index).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
+        //                ++countStaticInputs;
+        //            }
+        //        }
+        //
+        //        if (countStaticInputs == NumDXMulSpeedCoils) {
+        //            OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstVAVDXCoolCoil, "Packaged VAV unit ratings per ANSI/AHRI
+        //            Standard 340/360-2007 with Addenda 1 and 2");
+        //        } else if (countStaticInputs == 0) {
+        //            OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstVAVDXCoolCoil,
+        //                                "Indoor-coil-only unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2, with "
+        //                                "supply fan specific power at 365 {W/1000cfm} (773.3 {W/(m3/s)})");
+        //        } else { // both
+        //            OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstVAVDXCoolCoil,
+        //                                "Packaged VAV unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2, "
+        //                                "indoor-coil-only units with supply fan specific power at 365 {W/1000cfm} (773.3 {W/(m3/s)})");
+        //        }
+    }
 
     static constexpr auto fmt = " VAV DX Cooling Coil Standard Rating Information, {},{},{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.4R},{:.4R},{:.4R},{:.4R}\n";
     if (this->unitStatic > 0) {
@@ -619,7 +767,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilCOP, this->name, EER_TestPoint_SI[0], 2);
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilEERIP, this->name, EER_TestPoint_IP[0], 2);
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilIEERIP, this->name, IEER, 2);
-    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERIP, this->name, "N/A");
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERUserIP, this->name, "N/A");
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERStandardIP, this->name, "N/A");
     OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
 
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilType, this->name, "Coil:Cooling:DX");
@@ -643,11 +792,9 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilMdotD, this->name, SupAirMdot_TestPoint[3], 4);
 }
 
-
-Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(
-        Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-        std::vector<Real64> const &Par
-)
+Real64
+CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlusData &state,Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                                   std::vector<Real64> const &Par)
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         Brent Griffith
@@ -701,8 +848,10 @@ Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(
     } else {
         AirMassFlowRatio = 0.0;
     }
-    Real64 const SupplyAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, DataEnvironment::OutBaroPress, RoutineName);
-    Real64 const SupplyAirRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, IndoorUnitInletDryBulb, SupplyAirHumRat, RoutineName);
+    Real64 const SupplyAirHumRat =
+        Psychrometrics::PsyWFnTdbTwbPb(IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, DataEnvironment::OutBaroPress, RoutineName);
+    Real64 const SupplyAirRho =
+        Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, IndoorUnitInletDryBulb, SupplyAirHumRat, RoutineName);
 
     SupplyAirVolFlowRate = SupplyAirMassFlowRate / SupplyAirRho;
 
@@ -712,13 +861,14 @@ Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(
         DataLoopNode::Node(FanInletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
         DataLoopNode::Node(FanOutletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
         DataLoopNode::Node(FanInletNodeNum).Temp = IndoorUnitInletDryBulb;
-        DataLoopNode::Node(FanInletNodeNum).HumRat = Psychrometrics::PsyWFnTdbTwbPb(IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, DataEnvironment::OutBaroPress, RoutineName);
+        DataLoopNode::Node(FanInletNodeNum).HumRat =
+            Psychrometrics::PsyWFnTdbTwbPb(IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, DataEnvironment::OutBaroPress, RoutineName);
         DataLoopNode::Node(FanInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(IndoorUnitInletDryBulb, DataLoopNode::Node(FanInletNodeNum).HumRat);
         if (supplyFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-            HVACFan::fanObjs[supplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
+            HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
         } else {
             // TODO: I am hoping we can just pass in the supply fan name
-            Fans::SimulateFanComponents("", true, supplyFanIndex, _, true, false, FanStaticPressureRise);
+            Fans::SimulateFanComponents(state, "", true, supplyFanIndex, _, true, false, FanStaticPressureRise);
         }
 
         FanHeatCorrection = DataLoopNode::Node(FanOutletNodeNum).Enthalpy - DataLoopNode::Node(FanInletNodeNum).Enthalpy;
@@ -760,4 +910,48 @@ Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(
 
     OutletAirTemp = evapOutlet.Temp;
     return TargetCoilLeavingDryBulb - OutletAirTemp;
+}
+
+void CoilCoolingDXCurveFitPerformance::setOperMode(CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode)
+{
+    // set parent mode for each speed
+    int numSpeeds;
+    bool errorsFound = false;
+
+    numSpeeds = (int)currentMode.speeds.size();
+    for (int speedNum = 0; speedNum < numSpeeds; speedNum++) {
+        currentMode.speeds[speedNum].parentOperatingMode = mode;
+        if (mode == 2) {
+            if (currentMode.speeds[speedNum].indexSHRFT == 0) {
+                ShowSevereError(currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
+                ShowContinueError("The input of Sensible Heat Ratio Modifier Function of Temperature Curve Name is required, but not available for "
+                                  "SubcoolReheat mode. Please input");
+                errorsFound = true;
+            }
+            if (currentMode.speeds[speedNum].indexSHRFFF == 0) {
+                ShowSevereError(currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
+                ShowContinueError("The input of Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name is required, but not available for "
+                                  "SubcoolReheat mode. Please input");
+                errorsFound = true;
+            }
+        }
+        if (mode == 3) {
+            if (currentMode.speeds[speedNum].indexSHRFT == 0) {
+                ShowSevereError(currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
+                ShowContinueError("The input of Sensible Heat Ratio Modifier Function of Temperature Curve Name is required, but not available for "
+                                  "SubcoolReheat mode. Please input");
+                errorsFound = true;
+            }
+            if (currentMode.speeds[speedNum].indexSHRFFF == 0) {
+                ShowSevereError(currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
+                ShowContinueError("The input of Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name is required, but not available for "
+                                  "SubcoolReheat mode. Please input");
+                errorsFound = true;
+            }
+        }
+    }
+    if (errorsFound) {
+        ShowFatalError("CoilCoolingDXCurveFitPerformance: Errors found in getting " + this->object_name +
+                       " input. Preceding condition(s) causes termination.");
+    }
 }

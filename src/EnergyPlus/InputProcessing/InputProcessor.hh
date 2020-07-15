@@ -132,7 +132,7 @@ public:
                        int const Number,
                        Array1S_string Alphas,
                        int &NumAlphas,
-                       Array1S<Real64> Numbers,
+                       Array1D<Real64> &Numbers,
                        int &NumNumbers,
                        int &Status,
                        Optional<Array1D_bool> NumBlank = _,
@@ -176,6 +176,8 @@ public:
     void preProcessorCheck(bool &PreP_Fatal); // True if a preprocessor flags a fatal error
 
     void preScanReportingVariables();
+
+    void reportIDFRecordsStats();
 
     void reportOrphanRecordObjects();
 
@@ -245,7 +247,7 @@ private:
                             bool within_max_fields,
                             Array1S_string Alphas,
                             int &NumAlphas,
-                            Array1S<Real64> Numbers,
+                            Array1D<Real64> &Numbers,
                             int &NumNumbers,
                             Optional<Array1D_bool> NumBlank = _,
                             Optional<Array1D_bool> AlphaBlank = _,

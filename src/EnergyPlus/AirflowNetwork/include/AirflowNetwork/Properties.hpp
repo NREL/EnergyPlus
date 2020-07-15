@@ -73,6 +73,9 @@ namespace EnergyPlus {
 
 namespace AirflowNetwork {
 
+    extern int lowerLimitErrIdx;
+    extern int upperLimitErrIdx;
+
     Real64 airThermConductivity(Real64 T // Temperature in Celsius
     );
 

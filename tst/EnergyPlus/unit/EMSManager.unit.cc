@@ -52,18 +52,23 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DataRuntimeLanguage.hh>
-#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
@@ -152,7 +157,7 @@ TEST_F(EnergyPlusFixture, Dual_NodeTempSetpoints)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.outputFiles);
 
     EMSManager::FinishProcessingUserInput = true;
 
@@ -225,7 +230,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     ASSERT_TRUE(process_idf(idf_objects));
 
     // sets number of EMS objects
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.outputFiles);
 
     // allows NodeSetpoint and AvailabilityManagers actuators to be setup
     EMSManager::FinishProcessingUserInput = true;
@@ -389,7 +394,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     ASSERT_TRUE(process_idf(idf_objects));
 
     // sets number of EMS objects
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.outputFiles);
 
     // allows NodeSetpoint and AvailabilityManagers actuators to be setup
     EMSManager::FinishProcessingUserInput = true;
@@ -696,7 +701,7 @@ TEST_F(EnergyPlusFixture, Test_EMSLogic)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.outputFiles);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
@@ -735,13 +740,22 @@ TEST_F(EnergyPlusFixture, Debug_EMSLogic)
 
         "OutdoorAir:Node, Test node 1;",
 
-        "EnergyManagementSystem:Actuator,", "TempSetpoint1,          !- Name", "Test node 1,  !- Actuated Component Unique Name",
-        "System Node Setpoint,    !- Actuated Component Type", "Temperature Setpoint;    !- Actuated Component Control Type",
+        "EnergyManagementSystem:Actuator,",
+        "TempSetpoint1,          !- Name",
+        "Test node 1,  !- Actuated Component Unique Name",
+        "System Node Setpoint,    !- Actuated Component Type",
+        "Temperature Setpoint;    !- Actuated Component Control Type",
 
-        "EnergyManagementSystem:ProgramCallingManager,", "Logic Manager 1,  !- Name", "BeginNewEnvironment,  !- EnergyPlus Model Calling Point",
+        "EnergyManagementSystem:ProgramCallingManager,",
+        "Logic Manager 1,  !- Name",
+        "BeginNewEnvironment,  !- EnergyPlus Model Calling Point",
         "LogicTest1;  !- Program Name 1",
 
-        "EnergyManagementSystem:Program,", "LogicTest1,", "Set MyVar1 = ( -2 ),", "Set MyVar2 = ( -2 ),", "Set TempSetpoint1 = MyVar1 / MyVar2;",
+        "EnergyManagementSystem:Program,",
+        "LogicTest1,",
+        "Set MyVar1 = ( -2 ),",
+        "Set MyVar2 = ( -2 ),",
+        "Set TempSetpoint1 = MyVar1 / MyVar2;",
 
         //		"IF MyVar1 == 8,",
         //		"  Set TempSetpoint1 = 11.0,",
@@ -755,7 +769,7 @@ TEST_F(EnergyPlusFixture, Debug_EMSLogic)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.outputFiles);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
@@ -792,8 +806,8 @@ TEST_F(EnergyPlusFixture, TestAnyRanArgument)
     ASSERT_TRUE(process_idf(idf_objects));
 
     OutAirNodeManager::SetOutAirNodes();
-    NodeInputManager::SetupNodeVarsForReporting();
-    EMSManager::CheckIfAnyEMS();
+    NodeInputManager::SetupNodeVarsForReporting(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(state.outputFiles);
 
     EMSManager::FinishProcessingUserInput = true;
 
@@ -830,7 +844,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.outputFiles);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
@@ -885,7 +899,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.outputFiles);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
@@ -922,7 +936,7 @@ TEST_F(EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    CheckIfAnyEMS();
+    CheckIfAnyEMS(state.outputFiles);
     EXPECT_TRUE(AnyEnergyManagementSystemInModel);
 }
 
@@ -1064,7 +1078,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
 
     DataGlobals::TimeStepZone = 0.25;
 
-    EMSManager::CheckIfAnyEMS(); // get EMS input
+    EMSManager::CheckIfAnyEMS(state.outputFiles); // get EMS input
     EMSManager::FinishProcessingUserInput = true;
     bool ErrorsFound(false);
     CurveManager::GetCurveInputData(ErrorsFound); // process curve for use with EMS
@@ -1311,7 +1325,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     index = 28 + offset;
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name,
               "VAR28"); // http://www.gribble.org/cycling/air_density.html 30 C db, 1013.25 hPa, 16 C dp = 0.011565 g/m3
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.011459487,
+    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number,
+                0.011459487,
                 0.00000001); // RhovFnTdbWPb 30.0 0.01 101325.0 = ** this and previous 2 numbers seem very different **
 
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(29).Operator, FuncRhFnTdbRhov);
@@ -1344,7 +1359,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(32).Operand(3).Type, 1); // argument was passed to EMS function
     index = 32 + offset;
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR32"); // verified at sugartech site using 30 C db and 0.01 kg/kg = 19.60536624685125 C
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 19.589790661, 0.00000001); // TwbFnTdbWPb 30.0 0.01 101325.0 =
+    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 19.60933534, 0.00000001); // TwbFnTdbWPb 30.0 0.01 101325.0 =
 
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(33).Operator, FuncVFnTdbWPb);
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(33).NumOperands, 3);
@@ -1482,7 +1497,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(49).Operand(2).Type, 1); // argument was passed to EMS function
     index = 49 + offset;
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR49");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, -4.4,
+    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number,
+                -4.4,
                 0.00000001); // TrendDirection Variable_Trend5 4 (-1.1 per 0.25 hrs = -4.4/hr)
 
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(50).Operator, FuncTrendSum);
@@ -1521,7 +1537,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
 
 TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
 {
-//    EMSActuatorAvailable.allocate(100);
+    //    EMSActuatorAvailable.allocate(100);
     NumOfNodes = 3;
     numActuatorsUsed = 3;
     Node.allocate(3);
@@ -1557,5 +1573,48 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
     EXPECT_TRUE(Node(1).IsLocalNode);
     EXPECT_FALSE(Node(2).IsLocalNode);
     EXPECT_TRUE(Node(3).IsLocalNode);
+}
+TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOption)
+{
+    // #7586
+    DataSurfaces::Surface.allocate(2);
+    DataSurfaces::SurfaceWindow.allocate(2);
+    dataConstruction.Construct.allocate(1);
+    DataSurfaces::WindowShadingControl.allocate(2);
+    DataDaylighting::ZoneDaylight.allocate(1);
+    DataSurfaces::Surface(1).Name = "Surface1";
+    DataSurfaces::Surface(2).Name = "Surface2";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(2).Zone = 1;
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    DataSurfaces::Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    DataSurfaces::Surface(1).WindowShadingControlPtr = 1;
+    DataSurfaces::Surface(2).WindowShadingControlPtr = 2;
+    DataSurfaces::Surface(1).HasShadeControl = true;
+    DataSurfaces::Surface(2).HasShadeControl = true;
+
+    DataSurfaces::SurfaceWindow(1).HasShadeOrBlindLayer = false;
+    DataSurfaces::SurfaceWindow(2).HasShadeOrBlindLayer = false;
+    DataSurfaces::SurfaceWindow(1).ShadedConstruction = 1;
+    DataSurfaces::SurfaceWindow(2).ShadedConstruction = 1;
+
+    dataConstruction.Construct(1).Name = "Construction1";
+
+    DataSurfaces::WindowShadingControl(1).ShadingType = 0;
+    DataSurfaces::WindowShadingControl(2).ShadingType = DataSurfaces::WSC_ST_ExteriorScreen;
+
+    DataSurfaces::TotSurfaces = 2;
+
+    SetupWindowShadingControlActuators();
+
+    EXPECT_FALSE(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn);
+    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue, 0);
+
+    DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn = true;
+    DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue = 1.0;
+    SolarShading::WindowShadingManager(state.dataWindowEquivalentLayer);
+    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlag, DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue);
 
 }

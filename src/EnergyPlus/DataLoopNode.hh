@@ -70,7 +70,6 @@ namespace DataLoopNode {
     extern int const NodeType_Steam;    // 'Steam'
     extern int const NodeType_Electric; // 'Electric'
     extern Array1D_string const ValidNodeFluidTypes;
-    extern int const NumValidNodeFluidTypes;
 
     // Valid Connection Types for Nodes
     extern Array1D_string const ValidConnectionTypes;
@@ -97,7 +96,6 @@ namespace DataLoopNode {
     extern bool const ObjectIsParent;
     extern bool const ObjectIsNotParent;
     extern bool const IncrementFluidStreamYes;
-    extern bool const IncrementFluidStreamNo;
     extern Real64 const SensedNodeFlagValue;
     extern Real64 const SensedLoadFlagValue;
 
@@ -238,7 +236,8 @@ namespace DataLoopNode {
                  Real64 const CO2SetPoint,                // {ppm}
                  Real64 const GenContam,                  // {ppm}
                  Real64 const GenContamSetPoint,          // {ppm}
-                 bool const SPMNodeWetBulbRepReq          // Set to true when node has SPM which follows wetbulb
+                 bool const SPMNodeWetBulbRepReq,          // Set to true when node has SPM which follows wetbulb
+                 bool const plantNodeErrorMsgIssued
                  )
             : FluidType(FluidType), FluidIndex(FluidIndex), Temp(Temp), TempMin(TempMin), TempMax(TempMax), TempSetPoint(TempSetPoint),
               TempLastTimestep(TempLastTimestep), MassFlowRateRequest(MassFlowRateRequest), MassFlowRate(MassFlowRate),
@@ -253,7 +252,8 @@ namespace DataLoopNode {
               OutAirWindSpeed(OutAirWindSpeed), EMSOverrideOutAirWindSpeed(EMSOverrideOutAirWindSpeed),
               EMSValueForOutAirWindSpeed(EMSValueForOutAirWindSpeed), OutAirWindDir(OutAirWindDir),
               EMSOverrideOutAirWindDir(EMSOverrideOutAirWindDir), EMSValueForOutAirWindDir(EMSValueForOutAirWindDir), CO2(CO2),
-              CO2SetPoint(CO2SetPoint), GenContam(GenContam), GenContamSetPoint(GenContamSetPoint), SPMNodeWetBulbRepReq(SPMNodeWetBulbRepReq)
+              CO2SetPoint(CO2SetPoint), GenContam(GenContam), GenContamSetPoint(GenContamSetPoint), SPMNodeWetBulbRepReq(SPMNodeWetBulbRepReq),
+              plantNodeErrorMsgIssued(plantNodeErrorMsgIssued)
         {
         }
     };

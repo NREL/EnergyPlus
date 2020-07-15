@@ -81,8 +81,6 @@ namespace GeneratorDynamicsManager {
     // MODULE INFORMATION:
     //       AUTHOR        B. Griffith
     //       DATE WRITTEN   July 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // collect routines for managing generator states
@@ -91,44 +89,17 @@ namespace GeneratorDynamicsManager {
     //  given load request data
     //   models requiring calculations across timesteps
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
     using namespace DataGenerators;
     using DataGlobals::CurrentTime;
     using DataGlobals::DayOfSim;
     using DataGlobals::HoursInDay;
     using DataGlobals::SecInHour;
-    // <use statements for access to subroutines in other modules>
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
-
-    // Functions
 
     void SetupGeneratorControlStateManager(int const GenNum) // index of generator to setup
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // sets up data structures
@@ -137,39 +108,16 @@ namespace GeneratorDynamicsManager {
         // like a get input routine but feeds from
         //  parent objects, could have its own input object someday
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // get the number of generators that might use this module
         NumGensWDynamics = MicroCHPElectricGenerator::NumMicroCHPs; // TODO  + NumFuelCellCGenerators
 
         if (!allocated(GeneratorDynamics)) {
             GeneratorDynamics.allocate(NumGensWDynamics);
-        } else {
-            GeneratorDynamics.deallocate();
-            GeneratorDynamics.allocate(NumGensWDynamics);
         }
 
         // first populate with Micro CHP data
 
-        // DO GenNum = 1, NumMicroCHPs
         GeneratorDynamics(GenNum).Name = MicroCHPElectricGenerator::MicroCHP(GenNum).Name;
         GeneratorDynamics(GenNum).PelMin = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.MinElecPower;
         GeneratorDynamics(GenNum).PelMax = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.MaxElecPower;
@@ -201,7 +149,6 @@ namespace GeneratorDynamicsManager {
             MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.ThermEff * MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.MinElecPower / MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.ElecEff;
         GeneratorDynamics(GenNum).QdotHXOpt = GeneratorDynamics(GenNum).QdotHXMax;
         MicroCHPElectricGenerator::MicroCHP(GenNum).DynamicsControlID = GenNum;
-        // ENDDO
     }
 
     void ManageGeneratorControlState(int const GeneratorType,                     // type of Generator

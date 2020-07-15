@@ -1,5 +1,9 @@
 project(ExpandObjects Fortran)
 
+cmake_minimum_required(VERSION 3.5.1)
+
+cmake_policy(SET CMP0012 NEW) # if() recognizes boolean constants
+
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
@@ -8,7 +12,7 @@ if(WIN32)
   configure_file( ExpandObjects.rc.in "${CMAKE_CURRENT_BINARY_DIR}/ExpandObjects.rc" )
 endif()
 
-set(SRC epfilter.f90) 
+set(SRC epfilter.f90)
 
 set(STATIC_EXE FALSE)
 
@@ -51,6 +55,9 @@ if (APPLE OR UNIX)
 else()  # windows
   add_executable( ExpandObjects ${SRC} "${CMAKE_CURRENT_BINARY_DIR}/ExpandObjects.rc" )
 endif()
+
+set_target_properties(ExpandObjects PROPERTIES FOLDER Auxiliary)
+
 
 install( TARGETS ExpandObjects DESTINATION "./" )
 if(NOT ${STATIC_EXE})

@@ -49,12 +49,12 @@
 #define SurfaceGeometry_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
 
@@ -62,6 +62,11 @@
 #include <map>
 
 namespace EnergyPlus {
+
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZoneTempPredictorCorrectorData;
+    class OutputFiles;
 
 namespace SurfaceGeometry {
 
@@ -82,6 +87,12 @@ namespace SurfaceGeometry {
     extern int const UnreconciledZoneSurface; // interim value between entering surfaces ("Surface") and reconciling
     // surface names in other zones
 
+    enum enclosureType
+    {
+        RadiantEnclosures,
+        SolarEnclosures
+    };
+    
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
@@ -114,11 +125,11 @@ namespace SurfaceGeometry {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetupZoneGeometry(OutputFiles &outputFiles, bool &ErrorsFound);
+    void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound);
 
     void AllocateModuleArrays();
 
-    void GetSurfaceData(OutputFiles &outputFiles, bool &ErrorsFound); // If errors found in input
+    void GetSurfaceData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles, bool &ErrorsFound); // If errors found in input
 
     void checkSubSurfAzTiltNorm(SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
@@ -127,7 +138,8 @@ namespace SurfaceGeometry {
 
     void GetGeometryParameters(OutputFiles &outputFiles, bool &ErrorsFound); // set to true if errors found during input
 
-    void GetDetShdSurfaceData(bool &ErrorsFound,          // Error flag indicator (true if errors found)
+    void GetDetShdSurfaceData(OutputFiles &outputFiles,
+                              bool &ErrorsFound,          // Error flag indicator (true if errors found)
                               int &SurfNum,               // Count of Current SurfaceNumber
                               int const TotDetachedFixed, // Number of Fixed Detached Shading Surfaces to obtain
                               int const TotDetachedBldg   // Number of Building Detached Shading Surfaces to obtain
@@ -146,9 +158,10 @@ namespace SurfaceGeometry {
                           int const TotDetailedWalls,       // Number of Wall:Detailed items to obtain
                           int const TotDetailedRoofs,       // Number of RoofCeiling:Detailed items to obtain
                           int const TotDetailedFloors,      // Number of Floor:Detailed items to obtain
-                          Array1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
-                          Array1S_int const BaseSurfIDs,
-                          int &NeedToAddSurfaces);
+                          const Array1D_string &BaseSurfCls, // Valid Classes for Base Surfaces
+                          const Array1D_int &BaseSurfIDs,
+                          int &NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
+    );
 
     void GetRectSurfaces(bool &ErrorsFound,             // Error flag indicator (true if errors found)
                          int &SurfNum,                  // Count of Current SurfaceNumber
@@ -162,7 +175,7 @@ namespace SurfaceGeometry {
                          int const TotRectGCFloors,     // Number of Floors with Ground Contact to obtain
                          int const TotRectIntFloors,    // Number of Adiabatic Walls to obtain
                          int const TotRectIZFloors,     // Number of Interzone Floors to obtain
-                         Array1S_int const BaseSurfIDs, // ID Assignments for valid surface classes
+                         const Array1D_int &BaseSurfIDs, // ID Assignments for valid surface classes
                          int &NeedToAddSurfaces         // Number of surfaces to add, based on unentered IZ surfaces
     );
 
@@ -174,11 +187,12 @@ namespace SurfaceGeometry {
                                  Real64 const Height,
                                  bool const SurfWorldCoordSystem);
 
-    void GetHTSubSurfaceData(bool &ErrorsFound,               // Error flag indicator (true if errors found)
+    void GetHTSubSurfaceData(OutputFiles &outputFiles,
+                             bool &ErrorsFound,               // Error flag indicator (true if errors found)
                              int &SurfNum,                    // Count of Current SurfaceNumber
                              int const TotHTSubs,             // Number of Heat Transfer SubSurfaces to obtain
-                             Array1S_string const SubSurfCls, // Valid Classes for Sub Surfaces
-                             Array1S_int const SubSurfIDs,    // ID Assignments for valid sub surface classes
+                             const Array1D_string &SubSurfCls, // Valid Classes for Sub Surfaces
+                             const Array1D_int &SubSurfIDs,    // ID Assignments for valid sub surface classes
                              int &AddedSubSurfaces,           // Subsurfaces added when windows reference Window5
                              int &NeedToAddSurfaces           // Number of surfaces to add, based on unentered IZ surfaces
     );
@@ -191,7 +205,7 @@ namespace SurfaceGeometry {
                             int const TotIZWindows,       // Number of Interzone Window SubSurfaces to obtain
                             int const TotIZDoors,         // Number of Interzone Door SubSurfaces to obtain
                             int const TotIZGlazedDoors,   // Number of Interzone Glass Door SubSurfaces to obtain
-                            Array1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
+                            const Array1D_int &SubSurfIDs, // ID Assignments for valid sub surface classes
                             int &AddedSubSurfaces,        // Subsurfaces added when windows reference Window5
                             int &NeedToAddSubSurfaces     // Number of surfaces to add, based on unentered IZ surfaces
     );
@@ -220,7 +234,8 @@ namespace SurfaceGeometry {
                                  bool &ErrorsFound  // Error flag indicator (true if errors found)
     );
 
-    void GetAttShdSurfaceData(bool &ErrorsFound,   // Error flag indicator (true if errors found)
+    void GetAttShdSurfaceData(OutputFiles &outputFiles,
+                              bool &ErrorsFound,   // Error flag indicator (true if errors found)
                               int &SurfNum,        // Count of Current SurfaceNumber
                               int const TotShdSubs // Number of Attached Shading SubSurfaces to obtain
     );
@@ -247,7 +262,7 @@ namespace SurfaceGeometry {
 
     void GetHTSurfExtVentedCavityData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
-    void GetSurfaceHeatTransferAlgorithmOverrides(OutputFiles &outputFiles, bool &ErrorsFound);
+    void GetSurfaceHeatTransferAlgorithmOverrides(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles, bool &ErrorsFound);
 
     class ExposedFoundationPerimeter
     {
@@ -264,12 +279,14 @@ namespace SurfaceGeometry {
 
     extern ExposedFoundationPerimeter exposedFoundationPerimeter;
 
-    void GetVertices(int const SurfNum,             // Current surface number
+    void GetVertices(OutputFiles &outputFiles,
+                     int const SurfNum,             // Current surface number
                      int const NSides,              // Number of sides to figure
                      Array1S<Real64> const Vertices // Vertices, in specified order
     );
 
-    void ReverseAndRecalculate(int const SurfNum,   // Surface number for the surface
+    void ReverseAndRecalculate(OutputFiles &outputFiles,
+                               int const SurfNum,   // Surface number for the surface
                                int const NSides,    // number of sides to surface
                                Real64 &SurfAzimuth, // Surface Facing angle (will be 0 for roofs/floors)
                                Real64 &SurfTilt     // Surface tilt (
@@ -285,7 +302,7 @@ namespace SurfaceGeometry {
 
     void GetStormWindowData(bool &ErrorsFound); // If errors found in input
 
-    void GetWindowGapAirflowControlData(bool &ErrorsFound); // If errors found in input
+    void GetWindowGapAirflowControlData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void GetOSCData(OutputFiles &outputFiles, bool &ErrorsFound);
 
@@ -295,7 +312,7 @@ namespace SurfaceGeometry {
 
     void GetMovableInsulationData(bool &ErrorsFound); // If errors found in input
 
-    void CalculateZoneVolume(Array1S_bool const CeilingHeightEntered);
+    void CalculateZoneVolume(OutputFiles &outputFiles, const Array1D_bool &CeilingHeightEntered);
 
     struct EdgeOfSurf
     {
@@ -346,8 +363,7 @@ namespace SurfaceGeometry {
 
     bool isPointOnLineBetweenPoints(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test);
 
-    void ProcessSurfaceVertices(int const ThisSurf, // Surface Number
-                                bool &ErrorsFound);
+    void ProcessSurfaceVertices(OutputFiles &outputFiles, int const ThisSurf, bool &ErrorsFound);
 
     void CalcCoordinateTransformation(int const SurfNum,            // Surface Number
                                       Vector &CompCoordTranslVector // Coordinate Translation Vector
@@ -378,9 +394,9 @@ namespace SurfaceGeometry {
 
     void SetupShadeSurfacesForSolarCalcs();
 
-    void SetupRadiantEnclosuresAndAirBoundaries(bool &ErrorsFound); // Set to true if errors found
-
-    void SetupSolarEnclosuresAndAirBoundaries(bool &ErrorsFound); // Set to true if errors found
+    void SetupEnclosuresAndAirBoundaries(Array1D<DataViewFactorInformation::ZoneViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
+                                         SurfaceGeometry::enclosureType const &EnclosureType,                       // Radiant or Solar
+                                         bool &ErrorsFound);                                                        // Set to true if errors found
 
     void CheckConvexity(int const SurfNum, // Current surface number
                         int const NSides   // Number of sides to figure

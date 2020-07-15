@@ -16056,7 +16056,11 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL AddToObjStr('Cooling Coil Name', TRIM(coolCoilObjectName))
   CALL AddToObjStr('Use DOAS DX Cooling Coil','')
   CALL AddToObjStr('DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}','')
-  CALL AddToObjStr('Latent Load Control','')
+  IF (isDehumidifyNone) THEN
+    CALL AddToObjStr('Latent Load Control','SensibleOnlyLoadControl')
+  ELSE
+    CALL AddToObjStr('Latent Load Control','LatentWithSensibleLoadControl')
+  END IF
   CALL AddToObjStr('Supplemental Heating Coil Object Type',TRIM(supheatCoilObjectType))
   CALL AddToObjStr('Supplemental Heating Coil Name',TRIM(supheatCoilObjectName))
   CALL AddToObjStr('Cooling Supply Air Flow Rate Method','SupplyAirFlowRate')
@@ -22987,7 +22991,11 @@ DO iSys = 1, numCompactSysVRF
   CALL AddToObjFld('Heating Energy Input Ratio Boundary Curve Name', base + vrfsNameOff,' VRFHeatEIRFTBoundary')
   CALL AddToObjFld('Heating Energy Input Ratio Modifier Function of High Temperature Curve Name', base + vrfsNameOff, &
    ' VRFHeatEIRFTHi')
-  CALL AddToObjStr('Heating Performance Curve Outdoor Temperature Type','WetBulbTemperature')
+  IF (isCondWaterCooled) THEN
+    CALL AddToObjStr('Heating Performance Curve Outdoor Temperature Type','DryBulbTemperature')
+  ELSE
+    CALL AddToObjStr('Heating Performance Curve Outdoor Temperature Type','WetBulbTemperature')
+  ENDIF
   CALL AddToObjFld('Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name', base + vrfsNameOff, &
    ' HeatingEIRLowPLR')
   CALL AddToObjFld('Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name', base + vrfsNameOff, &

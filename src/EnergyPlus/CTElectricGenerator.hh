@@ -59,6 +59,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct BranchInputManagerData;
+
 namespace CTElectricGenerator {
 
     using DataGlobalConstants::iGeneratorCombTurbine;
@@ -142,11 +145,12 @@ namespace CTElectricGenerator {
         {
         }
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVars();
 
-        void InitCTGenerators(bool RunFlag, bool FirstHVACIteration);
+        void InitCTGenerators(BranchInputManagerData &dataBranchInputManager,
+                              bool RunFlag, bool FirstHVACIteration);
 
         void CalcCTGeneratorModel(bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 

@@ -64,6 +64,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -151,9 +152,9 @@ namespace PlantHeatExchangerFluidToFluid {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void HeatExchangerStruct::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void HeatExchangerStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
     }
 
     void HeatExchangerStruct::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
@@ -170,7 +171,7 @@ namespace PlantHeatExchangerFluidToFluid {
         }
     }
 
-    void HeatExchangerStruct::simulate(const PlantLocation &calledFromLocation,
+    void HeatExchangerStruct::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation,
                                        bool const FirstHVACIteration,
                                        Real64 &CurLoad,
                                        bool const EP_UNUSED(RunFlag))
@@ -185,7 +186,7 @@ namespace PlantHeatExchangerFluidToFluid {
         // PURPOSE OF THIS SUBROUTINE:
         // Main entry point and simulation manager for heat exchanger
 
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
 
         // for op scheme led HXs, only call controls if called from Loop Supply Side
         if ((this->ControlMode == OperationSchemeModulated) || (this->ControlMode == OperationSchemeOnOff)) {
@@ -604,7 +605,7 @@ namespace PlantHeatExchangerFluidToFluid {
         SetupOutputVariable("Fluid Heat Exchanger Effectiveness", OutputProcessor::Unit::None, this->Effectiveness, "System", "Average", this->Name);
     }
 
-    void HeatExchangerStruct::initialize()
+    void HeatExchangerStruct::initialize(BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -629,7 +630,8 @@ namespace PlantHeatExchangerFluidToFluid {
         if (this->MyFlag) {
             // locate the main two connections to the plant loops
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_FluidToFluidPlantHtExchg,
                                                     this->DemandSideLoop.loopNum,
                                                     this->DemandSideLoop.loopSideNum,
@@ -649,7 +651,8 @@ namespace PlantHeatExchangerFluidToFluid {
                 errFlag = true;
             }
 
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_FluidToFluidPlantHtExchg,
                                                     this->SupplySideLoop.loopNum,
                                                     this->SupplySideLoop.loopSideNum,
@@ -739,7 +742,8 @@ namespace PlantHeatExchangerFluidToFluid {
             }
             if (this->ControlMode == TrackComponentOnOff) {
                 if (this->OtherCompSupplySideLoop.inletNodeNum > 0) {
-                    PlantUtilities::ScanPlantLoopsForObject(this->ComponentUserName,
+                    PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                            this->ComponentUserName,
                                                             this->ComponentTypeOfNum,
                                                             this->OtherCompSupplySideLoop.loopNum,
                                                             this->OtherCompSupplySideLoop.loopSideNum,
@@ -753,7 +757,8 @@ namespace PlantHeatExchangerFluidToFluid {
                                                             _);
                 }
                 if (this->OtherCompDemandSideLoop.inletNodeNum > 0) {
-                    PlantUtilities::ScanPlantLoopsForObject(this->ComponentUserName,
+                    PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                            this->ComponentUserName,
                                                             this->ComponentTypeOfNum,
                                                             this->OtherCompDemandSideLoop.loopNum,
                                                             this->OtherCompDemandSideLoop.loopSideNum,
@@ -2275,7 +2280,7 @@ namespace PlantHeatExchangerFluidToFluid {
     }
 
     Real64 HeatExchangerStruct::demandSideFlowResidual(Real64 const DmdSideMassFlowRate,
-                                                       Array1<Real64> const &Par // Par(1) = HX index number
+                                                       Array1D<Real64> const &Par // Par(1) = HX index number
     )
     {
 

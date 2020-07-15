@@ -90,7 +90,7 @@ bool SurfaceOctreeCube::contains(Surface const &surface) const
 }
 
 // Surfaces Outer Cube Initilization
-void SurfaceOctreeCube::init(ObjexxFCL::Array1<Surface> &surfaces)
+void SurfaceOctreeCube::init(Array1D<Surface> &surfaces)
 {
     assert(d_ == 0u);
     assert(n_ == 0u);

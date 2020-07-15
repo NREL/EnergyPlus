@@ -414,6 +414,7 @@ namespace CurveManager {
         int NumAlphas;                   // Number of Alphas for each GetObjectItem call
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call
         int IOStatus;                    // Used in GetObjectItem
+        int NumTableLookup;
         std::string CurrentModuleObject; // for ease in renaming.
         static int MaxTableNums(0);      // Maximum number of numeric input fields in Tables
         //   certain object in the input file
@@ -433,7 +434,7 @@ namespace CurveManager {
         NumBicubic = inputProcessor->getNumObjectsFound("Curve:Bicubic");
         NumTriQuad = inputProcessor->getNumObjectsFound("Curve:Triquadratic");
         NumExponent = inputProcessor->getNumObjectsFound("Curve:Exponent");
-        int NumTableLookup = inputProcessor->getNumObjectsFound("Table:Lookup");
+        NumTableLookup = inputProcessor->getNumObjectsFound("Table:Lookup");
         NumFanPressRise = inputProcessor->getNumObjectsFound("Curve:FanPressureRise");                    // cpw22Aug2010
         NumExpSkewNorm = inputProcessor->getNumObjectsFound("Curve:ExponentialSkewNormal");               // cpw22Aug2010
         NumSigmoid = inputProcessor->getNumObjectsFound("Curve:Sigmoid");                                 // cpw22Aug2010
@@ -2028,8 +2029,6 @@ namespace CurveManager {
                     normalizationDivisor = fields.at("normalization_divisor");
                 }
 
-                PerfCurve(CurveNum).NormalizationValue = normalizationDivisor;  // TODO: Remove/Fix use in Hybrid Unitary
-
                 std::vector<double> lookupValues;
                 if (fields.count("external_file_name")) {
                     std::string filePath = fields.at("external_file_name");
@@ -2087,12 +2086,20 @@ namespace CurveManager {
                         ShowContinueError("    b) no normalization reference values are defined.");
                         ErrorsFound = true;
                     } else if (pointsSpecified) {
-                        // normalizeGridValues normalizes to 1.0 at the reference values. We must redivide by passing in the 1.0/normalizationDivisor as the scalar here.
-                        btwxtManager.normalizeGridValues(gridIndex, PerfCurve(CurveNum).GridValueIndex, normalizeTarget, 1.0/normalizationDivisor);
+                        // normalizeGridValues normalizes curve values to 1.0 at the normalization target, and returns the scalar needed to perform this normalization.
+                        // The result is multiplied by the input normalizationDivisor again for the AutomaticWithDivisor case, in which normalizeGridValues returns a compound scalar.
+                        normalizationDivisor = btwxtManager.normalizeGridValues(gridIndex, PerfCurve(CurveNum).GridValueIndex, normalizeTarget, normalizationDivisor)*normalizationDivisor;
                     }
+                }
 
-              }
-
+                if ((normalizeMethod == NM_DIVISOR_ONLY) || (normalizeMethod == NM_AUTO_WITH_DIVISOR)) {
+                    if (PerfCurve(CurveNum).CurveMaxPresent) {
+                        PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
+                    }
+                    if (PerfCurve(CurveNum).CurveMinPresent) {
+                        PerfCurve(CurveNum).CurveMin = PerfCurve(CurveNum).CurveMin / normalizationDivisor;
+                    }
+                }
             }
         }
         btwxtManager.tableFiles.clear();
@@ -2127,8 +2134,8 @@ namespace CurveManager {
         return grids[gridIndex](target)[outputIndex];
     }
 
-    void BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target, const double scalar) {
-        grids[gridIndex].normalize_values_at_target(outputIndex, target, scalar);
+    double BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target, const double scalar) {
+        return grids[gridIndex].normalize_values_at_target(outputIndex, target, scalar);
     }
 
     void BtwxtManager::clear() {
@@ -2146,7 +2153,7 @@ namespace CurveManager {
         filePath = path;
         bool fileFound;
         std::string fullPath;
-        DataSystemVariables::CheckForActualFileName(path, fileFound, fullPath);
+        DataSystemVariables::CheckForActualFileName(OutputFiles::getSingleton(), path, fileFound, fullPath);
         if (!fileFound) {
             ShowFatalError("File \"" + filePath + "\" : File not found.");
         }
@@ -2686,22 +2693,6 @@ namespace CurveManager {
             GetCurveName = "";
         }
         return GetCurveName;
-    }
-    double GetNormalPoint(int const CurveIndex)
-    {
-
-        std::string s = std::to_string(CurveIndex);
-        if (CurveIndex > 0 && CurveIndex <= NumCurves) {
-            if (PerfCurve(CurveIndex).InterpolationType == BtwxtMethod) {
-                return PerfCurve(CurveIndex).NormalizationValue;
-            } else {
-                ShowWarningError("GetNormalPoint: CurveIndex is not a table, CurveIndex requested  " + s);
-                return -1;
-            }
-        }
-
-        ShowWarningError("GetNormalPoint: CurveIndex not in range of curves, CurveIndex requested  " + s);
-        return -1;
     }
 
     int GetCurveIndex(std::string const &CurveName) // name of the curve

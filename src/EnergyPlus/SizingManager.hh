@@ -56,7 +56,10 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
     class OutputFiles;
+
 namespace SizingManager {
 
     // Using/Aliasing
@@ -91,9 +94,17 @@ namespace SizingManager {
     // Functions
     void clear_state();
 
-    void ManageSizing(OutputFiles &outputFiles);
+    void ManageSizing(EnergyPlusData &state);
 
-    void ManageSystemSizingAdjustments();
+    bool CalcdoLoadComponentPulseNow(bool const isPulseZoneSizing,
+                                     bool const WarmupFlag,
+                                     int const HourOfDay,
+                                     int const TimeStep,
+                                     int const KindOfSim,
+                                     int const DayOfSim
+                                     );
+
+    void ManageSystemSizingAdjustments(EnergyPlusData &state);
 
     void ManageSystemVentilationAdjustments();
 
@@ -103,14 +114,14 @@ namespace SizingManager {
 
     void ProcessInputOARequirements(std::string const &cCurrentModuleObject,
                                     int const OAIndex,
-                                    Array1_string const &cAlphaArgs,
+                                    Array1D_string const &cAlphaArgs,
                                     int &NumAlphas,
-                                    Array1<Real64> const &rNumericArgs,
+                                    Array1D<Real64> const &rNumericArgs,
                                     int &NumNumbers,
-                                    Array1_bool const &lNumericFieldBlanks, // Unused
-                                    Array1_bool const &lAlphaFieldBlanks,
-                                    Array1_string const &cAlphaFieldNames,
-                                    Array1_string const &cNumericFieldNames, // Unused
+                                    Array1D_bool const &lNumericFieldBlanks, // Unused
+                                    Array1D_bool const &lAlphaFieldBlanks,
+                                    Array1D_string const &cAlphaFieldNames,
+                                    Array1D_string const &cNumericFieldNames, // Unused
                                     bool &ErrorsFound                        // If errors found in input
     );
 
@@ -131,7 +142,7 @@ namespace SizingManager {
 
     void GetPlantSizingInput();
 
-    void SetupZoneSizing(bool &ErrorsFound);
+    void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound);
 
     void ReportZoneSizing(OutputFiles &outputFiles,
                           std::string const &ZoneName,   // the name of the zone
@@ -164,7 +175,7 @@ namespace SizingManager {
 
     std::string TimeIndexToHrMinString(int timeIndex);
 
-    void UpdateFacilitySizing(int const CallIndicator);
+    void UpdateFacilitySizing(DataGlobal const &dataGlobals, int const CallIndicator);
 
     void UpdateTermUnitFinalZoneSizing();
 

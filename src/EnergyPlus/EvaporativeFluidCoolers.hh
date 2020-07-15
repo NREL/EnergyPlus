@@ -58,6 +58,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace EvaporativeFluidCoolers {
 
     extern std::string const cEvapFluidCooler_SingleSpeed;
@@ -254,9 +258,9 @@ namespace EvaporativeFluidCoolers {
 
         void getDesignCapacities(const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitEvapFluidCooler();
+        void InitEvapFluidCooler(BranchInputManagerData &dataBranchInputManager);
 
         void SizeEvapFluidCooler();
 
@@ -270,9 +274,11 @@ namespace EvaporativeFluidCoolers {
 
         void CalcTwoSpeedEvapFluidCooler();
 
-        Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA, Array1<Real64> const &Par);
+        Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA, Array1D<Real64> const &Par);
 
         void SimSimpleEvapFluidCooler(Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
+
+        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
     };
 
     // Object Data

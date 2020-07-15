@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -187,7 +188,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     PurchAir(PurchAirNum).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
     PurchAir(PurchAirNum).Name = "Ideal Loads 1";
 
-    SizePurchasedAir(PurchAirNum);
+    SizePurchasedAir(state, PurchAirNum);
     EXPECT_DOUBLE_EQ(1.0, PurchAir(PurchAirNum).MaxHeatVolFlowRate);
     EXPECT_NEAR(50985.58, PurchAir(PurchAirNum).MaxHeatSensCap, 0.1);
     EXPECT_DOUBLE_EQ(2.0, PurchAir(PurchAirNum).MaxCoolVolFlowRate);
@@ -241,7 +242,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test2)
     PurchAir(PurchAirNum).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
     PurchAir(PurchAirNum).Name = "Ideal Loads 1";
 
-    SizePurchasedAir(PurchAirNum);
+    SizePurchasedAir(state, PurchAirNum);
     EXPECT_DOUBLE_EQ(1.0, PurchAir(PurchAirNum).MaxHeatVolFlowRate);
     EXPECT_NEAR(63731.97, PurchAir(PurchAirNum).MaxHeatSensCap, 0.1); // larger than test 1 above
     EXPECT_DOUBLE_EQ(2.0, PurchAir(PurchAirNum).MaxCoolVolFlowRate);
@@ -396,20 +397,20 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
-    ManageZoneEquipment(FirstHVACIteration, SimZone,
+    ManageZoneEquipment(state, FirstHVACIteration, SimZone,
                         SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
 
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
     // Ideal loads air system found the plenum it is attached to
     EXPECT_EQ(PurchAir(1).ReturnPlenumIndex, 1);
     // The ideal loads air system inlet air node is equal to the zone return plenum outlet node
-    EXPECT_EQ(PurchAir(1).PlenumExhaustAirNodeNum, ZoneRetPlenCond(1).OutletNode);
+    EXPECT_EQ(PurchAir(1).PlenumExhaustAirNodeNum, state.dataZonePlenum.ZoneRetPlenCond(1).OutletNode);
     // The ideal loads air system ZoneSupplyAirNodeNum is equal to the zone air inlet node
     EXPECT_EQ(PurchAir(1).ZoneSupplyAirNodeNum, ZoneEquipConfig(1).InletNode(1));
     // The ideal loads air system ZoneExhaustAirNodeNum is equal to the zone exhaust air node num
     EXPECT_EQ(PurchAir(1).ZoneExhaustAirNodeNum, ZoneEquipConfig(1).ExhaustNode(1));
     // The zone exhaust air node is equal to the zone return plenum inlet air node
-    EXPECT_EQ(ZoneEquipConfig(1).ExhaustNode(1), ZoneRetPlenCond(1).InletNode(1));
+    EXPECT_EQ(ZoneEquipConfig(1).ExhaustNode(1), state.dataZonePlenum.ZoneRetPlenCond(1).InletNode(1));
     // The ideal loads air system has a non-zero mass flow rate
     EXPECT_GT(PurchAir(1).SupplyAirMassFlowRate, 0.0);
     // The ideal loads air system mass flow rate is equal to all nodes attached to this system
@@ -504,7 +505,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
-    ManageZoneEquipment(FirstHVACIteration, SimZone,
+    ManageZoneEquipment(state, FirstHVACIteration, SimZone,
                         SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
 
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
