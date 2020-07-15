@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DXFEarClipping.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
@@ -262,7 +263,7 @@ void LinesOut(std::string const &option)
     auto slnfile = OutputFiles::getSingleton().sln.open("LinesOut", OutputFiles::getSingleton().outputControl.sln);
 
     if (option != "IDF") {
-        for (int surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Sides == 0) continue;
             print(slnfile, "{}:{}\n", Surface(surf).ZoneName, Surface(surf).Name);
@@ -293,7 +294,7 @@ void LinesOut(std::string const &option)
     } else {
         print(slnfile, "{}\n", " Building North Axis = 0");
         print(slnfile, "{}\n", "GlobalGeometryRules,UpperLeftCorner,CounterClockwise,WorldCoordinates;");
-        for (int surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Sides == 0) continue;
             // process heat transfer surfaces
@@ -372,7 +373,7 @@ static void WriteDXFCommon(OutputFile &of, const std::string &ColorScheme)
 
     Real64 minx = 99999.0;
     Real64 miny = 99999.0;
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         if (Surface(surf).Class == SurfaceClass_IntMass) continue;
         for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
             minx = min(minx, Surface(surf).Vertex(vert).x);
@@ -597,7 +598,7 @@ void DXFOut(OutputFiles &outputFiles,
 
     auto colorindex = ColorNo_ShdDetFix;
     //  Do all detached shading surfaces first
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         std::string ShadeType;
 
         if (Surface(surf).HeatTransSurf) continue;
@@ -672,7 +673,8 @@ void DXFOut(OutputFiles &outputFiles,
     for (int zones = 1; zones <= NumOfZones; ++zones) {
         const auto TempZoneName = normalizeName(Zone(zones).Name);
 
-        for (int surf = max(Zone(zones).SurfaceFirst, 1); surf <= Zone(zones).SurfaceLast; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+            if (Surface(surf).Zone != zones) continue;
             if (Surface(surf).Sides == 0) continue;
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Class == SurfaceClass_Wall) colorindex = ColorNo_Wall;
@@ -748,7 +750,7 @@ void DXFOut(OutputFiles &outputFiles,
             }
         }
         // still have to do shading surfaces for zone
-        for (int surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass_Shading) continue;
             if (Surface(surf).ZoneName != Zone(zones).Name) continue;
@@ -933,7 +935,7 @@ void DXFOutLines(std::string const &ColorScheme)
     //  Do all detached shading surfaces first
     int surfcount = 0;
     int colorindex = 0;
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         std::string ShadeType;
         if (Surface(surf).HeatTransSurf) continue;
         if (Surface(surf).Class == SurfaceClass_Shading) continue;
@@ -978,7 +980,8 @@ void DXFOutLines(std::string const &ColorScheme)
         auto TempZoneName = normalizeName(Zone(zones).Name);
 
         surfcount = 0;
-        for (int surf = max(Zone(zones).SurfaceFirst, 1); surf <= Zone(zones).SurfaceLast; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+            if (Surface(surf).Zone != zones) continue;
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Class == SurfaceClass_Wall) colorindex = ColorNo_Wall;
             if (Surface(surf).Class == SurfaceClass_Roof) colorindex = ColorNo_Roof;
@@ -1028,7 +1031,7 @@ void DXFOutLines(std::string const &ColorScheme)
         }
         // still have to do shading surfaces for zone
         surfcount = 0;
-        for (int surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass_Shading) continue;
             if (Surface(surf).ZoneName != Zone(zones).Name) continue;
@@ -1144,7 +1147,7 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
     //  Do all detached shading surfaces first
     int surfcount = 0;
     int colorindex = 0;
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         std::string ShadeType;
 
         if (Surface(surf).HeatTransSurf) continue;
@@ -1178,7 +1181,8 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
         const auto SaveZoneName = normalizeName(Zone(zones).Name);
 
         surfcount = 0;
-        for (int surf = max(Zone(zones).SurfaceFirst, 1); surf <= Zone(zones).SurfaceLast; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+            if (Surface(surf).Zone != zones) continue;
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Class == SurfaceClass_Wall) colorindex = ColorNo_Wall;
             if (Surface(surf).Class == SurfaceClass_Roof) colorindex = ColorNo_Roof;
@@ -1208,7 +1212,7 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
         }
         // still have to do shading surfaces for zone
         surfcount = 0;
-        for (int surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass_Shading) continue;
             if (Surface(surf).ZoneName != Zone(zones).Name) continue;
@@ -1284,7 +1288,6 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int surf;    // Loop variable for surfaces
     int vert;    // Loop counter
     int ZoneNum; // Loop counter
     std::string BaseSurfName;
@@ -1365,13 +1368,15 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
     }
 
     // Do just "detached" shading first
-    for (surf = 1; surf <= TotSurfaces; ++surf) {
+    int surf2 = 0;
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        surf2 = surf;
         if (Surface(surf).Zone != 0) break;
     }
-    if ((surf - 1) > 0) {
+    if ((surf2 - 1) > 0) {
         *eiostream << "Shading Surfaces,"
-                   << "Number of Shading Surfaces," << surf - 1 << '\n';
-        for (surf = 1; surf <= TotSurfaces; ++surf) {
+                   << "Number of Shading Surfaces," << surf2 - 1 << '\n';
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != 0) break;
             AlgoName = "None";
             *eiostream << "Shading Surface," << Surface(surf).Name << "," << cSurfaceClass(Surface(surf).Class) << "," << Surface(surf).BaseSurfName
@@ -1426,7 +1431,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
 
     for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
         *eiostream << "Zone Surfaces," << Zone(ZoneNum).Name << "," << (Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1) << '\n';
-        for (surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != ZoneNum) continue;
             SolarDiffusing = "";
             if (RptType == 10 || RptType == 11) { // Details and Details with Vertices
@@ -1471,7 +1476,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                 // prescribed R-values for interior and exterior convection coefficients as found in ASHRAE 90.1-2004, Appendix A
                 if (Surface(surf).Construction > 0 && Surface(surf).Construction <= TotConstructs) {
                     cNominalUwithConvCoeffs = "";
-                    ConstructionName = Construct(Surface(surf).Construction).Name;
+                    ConstructionName = dataConstruction.Construct(Surface(surf).Construction).Name;
                     {
                         auto const SELECT_CASE_var(Surface(surf).Class);
                         if (SELECT_CASE_var == SurfaceClass_Wall) {
@@ -1774,7 +1779,7 @@ void CostInfoOut(OutputFiles &outputFiles)
     // need to determine unique surfacs... some surfaces are shared by zones and hence doubled
     uniqueSurf.dimension(TotSurfaces, true);
 
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         if (Surface(surf).ExtBoundCond > 0) {
             if (Surface(surf).ExtBoundCond < surf) { // already cycled through
                 uniqueSurf(surf) = false;
@@ -1791,7 +1796,7 @@ void CostInfoOut(OutputFiles &outputFiles)
     print(scifile, "{}\n", " data for surfaces useful for cost information");
     print(scifile, "{}\n", " Number, Name, Construction, class, area, grossarea");
 
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         // if (surface(surf)%class .eq. SurfaceClass_IntMass) CYCLE
         if (!uniqueSurf(surf)) continue;
         // why the heck are constructions == 0 ?
@@ -1802,7 +1807,7 @@ void CostInfoOut(OutputFiles &outputFiles)
                   Format_801,
                   surf,
                   Surface(surf).Name,
-                  Construct(Surface(surf).Construction).Name,
+                  dataConstruction.Construct(Surface(surf).Construction).Name,
                   cSurfaceClass(Surface(surf).Class),
                   Surface(surf).Area,
                   Surface(surf).GrossArea);
@@ -1919,10 +1924,10 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
     int colorindex = 0;
 
     //  Do all detached shading surfaces first
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         if (Surface(surf).HeatTransSurf) continue;
         if (Surface(surf).Construction > 0) {
-            if (DataHeatBalance::Construct(Surface(surf).Construction).TypeIsAirBoundary) continue;
+            if (dataConstruction.Construct(Surface(surf).Construction).TypeIsAirBoundary) continue;
         }
         if (Surface(surf).Class == SurfaceClass_Shading) continue;
         if (Surface(surf).Sides == 0) continue;
@@ -1966,9 +1971,11 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
         }
     }
     //  ! now do zone surfaces, by zone
-    for (int zones = 1; zones <= NumOfZones; ++zones) {
-
-        for (int surf = max(Zone(zones).SurfaceFirst, 1); surf <= Zone(zones).SurfaceLast; ++surf) {
+    for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+        int oldSurfNum = 0;
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+            ++oldSurfNum;
+            if (Surface(surf).Zone != zoneNum) continue;
             if (Surface(surf).Sides == 0) continue;
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Class == SurfaceClass_Wall) colorindex = 1;
@@ -1979,7 +1986,7 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
             if (Surface(surf).Class == SurfaceClass_Door) colorindex = 2;
 
             print(wrlfile, "# {}:{}\n", Surface(surf).ZoneName, Surface(surf).Name);
-            print(wrlfile, Format_801, colorstring(colorindex), "Surf", surf);
+            print(wrlfile, Format_801, colorstring(colorindex), "Surf", oldSurfNum);
             for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
                 print(wrlfile, Format_802, Surface(surf).Vertex(vert).x, Surface(surf).Vertex(vert).y, Surface(surf).Vertex(vert).z);
             }
@@ -2011,10 +2018,10 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
         }
         // still have to do shading surfaces for zone
         colorindex = 4;
-        for (int surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             //      !if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass_Shading) continue;
-            if (Surface(surf).ZoneName != Zone(zones).Name) continue;
+            if (Surface(surf).ZoneName != Zone(zoneNum).Name) continue;
             if (Surface(surf).Sides == 0) continue;
             print(wrlfile, "# {}:{}\n", Surface(surf).ZoneName, Surface(surf).Name);
             print(wrlfile, Format_801, colorstring(colorindex), "Surf", surf);

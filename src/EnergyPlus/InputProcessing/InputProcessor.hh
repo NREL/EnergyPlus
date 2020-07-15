@@ -174,6 +174,8 @@ public:
 
     void preScanReportingVariables();
 
+    void reportIDFRecordsStats();
+
     void reportOrphanRecordObjects();
 
     const json &getObjectInstances(std::string const &ObjType);

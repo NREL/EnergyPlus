@@ -53,13 +53,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct ConvectionCoefficientsData;
+
 namespace CrossVentMgr {
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
 
     // MODULE VARIABLE DECLARATIONS:
     extern Real64 HAT_J;           // HAT_J Convection Coefficient times Area times Temperature for Jet subzone
@@ -79,7 +76,7 @@ namespace CrossVentMgr {
 
     // Functions
 
-    void ManageUCSDCVModel(int const ZoneNum); // index number for the specified zone
+    void ManageUCSDCVModel(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // index number for the specified zone
 
     //**************************************************************************************************
 
@@ -87,7 +84,7 @@ namespace CrossVentMgr {
 
     //**************************************************************************************************
 
-    void HcUCSDCV(int const ZoneNum);
+    void HcUCSDCV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum);
 
     //**************************************************************************************************
 
@@ -95,7 +92,7 @@ namespace CrossVentMgr {
 
     //**************************************************************************************************
 
-    void CalcUCSDCV(int const ZoneNum); // Which Zonenum
+    void CalcUCSDCV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // Which Zonenum
 
     // Clears the global data.
     // Needed for unit tests, should not be normally called.
