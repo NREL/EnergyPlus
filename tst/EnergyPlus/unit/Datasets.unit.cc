@@ -240,4 +240,4 @@ TEST_F(DataSetFixture, WindowShadeMaterials)
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/WindowShadeMaterials.idf"))));
 }
 
-}
+} // namespace EnergyPlus

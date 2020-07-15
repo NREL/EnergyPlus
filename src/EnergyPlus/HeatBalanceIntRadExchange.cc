@@ -113,13 +113,6 @@ namespace HeatBalanceIntRadExchange {
     using namespace DataSurfaces;
     using namespace DataSystemVariables;
     using namespace DataViewFactorInformation;
-<<<<<<< HEAD
-    using namespace DataTimings;
-    using Eigen::MatrixXd;
-    using Eigen::ArrayXd;
-    using Eigen::Map;
-=======
->>>>>>> origin/develop
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -1804,13 +1797,13 @@ namespace HeatBalanceIntRadExchange {
         // Array2D<Real64>::size_type l(0u);
 
         // Load Cmatrix with AF (AREA * DIRECT VIEW FACTOR) matrix
-        Map<const ArrayXd> areas(A.data(), N);
-        MatrixXd CMatrix(N, N);
-        CMatrix = Map<const MatrixXd>(F.data(), N, N);
+        Eigen::Map<const Eigen::ArrayXd> areas(A.data(), N);
+        Eigen::MatrixXd CMatrix(N, N);
+        CMatrix = Eigen::Map<const Eigen::MatrixXd>(F.data(), N, N);
         CMatrix.array().colwise() *= areas.array();
 
         // Load Cmatrix with (AF - EMISS/REFLECTANCE) matrix
-        Map<ArrayXd> emissivity(EMISS.data(), N);
+        Eigen::Map<Eigen::ArrayXd> emissivity(EMISS.data(), N);
 
         // ensure max limit not exceeded
         if ((emissivity > MaxEmissLimit).any()) {
@@ -1819,7 +1812,7 @@ namespace HeatBalanceIntRadExchange {
         }
 
         // set the excitation vector first to A/(1-emiss) so it can be used to modify CMatrix
-        ArrayXd excitation(N);
+        Eigen::ArrayXd excitation(N);
         excitation = areas / (1.0 - emissivity);
 
         // modify CMatrix
@@ -1829,9 +1822,9 @@ namespace HeatBalanceIntRadExchange {
         excitation *= -emissivity;
 
         // map the scriptF matrix so it can be assigned to
-        Map<MatrixXd> scriptF(ScriptF.data(), N, N);
+        Eigen::Map<Eigen::MatrixXd> scriptF(ScriptF.data(), N, N);
 
-        MatrixXd Cinverse(N, N);
+        Eigen::MatrixXd Cinverse(N, N);
         Cinverse = CMatrix.inverse();
 
         Cinverse *= excitation.matrix().asDiagonal();

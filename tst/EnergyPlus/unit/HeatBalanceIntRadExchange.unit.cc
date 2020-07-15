@@ -69,19 +69,13 @@
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-<<<<<<< HEAD
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-=======
 #include <EnergyPlus/Material.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
->>>>>>> origin/develop
 
 using namespace EnergyPlus::HeatBalanceIntRadExchange;
-using Eigen::MatrixXd;
-using Eigen::ArrayXd;
-using Eigen::Map;
 
 namespace EnergyPlus {
 
@@ -1695,11 +1689,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_CalcInteriorRadExchange)
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
-    HeatBalanceManager::GetBuildingData(ErrorsFound);
+    HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
     Psychrometrics::InitializePsychRoutines();
 
@@ -1901,8 +1895,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_CalcInverse)
     }
 
     // CalcMatrixInverse(Cmatrix, Cinverse);
-    Map<MatrixXd> CMatrixXd(Cmatrix.data(), N, N);
-    Map<MatrixXd> CinverseXd(Cinverse.data(), N, N);
+    Eigen::Map<Eigen::MatrixXd> CMatrixXd(Cmatrix.data(), N, N);
+    Eigen::Map<Eigen::MatrixXd> CinverseXd(Cinverse.data(), N, N);
     CinverseXd = CMatrixXd.inverse();
 
     for (int i = 0; i < N * N; ++i) {
@@ -1921,8 +1915,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_CalcInverse)
     }
 
     // CalcMatrixInverse(Cmatrix, Cinverse);
-    Map<MatrixXd> CMatrixXd2(Cmatrix.data(), N, N);
-    Map<MatrixXd> CinverseXd2(Cinverse.data(), N, N);
+    Eigen::Map<Eigen::MatrixXd> CMatrixXd2(Cmatrix.data(), N, N);
+    Eigen::Map<Eigen::MatrixXd> CinverseXd2(Cinverse.data(), N, N);
     CinverseXd2 = CMatrixXd2.inverse();
 
     for (int i = 0; i < N * N; ++i) {
