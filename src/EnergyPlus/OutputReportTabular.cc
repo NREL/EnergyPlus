@@ -5683,21 +5683,7 @@ namespace OutputReportTabular {
 
         if (WriteTabularFiles) {
             // call each type of report in turn
-<<<<<<< HEAD
-            WriteBEPSTable(state.dataZoneTempPredictorCorrector, state.outputFiles);
-            WriteTableOfContents();
-            WriteVeriSumTable(state.outputFiles);
-            WriteDemandEndUseSummary();
-            WriteSourceEnergyEndUseSummary();
-            WriteComponentSizing();
-            WriteSurfaceShadowing();
-            WriteCompCostTable();
-            WriteAdaptiveComfortTable();
-            WriteEioTables(state.outputFiles);
-            WriteLoadComponentSummaryTables();
-            WriteHeatEmissionTable();
-=======
-            WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector);
+            WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector, state.outputFiles);
             WriteTableOfContents(state);
             WriteVeriSumTable(state.dataCostEstimateManager,state.outputFiles);
             WriteDemandEndUseSummary(state.dataCostEstimateManager);
@@ -5709,7 +5695,6 @@ namespace OutputReportTabular {
             WriteEioTables(state.dataCostEstimateManager,state.outputFiles);
             WriteLoadComponentSummaryTables(state.dataCostEstimateManager);
             WriteHeatEmissionTable(state.dataCostEstimateManager);
->>>>>>> origin/develop
 
             coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
             WritePredefinedTables(state.dataCostEstimateManager);                                // moved to come after zone load components is finished
@@ -7465,12 +7450,9 @@ namespace OutputReportTabular {
         }
     }
 
-<<<<<<< HEAD
-    void WriteBEPSTable(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles)
-=======
     void WriteBEPSTable(CostEstimateManagerData &dataCostEstimateManager,
-                        ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
->>>>>>> origin/develop
+                        ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
+                        OutputFiles &outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer

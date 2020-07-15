@@ -70,11 +70,8 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
-<<<<<<< HEAD
 #include <EnergyPlus/OutputFiles.hh>
-=======
 #include <EnergyPlus/Material.hh>
->>>>>>> origin/develop
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
