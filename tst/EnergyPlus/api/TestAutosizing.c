@@ -45,10 +45,13 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <EnergyPlus/api/autosizing.h>
 
-int main() {
+int runSuccess() {
     Sizer s = sizerHeatingAirflowUANew();
     sizerHeatingAirflowUAInitializeForZoneFanCoil(s, 0.0, 500);
     int status = sizerHeatingAirflowUACalculate(s);
@@ -56,8 +59,19 @@ int main() {
         Real64 val = sizerHeatingAirflowUAValue(s);
         printf("Calculated successfully!  Value = %8.4f\n", val);
     } else {
-        printf("Autosizing failed!\n");
+        printf("Autosizing failed!");
     }
     sizerHeatingAirflowUADelete(s);
-    return status;
+    char *messages = sizerGetLastErrorMessages(s);
+    free(messages);
+    if (strlen(messages) != 0) {
+        return 1;
+    }
+    return 0;
+}
+
+int main() {
+    int retVal;
+    retVal = runSuccess();
+    assert(retVal == 0);
 }

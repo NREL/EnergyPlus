@@ -70,7 +70,7 @@ ENERGYPLUSLIB_API typedef void * Sizer;
 ///          This function also clears the message buffer so a subsequent call will get only new messages.
 /// \param[in] sizer An instance of a Sizer class, it works for any sizer type.
 /// \return A char * pointing to a string of error messages, or blank if none have been reported.
-ENERGYPLUSLIB_API char * getLastErrorMessages(Sizer sizer);
+ENERGYPLUSLIB_API char * sizerGetLastErrorMessages(Sizer sizer);
 
 /// \brief Returns a new reference to a HeatingAirflowUA Sizer class
 /// \details The sizer class allows access to sizer stuff.

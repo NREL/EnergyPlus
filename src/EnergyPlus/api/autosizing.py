@@ -8,8 +8,8 @@ class BaseSizerWorker:
     """
 
     def __init__(self, api: cdll):
-        api.getLastErrorMessages.argtypes = [c_void_p]
-        api.getLastErrorMessages.restype = c_char_p
+        api.sizerGetLastErrorMessages.argtypes = [c_void_p]
+        api.sizerGetLastErrorMessages.restype = c_char_p
 
     @staticmethod
     def get_error_messages(api: cdll, instance: c_void_p) -> bytes:

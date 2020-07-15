@@ -197,7 +197,10 @@ namespace EnergyPlus {
                 this->autoSizedValue *= this->stdRhoAir;
             }
         }
-        if (this->autoSizedValue < DataHVACGlobals::SmallAirVolFlow) this->autoSizedValue = 0.0;
+        if (this->autoSizedValue < DataHVACGlobals::SmallAirVolFlow) {
+            this->addErrorMessage("Autosized value was zero or less than zero");
+            this->autoSizedValue = 0.0;
+        }
         this->selectSizerOutput(errorsFound);
         return this->autoSizedValue;
     }
