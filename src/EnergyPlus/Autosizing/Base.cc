@@ -122,6 +122,10 @@ void BaseSizer::initializeFromAPI(Real64 const elevation) {
     this->getCoilReportObject = false;
 }
 
+void BaseSizer::addErrorMessage(std::string const &s) {
+    this->lastErrorMessages.append(s).append("\n");
+}
+
 std::string BaseSizer::getLastErrorMessages() {
     std::string s(this->lastErrorMessages);
     this->lastErrorMessages = "";
@@ -132,7 +136,7 @@ void BaseSizer::preSize(Real64 const _originalValue)
 {
     if (this->sizingType == AutoSizingType::Unknown) {
         std::string msg = "Sizing Library Base Class: preSize, SizingType not defined.";
-        this->lastErrorMessages.append(msg);
+        this->addErrorMessage(msg);
         ShowSevereError(msg);
         ShowFatalError("Sizing type causes fatal error.");
     }
@@ -179,16 +183,16 @@ void BaseSizer::preSize(Real64 const _originalValue)
         if (!this->sizingDesRunThisAirSys && this->curSysNum > 0 && this->sizingType != AutoSizingType::AutoCalculate) {
             if (!this->sysSizingRunDone) {
                 std::string msg = "For autosizing of " + this->compType + ' ' + this->compName + ", a system sizing run must be done.";
-                this->lastErrorMessages.append(msg);
+                this->addErrorMessage(msg);
                 ShowSevereError(msg);
                 if (this->numSysSizInput == 0) {
                     std::string msg2 = "No \"Sizing:System\" objects were entered.";
-                    this->lastErrorMessages.append(msg2);
+                    this->addErrorMessage(msg2);
                     ShowContinueError(msg2);
                 }
                 if (!this->doSystemSizing) {
                     std::string msg2 = R"(The "SimulationControl" object did not have the field "Do System Sizing Calculation" set to Yes.)";
-                    this->lastErrorMessages.append(msg2);
+                    this->addErrorMessage(msg2);
                     ShowContinueError(msg2);
                 }
                 ShowFatalError("Program terminates due to previously shown condition(s).");
@@ -198,16 +202,16 @@ void BaseSizer::preSize(Real64 const _originalValue)
             this->sizingType != AutoSizingType::AutoCalculate) {
             if (!this->zoneSizingRunDone) {
                 std::string msg = "For autosizing of " + this->compType + ' ' + this->compName + ", a zone sizing run must be done.";
-                this->lastErrorMessages.append(msg);
+                this->addErrorMessage(msg);
                 ShowSevereError(msg);
                 if (this->numZoneSizingInput == 0) {
                     std::string msg2 = "No \"Sizing:Zone\" objects were entered.";
-                    this->lastErrorMessages.append(msg2);
+                    this->addErrorMessage(msg2);
                     ShowContinueError(msg2);
                 }
                 if (!this->doZoneSizing) {
                     std::string msg2 = R"(The "SimulationControl" object did not have the field "Do Zone Sizing Calculation" set to Yes.)";
-                    this->lastErrorMessages.append(msg2);
+                    this->addErrorMessage(msg2);
                     ShowContinueError(msg2);
                 }
                 ShowFatalError("Program terminates due to previously shown condition(s).");

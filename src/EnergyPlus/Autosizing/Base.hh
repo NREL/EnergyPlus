@@ -147,6 +147,8 @@ protected:
 
     std::string lastErrorMessages = "";
 
+    void addErrorMessage(std::string const &s);
+
     void initializeFromAPI(Real64 elevation); // don't accidentally call this direct component from outside
 
     void preSize(Real64 originalValue);

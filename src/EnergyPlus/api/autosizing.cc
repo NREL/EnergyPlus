@@ -49,7 +49,7 @@
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/DataSizing.hh>
 
-char * getLastErrorMessages(Sizer sizer) {
+char * sizerGetLastErrorMessages(Sizer sizer) {
     auto s = reinterpret_cast<EnergyPlus::BaseSizer *>(sizer);
     std::string const msg = s->getLastErrorMessages();
     // note that we cannot just return a c_str to the local string, as the string will be destructed upon leaving
