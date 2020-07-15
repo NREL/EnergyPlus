@@ -58,7 +58,9 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -73,10 +75,10 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -539,14 +541,14 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
 
         case BBSteamRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
             // Simulate baseboard
-            CalcSteamBaseboard(state.dataZoneTempPredictorCorrector, CompNum, LoadMet);
+            CalcSteamBaseboard(state, CompNum, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
         case BBWaterRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
             // Simulate baseboard
-            CalcHWBaseboard(state.dataZoneTempPredictorCorrector, CompNum, LoadMet);
+            CalcHWBaseboard(state, CompNum, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
@@ -981,7 +983,8 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
     }
 }
 
-void CalcPassiveExteriorBaffleGap(const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
+void CalcPassiveExteriorBaffleGap(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                  const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,         // Area available for venting the gap [m2]
                                   Real64 const Cv,               // Oriface coefficient for volume-based discharge, wind-driven [--]
                                   Real64 const Cd,               // oriface coefficient for discharge,  bouyancy-driven [--]
@@ -1030,8 +1033,6 @@ void CalcPassiveExteriorBaffleGap(const Array1D_int &SurfPtrARR, // Array of ind
     // USE DataLoopNode    , ONLY: Node
     using ConvectionCoefficients::InitExteriorConvectionCoeff;
     using DataGlobals::BeginEnvrnFlag;
-    using DataHeatBalance::Construct;
-    using DataHeatBalance::Material;
     using DataHeatBalance::QRadSWOutIncident;
     using DataHeatBalSurface::TH;
     using DataSurfaces::Surface;
@@ -1145,10 +1146,10 @@ void CalcPassiveExteriorBaffleGap(const Array1D_int &SurfPtrARR, // Array of ind
         // Initializations for this surface
         HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
-        InitExteriorConvectionCoeff(
+        InitExteriorConvectionCoeff(dataConvectionCoefficients,
             SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = Surface(SurfPtr).Construction;
-        AbsThermSurf = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+        AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         TsoK = TH(1, 1, SurfPtr) + KelvinConv;
         TsBaffK = TmpTsBaf + KelvinConv;
         if (TsBaffK == TsoK) {        // avoid divide by zero

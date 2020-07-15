@@ -265,8 +265,8 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
 
       // rating data
       RatedInletAirTemp(26.6667),        // 26.6667C or 80F
-      RatedInletWetBulbTemp(19.44),      // 19.44 or 67F
-      RatedInletAirHumRat(0.01125),      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+      RatedInletWetBulbTemp(19.4444),      // 19.44 or 67F
+      RatedInletAirHumRat(0.0111847),   // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
       RatedOutdoorAirTemp(35.0),         // 35 C or 95F
       DryCoilOutletHumRatioMin(0.00001) // dry coil outlet minimum hum ratio kgH2O/kgdry air
 

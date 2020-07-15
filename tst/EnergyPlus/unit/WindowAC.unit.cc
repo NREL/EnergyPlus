@@ -435,12 +435,12 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedule data
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state, state.outputFiles);
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
 
@@ -461,9 +461,9 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     // check input processing
     EXPECT_EQ(compIndex, 1);
 
-    EXPECT_EQ(WindowAC::WindAC(1).DXCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
+    EXPECT_EQ(state.dataWindowAC.WindAC(1).DXCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
     // check Sizing
-    EXPECT_NEAR(WindowAC::WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
+    EXPECT_NEAR(state.dataWindowAC.WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -295.0;
     DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;

@@ -52,10 +52,9 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDaylighting.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -1580,7 +1579,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     // #7586
     DataSurfaces::Surface.allocate(2);
     DataSurfaces::SurfaceWindow.allocate(2);
-    DataHeatBalance::Construct.allocate(1);
+    dataConstruction.Construct.allocate(1);
     DataSurfaces::WindowShadingControl.allocate(2);
     DataDaylighting::ZoneDaylight.allocate(1);
     DataSurfaces::Surface(1).Name = "Surface1";
@@ -1601,7 +1600,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::SurfaceWindow(1).ShadedConstruction = 1;
     DataSurfaces::SurfaceWindow(2).ShadedConstruction = 1;
 
-    DataHeatBalance::Construct(1).Name = "Construction1";
+    dataConstruction.Construct(1).Name = "Construction1";
 
     DataSurfaces::WindowShadingControl(1).ShadingType = 0;
     DataSurfaces::WindowShadingControl(2).ShadingType = DataSurfaces::WSC_ST_ExteriorScreen;
@@ -1615,7 +1614,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
 
     DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn = true;
     DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue = 1.0;
-    SolarShading::WindowShadingManager();
+    SolarShading::WindowShadingManager(state.dataWindowEquivalentLayer);
     EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlag, DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue);
 
 }
