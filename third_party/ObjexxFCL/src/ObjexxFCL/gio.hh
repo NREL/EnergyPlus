@@ -20,7 +20,6 @@
 #include <ObjexxFCL/gio_Fmt.hh> // Convenience include
 #include <ObjexxFCL/Print.hh>
 #include <ObjexxFCL/Read.hh>
-#include <ObjexxFCL/Write.hh>
 
 // C++ Headers
 #include <ios>
@@ -238,155 +237,12 @@ read( std::string const & str, Fmt & fmt, IOFlags & flags )
 	return ReadString( str, fmt, flags );
 }
 
-// Read Line from Unit
-void
-read_line( Unit const unit, std::string & line );
 
-// Read Line from Unit
-void
-read_line( Unit const unit, IOFlags & flags, std::string & line );
-
-// Input Stream of Unit
-std::istream *
-inp_stream( Unit const unit );
-
-// Write /////
-
-// Write to Unit
-Write
-write( Unit const unit, std::string const & fmt );
-
-// Write to Unit
-Write
-write( Unit const unit, Fmt const & fmt );
-
-// Write to Unit
-Write
-write( Unit const unit, Fmt & fmt );
-
-// Write to Unit
-Write
-write( Unit const unit, std::string const & fmt, IOFlags & flags );
-
-// Write to Unit
-Write
-write( Unit const unit, Fmt const & fmt, IOFlags & flags );
-
-// Write to Unit
-Write
-write( Unit const unit, Fmt & fmt, IOFlags & flags );
-
-// Write End-of-Line to Unit
-void
-write( Unit const unit );
-
-// Write to stdout
-Write
-write( std::string const & fmt );
-
-// Write to stdout
-Write
-write( Fmt const & fmt );
-
-// Write to stdout
-Write
-write( Fmt & fmt );
-
-// Write to stdout
-Write
-write( std::string const & fmt, IOFlags & flags );
-
-// Write to stdout
-Write
-write( Fmt const & fmt, IOFlags & flags );
-
-// Write to stdout
-Write
-write( Fmt & fmt, IOFlags & flags );
-
-// Write End-of-Line to stdout
-inline
-void
-write()
-{
-	std::cout << LF;
-}
-
-// Write to String
-inline
-Write
-write( std::string & str, std::string const & fmt )
-{
-	return Write( str, fmt );
-}
-
-// Write to String
-inline
-Write
-write( std::string & str, Fmt const & fmt )
-{
-	return Write( str, fmt );
-}
-
-// Write to String
-inline
-Write
-write( std::string & str, Fmt & fmt )
-{
-	return Write( str, fmt );
-}
-
-// Write to String
-inline
-Write
-write( std::string & str, std::string const & fmt, IOFlags & flags )
-{
-	return Write( str, fmt, flags );
-}
-
-// Write to String
-inline
-Write
-write( std::string & str, Fmt const & fmt, IOFlags & flags )
-{
-	return Write( str, fmt, flags );
-}
-
-// Write to String
-inline
-Write
-write( std::string & str, Fmt & fmt, IOFlags & flags )
-{
-	return Write( str, fmt, flags );
-}
 
 // Output Stream of Unit
 std::ostream *
 out_stream( Unit const unit );
 
-// Print /////
-
-// Print to stdout
-Print
-print( std::string const & fmt );
-
-// Print to stdout
-Print
-print( Fmt const & fmt );
-
-// Print to stdout
-Print
-print( Fmt & fmt );
-
-// Print to stdout with List-Directed Format
-Print
-print();
-
-// Flush /////
-
-// Flush
-void
-flush( Unit const unit );
 
 // Inquire /////
 
@@ -405,18 +261,6 @@ inquire( char const * const name, IOFlags & flags );
 // File Exists?
 bool
 file_exists( std::string const & file_name );
-
-// File Exists?
-bool
-file_exists( char const * const file_name );
-
-// File Openable?
-bool
-file_openable( std::string const & file_name );
-
-// File Openable?
-bool
-file_openable( char const * const file_name );
 
 // Backspace /////
 
@@ -437,10 +281,6 @@ rewind( Unit const unit, IOFlags & flags );
 // Rewind
 void
 rewind( Unit const unit );
-
-// Rewind and Truncate
-void
-rewind_truncate( Unit const unit );
 
 // Close /////
 

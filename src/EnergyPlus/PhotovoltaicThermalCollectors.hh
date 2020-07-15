@@ -52,10 +52,13 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    struct BranchInputManagerData;
 
 namespace PhotovoltaicThermalCollectors {
 
@@ -166,13 +169,13 @@ namespace PhotovoltaicThermalCollectors {
 
         void setupReportVars();
 
-        void initialize(bool FirstHVACIteration);
+        void initialize(BranchInputManagerData &dataBranchInputManager, bool FirstHVACIteration);
 
         void size();
 
         void control();
 
-        void calculate();
+        void calculate(ConvectionCoefficientsData &dataConvectionCoefficients);
 
         void update();
     };

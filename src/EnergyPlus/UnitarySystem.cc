@@ -51,7 +51,6 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
-#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -320,7 +319,7 @@ namespace UnitarySystems {
                     if (ZoneEquipment) {
                         this->controlUnitarySystemtoSP(state, 0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     } else {
-                        this->controlUnitarySystemtoSP(state, 
+                        this->controlUnitarySystemtoSP(state,
                             AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     }
                 } else if (SELECT_CASE_var == ControlType::Load || SELECT_CASE_var == ControlType::CCMASHRAE) {
@@ -664,7 +663,8 @@ namespace UnitarySystems {
         if (this->m_MyPlantScanFlag && allocated(DataPlant::PlantLoop)) {
             if (this->m_HeatRecActive) {
                 initUnitarySystemsErrFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        this->Name,
                                                         DataPlant::TypeOf_UnitarySysRecovery,
                                                         this->m_HRLoopNum,
                                                         this->m_HRLoopSideNum,
@@ -695,7 +695,7 @@ namespace UnitarySystems {
                     CoolingCoilType = "Coil:Cooling:Water:DetailedGeometry";
                     CoolingCoilName = this->m_CoolingCoilName;
                 } else {
-                    TypeOfCoilWaterCooling = HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(state, 
+                    TypeOfCoilWaterCooling = HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(state,
                         DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, initUnitarySystemsErrFlag, true);
                     if (TypeOfCoilWaterCooling == DataHVACGlobals::Coil_CoolingWater) {
                         TypeOfCoilWaterCooling = DataPlant::TypeOf_CoilWaterCooling;
@@ -704,11 +704,12 @@ namespace UnitarySystems {
                         TypeOfCoilWaterCooling = DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
                         CoolingCoilType = "Coil:Cooling:Water:DetailedGeometry";
                     }
-                    CoolingCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, 
+                    CoolingCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state,
                         DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, initUnitarySystemsErrFlag);
                 }
                 initUnitarySystemsErrFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(CoolingCoilName,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        CoolingCoilName,
                                                         TypeOfCoilWaterCooling,
                                                         this->CoolCoilLoopNum,
                                                         this->CoolCoilLoopSide,
@@ -755,7 +756,8 @@ namespace UnitarySystems {
                     HeatingCoilType = "Coil:Heating:Steam";
                 }
                 initUnitarySystemsErrFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(this->m_HeatingCoilName,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        this->m_HeatingCoilName,
                                                         TypeOfCoilWaterHeating,
                                                         this->HeatCoilLoopNum,
                                                         this->HeatCoilLoopSide,
@@ -809,7 +811,8 @@ namespace UnitarySystems {
         if (this->m_MySuppCoilPlantScanFlag && allocated(DataPlant::PlantLoop)) {
             if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                 initUnitarySystemsErrFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(this->m_SuppHeatCoilName,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        this->m_SuppHeatCoilName,
                                                         DataPlant::TypeOf_CoilWaterSimpleHeating,
                                                         this->m_SuppCoilLoopNum,
                                                         this->m_SuppCoilLoopSide,
@@ -849,7 +852,8 @@ namespace UnitarySystems {
 
             } else if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
                 initUnitarySystemsErrFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(this->m_SuppHeatCoilName,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        this->m_SuppHeatCoilName,
                                                         DataPlant::TypeOf_CoilSteamAirHeating,
                                                         this->m_SuppCoilLoopNum,
                                                         this->m_SuppCoilLoopSide,
@@ -1108,7 +1112,7 @@ namespace UnitarySystems {
                                                      this->CoolCoilBranchNum,
                                                      this->CoolCoilCompNum);
                 //     simulate water coil to find operating capacity
-                WaterCoils::SimulateWaterCoilComponents(state, 
+                WaterCoils::SimulateWaterCoilComponents(state,
                     this->m_CoolingCoilName, FirstHVACIteration, this->m_CoolingCoilIndex, initUnitarySystemsQActual);
                 this->m_DesignCoolingCapacity = initUnitarySystemsQActual;
 
@@ -1125,7 +1129,7 @@ namespace UnitarySystems {
                                                      this->HeatCoilBranchNum,
                                                      this->HeatCoilCompNum);
                 //     simulate water coil to find operating capacity
-                WaterCoils::SimulateWaterCoilComponents(state, 
+                WaterCoils::SimulateWaterCoilComponents(state,
                     this->m_HeatingCoilName, FirstHVACIteration, this->m_HeatingCoilIndex, initUnitarySystemsQActual);
                 this->m_DesignHeatingCapacity = initUnitarySystemsQActual;
 
@@ -1143,13 +1147,13 @@ namespace UnitarySystems {
                                                      this->HeatCoilBranchNum,
                                                      this->HeatCoilCompNum);
                 //     simulate steam coil to find operating capacity
-                SteamCoils::SimulateSteamCoilComponents(state, 
+                SteamCoils::SimulateSteamCoilComponents(state,
                     this->m_HeatingCoilName,
                     FirstHVACIteration,
                     this->m_HeatingCoilIndex,
                     1.0,
                     initUnitarySystemsQActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
-                this->m_DesignHeatingCapacity = SteamCoils::GetCoilCapacity(state, 
+                this->m_DesignHeatingCapacity = SteamCoils::GetCoilCapacity(state,
                     DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num), this->m_HeatingCoilName, initUnitarySystemsErrorsFound);
 
             } // from IF(UnitarySystem(UnitarySysNum)%HeatingCoilType_Num == Coil_HeatingSteam) THEN
@@ -1167,7 +1171,7 @@ namespace UnitarySystems {
                 //     simulate water coil to find operating capacity
                 if (mdot > 0.0) { // not sure why this is here and not used for other coil types, wouldn't capacity be 0 if water flow = 0? Maybe a
                                   // speed issue where coil doesn't need to be simulation if mdot=0.
-                    WaterCoils::SimulateWaterCoilComponents(state, 
+                    WaterCoils::SimulateWaterCoilComponents(state,
                         this->m_SuppHeatCoilName, FirstHVACIteration, this->m_SuppHeatCoilIndex, initUnitarySystemsQActual);
                     this->m_DesignSuppHeatingCapacity = initUnitarySystemsQActual;
                 } else {
@@ -1188,7 +1192,7 @@ namespace UnitarySystems {
                                                      this->m_SuppCoilBranchNum,
                                                      this->m_SuppCoilCompNum);
                 //     simulate steam coil to find operating capacity
-                SteamCoils::SimulateSteamCoilComponents(state, 
+                SteamCoils::SimulateSteamCoilComponents(state,
                     this->m_SuppHeatCoilName,
                     FirstHVACIteration,
                     this->m_SuppHeatCoilIndex,
@@ -2421,11 +2425,11 @@ namespace UnitarySystems {
         // Not sure if this may be needed for special cases
         if (this->m_CoolCoilExists && this->m_MaxCoolAirVolFlow < 0.0) {
             if (!DataSizing::SysSizingRunDone) {
-                BranchNum = BranchInputManager::GetAirBranchIndex("AirloopHVAC:UnitarySystem", this->Name);
+                BranchNum = BranchInputManager::GetAirBranchIndex(state.dataBranchInputManager, "AirloopHVAC:UnitarySystem", this->Name);
                 FanType = "";
                 m_FanName = "";
                 BranchFanFlow = 0.0;
-                if (BranchNum > 0.0) BranchInputManager::GetBranchFanTypeName(BranchNum, FanType, m_FanName, ErrFound);
+                if (BranchNum > 0.0) BranchInputManager::GetBranchFanTypeName(state.dataBranchInputManager, BranchNum, FanType, m_FanName, ErrFound);
                 if (!ErrFound && BranchNum > 0) {
                     if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                         BranchFanFlow = HVACFan::fanObjs[this->m_FanIndex]->designAirVolFlowRate;
@@ -2459,7 +2463,7 @@ namespace UnitarySystems {
             // water coils must report their size to parent objects (or split out sizing routines for water coils so they can be call from here)
             if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
                 this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
-                WaterCoils::SimulateWaterCoilComponents(state, 
+                WaterCoils::SimulateWaterCoilComponents(state,
                     this->m_CoolingCoilName, FirstHVACIteration, this->m_CoolingCoilIndex, QActual, this->m_FanOpMode, 1.0);
                 DataSizing::DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(
                     UtilityRoutines::MakeUPPERCase(DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num)), this->m_CoolingCoilName, ErrFound);
@@ -2468,9 +2472,9 @@ namespace UnitarySystems {
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 this->m_DesignCoolingCapacity = DataSizing::AutoSize;
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted) {
-                HXCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, 
+                HXCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state,
                     DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
-                ActualCoolCoilType = HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(state, 
+                ActualCoolCoilType = HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(state,
                     DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound, true);
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state, blankString, true, On, 1.0, this->m_CoolingCoilIndex, 1, false, 1.0, false);
                 DataSizing::DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(
@@ -2492,7 +2496,7 @@ namespace UnitarySystems {
                                                                 0,
                                                                 0.0,
                                                                 FirstHVACIteration);
-                DataSizing::DataConstantUsedForSizing = WaterToAirHeatPumpSimple::GetCoilCapacity(state, 
+                DataSizing::DataConstantUsedForSizing = WaterToAirHeatPumpSimple::GetCoilCapacity(state,
                     DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
                 EqSizing.DesCoolingLoad = DataSizing::DataConstantUsedForSizing;
                 DataSizing::DataFractionUsedForSizing = 1.0;
@@ -2502,7 +2506,8 @@ namespace UnitarySystems {
                     this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP)
                     EqSizing.DesHeatingLoad = DataSizing::DataConstantUsedForSizing;
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHP) {
-                WaterToAirHeatPump::SimWatertoAirHP(blankString,
+                WaterToAirHeatPump::SimWatertoAirHP(state.dataBranchInputManager,
+                                                    blankString,
                                                     this->m_CoolingCoilIndex,
                                                     this->MaxCoolAirMassFlow,
                                                     this->m_FanOpMode,
@@ -2516,7 +2521,7 @@ namespace UnitarySystems {
                                                     0.0,
                                                     0,
                                                     0.0);
-                DataSizing::DataConstantUsedForSizing = WaterToAirHeatPump::GetCoilCapacity(state, 
+                DataSizing::DataConstantUsedForSizing = WaterToAirHeatPump::GetCoilCapacity(state,
                     DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
                 EqSizing.DesCoolingLoad = DataSizing::DataConstantUsedForSizing;
                 DataSizing::DataFractionUsedForSizing = 1.0;
@@ -3178,7 +3183,7 @@ namespace UnitarySystems {
                 bool ZoneInletNodeFound = false;
 
                 // Get AirTerminal mixer data
-                SingleDuct::GetATMixer(thisObjectName,
+                SingleDuct::GetATMixer(state.dataZoneAirLoopEquipmentManager, thisObjectName,
                                        thisSys.m_ATMixerName,
                                        thisSys.m_ATMixerIndex,
                                        thisSys.ATMixerType,
@@ -3784,7 +3789,7 @@ namespace UnitarySystems {
                             errFlag = false;
                         }
 
-                        DXCoils::SetDXCoolingCoilData(state, 
+                        DXCoils::SetDXCoolingCoilData(state,
                             thisSys.m_HeatingCoilIndex, errorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, loc_m_HeatingSizingRatio);
                     }
 
@@ -4428,9 +4433,9 @@ namespace UnitarySystems {
 
                             if (thisSys.m_FanExists) {
                                 errFlag = false;
-                                DXCoils::SetDXCoolingCoilData(state, 
+                                DXCoils::SetDXCoolingCoilData(state,
                                     thisSys.m_CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, loc_m_FanName);
-                                DXCoils::SetDXCoolingCoilData(state, 
+                                DXCoils::SetDXCoolingCoilData(state,
                                     thisSys.m_CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, thisSys.m_FanIndex);
                                 DXCoils::SetDXCoolingCoilData(state, thisSys.m_CoolingCoilIndex,
                                                               errFlag,
@@ -7257,7 +7262,7 @@ namespace UnitarySystems {
                 CompName, FirstHVACIteration, _, this->m_SuppHeatCoilIndex, _, _, this->m_FanOpMode, this->m_SuppHeatPartLoadFrac);
 
         } else if (CoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
-            WaterCoils::SimulateWaterCoilComponents(state, 
+            WaterCoils::SimulateWaterCoilComponents(state,
                 CompName, FirstHVACIteration, this->m_SuppHeatCoilIndex, QActual, this->m_FanOpMode, this->m_SuppHeatPartLoadFrac);
 
         } else if (CoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
@@ -8601,7 +8606,7 @@ namespace UnitarySystems {
                                                                   CompressorONFlag);
                                 }
                                 // Now solve again with tighter PLR limits
-                                TempSolveRoot::SolveRoot(state, 
+                                TempSolveRoot::SolveRoot(state,
                                     0.001, MaxIter, SolFlag, HeatPLR, &this->calcUnitarySystemLoadResidual, TempMinPLR, TempMaxPLR, Par);
                                 this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                               FirstHVACIteration,
@@ -8662,7 +8667,7 @@ namespace UnitarySystems {
                                     TempSysOutput = TempSensOutput;
                                 }
                                 // Now solve again with tighter PLR limits
-                                TempSolveRoot::SolveRoot(state, 
+                                TempSolveRoot::SolveRoot(state,
                                     0.001, MaxIter, SolFlag, CoolPLR, &this->calcUnitarySystemLoadResidual, TempMinPLR, TempMaxPLR, Par);
                                 this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                               FirstHVACIteration,
@@ -10210,7 +10215,7 @@ namespace UnitarySystems {
                     Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, FanSpeedRatio);
                 }
                 if (this->m_CoolCoilExists) {
-                    this->calcUnitaryCoolingSystem(state, 
+                    this->calcUnitaryCoolingSystem(state,
                         AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn);
                 }
                 if (this->m_HeatCoilExists) {
@@ -10259,7 +10264,7 @@ namespace UnitarySystems {
                     }
                 }
                 if (this->m_CoolCoilExists) {
-                    this->calcUnitaryCoolingSystem(state, 
+                    this->calcUnitaryCoolingSystem(state,
                         AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn);
                 }
             }
@@ -10525,7 +10530,7 @@ namespace UnitarySystems {
                 HeatingActive = false; // set to arbitrary value on entry to function
                 CoolingActive = false; // set to arbitrary value on entry to function
 
-                UserDefinedComponents::SimCoilUserDefined(CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
+                UserDefinedComponents::SimCoilUserDefined(state.dataBranchInputManager, CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWater) || (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterDetailed)) {
 
@@ -10593,7 +10598,8 @@ namespace UnitarySystems {
                     DataHVACGlobals::OnOffFanPartLoadFraction = PartLoadRatio / this->m_WSHPRuntimeFrac;
                 }
 
-                WaterToAirHeatPump::SimWatertoAirHP(blankString,
+                WaterToAirHeatPump::SimWatertoAirHP(state.dataBranchInputManager,
+                                                    blankString,
                                                     this->m_CoolingCoilIndex,
                                                     this->MaxCoolAirMassFlow,
                                                     this->m_FanOpMode,
@@ -10684,7 +10690,7 @@ namespace UnitarySystems {
                 HeatingActive = false; // set to arbitrary value on entry to function
                 CoolingActive = true;  // set to arbitrary value on entry to function
 
-                UserDefinedComponents::SimCoilUserDefined(CompName, this->m_HeatingCoilIndex, AirLoopNum, HeatingActive, CoolingActive);
+                UserDefinedComponents::SimCoilUserDefined(state.dataBranchInputManager, CompName, this->m_HeatingCoilIndex, AirLoopNum, HeatingActive, CoolingActive);
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
@@ -10792,7 +10798,8 @@ namespace UnitarySystems {
                     DataHVACGlobals::OnOffFanPartLoadFraction = PartLoadRatio / this->m_WSHPRuntimeFrac;
                 }
 
-                WaterToAirHeatPump::SimWatertoAirHP(blankString,
+                WaterToAirHeatPump::SimWatertoAirHP(state.dataBranchInputManager,
+                                                    blankString,
                                                     this->m_HeatingCoilIndex,
                                                     this->MaxHeatAirMassFlow,
                                                     this->m_FanOpMode,
@@ -10910,7 +10917,7 @@ namespace UnitarySystems {
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
                 mdot = min(DataLoopNode::Node(this->m_SuppCoilFluidOutletNodeNum).MassFlowRateMaxAvail, this->m_MaxSuppCoilFluidFlow * PartLoadRatio);
                 DataLoopNode::Node(this->m_SuppCoilFluidInletNode).MassFlowRate = mdot;
-                SteamCoils::SimulateSteamCoilComponents(state, 
+                SteamCoils::SimulateSteamCoilComponents(state,
                     CompName, FirstHVACIteration, this->m_SuppHeatCoilIndex, SuppHeatCoilLoad, _, this->m_FanOpMode, PartLoadRatio);
 
             } else {
@@ -11073,7 +11080,7 @@ namespace UnitarySystems {
 
                 } else if (CoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
 
-                    this->simMultiSpeedCoils(state, 
+                    this->simMultiSpeedCoils(state,
                         AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, CoolingCoil, this->m_SpeedNum);
 
                 } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
@@ -11122,7 +11129,8 @@ namespace UnitarySystems {
 
                 } else if (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHP) {
 
-                    WaterToAirHeatPump::SimWatertoAirHP(blankString,
+                    WaterToAirHeatPump::SimWatertoAirHP(state.dataBranchInputManager,
+                                                        blankString,
                                                         this->m_CoolingCoilIndex,
                                                         this->MaxCoolAirMassFlow,
                                                         FanOpMode,
@@ -11141,7 +11149,7 @@ namespace UnitarySystems {
 
                     HeatingActive = false; // set to arbitrary value on entry to function
                     CoolingActive = true;  // set to arbitrary value on entry to function
-                    UserDefinedComponents::SimCoilUserDefined(CompName, this->m_CoolingCoilIndex, AirLoopNum, HeatingActive, CoolingActive);
+                    UserDefinedComponents::SimCoilUserDefined(state.dataBranchInputManager, CompName, this->m_CoolingCoilIndex, AirLoopNum, HeatingActive, CoolingActive);
                     if (CoolingActive) PartLoadFrac = 1.0;
 
                 } else if (CoilType_Num == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling) {
@@ -11204,7 +11212,7 @@ namespace UnitarySystems {
                             if (SpeedNum > 1) CycRatio = 0.0;
                             if (SpeedNum > 1) SpeedRatio = 1.0;
                             this->m_CoolingSpeedNum = SpeedNum;
-                            this->simMultiSpeedCoils(state, 
+                            this->simMultiSpeedCoils(state,
                                 AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, CoolingCoil, SpeedNum);
                             OutletTemp = DataLoopNode::Node(OutletNode).Temp;
                             if (OutletTemp < DesOutTemp && SensibleLoad) break;
@@ -11276,7 +11284,8 @@ namespace UnitarySystems {
 
                     } else if (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHP) {
 
-                        WaterToAirHeatPump::SimWatertoAirHP(blankString,
+                        WaterToAirHeatPump::SimWatertoAirHP(state.dataBranchInputManager,
+                                                            blankString,
                                                             this->m_CoolingCoilIndex,
                                                             this->MaxCoolAirMassFlow,
                                                             FanOpMode,
@@ -11295,7 +11304,7 @@ namespace UnitarySystems {
                         HeatingActive = false; // set to arbitrary value on entry to function
                         CoolingActive = false; // set to arbitrary value on entry to function
 
-                        UserDefinedComponents::SimCoilUserDefined(CompName, this->m_CoolingCoilIndex, AirLoopNum, HeatingActive, CoolingActive);
+                        UserDefinedComponents::SimCoilUserDefined(state.dataBranchInputManager, CompName, this->m_CoolingCoilIndex, AirLoopNum, HeatingActive, CoolingActive);
                         if (CoolingActive) PartLoadFrac = 1.0;
 
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling) {
@@ -11807,7 +11816,7 @@ namespace UnitarySystems {
                                         OutletHumRatDXCoil = HVACHXAssistedCoolingCoil::HXAssistedCoilOutletHumRat(this->m_CoolingCoilIndex);
                                     }
                                     //                   tighter boundary of solution has been found, CALL RegulaFalsi a second time
-                                    TempSolveRoot::SolveRoot(state, 
+                                    TempSolveRoot::SolveRoot(state,
                                         HumRatAcc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilHRResidual, TempMinPLR, TempMaxPLR, Par);
                                     if (SolFla == -1) {
                                         if (!DataGlobals::WarmupFlag) {
@@ -12311,14 +12320,14 @@ namespace UnitarySystems {
 
                     } else if (SELECT_CASE_var == DataHVACGlobals::Coil_UserDefined) { // do nothing, user defined coil cannot be controlled
 
-                        UserDefinedComponents::SimCoilUserDefined(CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
+                        UserDefinedComponents::SimCoilUserDefined(state.dataBranchInputManager, CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
                         if (HeatingActive) PartLoadFrac = 1.0;
 
                     } else if ((SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedHeating) ||
                                (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric_MultiStage) ||
                                (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGas_MultiStage)) {
 
-                        this->simMultiSpeedCoils(state, 
+                        this->simMultiSpeedCoils(state,
                             AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, this->m_SpeedNum);
 
                     } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) ||
@@ -12342,7 +12351,7 @@ namespace UnitarySystems {
                                (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric) ||
                                (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater)) {
 
-                        HeatingCoils::SimulateHeatingCoilComponents(state, 
+                        HeatingCoils::SimulateHeatingCoilComponents(state,
                             CompName, FirstHVACIteration, DataLoopNode::SensedLoadFlagValue, CompIndex, _, _, FanOpMode);
 
                     } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
@@ -12380,7 +12389,8 @@ namespace UnitarySystems {
 
                     } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHP) {
 
-                        WaterToAirHeatPump::SimWatertoAirHP(blankString,
+                        WaterToAirHeatPump::SimWatertoAirHP(state.dataBranchInputManager,
+                                                            blankString,
                                                             CompIndex,
                                                             this->MaxHeatAirMassFlow,
                                                             FanOpMode,
@@ -12433,7 +12443,7 @@ namespace UnitarySystems {
                                 if (SpeedNum > 1) CycRatio = 0.0;
                                 if (SpeedNum > 1) SpeedRatio = 1.0;
                                 this->m_HeatingSpeedNum = SpeedNum;
-                                this->simMultiSpeedCoils(state, 
+                                this->simMultiSpeedCoils(state,
                                     AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, SpeedNum);
                                 OutletTemp = DataLoopNode::Node(OutletNode).Temp;
                                 if (OutletTemp > DesOutTemp && SensibleLoad) break;
@@ -12449,7 +12459,7 @@ namespace UnitarySystems {
                             this->m_HeatingPartLoadFrac = PartLoadFrac;
                             for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedHeating; ++SpeedNum) {
                                 this->m_HeatingSpeedNum = SpeedNum;
-                                this->simMultiSpeedCoils(state, 
+                                this->simMultiSpeedCoils(state,
                                     AirLoopNum, FirstHVACIteration, CompOn, SensibleLoad, LatentLoad, PartLoadFrac, HeatingCoil, SpeedNum);
                                 OutletTemp = DataLoopNode::Node(OutletNode).Temp;
                                 SpeedRatio = double(SpeedNum) - 1.0;
@@ -12485,7 +12495,7 @@ namespace UnitarySystems {
                         } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) ||
                                    (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
 
-                            HeatingCoils::SimulateHeatingCoilComponents(state, 
+                            HeatingCoils::SimulateHeatingCoilComponents(state,
                                 CompName, FirstHVACIteration, this->m_DesignHeatingCapacity, CompIndex, _, _, FanOpMode);
 
                         } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater) {
@@ -12543,7 +12553,8 @@ namespace UnitarySystems {
                             this->m_CompPartLoadRatio = PartLoadFrac;
 
                         } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHP) {
-                            WaterToAirHeatPump::SimWatertoAirHP(blankString,
+                            WaterToAirHeatPump::SimWatertoAirHP(state.dataBranchInputManager,
+                                                                blankString,
                                                                 CompIndex,
                                                                 this->MaxHeatAirMassFlow,
                                                                 FanOpMode,
@@ -12622,7 +12633,7 @@ namespace UnitarySystems {
 
                             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) {
 
-                                HeatingCoils::SimulateHeatingCoilComponents(state, 
+                                HeatingCoils::SimulateHeatingCoilComponents(state,
                                     this->m_HeatingCoilName, FirstHVACIteration, ReqOutput, CompIndex, _, true, FanOpMode, PartLoadFrac);
                                 PartLoadFrac = ReqOutput / FullOutput;
                                 HeatCoilLoad = ReqOutput;
@@ -12910,7 +12921,7 @@ namespace UnitarySystems {
                                                                 PartLoadFrac); // QCoilReq, simulate any load > 0 to get max capacity
 
                     } else if (SELECT_CASE_var == DataHVACGlobals::Coil_UserDefined) { // do nothing, user defined coil cannot be controlled
-                        UserDefinedComponents::SimCoilUserDefined(CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
+                        UserDefinedComponents::SimCoilUserDefined(state.dataBranchInputManager, CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
                         if (HeatingActive) PartLoadFrac = 1.0;
 
                     } else {
@@ -13050,7 +13061,7 @@ namespace UnitarySystems {
                                     min(1.0,
                                         ((mdot / this->m_MaxSuppCoilFluidFlow) +
                                          0.001)); // plant can limit flow and RegulaFalsi could hit max iteration limit (leave a little slop, 0.001)
-                                TempSolveRoot::SolveRoot(state, 
+                                TempSolveRoot::SolveRoot(state,
                                     Acc, SolveMaxIter, SolFla, PartLoadFrac, this->hotWaterHeatingCoilResidual, 0.0, maxPartLoadFrac, Par);
 
                             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
@@ -13866,7 +13877,7 @@ namespace UnitarySystems {
             Real64 mdot =
                 min(DataLoopNode::Node(thisSys.HeatCoilFluidOutletNodeNum).MassFlowRateMaxAvail, thisSys.MaxHeatCoilFluidFlow * PartLoadFrac);
             DataLoopNode::Node(thisSys.HeatCoilFluidInletNode).MassFlowRate = mdot;
-            WaterCoils::SimulateWaterCoilComponents(state, 
+            WaterCoils::SimulateWaterCoilComponents(state,
                 thisSys.m_HeatingCoilName, FirstHVACIteration, thisSys.m_HeatingCoilIndex, QActual, thisSys.m_FanOpMode, PartLoadFrac);
             OutletAirTemp = DataLoopNode::Node(thisSys.HeatCoilOutletNodeNum).Temp;
         } else {
@@ -14118,7 +14129,7 @@ namespace UnitarySystems {
         bool FirstHVACIteration = (Par[3] > 0.0);
         bool HXUnitOn = (Par[4] == 1.0);
         int FanOpMode = int(Par[5]);
-        HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(state, 
+        HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(state,
             CoilIndex, FirstHVACIteration, On, PartLoadRatio, HXUnitOn, FanOpMode, _, economizerFlag);
         Real64 OutletAirHumRat = HVACHXAssistedCoolingCoil::HXAssistedCoilOutletHumRat(CoilIndex);
         Residuum = Par[2] - OutletAirHumRat;
@@ -15046,12 +15057,12 @@ namespace UnitarySystems {
         if (!SuppHeatingCoilFlag) {
             mdot = min(DataLoopNode::Node(thisSys.HeatCoilFluidOutletNodeNum).MassFlowRateMaxAvail, thisSys.MaxHeatCoilFluidFlow * PartLoadFrac);
             DataLoopNode::Node(thisSys.HeatCoilFluidInletNode).MassFlowRate = mdot;
-            SteamCoils::SimulateSteamCoilComponents(state, 
+            SteamCoils::SimulateSteamCoilComponents(state,
                 thisSys.m_HeatingCoilName, FirstHVACIteration, thisSys.m_HeatingCoilIndex, 1.0, _, thisSys.m_FanOpMode, PartLoadFrac);
         } else {
             mdot = min(DataLoopNode::Node(thisSys.m_SuppCoilFluidOutletNodeNum).MassFlowRateMaxAvail, thisSys.m_MaxSuppCoilFluidFlow * PartLoadFrac);
             DataLoopNode::Node(thisSys.m_SuppCoilFluidInletNode).MassFlowRate = mdot;
-            SteamCoils::SimulateSteamCoilComponents(state, 
+            SteamCoils::SimulateSteamCoilComponents(state,
                 thisSys.m_SuppHeatCoilName, FirstHVACIteration, thisSys.m_SuppHeatCoilIndex, 1.0, _, thisSys.m_FanOpMode, PartLoadFrac);
         }
         OutletAirTemp = DataLoopNode::Node(thisSys.HeatCoilOutletNodeNum).Temp; // RR this should be supp coil
@@ -15122,7 +15133,8 @@ namespace UnitarySystems {
                                                             PartLoadRatio,
                                                             FirstHVACIteration);
         } else {
-            WaterToAirHeatPump::SimWatertoAirHP(blankString,
+            WaterToAirHeatPump::SimWatertoAirHP(state.dataBranchInputManager,
+                                                blankString,
                                                 thisSys.m_HeatingCoilIndex,
                                                 thisSys.MaxHeatAirMassFlow,
                                                 thisSys.m_FanOpMode,
@@ -15196,7 +15208,8 @@ namespace UnitarySystems {
                                                             PartLoadRatio,
                                                             FirstHVACIteration);
         } else {
-            WaterToAirHeatPump::SimWatertoAirHP(blankString,
+            WaterToAirHeatPump::SimWatertoAirHP(state.dataBranchInputManager,
+                                                blankString,
                                                 thisSys.m_CoolingCoilIndex,
                                                 thisSys.MaxCoolAirMassFlow,
                                                 thisSys.m_FanOpMode,
@@ -15278,7 +15291,8 @@ namespace UnitarySystems {
                                                             PartLoadRatio,
                                                             FirstHVACIteration);
         } else {
-            WaterToAirHeatPump::SimWatertoAirHP(blankString,
+            WaterToAirHeatPump::SimWatertoAirHP(state.dataBranchInputManager,
+                                                blankString,
                                                 thisSys.m_CoolingCoilIndex,
                                                 thisSys.MaxCoolAirMassFlow,
                                                 thisSys.m_FanOpMode,

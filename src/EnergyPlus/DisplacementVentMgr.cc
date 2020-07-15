@@ -54,7 +54,7 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Elements.hpp>
+//#include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -73,6 +73,8 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 
 namespace EnergyPlus {
 
@@ -131,7 +133,7 @@ namespace DisplacementVentMgr {
 
     // Functions
 
-    void ManageUCSDDVModel(int const ZoneNum) // index number for the specified zone
+    void ManageUCSDDVModel(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -174,7 +176,7 @@ namespace DisplacementVentMgr {
         InitUCSDDV(ZoneNum);
 
         // perform Displacement Ventilation model calculations
-        CalcUCSDDV(ZoneNum);
+        CalcUCSDDV(dataConvectionCoefficients, ZoneNum);
     }
 
     //**************************************************************************************************
@@ -253,7 +255,7 @@ namespace DisplacementVentMgr {
 
     //**************************************************************************************************
 
-    void HcUCSDDV(int const ZoneNum, Real64 const FractionHeight)
+    void HcUCSDDV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum, Real64 const FractionHeight)
     {
 
         // SUBROUTINE INFORMATION:
@@ -311,7 +313,7 @@ namespace DisplacementVentMgr {
                 // The Wall surface is in the upper subzone
                 if (ZInfSurf > LayH) {
                     TempEffBulkAir(SurfNum) = ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                    CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                     HWall(Ctd) = DVHcIn(SurfNum);
                     HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWall(Ctd);
                     HA_MX += Surface(SurfNum).Area * HWall(Ctd);
@@ -320,7 +322,7 @@ namespace DisplacementVentMgr {
                 // The Wall surface is in the lower subzone
                 if (ZSupSurf < LayH) {
                     TempEffBulkAir(SurfNum) = ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                    CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                     HWall(Ctd) = DVHcIn(SurfNum);
                     HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWall(Ctd);
                     HA_OC += Surface(SurfNum).Area * HWall(Ctd);
@@ -329,10 +331,10 @@ namespace DisplacementVentMgr {
                 // The Wall surface is partially in upper and partially in lower subzone
                 if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
                     TempEffBulkAir(SurfNum) = ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                    CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                     HLU = DVHcIn(SurfNum);
                     TempEffBulkAir(SurfNum) = ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                    CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                     HLD = DVHcIn(SurfNum);
                     TmedDV = ((ZSupSurf - LayH) * ZTMX(ZoneNum) + (LayH - ZInfSurf) * ZTOC(ZoneNum)) / (ZSupSurf - ZInfSurf);
                     HWall(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
@@ -360,7 +362,7 @@ namespace DisplacementVentMgr {
 
                     if (ZInfSurf > LayH) {
                         TempEffBulkAir(SurfNum) = ZTMX(ZoneNum);
-                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                        CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                         HWindow(Ctd) = DVHcIn(SurfNum);
                         HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
                         HA_MX += Surface(SurfNum).Area * HWindow(Ctd);
@@ -368,7 +370,7 @@ namespace DisplacementVentMgr {
 
                     if (ZSupSurf < LayH) {
                         TempEffBulkAir(SurfNum) = ZTOC(ZoneNum);
-                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                        CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                         HWindow(Ctd) = DVHcIn(SurfNum);
                         HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
                         HA_OC += Surface(SurfNum).Area * HWindow(Ctd);
@@ -376,10 +378,10 @@ namespace DisplacementVentMgr {
 
                     if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
                         TempEffBulkAir(SurfNum) = ZTMX(ZoneNum);
-                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                        CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                         HLU = DVHcIn(SurfNum);
                         TempEffBulkAir(SurfNum) = ZTOC(ZoneNum);
-                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                        CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                         HLD = DVHcIn(SurfNum);
                         TmedDV = ((ZSupSurf - LayH) * ZTMX(ZoneNum) + (LayH - ZInfSurf) * ZTOC(ZoneNum)) / (ZSupSurf - ZInfSurf);
                         HWindow(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
@@ -393,7 +395,7 @@ namespace DisplacementVentMgr {
 
                 if (Surface(SurfNum).Tilt <= 10.0) { // Window Ceiling
                     TempEffBulkAir(SurfNum) = ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                    CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                     HWindow(Ctd) = DVHcIn(SurfNum);
                     HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
                     HA_MX += Surface(SurfNum).Area * HWindow(Ctd);
@@ -401,7 +403,7 @@ namespace DisplacementVentMgr {
 
                 if (Surface(SurfNum).Tilt >= 170.0) { // Window Floor
                     TempEffBulkAir(SurfNum) = ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                    CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                     HWindow(Ctd) = DVHcIn(SurfNum);
                     HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
                     HA_OC += Surface(SurfNum).Area * HWindow(Ctd);
@@ -424,7 +426,7 @@ namespace DisplacementVentMgr {
 
                     if (ZInfSurf > LayH) {
                         TempEffBulkAir(SurfNum) = ZTMX(ZoneNum);
-                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                        CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                         HDoor(Ctd) = DVHcIn(SurfNum);
                         HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HDoor(Ctd);
                         HA_MX += Surface(SurfNum).Area * HDoor(Ctd);
@@ -432,7 +434,7 @@ namespace DisplacementVentMgr {
 
                     if (ZSupSurf < LayH) {
                         TempEffBulkAir(SurfNum) = ZTOC(ZoneNum);
-                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                        CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                         HDoor(Ctd) = DVHcIn(SurfNum);
                         HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HDoor(Ctd);
                         HA_OC += Surface(SurfNum).Area * HDoor(Ctd);
@@ -440,10 +442,10 @@ namespace DisplacementVentMgr {
 
                     if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
                         TempEffBulkAir(SurfNum) = ZTMX(ZoneNum);
-                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                        CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                         HLU = DVHcIn(SurfNum);
                         TempEffBulkAir(SurfNum) = ZTOC(ZoneNum);
-                        CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                        CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                         HLD = DVHcIn(SurfNum);
                         TmedDV = ((ZSupSurf - LayH) * ZTMX(ZoneNum) + (LayH - ZInfSurf) * ZTOC(ZoneNum)) / (ZSupSurf - ZInfSurf);
                         HDoor(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
@@ -457,7 +459,7 @@ namespace DisplacementVentMgr {
 
                 if (Surface(SurfNum).Tilt <= 10.0) { // Door Ceiling
                     TempEffBulkAir(SurfNum) = ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                    CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                     HDoor(Ctd) = DVHcIn(SurfNum);
                     HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HDoor(Ctd);
                     HA_MX += Surface(SurfNum).Area * HDoor(Ctd);
@@ -465,7 +467,7 @@ namespace DisplacementVentMgr {
 
                 if (Surface(SurfNum).Tilt >= 170.0) { // Door Floor
                     TempEffBulkAir(SurfNum) = ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                    CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                     HDoor(Ctd) = DVHcIn(SurfNum);
                     HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HDoor(Ctd);
                     HA_OC += Surface(SurfNum).Area * HDoor(Ctd);
@@ -486,7 +488,7 @@ namespace DisplacementVentMgr {
 
                 if (ZSupSurf < LayH) {
                     TempEffBulkAir(SurfNum) = ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                    CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                     HInternal(Ctd) = DVHcIn(SurfNum);
                     HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HInternal(Ctd);
                     HA_OC += Surface(SurfNum).Area * HInternal(Ctd);
@@ -494,10 +496,10 @@ namespace DisplacementVentMgr {
 
                 if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
                     TempEffBulkAir(SurfNum) = ZTMX(ZoneNum);
-                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                    CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                     HLU = DVHcIn(SurfNum);
                     TempEffBulkAir(SurfNum) = ZTOC(ZoneNum);
-                    CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                    CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                     HLD = DVHcIn(SurfNum);
                     TmedDV = ((ZSupSurf - LayH) * ZTMX(ZoneNum) + (LayH - ZInfSurf) * ZTOC(ZoneNum)) / (ZSupSurf - ZInfSurf);
                     HInternal(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
@@ -517,7 +519,7 @@ namespace DisplacementVentMgr {
                 Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
                 TempEffBulkAir(SurfNum) = ZTMX(ZoneNum);
-                CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                 HCeiling(Ctd) = DVHcIn(SurfNum);
                 HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HCeiling(Ctd);
                 HA_MX += Surface(SurfNum).Area * HCeiling(Ctd);
@@ -530,7 +532,7 @@ namespace DisplacementVentMgr {
                 Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
                 TempEffBulkAir(SurfNum) = ZTFloor(ZoneNum);
-                CalcDetailedHcInForDVModel(SurfNum, TempSurfIn, DVHcIn);
+                CalcDetailedHcInForDVModel(dataConvectionCoefficients, SurfNum, TempSurfIn, DVHcIn);
                 HFloor(Ctd) = DVHcIn(SurfNum);
                 HAT_FLOOR += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HFloor(Ctd);
                 HA_FLOOR += Surface(SurfNum).Area * HFloor(Ctd);
@@ -557,7 +559,7 @@ namespace DisplacementVentMgr {
                (elevenOverSix * airCap + HA_floor + 1.6 * MCp_Total);
     }
 
-    void CalcUCSDDV(int const ZoneNum) // Which Zonenum
+    void CalcUCSDDV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum) // Which Zonenum
     {
 
         // SUBROUTINE INFORMATION:
@@ -745,8 +747,8 @@ namespace DisplacementVentMgr {
         SumMCpT =
             MCPTI(ZoneNum) + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) + MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
         if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
-            SumMCp = AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMCp + AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMMCp;
-            SumMCpT = AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMCpT + AirflowNetwork::AirflowNetworkExchangeData(ZoneNum).SumMMCpT;
+            SumMCp = dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMCp + dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMMCp;
+            SumMCpT = dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMCpT + dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMMCpT;
         }
 
         MCp_Total = SumMCp + SumSysMCp;
@@ -853,7 +855,7 @@ namespace DisplacementVentMgr {
             Real64 const plume_fac(NumberOfPlumes * std::pow(PowerPerPlume, OneThird));
             HeightFrac = min(24.55 * std::pow(MCp_Total * 0.000833 / plume_fac, 0.6) / CeilingHeight, 1.0);
             for (Ctd = 1; Ctd <= 4; ++Ctd) {
-                HcUCSDDV(ZoneNum, HeightFrac);
+                HcUCSDDV(dataConvectionCoefficients, ZoneNum, HeightFrac);
                 // HeightFrac = min( 24.55 * std::pow( MCp_Total * 0.000833 / ( NumberOfPlumes * std::pow( PowerPerPlume, OneThird ) ), 0.6 ) /
                 // CeilingHeight, 1.0 ); //Tuned This does not vary in loop  EPTeam-replaces above (cause diffs)      HeightFrac =
                 // MIN(24.55d0*(MCp_Total*0.000833d0/(NumberOfPlumes*PowerPerPlume**(1.0d0/3.d0)))**0.6 / CeilingHeight , 1.0d0)
@@ -1010,7 +1012,7 @@ namespace DisplacementVentMgr {
                 ZTOC(ZoneNum) = ZTAveraged;
                 ZTMX(ZoneNum) = ZTAveraged;
                 ZTFloor(ZoneNum) = ZTAveraged;
-                HcUCSDDV(ZoneNum, HeightFrac);
+                HcUCSDDV(dataConvectionCoefficients, ZoneNum, HeightFrac);
                 TempDepCoef = HA_MX + HA_OC + HA_FLOOR + MCp_Total;
                 TempIndCoef = ConvGains + HAT_MX + HAT_OC + HAT_FLOOR + MCpT_Total;
                 {

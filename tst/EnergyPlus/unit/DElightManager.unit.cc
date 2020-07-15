@@ -303,10 +303,10 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
 
     bool foundErrors = false;
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state.outputFiles, foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(foundErrors); // read construction data
@@ -324,7 +324,7 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.outputFiles, foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()

@@ -777,7 +777,7 @@ namespace MixedAir {
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == Coil_UserDefined) {
                 if (Sim) {
-                    SimCoilUserDefined(CompName, CompIndex, AirLoopNum, OAHeatingCoil, OACoolingCoil);
+                    SimCoilUserDefined(state.dataBranchInputManager, CompName, CompIndex, AirLoopNum, OAHeatingCoil, OACoolingCoil);
                 }
                 // Heat recovery
             } else if (SELECT_CASE_var == HeatXchngr) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent',
@@ -837,7 +837,7 @@ namespace MixedAir {
                 // Unglazed Transpired Solar Collector
             } else if (SELECT_CASE_var == Unglazed_SolarCollector) { // 'SolarCollector:UnglazedTranspired'
                 if (Sim) {
-                    SimTranspiredCollector(CompName, CompIndex);
+                    SimTranspiredCollector(state.dataConvectionCoefficients, CompName, CompIndex);
                 }
 
                 // Air-based Photovoltaic-thermal flat plate collector
@@ -4414,7 +4414,7 @@ namespace MixedAir {
         }
     }
 
-    void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state, 
+    void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
         int const AirLoopNum, Real64 const OutAirMinFrac, Real64 &OASignal, bool &HighHumidityOperationFlag, bool const FirstHVACIteration)
     {
         using DataAirLoop::OutsideAirSys;

@@ -13,6 +13,8 @@ if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
   CMAKE_POLICY(SET CMP0054 NEW) # CMake 3.1 added this policy
 endif()
 
+cmake_policy(SET CMP0012 NEW)  # if() recognizes boolean constants
+
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
 set( CMAKE_POSITION_INDEPENDENT_CODE ON )
@@ -103,8 +105,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     "MinSizeRel" "RelWithDebInfo")
 endif()
 
-# we are making *a Python 3 Interpreter* a required dependency, so find it here
-find_package(PythonInterp 3 REQUIRED)
+# we are making *a Python 3.6 Interpreter* a required dependency, so find it here
+find_package(PythonInterp 3.6 REQUIRED)
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
@@ -319,9 +321,9 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
   set(TRANSITION_EXTRA_FLAGS "-DCMAKE_VERSION_MAJOR:STRING=${CMAKE_VERSION_MAJOR}" "-DCMAKE_VERSION_MINOR:STRING=${CMAKE_VERSION_MINOR}" "-DCMAKE_VERSION_PATCH:STRING=${CMAKE_VERSION_PATCH}")
   cmake_add_fortran_subdirectory(src/Transition PROJECT Transition CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS} NO_EXTERNAL_INSTALL )
-  file( COPY "idd/V9-2-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
-  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-3-0-Energy+.idd" )
-  file( COPY "src/Transition/SupportFiles/Report Variables 9-2-0 to 9-3-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  file( COPY "idd/V9-3-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-4-0-Energy+.idd" )
+  file( COPY "src/Transition/SupportFiles/Report Variables 9-3-0 to 9-4-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
   cmake_add_fortran_subdirectory(src/Basement PROJECT Basement NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/HVAC-Diagram PROJECT HVAC-Diagram NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
@@ -337,6 +339,7 @@ if( BUILD_PACKAGE )
 endif()
 
 if (BUILD_DOCS)
+  set(DOCS_TESTING ${BUILD_TESTING} CACHE INTERNAL "" FORCE)
   add_subdirectory(doc)
 endif()
 

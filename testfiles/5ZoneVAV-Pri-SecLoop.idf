@@ -3560,6 +3560,8 @@
 
   Output:Variable,*,Boiler Gas Rate,hourly;
 
+  Output:Variable,*,Boiler Efficiency,Hourly;
+
   Output:Variable,*,Cooling Tower Heat Transfer Rate,hourly;
 
   Output:Variable,*,Cooling Tower Fan Electric Power,hourly;

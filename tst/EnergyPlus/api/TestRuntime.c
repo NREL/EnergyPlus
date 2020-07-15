@@ -99,24 +99,24 @@ void errorHandler(const char * message) {
 }
 
 int main(int argc, const char * argv[]) {
-    callbackBeginNewEnvironment(BeginNewEnvironmentHandler);
-    callbackAfterNewEnvironmentWarmupComplete(AfterNewEnvironmentWarmupCompleteHandler);
-    callbackBeginZoneTimeStepBeforeInitHeatBalance(BeginZoneTimeStepBeforeInitHeatBalanceHandler);
-    callbackBeginZoneTimeStepAfterInitHeatBalance(BeginZoneTimeStepAfterInitHeatBalanceHandler);
-    callbackBeginTimeStepBeforePredictor(BeginTimeStepBeforePredictorHandler);
-    callbackAfterPredictorBeforeHVACManagers(AfterPredictorBeforeHVACManagersHandler);
-    callbackAfterPredictorAfterHVACManagers(AfterPredictorAfterHVACManagersHandler);
-    callbackInsideSystemIterationLoop(InsideSystemIterationLoopHandler);
-    callbackEndOfZoneTimeStepBeforeZoneReporting(EndOfZoneTimeStepBeforeZoneReportingHandler);
-    callbackEndOfZoneTimeStepAfterZoneReporting(EndOfZoneTimeStepAfterZoneReportingHandler);
-    callbackEndOfSystemTimeStepBeforeHVACReporting(EndOfSystemTimeStepBeforeHVACReportingHandler);
-    callbackEndOfSystemTimeStepAfterHVACReporting(EndOfSystemTimeStepAfterHVACReportingHandler);
-    callbackEndOfZoneSizing(EndOfZoneSizingHandler);
-    callbackEndOfSystemSizing(EndOfSystemSizingHandler);
-    callbackEndOfAfterComponentGetInput(EndOfAfterComponentGetInputHandler);
-    callbackUnitarySystemSizing(UnitarySystemSizingHandler);
-    registerProgressCallback(progressHandler);
-    registerErrorCallback(errorHandler);
+//    callbackBeginNewEnvironment(BeginNewEnvironmentHandler);
+//    callbackAfterNewEnvironmentWarmupComplete(AfterNewEnvironmentWarmupCompleteHandler);
+//    callbackBeginZoneTimeStepBeforeInitHeatBalance(BeginZoneTimeStepBeforeInitHeatBalanceHandler);
+//    callbackBeginZoneTimeStepAfterInitHeatBalance(BeginZoneTimeStepAfterInitHeatBalanceHandler);
+//    callbackBeginTimeStepBeforePredictor(BeginTimeStepBeforePredictorHandler);
+//    callbackAfterPredictorBeforeHVACManagers(AfterPredictorBeforeHVACManagersHandler);
+//    callbackAfterPredictorAfterHVACManagers(AfterPredictorAfterHVACManagersHandler);
+//    callbackInsideSystemIterationLoop(InsideSystemIterationLoopHandler);
+//    callbackEndOfZoneTimeStepBeforeZoneReporting(EndOfZoneTimeStepBeforeZoneReportingHandler);
+//    callbackEndOfZoneTimeStepAfterZoneReporting(EndOfZoneTimeStepAfterZoneReportingHandler);
+//    callbackEndOfSystemTimeStepBeforeHVACReporting(EndOfSystemTimeStepBeforeHVACReportingHandler);
+//    callbackEndOfSystemTimeStepAfterHVACReporting(EndOfSystemTimeStepAfterHVACReportingHandler);
+//    callbackEndOfZoneSizing(EndOfZoneSizingHandler);
+//    callbackEndOfSystemSizing(EndOfSystemSizingHandler);
+//    callbackEndOfAfterComponentGetInput(EndOfAfterComponentGetInputHandler);
+//    callbackUnitarySystemSizing(UnitarySystemSizingHandler);
+//    registerProgressCallback(progressHandler);
+//    registerErrorCallback(errorHandler);
     energyplus(argc, argv);
     if (numWarnings > 0) {
         printf("There were %d warnings!\n", numWarnings);

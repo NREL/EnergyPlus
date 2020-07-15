@@ -19,24 +19,24 @@
  * under contract with Lawrence Berkeley National Laboratory.
  **************************************************************/
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 
@@ -52,8 +52,7 @@ int CalcInterpolationVars(
 	int *iphs_ptr,		/* sun position altitude interpolation index */
 	int *iths_ptr,		/* sun position azimuth interpolation index */
 	double *phratio_ptr,	/* sun position altitude interpolation displacement ratio */
-	double *thratio_ptr,	/* sun position azimuth interpolation displacement ratio */
-	ofstream* pofdmpfile);	/* ptr to LBLDLL error dump file */
+	double *thratio_ptr);	/* sun position azimuth interpolation displacement ratio */
 
 int	CalcZoneInteriorIllum(
 	ZONE *zone_ptr,			/* bldg->zone data structure pointer */
@@ -63,5 +62,4 @@ int	CalcZoneInteriorIllum(
 	int iphs,		/* sun altitude interpolation lower bound index */
 	int iths,		/* sun azimuth interpolation lower bound index */
 	double phratio,	/* sun altitude interpolation displacement ratio */
-	double thratio,	/* sun azimuth interpolation displacement ratio */
-	ofstream* pofdmpfile);	/* ptr to dump file */
+	double thratio);	/* sun azimuth interpolation displacement ratio */

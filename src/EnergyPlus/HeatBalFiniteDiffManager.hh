@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Material.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -282,7 +283,7 @@ namespace HeatBalFiniteDiffManager {
 
     void adjustPropertiesForPhaseChange(int finiteDifferenceLayerIndex,
                                         int surfaceIndex,
-                                        const DataHeatBalance::MaterialProperties &materialDefinition,
+                                        const Material::MaterialProperties &materialDefinition,
                                         Real64 temperaturePrevious,
                                         Real64 temperatureUpdated,
                                         Real64 &updatedSpecificHeat,

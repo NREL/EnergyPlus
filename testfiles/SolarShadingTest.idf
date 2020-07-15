@@ -2935,6 +2935,8 @@
 
   Output:Variable,*,Zone Mean Radiant Temperature,hourly;
 
+  Output:Variable,*,Surface Outside Face Sunlit Fraction,timestep;
+
   Output:Variable,*,Surface Inside Face Temperature,daily;
 
   Output:Variable,*,Surface Outside Face Temperature,daily;
@@ -2965,3 +2967,10 @@
 
   Output:Surfaces:List,Details;
 
+  ShadowCalculation,
+    PolygonClipping, !- Shading Calculation Method
+    Periodic, !- Shading Calculation Update Frequency Method
+    , !- Shading Calculation Update Frequency
+    , !- Maximum Figures in Shadow Overlap Calculations
+    , !- Polygon Clipping Algorithm
+    ; !- Pixel Counting Resolution

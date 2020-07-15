@@ -84,7 +84,8 @@ The coil is operable in two configurations: \textit{CounterFlow} or \textit{Cros
 
 This field is optional. It is used to describe where condensate from the coil is collected. If blank or omitted, then any coil condensate is discarded. Enter the name of Water Storage Tank object defined elsewhere and the condensate will then be collected in that tank.
 
-\paragraph{Field: Design Water Temperature Difference}\label{field-design-water-temperature-difference}
+\paragraph{Field: Design Water Temperature Difference}
+
 This input field is optional. If specified, it is used for sizing the \textit{Design Water Flow Rate}. If blank or omitted, the \textit{Loop Design Temperature Difference} value specified in \textit{\hyperref[sizingplant]{Sizing:Plant}} object is used for sizing the \textit{Design Water Flow Rate}.
 
 Examples when auto sized in an IDF are as below:
@@ -268,7 +269,7 @@ where,
 
 \emph{A} is the surface area
 
-\paragraph{Field: Design Water Temperature Difference}\label{field-design-water-temperature-difference}
+\paragraph{Field: Design Water Temperature Difference}
 
 This input field is optional. If specified, it is used for sizing the \textit{Design Water Flow Rate}. If blank or omitted, the \textit{Loop Design Temperature Difference} value specified in \textit{\hyperref[sizingplant]{Sizing:Plant}} object is used for sizing the \textit{Design Water Flow Rate}.
 
@@ -1238,7 +1239,7 @@ A unique identifying name for each coil.
 
 Schedule that defines when the coil is available. If the schedule's value is 0.0, then the coil is not available and flow will not be requested. If the schedule's value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods. Schedule values must be \textgreater{} = 0 and \textless{} = 1.
 
-\paragraph{Field: Fuel Type}\label{field-gas-burner-efficiency}
+\paragraph{Field: Fuel Type}
 
 This field designates the appropriate fuel type for the coil. Valid fuel types are: Gas, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, Steam, \hyperref[districtheating]{DistrictHeating}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. NaturalGas is the default.
 
@@ -1825,7 +1826,7 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
        PLF = 1.0 + 0.0(PLR)
 \end{lstlisting}
 
-\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}
 
 This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the default value is -25 °C.
 
@@ -2075,7 +2076,7 @@ This optional alpha field specifies the outdoor air node name used to define the
 
 The type of condenser used by the multi-speed DX cooling coil. Valid choices for this input field are \textbf{AirCooled} or \textbf{EvaporativelyCooled}. The default for this field is \textbf{AirCooled}.
 
-\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}
 
 This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD (e.g., -25 °C). If this field is not included in the input, the default value is -25 °C.
 
@@ -2345,7 +2346,7 @@ This field is optional. It is used to describe where the coil obtains water used
 
 This field is optional. It is used to describe where condensate from the coil is collected. If blank or omitted, then any coil condensate is discarded. Enter the name of Water Storage Tank object defined elsewhere and the condensate will then be collected in that tank.
 
-\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}
 
 This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD (e.g., -25 °C). If this field is not included in the input, the default value is -25 °C.
 
@@ -2446,7 +2447,7 @@ This numeric field defines the crankcase heater capacity in Watts. When the outd
 
 This numeric field defines the outdoor air dry-bulb temperature above which the compressor's crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C. If this input field is left blank, the default value is 10 °C.
 
-\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}
 
 This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD (e.g., -25 °C).
 
@@ -2971,7 +2972,7 @@ This numeric field defines the crankcase heater capacity in Watts. When the outd
 
 This numeric field defines the outdoor air dry-bulb temperature above which the compressor's crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C, and the default value is 10 °C.
 
-\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}
 
 This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD (e.g., -25 °C).
 
@@ -3896,7 +3897,7 @@ This is the average electricity consumption rate of the DX coil compressor's cra
 
 This is the electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Miscellaneous, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-4}
+\paragraph{Heating Coil Runtime Fraction {[]}}
 
 This is the runtime fraction of the DX heating coil compressor and outdoor fan(s) for the timestep being reported.
 
@@ -4195,7 +4196,7 @@ This field is the total heating rate output of the DX coil in Watts. This is det
 
 This is the total heating output of the DX coil in Joules over the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoil, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Heating Coil Electric Power {[}W{]}}\label{heating-coil-electric-power-w-6}
+\paragraph{Heating Coil Electric Power {[}W{]}}
 
 This output variable is the input fuel type power for the heating coil in the unit of Watts, averaged during the report period. If Fuel Type is not Electricity, the value is zero.
 
@@ -4227,7 +4228,7 @@ This is the average electricity consumption rate of the DX coil compressor's cra
 
 This is the electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects). When a companion cooling coil exits, the crankcase heater power of the companion cool coil is alos reported in this variable.
 
-\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-5}
+\paragraph{Heating Coil Runtime Fraction {[]}}
 
 This is the runtime fraction of the DX heating coil compressor and outdoor fan(s) for the timestep being reported. When the heating speed is above 1, this output is the run time fraction for the higher speed.
 
@@ -4598,7 +4599,7 @@ The output variable is the total electric defrosting energy usage of the coil in
 
 The output variable is the average power used for crankcase heater, in Watts over the timestep being reported.
 
-\paragraph{Heating Coil Crankcase Heater Electric Energy {[}J{]}}\label{heating-coil-crankcase-heater-electric-energy-j-2}
+\paragraph{Heating Coil Crankcase Heater Electric Energy {[}J{]}}
 
 The output variable is the total electric energy usage of the coil for crankcase heater, in Joules over the timestep being reported.
 
@@ -4989,7 +4990,7 @@ CoilSystem:Cooling:DX,
 
 The system may operate for the entire system timestep, but to meet the load the compressor can cycle on and off. This reports the fraction of the system timestep that the compressor is operating. (1.0 is continuous, 0.0 is off). For Coil:Cooling:VariableSpeed this description is true when compressor speed = 1. At higher compressor speeds Coil System Cycling Ratio = 1.
 
-\paragraph{Coil System Compressor Speed Ratio}\label{coil-system-compressor-speed-ratio}
+\paragraph{Coil System Compressor Speed Ratio}
 
 This is the ratio of time in a system timestep that the compressor is at rated speed. The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. This report is a duplicate of the report in Coil:Cooling:DX:VaraibleSpeed named Cooling Coil Neighboring Speed Levels Ratio.
 
@@ -6954,7 +6955,7 @@ These output variables are the total latent cooling output of the coil in Joules
 
 The output variable is the total source side heat transfer of the coil in Joules over the timestep being reported
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 \protect\hyperlink{ux5fftnref1}{{[}1{]}} The 23.9 °C wet-bulb temperature condition is not applicable for air-cooled condensers which do not evaporate condensate.
 
