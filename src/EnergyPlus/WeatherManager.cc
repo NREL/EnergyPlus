@@ -305,6 +305,42 @@ namespace WeatherManager {
     std::vector<UnderwaterBoundary> underwaterBoundaries;
     AnnualMonthlyDryBulbWeatherData OADryBulbAverage; // processes outside air drybulb temperature NOLINT(cert-err58-cpp)
 
+    // ManageWeather static vars
+    bool PrintEnvrnStamp(false); // Set to true when the environment header should be printed
+
+    // InitializeWeather static vars
+    bool FirstCall(true);
+    bool WaterMainsParameterReport(true);
+
+    // SetCurrentWeather static vars
+    int NextHour;
+
+    // ReadEPlusWeatherForDay static vars
+    int CurDayOfWeek;
+    Real64 ReadEPlusWeatherCurTime;
+    bool LastHourSet;
+    Real64 LastHrOutDryBulbTemp;
+    Real64 LastHrOutDewPointTemp;
+    Real64 LastHrOutBaroPress;
+    Real64 LastHrOutRelHum;
+    Real64 LastHrWindSpeed;
+    Real64 LastHrWindDir;
+    Real64 LastHrSkyTemp;
+    Real64 LastHrHorizIRSky;
+    Real64 LastHrBeamSolarRad;
+    Real64 LastHrDifSolarRad;
+    Real64 LastHrAlbedo;
+    Real64 LastHrLiquidPrecip;
+    Real64 NextHrBeamSolarRad;
+    Real64 NextHrDifSolarRad;
+    Real64 NextHrLiquidPrecip;
+
+    // SetUpDesignDay static vars
+    bool PrintDDHeader;
+
+    // ProcessEPWHeader static vars
+    std::string EPWHeaderTitle;
+
     // MODULE SUBROUTINES:
 
     // Functions
@@ -471,6 +507,28 @@ namespace WeatherManager {
 
         underwaterBoundaries.clear();
 
+        // ManageWeather static vars
+        PrintEnvrnStamp = false;
+
+        // InitializeWeather static vars
+        FirstCall = true;
+        WaterMainsParameterReport = true;
+
+        // SetCurrentWeather static vars
+        NextHour = 1;
+
+        // ReadEPlusWeatherForDay static vars
+        CurDayOfWeek = 1;
+        ReadEPlusWeatherCurTime = 1.0;
+        LastHourSet = false;
+
+        // SetUpDesignDay static vars
+        PrintDDHeader = true;
+
+        // ProcessEPWHeader static vars
+        EPWHeaderTitle = "";
+
+
     } // clear_state, for unit tests
 
     void ManageWeather()
@@ -489,8 +547,6 @@ namespace WeatherManager {
 
         // METHODOLOGY EMPLOYED:
         // Standard EnergyPlus "manager" methodology.
-
-        static bool PrintEnvrnStamp(false); // Set to true when the environment header should be printed
 
         // FLOW:
 
@@ -1853,8 +1909,6 @@ namespace WeatherManager {
         int Loop;
         int FirstSimDayofYear; // Variable which tells when to skip the day in a multi year simulation.
 
-        static bool FirstCall(true);                 // Some things should only be done once
-        static bool WaterMainsParameterReport(true); // should only be done once
         int JDay5Start;
         int JDay5End;
         int TWeekDay;
@@ -2206,12 +2260,8 @@ namespace WeatherManager {
         // day boundary (current hour = 24), the next hour is hour 1 of next
         // weather data day (Tomorrow%).
 
-        static char time_stamp[10];
-        static char day_stamp[6];
-        static char day_year_stamp[11];
         static std::string const RoutineName("SetCurrentWeather");
 
-        static int NextHour;
         Real64 TempVal;
         Real64 TempDPVal;
 
@@ -2227,11 +2277,15 @@ namespace WeatherManager {
 
         ScheduleManager::UpdateScheduleValues();
 
+        char time_stamp[10];
         std::sprintf(time_stamp, "%02d/%02d %02hu", DataEnvironment::Month, DataEnvironment::DayOfMonth, (unsigned short)(DataGlobals::HourOfDay - 1));
-
         DataEnvironment::CurMnDyHr = time_stamp;
+
+        char day_stamp[6];
         std::sprintf(day_stamp, "%02d/%02d", DataEnvironment::Month, DataEnvironment::DayOfMonth);
         DataEnvironment::CurMnDy = day_stamp;
+
+        char day_year_stamp[11];
         std::sprintf(day_year_stamp, "%02d/%02d/%04d", DataEnvironment::Month, DataEnvironment::DayOfMonth, DataGlobals::CalendarYear);
         DataEnvironment::CurMnDyYr = day_year_stamp;
 
@@ -2407,10 +2461,10 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reads the appropriate day of EPW weather data.
 
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-        static ObjexxFCL::gio::Fmt YMDHFmt("(I4.4,2('/',I2.2),1X,I2.2,':',I2.2)");
-        static ObjexxFCL::gio::Fmt YMDHFmt1("(I4.4,2('/',I2.2),1X,'hour=',I2.2,' - expected hour=',I2.2)");
+        static ObjexxFCL::gio::Fmt const fmtA("(A)");
+        static ObjexxFCL::gio::Fmt const fmtLD("*");
+        static ObjexxFCL::gio::Fmt const YMDHFmt("(I4.4,2('/',I2.2),1X,I2.2,':',I2.2)");
+        static ObjexxFCL::gio::Fmt const YMDHFmt1("(I4.4,2('/',I2.2),1X,'hour=',I2.2,' - expected hour=',I2.2)");
 
         int Hour;
         int TS;
@@ -2457,40 +2511,21 @@ namespace WeatherManager {
         Real64 C;
         Real64 AVSC;
         Real64 SkyTemp;
-        static int CurDayOfWeek;
-        static bool UseDayOfWeek;
         bool SkipThisDay; // Used when LeapYear is/is not in effect
         bool TryAgain;
         int ReadStatus;
         int NumRewinds;
         std::string BadRecord;
         bool ErrorsFound;
-        static Real64 CurTime;
         Real64 HourRep;
         Real64 ESky;
         bool ErrorFound;
-        static bool LastHourSet; // for Interpolation
         int NxtHour;
         Real64 WtNow;
         Real64 WtPrevHour;
         Real64 WgtHourNow;
         Real64 WgtPrevHour;
         Real64 WgtNextHour;
-        static Real64 LastHrOutDryBulbTemp;
-        static Real64 LastHrOutDewPointTemp;
-        static Real64 LastHrOutBaroPress;
-        static Real64 LastHrOutRelHum;
-        static Real64 LastHrWindSpeed;
-        static Real64 LastHrWindDir;
-        static Real64 LastHrSkyTemp;
-        static Real64 LastHrHorizIRSky;
-        static Real64 LastHrBeamSolarRad;
-        static Real64 LastHrDifSolarRad;
-        static Real64 LastHrAlbedo;
-        static Real64 LastHrLiquidPrecip;
-        static Real64 NextHrBeamSolarRad;
-        static Real64 NextHrDifSolarRad;
-        static Real64 NextHrLiquidPrecip;
         bool RecordDateMatch;
 
         struct HourlyWeatherData
@@ -2532,7 +2567,7 @@ namespace WeatherManager {
             //     Must position file to proper day
             //     File already position to first data record
             //          Set Current Day of Week to "start of Data Period"
-            CurTime = 1.0 / double(NumIntervalsPerHour);
+            ReadEPlusWeatherCurTime = 1.0 / double(NumIntervalsPerHour);
             CurDayOfWeek = DataPeriods(1).WeekDay - 1;
             WYear = 0;
             WMonth = 0;
@@ -2777,13 +2812,13 @@ namespace WeatherManager {
             if (!DataGlobals::KickOffSimulation && !DataGlobals::DoingSizing && Environment(Environ).KindOfEnvrn == DataGlobals::ksRunPeriodWeather) {
                 ++Environment(Environ).CurrentCycle;
                 if (!Environment(Environ).RollDayTypeOnRepeat) {
-                    SetDayOfWeekInitialValues(Environment(Environ).DayOfWeek, CurDayOfWeek, UseDayOfWeek);
+                    SetDayOfWeekInitialValues(Environment(Environ).DayOfWeek, CurDayOfWeek);
                     if (DaylightSavingIsActive) {
                         SetDSTDateRanges(Environment(Envrn).MonWeekDay, DSTIndex);
                     }
                     SetSpecialDayDates(Environment(Envrn).MonWeekDay);
                 } else if (Environment(Environ).CurrentCycle == 1) {
-                    SetDayOfWeekInitialValues(Environment(Environ).DayOfWeek, CurDayOfWeek, UseDayOfWeek);
+                    SetDayOfWeekInitialValues(Environment(Environ).DayOfWeek, CurDayOfWeek);
                     Environment(Environ).SetWeekDays = true;
                     if (DaylightSavingIsActive) {
                         SetDSTDateRanges(Environment(Envrn).MonWeekDay, DSTIndex);
@@ -2793,7 +2828,7 @@ namespace WeatherManager {
                     CurDayOfWeek = DataEnvironment::DayOfWeekTomorrow;
                 }
             } else {
-                SetDayOfWeekInitialValues(Environment(Environ).DayOfWeek, CurDayOfWeek, UseDayOfWeek);
+                SetDayOfWeekInitialValues(Environment(Environ).DayOfWeek, CurDayOfWeek);
             }
         }
 
@@ -2821,7 +2856,7 @@ namespace WeatherManager {
 
             for (Hour = 1; Hour <= 24; ++Hour) {
                 for (CurTimeStep = 1; CurTimeStep <= NumIntervalsPerHour; ++CurTimeStep) {
-                    HourRep = double(Hour - 1) + (CurTime * double(CurTimeStep));
+                    HourRep = double(Hour - 1) + (ReadEPlusWeatherCurTime * double(CurTimeStep));
                     {
                         IOFlags flags;
                         ObjexxFCL::gio::read(WeatherFileUnitNumber, fmtA, flags) >> WeatherDataLine;
@@ -3386,8 +3421,7 @@ namespace WeatherManager {
 
 
     void SetDayOfWeekInitialValues(int const EnvironDayOfWeek, // Starting Day of Week for the (Weather) RunPeriod (User Input)
-                                   int &CurDayOfWeek,          // Current Day of Week
-                                   bool &UseDayOfWeek          // hmmm does not appear to be used anywhere.
+                                   int &currentDayOfWeek          // Current Day of Week
     )
     {
 
@@ -3404,13 +3438,10 @@ namespace WeatherManager {
 
         if (EnvironDayOfWeek != 0) {
             if (EnvironDayOfWeek <= 7) {
-                CurDayOfWeek = EnvironDayOfWeek - 1;
+                currentDayOfWeek = EnvironDayOfWeek - 1;
             } else {
-                CurDayOfWeek = EnvironDayOfWeek;
+                currentDayOfWeek = EnvironDayOfWeek;
             }
-            UseDayOfWeek = false;
-        } else {
-            UseDayOfWeek = true;
         }
     }
 
@@ -3471,8 +3502,8 @@ namespace WeatherManager {
         EP_SIZE_CHECK(WCodesArr, 9);  // NOLINT(misc-static-assert)
 
         static std::string const ValidDigits("0123456789");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-        static ObjexxFCL::gio::Fmt fmt9I1("(9I1)");
+        static ObjexxFCL::gio::Fmt const fmtLD("*");
+        static ObjexxFCL::gio::Fmt const fmt9I1("(9I1)");
 
         std::string::size_type Pos;
         std::string PresWeathCodes;
@@ -3484,10 +3515,8 @@ namespace WeatherManager {
         std::string DateError;
         Real64 RField21;
         int Count;
-        static int LCount(0);
         bool DateInError;
 
-        ++LCount;
         ErrorFound = false;
         std::string const SaveLine = Line; // in case of errors
 
@@ -3785,7 +3814,6 @@ namespace WeatherManager {
         Real64 WBRange;       // working copy of wet-bulb daily range. C (or 1 if input is difference)
 
         Array1D_int Date0(8);
-        static bool PrintDDHeader;
         std::string AlpUseRain;
         std::string AlpUseSnow;
         bool ConstantHumidityRatio;
@@ -4674,7 +4702,7 @@ namespace WeatherManager {
         // METHODOLOGY EMPLOYED:
         // List directed reads, as possible.
 
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt const fmtA("(A)");
 
         static Array1D_string const Header(8,
                                            {"LOCATION",
@@ -4965,13 +4993,13 @@ namespace WeatherManager {
         // incremented.  Finally, the header information for the report must
         // be sent to the output file.
 
-        static ObjexxFCL::gio::Fmt A("(a)");
-        static std::string EnvironmentString(",5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]");
-        static std::string TimeStepString(",8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType");
-        static std::string DailyString(",5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily ");
-        static std::string MonthlyString(",2,Cumulative Days of Simulation[],Month[]  ! When Monthly ");
-        static std::string RunPeriodString(",1,Cumulative Days of Simulation[] ! When Run Period ");
-        static std::string YearlyString(",1,Calendar Year of Simulation[] ! When Annual ");
+        static ObjexxFCL::gio::Fmt const A("(a)");
+        static std::string const EnvironmentString(",5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]");
+        static std::string const TimeStepString(",8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType");
+        static std::string const DailyString(",5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily ");
+        static std::string const MonthlyString(",2,Cumulative Days of Simulation[],Month[]  ! When Monthly ");
+        static std::string const RunPeriodString(",1,Cumulative Days of Simulation[] ! When Run Period ");
+        static std::string const YearlyString(",1,Calendar Year of Simulation[] ! When Annual ");
 
         AssignReportNumber(EnvironmentReportNbr);
         if (EnvironmentReportNbr != 1) { //  problem
@@ -5083,7 +5111,7 @@ namespace WeatherManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Env; // Environment Loop Counter
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int RPD1;
         int RPD2;
 
@@ -5183,7 +5211,7 @@ namespace WeatherManager {
         // the date with the weekday specified.
 
         // Tu, W, Th, F, Sa, Su, M, Tu, W, Th, F, Sa, Su
-        static std::array<int, 13> defaultYear{{2013, 2014, 2015, 2010, 2011, 2017, 2007, 2013, 2014, 2015, 2010, 2011, 2017}};
+        static std::array<int, 13> const defaultYear{{2013, 2014, 2015, 2010, 2011, 2017, 2007, 2013, 2014, 2015, 2010, 2011, 2017}};
 
         int rem = calculateDayOfYear(month, day) % 7;
         return defaultYear[static_cast<int>(weekday) - rem + 5]; // static_cast<int>(weekday) - rem + 1 + 4
@@ -5195,7 +5223,7 @@ namespace WeatherManager {
         // the date with the weekday specified.
 
         // Tu, W, Th, F, Sa, Su, M, Tu, W, Th, F, Sa, Su
-        static std::array<int, 13> defaultLeapYear{{2008, 1992, 2004, 2016, 2000, 2012, 1996, 2008, 1992, 2004, 2016, 2000, 2012}};
+        static std::array<int, 13> const defaultLeapYear{{2008, 1992, 2004, 2016, 2000, 2012, 1996, 2008, 1992, 2004, 2016, 2000, 2012}};
 
         int rem = calculateDayOfYear(month, day, true) % 7;
         return defaultLeapYear[static_cast<int>(weekday) - rem + 5]; // static_cast<int>(weekday) - rem + 1 + 4
@@ -7129,7 +7157,7 @@ namespace WeatherManager {
         // This file reads the Ground Temps from the input file and puts them
         //  in a new variable.
 
-        static ObjexxFCL::gio::Fmt Format_720("(' ',A,12(', ',F6.2))");
+        static ObjexxFCL::gio::Fmt const Format_720("(' ',A,12(', ',F6.2))");
 
         // Initialize Site:GroundTemperature:BuildingSurface object
         siteBuildingSurfaceGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
@@ -7176,7 +7204,7 @@ namespace WeatherManager {
         Array1D_string GndAlphas; // Construction Alpha names defined
         Array1D<Real64> GndProps; // Temporary array to transfer ground reflectances
 
-        static ObjexxFCL::gio::Fmt Format_720("(' Site:GroundReflectance',12(', ',F5.2))");
+        static ObjexxFCL::gio::Fmt const Format_720("(' Site:GroundReflectance',12(', ',F5.2))");
 
         DataIPShortCuts::cCurrentModuleObject = "Site:GroundReflectance";
         I = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
@@ -7237,7 +7265,7 @@ namespace WeatherManager {
         Array1D_string GndAlphas; // Construction Alpha names defined
         Array1D<Real64> GndProps; // Temporary array to transfer ground reflectances
 
-        static ObjexxFCL::gio::Fmt Format_721("(A,12(', ',F5.2))");
+        static ObjexxFCL::gio::Fmt const Format_721("(A,12(', ',F5.2))");
 
         DataIPShortCuts::cCurrentModuleObject = "Site:GroundReflectance:SnowModifier";
         I = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
@@ -7727,10 +7755,9 @@ namespace WeatherManager {
         // File is positioned to the correct line, then backspaced.  This routine
         // reads in the line and processes as appropriate.
 
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt const fmtA("(A)");
+        static ObjexxFCL::gio::Fmt const fmtLD("*");
 
-        static std::string Title;
         int Count;
         std::string WMO;
         std::string::size_type Pos;
@@ -7791,14 +7818,14 @@ namespace WeatherManager {
                         auto const SELECT_CASE_var1(Count);
 
                         if (SELECT_CASE_var1 == 1) {
-                            Title = stripped(Line.substr(0, Pos));
+                            EPWHeaderTitle = stripped(Line.substr(0, Pos));
 
                         } else if ((SELECT_CASE_var1 == 2) || (SELECT_CASE_var1 == 3) || (SELECT_CASE_var1 == 4)) {
-                            Title = strip(Title) + ' ' + stripped(Line.substr(0, Pos));
+                            EPWHeaderTitle = strip(EPWHeaderTitle) + ' ' + stripped(Line.substr(0, Pos));
 
                         } else if (SELECT_CASE_var1 == 5) {
                             WMO = stripped(Line.substr(0, Pos));
-                            Title += " WMO#=" + WMO;
+                            EPWHeaderTitle += " WMO#=" + WMO;
 
                         } else if ((SELECT_CASE_var1 == 6) || (SELECT_CASE_var1 == 7) || (SELECT_CASE_var1 == 8) || (SELECT_CASE_var1 == 9)) {
                             Number = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
@@ -7824,7 +7851,7 @@ namespace WeatherManager {
                     Line.erase(0, Pos + 1);
                     ++Count;
                 }
-                DataEnvironment::WeatherFileLocationTitle = stripped(Title);
+                DataEnvironment::WeatherFileLocationTitle = stripped(EPWHeaderTitle);
 
             } else if (SELECT_CASE_var == "TYPICAL/EXTREME PERIODS") {
                 TropExtremeCount = 0;
@@ -8414,7 +8441,7 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine skips the initial header records on the EnergyPlus Weather File (in.epw).
 
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt const fmtA("(A)");
         static std::string const Header("DATA PERIODS");
         std::string::size_type Pos;
         std::string Line;
@@ -9059,7 +9086,7 @@ namespace WeatherManager {
         // PURPOSE OF THIS FUNCTION:
         // Compute the day of the year for non-leap years.
 
-        static std::array<int, 12> daysbefore{{0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334}};
+        static std::array<int, 12> const daysbefore{{0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334}};
 
         // Could probably do some bounds checking here, but for now assume the month is in [1, 12]
         return daysbefore[Month - 1] + Day;
@@ -9077,8 +9104,8 @@ namespace WeatherManager {
         // PURPOSE OF THIS FUNCTION:
         // Compute the day of the year for leap and non-leap years.
 
-        static std::array<int, 12> daysbefore{{0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334}};
-        static std::array<int, 12> daysbeforeleap{{0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335}};
+        static std::array<int, 12> const daysbefore{{0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334}};
+        static std::array<int, 12> const daysbeforeleap{{0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335}};
 
         // Could probably do some bounds checking here, but for now assume the month is in [1, 12]
         if (leapYear) {
@@ -9140,16 +9167,16 @@ namespace WeatherManager {
         // drybulb temperature from STAT (*.stat) for use to autosize main water
         // temperature.
 
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt const fmtA("(A)");
 
         Real64 HourlyDryBulbTemp;                                  // hourly outside air dry-bulb temperature read from weather file
         Real64 MonthlyDailyDryBulbMin(200.0);                      // monthly-daily minimum outside air dry-bulb temperature
         Real64 MonthlyDailyDryBulbMax(-200.0);                     // monthly-daily maximum outside air dry-bulb temperature
         Real64 MonthlyDailyDryBulbAvg(0.0);                        // monthly-daily average outside air dry-bulb temperature
         Real64 AnnualDailyAverageDryBulbTempSum(0.0);              // annual sum of daily average outside air dry-bulb temperature
-        static Real64 DailyAverageDryBulbTemp(0.0);                // daily average outside air dry-bulb temperature
-        static Array1D<Real64> MonthlyAverageDryBulbTemp(12, 0.0); // monthly-daily average outside air temperature
-        static Array1D<int> EndDayOfMonthLocal(12, 0);             // number of days in each month
+        Real64 DailyAverageDryBulbTemp(0.0);                // daily average outside air dry-bulb temperature
+        Array1D<Real64> MonthlyAverageDryBulbTemp(12, 0.0); // monthly-daily average outside air temperature
+        Array1D<int> EndDayOfMonthLocal(12, 0);             // number of days in each month
         std::string lineIn;
         std::string lineAvg;
         std::string epwLine;

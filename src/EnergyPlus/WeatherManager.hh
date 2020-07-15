@@ -637,8 +637,7 @@ namespace WeatherManager {
     Real64 interpolateWindDirection(Real64 prevHrWindDir, Real64 curHrWindDir, Real64 curHrWeight);
 
     void SetDayOfWeekInitialValues(int EnvironDayOfWeek, // Starting Day of Week for the (Weather) RunPeriod (User Input)
-                                   int &CurDayOfWeek,          // Current Day of Week
-                                   bool &UseDayOfWeek          // hmmm does not appear to be used anywhere.
+                                   int &currentDayOfWeek          // Current Day of Week
     );
 
     void InterpretWeatherDataLine(std::string &Line,
