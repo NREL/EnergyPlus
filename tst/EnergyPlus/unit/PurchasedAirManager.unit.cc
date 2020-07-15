@@ -670,22 +670,6 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
 
     CalcPurchAirLoads(1, SysOutputProvided, MoistOutputProvided, 1, 1);
 
-    // mass flow rate
-    EXPECT_EQ(RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(1).EMSMassFlowRateOutVarNum).Value, 0.0);
-    EXPECT_TRUE(RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(1).EMSMassFlowRateOutVarNum).BypassFlag);
-    // Supply temp
-    EXPECT_NEAR(RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(1).EMSSupplyTempOutVarNum).Value, 25.0, 0.0001);
-    EXPECT_TRUE(RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(1).EMSSupplyTempOutVarNum).BypassFlag);
-
-    DataRuntimeLanguage::ErlVariable(2).Value.Type = 1;
-    DataRuntimeLanguage::ErlVariable(2).Value.Number = 0.2;
-    RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(1).EMSMassFlowRateOutVarNum).BypassFlag = false;
-    DataRuntimeLanguage::ErlVariable(3).Value.Type = 1;
-    DataRuntimeLanguage::ErlVariable(3).Value.Number = 14.0;
-    RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(1).EMSSupplyTempOutVarNum).BypassFlag = false;
-    RuntimeLanguageProcessor::ReportRuntimeLanguage();
-    // mass flow rate
-    EXPECT_NEAR(RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(1).EMSMassFlowRateOutVarNum).Value, 0.2, 0.00001);
-    // Supply air temperature
-    EXPECT_NEAR(RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(1).EMSSupplyTempOutVarNum).Value, 14.0, 0.00001);
+    EXPECT_EQ(PurchAir(1).EMSValueMassFlowRate, 0.0);
+    EXPECT_EQ(PurchAir(1).EMSValueSupplyTemp, 0.0);
 }

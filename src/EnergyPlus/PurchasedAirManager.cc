@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -77,7 +76,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
-#include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZonePlenum.hh>
@@ -181,8 +179,6 @@ namespace PurchasedAirManager {
     int NumPurchAir;
     int NumPlenumArrays;
     bool GetPurchAirInputFlag(true);
-    Array1D_bool EMSMdotSetupFlag;
-    Array1D_bool EMSTsupSetupFlag;
     Array1D_bool CheckEquipName;
     // SUBROUTINE SPECIFICATIONS FOR MODULE PurchasedAir:
 
@@ -1090,12 +1086,6 @@ namespace PurchasedAirManager {
         if (ErrorsFound) {
             ShowFatalError(RoutineName + "Errors found in input. Preceding conditions cause termination.");
         }
-        if (AnyEnergyManagementSystemInModel) {
-            EMSMdotSetupFlag.allocate(NumPurchAir);
-            EMSMdotSetupFlag = true;
-            EMSTsupSetupFlag.allocate(NumPurchAir);
-            EMSTsupSetupFlag = true;
-        }
     }
 
     void InitPurchasedAir(EnergyPlusData &state,
@@ -1282,45 +1272,6 @@ namespace PurchasedAirManager {
             InitPurchasedAirMyEnvrnFlag(PurchAirNum) = true;
         }
 
-        if (AnyEnergyManagementSystemInModel) {
-            if (EMSMdotSetupFlag(PurchAirNum)) {
-                if (PurchAir(PurchAirNum).EMSOverrideMdotOn) {
-                    for (int ii = 1; ii <= DataRuntimeLanguage::numActuatorsUsed; ii++) {
-                        if (UtilityRoutines::SameString(PurchAir(PurchAirNum).Name, DataRuntimeLanguage::EMSActuatorUsed(ii).UniqueIDName)) {
-                            if (UtilityRoutines::SameString("AIR MASS FLOW RATE", DataRuntimeLanguage::EMSActuatorUsed(ii).ControlTypeName)) {
-                                for (int jj = 1; jj <= DataRuntimeLanguage::NumEMSOutputVariables; jj++) {
-                                    if (DataRuntimeLanguage::EMSActuatorUsed(ii).ErlVariableNum ==
-                                        RuntimeLanguageProcessor::RuntimeReportVar(jj).VariableNum) {
-                                        PurchAir(PurchAirNum).EMSMassFlowRateOutVarNum = jj;
-                                        EMSMdotSetupFlag(PurchAirNum) = false;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (EMSTsupSetupFlag(PurchAirNum)) {
-                if (PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) {
-                    for (int ii = 1; ii <= DataRuntimeLanguage::numActuatorsUsed; ii++) {
-                        if (UtilityRoutines::SameString(PurchAir(PurchAirNum).Name, DataRuntimeLanguage::EMSActuatorUsed(ii).UniqueIDName)) {
-                            if (UtilityRoutines::SameString("AIR TEMPERATURE", DataRuntimeLanguage::EMSActuatorUsed(ii).ControlTypeName)) {
-                                for (int jj = 1; jj <= DataRuntimeLanguage::NumEMSOutputVariables; jj++) {
-                                    if (DataRuntimeLanguage::EMSActuatorUsed(ii).ErlVariableNum ==
-                                        RuntimeLanguageProcessor::RuntimeReportVar(jj).VariableNum) {
-                                        PurchAir(PurchAirNum).EMSSupplyTempOutVarNum = jj;
-                                        EMSTsupSetupFlag(PurchAirNum) = false;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         // These initializations are done every iteration
         // check that supply air temps can meet the zone thermostat setpoints
         if (PurchAir(PurchAirNum).MinCoolSuppAirTemp > ZoneThermostatSetPointHi(ActualZoneNum) && ZoneThermostatSetPointHi(ActualZoneNum) != 0 &&
@@ -1410,12 +1361,6 @@ namespace PurchasedAirManager {
         //      IF (ErrorsFound .and. .not. WarmupFlag) THEN
         //        CALL ShowFatalError('Preceding conditions cause termination.')
         //      ENDIF
-        if (PurchAir(PurchAirNum).EMSOverrideMdotOn && PurchAir(PurchAirNum).EMSMassFlowRateOutVarNum > 0) {
-            RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(PurchAirNum).EMSMassFlowRateOutVarNum).BypassFlag = false;
-        }
-        if (PurchAir(PurchAirNum).EMSOverrideMdotOn && PurchAir(PurchAirNum).EMSSupplyTempOutVarNum > 0) {
-            RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(PurchAirNum).EMSSupplyTempOutVarNum).BypassFlag = false;
-        }
     }
 
     void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
@@ -2752,17 +2697,10 @@ namespace PurchasedAirManager {
                 }
                 if (PurchAir(PurchAirNum).EMSOverrideMdotOn) {
                     PurchAir(PurchAirNum).EMSValueMassFlowRate = 0.0;
-                    if (PurchAir(PurchAirNum).EMSMassFlowRateOutVarNum > 0) {
-                        RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(PurchAirNum).EMSMassFlowRateOutVarNum).Value = 0.0;
-                        RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(PurchAirNum).EMSMassFlowRateOutVarNum).BypassFlag = true;
-                    }
+                    OAMassFlowRate = 0.0;
                 }
                 if (PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) {
-                    PurchAir(PurchAirNum).EMSValueSupplyTemp = SupplyTemp;
-                    if (PurchAir(PurchAirNum).EMSSupplyTempOutVarNum > 0) {
-                        RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(PurchAirNum).EMSSupplyTempOutVarNum).Value = SupplyTemp;
-                        RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(PurchAirNum).EMSSupplyTempOutVarNum).BypassFlag = true;
-                    }
+                    SupplyTemp = PurchAir(PurchAirNum).EMSValueSupplyTemp;
                 }
             }
 
@@ -2790,17 +2728,9 @@ namespace PurchasedAirManager {
 
             if (PurchAir(PurchAirNum).EMSOverrideMdotOn) {
                 PurchAir(PurchAirNum).EMSValueMassFlowRate = 0.0;
-                if (PurchAir(PurchAirNum).EMSMassFlowRateOutVarNum > 0) {
-                    RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(PurchAirNum).EMSMassFlowRateOutVarNum).Value = 0.0;
-                    RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(PurchAirNum).EMSMassFlowRateOutVarNum).BypassFlag = true;
-                }
             }
             if (PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) {
-                PurchAir(PurchAirNum).EMSValueSupplyTemp = Node(ZoneNodeNum).Temp;
-                if (PurchAir(PurchAirNum).EMSSupplyTempOutVarNum > 0) {
-                    RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(PurchAirNum).EMSSupplyTempOutVarNum).Value = Node(ZoneNodeNum).Temp;
-                    RuntimeLanguageProcessor::RuntimeReportVar(PurchAir(PurchAirNum).EMSSupplyTempOutVarNum).BypassFlag = true;
-                }
+                SupplyTemp = PurchAir(PurchAirNum).EMSValueSupplyTemp;
             }
 
             Node(InNodeNum).MassFlowRate = 0.0;

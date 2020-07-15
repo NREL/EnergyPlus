@@ -162,12 +162,10 @@ namespace PurchasedAirManager {
         Real64 MaxCoolMassFlowRate;         // The maximum cooling air mass flow rate [kg/s]
         bool EMSOverrideMdotOn;             // if true, then EMS is calling to override supply mass flow rate
         Real64 EMSValueMassFlowRate;        // Value EMS is directing to use for supply mass flow rate [kg/s]
-        int EMSMassFlowRateOutVarNum;        // EMS report number for supply mass flow rate
         bool EMSOverrideOAMdotOn;           // if true, then EMS is calling to override OA mass flow rate
         Real64 EMSValueOAMassFlowRate;      // Value EMS is directing to use for OA mass flow rate [kg/s]
         bool EMSOverrideSupplyTempOn;       // if true, then EMS is calling to override supply temperature
         Real64 EMSValueSupplyTemp;          // Value EMS is directing to use for supply temperature [C]
-        int EMSSupplyTempOutVarNum;        // EMS report number for supply air temperature
         bool EMSOverrideSupplyHumRatOn;     // if true, then EMS is calling to override supply humidity ratio
         Real64 EMSValueSupplyHumRat;        // Value EMS is directing to use for supply humidity ratio [kgWater/kgDryAir]
         Real64 MinOAMassFlowRate;           // The minimum required outdoor air mass flow rate [kg/s]
@@ -257,8 +255,8 @@ namespace PurchasedAirManager {
               MaxCoolVolFlowRate(0.0), MaxCoolTotCap(0.0), HeatSchedPtr(0), CoolSchedPtr(0), DehumidCtrlType(0), CoolSHR(0.0), HumidCtrlType(0),
               OARequirementsPtr(0), DCVType(0), EconomizerType(0), OutdoorAir(false), OutdoorAirNodeNum(0), HtRecType(0), HtRecSenEff(0.0),
               HtRecLatEff(0.0), OAFlowFracSchPtr(0), MaxHeatMassFlowRate(0.0), MaxCoolMassFlowRate(0.0), EMSOverrideMdotOn(false),
-              EMSValueMassFlowRate(0.0), EMSMassFlowRateOutVarNum(0), EMSOverrideOAMdotOn(false), EMSValueOAMassFlowRate(0.0),
-              EMSOverrideSupplyTempOn(false), EMSValueSupplyTemp(0.0), EMSSupplyTempOutVarNum(0), EMSOverrideSupplyHumRatOn(false),
+              EMSValueMassFlowRate(0.0), EMSOverrideOAMdotOn(false), EMSValueOAMassFlowRate(0.0),
+              EMSOverrideSupplyTempOn(false), EMSValueSupplyTemp(0.0), EMSOverrideSupplyHumRatOn(false),
               EMSValueSupplyHumRat(0.0), MinOAMassFlowRate(0.0),
               OutdoorAirMassFlowRate(0.0), OutdoorAirVolFlowRateStdRho(0.0), SupplyAirMassFlowRate(0.0), SupplyAirVolFlowRateStdRho(0.0),
               FinalMixedAirTemp(0.0), FinalMixedAirHumRat(0.0), HtRecSenOutput(0.0), HtRecLatOutput(0.0), OASenOutput(0.0), OALatOutput(0.0),
