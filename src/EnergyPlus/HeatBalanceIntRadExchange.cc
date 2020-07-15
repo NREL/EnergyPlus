@@ -1547,46 +1547,55 @@ namespace HeatBalanceIntRadExchange {
         Real64 CheckConvergeTolerance; // check value for actual warning
 
         bool Converged;
+        int i;
+        int j;
+        static int LargestSurf(0);
 
         // FLOW:
         OriginalCheckValue = std::abs(sum(F) - N);
+
+        //  Allocate and zero arrays
+        Array2D<Real64> FixedAF(F); // store for largest area check
 
         Accelerator = 1.0;
         ConvrgOld = 10.0;
         LargestArea = maxval(A);
 
-        // set up eigen maps to existing arrays
-        Map<MatrixXd> viewFactors(F.data(), N, N);
-        Map<const ArrayXd> areas(A.data(), N);
-
-        // copy the current view factors for modification
-        MatrixXd fixedAF = viewFactors;
-
-        // find the largest area and its index
-        Eigen::Index largestAreaIndex;
-        Real64 const largestArea(areas.maxCoeff(&largestAreaIndex));
-        Real64 const totalArea(areas.sum());
-
         //  Check for Strange Geometry
-        if (largestArea > 0.5 * totalArea) {
-            fixedAF(largestAreaIndex, largestAreaIndex) = min(0.9, 1.2 * largestArea / totalArea); // Give self view to big surface
+        if (LargestArea > (sum(A) - LargestArea)) {
+            for (i = 1; i <= N; ++i) {
+                if (LargestArea != A(i)) continue;
+                LargestSurf = i;
+                break;
+            }
+            FixedAF(LargestSurf, LargestSurf) = min(0.9, 1.2 * LargestArea / sum(A)); // Give self view to big surface
         }
 
-        // multiple view factors by area, each column is a single surface
-        fixedAF.array().colwise() *= areas;
+                //  Set up AF matrix.
+        Array2D<Real64> AF(N, N); // = (AREA * DIRECT VIEW FACTOR) MATRIX
+        for (i = 1; i <= N; ++i) {
+            for (j = 1; j <= N; ++j) {
+                AF(j, i) = FixedAF(j, i) * A(i);
+            }
+        }
 
-        // Enforce reciprocity by averaging AiFij and AjFji
-        fixedAF += fixedAF.transpose().eval();
-        fixedAF *= 0.5;
+                //  Enforce reciprocity by averaging AiFij and AjFji
+        FixedAF = 0.5 * (AF + transpose(AF)); // Performance Slow way to average with transpose (heap use)
 
-        MatrixXd fixedF(N, N);
+        AF.deallocate();
+
+        Array2D<Real64> FixedF(N, N); // CORRECTED MATRIX OF VIEW FACTORS (N X N)
 
         NumIterations = 0;
         RowSum = 0.0;
 
         //  Check for physically unreasonable enclosures.
         if (N <= 3) {
-            fixedF = fixedAF.array().colwise() / areas;
+            for (i = 1; i <= N; ++i) {
+                for (j = 1; j <= N; ++j) {
+                    FixedF(j, i) = FixedAF(j, i) / A(i);
+                }
+            }
 
             ShowWarningError("Surfaces in Zone/Enclosure=\"" + enclName + "\" do not define an enclosure.");
             ShowContinueError("Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.");
@@ -1596,7 +1605,7 @@ namespace HeatBalanceIntRadExchange {
             ShowContinueError(
                 "it will not exchange the full amount of radiation with the rest of the zone as it would if there was a completed enclosure.");
 
-            RowSum = fixedF.sum();
+            RowSum = sum(FixedF);
             if (RowSum > (N + 0.01)) {
                 // Reciprocity enforced but there is more radiation than possible somewhere since the sum of one of the rows
                 // is now greater than unity.  This should not be allowed as it can cause issues with the heat balance.
@@ -1604,18 +1613,30 @@ namespace HeatBalanceIntRadExchange {
                 // this max summation.  This will provide a cap on radiation so that no row has a sum greater than unity
                 // and will still maintain reciprocity.
 
-                Real64 maxFixedFColSum;
-                maxFixedFColSum = fixedF.array().colwise().sum().maxCoeff();
-
-                if (maxFixedFColSum < 1.0) {
+                Array1D<Real64> sumFixedF;
+                Real64 MaxFixedFRowSum;
+                sumFixedF.allocate(N);
+                sumFixedF = 0.0;
+                for (i = 1; i <= N; ++i) {
+                    for (j = 1; j <= N; ++j) {
+                        sumFixedF(i) += FixedF(i, j);
+                    }
+                    if (i == 1) {
+                        MaxFixedFRowSum = sumFixedF(i);
+                    } else {
+                        if (sumFixedF(i) > MaxFixedFRowSum) MaxFixedFRowSum = sumFixedF(i);
+                    }
+                }
+                sumFixedF.deallocate();
+                if (MaxFixedFRowSum < 1.0) {
                     ShowFatalError(" FixViewFactors: Three surface or less zone failing ViewFactorFix correction which should never happen.");
                 } else {
-                    fixedF *= (1.0 / maxFixedFColSum);
+                    FixedF *= (1.0 / MaxFixedFRowSum);
                 }
-                RowSum = fixedF.sum(); // needs to be recalculated
+                RowSum = sum(FixedF); // needs to be recalculated
             }
             FinalCheckValue = FixedCheckValue = std::abs(RowSum - N);
-            viewFactors = fixedF;
+            F = FixedF;
             for (int zoneNum : zoneNums) {
                 Zone(zoneNum).EnforcedReciprocity = true;
             }
@@ -1624,39 +1645,50 @@ namespace HeatBalanceIntRadExchange {
         } //  N <= 3 Case
 
         //  Regular fix cases
-        ArrayXd colCoefficient(N);
+        Array1D<Real64> RowCoefficient(N);
         Converged = false;
         while (!Converged) {
             ++NumIterations;
-            // correct the A*F value by ensuring the i-th column sums to Ai
-            colCoefficient = fixedAF.array().colwise().sum();
-            colCoefficient = (colCoefficient.abs() > 1.0e-10).select(areas / colCoefficient, 1.0);
-            fixedAF.array().colwise() *= colCoefficient;
+            for (i = 1; i <= N; ++i) {
+                // Determine row coefficients which will enforce closure.
+                Real64 const sum_FixedAF_i(sum(FixedAF(_, i)));
+                if (std::abs(sum_FixedAF_i) > 1.0e-10) {
+                    RowCoefficient(i) = A(i) / sum_FixedAF_i;
+                } else {
+                    RowCoefficient(i) = 1.0;
+                }
+                FixedAF(_, i) *= RowCoefficient(i);
+            }
 
-            //  Enforce reciprocity by averaging AiFij and AjFji
-            fixedAF += fixedAF.transpose().eval();
-            fixedAF *= 0.5;
+            FixedAF = 0.5 * (FixedAF + transpose(FixedAF));
 
             //  Form FixedF matrix
-            fixedF = fixedAF.array().colwise() / areas;
+            for (i = 1; i <= N; ++i) {
+                for (j = 1; j <= N; ++j) {
+                    FixedF(j, i) = FixedAF(j, i) / A(i);
+                    if (std::abs(FixedF(j, i)) < 1.e-10) {
+                        FixedF(j, i) = 0.0;
+                        FixedAF(j, i) = 0.0;
+                    }
+                }
+            }
 
-            // set fixedAF first using fixedF
-            fixedAF = (fixedF.array().abs() < 1.0e-10).select(0.0, fixedAF);
-            fixedF = (fixedF.array().abs() < 1.0e-10).select(0.0, fixedF);
-
-            ConvrgNew = std::abs(fixedF.sum() - N);
+            ConvrgNew = std::abs(sum(FixedF) - N);
             if (std::abs(ConvrgOld - ConvrgNew) < DifferenceConvergence || ConvrgNew <= PrimaryConvergence) { //  Change in sum of Fs must be small.
                 Converged = true;
             }
             ConvrgOld = ConvrgNew;
             if (NumIterations > 400) { //  If everything goes bad,enforce reciprocity and go home.
                 //  Enforce reciprocity by averaging AiFij and AjFji
-                fixedAF += fixedAF.transpose().eval();
-                fixedAF *= 0.5;
+                FixedAF = 0.5 * (FixedAF + transpose(FixedAF));
 
-                fixedF = fixedAF.array().colwise() / areas;
-
-                Real64 const sum_FixedF(fixedF.sum());
+                //  Form FixedF matrix
+                for (i = 1; i <= N; ++i) {
+                    for (j = 1; j <= N; ++j) {
+                        FixedF(j, i) = FixedAF(j, i) / A(i);
+                    }
+                }
+                Real64 const sum_FixedF(sum(FixedF));
                 FinalCheckValue = FixedCheckValue = CheckConvergeTolerance = std::abs(sum_FixedF - N);
                 if (CheckConvergeTolerance > 0.005) {
                     ShowWarningError("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
@@ -1666,7 +1698,7 @@ namespace HeatBalanceIntRadExchange {
                     ShowContinueError("If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK.");
                 }
                 if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {
-                    viewFactors = fixedF;
+                    F = FixedF;
                     FinalCheckValue = FixedCheckValue;
                 }
                 RowSum = sum_FixedF;
@@ -1675,13 +1707,13 @@ namespace HeatBalanceIntRadExchange {
         }
         FixedCheckValue = ConvrgNew;
         if (FixedCheckValue < OriginalCheckValue) {
-            viewFactors = fixedF;
+            F = FixedF;
             FinalCheckValue = FixedCheckValue;
         } else {
             FinalCheckValue = OriginalCheckValue;
-            RowSum = fixedF.sum();
+            RowSum = sum(FixedF);
             if (std::abs(RowSum - N) < PrimaryConvergence) {
-                viewFactors = fixedF;
+                F = FixedF;
                 FinalCheckValue = FixedCheckValue;
             } else {
                 ShowWarningError("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" + enclName +
