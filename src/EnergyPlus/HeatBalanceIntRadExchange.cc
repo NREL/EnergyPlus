@@ -1797,41 +1797,105 @@ namespace HeatBalanceIntRadExchange {
         // Array2D<Real64>::size_type l(0u);
 
         // Load Cmatrix with AF (AREA * DIRECT VIEW FACTOR) matrix
-        Eigen::Map<const Eigen::ArrayXd> areas(A.data(), N);
-        Eigen::MatrixXd CMatrix(N, N);
-        CMatrix = Eigen::Map<const Eigen::MatrixXd>(F.data(), N, N);
-        CMatrix.array().colwise() *= areas.array();
-
-        // Load Cmatrix with (AF - EMISS/REFLECTANCE) matrix
-        Eigen::Map<Eigen::ArrayXd> emissivity(EMISS.data(), N);
-
-        // ensure max limit not exceeded
-        if ((emissivity > MaxEmissLimit).any()) {
-            emissivity = (emissivity > MaxEmissLimit).select(MaxEmissLimit, emissivity);
-            ShowWarningError("A thermal emissivity above 0.99999 was detected. This is not allowed. Value(s) reset to 0.99999");
+        Array2D<Real64> Cmatrix(N, N);        // = (AF - EMISS/REFLECTANCE) matrix (but plays other roles)
+        assert(equal_dimensions(Cmatrix, F)); // For linear indexing
+        Array2D<Real64>::size_type l(0u);
+        for (int j = 1; j <= N; ++j) {
+            for (int i = 1; i <= N; ++i, ++l) {
+                Cmatrix[l] = A(i) * F[l]; // [ l ] == ( i, j )
+            }
         }
 
-        // set the excitation vector first to A/(1-emiss) so it can be used to modify CMatrix
-        Eigen::ArrayXd excitation(N);
-        excitation = areas / (1.0 - emissivity);
+        // Eigen::Map<const Eigen::ArrayXd> areas(A.data(), N);
+        // Eigen::MatrixXd CMatrix(N, N);
+        // CMatrix = Eigen::Map<const Eigen::MatrixXd>(F.data(), N, N);
+        // CMatrix.array().colwise() *= areas.array();
 
-        // modify CMatrix
-        CMatrix -= excitation.matrix().asDiagonal();
+        // Load Cmatrix with (AF - EMISS/REFLECTANCE) matrix
+        Array1D<Real64> Excite(N); // Excitation vector = A*EMISS/REFLECTANCE
+        l = 0u;
+        for (int i = 1; i <= N; ++i, l += N + 1) {
+            Real64 EMISS_i(EMISS(i));
+            if (EMISS_i > MaxEmissLimit) { // Check/limit EMISS for this surface to avoid divide by zero below
+                EMISS_i = EMISS(i) = MaxEmissLimit;
+                ShowWarningError("A thermal emissivity above 0.99999 was detected. This is not allowed. Value was reset to 0.99999");
+            }
+            Real64 const EMISS_i_fac(A(i) / (1.0 - EMISS_i));
+            Excite(i) = -EMISS_i * EMISS_i_fac; // Set up matrix columns for partial radiosity calculation
+            Cmatrix[l] -= EMISS_i_fac;          // Coefficient matrix for partial radiosity calculation // [ l ] == ( i, i )
+        }
 
-        // finalise the calculation of the excitation array
-        excitation *= -emissivity;
+        // Array2D<Real64> Cinverse(N, N);       // Inverse of Cmatrix
+        // CalcMatrixInverse(Cmatrix, Cinverse); // SOLVE THE LINEAR SYSTEM
+        // Cmatrix.clear();                      // Release memory ASAP
 
-        // map the scriptF matrix so it can be assigned to
-        Eigen::Map<Eigen::MatrixXd> scriptF(ScriptF.data(), N, N);
+        Array2D<Real64> Cinverse(N, N);       // Inverse of Cmatrix
 
-        Eigen::MatrixXd Cinverse(N, N);
-        Cinverse = CMatrix.inverse();
+        Eigen::MatrixXd EigenCMatrix(N, N);
+        EigenCMatrix = Eigen::Map<const Eigen::MatrixXd>(Cmatrix.data(), N, N);
+        Eigen::MatrixXd EigenCinverse(N, N);
+        EigenCinverse = Eigen::Map<const Eigen::MatrixXd>(Cinverse.data(), N, N);
 
-        Cinverse *= excitation.matrix().asDiagonal();
+        EigenCinverse = EigenCMatrix.inverse();
+        Cmatrix.clear();                      // Release memory ASAP
 
-        Cinverse -= emissivity.matrix().asDiagonal();
-        Cinverse.array().colwise() *= (emissivity / (1.0 - emissivity));
-        scriptF = Cinverse.transpose();
+        // Scale Cinverse colums by excitation to get partial radiosity matrix
+        l = 0u;
+        for (int j = 1; j <= N; ++j) {
+            Real64 const e_j(Excite(j));
+            for (int i = 1; i <= N; ++i, ++l) {
+                Cinverse[l] *= e_j; // [ l ] == ( i, j )
+            }
+        }
+        Excite.clear(); // Release memory ASAP
+
+        // Form Script F matrix transposed
+        assert(equal_dimensions(Cinverse, ScriptF)); // For linear indexing
+        Array2D<Real64>::size_type m(0u);
+        for (int i = 1; i <= N; ++i) { // Inefficient order for cache but can reuse multiplier so faster choice depends on N
+            Real64 const EMISS_i(EMISS(i));
+            Real64 const EMISS_fac(EMISS_i / (1.0 - EMISS_i));
+            l = static_cast<Array2D<Real64>::size_type>(i - 1);
+            for (int j = 1; j <= N; ++j, l += N, ++m) {
+                if (i == j) {
+                    //        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=1
+                    ScriptF[m] = EMISS_fac * (Cinverse[l] - EMISS_i); // [ l ] = ( i, j ), [ m ] == ( j, i )
+                } else {
+                    //        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=0
+                    ScriptF[m] = EMISS_fac * Cinverse[l]; // [ l ] == ( i, j ), [ m ] == ( j, i )
+                }
+            }
+        }
+
+        // Eigen::Map<Eigen::ArrayXd> emissivity(EMISS.data(), N);
+
+        // // ensure max limit not exceeded
+        // if ((emissivity > MaxEmissLimit).any()) {
+        //     emissivity = (emissivity > MaxEmissLimit).select(MaxEmissLimit, emissivity);
+        //     ShowWarningError("A thermal emissivity above 0.99999 was detected. This is not allowed. Value(s) reset to 0.99999");
+        // }
+
+        // // set the excitation vector first to A/(1-emiss) so it can be used to modify CMatrix
+        // Eigen::ArrayXd excitation(N);
+        // excitation = areas / (1.0 - emissivity);
+
+        // // modify CMatrix
+        // CMatrix -= excitation.matrix().asDiagonal();
+
+        // // finalise the calculation of the excitation array
+        // excitation *= -emissivity;
+
+        // // map the scriptF matrix so it can be assigned to
+        // Eigen::Map<Eigen::MatrixXd> scriptF(ScriptF.data(), N, N);
+
+        // Eigen::MatrixXd Cinverse(N, N);
+        // Cinverse = CMatrix.inverse();
+
+        // Cinverse *= excitation.matrix().asDiagonal();
+
+        // Cinverse -= emissivity.matrix().asDiagonal();
+        // Cinverse.array().colwise() *= (emissivity / (1.0 - emissivity));
+        // scriptF = Cinverse.transpose();
     }
 
     void CalcFMRT(int const N,             // Number of surfaces
