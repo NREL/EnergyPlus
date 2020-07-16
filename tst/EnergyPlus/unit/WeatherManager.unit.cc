@@ -805,8 +805,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, false));
 
-    OutputReportTabular::WriteEioTables(state.files);
-
+    OutputReportTabular::WriteEioTables(state.dataCostEstimateManager, state.files);
 
     // Close output files *after* the EIO has been written to
     SimulationManager::CloseOutputFiles(state.files);

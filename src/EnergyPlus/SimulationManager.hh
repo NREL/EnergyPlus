@@ -52,7 +52,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
     class IOFiles;
+    struct CostEstimateManagerData;
     struct EnergyPlusData;
     struct ZoneTempPredictorCorrectorData;
 
