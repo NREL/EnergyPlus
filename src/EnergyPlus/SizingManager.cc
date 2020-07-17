@@ -670,8 +670,8 @@ namespace SizingManager {
                     }
                     PreDefTableEntry(pdchZnClCalcDesAirFlow, curName, 0.0, 3);
                     PreDefTableEntry(pdchZnClUserDesAirFlow, curName, 0.0, 3);
-                    PreDefTableEntry(pdchZnClDesDay, curName, FinalZoneSizing(CtrlZoneNum).CoolDesDay);
-                    PreDefTableEntry(pdchZnClPkTime, curName, "00/00 00:00:00");
+                    PreDefTableEntry(pdchZnClDesDay, curName, "N/A");
+                    PreDefTableEntry(pdchZnClPkTime, curName, "N/A");
                     PreDefTableEntry(pdchZnClPkTstatTemp, curName, 0.0);
                     PreDefTableEntry(pdchZnClPkIndTemp, curName, 0.0);
                     PreDefTableEntry(pdchZnClPkIndHum, curName, 0.0, 5);
@@ -726,6 +726,24 @@ namespace SizingManager {
                     PreDefTableEntry(pdchZnHtPkOAHum, curName, HumRatAtPeak, 5);
                     PreDefTableEntry(pdchZnHtPkOAMinFlow, curName, FinalZoneSizing(CtrlZoneNum).MinOA, 3);
                     PreDefTableEntry(pdchZnHtPkDOASHeatGain, curName, DOASHeatGainRateAtHtPk);
+                } else {
+                    curName = FinalZoneSizing(CtrlZoneNum).ZoneName;
+                    PreDefTableEntry(pdchZnHtCalcDesLd, curName, 0.0);
+                    PreDefTableEntry(pdchZnHtUserDesLd, curName, 0.0);
+                    if (Zone(ZoneNum).FloorArea != 0.0) {
+                        PreDefTableEntry(pdchZnHtUserDesLdPerArea, curName, 0.0);
+                    }
+                    PreDefTableEntry(pdchZnHtCalcDesAirFlow, curName, 0.0, 3);
+                    PreDefTableEntry(pdchZnHtUserDesAirFlow, curName, 0.0, 3);
+                    PreDefTableEntry(pdchZnHtDesDay, curName, "N/A");
+                    PreDefTableEntry(pdchZnHtPkTime, curName, "N/A");
+                    PreDefTableEntry(pdchZnHtPkTstatTemp, curName, 0.0);
+                    PreDefTableEntry(pdchZnHtPkIndTemp, curName, 0.0);
+                    PreDefTableEntry(pdchZnHtPkIndHum, curName, 0.0, 5);
+                    PreDefTableEntry(pdchZnHtPkOATemp, curName, 0.0);
+                    PreDefTableEntry(pdchZnHtPkOAHum, curName, 0.0, 5);
+                    PreDefTableEntry(pdchZnHtPkOAMinFlow, curName, 0.0, 3);
+                    PreDefTableEntry(pdchZnHtPkDOASHeatGain, curName, 0.0);
                 }
             }
             // Deallocate arrays no longer needed
