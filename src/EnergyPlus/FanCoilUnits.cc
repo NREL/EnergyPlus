@@ -2046,12 +2046,12 @@ namespace FanCoilUnits {
 
                 ZoneCoolingLoadSizer sizerZoneCoolingLoad;
                 sizerZoneCoolingLoad.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                FanCoil(FanCoilNum).DesZoneCoolingLoad = sizerZoneCoolingLoad.size(TempSize, ErrorsFound);
+                FanCoil(FanCoilNum).DesZoneCoolingLoad = sizerZoneCoolingLoad.size(FanCoil(FanCoilNum).DesZoneCoolingLoad, ErrorsFound);
                 FanCoil(FanCoilNum).DesZoneCoolingLoad *= -1.0;
 
                 ZoneHeatingLoadSizer sizerZoneHeatingLoad;
                 sizerZoneHeatingLoad.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                FanCoil(FanCoilNum).DesZoneHeatingLoad = sizerZoneCoolingLoad.size(TempSize, ErrorsFound);
+                FanCoil(FanCoilNum).DesZoneHeatingLoad = sizerZoneCoolingLoad.size(FanCoil(FanCoilNum).DesZoneHeatingLoad, ErrorsFound);
 
                 FanCoil(FanCoilNum).DSOAPtr = FinalZoneSizing(CurZoneEqNum).ZoneDesignSpecOAIndex;
 
