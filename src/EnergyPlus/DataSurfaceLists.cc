@@ -229,8 +229,7 @@ namespace DataSurfaceLists {
                         }
                         if (SurfNum > 1) {
                             if (ZoneForSurface != Surface(SurfList(Item).SurfPtr(SurfNum)).Zone) {
-                                ShowSevereError("Not all surfaces in same zone for " + CurrentModuleObject1 + " = " + SurfList(Item).Name);
-                                ErrorsFound = true;
+                                ShowWarningError("Not all surfaces in same zone for " + CurrentModuleObject1 + " = " + SurfList(Item).Name);
                             }
                         }
                     }
