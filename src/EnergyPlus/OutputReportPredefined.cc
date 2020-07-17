@@ -2773,30 +2773,30 @@ namespace OutputReportPredefined {
 
         pdstHIHours = newPreDefSubTable(pdrThermalResilience, "Heat Index Hours");
         pdchHIHourSafe = newPreDefColumn(pdstHIHours, "Safe (≤ 26.7°C) [hr]");
-        pdchHIHourCaution = newPreDefColumn(pdstHIHours, "Caution (26.7, 32.2°C] [hr]");
-        pdchHIHourExtremeCaution = newPreDefColumn(pdstHIHours, "Extreme Caution (32.2, 39.4°C] [hr]");
-        pdchHIHourDanger = newPreDefColumn(pdstHIHours, "Danger (39.4, 51.7°C] [hr]");
+        pdchHIHourCaution = newPreDefColumn(pdstHIHours, "Caution (> 26.7, ≤ 32.2°C) [hr]");
+        pdchHIHourExtremeCaution = newPreDefColumn(pdstHIHours, "Extreme Caution (> 32.2, ≤ 39.4°C) [hr]");
+        pdchHIHourDanger = newPreDefColumn(pdstHIHours, "Danger (> 39.4, ≤ 51.7°C) [hr]");
         pdchHIHourExtremeDanger = newPreDefColumn(pdstHIHours, "Extreme Danger (> 51.7°C) [hr]");
 
         pdstHIOccuHours = newPreDefSubTable(pdrThermalResilience, "Heat Index OccupantHours");
         pdchHIOccuHourSafe = newPreDefColumn(pdstHIOccuHours, "Safe (≤ 26.7°C) [hr]");
-        pdchHIOccuHourCaution = newPreDefColumn(pdstHIOccuHours, "Caution (26.7, 32.2°C] [hr]");
-        pdchHIOccuHourExtremeCaution = newPreDefColumn(pdstHIOccuHours, "Extreme Caution (32.2, 39.4°C] [hr]");
-        pdchHIOccuHourDanger = newPreDefColumn(pdstHIOccuHours, "Danger (39.4, 51.7°C] [hr]");
+        pdchHIOccuHourCaution = newPreDefColumn(pdstHIOccuHours, "Caution (> 26.7, ≤ 32.2°C) [hr]");
+        pdchHIOccuHourExtremeCaution = newPreDefColumn(pdstHIOccuHours, "Extreme Caution (> 32.2, ≤ 39.4°C) [hr]");
+        pdchHIOccuHourDanger = newPreDefColumn(pdstHIOccuHours, "Danger (> 39.4, ≤ 51.7°C) [hr]");
         pdchHIOccuHourExtremeDanger = newPreDefColumn(pdstHIOccuHours, "Extreme Danger (> 51.7°C) [hr]");
 
         pdstHumidexHours = newPreDefSubTable(pdrThermalResilience, "Humidex Hours");
         pdchHumidexHourLittle = newPreDefColumn(pdstHumidexHours, "Little to no Discomfort (≤ 29) [hr]");
-        pdchHumidexHourSome = newPreDefColumn(pdstHumidexHours, "Some Discomfort (29, 40] [hr]");
-        pdchHumidexHourGreat = newPreDefColumn(pdstHumidexHours, "Great Discomfort; Avoid Exertion (40, 45] [hr]");
-        pdchHumidexHourDanger = newPreDefColumn(pdstHumidexHours, "Dangerous (45, 50] [hr]");
+        pdchHumidexHourSome = newPreDefColumn(pdstHumidexHours, "Some Discomfort (> 29, ≤ 40) [hr]");
+        pdchHumidexHourGreat = newPreDefColumn(pdstHumidexHours, "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]");
+        pdchHumidexHourDanger = newPreDefColumn(pdstHumidexHours, "Dangerous (> 45, ≤ 50) [hr]");
         pdchHumidexHourStroke = newPreDefColumn(pdstHumidexHours, "Heat Stroke Quite Possible (> 50) [hr]");
 
         pdstHumidexOccuHours = newPreDefSubTable(pdrThermalResilience, "Humidex OccupantHours");
         pdchHumidexOccuHourLittle = newPreDefColumn(pdstHumidexOccuHours, "Little to no Discomfort (≤ 29) [hr]");
-        pdchHumidexOccuHourSome = newPreDefColumn(pdstHumidexOccuHours, "Some Discomfort (29, 40] [hr]");
-        pdchHumidexOccuHourGreat = newPreDefColumn(pdstHumidexOccuHours, "Great Discomfort; Avoid Exertion (40, 45] [hr]");
-        pdchHumidexOccuHourDanger = newPreDefColumn(pdstHumidexOccuHours, "Dangerous (45, 50] [hr]");
+        pdchHumidexOccuHourSome = newPreDefColumn(pdstHumidexOccuHours, "Some Discomfort (> 29, ≤ 40) [hr]");
+        pdchHumidexOccuHourGreat = newPreDefColumn(pdstHumidexOccuHours, "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]");
+        pdchHumidexOccuHourDanger = newPreDefColumn(pdstHumidexOccuHours, "Dangerous (> 45, ≤ 50) [hr]");
         pdchHumidexOccuHourStroke = newPreDefColumn(pdstHumidexOccuHours, "Heat Stroke Quite Possible (> 50) [hr]");
 
         pdstHeatingSETHours = newPreDefSubTable(pdrThermalResilience, "Heating SET Hours");
@@ -2815,26 +2815,26 @@ namespace OutputReportPredefined {
 
         pdstCO2Hours = newPreDefSubTable(pdrCO2Resilience, "CO2 Level Hours");
         pdchCO2HourSafe = newPreDefColumn(pdstCO2Hours, "Safe (<= 1000 ppm) [hr]");
-        pdchCO2HourCaution = newPreDefColumn(pdstCO2Hours, "Caution (1000, 5000 ppm] [hr]");
+        pdchCO2HourCaution = newPreDefColumn(pdstCO2Hours, "Caution (> 1000, <= 5000 ppm) [hr]");
         pdchCO2HourHazard = newPreDefColumn(pdstCO2Hours, "Hazard (> 5000 ppm) [hr]");
 
         pdstCO2OccuHours = newPreDefSubTable(pdrCO2Resilience, "CO2 Level OccupantHours");
         pdchCO2OccuHourSafe = newPreDefColumn(pdstCO2OccuHours, "Safe (<= 1000 ppm) [hr]");
-        pdchCO2OccuHourCaution = newPreDefColumn(pdstCO2OccuHours, "Caution (1000, 5000 ppm] [hr]");
+        pdchCO2OccuHourCaution = newPreDefColumn(pdstCO2OccuHours, "Caution (> 1000, <= 5000 ppm) [hr]");
         pdchCO2OccuHourHazard = newPreDefColumn(pdstCO2OccuHours, "Hazard (> 5000 ppm) [hr]");
 
         pdrVisualResilience = newPreDefReport("VisualResilienceSummary", "VisualR", "Annual Visual Resilience Summary");
 
         pdstIllumHours = newPreDefSubTable(pdrVisualResilience, "Illuminance Level Hours");
         pdchIllumHourDark = newPreDefColumn(pdstIllumHours, "A Bit Dark (<= 100 lux) [hr]");
-        pdchIllumHourDim = newPreDefColumn(pdstIllumHours, "Dim (100, 300 lux] [hr]");
-        pdchIllumHourAdequate = newPreDefColumn(pdstIllumHours, "Adequate (300, 500 lux] [hr]");
+        pdchIllumHourDim = newPreDefColumn(pdstIllumHours, "Dim (> 100, <= 300 lux) [hr]");
+        pdchIllumHourAdequate = newPreDefColumn(pdstIllumHours, "Adequate (> 300, <= 500 lux) [hr]");
         pdchIllumHourBright = newPreDefColumn(pdstIllumHours, "Bright (>500 lux) [hr]");
 
         pdstIllumOccuHours = newPreDefSubTable(pdrVisualResilience, "Illuminance Level OccupantHours");
         pdchIllumOccuHourDark = newPreDefColumn(pdstIllumOccuHours, "A Bit Dark (<= 100 lux) [hr]");
-        pdchIllumOccuHourDim = newPreDefColumn(pdstIllumOccuHours, "Dim (100, 300 lux] [hr]");
-        pdchIllumOccuHourAdequate = newPreDefColumn(pdstIllumOccuHours, "Adequate (300, 500 lux] [hr]");
+        pdchIllumOccuHourDim = newPreDefColumn(pdstIllumOccuHours, "Dim (> 100, <= 300 lux) [hr]");
+        pdchIllumOccuHourAdequate = newPreDefColumn(pdstIllumOccuHours, "Adequate (> 300, <= 500 lux) [hr]");
         pdchIllumOccuHourBright = newPreDefColumn(pdstIllumOccuHours, "Bright (>500 lux) [hr]");
 
     }
