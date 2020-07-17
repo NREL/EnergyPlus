@@ -2051,7 +2051,7 @@ namespace FanCoilUnits {
 
                 ZoneHeatingLoadSizer sizerZoneHeatingLoad;
                 sizerZoneHeatingLoad.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                FanCoil(FanCoilNum).DesZoneHeatingLoad = sizerZoneCoolingLoad.size(FanCoil(FanCoilNum).DesZoneHeatingLoad, ErrorsFound);
+                FanCoil(FanCoilNum).DesZoneHeatingLoad = sizerZoneHeatingLoad.size(FanCoil(FanCoilNum).DesZoneHeatingLoad, ErrorsFound);
 
                 FanCoil(FanCoilNum).DSOAPtr = FinalZoneSizing(CurZoneEqNum).ZoneDesignSpecOAIndex;
 
