@@ -684,9 +684,9 @@ namespace SimulationManager {
 
         WriteTabularReports(state); //     Create the tabular reports at completion of each
 
-        WriteTabularTariffReports();
+        WriteTabularTariffReports(state.dataCostEstimateManager);
 
-        ComputeLifeCycleCostAndReport(); // must be after WriteTabularReports and WriteTabularTariffReports
+        ComputeLifeCycleCostAndReport(state.dataCostEstimateManager); // must be after WriteTabularReports and WriteTabularTariffReports
 
         CloseOutputTabularFile();
 
@@ -3150,7 +3150,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
     if (ResimHB) {
         // Surface simulation
         InitSurfaceHeatBalance(state);
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
         // Air simulation

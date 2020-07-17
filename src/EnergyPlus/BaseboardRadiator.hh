@@ -52,7 +52,6 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-//#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -107,6 +106,7 @@ namespace BaseboardRadiator {
         bool MySizeFlag;
         bool CheckEquipName;
         bool SetLoopIndexFlag;
+        bool MyEnvrnFlag;
 
         // Default Constructor
         BaseboardParams()
@@ -115,7 +115,7 @@ namespace BaseboardRadiator {
               WaterInletTemp(0.0), WaterOutletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletEnthalpy(0.0), AirInletTemp(0.0), AirInletHumRat(0.0),
               AirOutletTemp(0.0), Power(0.0), Energy(0.0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), BBLoadReSimIndex(0),
               BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0), MySizeFlag(true),
-              CheckEquipName(true), SetLoopIndexFlag(true)
+              CheckEquipName(true), SetLoopIndexFlag(true), MyEnvrnFlag(true)
         {
         }
     };
@@ -156,17 +156,21 @@ namespace BaseboardRadiator {
     struct BaseboardRadiatorData : BaseGlobalStruct {
 
         int NumBaseboards;
+        bool getInputFlag;
+        bool ZoneEquipmentListChecked;
         Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
         Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
         void clear_state() override
         {
             NumBaseboards = 0;
+            getInputFlag = true;
+            ZoneEquipmentListChecked = false;
             Baseboard.deallocate();
             BaseboardParamsNumericFields.deallocate();
         }
         // Default Constructor
         BaseboardRadiatorData()
-            : NumBaseboards(0) {}
+            : NumBaseboards(0), getInputFlag(true), ZoneEquipmentListChecked(false) {}
     };
 
 } // namespace EnergyPlus

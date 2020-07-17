@@ -1100,7 +1100,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     EXPECT_FALSE(localErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.outputFiles, localErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
     HeatBalanceManager::GetConstructData(localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
@@ -1120,10 +1120,14 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     DataHeatBalance::HConvIn.allocate(TotSurfaces);
     DataHeatBalance::HConvIn = 0.1;
     DataHeatBalSurface::TempSurfIn = 25.00;
-    DataHeatBalSurface::TempSurfIn(8) = 25.92;
-    DataHeatBalSurface::TempSurfIn(9) = 25.92;
-    DataHeatBalSurface::TempSurfIn(12) = 26.99;
-    DataHeatBalSurface::TempSurfIn(24) = 22.99;
+    int surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001", DataSurfaces::Surface);
+    DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;
+    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001:WIN001", DataSurfaces::Surface);
+    DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;
+    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL004", DataSurfaces::Surface);
+    DataHeatBalSurface::TempSurfIn(surfNum) = 26.99;
+    surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", DataSurfaces::Surface);
+    DataHeatBalSurface::TempSurfIn(surfNum) = 22.99;
     DataHeatBalFanSys::MAT.allocate(DataGlobals::NumOfZones);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(DataGlobals::NumOfZones);
     DataHeatBalFanSys::MAT = 23.0;

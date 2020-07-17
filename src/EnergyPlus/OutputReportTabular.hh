@@ -66,7 +66,9 @@
 #include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
+
     // Forward declarations
+    struct CostEstimateManagerData;
     struct EnergyPlusData;
     struct ZoneTempPredictorCorrectorData;
 
@@ -756,7 +758,7 @@ namespace OutputReportTabular {
 
     void CloseOutputTabularFile();
 
-    void WriteTableOfContents();
+    void WriteTableOfContents(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -802,25 +804,26 @@ namespace OutputReportTabular {
 
     void FillRemainingPredefinedEntries(EnergyPlusData &state);
 
-    void WriteMonthlyTables();
+    void WriteMonthlyTables(CostEstimateManagerData &dataCostEstimateManager);
 
-    void WriteTimeBinTables();
+    void WriteTimeBinTables(CostEstimateManagerData &dataCostEstimateManager);
 
-    void WriteBEPSTable(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+    void WriteBEPSTable(CostEstimateManagerData &dataCostEstimateManager,
+                        ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
 
     std::string ResourceWarningMessage(std::string resource);
 
     Real64 WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor);
 
-    void WriteSourceEnergyEndUseSummary();
+    void WriteSourceEnergyEndUseSummary(CostEstimateManagerData &dataCostEstimateManager);
 
-    void WriteDemandEndUseSummary();
+    void WriteDemandEndUseSummary(CostEstimateManagerData &dataCostEstimateManager);
 
-    void WriteCompCostTable();
+    void WriteCompCostTable(CostEstimateManagerData &dataCostEstimateManager);
 
-    void WriteVeriSumTable(OutputFiles &outputFiles);
+    void WriteVeriSumTable(CostEstimateManagerData &dataCostEstimateManager, OutputFiles &outputFiles);
 
-    void WriteAdaptiveComfortTable();
+    void WriteAdaptiveComfortTable(CostEstimateManagerData &dataCostEstimateManager);
 
     void WriteThermalResilienceTables();
 
@@ -836,15 +839,15 @@ namespace OutputReportTabular {
                             std::vector<std::string> const &columnHead,
                             Array1D<std::vector<double>> const &ZoneBins);
 
-    void WriteHeatEmissionTable();
+    void WriteHeatEmissionTable(CostEstimateManagerData &dataCostEstimateManager);
 
-    void WritePredefinedTables();
+    void WritePredefinedTables(CostEstimateManagerData &dataCostEstimateManager);
 
-    void WriteComponentSizing();
+    void WriteComponentSizing(CostEstimateManagerData &dataCostEstimateManager);
 
-    void WriteSurfaceShadowing();
+    void WriteSurfaceShadowing(CostEstimateManagerData &dataCostEstimateManager);
 
-    void WriteEioTables(OutputFiles &outputFiles);
+    void WriteEioTables(CostEstimateManagerData &dataCostEstimateManager, OutputFiles &outputFiles);
 
     int unitsFromHeading(std::string &heading);
 
@@ -862,7 +865,7 @@ namespace OutputReportTabular {
 
     void GatherComponentLoadsHVAC();
 
-    void WriteLoadComponentSummaryTables();
+    void WriteLoadComponentSummaryTables(CostEstimateManagerData &dataCostEstimateManager);
 
     void GetDelaySequences(int const &desDaySelected,
                            bool const &isCooling,
@@ -911,7 +914,8 @@ namespace OutputReportTabular {
 
     void CreateListOfZonesForAirLoop(CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop);
 
-    void OutputCompLoadSummary(int const &kind, // zone=1, airloop=2, facility=3
+    void OutputCompLoadSummary(CostEstimateManagerData &dataCostEstimateManager,
+                               int const &kind, // zone=1, airloop=2, facility=3
                                CompLoadTablesType const &compLoadCool,
                                CompLoadTablesType const &compLoadHeat,
                                int const &zoneOrAirLoopIndex);
@@ -922,7 +926,8 @@ namespace OutputReportTabular {
 
     void WriteTextLine(std::string const &lineOfText, Optional_bool_const isBold = _);
 
-    void WriteTable(Array2S_string const body, // row,column
+    void WriteTable(CostEstimateManagerData &dataCostEstimateManager,
+                    Array2S_string const body, // row,column
                     const Array1D_string &rowLabels,
                     const Array1D_string &columnLabels,
                     Array1D_int &widthColumn,
@@ -931,7 +936,8 @@ namespace OutputReportTabular {
 
     std::string MakeAnchorName(std::string const &reportString, std::string const &objectString);
 
-    std::string InsertCurrencySymbol(std::string const &inString, // Input String
+    std::string InsertCurrencySymbol(CostEstimateManagerData &dataCostEstimateManager,
+                                     std::string const &inString, // Input String
                                      bool const isHTML            // True if an HTML string
     );
 
