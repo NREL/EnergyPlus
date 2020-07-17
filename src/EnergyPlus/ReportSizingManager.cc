@@ -2228,21 +2228,6 @@ namespace ReportSizingManager {
                         CoilOutHumRat = FinalZoneSizing(CurZoneEqNum).HeatDesHumRat;
                         AutosizeDes = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
                     }
-                } else if (SizingType == HeatingWaterDesCoilWaterVolFlowUsedForUASizing) {
-                    if (TermUnitSingDuct) {
-                        AutosizeDes = DataWaterFlowUsedForSizing;
-                        coilSelectionReportObj->setCoilReheatMultiplier(CompName, CompType, 1.0);
-                    } else if ((TermUnitPIU || TermUnitIU) && (CurTermUnitSizingNum > 0)) {
-                        AutosizeDes = DataWaterFlowUsedForSizing * TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult;
-                        coilSelectionReportObj->setCoilReheatMultiplier(CompName, CompType, TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult);
-
-                    } else if (ZoneEqFanCoil) {
-                        AutosizeDes = DataWaterFlowUsedForSizing;
-                        coilSelectionReportObj->setCoilReheatMultiplier(CompName, CompType, 1.0);
-                    } else {
-                        AutosizeDes = DataWaterFlowUsedForSizing;
-                    }
-                    bCheckForZero = false;
                 } else if (SizingType == WaterHeatingCoilUASizing) {
                     if (DataCapacityUsedForSizing > 0.0 && DataWaterFlowUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0) {
                         Par(1) = DataCapacityUsedForSizing;
@@ -2327,34 +2312,6 @@ namespace ReportSizingManager {
                             ShowContinueError("  the zone heating design supply air temperature");
                             ShowContinueError("Water coil UA is set to 1 and the simulation continues.");
                         }
-                    }
-                } else if (SizingType == MaxHeaterOutletTempSizing) {
-                    AutosizeDes = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
-                } else if (SizingType == ZoneCoolingLoadSizing) {
-                    AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesCoolLoad;
-                } else if (SizingType == ZoneHeatingLoadSizing) {
-                    AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesHeatLoad;
-                } else if (SizingType == MinSATempCoolingSizing) {
-                    if (DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0) {
-                        AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp -
-                                      (DataCapacityUsedForSizing /
-                                       (DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnW(FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat)));
-                    } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
-                        ShowContinueError("SizingString = " + SizingString +
-                                          ", DataCapacityUsedForSizing = " + TrimSigDigits(DataCapacityUsedForSizing, 1));
-                        ShowContinueError("SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits(DataFlowUsedForSizing, 1));
-                    }
-                } else if (SizingType == MaxSATempHeatingSizing) {
-                    if (DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0) {
-                        AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp +
-                                      (DataCapacityUsedForSizing /
-                                       (DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnW(FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat)));
-                    } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
-                        ShowContinueError("SizingString = " + SizingString +
-                                          ", DataCapacityUsedForSizing = " + TrimSigDigits(DataCapacityUsedForSizing, 1));
-                        ShowContinueError("SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits(DataFlowUsedForSizing, 1));
                     }
                 } else if (SizingType == ASHRAEMinSATCoolingSizing) {
                     if (DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0) {
@@ -3303,9 +3260,6 @@ namespace ReportSizingManager {
                             AutosizeDes = CpAirStd * StdRhoAir * DataAirFlowUsedForSizing * (FinalSysSizing(CurSysNum).HeatSupTemp - CoilInTemp);
                         }
                     }
-                } else if (SizingType == HeatingWaterDesCoilWaterVolFlowUsedForUASizing) {
-                    AutosizeDes = DataWaterFlowUsedForSizing;
-                    bCheckForZero = false;
                 } else if (SizingType == WaterHeatingCoilUASizing) {
                     if (DataCapacityUsedForSizing >= SmallLoad && DataWaterFlowUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0) {
                         Par(1) = DataCapacityUsedForSizing;
@@ -3373,69 +3327,9 @@ namespace ReportSizingManager {
                             ShowContinueError("Water coil UA is set to 1 and the simulation continues.");
                         }
                     }
-                } else if (SizingType == MaxHeaterOutletTempSizing) {
-                    AutosizeDes = FinalSysSizing(CurSysNum).HeatSupTemp;
                 } else if (SizingType == DesiccantDehumidifierBFPerfDataFaceVelocitySizing) {
                     AutosizeDes = 4.30551 + 0.01969 * DataAirFlowUsedForSizing;
                     AutosizeDes = min(6.0, AutosizeDes);
-                } else if (SizingType == MinSATempCoolingSizing) {
-                    if (DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0) {
-                        if (CurOASysNum > 0) { // coil is in OA stream
-                            CoilInTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
-                            CoilInHumRat = FinalSysSizing(CurSysNum).OutHumRatAtCoolPeak;
-                        } else {                                                   // coil is in main air loop
-                            if (PrimaryAirSystem(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
-                                CoilInTemp = FinalSysSizing(CurSysNum).MixTempAtCoolPeak;
-                                CoilInHumRat = FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak;
-                            } else { // thereis precooling of the OA stream
-                                if (DataFlowUsedForSizing > 0.0) {
-                                    OutAirFrac = FinalSysSizing(CurSysNum).DesOutAirVolFlow / DataFlowUsedForSizing;
-                                } else {
-                                    OutAirFrac = 1.0;
-                                }
-                                OutAirFrac = min(1.0, max(0.0, OutAirFrac));
-                                CoilInTemp = OutAirFrac * FinalSysSizing(CurSysNum).PrecoolTemp +
-                                             (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).RetTempAtCoolPeak;
-                                CoilInHumRat = OutAirFrac * FinalSysSizing(CurSysNum).PrecoolHumRat +
-                                               (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).RetHumRatAtCoolPeak;
-                            }
-                        }
-                        AutosizeDes = CoilInTemp - (DataCapacityUsedForSizing / (DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnW(CoilInHumRat)));
-                    } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
-                        ShowContinueError("SizingString = " + SizingString +
-                                          ", DataCapacityUsedForSizing = " + TrimSigDigits(DataCapacityUsedForSizing, 1));
-                        ShowContinueError("SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits(DataFlowUsedForSizing, 1));
-                    }
-                } else if (SizingType == MaxSATempHeatingSizing) {
-                    if (DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0) {
-                        if (CurOASysNum > 0) { // coil is in OA stream
-                            CoilInTemp = FinalSysSizing(CurSysNum).HeatOutTemp;
-                            CoilInHumRat = FinalSysSizing(CurSysNum).HeatOutHumRat;
-                        } else {                                                   // coil is in main air loop
-                            if (PrimaryAirSystem(CurSysNum).NumOAHeatCoils == 0) { // there is no precooling of the OA stream
-                                CoilInTemp = FinalSysSizing(CurSysNum).HeatMixTemp;
-                                CoilInHumRat = FinalSysSizing(CurSysNum).HeatMixHumRat;
-                            } else { // thereis precooling of the OA stream
-                                if (DataFlowUsedForSizing > 0.0) {
-                                    OutAirFrac = FinalSysSizing(CurSysNum).DesOutAirVolFlow / DataFlowUsedForSizing;
-                                } else {
-                                    OutAirFrac = 1.0;
-                                }
-                                OutAirFrac = min(1.0, max(0.0, OutAirFrac));
-                                CoilInTemp =
-                                    OutAirFrac * FinalSysSizing(CurSysNum).PreheatTemp + (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).HeatRetTemp;
-                                CoilInHumRat = OutAirFrac * FinalSysSizing(CurSysNum).PreheatHumRat +
-                                               (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).HeatRetHumRat;
-                            }
-                        }
-                        AutosizeDes = CoilInTemp + (DataCapacityUsedForSizing / (DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnW(CoilInHumRat)));
-                    } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
-                        ShowContinueError("SizingString = " + SizingString +
-                                          ", DataCapacityUsedForSizing = " + TrimSigDigits(DataCapacityUsedForSizing, 1));
-                        ShowContinueError("SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits(DataFlowUsedForSizing, 1));
-                    }
                 } else if (SizingType == ASHRAEMinSATCoolingSizing) {
                     if (DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0 && DataZoneUsedForSizing > 0) {
                         AutosizeDes = FinalZoneSizing(DataZoneUsedForSizing).ZoneTempAtCoolPeak -
@@ -3775,8 +3669,6 @@ namespace ReportSizingManager {
                                                            TotCapTempModFac,
                                                            DXFlowPerCapMinRatio,
                                                            DXFlowPerCapMaxRatio);
-        } else if (SizingType == HeatingWaterDesCoilWaterVolFlowUsedForUASizing) {
-            coilSelectionReportObj->setCoilWaterFlowPltSizNum(CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum, DataWaterLoopNum);
         } else if (SizingType == HeatingAirflowSizing) {
             if (coilSelectionReportObj->isCompTypeCoil(CompType)) {
                 // SizingResult is airflow in m3/s
@@ -3858,18 +3750,8 @@ namespace ReportSizingManager {
 
         } else if (SizingType == HeatingDefrostSizing) {
 
-        } else if (SizingType == MaxHeaterOutletTempSizing) {
-
         } else if (SizingType == AutoCalculateSizing) {
             // do nothing
-        } else if (SizingType == ZoneCoolingLoadSizing) {
-            // do nothing
-        } else if (SizingType == ZoneHeatingLoadSizing) {
-            // do nothing
-        } else if (SizingType == MinSATempCoolingSizing) {
-
-        } else if (SizingType == MaxSATempHeatingSizing) {
-
         } else if (SizingType == HeatingCoilDesAirInletTempSizing) {
             coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, SizingResult, CurSysNum, CurZoneEqNum);
         } else if (SizingType == HeatingCoilDesAirOutletTempSizing) {

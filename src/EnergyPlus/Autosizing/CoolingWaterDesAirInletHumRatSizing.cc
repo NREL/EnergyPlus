@@ -46,11 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletHumRatSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/ReportSizingManager.hh>
 
 namespace EnergyPlus {
@@ -84,16 +79,16 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &err
         } else {
             Real64 OutAirFrac = 1.0;
             if (this->curOASysNum > 0) { // coil is in OA stream
-                if (DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
+                if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                     this->autoSizedValue =
-                        this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
+                        this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).OutHumRatAtCoolPeak;
                 }
             } else if (this->dataDesInletAirHumRat > 0.0) {
                 this->autoSizedValue = this->dataDesInletAirHumRat;
             } else {                                                                         // coil is in main air loop
-                if (DataAirSystems::PrimaryAirSystem(this->curSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
+                if ( this->primaryAirSystem(this->curSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).MixHumRatAtCoolPeak;
                 } else { // there is precooling of the OA stream
                     if (this->dataFlowUsedForSizing > 0.0) {

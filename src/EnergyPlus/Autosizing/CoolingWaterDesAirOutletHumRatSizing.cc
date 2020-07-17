@@ -46,14 +46,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/api/TypeDefs.h>
 
 namespace EnergyPlus {
 
@@ -85,9 +81,9 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &er
             this->autoSizedValue = _originalValue;
         } else {
             if (this->curOASysNum > 0) { // coil is in OA stream
-                if (DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
+                if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                     this->autoSizedValue =
-                        this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].PrecoolHumRat;
+                        this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].PrecoolHumRat;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).PrecoolHumRat;
                 }

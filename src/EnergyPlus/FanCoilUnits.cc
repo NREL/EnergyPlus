@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -1373,8 +1374,6 @@ namespace FanCoilUnits {
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
         using DataHVACGlobals::SystemAirflowSizing;
-        using DataHVACGlobals::ZoneCoolingLoadSizing;
-        using DataHVACGlobals::ZoneHeatingLoadSizing;
         using DataPlant::PlantLoop;
         using Fans::GetFanDesignVolumeFlowRate;
         using FluidProperties::GetDensityGlycol;
@@ -2043,15 +2042,16 @@ namespace FanCoilUnits {
 
                 CompType = FanCoil(FanCoilNum).UnitType;
                 CompName = FanCoil(FanCoilNum).Name;
-                SizingMethod = ZoneCoolingLoadSizing;
                 PrintFlag = true;
-                SizingString = "Zone Cooling Sensible Load [W]";
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, FanCoil(FanCoilNum).DesZoneCoolingLoad, PrintFlag, RoutineName);
+
+                ZoneCoolingLoadSizer sizerZoneCoolingLoad;
+                sizerZoneCoolingLoad.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                FanCoil(FanCoilNum).DesZoneCoolingLoad = sizerZoneCoolingLoad.size(TempSize, ErrorsFound);
                 FanCoil(FanCoilNum).DesZoneCoolingLoad *= -1.0;
 
-                SizingMethod = ZoneHeatingLoadSizing;
-                SizingString = "Zone Heating Sensible Load [W]";
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, FanCoil(FanCoilNum).DesZoneHeatingLoad, PrintFlag, RoutineName);
+                ZoneHeatingLoadSizer sizerZoneHeatingLoad;
+                sizerZoneHeatingLoad.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                FanCoil(FanCoilNum).DesZoneHeatingLoad = sizerZoneCoolingLoad.size(TempSize, ErrorsFound);
 
                 FanCoil(FanCoilNum).DSOAPtr = FinalZoneSizing(CurZoneEqNum).ZoneDesignSpecOAIndex;
 

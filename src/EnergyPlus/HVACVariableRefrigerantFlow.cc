@@ -55,6 +55,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -7687,11 +7688,11 @@ namespace HVACVariableRefrigerantFlow {
                 }
             }
         } else {
-            SizingMethod = DataHVACGlobals::MaxHeaterOutletTempSizing;
+            bool ErrorsFound = false;
             TempSize = VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil;
-            SizingString = "Maximum Supply Air Temperature from Supplemental Heater [C]";
-            ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil = TempSize;
+            MaxHeaterOutletTempSizer sizerMaxHeaterOutTemp;
+            sizerMaxHeaterOutTemp.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil = sizerMaxHeaterOutTemp.size(TempSize, ErrorsFound);
         }
 
         if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {

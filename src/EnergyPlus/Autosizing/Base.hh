@@ -50,7 +50,9 @@
 
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/api/TypeDefs.h>
 
 namespace EnergyPlus {
@@ -65,6 +67,10 @@ enum class AutoSizingType
     HeatingAirflowUASizing,
     HeatingWaterDesAirInletHumRatSizing,
     HeatingWaterDesAirInletTempSizing,
+    HeatingWaterDesCoilWaterVolFlowUsedForUASizing,
+    MaxHeaterOutletTempSizing,
+    ZoneCoolingLoadSizing,
+    ZoneHeatingLoadSizing,
     Unknown
 };
 
@@ -120,7 +126,15 @@ struct BaseSizer
     // error message handling
     std::string getLastErrorMessages();
 
+    // global sizing data
+    Real64 minOA = 0.0;
+
     // global Data* sizing constants
+
+    // HeatingWaterDesCoilWaterVolFlowUsedForUASizer
+    Real64 dataPltSizHeatNum = 0.0;
+    Real64 dataWaterLoopNum = 0.0;
+
     // CoolingWaterDesWaterInletTempSizer, CoolingWaterNumofTubesPerRowSizer
     Real64 dataPltSizCoolNum = 0.0;
 
@@ -136,7 +150,7 @@ struct BaseSizer
     Real64 dataDesInletWaterTemp = 0.0;
     Real64 dataDesOutletAirTemp = 0.0;
 
-    // CoolingWaterNumofTubesPerRowSizer
+    // CoolingWaterNumofTubesPerRowSizer, HeatingWaterDesCoilWaterVolFlowUsedForUASizer
     Real64 dataWaterFlowUsedForSizing = 0.0;
 
     bool printWarningFlag = false;
@@ -151,6 +165,8 @@ struct BaseSizer
     Array1D<DataSizing::ZoneSizingData> termUnitFinalZoneSizing;
     Array1D<DataSizing::ZoneSizingData> finalZoneSizing;
     Array1D<DataSizing::SystemSizingData> finalSysSizing;
+    Array1D<DataSizing::PlantSizingData> plantSizData;
+    Array1D<DataAirSystems::DefinePrimaryAirSystem> primaryAirSystem;
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
 
     virtual void initializeWithinEP(EnergyPlusData &state,

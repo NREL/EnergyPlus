@@ -45,25 +45,81 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef HeatingWaterDesAirInletHumRatSizing_hh_INCLUDED
-#define HeatingWaterDesAirInletHumRatSizing_hh_INCLUDED
-
-#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 
 namespace EnergyPlus {
 
-struct HeatingWaterDesAirInletHumRatSizer : BaseSizer
+Real64 MaxHeaterOutletTempSizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    HeatingWaterDesAirInletHumRatSizer()
-    {
-        this->sizingType = AutoSizingType::HeatingWaterDesAirInletHumRatSizing;
-        this->sizingString = "Design Inlet Air Humidity Ratio [kgWater/kgDryAir]";
+    if (!this->checkInitialized(errorsFound)) {
+        return 0.0;
     }
-    ~HeatingWaterDesAirInletHumRatSizer() = default;
+    this->preSize(_originalValue);
+    if (this->curZoneEqNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp;
+        }
+    } else if (this->curSysNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            this->autoSizedValue = this->finalSysSizing(this->curSysNum).HeatSupTemp;
+        }
+    }
+    this->selectSizerOutput(errorsFound);
+    return this->autoSizedValue;
+}
 
-    Real64 size(Real64 originalValue, bool &errorsFound) override;
-};
+Real64 ZoneCoolingLoadSizer::size(Real64 _originalValue, bool &errorsFound)
+{
+    if (!this->checkInitialized(errorsFound)) {
+        return 0.0;
+    }
+    this->preSize(_originalValue);
+    if (this->curZoneEqNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesCoolLoad;
+        }
+    } else if (this->curSysNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            // not implemented
+            this->errorType = AutoSizingResultType::ErrorType1;
+            this->autoSizedValue = 0.0;
+        }
+    }
+    this->selectSizerOutput(errorsFound);
+    return this->autoSizedValue;
+}
+
+Real64 ZoneHeatingLoadSizer::size(Real64 _originalValue, bool &errorsFound)
+{
+    if (!this->checkInitialized(errorsFound)) {
+        return 0.0;
+    }
+    this->preSize(_originalValue);
+    if (this->curZoneEqNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesHeatLoad;
+        }
+    } else if (this->curSysNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            // not implemented
+            this->errorType = AutoSizingResultType::ErrorType1;
+            this->autoSizedValue = 0.0;
+        }
+    }
+    this->selectSizerOutput(errorsFound);
+    return this->autoSizedValue;
+}
 
 } // namespace EnergyPlus
-
-#endif

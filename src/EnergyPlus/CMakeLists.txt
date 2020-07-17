@@ -25,6 +25,8 @@ SET( SRC
   AirLoopHVACDOAS.cc
   AirLoopHVACDOAS.hh
   AirTerminalUnit.hh
+  Autosizing/All_Simple_Sizing.cc
+  Autosizing/All_Simple_Sizing.hh
   Autosizing/Base.cc
   Autosizing/Base.hh
   Autosizing/CoolingWaterDesAirInletHumRatSizing.cc
@@ -41,6 +43,8 @@ SET( SRC
   Autosizing/HeatingWaterDesAirInletHumRatSizing.hh
   Autosizing/HeatingWaterDesAirInletTempSizing.cc
   Autosizing/HeatingWaterDesAirInletTempSizing.hh
+  Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.cc
+  Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc

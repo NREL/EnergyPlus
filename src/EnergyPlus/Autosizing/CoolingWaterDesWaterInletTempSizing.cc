@@ -46,10 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/api/TypeDefs.h>
 
 namespace EnergyPlus {
 
@@ -59,12 +55,12 @@ Real64 CoolingWaterDesWaterInletTempSizer::size(Real64 _originalValue, bool &err
         return 0.0;
     }
     this->preSize(_originalValue);
-    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || DataSizing::PlantSizData.empty())) {
+    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || this->plantSizData.empty())) {
         this->autoSizedValue = _originalValue;
-    } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
-        this->autoSizedValue = DataSizing::PlantSizData(this->dataPltSizCoolNum).ExitTemp;
-    } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
-        this->autoSizedValue = DataSizing::PlantSizData(this->dataPltSizCoolNum).ExitTemp;
+    } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= this->plantSizData.size()) {
+        this->autoSizedValue = this->plantSizData(this->dataPltSizCoolNum).ExitTemp;
+    } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= this->plantSizData.size()) {
+        this->autoSizedValue = this->plantSizData(this->dataPltSizCoolNum).ExitTemp;
     } else {
         this->errorType = AutoSizingResultType::ErrorType1;
     }

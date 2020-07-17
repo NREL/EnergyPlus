@@ -45,23 +45,46 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef HeatingWaterDesAirInletHumRatSizing_hh_INCLUDED
-#define HeatingWaterDesAirInletHumRatSizing_hh_INCLUDED
+#ifndef All_Simple_Sizing_hh_INCLUDED
+#define All_Simple_Sizing_hh_INCLUDED
 
 #include <EnergyPlus/Autosizing/Base.hh>
 
 namespace EnergyPlus {
 
-struct HeatingWaterDesAirInletHumRatSizer : BaseSizer
+struct MaxHeaterOutletTempSizer : BaseSizer
 {
-    HeatingWaterDesAirInletHumRatSizer()
+    MaxHeaterOutletTempSizer()
     {
-        this->sizingType = AutoSizingType::HeatingWaterDesAirInletHumRatSizing;
-        this->sizingString = "Design Inlet Air Humidity Ratio [kgWater/kgDryAir]";
+        this->sizingType = AutoSizingType::MaxHeaterOutletTempSizing;
+        this->sizingString = "Maximum Supply Air Temperature [C]";
+
     }
-    ~HeatingWaterDesAirInletHumRatSizer() = default;
+    ~MaxHeaterOutletTempSizer() = default;
 
     Real64 size(Real64 originalValue, bool &errorsFound) override;
+};
+
+struct ZoneCoolingLoadSizer: BaseSizer {
+    ZoneCoolingLoadSizer() {
+        this->sizingType = AutoSizingType::ZoneCoolingLoadSizing;
+        this->sizingString = "Zone Cooling Sensible Load [W]";
+
+    }
+    ~ZoneCoolingLoadSizer() = default;
+
+    Real64 size(Real64 originalValue, bool& errorsFound) override;
+};
+
+struct ZoneHeatingLoadSizer: BaseSizer {
+    ZoneHeatingLoadSizer() {
+        this->sizingType = AutoSizingType::ZoneHeatingLoadSizing;
+        this->sizingString = "Zone Heating Sensible Load [W]";
+
+    }
+    ~ZoneHeatingLoadSizer() = default;
+
+    Real64 size(Real64 originalValue, bool& errorsFound) override;
 };
 
 } // namespace EnergyPlus

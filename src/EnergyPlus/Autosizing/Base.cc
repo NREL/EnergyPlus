@@ -45,6 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -56,7 +57,6 @@
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/api/TypeDefs.h>
 
 namespace EnergyPlus {
 
@@ -106,12 +106,20 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->zoneEqSizing = DataSizing::ZoneEqSizing;
     this->sysSizingInputData = DataSizing::SysSizInput;
     this->finalSysSizing = DataSizing::FinalSysSizing;
+    this->plantSizData = DataSizing::PlantSizData;
+    this->primaryAirSystem = DataAirSystems::PrimaryAirSystem;
+
     this->airloopDOAS = state.dataAirLoopHVACDOAS.airloopDOAS;
     if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if coilType is not one of DataHVACGlobals::cAllCoilTypes
         this->getCoilReportObject = true;
     }
 
+    // global sizing data
+    this->minOA = DataSizing::MinOA;
+
     // global Data* sizing constants
+    this->dataPltSizHeatNum = DataSizing::DataPltSizHeatNum;
+    this->dataWaterLoopNum = DataSizing::DataWaterLoopNum;
     this->dataPltSizCoolNum = DataSizing::DataPltSizCoolNum;
 
     this->dataDesInletAirHumRat = DataSizing::DataDesInletAirHumRat;

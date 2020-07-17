@@ -49,8 +49,6 @@
 #define CoolingWaterNumofTubesPerRowSizing_hh_INCLUDED
 
 #include <EnergyPlus/Autosizing/Base.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <ObjexxFCL/Array1D.hh>
 
 namespace EnergyPlus {
 

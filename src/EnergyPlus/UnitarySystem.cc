@@ -48,6 +48,7 @@
 #include <string> // std::string, std::to_string
 
 #include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
@@ -2589,13 +2590,11 @@ namespace UnitarySystems {
 
         if ((this->m_HeatCoilExists || this->m_SuppCoilExists) && this->m_ControlType != ControlType::CCMASHRAE) {
 
-            SizingMethod = DataHVACGlobals::MaxHeaterOutletTempSizing;
+            bool ErrorsFound = false;
             TempSize = this->DesignMaxOutletTemp;
-            FieldNum = 17; // N17, \field Maximum Supply Air Temperature
-            // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [C]";
-            SizingString = "Maximum Supply Air Temperature [C]";
-            ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            this->DesignMaxOutletTemp = TempSize;
+            MaxHeaterOutletTempSizer sizerMaxHeaterOutTemp;
+            sizerMaxHeaterOutTemp.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            this->DesignMaxOutletTemp = sizerMaxHeaterOutTemp.size(TempSize, ErrorsFound);
         }
 
         if (this->m_SuppCoilExists) {

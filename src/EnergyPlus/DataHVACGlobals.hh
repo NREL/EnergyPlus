@@ -97,7 +97,6 @@ namespace DataHVACGlobals {
     extern int const CoolingWaterDesWaterInletTempSizing;               // request sizing for cooling water coil inlet water temp
     extern int const CoolingWaterDesAirOutletTempSizing;                // request sizing for cooling water coil outlet air temp
     extern int const HeatingWaterDesCoilLoadUsedForUASizing;            // request sizing for heating water coil capacity used for UA sizing
-    extern int const HeatingWaterDesCoilWaterVolFlowUsedForUASizing;    // request sizing for heating water coil volume flow rate used for UA sizing
     extern int const HeatingAirflowSizing;                              // request sizing for heating air flow rate
     extern int const SystemAirflowSizing;                               // request sizing for system air flow rate
     extern int const CoolingCapacitySizing;                             // request sizing for cooling capacity
@@ -107,12 +106,7 @@ namespace DataHVACGlobals {
     extern int const SystemCapacitySizing;                              // request sizing for system capacity
     extern int const CoolingSHRSizing;                                  // request sizing for cooling SHR
     extern int const HeatingDefrostSizing;                              // request sizing for heating defrost capacity
-    extern int const MaxHeaterOutletTempSizing;                         // request sizing for heating coil maximum outlet temperature
     extern int const AutoCalculateSizing;                               // identifies an autocalulate input
-    extern int const ZoneCoolingLoadSizing;                             // zone cooling sensible load (zsz file)
-    extern int const ZoneHeatingLoadSizing;                             // zome heating sensible load (zsz file)
-    extern int const MinSATempCoolingSizing;                            // minimum SA temperature in cooling
-    extern int const MaxSATempHeatingSizing;                            // maximum SA temperature in heating
     extern int const ASHRAEMinSATCoolingSizing;                         // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
     extern int const ASHRAEMaxSATHeatingSizing;                         // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
     extern int const HeatingCoilDesAirInletTempSizing;                  // design inlet air temperature for heating coil

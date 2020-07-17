@@ -46,10 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/CoolingWaterNumofTubesPerRowSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/api/TypeDefs.h>
 
 namespace EnergyPlus {
 
@@ -60,12 +56,12 @@ Real64 CoolingWaterNumofTubesPerRowSizer::size(Real64 _originalValue, bool &erro
     }
     this->preSize(_originalValue);
 
-    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || DataSizing::PlantSizData.size() == 0)) {
+    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || this->plantSizData.size() == 0)) {
         this->autoSizedValue = _originalValue;
-    } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
+    } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= this->plantSizData.size()) {
         // result will be integerized external to this routine , add 0.5 to existing calc to round the result
         this->autoSizedValue = int(max(3.0, 13750.0 * this->dataWaterFlowUsedForSizing + 1.0));
-    } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= DataSizing::PlantSizData.size()) {
+    } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= this->plantSizData.size()) {
         // result will be integerized external to this routine , add 0.5 to existing calc to round the result
         this->autoSizedValue = int(max(3.0, 13750.0 * this->dataWaterFlowUsedForSizing + 1.0));
     } else {

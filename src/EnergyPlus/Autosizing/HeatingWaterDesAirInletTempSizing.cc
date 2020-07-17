@@ -46,12 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletTempSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/ReportSizingManager.hh>
 
 namespace EnergyPlus {
@@ -102,7 +97,7 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
             Real64 OutAirFrac = 1.0;
             if (this->curOASysNum > 0) {
                 OutAirFrac = 1.0;
-            } else if (this->finalSysSizing(this->curSysNum).HeatOAOption == DataSizing::MinOA) {
+            } else if (this->finalSysSizing(this->curSysNum).HeatOAOption == this->minOA) {
                 if (this->dataFlowUsedForSizing > 0.0) {
                     OutAirFrac = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow / this->dataFlowUsedForSizing;
                 } else {
@@ -111,12 +106,12 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
             }
             // coil inlet temperature
-            if (this->curOASysNum == 0 && DataAirSystems::PrimaryAirSystem(this->curSysNum).NumOAHeatCoils > 0) {
+            if (this->curOASysNum == 0 && this->primaryAirSystem(this->curSysNum).NumOAHeatCoils > 0) {
                 this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).PreheatTemp +
                                        (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
-            } else if (this->curOASysNum > 0 && DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
+            } else if (this->curOASysNum > 0 && this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                 this->autoSizedValue =
-                    this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
+                    this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
             } else {
                 this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).HeatOutTemp +
                                        (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;

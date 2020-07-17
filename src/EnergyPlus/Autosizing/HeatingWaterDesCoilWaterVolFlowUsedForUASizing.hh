@@ -45,21 +45,21 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef HeatingWaterDesAirInletHumRatSizing_hh_INCLUDED
-#define HeatingWaterDesAirInletHumRatSizing_hh_INCLUDED
+#ifndef HeatingWaterDesCoilWaterVolFlowUsedForUASizing_hh_INCLUDED
+#define HeatingWaterDesCoilWaterVolFlowUsedForUASizing_hh_INCLUDED
 
 #include <EnergyPlus/Autosizing/Base.hh>
 
 namespace EnergyPlus {
 
-struct HeatingWaterDesAirInletHumRatSizer : BaseSizer
+struct HeatingWaterDesCoilWaterVolFlowUsedForUASizer : BaseSizer
 {
-    HeatingWaterDesAirInletHumRatSizer()
+    HeatingWaterDesCoilWaterVolFlowUsedForUASizer()
     {
-        this->sizingType = AutoSizingType::HeatingWaterDesAirInletHumRatSizing;
-        this->sizingString = "Design Inlet Air Humidity Ratio [kgWater/kgDryAir]";
+        this->sizingType = AutoSizingType::HeatingWaterDesCoilWaterVolFlowUsedForUASizing;
+        this->sizingString = "Design Water Volume Flow Rate Used for UA Sizing";
     }
-    ~HeatingWaterDesAirInletHumRatSizer() = default;
+    ~HeatingWaterDesCoilWaterVolFlowUsedForUASizer() = default;
 
     Real64 size(Real64 originalValue, bool &errorsFound) override;
 };

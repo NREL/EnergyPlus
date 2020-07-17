@@ -17,6 +17,7 @@ set( test_src
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
   Autosizing/AutosizingFixture.hh
+  Autosizing/All_Simple_Sizing.unit.cc
   Autosizing/CoolingWaterDesAirInletHumRatSizing.unit.cc
   Autosizing/CoolingWaterDesAirOutletHumRatSizing.unit.cc
   Autosizing/CoolingWaterDesWaterInletTempSizing.unit.cc
@@ -24,6 +25,7 @@ set( test_src
   Autosizing/HeatingAirflowUASizing.unit.cc
   Autosizing/HeatingWaterDesAirInletHumRatSizing.unit.cc
   Autosizing/HeatingWaterDesAirInletTempSizing.unit.cc
+  Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.unit.cc
   BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
   BoilerSteam.unit.cc

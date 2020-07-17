@@ -45,25 +45,45 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef HeatingWaterDesAirInletHumRatSizing_hh_INCLUDED
-#define HeatingWaterDesAirInletHumRatSizing_hh_INCLUDED
-
-#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh>
 
 namespace EnergyPlus {
 
-struct HeatingWaterDesAirInletHumRatSizer : BaseSizer
+Real64 HeatingWaterDesCoilWaterVolFlowUsedForUASizer::size(Real64 _originalValue, bool &errorsFound)
 {
-    HeatingWaterDesAirInletHumRatSizer()
-    {
-        this->sizingType = AutoSizingType::HeatingWaterDesAirInletHumRatSizing;
-        this->sizingString = "Design Inlet Air Humidity Ratio [kgWater/kgDryAir]";
+    if (!this->checkInitialized(errorsFound)) {
+        return 0.0;
     }
-    ~HeatingWaterDesAirInletHumRatSizer() = default;
+    this->preSize(_originalValue);
 
-    Real64 size(Real64 originalValue, bool &errorsFound) override;
-};
+    if (this->curZoneEqNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            if (this->termUnitSingDuct || this->zoneEqFanCoil) {
+                this->autoSizedValue = this->dataWaterFlowUsedForSizing;
+            } else if ((this->termUnitPIU || this->termUnitIU) && (this->curTermUnitSizingNum > 0)) {
+                this->autoSizedValue = this->dataWaterFlowUsedForSizing * this->termUnitSizing(this->curTermUnitSizingNum).ReheatLoadMult;
+            } else {
+                this->autoSizedValue = this->dataWaterFlowUsedForSizing;
+            }
+        }
+    } else if (this->curSysNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            this->autoSizedValue = this->dataWaterFlowUsedForSizing;
+        }
+    }
+    this->selectSizerOutput(errorsFound);
+    if (this->getCoilReportObject) {
+        coilSelectionReportObj->setCoilWaterFlowPltSizNum(
+            this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizHeatNum, this->dataWaterLoopNum);
+        if (this->termUnitSingDuct || this->zoneEqFanCoil || ((this->termUnitPIU || this->termUnitIU) && this->curTermUnitSizingNum > 0)) {
+            coilSelectionReportObj->setCoilReheatMultiplier(this->compName, this->compType, 1.0);
+        }
+    }
+    return this->autoSizedValue;
+}
 
 } // namespace EnergyPlus
-
-#endif
