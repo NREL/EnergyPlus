@@ -119,6 +119,7 @@ namespace BaseboardElectric {
 
     struct BaseboardElectricData : BaseGlobalStruct {
         int NumBaseboards;
+        bool getInputFlag;
         Array1D<BaseboardElectric::BaseboardParams> Baseboard;
         Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
         void clear_state() override
@@ -129,7 +130,7 @@ namespace BaseboardElectric {
         }
         // Default Constructor
         BaseboardElectricData()
-            : NumBaseboards(0) {}
+            : NumBaseboards(0), getInputFlag(true) {}
     };
 
 } // namespace EnergyPlus
