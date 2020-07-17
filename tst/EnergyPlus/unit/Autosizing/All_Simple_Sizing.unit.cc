@@ -187,11 +187,145 @@ TEST_F(AutoSizingFixture, MaxHeaterOutletTempSizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
 
-TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet) {
+TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet)
+{
     static std::string const routineName("ZoneCoolingLoadSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     ZoneCoolingLoadSizer sizer;
+    Real64 inputValue = 3007.5;
+    bool errorsFound = false;
+    bool printFlag = false;
+
+    // uninitialized sizing type
+    Real64 sizedValue = sizer.size(inputValue, errorsFound);
+    EXPECT_TRUE(errorsFound);
+    EXPECT_EQ(AutoSizingResultType::ErrorType2, sizer.errorType);
+    EXPECT_NEAR(0.0, sizedValue, 0.0001); // unitialized sizing types always return 0
+    errorsFound = false;
+
+    // ZONE EQUIPMENT TESTING
+    DataSizing::CurZoneEqNum = 1;
+
+    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+
+    // Test #1 - Zone Equipment, no autosizing
+    sizedValue = sizer.size(inputValue, errorsFound);
+    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
+    EXPECT_FALSE(sizer.wasAutoSized);
+    EXPECT_NEAR(3007.5, sizedValue, 0.0001); // hard-sized value
+    sizer.autoSizedValue = 0.0;              // reset for next test
+
+    // reset eio stream
+    has_eio_output(true);
+    printFlag = true;
+
+    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(inputValue, errorsFound);
+    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
+    EXPECT_FALSE(sizer.wasAutoSized);
+    EXPECT_NEAR(3007.5, sizedValue, 0.001); // hard-sized value
+    sizer.autoSizedValue = 0.0;             // reset for next test
+
+    std::string eiooutput =
+        std::string("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
+                    " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Zone Cooling Sensible Load [W], 3007.50000\n");
+
+    EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+    EnergyPlus::DataSizing::ZoneSizingInput.allocate(1);
+    EnergyPlus::DataSizing::ZoneSizingInput(DataSizing::CurZoneEqNum).ZoneNum = DataSizing::CurZoneEqNum;
+    EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
+    EnergyPlus::DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolLoad = 2500.0;
+    DataSizing::ZoneSizingRunDone = true;
+
+    // Test 2 - Zone Equipment, Single Duct TU (doesn't matter)
+    DataSizing::TermUnitSingDuct = true;
+    // start with an auto-sized value as the user input
+    inputValue = EnergyPlus::DataSizing::AutoSize;
+    // do sizing
+    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(inputValue, errorsFound);
+    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
+    EXPECT_TRUE(sizer.wasAutoSized);
+    EXPECT_NEAR(2500.0, sizedValue, 0.001);
+    sizer.autoSizedValue = 0.0; // reset for next test
+
+    // reset eio stream
+    has_eio_output(true);
+    eiooutput = "";
+
+    // AIRLOOP EQUIPMENT TESTING - CurDuctType not set, no reporting
+    // Test 3 - Airloop Equipment
+    DataSizing::CurZoneEqNum = 0;
+    DataSizing::NumZoneSizingInput = 0;
+    // baseFlags.otherEqType = false; set in initialize function based on other flags
+    EnergyPlus::DataSizing::ZoneEqSizing.deallocate();
+    EnergyPlus::DataSizing::FinalZoneSizing.deallocate();
+
+    DataSizing::CurSysNum = 1;
+    DataHVACGlobals::NumPrimaryAirSys = 1;
+    DataSizing::NumSysSizInput = 1;
+    DataSizing::SysSizingRunDone = false;
+    // start with a hard-sized value as the user input, no system sizing arrays
+    inputValue = 2007.8;
+    // do sizing
+    sizer.wasAutoSized = false;
+    printFlag = false;
+    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(inputValue, errorsFound);
+    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
+    EXPECT_FALSE(sizer.wasAutoSized);
+    EXPECT_NEAR(2007.8, sizedValue, 0.0001); // hard-sized value
+    sizer.autoSizedValue = 0.0;              // reset for next test
+    EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+
+    // Test 6 - Airloop Equipment - CurDuctType not set
+    DataSizing::SysSizingRunDone = true;
+    EnergyPlus::DataSizing::FinalSysSizing.allocate(1);
+    EnergyPlus::DataSizing::SysSizInput.allocate(1);
+    EnergyPlus::DataSizing::SysSizInput(1).AirLoopNum = 1;
+    EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).HeatSupTemp = 25.8;
+
+    // start with an auto-sized value as the user input
+    inputValue = EnergyPlus::DataSizing::AutoSize;
+
+    // do sizing
+    sizer.wasAutoSized = false;
+    printFlag = true;
+    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(inputValue, errorsFound);
+    EXPECT_EQ(AutoSizingResultType::ErrorType1, sizer.errorType);
+    EXPECT_TRUE(sizer.wasAutoSized);
+    EXPECT_NEAR(0.0, sizedValue, 0.0001);
+    sizer.autoSizedValue = 0.0; // reset for next test
+
+    // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
+    eiooutput = std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Zone Cooling Sensible Load [W], 0.00000\n");
+
+    EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+
+    // Test 4 - Airloop Equipment
+    sizer.wasAutoSized = false;
+    inputValue = 2880.0;
+    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(inputValue, errorsFound);
+    EXPECT_EQ(AutoSizingResultType::ErrorType1, sizer.errorType);
+    EXPECT_FALSE(sizer.wasAutoSized);
+    EXPECT_NEAR(2880.0, sizedValue, 0.0001);
+    sizer.autoSizedValue = 0.0; // reset for next test
+    // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
+    eiooutput =
+        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Zone Cooling Sensible Load [W], 0.00000\n"
+                    " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Zone Cooling Sensible Load [W], 2880.00000\n");
+    EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+}
+
+TEST_F(AutoSizingFixture, ZoneHeatingLoadSizingGauntlet)
+{
+    static std::string const routineName("ZoneHeatingLoadSizingGauntlet");
+
+    // create the sizer and set up the flags to specify the sizing configuration
+    ZoneHeatingLoadSizer sizer;
     Real64 inputValue = 3007.5;
     bool errorsFound = false;
     bool printFlag = false;
@@ -213,7 +347,7 @@ TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet) {
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(3007.5, sizedValue, 0.0001); // hard-sized value
-    sizer.autoSizedValue = 0.0;            // reset for next test
+    sizer.autoSizedValue = 0.0;              // reset for next test
 
     // reset eio stream
     has_eio_output(true);
@@ -224,17 +358,17 @@ TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet) {
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(3007.5, sizedValue, 0.001); // hard-sized value
-    sizer.autoSizedValue = 0.0;           // reset for next test
+    sizer.autoSizedValue = 0.0;             // reset for next test
 
     std::string eiooutput =
         std::string("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
-            " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Zone Cooling Sensible Load [W], 3007.50000\n");
+                    " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Zone Heating Sensible Load [W], 3007.50000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
     EnergyPlus::DataSizing::ZoneSizingInput.allocate(1);
     EnergyPlus::DataSizing::ZoneSizingInput(DataSizing::CurZoneEqNum).ZoneNum = DataSizing::CurZoneEqNum;
     EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
-    EnergyPlus::DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolLoad = 2500.0;
+    EnergyPlus::DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesHeatLoad = 2500.0;
     DataSizing::ZoneSizingRunDone = true;
 
     // Test 2 - Zone Equipment, Single Duct TU (doesn't matter)
@@ -275,7 +409,7 @@ TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet) {
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(2007.8, sizedValue, 0.0001); // hard-sized value
-    sizer.autoSizedValue = 0.0;            // reset for next test
+    sizer.autoSizedValue = 0.0;              // reset for next test
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 6 - Airloop Equipment - CurDuctType not set
@@ -283,7 +417,6 @@ TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet) {
     EnergyPlus::DataSizing::FinalSysSizing.allocate(1);
     EnergyPlus::DataSizing::SysSizInput.allocate(1);
     EnergyPlus::DataSizing::SysSizInput(1).AirLoopNum = 1;
-    EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).HeatSupTemp = 25.8;
 
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
@@ -299,8 +432,7 @@ TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet) {
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput =
-        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Zone Cooling Sensible Load [W], 0.00000\n");
+    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Zone Heating Sensible Load [W], 0.00000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -315,8 +447,8 @@ TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet) {
     sizer.autoSizedValue = 0.0; // reset for next test
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
     eiooutput =
-        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Zone Cooling Sensible Load [W], 0.00000\n"
-            " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Zone Cooling Sensible Load [W], 2880.00000\n");
+        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Zone Heating Sensible Load [W], 0.00000\n"
+                    " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Zone Heating Sensible Load [W], 2880.00000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
 
