@@ -835,7 +835,7 @@ namespace ZoneEquipmentManager {
                     ZoneSizingInput(ZoneSizIndex).ZoneNum = ZoneIndex;
                 }
                 if (ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod == FromDDCalc || ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod == FromDDCalc) {
-                    if (!VerifyThermostatInZone(state.dataZoneTempPredictorCorrector, ZoneSizingInput(ZoneSizIndex).ZoneName)) {
+                    if (!VerifyThermostatInZone(state.dataZoneTempPredictorCorrector, state.files, ZoneSizingInput(ZoneSizIndex).ZoneName)) {
                         if (!isPulseZoneSizing) {
                             ShowWarningError("SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput(ZoneSizIndex).ZoneName +
                                              "\", Zone has no thermostat (ref: ZoneControl:Thermostat, et al)");
@@ -1794,7 +1794,7 @@ namespace ZoneEquipmentManager {
 
                 // candidate EMS calling point to customize CalcFinalZoneSizing
                 bool anyEMSRan;
-                ManageEMS(emsCallFromZoneSizing, anyEMSRan);
+                ManageEMS(state.files, emsCallFromZoneSizing, anyEMSRan, ObjexxFCL::Optional_int_const());
 
                 // now apply EMS overrides (if any)
 
@@ -3104,6 +3104,7 @@ namespace ZoneEquipmentManager {
 
                     } else if (SELECT_CASE_var == UserDefinedZoneHVACForcedAir_Num) {
                         SimZoneAirUserDefined(state.dataBranchInputManager,
+                                              state.files,
                                               state.dataZoneEquipmentManager.PrioritySimOrder(EquipTypeNum).EquipName,
                                               ActualZoneNum,
                                               SysOutputProvided,

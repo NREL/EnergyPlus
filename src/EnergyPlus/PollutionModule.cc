@@ -594,7 +594,7 @@ namespace PollutionModule {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void SetupPollutionCalculations()
+    void SetupPollutionCalculations(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -643,9 +643,9 @@ namespace PollutionModule {
             //  necessary to make sure that the Meter file is opened and written to by the OP so that time stamps
             //  and the like are happening as expected.
             if (!lAlphaFieldBlanks(1)) {
-                InitPollutionMeterReporting(IOFiles::getSingleton(), cAlphaArgs(1));
+                InitPollutionMeterReporting(ioFiles, cAlphaArgs(1));
             } else {
-                InitPollutionMeterReporting(IOFiles::getSingleton(), "RunPeriod");
+                InitPollutionMeterReporting(ioFiles, "RunPeriod");
             }
         }
     }

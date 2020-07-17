@@ -2704,7 +2704,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_GetCoilInput)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Run the method
-    GetDXCoils();
+    GetDXCoils(state.files);
 
     // Check the results
     ASSERT_EQ(1, NumDXCoils);

@@ -114,11 +114,11 @@ namespace FuelCellElectricGenerator {
         FuelCell.deallocate();
     }
 
-    PlantComponent *FCDataStruct::factory(std::string const &objectName)
+    PlantComponent *FCDataStruct::factory(IOFiles &ioFiles, std::string const &objectName)
     {
         // Process the input data
         if (getFuelCellInputFlag) {
-            getFuelCellInput();
+            getFuelCellInput(ioFiles);
             getFuelCellInputFlag = false;
         }
 
@@ -134,11 +134,11 @@ namespace FuelCellElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    PlantComponent *FCDataStruct::factory_exhaust(std::string const &objectName)
+    PlantComponent *FCDataStruct::factory_exhaust(IOFiles &ioFiles, std::string const &objectName)
     {
         // Process the input data
         if (getFuelCellInputFlag) {
-            getFuelCellInput();
+            getFuelCellInput(ioFiles);
             getFuelCellInputFlag = false;
         }
 
@@ -174,7 +174,7 @@ namespace FuelCellElectricGenerator {
         this->UpdateFuelCellGeneratorRecords();
     }
 
-    void getFuelCellInput()
+    void getFuelCellInput(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brent Griffith
@@ -366,10 +366,10 @@ namespace FuelCellElectricGenerator {
             }
         } // loop over NumFuelCellPMs
 
-        GeneratorFuelSupply::GetGeneratorFuelSupplyInput();
+        GeneratorFuelSupply::GetGeneratorFuelSupplyInput(ioFiles);
 
         for (int FuelSupNum = 1; FuelSupNum <= DataGenerators::NumGeneratorFuelSups; ++FuelSupNum) {
-            GeneratorFuelSupply::SetupFuelConstituentData(IOFiles::getSingleton(), FuelSupNum, ErrorsFound);
+            GeneratorFuelSupply::SetupFuelConstituentData(ioFiles, FuelSupNum, ErrorsFound);
         }
 
         // set fuel supply ID in Fuel cell structure

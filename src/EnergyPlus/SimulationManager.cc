@@ -426,7 +426,7 @@ namespace SimulationManager {
             UpdateMeterReporting(state.files);
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
-            SetupPollutionCalculations();
+            SetupPollutionCalculations(state.files);
             InitDemandManagers(state);
             TestBranchIntegrity(state.dataBranchInputManager, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
@@ -451,7 +451,10 @@ namespace SimulationManager {
             }
             CreateEnergyReportStructure();
             bool anyEMSRan;
-            ManageEMS(emsCallFromSetupSimulation, anyEMSRan); // point to finish setup processing EMS, sensor ready now
+            ManageEMS(state.files,
+                      emsCallFromSetupSimulation,
+                      anyEMSRan,
+                      ObjexxFCL::Optional_int_const()); // point to finish setup processing EMS, sensor ready now
 
             ProduceRDDMDD();
 
@@ -539,7 +542,7 @@ namespace SimulationManager {
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
-            ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+            ManageEMS(state.files, DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
@@ -603,7 +606,7 @@ namespace SimulationManager {
                         }
 
                         BeginTimeStepFlag = true;
-                        ExternalInterfaceExchangeVariables();
+                        ExternalInterfaceExchangeVariables(state.files);
 
                         // Set the End__Flag variables to true if necessary.  Note that
                         // each flag builds on the previous level.  EndDayFlag cannot be
@@ -649,7 +652,7 @@ namespace SimulationManager {
             } // ... End day loop.
 
             // Need one last call to send latest states to middleware
-            ExternalInterfaceExchangeVariables();
+            ExternalInterfaceExchangeVariables(state.files);
 
         } // ... End environment loop.
 
@@ -3127,7 +3130,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
     if (ResimHB) {
         // Surface simulation
         InitSurfaceHeatBalance(state);
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
         // Air simulation

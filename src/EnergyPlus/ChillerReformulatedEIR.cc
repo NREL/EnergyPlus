@@ -166,7 +166,7 @@ namespace ChillerReformulatedEIR {
         this->initialize(state.dataBranchInputManager, runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->size();
+            this->size(state.files);
         }
     }
 
@@ -980,7 +980,7 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void ReformulatedEIRChillerSpecs::size()
+    void ReformulatedEIRChillerSpecs::size(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1280,7 +1280,7 @@ namespace ChillerReformulatedEIR {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             if (this->MySizeFlag) {
                 Real64 IPLV;
-                StandardRatings::CalcChillerIPLV(IOFiles::getSingleton(),
+                StandardRatings::CalcChillerIPLV(ioFiles,
                                                  this->Name,
                                                  DataPlant::TypeOf_Chiller_ElectricReformEIR,
                                                  this->RefCap,

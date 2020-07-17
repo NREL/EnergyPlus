@@ -137,6 +137,7 @@ namespace EcoRoofManager {
     // Functions
 
     void CalcEcoRoof(ConvectionCoefficientsData &dataConvectionCoefficients,
+                     IOFiles &ioFiles,
                      int const SurfNum, // Indicator of Surface Number for the current surface
                      int const ZoneNum, // Indicator for zone number where the current surface
                      int &ConstrNum,    // Indicator for construction index for the current surface
@@ -323,6 +324,7 @@ namespace EcoRoofManager {
 
         if (Surface(SurfNum).ExtWind) {
             InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                                        ioFiles,
                                         SurfNum,
                                         HMovInsul,
                                         RoughSurf,

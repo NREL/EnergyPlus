@@ -206,7 +206,7 @@ namespace SolarShading {
     // Functions
     void clear_state();
 
-    void InitSolarCalculations();
+    void InitSolarCalculations(IOFiles &ioFiles);
 
     void GetShadowingInput(IOFiles &ioFiles);
 
@@ -353,7 +353,7 @@ namespace SolarShading {
                                  int const ConstNum // Construction number
     );
 
-    void PerformSolarCalculations(WindowComplexManagerData &dataWindowComplexManager);
+    void PerformSolarCalculations(WindowComplexManagerData &dataWindowComplexManager, IOFiles &ioFiles);
 
     void SHDRVL(int const HTSS,  // Heat transfer surface number of the subsurface
                 int const SBSNR, // Subsurface number

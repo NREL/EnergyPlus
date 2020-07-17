@@ -2428,7 +2428,8 @@ namespace General {
 
     // END SUBROUTINE SaveCompDesWaterFlow
 
-    void Invert3By3Matrix(Array2A<Real64> const A, // Input 3X3 Matrix
+    void Invert3By3Matrix(IOFiles &ioFiles,
+                          Array2A<Real64> const A, // Input 3X3 Matrix
                           Array2A<Real64> InverseA // Output 3X3 Matrix - Inverse Of A
     )
     {
@@ -2474,7 +2475,7 @@ namespace General {
                       A(1, 2) * A(2, 1) * A(3, 3) - A(1, 3) * A(2, 2) * A(3, 1);
 
         if (std::abs(Determinant) < .1E-12) {
-            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{IOFiles::getSingleton().eso});
+            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{ioFiles.eso});
         }
 
         // Compute Inverse

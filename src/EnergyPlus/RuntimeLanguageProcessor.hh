@@ -174,7 +174,7 @@ namespace RuntimeLanguageProcessor {
     // Functions
     void clear_state();
 
-    void InitializeRuntimeLanguage();
+    void InitializeRuntimeLanguage(IOFiles &ioFiles);
 
     void BeginEnvrnInitializeRuntimeLanguage();
 
@@ -215,7 +215,7 @@ namespace RuntimeLanguageProcessor {
 
     ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound);
 
-    void GetRuntimeLanguageUserInput();
+    void GetRuntimeLanguageUserInput(IOFiles &ioFiles);
 
     void ReportRuntimeLanguage();
 

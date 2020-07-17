@@ -189,16 +189,17 @@ namespace HeatBalFiniteDiffManager {
 
     void clear_state();
 
-    void ManageHeatBalFiniteDiff(int const SurfNum,
+    void ManageHeatBalFiniteDiff(IOFiles &ioFiles,
+                                 int const SurfNum,
                                  Real64 &TempSurfInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
                                  Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
     );
 
-    void GetCondFDInput();
+    void GetCondFDInput(IOFiles &ioFiles);
 
-    void InitHeatBalFiniteDiff();
+    void InitHeatBalFiniteDiff(IOFiles &ioFiles);
 
-    void InitialInitHeatBalFiniteDiff();
+    void InitialInitHeatBalFiniteDiff(IOFiles &ioFiles);
 
     void CalcHeatBalFiniteDiff(int const Surf,
                                Real64 &TempSurfInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.

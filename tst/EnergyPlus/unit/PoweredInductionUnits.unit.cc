@@ -183,7 +183,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
-    Fans::GetFanInput(state.fans);
+    Fans::GetFanInput(state.fans, state.files);
     state.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
     EXPECT_TRUE(compare_err_stream(""));
@@ -401,7 +401,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
-    Fans::GetFanInput(state.fans);
+    Fans::GetFanInput(state.fans, state.files);
     state.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
     EXPECT_TRUE(compare_err_stream(""));
@@ -674,7 +674,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
-    Fans::GetFanInput(state.fans);
+    Fans::GetFanInput(state.fans, state.files);
     state.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
     EXPECT_TRUE(compare_err_stream(""));

@@ -320,7 +320,7 @@ namespace ExternalInterface {
 
     // Functions
 
-    void ExternalInterfaceExchangeVariables();
+    void ExternalInterfaceExchangeVariables(IOFiles &ioFiles);
 
     void CloseSocket(int const FlagToWriteToSocket);
 
@@ -328,7 +328,7 @@ namespace ExternalInterface {
 
     void GetExternalInterfaceInput();
 
-    void CalcExternalInterface();
+    void CalcExternalInterface(IOFiles &ioFiles);
 
     void ParseString(std::string const &str, Array1D_string &ele, int const nEle);
 
@@ -345,15 +345,15 @@ namespace ExternalInterface {
 
     void WarnIfExternalInterfaceObjectsAreUsed(std::string const &ObjectWord);
 
-    void CalcExternalInterfaceFMUImport();
+    void CalcExternalInterfaceFMUImport(IOFiles &ioFiles);
 
-    void InitExternalInterfaceFMUImport();
+    void InitExternalInterfaceFMUImport(IOFiles &ioFiles);
 
     void InstantiateInitializeFMUImport();
 
     void TerminateResetFreeFMUImport(int fmiEndSimulation);
 
-    void GetSetVariablesAndDoStepFMUImport();
+    void GetSetVariablesAndDoStepFMUImport(IOFiles &ioFiles);
 
     void VerifyExternalInterfaceObject();
 

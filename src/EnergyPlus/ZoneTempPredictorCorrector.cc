@@ -6702,7 +6702,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, std::string const &ZoneName) // Zone to verify
+    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, std::string const &ZoneName) // Zone to verify
     {
 
         // FUNCTION INFORMATION:
@@ -6719,7 +6719,7 @@ namespace ZoneTempPredictorCorrector {
         bool HasThermostat; // True if does, false if not.
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints(dataZoneTempPredictorCorrector, IOFiles::getSingleton());
+            GetZoneAirSetPoints(dataZoneTempPredictorCorrector, ioFiles);
             GetZoneAirStatsInputFlag = false;
         }
         if (NumTempControlledZones > 0) {

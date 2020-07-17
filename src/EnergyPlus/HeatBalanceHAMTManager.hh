@@ -156,7 +156,7 @@ namespace HeatBalanceHAMTManager {
 
     // Functions
 
-    void ManageHeatBalHAMT(int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
+    void ManageHeatBalHAMT(IOFiles &ioFiles, int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
 
     void GetHeatBalHAMTInput();
 

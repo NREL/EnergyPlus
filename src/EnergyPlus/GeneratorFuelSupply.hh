@@ -71,7 +71,7 @@ namespace GeneratorFuelSupply {
 
     // Functions
 
-    void GetGeneratorFuelSupplyInput();
+    void GetGeneratorFuelSupplyInput(IOFiles &ioFiles);
 
     //******************************************************************************
 

@@ -91,16 +91,17 @@ namespace EMSManager {
 
     // MODULE SUBROUTINES:
 
-    void ManageEMS(int const iCalledFrom,                     // indicates where subroutine was called from, parameters in DataGlobals.
+    void ManageEMS(IOFiles &ioFiles,
+                   int const iCalledFrom,                     // indicates where subroutine was called from, parameters in DataGlobals.
                    bool &anyProgramRan,                       // true if any Erl programs ran for this call
                    Optional_int_const ProgramManagerToRun = _ // specific program manager to run
     );
 
-    void InitEMS(int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
+    void InitEMS(IOFiles &ioFiles, int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
 
     void ReportEMS();
 
-    void GetEMSInput();
+    void GetEMSInput(IOFiles &ioFiles);
 
     void ProcessEMSInput(bool const reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 

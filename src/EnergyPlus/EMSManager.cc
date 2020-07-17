@@ -246,7 +246,8 @@ namespace EMSManager {
 
     // MODULE SUBROUTINES:
 
-    void ManageEMS(int const iCalledFrom,                 // indicates where subroutine was called from, parameters in DataGlobals.
+    void ManageEMS(IOFiles &ioFiles,
+                   int const iCalledFrom,                 // indicates where subroutine was called from, parameters in DataGlobals.
                    bool &anyProgramRan,                   // true if any Erl programs ran for this call
                    Optional_int_const ProgramManagerToRun // specific program manager to run
     )
@@ -297,7 +298,7 @@ namespace EMSManager {
             PluginManagement::onBeginEnvironment();
         }
 
-        InitEMS(iCalledFrom);
+        InitEMS(ioFiles, iCalledFrom);
 
         // also call plugins and callbacks here for convenience
         bool anyPluginsOrCallbacksRan = false;
@@ -315,7 +316,6 @@ namespace EMSManager {
 
         // Run the Erl programs depending on calling point.
 
-        auto &ioFiles = IOFiles::getSingleton();
         if (iCalledFrom != emsCallFromUserDefinedComponentModel) {
             for (ProgramManagerNum = 1; ProgramManagerNum <= NumProgramCallManagers; ++ProgramManagerNum) {
 
@@ -385,7 +385,7 @@ namespace EMSManager {
         ReportEMS();
     }
 
-    void InitEMS(int const iCalledFrom) // indicates where subroutine was called from, parameters in DataGlobals.
+    void InitEMS(IOFiles &ioFiles, int const iCalledFrom) // indicates where subroutine was called from, parameters in DataGlobals.
     {
 
         // SUBROUTINE INFORMATION:
@@ -442,7 +442,7 @@ namespace EMSManager {
             SetupSurfaceConstructionActuators();
             SetupSurfaceOutdoorBoundaryConditionActuators();
             SetupZoneOutdoorBoundaryConditionActuators();
-            GetEMSInput();
+            GetEMSInput(ioFiles);
             GetEMSUserInput = false;
         }
 
@@ -461,7 +461,7 @@ namespace EMSManager {
             FinishProcessingUserInput = false;
         }
 
-        InitializeRuntimeLanguage();
+        InitializeRuntimeLanguage(ioFiles);
 
         if ((BeginEnvrnFlag) || (iCalledFrom == emsCallFromZoneSizing) || (iCalledFrom == emsCallFromSystemSizing) ||
             (iCalledFrom == emsCallFromUserDefinedComponentModel)) {
@@ -536,7 +536,7 @@ namespace EMSManager {
         ReportRuntimeLanguage();
     }
 
-    void GetEMSInput()
+    void GetEMSInput(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -928,7 +928,7 @@ namespace EMSManager {
             }
         }
 
-        InitializeRuntimeLanguage(); // Loads built-in globals and functions, then performs GetInput for runtime language objects
+        InitializeRuntimeLanguage(ioFiles); // Loads built-in globals and functions, then performs GetInput for runtime language objects
 
         if (NumProgramCallManagers > 0) {
             cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";

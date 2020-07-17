@@ -730,7 +730,8 @@ namespace WeatherManager {
 
     void SetCurrentWeather();
 
-    void ReadWeatherForDay(int const DayToRead,          // =1 when starting out, otherwise signifies next day
+    void ReadWeatherForDay(IOFiles &ioFiles,
+                           int const DayToRead,          // =1 when starting out, otherwise signifies next day
                            int const Environ,            // Environment being simulated
                            bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
     );
@@ -940,7 +941,7 @@ namespace WeatherManager {
 
     extern AnnualMonthlyDryBulbWeatherData OADryBulbAverage;
 
-    void ReportWaterMainsTempParameters();
+    void ReportWaterMainsTempParameters(IOFiles &ioFiles);
 
 } // namespace WeatherManager
 

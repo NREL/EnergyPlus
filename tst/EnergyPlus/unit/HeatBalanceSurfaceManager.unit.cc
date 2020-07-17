@@ -1340,7 +1340,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
         DataSurfaces::Surface(SurfNum).ExtConvCoeff = -1;
     }
-    CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+    CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
     Real64 HExt_Expect_Surf1 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(5, 1.5);
     Real64 HExt_Expect_Surf2 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(5, 0.0);
     EXPECT_EQ(HExt_Expect_Surf1, DataHeatBalSurface::HcExtSurf(1));
@@ -1897,7 +1897,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
         DataSurfaces::Surface(SurfNum).ExtConvCoeff = -6;
         DataSurfaces::AirSkyRadSplit(SurfNum) = 1.0;
     }
-    CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+    CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
 
     // Test if local value correctly overwritten
     // Surface(1-3) - local; Surface(4-6) - global;
@@ -2456,7 +2456,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     }
 
     // Test Additional Heat Source Calculation
-    CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+    CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
     EXPECT_EQ(-0.1, DataHeatBalSurface::QAdditionalHeatSourceOutside(1));
 
     CalcHeatBalanceInsideSurf(state);

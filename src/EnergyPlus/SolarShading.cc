@@ -358,7 +358,7 @@ namespace SolarShading {
         ISABSF.deallocate();
     }
 
-    void InitSolarCalculations()
+    void InitSolarCalculations(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -404,7 +404,7 @@ namespace SolarShading {
             }
 
             if (GetInputFlag) {
-                GetShadowingInput(IOFiles::getSingleton());
+                GetShadowingInput(ioFiles);
                 GetInputFlag = false;
                 MaxHCV = (((max(15, MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
                 assert((MaxHCV + 1) % 16 == 0);
@@ -9148,7 +9148,7 @@ namespace SolarShading {
         return SurfaceScheduledSolarInc;
     }
 
-    void PerformSolarCalculations(WindowComplexManagerData &dataWindowComplexManager)
+    void PerformSolarCalculations(WindowComplexManagerData &dataWindowComplexManager, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9271,7 +9271,7 @@ namespace SolarShading {
             }
 
             //  Calculate daylighting coefficients
-            CalcDayltgCoefficients(IOFiles::getSingleton());
+            CalcDayltgCoefficients(ioFiles);
         }
 
         if (!WarmupFlag) {
@@ -9281,7 +9281,7 @@ namespace SolarShading {
         // Recalculate daylighting coefficients if storm window has been added
         // or removed from one or more windows at beginning of day
         if (TotWindowsWithDayl > 0 && !BeginSimFlag && !BeginEnvrnFlag && !WarmupFlag && TotStormWin > 0 && StormWinChangeThisDay) {
-            CalcDayltgCoefficients(IOFiles::getSingleton());
+            CalcDayltgCoefficients(ioFiles);
         }
     }
 

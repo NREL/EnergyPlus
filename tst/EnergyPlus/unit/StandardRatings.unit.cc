@@ -454,7 +454,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetDXCoils();
+    GetDXCoils(state.files);
 
     auto &thisCoil(DXCoils::DXCoil(1));
     auto &thisCoolPLFfPLR(PerfCurve(thisCoil.PLFFPLR(1)));
@@ -725,7 +725,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetDXCoils();
+    GetDXCoils(state.files);
 
     auto &thisCoil(DXCoils::DXCoil(1));
     auto &thisCoolPLFfPLR(PerfCurve(thisCoil.MSPLFFPLR(1)));

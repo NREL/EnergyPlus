@@ -164,7 +164,7 @@ namespace ExternalInterface {
 
     // Functions
 
-    void ExternalInterfaceExchangeVariables()
+    void ExternalInterfaceExchangeVariables(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -197,7 +197,7 @@ namespace ExternalInterface {
             // Note that checking for ZoneSizingCalc SysSizingCalc does not work here, hence we
             // use the KindOfSim flag
             if (!WarmupFlag && (KindOfSim == ksRunPeriodWeather)) {
-                CalcExternalInterface();
+                CalcExternalInterface(ioFiles);
             }
         }
 
@@ -210,10 +210,10 @@ namespace ExternalInterface {
                 StopExternalInterfaceIfError();
             }
             // initialize the FunctionalMockupUnitImport interface
-            InitExternalInterfaceFMUImport();
+            InitExternalInterfaceFMUImport(ioFiles);
             // No Data exchange during design days
             // Data Exchange data during warmup and after warmup
-            CalcExternalInterfaceFMUImport();
+            CalcExternalInterfaceFMUImport(ioFiles);
         }
     }
 
@@ -667,7 +667,7 @@ namespace ExternalInterface {
         StopExternalInterfaceIfError();
     }
 
-    void GetSetVariablesAndDoStepFMUImport()
+    void GetSetVariablesAndDoStepFMUImport(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
@@ -892,7 +892,7 @@ namespace ExternalInterface {
         // If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
         if (useEMS) {
             bool anyRan;
-            ManageEMS(emsCallFromExternalInterface, anyRan);
+            ManageEMS(ioFiles, emsCallFromExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
         }
 
         FirstCallGetSetDoStep = false;
@@ -1018,7 +1018,7 @@ namespace ExternalInterface {
         }
     }
 
-    void InitExternalInterfaceFMUImport()
+    void InitExternalInterfaceFMUImport(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1101,7 +1101,7 @@ namespace ExternalInterface {
                                               cNumericFieldNames);
                 // Get the FMU name
                 FMU(Loop).Name = cAlphaArgs(1);
-                CheckForActualFileName(IOFiles::getSingleton(), cAlphaArgs(1), fileExist, tempFullFileName);
+                CheckForActualFileName(ioFiles, cAlphaArgs(1), fileExist, tempFullFileName);
                 if (fileExist) {
                     pos = index(FMU(Loop).Name, pathChar, true); // look backwards
                     if (pos != std::string::npos) {
@@ -1911,7 +1911,7 @@ namespace ExternalInterface {
         return simtime;
     }
 
-    void CalcExternalInterfaceFMUImport()
+    void CalcExternalInterfaceFMUImport(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1987,13 +1987,13 @@ namespace ExternalInterface {
                     }
                 }
 
-                GetSetVariablesAndDoStepFMUImport();
+                GetSetVariablesAndDoStepFMUImport(ioFiles);
                 tComm += hStep;
                 FirstCallWUp = false;
 
             } else {
                 if (tComm < tStop) {
-                    GetSetVariablesAndDoStepFMUImport();
+                    GetSetVariablesAndDoStepFMUImport(ioFiles);
                     // Advance the communication time step
                     tComm += hStep;
                 } else {
@@ -2076,7 +2076,7 @@ namespace ExternalInterface {
                     }
                     // set the flag to reinitialize states to be true
                     FlagReIni = true;
-                    GetSetVariablesAndDoStepFMUImport();
+                    GetSetVariablesAndDoStepFMUImport(ioFiles);
                     FlagReIni = false;
                     // advance one time step ahead for the next calculation
                     tComm += hStep;
@@ -2133,14 +2133,14 @@ namespace ExternalInterface {
                 }
                 // set the flag to reinitialize states to be true
                 FlagReIni = true;
-                GetSetVariablesAndDoStepFMUImport();
+                GetSetVariablesAndDoStepFMUImport(ioFiles);
                 FlagReIni = false;
                 // advance one time step ahead for the next calculation
                 tComm += hStep;
                 FirstCallTStep = false;
             } else {
                 if (tComm != tStop) {
-                    GetSetVariablesAndDoStepFMUImport();
+                    GetSetVariablesAndDoStepFMUImport(ioFiles);
                     tComm += hStep;
                 } else {
                     // Terminate reset and free Slaves
@@ -2226,7 +2226,7 @@ namespace ExternalInterface {
         }
     }
 
-    void CalcExternalInterface()
+    void CalcExternalInterface(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
@@ -2362,7 +2362,7 @@ namespace ExternalInterface {
         // If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
         if (useEMS) {
             bool anyRan;
-            ManageEMS(emsCallFromExternalInterface, anyRan);
+            ManageEMS(ioFiles, emsCallFromExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
         }
 
         firstCall = false; // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui

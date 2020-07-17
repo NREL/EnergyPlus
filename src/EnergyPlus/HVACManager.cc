@@ -215,7 +215,7 @@ namespace HVACManager {
         ReportAirHeatBalanceFirstTimeFlag = true;
     }
 
-    void ManageHVAC(EnergyPlusData &state, IOFiles &ioFiles)
+    void ManageHVAC(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -374,7 +374,7 @@ namespace HVACManager {
         FracTimeStepZone = TimeStepSys / TimeStepZone;
 
         bool anyEMSRan;
-        ManageEMS(emsCallFromBeginTimestepBeforePredictor, anyEMSRan); // calling point
+        ManageEMS(state.files, emsCallFromBeginTimestepBeforePredictor, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
         SetOutAirNodes();
 
@@ -515,14 +515,14 @@ namespace HVACManager {
                 OutputReportTabular::CalcHeatEmissionReport(state);
             }
 
-            ManageEMS(emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan); // EMS calling point
+            ManageEMS(state.files, emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
             // This is where output processor data is updated for System Timestep reporting
             if (!WarmupFlag) {
                 if (DoOutputReporting) {
                     CalcMoreNodeInfo();
                     CalculatePollution();
-                    InitEnergyReports(ioFiles);
+                    InitEnergyReports(state.files);
                     ReportSystemEnergyUse();
                 }
                 if (DoOutputReporting || (ZoneSizingCalc && CompLoadReportIsReq)) {
@@ -550,13 +550,13 @@ namespace HVACManager {
                 if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
-                        print(ioFiles.eso, "{}\n", EndOfHeaderString);
-                        print(ioFiles.mtr, "{}\n", EndOfHeaderString);
+                        print(state.files.eso, "{}\n", EndOfHeaderString);
+                        print(state.files.mtr, "{}\n", EndOfHeaderString);
                         PrintEndDataDictionary = false;
                     }
                     if (DoOutputReporting && !PrintedWarmup) {
 
-                        print(ioFiles.eso,
+                        print(state.files.eso,
                               EnvironmentStampFormatStr,
                               "1",
                               "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -564,7 +564,7 @@ namespace HVACManager {
                               Longitude,
                               TimeZoneNumber,
                               Elevation);
-                        print(ioFiles.mtr,
+                        print(state.files.mtr,
                               EnvironmentStampFormatStr,
                               "1",
                               "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -589,12 +589,12 @@ namespace HVACManager {
                 if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
-                        print(ioFiles.eso, "{}\n", EndOfHeaderString);
-                        print(ioFiles.mtr, "{}\n", EndOfHeaderString);
+                        print(state.files.eso, "{}\n", EndOfHeaderString);
+                        print(state.files.mtr, "{}\n", EndOfHeaderString);
                         PrintEndDataDictionary = false;
                     }
                     if (DoOutputReporting && !PrintedWarmup) {
-                        print(ioFiles.eso,
+                        print(state.files.eso,
                               EnvironmentStampFormatStr,
                               "1",
                               "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -602,7 +602,7 @@ namespace HVACManager {
                               Longitude,
                               TimeZoneNumber,
                               Elevation);
-                        print(ioFiles.mtr,
+                        print(state.files.mtr,
                               EnvironmentStampFormatStr,
                               "1",
                               "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -616,7 +616,7 @@ namespace HVACManager {
                 }
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
             }
-            ManageEMS(emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan); // EMS calling point
+            ManageEMS(state.files, emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan, ObjexxFCL::Optional_int_const()); // EMS calling point
             // UPDATE SYSTEM CLOCKS
             SysTimeElapsed += TimeStepSys;
 
@@ -641,16 +641,16 @@ namespace HVACManager {
             }
             if ((ReportDebug) && (DayOfSim > 0)) { // Report the node data
                 if (size(Node) > 0 && !DebugNamesReported) {
-                    print(ioFiles.debug, "{}\n", "node #   Name");
+                    print(state.files.debug, "{}\n", "node #   Name");
                     for (NodeNum = 1; NodeNum <= isize(Node); ++NodeNum) {
-                        print(ioFiles.debug, " {:3}     {}\n", NodeNum, NodeID(NodeNum));
+                        print(state.files.debug, " {:3}     {}\n", NodeNum, NodeID(NodeNum));
                     }
                     DebugNamesReported = true;
                 }
                 if (size(Node) > 0) {
-                    print(ioFiles.debug, "\n\n Day of Sim     Hour of Day    Time\n");
-                    print(ioFiles.debug, "{:12}{:12} {:22.15N} \n", DayOfSim, HourOfDay, TimeStep * TimeStepZone);
-                    print(ioFiles.debug,
+                    print(state.files.debug, "\n\n Day of Sim     Hour of Day    Time\n");
+                    print(state.files.debug, "{:12}{:12} {:22.15N} \n", DayOfSim, HourOfDay, TimeStep * TimeStepZone);
+                    print(state.files.debug,
                           "{}\n",
                           "node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       MassMax        MassSP    Press        "
                           "Enthal     HumRat Fluid Type");
@@ -659,7 +659,7 @@ namespace HVACManager {
                     static constexpr auto Format_20{
                         " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#8.0F}  {:11.2F}  {:9.5F}  {}\n"};
 
-                    print(ioFiles.debug,
+                    print(state.files.debug,
                           Format_20,
                           NodeNum,
                           Node(NodeNum).Temp,
@@ -870,7 +870,7 @@ namespace HVACManager {
         // Before the HVAC simulation, call ManageSetPoints to set all the HVAC
         // node setpoints
         bool anyEMSRan = false;
-        ManageEMS(emsCallFromBeforeHVACManagers, anyEMSRan); // calling point
+        ManageEMS(state.files, emsCallFromBeforeHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
         ManageSetPoints(state);
 
@@ -881,8 +881,8 @@ namespace HVACManager {
         // the system on/off flags
         ManageSystemAvailability();
 
-        ManageEMS(emsCallFromAfterHVACManagers, anyEMSRan); // calling point
-        ManageEMS(emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
+        ManageEMS(state.files, emsCallFromAfterHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+        ManageEMS(state.files, emsCallFromHVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
 
         // first explicitly call each system type with FirstHVACIteration,
 
@@ -910,7 +910,7 @@ namespace HVACManager {
         while ((SimAirLoopsFlag || SimZoneEquipmentFlag || SimNonZoneEquipmentFlag || SimPlantLoopsFlag || SimElecCircuitsFlag) &&
                (HVACManageIteration <= MaxIter)) {
 
-            ManageEMS(emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
+            ManageEMS(state.files, emsCallFromHVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
 
             // Manages the various component simulations
             SimSelectedEquipment(state, SimAirLoopsFlag,

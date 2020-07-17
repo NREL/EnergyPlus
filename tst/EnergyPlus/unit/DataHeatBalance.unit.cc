@@ -855,7 +855,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     SetFlagForWindowConstructionWithShadeOrBlindLayer();
     EXPECT_FALSE(SurfaceWindow(windowSurfNum).HasShadeOrBlindLayer); // the window construction has no blind
 
-    GetEMSInput();
+    GetEMSInput(state.files);
     // check if EMS actuator is not setup because there is no blind/shade layer
     SetupWindowShadingControlActuators();
     EXPECT_EQ(numEMSActuatorsAvailable, 0); // no EMS actuator because there is shade/blind layer

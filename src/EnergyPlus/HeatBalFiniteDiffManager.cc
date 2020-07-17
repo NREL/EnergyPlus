@@ -199,7 +199,8 @@ namespace HeatBalFiniteDiffManager {
         MaterialFD.deallocate();
     }
 
-    void ManageHeatBalFiniteDiff(int const SurfNum,
+    void ManageHeatBalFiniteDiff(IOFiles &ioFiles,
+                                 int const SurfNum,
                                  Real64 &TempSurfInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
                                  Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
     )
@@ -219,14 +220,14 @@ namespace HeatBalFiniteDiffManager {
         // Get the moisture balance input at the beginning of the simulation only
         if (GetHBFiniteDiffInputFlag) {
             // Obtains conduction FD related parameters from input file
-            GetCondFDInput();
+            GetCondFDInput(ioFiles);
             GetHBFiniteDiffInputFlag = false;
         }
         // Solve the zone heat & moisture balance using a finite difference solution
         CalcHeatBalFiniteDiff(SurfNum, TempSurfInTmp, TempSurfOutTmp);
     }
 
-    void GetCondFDInput()
+    void GetCondFDInput(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Curtis Pedersen
@@ -495,10 +496,10 @@ namespace HeatBalFiniteDiffManager {
             ShowFatalError("GetCondFDInput: Errors found getting ConductionFiniteDifference properties. Program terminates.");
         }
 
-        InitialInitHeatBalFiniteDiff();
+        InitialInitHeatBalFiniteDiff(ioFiles);
     }
 
-    void InitHeatBalFiniteDiff()
+    void InitHeatBalFiniteDiff(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -522,7 +523,7 @@ namespace HeatBalFiniteDiffManager {
 
         if (GetHBFiniteDiffInputFlag) {
             // Obtains conduction FD related parameters from input file
-            GetCondFDInput();
+            GetCondFDInput(ioFiles);
             GetHBFiniteDiffInputFlag = false;
         }
 
@@ -598,7 +599,7 @@ namespace HeatBalFiniteDiffManager {
         }
     }
 
-    void InitialInitHeatBalFiniteDiff()
+    void InitialInitHeatBalFiniteDiff(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -995,7 +996,7 @@ namespace HeatBalFiniteDiffManager {
 
         } // End of the Surface Loop for Report Variable Setup
 
-        ReportFiniteDiffInits(IOFiles::getSingleton()); // Report the results from the Finite Diff Inits
+        ReportFiniteDiffInits(ioFiles); // Report the results from the Finite Diff Inits
     }
 
     void relax_array(Array1D<Real64> &a,       // Array to relax

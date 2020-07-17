@@ -149,7 +149,7 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     // reset eio stream
     has_eio_output(true);
 
-    DetailsForSurfaces(10); // 10 = Details Only, Surface details report
+    DetailsForSurfaces(state.files, 10); // 10 = Details Only, Surface details report
     std::string const eiooutput = delimited_string(
         {"! <Zone Surfaces>,Zone Name,# Surfaces", "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces",
          "! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm,Construction,Nominal U (w/o film coefs) "

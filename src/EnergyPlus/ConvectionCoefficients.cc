@@ -118,6 +118,7 @@ namespace ConvectionCoefficients {
     Array1D<Real64> const RoughnessMultiplier(6, {2.17, 1.67, 1.52, 1.13, 1.11, 1.0});
 
     void InitInteriorConvectionCoeffs(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                      IOFiles &ioFiles,
                                       const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                       Optional_int_const ZoneToResimulate         // if passed in, then only calculate surfaces that have this zone
     )
@@ -168,7 +169,7 @@ namespace ConvectionCoefficients {
 
         // FLOW:
         if (dataConvectionCoefficients.GetUserSuppliedConvectionCoeffs) {
-            GetUserConvectionCoefficients(dataConvectionCoefficients, IOFiles::getSingleton());
+            GetUserConvectionCoefficients(dataConvectionCoefficients, ioFiles);
             dataConvectionCoefficients.GetUserSuppliedConvectionCoeffs = false;
         }
 
@@ -324,6 +325,7 @@ namespace ConvectionCoefficients {
     }
 
     void InitExteriorConvectionCoeff(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                     IOFiles &ioFiles,
                                      int const SurfNum,      // Surface number (in Surface derived type)
                                      Real64 const HMovInsul, // Equivalent convection coefficient of movable insulation
                                      int const Roughness,    // Roughness index (1-6), see DataHeatBalance parameters
@@ -379,7 +381,7 @@ namespace ConvectionCoefficients {
 
         // FLOW:
         if (dataConvectionCoefficients.GetUserSuppliedConvectionCoeffs) {
-            GetUserConvectionCoefficients(dataConvectionCoefficients, IOFiles::getSingleton());
+            GetUserConvectionCoefficients(dataConvectionCoefficients, ioFiles);
             dataConvectionCoefficients.GetUserSuppliedConvectionCoeffs = false;
         }
 

@@ -122,11 +122,11 @@ namespace MicroCHPElectricGenerator {
         MicroCHPParamInput.deallocate();
     }
 
-    PlantComponent *MicroCHPDataStruct::factory(std::string const &objectName)
+    PlantComponent *MicroCHPDataStruct::factory(IOFiles &ioFiles, std::string const &objectName)
     {
         // Process the input data
         if (getMicroCHPInputFlag) {
-            GetMicroCHPGeneratorInput();
+            GetMicroCHPGeneratorInput(ioFiles);
             getMicroCHPInputFlag = false;
         }
 
@@ -142,7 +142,7 @@ namespace MicroCHPElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GetMicroCHPGeneratorInput()
+    void GetMicroCHPGeneratorInput(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brent Griffith
@@ -166,7 +166,7 @@ namespace MicroCHPElectricGenerator {
         if (MyOneTimeFlag) {
 
             // call to Fuel supply module to set up data there.
-            GeneratorFuelSupply::GetGeneratorFuelSupplyInput();
+            GeneratorFuelSupply::GetGeneratorFuelSupplyInput(ioFiles);
 
             // First get the Micro CHP Parameters so they can be nested in structure later
             DataIPShortCuts::cCurrentModuleObject = "Generator:MicroCHP:NonNormalizedParameters";

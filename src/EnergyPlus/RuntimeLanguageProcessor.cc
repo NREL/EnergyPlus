@@ -210,7 +210,7 @@ namespace RuntimeLanguageProcessor {
         RuntimeReportVarUniqueNames.clear();
     }
 
-    void InitializeRuntimeLanguage()
+    void InitializeRuntimeLanguage(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -298,7 +298,7 @@ namespace RuntimeLanguageProcessor {
             ActualTimeNum = NewEMSVariable("ACTUALTIME", 0);
             WarmUpFlagNum = NewEMSVariable("WARMUPFLAG", 0);
 
-            GetRuntimeLanguageUserInput(); // Load and parse all runtime language objects
+            GetRuntimeLanguageUserInput(ioFiles); // Load and parse all runtime language objects
 
             date_and_time(datestring, _, _, datevalues);
             if (datestring != "") {
@@ -2449,7 +2449,7 @@ namespace RuntimeLanguageProcessor {
         return ReturnValue;
     }
 
-    void GetRuntimeLanguageUserInput()
+    void GetRuntimeLanguageUserInput(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2973,7 +2973,7 @@ namespace RuntimeLanguageProcessor {
 
             // Parse the runtime language code
             for (StackNum = 1; StackNum <= NumErlStacks; ++StackNum) {
-                ParseStack(IOFiles::getSingleton(), StackNum);
+                ParseStack(ioFiles, StackNum);
 
                 if (ErlStack(StackNum).NumErrors > 0) {
                     ShowSevereError("Errors found parsing EMS Runtime Language program or subroutine = " + ErlStack(StackNum).Name);

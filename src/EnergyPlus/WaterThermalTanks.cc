@@ -49,7 +49,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/floops.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
@@ -329,7 +328,7 @@ namespace WaterThermalTanks {
         this->callerLoopNum = calledFromLocation.loopNum;
 
         if (this->myOneTimeInitFlag) {
-            this->setupOutputVars();
+            this->setupOutputVars(state.files);
             this->myOneTimeInitFlag = false;
         }
 
@@ -415,7 +414,7 @@ namespace WaterThermalTanks {
 
         if (this->myOneTimeInitFlag) {
             if (Tank.myOneTimeInitFlag) {
-                Tank.setupOutputVars();
+                Tank.setupOutputVars(state.files);
                 Tank.myOneTimeInitFlag = false;
             }
             this->myOneTimeInitFlag = false;
@@ -698,7 +697,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    bool getDesuperHtrInput()
+    bool getDesuperHtrInput(IOFiles &ioFiles)
     {
         bool ErrorsFound = false;
         std::string const RoutineName = "getDesuperHtrInput";
@@ -939,10 +938,12 @@ namespace WaterThermalTanks {
                 } else {
                     WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObjEnum::DXMultiSpeed;
                 }
-                DXCoils::GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName,
+                DXCoils::GetDXCoilIndex(ioFiles,
+                                        WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName,
                                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum,
                                         errFlag,
-                                        DataIPShortCuts::cCurrentModuleObject);
+                                        DataIPShortCuts::cCurrentModuleObject,
+                                        ObjexxFCL::Optional_bool_const());
                 if (allocated(DataHeatBalance::HeatReclaimDXCoil)) {
                     DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
                         DataHeatBalance::HeatReclaimDXCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
@@ -1404,7 +1405,7 @@ namespace WaterThermalTanks {
             // check that the DX Coil exists
             bool DXCoilErrFlag = false;
             bool bIsVScoil = false;
-            DXCoils::GetDXCoilIndex(HPWH.DXCoilName, HPWH.DXCoilNum, DXCoilErrFlag, DataIPShortCuts::cCurrentModuleObject, true);
+            DXCoils::GetDXCoilIndex(state.files, HPWH.DXCoilName, HPWH.DXCoilNum, DXCoilErrFlag, DataIPShortCuts::cCurrentModuleObject, true);
             if (DXCoilErrFlag) {
                 // This could be a variable speed heat pump water heater
                 bool bVSCoilErrFlag = false;
@@ -1576,13 +1577,13 @@ namespace WaterThermalTanks {
             } else {
                 if (UtilityRoutines::SameString(HPWH.FanType, "Fan:SystemModel")) {
                     HPWH.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(HPWH.FanName)); // call constructor
+                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state.files, HPWH.FanName)); // call constructor
                     HPWH.FanNum = HVACFan::getFanObjectVectorIndex(HPWH.FanName);
                     FanVolFlow = HVACFan::fanObjs[HPWH.FanNum]->designAirVolFlowRate;
 
                 } else {
-                    Fans::GetFanType(state.fans, HPWH.FanName, HPWH.FanType_Num, errFlag, DataIPShortCuts::cCurrentModuleObject, HPWH.Name);
-                    Fans::GetFanIndex(state.fans, HPWH.FanName, HPWH.FanNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
+                    Fans::GetFanType(state.fans, state.files, HPWH.FanName, HPWH.FanType_Num, errFlag, DataIPShortCuts::cCurrentModuleObject, HPWH.Name);
+                    Fans::GetFanIndex(state.fans, state.files, HPWH.FanName, HPWH.FanNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
                     Fans::GetFanVolFlow(HPWH.FanNum, FanVolFlow);
                 }
             }
@@ -2007,7 +2008,7 @@ namespace WaterThermalTanks {
                 FanOutletNodeNum = HVACFan::fanObjs[HPWH.FanNum]->outletNodeNum;
             } else {
                 errFlag = false;
-                FanOutletNodeNum = Fans::GetFanOutletNode(state.fans, HPWH.FanType, HPWH.FanName, errFlag);
+                FanOutletNodeNum = Fans::GetFanOutletNode(state.fans, state.files, HPWH.FanType, HPWH.FanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in unit=\"" + HPWH.Name + "\".");
                     ErrorsFound = true;
@@ -2029,7 +2030,7 @@ namespace WaterThermalTanks {
                 FanInletNodeNum = HVACFan::fanObjs[HPWH.FanNum]->inletNodeNum;
             } else {
                 errFlag = false;
-                FanInletNodeNum = Fans::GetFanInletNode(state.fans, HPWH.FanType, HPWH.FanName, errFlag);
+                FanInletNodeNum = Fans::GetFanInletNode(state.fans, state.files, HPWH.FanType, HPWH.FanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in unit=\"" + HPWH.Name + "\".");
                     ErrorsFound = true;
@@ -4105,7 +4106,7 @@ namespace WaterThermalTanks {
 
             // =======   Get Coil:WaterHeating:Desuperheater ======================================================================
             if (numWaterHeaterDesuperheater > 0) {
-                ErrorsFound |= getDesuperHtrInput();
+                ErrorsFound |= getDesuperHtrInput(state.files);
             }
 
             //  =======   Get HEAT PUMP:WATER HEATER ===============================================================================
@@ -4783,13 +4784,13 @@ namespace WaterThermalTanks {
         return ErrorsFound;
     }
 
-    void WaterThermalTankData::setupOutputVars()
+    void WaterThermalTankData::setupOutputVars(IOFiles &ioFiles)
     {
         if ((this->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed) || (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-            this->setupChilledWaterTankOutputVars(IOFiles::getSingleton());
+            this->setupChilledWaterTankOutputVars(ioFiles);
         } else {
             // moving setupWaterHeaterOutputVars to here causes big table diffs...
-            this->setupWaterHeaterOutputVars(IOFiles::getSingleton());
+            this->setupWaterHeaterOutputVars(ioFiles);
         }
         // moving setupZoneInternalGains to here causes math and table diffs...
         // this->setupZoneInternalGains();
@@ -11897,7 +11898,7 @@ namespace WaterThermalTanks {
 
 
         if (this->myOneTimeInitFlag) {
-            this->setupOutputVars();
+            this->setupOutputVars(ioFiles);
             this->myOneTimeInitFlag = false;
         }
 

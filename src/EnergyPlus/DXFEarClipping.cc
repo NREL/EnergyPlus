@@ -181,7 +181,8 @@ namespace DXFEarClipping {
         return rModulus;
     }
 
-    int Triangulate(int const nsides, // number of sides to polygon
+    int Triangulate(IOFiles &ioFiles,
+                    int const nsides, // number of sides to polygon
                     Array1D<Vector> &polygon,
                     Array1D<dTriangle> &outtriangles,
                     Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
@@ -312,7 +313,7 @@ namespace DXFEarClipping {
         evert = 3;
         removed = false;
         while (nvertcur > 3) {
-            generate_ears(IOFiles::getSingleton(), nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
+            generate_ears(ioFiles, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
             if (!any_gt(ears, 0)) {
                 ShowWarningError("DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
                                  "\", check surface vertex order(entry)");

@@ -667,7 +667,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SolarDistribution = FullExterior;
 
     CalcSkyDifShading = true;
-    SolarShading::InitSolarCalculations();
+    SolarShading::InitSolarCalculations(state.files);
     SolarShading::SkyDifSolarShading();
     CalcSkyDifShading = false;
 
@@ -1066,7 +1066,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     SolarDistribution = FullExterior;
 
     CalcSkyDifShading = true;
-    SolarShading::InitSolarCalculations();
+    SolarShading::InitSolarCalculations(state.files);
     SolarShading::SkyDifSolarShading();
     CalcSkyDifShading = false;
 
@@ -1850,7 +1850,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     DataSystemVariables::SlaterBarsky = true;
 
     CalcSkyDifShading = true;
-    SolarShading::InitSolarCalculations();
+    SolarShading::InitSolarCalculations(state.files);
     SolarShading::SkyDifSolarShading();
     CalcSkyDifShading = false;
 

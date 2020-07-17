@@ -434,8 +434,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
                 fanInletNode = HVACFan::fanObjs[supplyFanIndex]->inletNodeNum;
                 fanOutletNode = HVACFan::fanObjs[supplyFanIndex]->outletNodeNum;
             } else { // TODO: Are there other fan types to be considered here??
-                fanInletNode = Fans::GetFanInletNode(state.fans, "FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
-                fanOutletNode = Fans::GetFanOutletNode(state.fans, "FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
+                fanInletNode = Fans::GetFanInletNode(state.fans, state.files, "FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
+                fanOutletNode = Fans::GetFanOutletNode(state.fans, state.files, "FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
             }
 
             // set node state variables in preparation for fan model.

@@ -106,7 +106,7 @@ namespace DataPlant {
 
             // Initialize loop side controls -- could just be done for one loop since this routine inherently
             //  loops over all plant/condenser loops.  Not sure if the penalty is worth investigating.
-            PlantCondLoopOperation::InitLoadDistribution(state.dataBranchInputManager, FirstHVACIteration);
+            PlantCondLoopOperation::InitLoadDistribution(state.dataBranchInputManager, state.files, FirstHVACIteration);
 
             // Now that the op scheme types are updated, do LoopSide validation
             this->ValidateFlowControlPaths();
@@ -1751,6 +1751,7 @@ namespace DataPlant {
                     break;
                 case DataPlant::CompSetPtBasedSchemeType:
                     PlantCondLoopOperation::ManagePlantLoadDistribution(state.dataBranchInputManager,
+                                                                        state.files,
                                                                         this->myLoopNum,
                                                                         this->myLoopSideNum,
                                                                         BranchCounter,
@@ -1769,6 +1770,7 @@ namespace DataPlant {
                         DataPlant::PlantLoop(this->myLoopNum).OpScheme(OpSchemePtr).EMSIntVarLoopDemandRate = InitialDemandToLoopSetPoint;
                     }
                     PlantCondLoopOperation::ManagePlantLoadDistribution(state.dataBranchInputManager,
+                                                                        state.files,
                                                                         this->myLoopNum,
                                                                         this->myLoopSideNum,
                                                                         BranchCounter,
@@ -1853,6 +1855,7 @@ namespace DataPlant {
                     if ((CurOpSchemeType >= DataPlant::LoadRangeBasedMin) && (CurOpSchemeType <= DataPlant::LoadRangeBasedMax)) { //~ load range based
                         if (!LoadDistributionWasPerformed) { //~ Still need to distribute load among load range based components
                             PlantCondLoopOperation::ManagePlantLoadDistribution(state.dataBranchInputManager,
+                                                                                state.files,
                                                                                 this->myLoopNum,
                                                                                 this->myLoopSideNum,
                                                                                 BranchCounter,

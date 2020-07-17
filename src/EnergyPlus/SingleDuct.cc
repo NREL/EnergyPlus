@@ -1723,8 +1723,8 @@ namespace SingleDuct {
                 ErrorsFound = true;
             }
             if (sd_airterminal(SysNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs.emplace_back(
-                    new HVACFan::FanSystem(sd_airterminal(SysNum).FanName)); // call constructor, safe here because get input is not using DataIPShortCuts.
+                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(
+                    state.files, sd_airterminal(SysNum).FanName)); // call constructor, safe here because get input is not using DataIPShortCuts.
                 sd_airterminal(SysNum).Fan_Index = HVACFan::getFanObjectVectorIndex(sd_airterminal(SysNum).FanName);
                 sd_airterminal(SysNum).OutletNodeNum = HVACFan::fanObjs[sd_airterminal(SysNum).Fan_Index]->outletNodeNum;
                 sd_airterminal(SysNum).InletNodeNum = HVACFan::fanObjs[sd_airterminal(SysNum).Fan_Index]->inletNodeNum;
@@ -1732,14 +1732,14 @@ namespace SingleDuct {
             } else if (sd_airterminal(SysNum).Fan_Num == DataHVACGlobals::FanType_SimpleVAV) {
                 IsNotOK = false;
 
-                sd_airterminal(SysNum).OutletNodeNum = GetFanOutletNode(state.fans, sd_airterminal(SysNum).FanType, sd_airterminal(SysNum).FanName, IsNotOK);
+                sd_airterminal(SysNum).OutletNodeNum = GetFanOutletNode(state.fans, state.files, sd_airterminal(SysNum).FanType, sd_airterminal(SysNum).FanName, IsNotOK);
                 if (IsNotOK) {
                     ShowContinueError("..Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                     ErrorsFound = true;
                 }
 
                 IsNotOK = false;
-                sd_airterminal(SysNum).InletNodeNum = GetFanInletNode(state.fans, sd_airterminal(SysNum).FanType, sd_airterminal(SysNum).FanName, IsNotOK);
+                sd_airterminal(SysNum).InletNodeNum = GetFanInletNode(state.fans, state.files, sd_airterminal(SysNum).FanType, sd_airterminal(SysNum).FanName, IsNotOK);
                 if (IsNotOK) {
                     ShowContinueError("..Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                     ErrorsFound = true;

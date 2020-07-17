@@ -203,7 +203,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state.fans);
+            GetFanInput(state.fans, state.files);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -273,7 +273,7 @@ namespace Fans {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetFanInput(FansData &fans)
+    void GetFanInput(FansData &fans, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -993,7 +993,7 @@ namespace Fans {
         }
 
         bool anyRan;
-        ManageEMS(emsCallFromComponentGetInput, anyRan);
+        ManageEMS(ioFiles, emsCallFromComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
         MySizeFlag.dimension(fans.NumFans, true);
     }
 
@@ -2610,7 +2610,7 @@ namespace Fans {
     // Beginning of Utility subroutines for the Fan Module
     // *****************************************************************************
 
-    void GetFanIndex(FansData &fans, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType)
+    void GetFanIndex(FansData &fans, IOFiles &ioFiles, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2624,7 +2624,7 @@ namespace Fans {
         // is not legal fan.
 
         if (fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(fans);
+            GetFanInput(fans, ioFiles);
             fans.GetFanInputFlag = false;
         }
 
@@ -2726,7 +2726,9 @@ namespace Fans {
         }
     }
 
-    void GetFanType(FansData &fans, std::string const &FanName,           // Fan name
+    void GetFanType(FansData &fans,
+                    IOFiles &ioFiles,
+                    std::string const &FanName,           // Fan name
                     int &FanType,                         // returned fantype number
                     bool &ErrorsFound,                    // error indicator
                     Optional_string_const ThisObjectType, // parent object type (for error message)
@@ -2748,7 +2750,7 @@ namespace Fans {
         int FanIndex;
 
         if (fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(fans);
+            GetFanInput(fans, ioFiles);
             fans.GetFanInputFlag = false;
         }
 
@@ -2768,7 +2770,9 @@ namespace Fans {
         }
     }
 
-    Real64 GetFanDesignVolumeFlowRate(FansData &fans, std::string const &FanType, // must match fan types in this module
+    Real64 GetFanDesignVolumeFlowRate(FansData &fans,
+                                      IOFiles &ioFiles,
+                                      std::string const &FanType, // must match fan types in this module
                                       std::string const &FanName, // must match fan names for the fan type
                                       bool &ErrorsFound,          // set to true if problem
                                       Optional_int_const FanIndex // index to fan
@@ -2794,7 +2798,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(fans);
+            GetFanInput(fans, ioFiles);
             fans.GetFanInputFlag = false;
         }
 
@@ -2815,7 +2819,9 @@ namespace Fans {
         return DesignVolumeFlowRate;
     }
 
-    int GetFanInletNode(FansData &fans, std::string const &FanType, // must match fan types in this module
+    int GetFanInletNode(FansData &fans,
+                        IOFiles &ioFiles,
+                        std::string const &FanType, // must match fan types in this module
                         std::string const &FanName, // must match fan names for the fan type
                         bool &ErrorsFound           // set to true if problem
     )
@@ -2840,7 +2846,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(fans);
+            GetFanInput(fans, ioFiles);
             fans.GetFanInputFlag = false;
         }
 
@@ -2856,7 +2862,9 @@ namespace Fans {
         return NodeNumber;
     }
 
-    int getFanInNodeIndex(FansData &fans, int const &FanIndex, // fan index
+    int getFanInNodeIndex(FansData &fans,
+                          IOFiles &ioFiles,
+                          int const &FanIndex, // fan index
                           bool &ErrorsFound    // set to true if problem
     )
     {
@@ -2865,7 +2873,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(fans);
+            GetFanInput(fans, ioFiles);
             fans.GetFanInputFlag = false;
         }
 
@@ -2879,7 +2887,9 @@ namespace Fans {
         return NodeNumber;
     }
 
-    int GetFanOutletNode(FansData &fans, std::string const &FanType, // must match fan types in this module
+    int GetFanOutletNode(FansData &fans,
+                         IOFiles &ioFiles,
+                         std::string const &FanType, // must match fan types in this module
                          std::string const &FanName, // must match fan names for the fan type
                          bool &ErrorsFound           // set to true if problem
     )
@@ -2904,7 +2914,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(fans);
+            GetFanInput(fans, ioFiles);
             fans.GetFanInputFlag = false;
         }
 
@@ -2920,7 +2930,9 @@ namespace Fans {
         return NodeNumber;
     }
 
-    int GetFanAvailSchPtr(FansData &fans, std::string const &FanType, // must match fan types in this module
+    int GetFanAvailSchPtr(FansData &fans,
+                          IOFiles &ioFiles,
+                          std::string const &FanType, // must match fan types in this module
                           std::string const &FanName, // must match fan names for the fan type
                           bool &ErrorsFound           // set to true if problem
     )
@@ -2945,7 +2957,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(fans);
+            GetFanInput(fans, ioFiles);
             fans.GetFanInputFlag = false;
         }
 
@@ -2961,7 +2973,9 @@ namespace Fans {
         return FanAvailSchPtr;
     }
 
-    int GetFanSpeedRatioCurveIndex(FansData &fans, std::string &FanType, // must match fan types in this module (set if nonzero index passed)
+    int GetFanSpeedRatioCurveIndex(FansData &fans,
+                                   IOFiles &ioFiles,
+                                   std::string &FanType, // must match fan types in this module (set if nonzero index passed)
                                    std::string &FanName, // must match fan names for the fan type (set if nonzero index passed)
                                    Optional_int IndexIn  // optional fan index if fan type and name are unknown or index needs setting
     )
@@ -2986,7 +3000,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(fans);
+            GetFanInput(fans, ioFiles);
             fans.GetFanInputFlag = false;
         }
 
@@ -3013,7 +3027,9 @@ namespace Fans {
         return FanSpeedRatioCurveIndex;
     }
 
-    void SetFanData(FansData &fans, int const FanNum,                     // Index of fan
+    void SetFanData(FansData &fans,
+                    IOFiles &ioFiles,
+                    int const FanNum,                     // Index of fan
                     bool &ErrorsFound,                    // Set to true if certain errors found
                     std::string const &FanName,           // Name of fan
                     Optional<Real64 const> MaxAirVolFlow, // Fan air volumetric flow rate    [m3/s]
@@ -3058,7 +3074,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(fans);
+            GetFanInput(fans, ioFiles);
             fans.GetFanInputFlag = false;
         }
 

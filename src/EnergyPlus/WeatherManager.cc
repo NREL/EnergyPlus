@@ -2128,7 +2128,7 @@ namespace WeatherManager {
             // Call and setup the Design Day environment
             if (Environment(Envrn).KindOfEnvrn != ksRunPeriodWeather) {
                 if (Environment(Envrn).DesignDayNum > 0) {
-                    SetUpDesignDay(IOFiles::getSingleton(), Environment(Envrn).DesignDayNum);
+                    SetUpDesignDay(ioFiles, Environment(Envrn).DesignDayNum);
                     EnvironmentName = Environment(Envrn).Title;
                 }
             }
@@ -2191,7 +2191,7 @@ namespace WeatherManager {
             }
 
             if ((KindOfSim != ksDesignDay) && (KindOfSim != ksHVACSizeDesignDay)) {
-                ReadWeatherForDay(1, Envrn, false); // Read first day's weather
+                ReadWeatherForDay(ioFiles, 1, Envrn, false); // Read first day's weather
             } else {
                 TomorrowVariables = DesignDay(Environment(Envrn).DesignDayNum);
             }
@@ -2232,9 +2232,9 @@ namespace WeatherManager {
                         }
                         ++YearOfSim;
                         FirstSimDayofYear = 1;
-                        ReadWeatherForDay(FirstSimDayofYear, Envrn, false); // Read tomorrow's weather
+                        ReadWeatherForDay(ioFiles, FirstSimDayofYear, Envrn, false); // Read tomorrow's weather
                     } else {
-                        ReadWeatherForDay(DayOfSim + 1, Envrn, false); // Read tomorrow's weather
+                        ReadWeatherForDay(ioFiles, DayOfSim + 1, Envrn, false); // Read tomorrow's weather
                     }
                 }
             }
@@ -2384,7 +2384,7 @@ namespace WeatherManager {
                 }
             }
             // reports to eio file
-            ReportWaterMainsTempParameters();
+            ReportWaterMainsTempParameters(ioFiles);
             WaterMainsParameterReport = false;
         }
     }
@@ -2689,7 +2689,8 @@ namespace WeatherManager {
         }
     }
 
-    void ReadWeatherForDay(int const DayToRead,          // =1 when starting out, otherwise signifies next day
+    void ReadWeatherForDay(IOFiles &ioFiles,
+                           int const DayToRead,          // =1 when starting out, otherwise signifies next day
                            int const Environ,            // Environment being simulated
                            bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
     )
@@ -2730,7 +2731,7 @@ namespace WeatherManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        ReadEPlusWeatherForDay(IOFiles::getSingleton(), DayToRead, Environ, BackSpaceAfterRead);
+        ReadEPlusWeatherForDay(ioFiles, DayToRead, Environ, BackSpaceAfterRead);
     }
 
     void ReadEPlusWeatherForDay(IOFiles &ioFiles,
@@ -10619,7 +10620,7 @@ namespace WeatherManager {
         }
     }
 
-    void ReportWaterMainsTempParameters()
+    void ReportWaterMainsTempParameters(IOFiles &ioFiles)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // report site water mains temperature object user inputs and/or parameters calculated
@@ -10634,7 +10635,7 @@ namespace WeatherManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string const cCalculationMethod({1, 3}, {"Schedule", "Correlation", "CorrelationFromWeatherFile"});
 
-        if (!IOFiles::getSingleton().eio.good()) {
+        if (!ioFiles.eio.good()) {
             return;
         }
 
@@ -10696,7 +10697,7 @@ namespace WeatherManager {
             }
         }
 
-        print(IOFiles::getSingleton().eio, "{}", ss.str());
+        print(ioFiles.eio, "{}", ss.str());
     }
 } // namespace WeatherManager
 

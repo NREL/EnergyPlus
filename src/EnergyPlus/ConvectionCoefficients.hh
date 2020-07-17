@@ -419,11 +419,13 @@ namespace ConvectionCoefficients {
     // Functions
 
     void InitInteriorConvectionCoeffs(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                      IOFiles &ioFiles,
                                       const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                       Optional_int_const ZoneToResimulate = _    // if passed in, then only calculate surfaces that have this zone
     );
 
     void InitExteriorConvectionCoeff(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                     IOFiles &ioFiles,
                                      int SurfNum,      // Surface number (in Surface derived type)
                                      Real64 HMovInsul, // Equivalent convection coefficient of movable insulation
                                      int Roughness,    // Roughness index (1-6), see DataHeatBalance parameters

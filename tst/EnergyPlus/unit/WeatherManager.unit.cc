@@ -508,7 +508,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
 
     // report water mains parameters to eio file
-    WeatherManager::ReportWaterMainsTempParameters();
+    WeatherManager::ReportWaterMainsTempParameters(state.files);
 
     std::string const eiooutput = delimited_string({"! <Site Water Mains Temperature Information>,"
                                                     "Calculation Method{},"
@@ -1032,7 +1032,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
     AllocateWeatherData();
     OpenWeatherFile(state, ErrorsFound);
-    ReadWeatherForDay(0, 1, false);
+    ReadWeatherForDay(state.files, 0, 1, false);
 
     Real64 expected_IRHorizSky = 345.73838855245953;
     EXPECT_NEAR(TomorrowHorizIRSky(1, 1), expected_IRHorizSky, 0.001);

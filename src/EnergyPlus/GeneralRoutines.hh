@@ -117,6 +117,7 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
 );
 
 void CalcPassiveExteriorBaffleGap(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                  IOFiles &ioFiles,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,        // Area available for venting the gap [m2]
                                   Real64 const Cv,              // Oriface coefficient for volume-based discharge, wind-driven [--]

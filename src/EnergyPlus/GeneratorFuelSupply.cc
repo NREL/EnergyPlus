@@ -121,7 +121,7 @@ namespace GeneratorFuelSupply {
 
     // Functions
 
-    void GetGeneratorFuelSupplyInput()
+    void GetGeneratorFuelSupplyInput(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -251,7 +251,7 @@ namespace GeneratorFuelSupply {
             // now make calls to Setup
 
             for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
-                SetupFuelConstituentData(IOFiles::getSingleton(), FuelSupNum, ErrorsFound);
+                SetupFuelConstituentData(ioFiles, FuelSupNum, ErrorsFound);
             }
 
             if (ErrorsFound) {

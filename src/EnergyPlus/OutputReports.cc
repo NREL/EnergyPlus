@@ -130,7 +130,7 @@ void ReportSurfaces(IOFiles &ioFiles)
     Option2 = "";
 
     ScanForReports("Surfaces", DoReport, "Lines", Option1);
-    if (DoReport) LinesOut(Option1);
+    if (DoReport) LinesOut(ioFiles, Option1);
 
     ScanForReports("Surfaces", DoReport, "Vertices");
     if (DoReport) {
@@ -202,11 +202,11 @@ void ReportSurfaces(IOFiles &ioFiles)
     }
 
     if (SurfDet || SurfVert) {
-        DetailsForSurfaces(SurfDetails);
+        DetailsForSurfaces(ioFiles, SurfDetails);
     }
 }
 
-void LinesOut(std::string const &option)
+void LinesOut(IOFiles &ioFiles, std::string const &option)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
@@ -260,7 +260,7 @@ void LinesOut(std::string const &option)
     lastoption = option;
     optiondone = true;
 
-    auto slnfile = IOFiles::getSingleton().sln.open("LinesOut");
+    auto slnfile = ioFiles.sln.open("LinesOut");
 
     if (option != "IDF") {
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
@@ -638,7 +638,8 @@ void DXFOut(IOFiles &ioFiles,
             } else {
                 Array1D<dTriangle> mytriangles;
 
-                const auto ntri = Triangulate(Surface(surf).Sides,
+                const auto ntri = Triangulate(ioFiles,
+                                              Surface(surf).Sides,
                                               Surface(surf).Vertex,
                                               mytriangles,
                                               Surface(surf).Azimuth,
@@ -719,7 +720,8 @@ void DXFOut(IOFiles &ioFiles,
                 } else {
                     Array1D<dTriangle> mytriangles;
 
-                    const auto ntri = Triangulate(Surface(surf).Sides,
+                    const auto ntri = Triangulate(ioFiles,
+                                                  Surface(surf).Sides,
                                                   Surface(surf).Vertex,
                                                   mytriangles,
                                                   Surface(surf).Azimuth,
@@ -788,7 +790,8 @@ void DXFOut(IOFiles &ioFiles,
                     Array1D<dTriangle> mytriangles;
                     int ntri = 0;
                     if (Surface(surf).Shape == SurfaceShape::RectangularOverhang) {
-                        ntri = Triangulate(Surface(surf).Sides,
+                        ntri = Triangulate(ioFiles,
+                                           Surface(surf).Sides,
                                            Surface(surf).Vertex,
                                            mytriangles,
                                            Surface(surf).Azimuth,
@@ -796,7 +799,8 @@ void DXFOut(IOFiles &ioFiles,
                                            Surface(surf).Name,
                                            SurfaceClass_Overhang);
                     } else {
-                        ntri = Triangulate(Surface(surf).Sides,
+                        ntri = Triangulate(ioFiles,
+                                           Surface(surf).Sides,
                                            Surface(surf).Vertex,
                                            mytriangles,
                                            Surface(surf).Azimuth,
@@ -859,7 +863,7 @@ void DXFOut(IOFiles &ioFiles,
     print(dxffile, Format_706);
 }
 
-void DXFOutLines(std::string const &ColorScheme)
+void DXFOutLines(IOFiles &ioFiles, std::string const &ColorScheme)
 {
 
     // SUBROUTINE INFORMATION:
@@ -920,7 +924,7 @@ void DXFOutLines(std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = IOFiles::getSingleton().dxf.open("DXFOutLines");
+    auto dxffile = ioFiles.dxf.open("DXFOutLines");
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1245,7 +1249,7 @@ void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme)
     print(dxffile, Format_706);
 }
 
-void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only, 11=Details with vertices)
+void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only, 10=Details only, 11=Details with vertices)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1728,7 +1732,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
         } // surfaces
     }     // zones
 
-    print(IOFiles::getSingleton().eio, "{}", eiostream->str());
+    print(ioFiles.eio, "{}", eiostream->str());
 }
 
 void CostInfoOut(IOFiles &ioFiles)
@@ -1953,7 +1957,8 @@ void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::stri
             print(wrlfile, Format_805);
         } else { // will be >4 sided polygon with triangulate option
             Array1D<dTriangle> mytriangles;
-            const auto ntri = Triangulate(Surface(surf).Sides,
+            const auto ntri = Triangulate(ioFiles,
+                                          Surface(surf).Sides,
                                           Surface(surf).Vertex,
                                           mytriangles,
                                           Surface(surf).Azimuth,
@@ -1999,7 +2004,8 @@ void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::stri
                 print(wrlfile, Format_805);
             } else { // will be >4 sided polygon with triangulate option
                 Array1D<dTriangle> mytriangles;
-                const auto ntri = Triangulate(Surface(surf).Sides,
+                const auto ntri = Triangulate(ioFiles,
+                                              Surface(surf).Sides,
                                               Surface(surf).Vertex,
                                               mytriangles,
                                               Surface(surf).Azimuth,
@@ -2037,7 +2043,8 @@ void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::stri
                 print(wrlfile, Format_805);
             } else { // will be >4 sided polygon with triangulate option
                 Array1D<dTriangle> mytriangles;
-                const auto ntri = Triangulate(Surface(surf).Sides,
+                const auto ntri = Triangulate(ioFiles,
+                                              Surface(surf).Sides,
                                               Surface(surf).Vertex,
                                               mytriangles,
                                               Surface(surf).Azimuth,

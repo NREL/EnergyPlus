@@ -1111,7 +1111,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    ScheduleManager::ProcessScheduleInput(IOFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(state.files);
     ScheduleManager::ScheduleInputProcessed = true;
 
     DataHeatBalance::Zone(2).HasWindow = true;

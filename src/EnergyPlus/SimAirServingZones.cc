@@ -1263,7 +1263,7 @@ namespace SimAirServingZones {
                             // Construct fan object
                             if (HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false) < 0) {
                                 HVACFan::fanObjs.emplace_back(
-                                    new HVACFan::FanSystem(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
+                                    new HVACFan::FanSystem(state.files, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
                             }
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex =
                                 HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) +
@@ -2066,16 +2066,31 @@ namespace SimAirServingZones {
                             if (PrimaryAirSystem(AirLoopNum).OASysExists && !PrimaryAirSystem(AirLoopNum).isAllOA) {
                                 if (FoundOASys) {
                                     if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3) {
-                                        GetFanIndex(state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
+                                        GetFanIndex(state.fans,
+                                                    state.files,
+                                                    PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                                    SupFanIndex,
+                                                    ErrorsFound,
+                                                    ObjexxFCL::Optional_string_const());
                                         supFanModelType = structArrayLegacyFanModels;
                                         goto EndOfAirLoop;
                                     }
                                 } else {
-                                    GetFanIndex(state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, RetFanIndex, ErrorsFound);
+                                    GetFanIndex(state.fans,
+                                                state.files,
+                                                PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                                RetFanIndex,
+                                                ErrorsFound,
+                                                ObjexxFCL::Optional_string_const());
                                     retFanModelType = structArrayLegacyFanModels;
                                 }
                             } else {
-                                GetFanIndex(state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
+                                GetFanIndex(state.fans,
+                                            state.files,
+                                            PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                            SupFanIndex,
+                                            ErrorsFound,
+                                            ObjexxFCL::Optional_string_const());
                                 supFanModelType = structArrayLegacyFanModels;
                                 goto EndOfAirLoop;
                             }
@@ -3623,7 +3638,7 @@ namespace SimAirServingZones {
                 if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
             } else if (SELECT_CASE_var == CoilUserDefined) { // Coil:UserDefined
-                SimCoilUserDefined(state.dataBranchInputManager, CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
+                SimCoilUserDefined(state.dataBranchInputManager, state.files, CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
 
             } else if (SELECT_CASE_var == UnitarySystemModel) { // 'AirLoopHVAC:UnitarySystem'
                 Real64 sensOut = 0.0;
@@ -7079,7 +7094,7 @@ namespace SimAirServingZones {
 
                 // EMS calling point to customize system sizing results
                 bool anyEMSRan;
-                ManageEMS(emsCallFromSystemSizing, anyEMSRan);
+                ManageEMS(ioFiles, emsCallFromSystemSizing, anyEMSRan, ObjexxFCL::Optional_int_const());
 
                 // EMS override point
                 if (AnyEnergyManagementSystemInModel) {

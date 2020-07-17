@@ -265,7 +265,7 @@ namespace EnergyPlus {
         GetZoneEquipmentData1(state);
         ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state.fans);
+        GetFanInput(state.fans, state.files);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);
@@ -578,7 +578,7 @@ namespace EnergyPlus {
         GetZoneEquipmentData1(state);
         ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state.fans);
+        GetFanInput(state.fans, state.files);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);
@@ -889,7 +889,7 @@ namespace EnergyPlus {
         GetZoneEquipmentData1(state);
         ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state.fans);
+        GetFanInput(state.fans, state.files);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);
@@ -1267,7 +1267,7 @@ namespace EnergyPlus {
         GetZoneEquipmentData1(state);
         ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state.fans);
+        GetFanInput(state.fans, state.files);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);
@@ -1586,7 +1586,7 @@ namespace EnergyPlus {
         GetZoneEquipmentData1(state);
         ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state.fans);
+        GetFanInput(state.fans, state.files);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);
@@ -1942,7 +1942,7 @@ namespace EnergyPlus {
         GetZoneEquipmentData1(state);
         ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state.fans);
+        GetFanInput(state.fans, state.files);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);
@@ -2277,7 +2277,7 @@ namespace EnergyPlus {
         ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
         SetPredefinedTables();
-        GetFanInput(state.fans);
+        GetFanInput(state.fans, state.files);
         GetFanCoilUnits(state);
 
         PlantLoop.allocate(TotNumLoops);
@@ -2650,7 +2650,7 @@ namespace EnergyPlus {
         GetZoneEquipmentData1(state);
         ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state.fans);
+        GetFanInput(state.fans, state.files);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);

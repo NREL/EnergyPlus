@@ -300,7 +300,7 @@ namespace DXCoils {
 
         // First time SimDXCoil is called, get the input for all the DX coils (condensing units)
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state.files);
             GetCoilsInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
         }
 
@@ -433,7 +433,7 @@ namespace DXCoils {
 
         // First time SimDXCoil is called, get the input for all the DX coils (condensing units)
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state.files);
             GetCoilsInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
         }
 
@@ -583,7 +583,7 @@ namespace DXCoils {
 
         // First time SimDXCoil is called, get the input for all the DX coils (condensing units)
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state.files);
             GetCoilsInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
         }
 
@@ -846,7 +846,7 @@ namespace DXCoils {
         ReportDXCoil(DXCoilNum);
     }
 
-    void GetDXCoils()
+    void GetDXCoils(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6017,7 +6017,7 @@ namespace DXCoils {
         lAlphaBlanks2.deallocate();
         lNumericBlanks2.deallocate();
         bool anyEMSRan;
-        ManageEMS(emsCallFromComponentGetInput, anyEMSRan);
+        ManageEMS(ioFiles, emsCallFromComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
     }
 
     void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the current DX coil unit being simulated
@@ -6966,7 +6966,7 @@ namespace DXCoils {
                             CoilInTemp = SysSizingRunDone ? FinalSysSizing(CurSysNum).MixTempAtCoolPeak : 26;
                         }
                     }
-                    CalcVRFCoilCapModFac(0, _, CompName, CoilInTemp, _, _, _, DataTotCapCurveValue);
+                    CalcVRFCoilCapModFac(state.files, 0, _, CompName, CoilInTemp, _, _, _, DataTotCapCurveValue);
                 } else if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling) {
                     SizingMethod = CoolingCapacitySizing;
                     CompName = DXCoil(DXCoilNum).Name;
@@ -13541,8 +13541,8 @@ namespace DXCoils {
                     FanInletNode = HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->inletNodeNum;
                     FanOutletNode = HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->outletNodeNum;
                 } else {
-                    FanInletNode = Fans::GetFanInletNode(state.fans, "FAN:VARIABLEVOLUME", DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
-                    FanOutletNode = Fans::GetFanOutletNode(state.fans, "FAN:VARIABLEVOLUME", DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
+                    FanInletNode = Fans::GetFanInletNode(state.fans, state.files, "FAN:VARIABLEVOLUME", DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
+                    FanOutletNode = Fans::GetFanOutletNode(state.fans, state.files, "FAN:VARIABLEVOLUME", DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
                 }
 
                 // set node state variables in preparation for fan model.
@@ -13941,7 +13941,8 @@ namespace DXCoils {
                     for (CompNum = 1; CompNum <= PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).TotalComponents; ++CompNum) {
                         if (PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num == SimAirServingZones::Fan_Simple_VAV) {
                             SupplyFanName = PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).Name;
-                            Fans::GetFanIndex(state.fans, SupplyFanName, SupplyFanIndex, ErrorsFound);
+                            Fans::GetFanIndex(
+                                state.fans, state.files, SupplyFanName, SupplyFanIndex, ErrorsFound, ObjexxFCL::Optional_string_const());
                             SupplyFan_TypeNum = DataHVACGlobals::FanType_SimpleVAV;
                             break;
                             // these are specified in SimAirServingZones and need to be moved to a Data* file. UnitarySystem=19
@@ -14095,8 +14096,12 @@ namespace DXCoils {
 
     // ======================  Utility routines ======================================
 
-    void GetDXCoilIndex(
-        std::string const &DXCoilName, int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning)
+    void GetDXCoilIndex(IOFiles &ioFiles,
+                        std::string const &DXCoilName,
+                        int &DXCoilIndex,
+                        bool &ErrorsFound,
+                        Optional_string_const ThisObjectType,
+                        Optional_bool_const SuppressWarning)
     {
 
         // SUBROUTINE INFORMATION:
@@ -14108,7 +14113,7 @@ namespace DXCoils {
         // DX Coil is not a legal DX Coil.
 
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14127,7 +14132,7 @@ namespace DXCoils {
         }
     }
 
-    std::string GetDXCoilName(int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning)
+    std::string GetDXCoilName(IOFiles &ioFiles, int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning)
     {
 
         // SUBROUTINE INFORMATION:
@@ -14139,7 +14144,7 @@ namespace DXCoils {
         // DX Coil is not a legal DX Coil.
 
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14162,7 +14167,7 @@ namespace DXCoils {
         }
     }
 
-    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state),
+    Real64 GetCoilCapacity(EnergyPlusData &state,
                            std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
@@ -14186,7 +14191,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state.files);
             GetCoilsInputFlag = false;
         }
 
@@ -14226,7 +14231,8 @@ namespace DXCoils {
         return CoilCapacity;
     }
 
-    Real64 GetCoilCapacityByIndexType(int const CoilIndex,    // must match coil index for the coil type
+    Real64 GetCoilCapacityByIndexType(IOFiles &ioFiles,
+                                      int const CoilIndex,    // must match coil index for the coil type
                                       int const CoilType_Num, // must match coil types in this module
                                       bool &ErrorsFound       // set to true if problem
     )
@@ -14246,7 +14252,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14277,7 +14283,8 @@ namespace DXCoils {
         return CoilCapacity;
     }
 
-    int GetCoilTypeNum(std::string const &CoilType,     // must match coil types in this module
+    int GetCoilTypeNum(IOFiles &ioFiles,
+                       std::string const &CoilType,     // must match coil types in this module
                        std::string const &CoilName,     // must match coil names for the coil type
                        bool &ErrorsFound,               // set to true if problem
                        Optional_bool_const PrintWarning // prints warning when true
@@ -14302,7 +14309,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14326,7 +14333,8 @@ namespace DXCoils {
         return TypeNum;
     }
 
-    Real64 GetMinOATCompressor(std::string const &CoilType, // must match coil types in this module
+    Real64 GetMinOATCompressor(IOFiles &ioFiles,
+                               std::string const &CoilType, // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     )
@@ -14349,7 +14357,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14385,7 +14393,8 @@ namespace DXCoils {
         return MinOAT;
     }
 
-    Real64 GetMinOATCompressorUsingIndex(int const CoilIndex, // index to cooling coil
+    Real64 GetMinOATCompressorUsingIndex(IOFiles &ioFiles,
+                                         int const CoilIndex, // index to cooling coil
                                          bool &ErrorsFound    // set to true if problem
     )
     {
@@ -14404,7 +14413,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14422,7 +14431,7 @@ namespace DXCoils {
 
         return MinOAT;
     }
-    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state),
+    int GetCoilInletNode(EnergyPlusData &state,
                          std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
@@ -14446,7 +14455,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state.files);
             GetCoilsInputFlag = false;
         }
 
@@ -14462,7 +14471,8 @@ namespace DXCoils {
         return NodeNumber;
     }
 
-    int getCoilInNodeIndex(int const &CoilIndex, // coil index
+    int getCoilInNodeIndex(IOFiles &ioFiles,
+                           int const &CoilIndex, // coil index
                            bool &ErrorsFound     // set to true if problem
     )
     {
@@ -14471,7 +14481,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14486,7 +14496,7 @@ namespace DXCoils {
         return NodeNumber;
     }
 
-    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state),
+    int GetCoilOutletNode(EnergyPlusData &state,
                           std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
@@ -14510,7 +14520,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state.files);
             GetCoilsInputFlag = false;
         }
 
@@ -14527,7 +14537,8 @@ namespace DXCoils {
         return NodeNumber;
     }
 
-    int getCoilOutNodeIndex(int const &CoilIndex, // must match coil types in this module
+    int getCoilOutNodeIndex(IOFiles &ioFiles,
+                            int const &CoilIndex, // must match coil types in this module
                             bool &ErrorsFound     // set to true if problem
     )
     {
@@ -14536,7 +14547,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14551,7 +14562,8 @@ namespace DXCoils {
         return NodeNumber;
     }
 
-    int GetCoilCondenserInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilCondenserInletNode(IOFiles &ioFiles,
+                                  std::string const &CoilType, // must match coil types in this module
                                   std::string const &CoilName, // must match coil names for the coil type
                                   bool &ErrorsFound            // set to true if problem
     )
@@ -14573,7 +14585,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14589,7 +14601,8 @@ namespace DXCoils {
         return CondNode;
     }
 
-    Real64 GetDXCoilBypassedFlowFrac(std::string const &CoilType, // must match coil types in this module
+    Real64 GetDXCoilBypassedFlowFrac(IOFiles &ioFiles,
+                                     std::string const &CoilType, // must match coil types in this module
                                      std::string const &CoilName, // must match coil names for the coil type
                                      bool &ErrorsFound            // set to true if problem
     )
@@ -14612,7 +14625,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14729,7 +14742,8 @@ namespace DXCoils {
         return DXCoolingCoilIndex;
     }
 
-    int GetDXCoilNumberOfSpeeds(std::string const &CoilType, // must match coil types in this module
+    int GetDXCoilNumberOfSpeeds(IOFiles &ioFiles,
+                                std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     )
@@ -14751,7 +14765,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14767,7 +14781,8 @@ namespace DXCoils {
         return NumberOfSpeeds;
     }
 
-    int GetDXCoilAvailSchPtr(std::string const &CoilType, // must match coil types in this module
+    int GetDXCoilAvailSchPtr(IOFiles &ioFiles,
+                             std::string const &CoilType, // must match coil types in this module
                              std::string const &CoilName, // must match coil names for the coil type
                              bool &ErrorsFound,           // set to true if problem
                              Optional_int_const CoilIndex // Coil index number
@@ -14791,7 +14806,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14822,7 +14837,8 @@ namespace DXCoils {
         return SchPtr;
     }
 
-    Real64 GetDXCoilAirFlow(std::string const &CoilType, // must match coil types in this module
+    Real64 GetDXCoilAirFlow(IOFiles &ioFiles,
+                            std::string const &CoilType, // must match coil types in this module
                             std::string const &CoilName, // must match coil names for the coil type
                             bool &ErrorsFound            // set to true if problem
     )
@@ -14845,7 +14861,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14875,7 +14891,8 @@ namespace DXCoils {
         return AirFlow;
     }
 
-    int GetDXCoilCapFTCurveIndex(int const CoilIndex, // coil index pointer
+    int GetDXCoilCapFTCurveIndex(IOFiles &ioFiles,
+                                 int const CoilIndex, // coil index pointer
                                  bool &ErrorsFound    // set to true if problem
     )
     {
@@ -14894,7 +14911,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -14967,7 +14984,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state.files);
             GetCoilsInputFlag = false;
         }
 
@@ -15084,7 +15101,8 @@ namespace DXCoils {
         }
     }
 
-    void SetCoilSystemHeatingDXFlag(std::string const &CoilType, // must match coil types in this module
+    void SetCoilSystemHeatingDXFlag(IOFiles &ioFiles,
+                                    std::string const &CoilType, // must match coil types in this module
                                     std::string const &CoilName  // must match coil names for the coil type
     )
     {
@@ -15105,7 +15123,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -15117,7 +15135,8 @@ namespace DXCoils {
         }
     }
 
-    void SetCoilSystemCoolingData(std::string const &CoilName, // must match coil names for the coil type
+    void SetCoilSystemCoolingData(IOFiles &ioFiles,
+                                  std::string const &CoilName, // must match coil names for the coil type
                                   std::string const &CoilSystemName)
     {
 
@@ -15132,7 +15151,7 @@ namespace DXCoils {
         int WhichCoil;
 
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -15209,7 +15228,7 @@ namespace DXCoils {
         return SHRopr;
     }
 
-    void SetDXCoilTypeData(std::string const &CoilName) // must match coil names for the coil type
+    void SetDXCoilTypeData(IOFiles &ioFiles, std::string const &CoilName) // must match coil names for the coil type
     {
 
         // SUBROUTINE INFORMATION:
@@ -15223,7 +15242,7 @@ namespace DXCoils {
         int WhichCoil;
 
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 
@@ -16709,7 +16728,8 @@ namespace DXCoils {
         }
     }
 
-    void CalcVRFCoilCapModFac(int const OperationMode,        // mode 0 for cooling, 1 for heating
+    void CalcVRFCoilCapModFac(IOFiles &ioFiles,
+                              int const OperationMode,        // mode 0 for cooling, 1 for heating
                               Optional<int const> CoilIndex,  // index to VRFTU cooling or heating coil
                               Optional<std::string> CoilName, // name of VRFTU cooling or heating coil
                               Real64 const Tinlet,            // dry bulb temperature of air entering the coil
@@ -16752,7 +16772,7 @@ namespace DXCoils {
         if (present(CoilIndex)) {
             CoilNum = CoilIndex;
         } else {
-            GetDXCoilIndex(CoilName, CoilNum, ErrorsFound);
+            GetDXCoilIndex(ioFiles, CoilName, CoilNum, ErrorsFound, ObjexxFCL::Optional_string_const(), ObjexxFCL::Optional_bool_const());
         }
 
         BFC_rate = DXCoil(CoilNum).RateBFVRFIUEvap;
@@ -16916,7 +16936,7 @@ namespace DXCoils {
         }
     }
 
-    void SetDXCoilAirLoopNumber(std::string const &CoilName, int const AirLoopNum)
+    void SetDXCoilAirLoopNumber(IOFiles &ioFiles, std::string const &CoilName, int const AirLoopNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         L. Gu
@@ -16929,7 +16949,7 @@ namespace DXCoils {
         int WhichCoil;
 
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(ioFiles);
             GetCoilsInputFlag = false;
         }
 

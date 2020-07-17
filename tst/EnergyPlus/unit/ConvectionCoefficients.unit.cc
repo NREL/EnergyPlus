@@ -1532,7 +1532,7 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
     DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    ConvectionCoefficients::InitInteriorConvectionCoeffs(state.dataConvectionCoefficients, DataHeatBalSurface::TempSurfInTmp);
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(state.dataConvectionCoefficients, state.files, DataHeatBalSurface::TempSurfInTmp);
 
     int algorithm_identifier;
 
@@ -1772,7 +1772,7 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
     DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    ConvectionCoefficients::InitInteriorConvectionCoeffs(state.dataConvectionCoefficients, DataHeatBalSurface::TempSurfInTmp);
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(state.dataConvectionCoefficients, state.files, DataHeatBalSurface::TempSurfInTmp);
     ConvectionCoefficients::GetUserConvectionCoefficients(state.dataConvectionCoefficients, state.files);
 
     int algorithm_identifier;

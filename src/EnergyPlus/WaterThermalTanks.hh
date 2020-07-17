@@ -652,7 +652,7 @@ namespace WaterThermalTanks {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void setupOutputVars();
+        void setupOutputVars(IOFiles &ioFiles);
 
         void setupZoneInternalGains();
 
@@ -890,7 +890,7 @@ namespace WaterThermalTanks {
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
                                 int &CompIndex);
 
-    bool getDesuperHtrInput();
+    bool getDesuperHtrInput(IOFiles &ioFiles);
 
     bool getHPWaterHeaterInput(EnergyPlusData &state);
 

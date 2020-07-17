@@ -380,7 +380,7 @@ namespace WindowAC {
             } else {
                 if (UtilityRoutines::SameString(state.dataWindowAC.WindAC(WindACNum).FanType, "Fan:SystemModel")) {
                     state.dataWindowAC.WindAC(WindACNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state.dataWindowAC.WindAC(WindACNum).FanName)); // call constructor
+                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state.files, state.dataWindowAC.WindAC(WindACNum).FanName)); // call constructor
                     state.dataWindowAC.WindAC(WindACNum).FanIndex = HVACFan::getFanObjectVectorIndex(state.dataWindowAC.WindAC(WindACNum).FanName);
                     FanVolFlow = HVACFan::fanObjs[state.dataWindowAC.WindAC(WindACNum).FanIndex]->designAirVolFlowRate;
                     if (FanVolFlow != AutoSize) {
@@ -397,11 +397,16 @@ namespace WindowAC {
                     state.dataWindowAC.WindAC(WindACNum).FanAvailSchedPtr = HVACFan::fanObjs[state.dataWindowAC.WindAC(WindACNum).FanIndex]->availSchedIndex;
                 } else {
 
-                    GetFanType(state.fans, state.dataWindowAC.WindAC(WindACNum).FanName, state.dataWindowAC.WindAC(WindACNum).FanType_Num, FanErrFlag, CurrentModuleObject, state.dataWindowAC.WindAC(WindACNum).Name);
+                    GetFanType(state.fans, state.files, state.dataWindowAC.WindAC(WindACNum).FanName, state.dataWindowAC.WindAC(WindACNum).FanType_Num, FanErrFlag, CurrentModuleObject, state.dataWindowAC.WindAC(WindACNum).Name);
                     {
                         auto const SELECT_CASE_var(state.dataWindowAC.WindAC(WindACNum).FanType_Num);
                         if ((SELECT_CASE_var == FanType_SimpleOnOff) || (SELECT_CASE_var == FanType_SimpleConstVolume)) {
-                            GetFanIndex(state.fans, state.dataWindowAC.WindAC(WindACNum).FanName, state.dataWindowAC.WindAC(WindACNum).FanIndex, FanErrFlag, CurrentModuleObject);
+                            GetFanIndex(state.fans,
+                                        state.files,
+                                        state.dataWindowAC.WindAC(WindACNum).FanName,
+                                        state.dataWindowAC.WindAC(WindACNum).FanIndex,
+                                        FanErrFlag,
+                                        CurrentModuleObject);
                             if (FanErrFlag) {
                                 ShowContinueError(" specified in " + CurrentModuleObject + " = \"" + state.dataWindowAC.WindAC(WindACNum).Name + "\".");
                                 ErrorsFound = true;
@@ -427,7 +432,7 @@ namespace WindowAC {
                         }
                     }
                     // Get the fan's availability schedule
-                    state.dataWindowAC.WindAC(WindACNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, state.dataWindowAC.WindAC(WindACNum).FanType, state.dataWindowAC.WindAC(WindACNum).FanName, FanErrFlag);
+                    state.dataWindowAC.WindAC(WindACNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, state.files, state.dataWindowAC.WindAC(WindACNum).FanType, state.dataWindowAC.WindAC(WindACNum).FanName, FanErrFlag);
                 }
                 if (FanErrFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + state.dataWindowAC.WindAC(WindACNum).Name);

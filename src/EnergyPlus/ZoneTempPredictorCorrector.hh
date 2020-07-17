@@ -300,7 +300,7 @@ namespace ZoneTempPredictorCorrector {
                                    Real64 &SumEnthalpyH      // Zone sum of phase change material freezing enthalpy
         );
 
-    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, std::string const &ZoneName); // Zone to verify
+    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, std::string const &ZoneName); // Zone to verify
 
     bool VerifyControlledZoneForThermostat(std::string const &ZoneName); // Zone to verify
 

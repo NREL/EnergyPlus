@@ -635,7 +635,7 @@ namespace DXCoils {
                             int const FanOpMode // allows parent object to control fan mode
     );
 
-    void GetDXCoils();
+    void GetDXCoils(IOFiles &ioFiles);
 
     void InitDXCoil(EnergyPlusData &state, int const DXCoilNum); // number of the current DX coil unit being simulated
 
@@ -766,63 +766,73 @@ namespace DXCoils {
 
     // ======================  Utility routines ======================================
 
-    void GetDXCoilIndex(std::string const &DXCoilName,
+    void GetDXCoilIndex(IOFiles &ioFiles,
+                        std::string const &DXCoilName,
                         int &DXCoilIndex,
                         bool &ErrorsFound,
-                        Optional_string_const ThisObjectType = _,
-                        Optional_bool_const SuppressWarning = _);
+                        Optional_string_const ThisObjectType,
+                        Optional_bool_const SuppressWarning);
 
-    std::string GetDXCoilName(int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType = _, Optional_bool_const SuppressWarning = _);
+    std::string
+    GetDXCoilName(IOFiles &ioFiles, int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning);
 
     Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilCapacityByIndexType(int const CoilIndex,    // must match coil index for the coil type
+    Real64 GetCoilCapacityByIndexType(IOFiles &ioFiles,
+                                      int const CoilIndex,    // must match coil index for the coil type
                                       int const CoilType_Num, // must match coil types in this module
                                       bool &ErrorsFound       // set to true if problem
     );
 
-    int GetCoilTypeNum(std::string const &CoilType,         // must match coil types in this module
+    int GetCoilTypeNum(IOFiles &ioFiles,
+                       std::string const &CoilType,         // must match coil types in this module
                        std::string const &CoilName,         // must match coil names for the coil type
                        bool &ErrorsFound,                   // set to true if problem
                        Optional_bool_const PrintWarning = _ // prints warning when true
     );
 
-    Real64 GetMinOATCompressor(std::string const &CoilType, // must match coil types in this module
+    Real64 GetMinOATCompressor(IOFiles &ioFiles,
+                               std::string const &CoilType, // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetMinOATCompressorUsingIndex(int const CoilIndex, // index to coil
+    Real64 GetMinOATCompressorUsingIndex(IOFiles &ioFiles,
+                                         int const CoilIndex, // index to coil
                                          bool &ErrorsFound    // set to true if problem
     );
 
-    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
 
-    int getCoilInNodeIndex(int const &CoilIndex,       // coil index
+    int getCoilInNodeIndex(IOFiles &ioFiles,
+                           int const &CoilIndex,       // coil index
                            bool &ErrorsFound           // set to true if problem
     );
 
-    int getCoilOutNodeIndex(int const &CoilIndex,      // coil index
+    int getCoilOutNodeIndex(IOFiles &ioFiles,
+                            int const &CoilIndex,      // coil index
                             bool &ErrorsFound          // set to true if problem
     );
 
-    int GetCoilCondenserInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilCondenserInletNode(IOFiles &ioFiles,
+                                  std::string const &CoilType, // must match coil types in this module
                                   std::string const &CoilName, // must match coil names for the coil type
                                   bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetDXCoilBypassedFlowFrac(std::string const &CoilType, // must match coil types in this module
+    Real64 GetDXCoilBypassedFlowFrac(IOFiles &ioFiles,
+                                     std::string const &CoilType, // must match coil types in this module
                                      std::string const &CoilName, // must match coil names for the coil type
                                      bool &ErrorsFound            // set to true if problem
     );
@@ -832,23 +842,27 @@ namespace DXCoils {
                               int const HeatingCoilIndex          // Index of DX heating coil used in HP
     );
 
-    int GetDXCoilNumberOfSpeeds(std::string const &CoilType, // must match coil types in this module
+    int GetDXCoilNumberOfSpeeds(IOFiles &ioFiles,
+                                std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     );
 
-    int GetDXCoilAvailSchPtr(std::string const &CoilType,     // must match coil types in this module
+    int GetDXCoilAvailSchPtr(IOFiles &ioFiles,
+                             std::string const &CoilType,     // must match coil types in this module
                              std::string const &CoilName,     // must match coil names for the coil type
                              bool &ErrorsFound,               // set to true if problem
                              Optional_int_const CoilIndex = _ // Coil index number
     );
 
-    Real64 GetDXCoilAirFlow(std::string const &CoilType, // must match coil types in this module
+    Real64 GetDXCoilAirFlow(IOFiles &ioFiles,
+                            std::string const &CoilType, // must match coil types in this module
                             std::string const &CoilName, // must match coil names for the coil type
                             bool &ErrorsFound            // set to true if problem
     );
 
-    int GetDXCoilCapFTCurveIndex(int const CoilIndex, // coil index pointer
+    int GetDXCoilCapFTCurveIndex(IOFiles &ioFiles,
+                                 int const CoilIndex, // coil index pointer
                                  bool &ErrorsFound    // set to true if problem
     );
 
@@ -877,11 +891,13 @@ namespace DXCoils {
                               Optional_string SupplyFanName = _,
                               Optional_int SupplyFan_TypeNum = _);
 
-    void SetCoilSystemHeatingDXFlag(std::string const &CoilType, // must match coil types in this module
+    void SetCoilSystemHeatingDXFlag(IOFiles &ioFiles,
+                                    std::string const &CoilType, // must match coil types in this module
                                     std::string const &CoilName  // must match coil names for the coil type
     );
 
-    void SetCoilSystemCoolingData(std::string const &CoilName, // must match coil names for the coil type
+    void SetCoilSystemCoolingData(IOFiles &ioFiles,
+                                  std::string const &CoilName, // must match coil names for the coil type
                                   std::string const &CoilSystemName);
 
     Real64 CalcSHRUserDefinedCurves(Real64 const InletDryBulb,     // inlet air dry bulb temperature [C]
@@ -892,7 +908,7 @@ namespace DXCoils {
                                     Real64 const SHRRated          // rated sensible heat ratio, user input
     );
 
-    void SetDXCoilTypeData(std::string const &CoilName); // must match coil names for the coil type
+    void SetDXCoilTypeData(IOFiles &ioFiles, std::string const &CoilName); // must match coil names for the coil type
 
     void CalcSecondaryDXCoils(int const DXCoilNum);
 
@@ -954,7 +970,8 @@ namespace DXCoils {
                            Real64 &T_coil_surf      // Air temperature at coil surface
     );
 
-    void CalcVRFCoilCapModFac(int const OperationMode,        // mode 0 for cooling, 1 for heating
+    void CalcVRFCoilCapModFac(IOFiles &ioFiles,
+                              int const OperationMode,        // mode 0 for cooling, 1 for heating
                               Optional<int const> CoilIndex,  // index to VRFTU cooling or heating coil
                               Optional<std::string> CoilName, // name of VRFTU cooling or heating coil
                               Real64 const Tinlet,            // dry bulb temperature of air entering the coil
@@ -976,8 +993,7 @@ namespace DXCoils {
 
     void SetMSHPDXCoilHeatRecoveryFlag(int const DXCoilNum); // must match coil names for the coil type
 
-    void SetDXCoilAirLoopNumber(std::string const &CoilName,
-                                int const AirLoopNum); // must match coil names for the coil type
+    void SetDXCoilAirLoopNumber(IOFiles &ioFiles, std::string const &CoilName, int const AirLoopNum); // must match coil names for the coil type
 
     void DisableLatentDegradation(int const DXCoilNum);
 

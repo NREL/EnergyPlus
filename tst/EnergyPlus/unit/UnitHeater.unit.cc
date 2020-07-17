@@ -1298,7 +1298,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     GetWaterCoilsInputFlag = false;
 
     ErrorsFound = false;
-    GetFanInput(state.fans);
+    GetFanInput(state.fans, state.files);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;

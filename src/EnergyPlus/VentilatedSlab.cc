@@ -903,7 +903,7 @@ namespace VentilatedSlab {
 
             if (HVACFan::checkIfFanNameIsAFanSystem(VentSlab(Item).FanName)) {
                 VentSlab(Item).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(VentSlab(Item).FanName));
+                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state.files, VentSlab(Item).FanName));
                 VentSlab(Item).Fan_Index = HVACFan::getFanObjectVectorIndex(VentSlab(Item).FanName);
             } else {
                 bool isNotOkay(false);
@@ -3895,7 +3895,7 @@ namespace VentilatedSlab {
                 // the new SumHATsurf value for the zone.  Note that the difference between the new
                 // SumHATsurf and the value originally calculated by the heat balance with a zero
                 // source for all radiant systems in the zone is the load met by the system (approximately).
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
             } // SYSCONFIG. SLABONLY&SLABANDZONE
@@ -4135,7 +4135,7 @@ namespace VentilatedSlab {
                 // SumHATsurf and the value originally calculated by the heat balance with a zero
                 // source for all radiant systems in the zone is the load met by the system (approximately).
 
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
             } // SeriesSlabs

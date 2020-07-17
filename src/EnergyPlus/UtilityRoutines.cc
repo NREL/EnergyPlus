@@ -1832,6 +1832,8 @@ namespace UtilityRoutines {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         auto *err_stream = []() -> std::ostream *{
+            // NOTE: this is called in too many places to justify changing the interface right now,
+            // so we are using the Singleton (not ideal)
             if (IOFiles::hasSingleton()) {
                 return IOFiles::getSingleton().err_stream.get();
             } else {

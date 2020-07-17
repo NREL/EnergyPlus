@@ -191,7 +191,7 @@ namespace HeatBalanceHAMTManager {
 
     // Functions
 
-    void ManageHeatBalHAMT(int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
+    void ManageHeatBalHAMT(IOFiles &ioFiles, int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -232,7 +232,7 @@ namespace HeatBalanceHAMTManager {
             OneTimeFlag = false;
             DisplayString("Initialising Heat and Moisture Transfer Model");
             GetHeatBalHAMTInput();
-            InitHeatBalHAMT(IOFiles::getSingleton());
+            InitHeatBalHAMT(ioFiles);
         }
 
         CalcHeatBalHAMT(SurfNum, TempSurfInTmp, TempSurfOutTmp);

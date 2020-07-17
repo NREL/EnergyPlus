@@ -75,7 +75,7 @@ namespace HVACManager {
     // Functions
     void clear_state();
 
-    void ManageHVAC(EnergyPlusData &state, IOFiles &ioFiles);
+    void ManageHVAC(EnergyPlusData &state);
 
     void SimHVAC(EnergyPlusData &state);
 

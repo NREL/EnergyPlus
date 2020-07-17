@@ -354,11 +354,15 @@ namespace HeatBalanceManager {
         }
 
         bool anyRan;
-        ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
+        ManageEMS(state.files,
+                  DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance,
+                  anyRan,
+                  ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
         InitHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files); // Initialize all heat balance related parameters
-        ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
+        ManageEMS(
+            state.files, DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
         // and then the Air Heat Balance Manager is called by the Surface Heat Balance
@@ -368,7 +372,7 @@ namespace HeatBalanceManager {
         // the HVAC system (called from the Air Heat Balance) and the zone (simulated
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance(state);
-        ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
+        ManageEMS(state.files, emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
         RecKeepHeatBalance(state.files);                                             // Do any heat balance related record keeping
 
         // This call has been moved to the FanSystemModule and does effect the output file
@@ -377,7 +381,7 @@ namespace HeatBalanceManager {
 
         ReportHeatBalance(state, state.files); // Manage heat balance reporting until the new reporting is in place
 
-        ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
+        ManageEMS(state.files, emsCallFromEndZoneTimestepAfterZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         UpdateEMSTrendVariables();
         EnergyPlus::PluginManagement::PluginManager::updatePluginValues();
@@ -389,7 +393,7 @@ namespace HeatBalanceManager {
                 DayOfSim = 0; // Reset DayOfSim if Warmup converged
                 state.dataGlobals.DayOfSimChr = "0";
 
-                ManageEMS(emsCallFromBeginNewEvironmentAfterWarmUp, anyRan); // calling point
+                ManageEMS(state.files, emsCallFromBeginNewEvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const()); // calling point
             }
         }
 
@@ -5194,7 +5198,7 @@ namespace HeatBalanceManager {
             InitWindowOpticalCalculations(dataWindowComplexManager, dataWindowManager, ioFiles);
             InitDaylightingDevices(ioFiles); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
-            InitSolarCalculations(); // Initialize the shadowing calculations
+            InitSolarCalculations(ioFiles); // Initialize the shadowing calculations
         }
 
         if (BeginEnvrnFlag) {
@@ -5259,12 +5263,12 @@ namespace HeatBalanceManager {
                 }
             }
             if (!DetailedSolarTimestepIntegration) {
-                PerformSolarCalculations(dataWindowComplexManager);
+                PerformSolarCalculations(dataWindowComplexManager, ioFiles);
             }
         }
 
         if (DetailedSolarTimestepIntegration) { // always redo solar calcs
-            PerformSolarCalculations(dataWindowComplexManager);
+            PerformSolarCalculations(dataWindowComplexManager, ioFiles);
         }
 
         if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
