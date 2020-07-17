@@ -238,6 +238,7 @@ namespace DXCoils {
     int NumDXMulSpeedCoolCoils(0); // number of multispeed DX cooling coils
     int NumDXMulSpeedHeatCoils(0); // number of multispeed DX heating coils
     Array1D_bool CheckEquipName;
+    bool CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite(true);
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -11117,7 +11118,7 @@ namespace DXCoils {
         Real64 HTinHumRatOut;                   // Air enthalpy at inlet air temp and outlet air humidity ratio [J/kg]
         Real64 AirMassFlowRate;                 // the standard air mass flow rate at the given capacity [kg/s]
         Real64 adjustedSHR;                     // SHR calculated using adjusted outlet air properties []
-        static bool CBFErrors(false);           // Set to true if errors in CBF calculation, fatal at end of routine
+        bool CBFErrors(false);           // Set to true if errors in CBF calculation, fatal at end of routine
 
         AirMassFlowRate = AirVolFlowRate * PsyRhoAirFnPbTdbW(StdPressureSeaLevel, InletAirTemp, InletAirHumRat, RoutineName);
         DeltaH = TotCap / AirMassFlowRate;
@@ -13479,7 +13480,6 @@ namespace DXCoils {
         Real64 PLF;
         Real64 RunTimeFraction;
         Real64 LowerBoundMassFlowRate;
-        static bool OneTimeEIOHeaderWrite(true);
         int PartLoadTestPoint;
         int countStaticInputs;
         int index;
@@ -13776,9 +13776,9 @@ namespace DXCoils {
         IEER = (0.02 * EER_TestPoint_IP(1)) + (0.617 * EER_TestPoint_IP(2)) + (0.238 * EER_TestPoint_IP(3)) + (0.125 * EER_TestPoint_IP(4));
 
         // begin output
-        if (OneTimeEIOHeaderWrite) {
+        if (CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite) {
             print(state.outputFiles.eio, Header);
-            OneTimeEIOHeaderWrite = false;
+            CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = false;
             pdstVAVDXCoolCoil = newPreDefSubTable(pdrEquip, "VAV DX Cooling Standard Rating Details");
             pdchVAVDXCoolCoilType = newPreDefColumn(pdstVAVDXCoolCoil, "DX Cooling Coil Type");
             pdchVAVDXFanName = newPreDefColumn(pdstVAVDXCoolCoil, "Assocated Fan");
@@ -16991,6 +16991,7 @@ namespace DXCoils {
         DXCoilHeatInletAirDBTemp.deallocate();
         DXCoilHeatInletAirWBTemp.deallocate();
         CheckEquipName.deallocate();
+        CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = true;
     }
 
 } // namespace DXCoils

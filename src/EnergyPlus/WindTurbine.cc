@@ -124,8 +124,17 @@ namespace WindTurbine {
 
     // MODULE VARIABLES DECLARATIONS:
     int NumWindTurbines(0); // Total wind turbine statements in inputs
+    bool GetInputFlag(true);
+    bool MyOneTimeFlag(true);
 
     // Subroutine Specifications for the Heat Balance Module
+
+    void clear_state() {
+        NumWindTurbines = 0; // Total wind turbine statements in inputs
+        GetInputFlag = true;
+        MyOneTimeFlag = true;
+        WindTurbineSys.clear();
+    }
 
     // Object Data
     Array1D<WindTurbineParams> WindTurbineSys;
@@ -154,7 +163,6 @@ namespace WindTurbine {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true);
         int WindTurbineNum;
         // Obtains and allocates heat balance related parameters from input
 
@@ -260,7 +268,7 @@ namespace WindTurbine {
         Real64 const DefaultH(50.0);       // Default of height for local wind speed
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         int WindTurbineNum;             // Wind turbine number
         int NumAlphas;                  // Number of Alphas for each GetobjectItem call
         int NumNumbers;                 // Number of Numbers for each GetobjectItem call
@@ -701,7 +709,6 @@ namespace WindTurbine {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
         int ReadStatus;               // Reading status of stat file
         int statFile;                 // Weather Stat File
         std::string::size_type lnPtr; // scan pointer for Line input

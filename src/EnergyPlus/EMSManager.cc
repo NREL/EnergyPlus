@@ -119,14 +119,12 @@ namespace EMSManager {
     bool GetEMSUserInput(true); // Flag to prevent input from being read multiple times
     bool ZoneThermostatActuatorsHaveBeenSetup(false);
     bool FinishProcessingUserInput(true); // Flag to indicate still need to process input
-    int count = 0;
 
     // SUBROUTINE SPECIFICATIONS:
 
     // Functions
     void clear_state()
     {
-        count = 0;
         GetEMSUserInput = true;
         ZoneThermostatActuatorsHaveBeenSetup = false;
         FinishProcessingUserInput = true;
@@ -470,10 +468,6 @@ namespace EMSManager {
 
             // another pass at trying to setup input data.
             if (FinishProcessingUserInput) {
-                count++;
-                if (count == 11) {
-                    int j = 1;
-                }
                 ProcessEMSInput(false);
             }
 
@@ -1089,7 +1083,7 @@ namespace EMSManager {
         //  INTEGER :: VariableNum  ! local do loop index
         int VarIndex;
         int VarType;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int ActuatorNum;
         bool FoundObjectType;
         bool FoundObjectName;
@@ -1678,9 +1672,7 @@ namespace EMSManager {
         std::string cControlTypeName;
         std::string cComponentTypeName;
         std::string cNodeName;
-        static bool FoundControl(false);
-
-        FoundControl = false;
+        bool FoundControl(false);
 
         cNodeName = NodeID(NodeNum);
         cComponentTypeName = "System Node Setpoint";

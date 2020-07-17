@@ -217,6 +217,8 @@ namespace SimAirServingZones {
         int TestUniqueNodesNum(0);
         bool SizeAirLoopsOneTimeFlag(true);
         bool InitAirLoopsBranchSizingFlag(true);
+        bool OutputSetupFlag(false);
+        bool MyEnvrnFlag(true);
     } // namespace
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
@@ -241,6 +243,8 @@ namespace SimAirServingZones {
         InitAirLoopsBranchSizingFlag = true;
         NumOfTimeStepInDay = 0;
         TestUniqueNodesNum = 0;
+        OutputSetupFlag = false;
+        MyEnvrnFlag = true;
     }
 
     void ManageAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
@@ -1562,13 +1566,6 @@ namespace SimAirServingZones {
 
         // Dimension the local subcomponent arrays
 
-        // Simulation Flags
-        static bool MyEnvrnFlag(true);
-        /////////// hoisted into namespace InitAirLoopsOneTimeFlag////////////
-        // static bool MyOneTimeFlag( true );
-        // static bool MyBranchSizingFlag( true ); //InitAirLoopsBranchSizingFlag
-        ///////////////////////////
-
         bool ErrorsFound;
         static Real64 OAReliefDiff(0.0); // local for massflow change across OA system, kg/s
 
@@ -2535,8 +2532,6 @@ namespace SimAirServingZones {
         int AirSysOutNum;
         // DO loop index; there are 2 passes - the 2nd is done only if mass balance fails
         int AirLoopPass;
-        // Output variable setup flag
-        static bool OutputSetupFlag(false);
         // Flag set by ResolveSysFlow; if TRUE, mass balance failed and there must be a second pass
         bool SysReSim;
         int CalledFrom;

@@ -151,7 +151,8 @@ namespace PackagedTerminalHeatPump {
 
     namespace {
         // clear_state variables
-        static bool MyOneTimeFlag(true); // initialization flag
+        bool MyOneTimeFlag(true); // initialization flag
+        bool ZoneEquipmentListNotChecked(true); // False after the Zone Equipment List has been checked for items
     }                                    // namespace
 
     // Data
@@ -241,6 +242,7 @@ namespace PackagedTerminalHeatPump {
         PTUnitUniqueNames.clear();
         PTUnit.deallocate();
         PTUnitUNumericFields.clear();
+        ZoneEquipmentListNotChecked = true;
     }
 
     void SimPackagedTerminalUnit(EnergyPlusData &state, std::string const &CompName,   // name of the packaged terminal heat pump
@@ -3760,7 +3762,6 @@ namespace PackagedTerminalHeatPump {
         Real64 RhoAir;                                 // air density at InNode
         Real64 PartLoadFrac;                           // compressor part load fraction
         Real64 CoilMaxVolFlowRate;                     // water or steam max volumetric water flow rate
-        static bool ZoneEquipmentListNotChecked(true); // False after the Zone Equipment List has been checked for items
         int Loop;
         static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
         static Array1D_bool MySizeFlag;  // used for sizing PTHP inputs one time

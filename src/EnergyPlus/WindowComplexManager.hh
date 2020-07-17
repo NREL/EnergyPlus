@@ -253,12 +253,19 @@ namespace WindowComplexManager {
         Array1D<WindowComplexManager::WindowIndex> WindowList;
         Array2D<WindowComplexManager::WindowStateIndex> WindowStateList;
 
+        bool InitComplexWindowsOnce = true; // Flag for insuring things happen once
+        bool InitBSDFWindowsOnce = true;
+        bool resetAbunchOfStuff = true;
+
         void clear_state() //override
         {
             NumComplexWind = 0;
             BasisList.deallocate();
             WindowList.deallocate();
             WindowStateList.deallocate();
+            InitComplexWindowsOnce = true;
+            InitBSDFWindowsOnce = true;
+            resetAbunchOfStuff = true;
         }
 
         // Default Constructor

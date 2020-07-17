@@ -313,7 +313,7 @@ namespace Fans {
         int NumNums;
         int checkNum;
         int IOStat;
-        static bool ErrorsFound(false);                        // If errors detected in input
+        bool ErrorsFound(false);                        // If errors detected in input
         static std::string const RoutineName("GetFanInput: "); // include trailing blank space
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;

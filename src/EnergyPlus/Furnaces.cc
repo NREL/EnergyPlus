@@ -256,6 +256,9 @@ namespace Furnaces {
     // Object Data
     Array1D<FurnaceEquipConditions> Furnace;
     std::unordered_map<std::string, std::string> UniqueFurnaceNames;
+    bool InitFurnaceMyOneTimeFlag = true;             // one time allocation flag
+    bool FlowFracFlagReady = true;                     // one time flag for calculating flow fraction through controlled zone
+    bool MyAirLoopPass = true;       // one time allocation flag
 
     // Utility routines for module
     // na
@@ -289,6 +292,9 @@ namespace Furnaces {
         CurrentModuleObject = "";
         Furnace.deallocate();
         UniqueFurnaceNames.clear();
+        InitFurnaceMyOneTimeFlag = true;
+        FlowFracFlagReady = true;                     // one time flag for calculating flow fraction through controlled zone
+        MyAirLoopPass = true;
     }
 
     void SimFurnace(EnergyPlusData &state, std::string const &FurnaceName,
@@ -4775,7 +4781,6 @@ namespace Furnaces {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);             // one time allocation flag
         static Array1D_bool MyEnvrnFlag;             // environment flag
         static Array1D_bool MySecondOneTimeFlag;     // additional one time flag
         static Array1D_bool MyFanFlag;               // used for sizing fan inputs one time
@@ -4804,7 +4809,6 @@ namespace Furnaces {
         static int ZoneInSysIndex(0);                            // number of zone inlet nodes counter in an airloop
         static int NumAirLoopZones(0);                           // number of zone inlet nodes in an air loop
         static int ZoneInletNodeNum(0);                          // zone inlet nodes node number
-        static bool FlowFracFlagReady(true);                     // one time flag for calculating flow fraction through controlled zone
         static Real64 SumOfMassFlowRateMax(0.0);                 // the sum of mass flow rates at inlet to zones in an airloop
         static Real64 CntrlZoneTerminalUnitMassFlowRateMax(0.0); // Maximum mass flow rate through controlled zone terminal unit
 
@@ -4821,7 +4825,6 @@ namespace Furnaces {
         int InNode;                            // Inlet node number in MSHP loop
         int OutNode;                           // Outlet node number in MSHP loop
         Real64 RhoAir;                         // Air density at InNode
-        static bool MyAirLoopPass(true);       // one time allocation flag
         int IHPIndex(0);                       // coil id of IHP coil
         int OperatingMode;                     // track cooling, heating, and no cooling or heating modes
         int OperatingModeMinusOne;
@@ -4832,7 +4835,7 @@ namespace Furnaces {
         OutNode = Furnace(FurnaceNum).FurnaceOutletNodeNum;
 
         // FLOW:
-        if (MyOneTimeFlag) {
+        if (InitFurnaceMyOneTimeFlag) {
             // initialize the environment and sizing flags
             MyEnvrnFlag.allocate(NumFurnaces);
             MySizeFlag.allocate(NumFurnaces);
@@ -4848,7 +4851,7 @@ namespace Furnaces {
             MyFanFlag = true;
             MyCheckFlag = true;
             MyFlowFracFlag = true;
-            MyOneTimeFlag = false;
+            InitFurnaceMyOneTimeFlag = false;
             MyPlantScanFlag = true;
             MySuppCoilPlantScanFlag = true;
         }

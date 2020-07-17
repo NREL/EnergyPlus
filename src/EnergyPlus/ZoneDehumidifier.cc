@@ -243,7 +243,7 @@ namespace ZoneDehumidifier {
         static int NumAlphas(0);        // Number of Alphas to allocate arrays, then used for each GetObjectItem call
         static int NumNumbers(0);       // Number of Numbers to allocate arrays, then used for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         Array1D_string Alphas;          // Alpha input items for object
         Array1D_string cAlphaFields;    // Alpha field names
         Array1D_string cNumericFields;  // Numeric field names
@@ -600,8 +600,6 @@ namespace ZoneDehumidifier {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
         //  LOGICAL, ALLOCATABLE, SAVE, DIMENSION(:) :: MySizeFlag  ! Used for sizing zone dehumidifier inputs one time
-        static bool MyOneTimeFlag(true);             // initialization flag
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int LoopIndex;                               // DO loop index
         int AirInletNode;                            // Inlet air node number
         Real64 RatedAirHumrat;                       // Humidity ratio (kg/kg) at rated inlet air conditions of 26.6667C, 60% RH
@@ -609,17 +607,17 @@ namespace ZoneDehumidifier {
         Real64 RatedAirRH;                           // Relative humidity of air (0.6 --> 60%) at rated conditions
 
         // Do the one time initializations
-        if (MyOneTimeFlag) {
+        if (dataZoneDehumidifier.MyOneTimeFlag) {
             MyEnvrnFlag.allocate(dataZoneDehumidifier.NumDehumidifiers);
             //    ALLOCATE(MySizeFlag(NumDehumidifiers))
             MyEnvrnFlag = true;
             //    MySizeFlag = .TRUE.
-            MyOneTimeFlag = false;
+            dataZoneDehumidifier.MyOneTimeFlag = false;
         }
 
         // Need to check all dehumidifiers to see if they are on Zone Equipment List or issue warning
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
-            ZoneEquipmentListChecked = true;
+        if (!dataZoneDehumidifier.ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+            dataZoneDehumidifier.ZoneEquipmentListChecked = true;
             for (LoopIndex = 1; LoopIndex <= dataZoneDehumidifier.NumDehumidifiers; ++LoopIndex) {
                 if (CheckZoneEquipmentList(dataZoneDehumidifier.ZoneDehumid(LoopIndex).UnitType, dataZoneDehumidifier.ZoneDehumid(LoopIndex).Name)) continue;
                 ShowSevereError("InitZoneDehumidifier: Zone Dehumidifier=\"" + dataZoneDehumidifier.ZoneDehumid(LoopIndex).UnitType + ',' + dataZoneDehumidifier.ZoneDehumid(LoopIndex).Name +

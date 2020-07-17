@@ -149,6 +149,7 @@ namespace WindTurbine {
     extern Array1D<WindTurbineParams> WindTurbineSys;
 
     // Functions
+    void clear_state();
 
     void SimWindTurbine(int const GeneratorType,          // Type of Generator
                         std::string const &GeneratorName, // User specified name of Generator

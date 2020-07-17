@@ -195,6 +195,7 @@ namespace SimulationManager {
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool PreP_Fatal(false);
+        bool WarningOut(true);
     } // namespace
 
     // Functions
@@ -203,6 +204,7 @@ namespace SimulationManager {
         RunPeriodsInInput = false;
         RunControlInInput = false;
         PreP_Fatal = false;
+        WarningOut = true;
     }
 
     void ManageSimulation(EnergyPlusData &state)
@@ -295,9 +297,9 @@ namespace SimulationManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool Available; // an environment is available to process
-        static bool ErrorsFound(false);
-        static bool TerminalError(false);
+        bool Available; // an environment is available to process
+        bool ErrorsFound(false);
+        bool TerminalError(false);
         bool SimsDone;
         bool ErrFound;
         bool oneTimeUnderwaterBoundaryCheck = true;
@@ -2074,14 +2076,7 @@ namespace SimulationManager {
         using PlantPipingSystemsManager::CheckIfAnySlabs;
         using PlantPipingSystemsManager::SimulateGroundDomains;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool Available(false); // an environment is available to process
-        //  integer :: env_iteration=0
-        //  CHARACTER(len=32) :: cEnvChar
-
-        //  return  ! remove comment to do 'old way'
-
-        Available = true;
+        bool Available = true;
 
         while (Available) { // do for each environment
 
@@ -2308,9 +2303,6 @@ namespace SimulationManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr static auto errstring("**error**");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool WarningOut(true);
 
         // Formats
         static constexpr auto Format_700("! <#Component Sets>,<Number of Component Sets>");
@@ -3032,11 +3024,6 @@ namespace SimulationManager {
         using FluidProperties::FluidIndex_EthyleneGlycol;
         using FluidProperties::FluidIndex_PropoleneGlycol;
         using FluidProperties::FluidIndex_Water;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool PreP_Fatal( false ); // True if a preprocessor flags a fatal error
-        ////////////////////////////////////////////////////////////////////////////////////
 
         DoingInputProcessing = false;
 

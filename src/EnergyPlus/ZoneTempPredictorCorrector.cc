@@ -279,7 +279,7 @@ namespace ZoneTempPredictorCorrector {
         int DualTempHeatCoolControlNum;
         int ControlTypeNum;
         int IOStat;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         bool errFlag;
         int CTIndex;
         int HumidControlledZoneNum; // The Humidity Controller that information is being loaded into
@@ -2588,13 +2588,6 @@ namespace ZoneTempPredictorCorrector {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int ZoneNum;
-        //////////// hoisted into namespace changed to InitZoneAirSetPointsOneTimeFlag////////////
-        // static bool MyOneTimeFlag( true );
-        //////////////////////////////////////
-        static bool MyEnvrnFlag(true);
-        static bool MyDayFlag(true);
-        static bool ErrorsFound(false);
-        static bool ControlledZonesChecked(false);
         bool FirstSurfFlag;
         int TRefFlag; // Flag for Reference Temperature process in Zones
         int SurfNum;
@@ -2931,7 +2924,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Do the Begin Environment initializations
-        if (MyEnvrnFlag && BeginEnvrnFlag) {
+        if (dataZoneTempPredictorCorrector.MyEnvrnFlag && BeginEnvrnFlag) {
             AIRRAT = 0.0;
             ZTM1 = 0.0;
             ZTM2 = 0.0;
@@ -3008,29 +3001,29 @@ namespace ZoneTempPredictorCorrector {
             PreviousMeasuredHumRat2 = 0.0; // Hybrid modeling
             PreviousMeasuredHumRat3 = 0.0; // Hybrid modeling
 
-            MyEnvrnFlag = false;
+            dataZoneTempPredictorCorrector.MyEnvrnFlag = false;
         }
 
         if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            dataZoneTempPredictorCorrector.MyEnvrnFlag = true;
         }
 
         // Do the Begin Day initializations
-        if (MyDayFlag && BeginDayFlag) {
-            MyDayFlag = false;
+        if (dataZoneTempPredictorCorrector.MyDayFlag && BeginDayFlag) {
+            dataZoneTempPredictorCorrector.MyDayFlag = false;
         }
 
         if (!BeginDayFlag) {
-            MyDayFlag = true;
+            dataZoneTempPredictorCorrector.MyDayFlag = true;
         }
 
         for (Loop = 1; Loop <= NumTempControlledZones; ++Loop) {
-            if (ZoneEquipInputsFilled && !ControlledZonesChecked) {
+            if (ZoneEquipInputsFilled && !dataZoneTempPredictorCorrector.ControlledZonesChecked) {
                 if (!VerifyControlledZoneForThermostat(TempControlledZone(Loop).ZoneName)) {
                     ShowSevereError(RoutineName + "Zone=\"" + TempControlledZone(Loop).ZoneName +
                                     "\" has specified a Thermostatic control but is not a controlled zone.");
                     ShowContinueError("...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
-                    ErrorsFound = true;
+                    dataZoneTempPredictorCorrector.ErrorsFound = true;
                 }
             }
 
@@ -3082,12 +3075,12 @@ namespace ZoneTempPredictorCorrector {
         }
 
         for (Loop = 1; Loop <= NumComfortControlledZones; ++Loop) {
-            if (ZoneEquipInputsFilled && !ControlledZonesChecked) {
+            if (ZoneEquipInputsFilled && !dataZoneTempPredictorCorrector.ControlledZonesChecked) {
                 if (!VerifyControlledZoneForThermostat(ComfortControlledZone(Loop).ZoneName)) {
                     ShowSevereError(RoutineName + "Zone=\"" + ComfortControlledZone(Loop).ZoneName +
                                     "\" has specified a Comfort control but is not a controlled zone.");
                     ShowContinueError("...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
-                    ErrorsFound = true;
+                    dataZoneTempPredictorCorrector.ErrorsFound = true;
                 }
             }
             if (ComfortControlledZone(Loop).ManageDemand) {
@@ -3140,12 +3133,12 @@ namespace ZoneTempPredictorCorrector {
             } // Demand manager
         }
 
-        if (ErrorsFound) {
+        if (dataZoneTempPredictorCorrector.ErrorsFound) {
             ShowFatalError("InitZoneAirSetpoints - program terminates due to previous condition.");
         }
 
         if (ZoneEquipInputsFilled) {
-            ControlledZonesChecked = true;
+            dataZoneTempPredictorCorrector.ControlledZonesChecked = true;
         }
     }
 
@@ -7066,13 +7059,11 @@ namespace ZoneTempPredictorCorrector {
         Real64 NumberOccupants;
         Real64 Tset;
 
-        static bool FirstTimeFlag(true); // Flag set to make sure you get input once
-
         // FLOW:
         // Call thermal comfort module to read zone control comfort object
-        if (FirstTimeFlag) {
+        if (dataZoneTempPredictorCorrector.CalcZoneAirComfortSetPointsFirstTimeFlag) {
             ManageThermalComfort(dataZoneTempPredictorCorrector, true);
-            FirstTimeFlag = false;
+            dataZoneTempPredictorCorrector.CalcZoneAirComfortSetPointsFirstTimeFlag = false;
         }
 
         ComfortControlType = 0; // Default

@@ -178,7 +178,7 @@ namespace PondGroundHeatExchanger {
         // from the user input file.  This will contain all of the information
         // needed to define and simulate the pond.
 
-        static bool ErrorsFound(false); // Set to true if errors in input,
+        bool ErrorsFound(false); // Set to true if errors in input,
 
         int IOStatus;   // Used in GetObjectItem
         int Item;       // Item to be "gotten"

@@ -210,6 +210,7 @@ namespace SingleDuct {
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool InitSysFlag(true);     // Flag set to make sure you do begin simulation initializaztions once
         bool InitATMixerFlag(true); // Flag set to make sure you do begin simulation initializaztions once for mixer
+        bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
     }                               // namespace
 
     // MODULE SUBROUTINES:
@@ -226,6 +227,7 @@ namespace SingleDuct {
         SysATMixer.deallocate();
         sd_airterminal.deallocate();
         InitATMixerFlag = true;
+        ZoneEquipmentListChecked = false;
     }
 
     void SimulateSingleDuct(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
@@ -375,7 +377,7 @@ namespace SingleDuct {
         int NumZoneSiz;
         int ZoneSizIndex;
         int IOStat;
-        static bool ErrorsFound(false);  // If errors detected in input
+        bool ErrorsFound(false);  // If errors detected in input
         bool IsNotOK;                    // Flag to verify name
         int CtrlZone;                    // controlled zone do loop index
         int SupAirIn;                    // controlled zone supply air inlet index
@@ -2030,7 +2032,6 @@ namespace SingleDuct {
         int InletNode;
         int OutletNode;
         int SysIndex;
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         //static Array1D_bool MyEnvrnFlag;
         //static Array1D_bool MySizeFlag;
         //static Array1D_bool GetGasElecHeatCoilCap; // Gets autosized value of coil capacity
@@ -5466,7 +5467,7 @@ namespace SingleDuct {
         int ATMixerNum; // Index of inlet side mixer air terminal unit
         int IOStat;
         static std::string const RoutineName("GetATMixers: "); // include trailing blank space
-        static bool ErrorsFound(false);                        // Error flag
+        bool ErrorsFound(false);                        // Error flag
         int NodeNum;                                           // Index to node number
         int CtrlZone;                                          // Index to control zone
         bool ZoneNodeNotFound;                                 // Flag for error checking

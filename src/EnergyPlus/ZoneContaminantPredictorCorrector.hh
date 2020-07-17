@@ -111,6 +111,10 @@ namespace ZoneContaminantPredictorCorrector {
         int TotGCBLDiff;                // Number of boudary layer diffusion generic contaminant model
         int TotGCDVS;                   // Number of deposition velocity sink generic contaminant model
         int TotGCDRS;                   // Number of deposition rate sink generic contaminant model
+        bool MyOneTimeFlag = true;
+        bool MyEnvrnFlag = true;
+        bool MyDayFlag = true;
+        bool MyConfigOneTimeFlag = true;
 
         void clear_state() override {
             GetZoneAirContamInputFlag = true;
@@ -123,6 +127,10 @@ namespace ZoneContaminantPredictorCorrector {
             TotGCDRS = 0;
             DataContaminantBalance::Contaminant.CO2Simulation = false;
             DataContaminantBalance::Contaminant.GenericContamSimulation = false;
+            MyOneTimeFlag = true;
+            MyEnvrnFlag = true;
+            MyDayFlag = true;
+            MyConfigOneTimeFlag = true;
         }
 
         // Default Constructor

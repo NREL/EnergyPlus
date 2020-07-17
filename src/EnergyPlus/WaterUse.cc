@@ -92,6 +92,7 @@ namespace WaterUse {
 
     Array1D<WaterEquipmentType> WaterEquipment;
     Array1D<WaterConnectionsType> WaterConnections;
+    bool MyEnvrnFlagLocal(true);
 
     void clear_state()
     {
@@ -101,6 +102,7 @@ namespace WaterUse {
         CheckEquipName.deallocate();
         WaterEquipment.deallocate();
         WaterConnections.deallocate();
+        MyEnvrnFlagLocal = true;
     }
 
     void SimulateWaterUse(BranchInputManagerData &dataBranchInputManager, bool FirstHVACIteration)
@@ -122,7 +124,6 @@ namespace WaterUse {
         int WaterEquipNum;
         int WaterConnNum;
         int NumIteration;
-        static bool MyEnvrnFlagLocal(true);
 
         if (getWaterUseInputFlag) {
             GetWaterUseInput();

@@ -8599,9 +8599,9 @@ namespace WindowManager {
         std::string cCurrentModuleObject;
         std::string cSolarSpectrum;
         std::string cVisibleSpectrum;
-        static int iSolarSpectrum(0);
-        static int iVisibleSpectrum(0);
-        static int NumSiteSpectrum(0);
+        int iSolarSpectrum(0);
+        int iVisibleSpectrum(0);
+        int NumSiteSpectrum(0);
         int Loop;
         int iTmp;
 

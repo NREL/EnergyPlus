@@ -266,9 +266,9 @@ namespace WindowAC {
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call
         Array1D_int OANodeNums(4);       // Node numbers of Outdoor air mixer (OA, EA, RA, MA)
         int IOStatus;                    // Used in GetObjectItem
-        static bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
-        static bool errFlag(false);      // Local error flag for GetOAMixerNodeNums
-        static bool FanErrFlag(false);   // Error flag used in GetFanIndex call
+        bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
+        bool errFlag(false);      // Local error flag for GetOAMixerNodeNums
+        bool FanErrFlag(false);   // Error flag used in GetFanIndex call
         Real64 FanVolFlow;               // Fan volumetric flow rate
         bool CoilNodeErrFlag;            // Used in error messages for mining coil outlet node number
         std::string CurrentModuleObject; // Object type for getting and error messages

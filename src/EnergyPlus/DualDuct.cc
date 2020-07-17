@@ -146,6 +146,9 @@ namespace DualDuct {
     // Object Data
     Array1D<DualDuctAirTerminal> dd_airterminal;
     std::unordered_map<std::string, std::string> UniqueDualDuctAirTerminalNames;
+    bool InitDualDuctMyOneTimeFlag(true);
+    bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
+    bool GetDualDuctOutdoorAirRecircUseFirstTimeOnly(true);
 
     void clear_state() {
         CheckEquipName.clear();
@@ -157,6 +160,9 @@ namespace DualDuct {
         GetDualDuctInputFlag = true;
         dd_airterminal.clear();
         UniqueDualDuctAirTerminalNames.clear();
+        InitDualDuctMyOneTimeFlag = true;
+        ZoneEquipmentListChecked = false;
+        GetDualDuctOutdoorAirRecircUseFirstTimeOnly = true;
     }
 
     void SimulateDualDuct(std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
@@ -861,17 +867,15 @@ namespace DualDuct {
         int OAInNode; // Outdoor Air Inlet Node for VAV:OutdoorAir units
         int RAInNode; // Reciruclated Air Inlet Node for VAV:OutdoorAir units
         int OutNode;
-        static bool MyOneTimeFlag(true);
         //static Array1D_bool MyEnvrnFlag;
         //static Array1D_bool MySizeFlag;
         //static Array1D_bool MyAirLoopFlag;
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;                                    // Loop checking control variable
         Real64 PeopleFlow;                           // local sum variable, m3/s
         // FLOW:
 
         // Do the Begin Simulation initializations
-        if (MyOneTimeFlag) {
+        if (InitDualDuctMyOneTimeFlag) {
 
             //MyEnvrnFlag.allocate(NumDDAirTerminal);
             //MySizeFlag.allocate(NumDDAirTerminal);
@@ -880,7 +884,7 @@ namespace DualDuct {
             //MySizeFlag = true;
             MassFlowSetToler = HVACFlowRateToler * 0.00001;
 
-            MyOneTimeFlag = false;
+            InitDualDuctMyOneTimeFlag = false;
         }
 
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
@@ -2290,8 +2294,6 @@ namespace DualDuct {
         // get routine to learn if a dual duct outdoor air unit is using its recirc deck
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  INTEGER :: DDNum
-        static bool FirstTimeOnly(true);
         static Array1D_bool RecircIsUsedARR;
         static Array1D_string DamperNamesARR;
         int DamperIndex;                 // Loop index to Damper that you are currently loading input into
@@ -2314,7 +2316,7 @@ namespace DualDuct {
         //    GetDualDuctInputFlag=.FALSE.
         //  END IF
 
-        if (FirstTimeOnly) {
+        if (GetDualDuctOutdoorAirRecircUseFirstTimeOnly) {
             NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(cCMO_DDVarVolOA);
             RecircIsUsedARR.allocate(NumDualDuctVarVolOA);
             DamperNamesARR.allocate(NumDualDuctVarVolOA);
@@ -2342,7 +2344,7 @@ namespace DualDuct {
                     }
                 }
             }
-            FirstTimeOnly = false;
+            GetDualDuctOutdoorAirRecircUseFirstTimeOnly = false;
         }
 
         DamperIndex = UtilityRoutines::FindItemInList(CompName, DamperNamesARR, NumDualDuctVarVolOA);
