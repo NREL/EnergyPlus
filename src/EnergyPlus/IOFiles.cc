@@ -48,8 +48,8 @@
 #include <EnergyPlus/IOFiles.hh>
 
 #include "DataStringGlobals.hh"
-#include "UtilityRoutines.hh"
 #include "FileSystem.hh"
+#include "UtilityRoutines.hh"
 
 #include <fmt/format.h>
 #include <stdexcept>
@@ -86,6 +86,9 @@ InputFile::ReadResult<std::string> InputFile::readLine() noexcept
     if (is) {
         std::string line;
         std::getline(*is, line);
+        if (!line.empty() && line.back() == '\r') {
+            line.pop_back();
+        }
         return {std::move(line), is->eof(), is->good()};
     } else {
         return {"", true, false};
@@ -103,7 +106,7 @@ std::ostream::pos_type InputFile::position() const noexcept
 
 void InputFile::open()
 {
-    is = std::unique_ptr<std::istream>(new std::fstream(fileName.c_str(), std::ios_base::in));
+    is = std::unique_ptr<std::istream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::binary));
     is->imbue(std::locale("C"));
 }
 
