@@ -49,7 +49,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-
+#include <chrono>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
@@ -3233,6 +3233,7 @@ namespace HeatBalanceSurfaceManager {
         using namespace HeatBalanceMovableInsulation;
         using DaylightingDevices::DistributeTDDAbsorbedSolar;
         using namespace DataWindowEquivalentLayer;
+        using namespace std::chrono;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -3277,6 +3278,7 @@ namespace HeatBalanceSurfaceManager {
         int Lay;                  // equivalent layer fenestration layer index
 
         // FLOW:
+        high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
         if (!allocated(QS)) QS.allocate(DataViewFactorInformation::NumOfSolarEnclosures);
         if (!allocated(QSLights)) QSLights.allocate(DataViewFactorInformation::NumOfSolarEnclosures);
@@ -3685,6 +3687,9 @@ namespace HeatBalanceSurfaceManager {
         }     // End of SurfNum loop to report variables for surface total absorbed short wave radiation
 
         DistributeTDDAbsorbedSolar();
+        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+        DataGlobals::timer_solar += time_span.count();
     }
 
     void ComputeIntThermalAbsorpFactors()
