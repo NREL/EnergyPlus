@@ -259,6 +259,8 @@ namespace DataGlobals {
 
     bool eplusRunningViaAPI;
 
+    double timer_solar;
+
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
     void clear_state(OutputFiles &outputFiles)
@@ -358,6 +360,7 @@ namespace DataGlobals {
         outputFiles.mtr.close();
         err_stream = nullptr;
         eplusRunningViaAPI = false;
+        timer_solar = 0.0;
     }
 
 } // namespace DataGlobals
