@@ -396,7 +396,6 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         ShowSevereError(e.what());
         return AbortEnergyPlus(state);
     }
-    std::cout << "timer_solar, " << EnergyPlus::DataGlobals::timer_solar << "\n";
     return EndEnergyPlus(state.outputFiles);
 }
 
