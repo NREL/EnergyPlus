@@ -59,6 +59,8 @@ namespace EnergyPlus {
 
     // Forward Declarations
     struct EnergyPlusData;
+    struct WindowComplexManagerData;
+    struct WindowEquivalentLayerData;
     struct WindowManagerData;
     class OutputFiles;
 
@@ -162,7 +164,7 @@ namespace HeatBalanceManager {
 
     void GetSiteAtmosphereData(EnergyPlus::OutputFiles &outputFiles, bool &ErrorsFound);
 
-    void GetMaterialData(OutputFiles &outputFiles, bool &ErrorsFound); // set to true if errors found in input
+    void GetMaterialData(WindowEquivalentLayerData &dataWindowEquivalentLayer, OutputFiles &outputFiles, bool &ErrorsFound); // set to true if errors found in input
 
     void GetWindowGlassSpectralData(bool &ErrorsFound); // set to true if errors found in input
 
@@ -198,7 +200,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
+    void InitHeatBalance(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
 
     void AllocateHeatBalArrays();
 

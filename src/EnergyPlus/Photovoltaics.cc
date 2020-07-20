@@ -131,20 +131,12 @@ namespace Photovoltaics {
     //   see DataPhotovoltaics.cc
 
     Array1D_bool CheckEquipName;
+    static bool GetInputFlag(true); // one time get input flag
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Photovoltaics
-
-    // The following subroutines are used for the SIMPLE model
-
-    // The following subroutines and functions are used for only the EQUIVALENT ONE-DIODE model
-
-    // The following subroutines and functions are used for the Sandia model.
-
-    //  OO get set methods for coupling to exterior vented baffle cavity mounting configurations
-
-    // *************
-
-    // Functions
+    void clear_state() {
+        CheckEquipName.clear();
+        GetInputFlag = true;
+    }
 
     void SimPVGenerator(int const EP_UNUSED(GeneratorType), // type of Generator !unused1208
                         std::string const &GeneratorName,   // user specified name of Generator
@@ -170,7 +162,6 @@ namespace Photovoltaics {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PVnum;                      // index of unit in PV array for Equivalent one-diode model
-        static bool GetInputFlag(true); // one time get input flag
 
         // Get PV data from input file
         if (GetInputFlag) {

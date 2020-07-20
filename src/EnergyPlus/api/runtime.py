@@ -71,6 +71,8 @@ class Runtime:
         # self.api.callbackUserDefinedComponentModel.restype = c_void_p
         self.api.callbackUnitarySystemSizing.argtypes = [self.py_empty_callback_type]
         self.api.callbackUnitarySystemSizing.restype = c_void_p
+        self.api.cClearAllStates.argtypes = []
+        self.api.cClearAllStates.restype = c_void_p
 
     def run_energyplus(self, command_line_args: List[Union[str, bytes]]) -> int:
         """
@@ -388,6 +390,14 @@ class Runtime:
         cb_ptr = self.py_empty_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackUnitarySystemSizing(cb_ptr)
+
+    def clear_all_states(self) -> None:
+        """
+        This function allows a client to clear the state of EnergyPlus in between subsequent calls to run_energyplus
+
+        :return: Nothing
+        """
+        self.api.cClearAllStates()
 
     @staticmethod
     def clear_callbacks() -> None:
