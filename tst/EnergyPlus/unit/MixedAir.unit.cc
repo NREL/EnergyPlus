@@ -5680,9 +5680,9 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     OAController(1).CalcOAController(state, 1, true);
     EXPECT_NEAR(0.006, OAController(1).OAMassFlow, 0.0001);
     std::string const error_string = delimited_string({
-        "   ** Warning ** Min OA fraction > Mechanical vetilation min OA fraction for OA controller=OA CONTROLLER 1, Min OA fraction is used",
-        "   ** Warning ** Therefore, Mechanical vetilation is not effective as desired.",
-        "   **   ~~~   ** Min OA fraction = 2.9412E-003, Min Mech Vent OA fraction = 1.5603E-003",
+        "   ** Warning ** CalcOAController: Minimum OA fraction > Mechanical Ventilation Controller request for Controller:OutdoorAir=OA CONTROLLER 1, Min OA fraction is used.",
+        "   **   ~~~   ** This may be overriding desired ventilation controls. Check inputs for Minimum Outdoor Air Flow Rate, Minimum Outdoor Air Schedule Name and Controller:MechanicalVentilation",
+        "   **   ~~~   ** Minimum OA fraction = 2.9412E-003, Mech Vent OA fraction = 1.5603E-003",
         "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
     });
 

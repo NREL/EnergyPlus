@@ -3676,16 +3676,17 @@ namespace MixedAir {
         //****** use greater of Mechanical Ventilation Outside Air fraction and OutAirMinFrac
         if (OutAirMinFrac > MechVentOutsideAirMinFrac) {
             if (!WarmupFlag) {
-                if (CountMechVentFrac == 0) {
-                    ++CountMechVentFrac;
-                    ShowWarningError("Min OA fraction > Mechanical vetilation min OA fraction for OA controller=" + this->Name + ", Min OA fraction is used");
-                    ShowWarningError("Therefore, Mechanical vetilation is not effective as desired.");
-                    ShowContinueErrorTimeStamp("Min OA fraction = " + RoundSigDigits(OutAirMinFrac, 4) +
-                                               ", Min Mech Vent OA fraction = " + RoundSigDigits(MechVentOutsideAirMinFrac, 4));
+                if (this->CountMechVentFrac == 0) {
+                    ++this->CountMechVentFrac;
+                    ShowWarningError(RoutineName + "Minimum OA fraction > Mechanical Ventilation Controller request for Controller:OutdoorAir=" +
+                                     this->Name + ", Min OA fraction is used.");
+                    ShowContinueError("This may be overriding desired ventilation controls. Check inputs for Minimum Outdoor Air Flow Rate, Minimum "
+                                      "Outdoor Air Schedule Name and Controller:MechanicalVentilation");
+                    ShowContinueErrorTimeStamp("Minimum OA fraction = " + RoundSigDigits(OutAirMinFrac, 4) +
+                                               ", Mech Vent OA fraction = " + RoundSigDigits(MechVentOutsideAirMinFrac, 4));
                 } else {
-                    ++CountMechVentFrac;
                     ShowRecurringWarningErrorAtEnd(this->Name +
-                                                       "\": Min OA fraction > Mechanical vetilation min OA fraction, continues...",
+                                                       "\": Min OA fraction > Mechanical ventilation OA fraction, continues...",
                                                    this->IndexMechVentFrac,
                                                    OutAirMinFrac,
                                                    OutAirMinFrac);
