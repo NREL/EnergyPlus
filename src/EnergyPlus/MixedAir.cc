@@ -3685,7 +3685,7 @@ namespace MixedAir {
                     ShowContinueErrorTimeStamp("Minimum OA fraction = " + RoundSigDigits(OutAirMinFrac, 4) +
                                                ", Mech Vent OA fraction = " + RoundSigDigits(MechVentOutsideAirMinFrac, 4));
                 } else {
-                    ShowRecurringWarningErrorAtEnd(this->Name +
+                    ShowRecurringWarningErrorAtEnd("Controller:OutdoorAir=\"" + this->Name +
                                                        "\": Min OA fraction > Mechanical ventilation OA fraction, continues...",
                                                    this->IndexMechVentFrac,
                                                    OutAirMinFrac,
