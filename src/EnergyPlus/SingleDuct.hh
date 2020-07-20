@@ -223,10 +223,6 @@ namespace SingleDuct {
         int OAPerPersonMode;         // mode for how per person rates are determined, DCV or design.
         bool EMSOverrideAirFlow;     // if true, EMS is calling to override flow rate
         Real64 EMSMassFlowRateValue; // value EMS is directing to use for flow rate [kg/s]
-        Real64 HeatRate;             // zone air terminal sensible heating rate
-        Real64 CoolRate;             // zone air terminal sensible cooling rate
-        Real64 HeatEnergy;           // zone air terminal sensible heating energy
-        Real64 CoolEnergy;           // zone air terminal sensible cooling energy
         int ZoneTurndownMinAirFracSchPtr;    // pointer to the schedule for turndown minimum airflow fraction
         Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow 
         bool ZoneTurndownMinAirFracSchExist; // if true, if zone turndown min air frac schedule exist
@@ -255,7 +251,7 @@ namespace SingleDuct {
               MaxAirVolFlowRateDuringReheat(0.0), MaxAirVolFractionDuringReheat(0.0), AirMassFlowDuringReheatMax(0.0), ZoneOutdoorAirMethod(0),
               OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0), HWLoopNum(0), HWLoopSide(0),
               HWBranchIndex(0), HWCompIndex(0), SecInNode(0), IterationLimit(0), IterationFailed(0), OAPerPersonMode(0), EMSOverrideAirFlow(false),
-              EMSMassFlowRateValue(0.0), HeatRate(0.0), CoolRate(0.0), HeatEnergy(0.0), CoolEnergy(0.0), ZoneTurndownMinAirFracSchPtr(0), 
+              EMSMassFlowRateValue(0.0), ZoneTurndownMinAirFracSchPtr(0), 
               ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false), MyEnvrnFlag(true), MySizeFlag(true), GetGasElecHeatCoilCap(true),
               PlantLoopScanFlag(true), MassFlow1(0.0), MassFlow2(0.0), MassFlow3(0.0), MassFlowDiff(0.0)
         {
