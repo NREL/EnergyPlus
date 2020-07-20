@@ -73,6 +73,7 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/CoolTower.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/Fans.hh>
@@ -116,6 +117,7 @@ namespace EnergyPlus {
         CondenserLoopTowersData dataCondenserLoopTowers;
         CostEstimateManagerData dataCostEstimateManager;
         CoolTowerData dataCoolTower;
+        CTElectricGeneratorData dataCTElectricGenerator;
         CrossVentMgrData dataCrossVentMgr;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
@@ -170,6 +172,7 @@ namespace EnergyPlus {
             dataCondenserLoopTowers.clear_state();
             dataCostEstimateManager.clear_state();
             dataCoolTower.clear_state();
+            dataCTElectricGenerator.clear_state();
             dataCrossVentMgr.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
