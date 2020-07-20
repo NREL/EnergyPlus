@@ -71,12 +71,21 @@
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/CostEstimateManager.hh>
+#include <EnergyPlus/CoolTower.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
+#include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/WaterUse.hh>
+#include <EnergyPlus/WindowAC.hh>
+#include <EnergyPlus/WindowComplexManager.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindTurbine.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
@@ -107,6 +116,10 @@ namespace EnergyPlus {
         ChillerReformulatedEIRData dataChillerReformulatedEIR;
         ConvectionCoefficientsData dataConvectionCoefficients;
         CondenserLoopTowersData dataCondenserLoopTowers;
+        CostEstimateManagerData dataCostEstimateManager;
+        CoolTowerData dataCoolTower;
+        CTElectricGeneratorData dataCTElectricGenerator;
+        CrossVentMgrData dataCrossVentMgr;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
@@ -120,7 +133,12 @@ namespace EnergyPlus {
         // after we've plumbed enough of the functions to allow
         OutputFiles outputFiles;
 
+        WaterUseData dataWaterUse;
+        WindowACData dataWindowAC;
+        WindowComplexManagerData dataWindowComplexManager;
+        WindowEquivalentLayerData dataWindowEquivalentLayer;
         WindowManagerData dataWindowManager;
+        WindTurbineData dataWindTurbine;
         ZoneAirLoopEquipmentManagerData dataZoneAirLoopEquipmentManager;
         ZoneContaminantPredictorCorrectorData dataZoneContaminantPredictorCorrector;
         ZoneDehumidifierData dataZoneDehumidifier;
@@ -154,13 +172,22 @@ namespace EnergyPlus {
             dataChillerReformulatedEIR.clear_state();
             dataConvectionCoefficients.clear_state();
             dataCondenserLoopTowers.clear_state();
+            dataCostEstimateManager.clear_state();
+            dataCoolTower.clear_state();
+            dataCTElectricGenerator.clear_state();
+            dataCrossVentMgr.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
             fans.clear_state();
             //outputReportTabular.clear_state();
             pipes.clear_state();
             dataPlantChillers.clear_state();
+            dataWaterUse.clear_state();
+            dataWindowAC.clear_state();
+            dataWindowComplexManager.clear_state();
+            dataWindowEquivalentLayer.clear_state();
             dataWindowManager.clear_state();
+            dataWindTurbine.clear_state();
             dataZoneAirLoopEquipmentManager.clear_state();
             dataZoneContaminantPredictorCorrector.clear_state();
             dataZoneDehumidifier.clear_state();
