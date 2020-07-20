@@ -205,6 +205,7 @@ namespace DaylightingDevices {
 
     void clear_state() {
         COSAngle.clear();
+        COSAngle.allocate(NumOfAngles);
         ShelfReported = false;
     }
 

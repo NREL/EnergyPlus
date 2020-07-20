@@ -122,6 +122,12 @@ namespace PondGroundHeatExchanger {
     bool GetInputFlag(true);
     Array1D<PondGroundHeatExchangerData> PondGHE;
 
+    void clear_state() {
+        NumOfPondGHEs = 0;
+        GetInputFlag = true;
+        PondGHE.clear();
+    }
+
     void PondGroundHeatExchangerData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                                bool const FirstHVACIteration,
                                                Real64 &EP_UNUSED(CurLoad),

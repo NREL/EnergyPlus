@@ -890,6 +890,7 @@ namespace HeatBalanceKivaManager {
                     fnd.isExposedPerimeter = isExposedPerimeter;
                     fnd.exposedFraction = exposedFraction;
 
+                    std::cout << "Got Kiva construct num: " << constructionNum << std::endl;
                     if (constructionNum > 0) {
                         auto &c = Constructs(constructionNum);
 

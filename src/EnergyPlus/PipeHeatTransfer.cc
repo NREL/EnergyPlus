@@ -191,7 +191,7 @@ namespace PipeHeatTransfer {
         return nullptr;
     }
 
-    void PipeHTData::clear_state()
+    void clear_state()
     {
         GetPipeInputFlag = true;
         PipeHT.clear();

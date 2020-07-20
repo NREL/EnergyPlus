@@ -106,12 +106,13 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
@@ -154,6 +155,7 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MicroCHPElectricGenerator.hh>
+#include <EnergyPlus/MicroturbineElectricGenerator.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
@@ -176,6 +178,7 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
+#include <EnergyPlus/PlantComponentTemperatureSources.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
@@ -186,6 +189,7 @@
 #include <EnergyPlus/PlantValves.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/PollutionModule.hh>
+#include <EnergyPlus/PondGroundHeatExchanger.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
@@ -216,6 +220,7 @@
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/TranspiredCollector.hh>
 #include <EnergyPlus/UFADManager.hh>
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitVentilator.hh>
@@ -298,11 +303,13 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     EMSManager::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
+    ExternalInterface::clear_state();
     FanCoilUnits::clear_state();
     Fans::clear_state();
     FaultsManager::clear_state();
     FluidCoolers::clear_state();
     FluidProperties::clear_state();
+    FuelCellElectricGenerator::clear_state();
     Furnaces::clear_state();
     General::clear_state();
     GeneralRoutines_clear_state(); // GeneralRoutines does not have a namespace
@@ -344,6 +351,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
     MicroCHPElectricGenerator::clear_state();
+    MicroturbineElectricGenerator::clear_state();
     MixedAir::clear_state();
     MixerComponent::clear_state();
     MoistureBalanceEMPDManager::clear_state();
@@ -362,6 +370,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     Pipes::clear_state();
     PipeHeatTransfer::clear_state();
     PlantCentralGSHP::clear_state();
+    PlantComponentTemperatureSources::clear_state();
     PlantCondLoopOperation::clear_state();
     PlantHeatExchangerFluidToFluid::clear_state();
     PlantLoadProfile::clear_state();
@@ -373,6 +382,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     PlantValves::clear_state();
     PluginManagement::clear_state();
     PollutionModule::clear_state();
+    PondGroundHeatExchanger::clear_state();
     PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();
     Pumps::clear_state();
@@ -403,6 +413,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     SwimmingPool::clear_state();
     ThermalChimney::clear_state();
     ThermalComfort::clear_state();
+    TranspiredCollector::clear_state();
     UFADManager::clear_state();
     UnitarySystems::clear_state();
     UnitHeater::clear_state();
