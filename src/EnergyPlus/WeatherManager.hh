@@ -608,14 +608,14 @@ namespace WeatherManager {
                               bool Rollover,
                               Optional_bool_const MidSimReset = _);
 
-    void SetDSTDateRanges(Array1D_int &MonWeekDay, // Weekday of each day 1 of month
+    void SetDSTDateRanges(Array1D_int const &MonWeekDay, // Weekday of each day 1 of month
                           Array1D_int &DSTIdx,   // DST Index for each julian day (1:366)
                           Optional_int DSTActStMon = _,
                           Optional_int DSTActStDay = _,
                           Optional_int DSTActEnMon = _,
                           Optional_int DSTActEnDay = _);
 
-    void SetSpecialDayDates(Array1D_int &MonWeekDay); // Weekday of each day 1 of month
+    void SetSpecialDayDates(Array1D_int const &MonWeekDay); // Weekday of each day 1 of month
 
     void InitializeWeather(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 

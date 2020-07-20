@@ -736,7 +736,6 @@ namespace WeatherManager {
         // if another environment is available in the "run list" or if the end has been
         // reached.
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetNextEnvironment: ");
         static constexpr auto EnvNameFormat("Environment,{},{},{},{},{},{},{},{},{},{},{},{},{}\n");
         static constexpr auto EnvDSTNFormat("Environment:Daylight Saving,No,{}\n");
@@ -766,32 +765,12 @@ namespace WeatherManager {
             {EmissivityCalcType::IdsoModel, "Idso"},
             {EmissivityCalcType::BerdahlMartinModel, "Berdahl and Martin"}
         };
-        int Loop;
         std::string StDate;
         std::string EnDate;
-        std::string string;
-        std::string cTotalEnvDays;
-        std::string skyTempModel;
         int DSTActStMon;
         int DSTActStDay;
         int DSTActEnMon;
         int DSTActEnDay;
-        int RunStJDay;
-        int RunEnJDay;
-        bool OkRun;
-        int TWeekDay;
-        Array1D_int MonWeekDay(12);
-        Array1D_int ActEndDayOfMonth(12);
-        int JDay5Start;
-        int JDay5End;
-        std::string Source;
-        std::string ApWkRule;
-        std::string AlpUseDST;
-        std::string AlpUseSpec;
-        std::string AlpUseRain;
-        std::string AlpUseSnow;
-        std::string kindOfRunPeriod;
-        Real64 GrossApproxAvgDryBulb;
 
         if (DataGlobals::BeginSimFlag && GetEnvironmentFirstCall) {
 
@@ -911,10 +890,10 @@ namespace WeatherManager {
             DataEnvironment::CurrentOverallSimDay = 0;
             DataEnvironment::TotalOverallSimDays = 0;
             DataEnvironment::MaxNumberSimYears = 1;
-            for (Loop = 1; Loop <= NumOfEnvrn; ++Loop) {
-                DataEnvironment::TotalOverallSimDays += Environment(Loop).TotalDays;
-                if (Environment(Loop).KindOfEnvrn == DataGlobals::ksRunPeriodWeather) {
-                    DataEnvironment::MaxNumberSimYears = max(DataEnvironment::MaxNumberSimYears, Environment(Loop).NumSimYears);
+            for (int i = 1; i <= NumOfEnvrn; ++i) {
+                DataEnvironment::TotalOverallSimDays += Environment(i).TotalDays;
+                if (Environment(i).KindOfEnvrn == DataGlobals::ksRunPeriodWeather) {
+                    DataEnvironment::MaxNumberSimYears = max(DataEnvironment::MaxNumberSimYears, Environment(i).NumSimYears);
                 }
             }
             DisplaySimDaysProgress(DataEnvironment::CurrentOverallSimDay, DataEnvironment::TotalOverallSimDays);
@@ -940,8 +919,7 @@ namespace WeatherManager {
                     if (DataGlobals::KindOfSim == DataGlobals::ksDesignDay) {
                         if (DataGlobals::DoDesDaySim) {
                             ShowWarningError(RoutineName + "Adaptive Comfort being reported during design day.");
-                            GrossApproxAvgDryBulb =
-                                (DesDayInput(Envrn).MaxDryBulb + (DesDayInput(Envrn).MaxDryBulb - DesDayInput(Envrn).DailyDBRange)) / 2.0;
+                            Real64 GrossApproxAvgDryBulb = (DesDayInput(Envrn).MaxDryBulb + (DesDayInput(Envrn).MaxDryBulb - DesDayInput(Envrn).DailyDBRange)) / 2.0;
                             if (DataHeatBalance::AdaptiveComfortRequested_ASH55) ThermalComfort::CalcThermalComfortAdaptiveASH55(true, false, GrossApproxAvgDryBulb);
                             if (DataHeatBalance::AdaptiveComfortRequested_CEN15251) ThermalComfort::CalcThermalComfortAdaptiveCEN15251(true, false, GrossApproxAvgDryBulb);
                         }
@@ -992,8 +970,9 @@ namespace WeatherManager {
                         auto const SELECT_CASE_var(DataGlobals::KindOfSim);
 
                         if ((SELECT_CASE_var == DataGlobals::ksRunPeriodWeather) || (SELECT_CASE_var == DataGlobals::ksRunPeriodDesign)) {
-                            kindOfRunPeriod = Environment(Envrn).cKindOfEnvrn;
+                            std::string kindOfRunPeriod = Environment(Envrn).cKindOfEnvrn;
                             DataEnvironment::RunPeriodEnvironment = DataGlobals::KindOfSim == DataGlobals::ksRunPeriodWeather;
+                            Array1D_int ActEndDayOfMonth(12);
                             ActEndDayOfMonth = EndDayOfMonth;
                             DataEnvironment::CurrentYearIsLeapYear = Environment(Envrn).IsLeapYear;
                             if (DataEnvironment::CurrentYearIsLeapYear && WFAllowsLeapYears) {
@@ -1021,7 +1000,7 @@ namespace WeatherManager {
                                 }
                             }
 
-                            OkRun = false;
+                            bool OkRun = false;
 
                             if (Environment(Envrn).ActualWeather) {
                                 // Actual weather
@@ -1074,14 +1053,12 @@ namespace WeatherManager {
                                 StDate = format(DateFormat, DataPeriods(1).StMon, DataPeriods(1).StDay);
                                 EnDate = format(DateFormat, DataPeriods(1).EnMon, DataPeriods(1).EnDay);
                                 if (DataPeriods(1).StYear > 0) {
-                                    string = General::RoundSigDigits(DataPeriods(1).StYear);
-                                    StDate += "/" + string;
+                                    StDate += "/" + General::RoundSigDigits(DataPeriods(1).StYear);
                                 } else {
                                     StDate += "/<noyear>";
                                 }
                                 if (DataPeriods(1).EnYear > 0) {
-                                    string = General::RoundSigDigits(DataPeriods(1).EnYear);
-                                    EnDate += "/" + string;
+                                    EnDate += "/" + General::RoundSigDigits(DataPeriods(1).EnYear);
                                 } else {
                                     EnDate += "/<noyear>";
                                 }
@@ -1107,42 +1084,15 @@ namespace WeatherManager {
                             }
                             DataEnvironment::EnvironmentStartEnd = StDate + " - " + EnDate;
 
-                            if (Environment(Envrn).DayOfWeek == 0) { // Use Sunday
-                                TWeekDay = 1;
-                                MonWeekDay = DataPeriods(Loop).MonWeekDay;
-                            } else {
-                                TWeekDay = Environment(Envrn).DayOfWeek;
-                                MonWeekDay = Environment(Envrn).MonWeekDay;
-                            }
+                            int TWeekDay = (Environment(Envrn).DayOfWeek == 0) ? 1 : Environment(Envrn).DayOfWeek;
+                            auto const &MonWeekDay = Environment(Envrn).MonWeekDay;
 
                             if (DataReportingFlags::DoWeatherInitReporting) {
-                                if (Environment(Envrn).UseDST) {
-                                    AlpUseDST = "Yes";
-                                } else {
-                                    AlpUseDST = "No";
-                                }
-                                if (Environment(Envrn).UseHolidays) {
-                                    AlpUseSpec = "Yes";
-                                } else {
-                                    AlpUseSpec = "No";
-                                }
-                                if (Environment(Envrn).ApplyWeekendRule) {
-                                    ApWkRule = "Yes";
-                                } else {
-                                    ApWkRule = "No";
-                                }
-                                if (Environment(Envrn).UseRain) {
-                                    AlpUseRain = "Yes";
-                                } else {
-                                    AlpUseRain = "No";
-                                }
-                                if (Environment(Envrn).UseSnow) {
-                                    AlpUseSnow = "Yes";
-                                } else {
-                                    AlpUseSnow = "No";
-                                }
-                                cTotalEnvDays = General::RoundSigDigits(Environment(Envrn).TotalDays);
-                                skyTempModel = SkyTempModelNames.at(Environment(Envrn).SkyTempModel);
+                                std::string const AlpUseDST = (Environment(Envrn).UseDST) ? "Yes" : "No";
+                                std::string const AlpUseSpec = (Environment(Envrn).UseHolidays) ? "Yes" : "No";
+                                std::string const ApWkRule = (Environment(Envrn).ApplyWeekendRule) ? "Yes" : "No";
+                                std::string const AlpUseRain = (Environment(Envrn).UseRain) ? "Yes" : "No";
+                                std::string const AlpUseSnow = (Environment(Envrn).UseSnow) ? "Yes" : "No";
 
                                 print(state.outputFiles.eio,
                                       EnvNameFormat,
@@ -1151,14 +1101,14 @@ namespace WeatherManager {
                                       StDate,
                                       EnDate,
                                       ValidDayNames(TWeekDay),
-                                      cTotalEnvDays,
+                                      General::RoundSigDigits(Environment(Envrn).TotalDays),
                                       "Use RunPeriod Specified Day",
                                       AlpUseDST,
                                       AlpUseSpec,
                                       ApWkRule,
                                       AlpUseRain,
                                       AlpUseSnow,
-                                      skyTempModel);
+                                      SkyTempModelNames.at(Environment(Envrn).SkyTempModel));
                             }
 
                             if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
@@ -1176,8 +1126,8 @@ namespace WeatherManager {
                                             ErrorsFound = true;
                                         }
                                         if (DataPeriods(1).StMon == 1 && DataPeriods(1).StDay == 1) {
-                                            RunStJDay = General::OrdinalDay(DataPeriods(1).StMon, DataPeriods(1).StDay, LeapYearAdd);
-                                            RunEnJDay = General::OrdinalDay(DataPeriods(1).EnMon, DataPeriods(1).EnDay, LeapYearAdd);
+                                            int RunStJDay = General::OrdinalDay(DataPeriods(1).StMon, DataPeriods(1).StDay, LeapYearAdd);
+                                            int RunEnJDay = General::OrdinalDay(DataPeriods(1).EnMon, DataPeriods(1).EnDay, LeapYearAdd);
                                             if (RunEnJDay - RunStJDay + 1 != 365) {
                                                 ShowSevereError(RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files "
                                                                               "that do not contain 365 days.");
@@ -1200,18 +1150,20 @@ namespace WeatherManager {
                             // Only need to set Week days for Run Days
                             DataEnvironment::RunPeriodStartDayOfWeek = TWeekDay;
                             WeekDayTypes = 0;
-                            JDay5Start = General::OrdinalDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
-                            JDay5End = General::OrdinalDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
+                            int JDay5Start = General::OrdinalDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
+                            int JDay5End = General::OrdinalDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
 
                             curSimDayForEndOfRunPeriod = Environment(Envrn).TotalDays;
 
-                            Loop = JDay5Start;
-                            while (true) {
-                                WeekDayTypes(Loop) = TWeekDay;
-                                TWeekDay = mod(TWeekDay, 7) + 1;
-                                ++Loop;
-                                if (Loop > 366) Loop = 1;
-                                if (Loop == JDay5End) break;
+                            {
+                                int i = JDay5Start;
+                                while (true) {
+                                    WeekDayTypes(i) = TWeekDay;
+                                    TWeekDay = mod(TWeekDay, 7) + 1;
+                                    ++i;
+                                    if (i > 366) i = 1;
+                                    if (i == JDay5End) break;
+                                }
                             }
 
                             if (UseDaylightSaving) {
@@ -1249,7 +1201,7 @@ namespace WeatherManager {
 
                             // Report Actual Dates for Daylight Saving and Special Days
                             if (!DataGlobals::KickOffSimulation) {
-                                Source = BlankString;
+                                std::string Source = BlankString;
                                 if (UseDaylightSaving) {
                                     if (EPWDaylightSaving) {
                                         Source = "WeatherFile";
@@ -1267,27 +1219,27 @@ namespace WeatherManager {
                                 } else if (DataGlobals::DoOutputReporting) {
                                     print(state.outputFiles.eio, EnvDSTNFormat, Source);
                                 }
-                                for (Loop = 1; Loop <= NumSpecialDays; ++Loop) {
+                                for (int i = 1; i <= NumSpecialDays; ++i) {
                                     static constexpr auto EnvSpDyFormat("Environment:Special Days,{},{},{},{},{:3}");
-                                    if (SpecialDays(Loop).WthrFile && UseSpecialDays && DataReportingFlags::DoWeatherInitReporting) {
-                                        StDate = format(DateFormat, SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay);
+                                    if (SpecialDays(i).WthrFile && UseSpecialDays && DataReportingFlags::DoWeatherInitReporting) {
+                                        StDate = format(DateFormat, SpecialDays(i).ActStMon, SpecialDays(i).ActStDay);
                                         print(state.outputFiles.eio,
                                               EnvSpDyFormat,
-                                              SpecialDays(Loop).Name,
-                                              SpecialDayNames(SpecialDays(Loop).DayType),
+                                              SpecialDays(i).Name,
+                                              SpecialDayNames(SpecialDays(i).DayType),
                                               "WeatherFile",
                                               StDate,
-                                              SpecialDays(Loop).Duration);
+                                              SpecialDays(i).Duration);
                                     }
-                                    if (!SpecialDays(Loop).WthrFile && DataReportingFlags::DoWeatherInitReporting) {
-                                        StDate = format(DateFormat, SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay);
+                                    if (!SpecialDays(i).WthrFile && DataReportingFlags::DoWeatherInitReporting) {
+                                        StDate = format(DateFormat, SpecialDays(i).ActStMon, SpecialDays(i).ActStDay);
                                         print(state.outputFiles.eio,
                                               EnvSpDyFormat,
-                                              SpecialDays(Loop).Name,
-                                              SpecialDayNames(SpecialDays(Loop).DayType),
+                                              SpecialDays(i).Name,
+                                              SpecialDayNames(SpecialDays(i).DayType),
                                               "InputFile",
                                               StDate,
-                                              SpecialDays(Loop).Duration);
+                                              SpecialDays(i).Duration);
                                     }
                                 }
                             }
@@ -1692,7 +1644,7 @@ namespace WeatherManager {
         }
     }
 
-    void SetDSTDateRanges(Array1D_int &MonWeekDay, // Weekday of each day 1 of month
+    void SetDSTDateRanges(Array1D_int const &MonWeekDay, // Weekday of each day 1 of month
                           Array1D_int &DSTIdx,   // DST Index for each julian day (1:366)
                           Optional_int DSTActStMon,
                           Optional_int DSTActStDay,
@@ -1800,7 +1752,7 @@ namespace WeatherManager {
         }
     }
 
-    void SetSpecialDayDates(Array1D_int &MonWeekDay) // Weekday of each day 1 of month
+    void SetSpecialDayDates(Array1D_int const &MonWeekDay) // Weekday of each day 1 of month
     {
 
         // SUBROUTINE INFORMATION:
