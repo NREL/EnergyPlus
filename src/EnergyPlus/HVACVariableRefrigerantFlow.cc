@@ -7638,11 +7638,15 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
-        bool ErrorsFound = false;
-        TempSize = VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil;
-        MaxHeaterOutletTempSizer sizerMaxHeaterOutTemp;
-        sizerMaxHeaterOutTemp.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-        VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil = sizerMaxHeaterOutTemp.size(TempSize, ErrorsFound);
+        if (VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
+            bool ErrorsFound = false;
+            TempSize = VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil;
+            MaxHeaterOutletTempSizer sizerMaxHeaterOutTemp;
+            std::string const stringOverride = "Maximum Supply Air Temperature from Supplemental Heater [C]";
+            sizerMaxHeaterOutTemp.overrideSizingString(stringOverride);
+            sizerMaxHeaterOutTemp.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil = sizerMaxHeaterOutTemp.size(TempSize, ErrorsFound);
+        }
 
         if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
             bool ErrorsFound = false;

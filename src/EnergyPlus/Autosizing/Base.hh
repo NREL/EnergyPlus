@@ -179,6 +179,8 @@ struct BaseSizer
 
     static void clear_state();
 
+    void overrideSizingString(std::string const& string);
+
 protected:
 
     std::string lastErrorMessages = "";

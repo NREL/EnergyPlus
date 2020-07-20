@@ -280,13 +280,15 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
 void BaseSizer::selectSizerOutput(bool &errorsFound)
 {
     if (this->printWarningFlag) {
-        if (!this->wasAutoSized && (this->autoSizedValue == this->originalValue)) { // no sizing run done
+        if (!this->wasAutoSized && ( this->autoSizedValue == this->originalValue) ) { // no sizing run done
             this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->originalValue);
             this->autoSizedValue = this->originalValue;
-        } else if (this->wasAutoSized && this->originalValue <= 0.0) { // autosized to 0 - will this ever catch anything?
-            // might need: if (this->originalValue == 0.0) this->wasAutoSized = this->originalValue;
-            this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
-        } else if (this->autoSizedValue >= 0.0) {
+        } else if (!this->wasAutoSized && this->autoSizedValue >= 0.0 && this->originalValue == 0.0) { // input was blank
+            this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->originalValue);
+        //} else if (this->wasAutoSized && this->autoSizedValue == 0.0) { // autosized to 0 - will this ever catch anything?
+        //    // might need: if (this->originalValue == 0.0) this->wasAutoSized = this->originalValue;
+        //    this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
+        } else if (this->autoSizedValue >= 0.0 && this->originalValue > 0.0) {
             if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
                 this->reportSizerOutput(this->compType,
                                         this->compName,
@@ -342,6 +344,11 @@ bool BaseSizer::checkInitialized(bool &errorsFound) {
         return false;
     }
     return true;
+}
+
+void BaseSizer::overrideSizingString(std::string const &string)
+{
+    this->sizingString = string;
 }
 
 } // namespace EnergyPlus
