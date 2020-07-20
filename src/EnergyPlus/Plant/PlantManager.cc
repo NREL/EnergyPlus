@@ -1250,7 +1250,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = CTElectricGenerator::CTGeneratorData::factory(CompNames(CompNum));
+                                this_comp.compPtr = CTElectricGenerator::CTGeneratorData::factory(state.dataCTElectricGenerator, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroCHP")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_MicroCHP;
                                 if (LoopSideNum == DemandSide) {

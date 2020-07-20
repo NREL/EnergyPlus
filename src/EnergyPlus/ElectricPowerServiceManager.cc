@@ -2119,7 +2119,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool
     }
     case GeneratorType::combTurbine: {
 
-        auto thisCTE = CTElectricGenerator::CTGeneratorData::factory(name);
+        auto thisCTE = CTElectricGenerator::CTGeneratorData::factory(state.dataCTElectricGenerator, name);
         // dummy vars
         PlantLocation L(0,0,0,0);
         Real64 tempLoad = myElecLoadRequest;
