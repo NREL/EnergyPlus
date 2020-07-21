@@ -26,30 +26,28 @@ class HeatingAirflowUASizer:
     This sizer class wraps the internal HeatingAirflowUASizer class
     """
 
+	ZoneConfigTerminal = 0
+	ZoneConfigInductionUnit = 1
+	ZoneConfigFanCoil = 2
+
+	SysConfigOutdoorAir = 0
+	SysConfigMainDuct = 1
+	SysConfigCoolingDuct = 2
+	SysConfigHeatingDuct = 3
+	SysConfigOtherDuct = 4
+	
     def __init__(self, api: cdll):
         self.api = api
         self.api.sizerHeatingAirflowUANew.argtypes = []
         self.api.sizerHeatingAirflowUANew.restype = c_void_p
-        self.api.sizerHeatingAirflowUAInitializeForSingleDuctZoneTerminal.argtypes = [c_void_p, RealEP, RealEP]
-        self.api.sizerHeatingAirflowUAInitializeForSingleDuctZoneTerminal.restype = c_void_p
-        self.api.sizerHeatingAirflowUAInitializeForZoneInductionUnit.argtypes = [c_void_p, RealEP, RealEP, RealEP]
-        self.api.sizerHeatingAirflowUAInitializeForZoneInductionUnit.restype = c_void_p
-        self.api.sizerHeatingAirflowUAInitializeForZoneFanCoil.argtypes = [c_void_p, RealEP, RealEP]
-        self.api.sizerHeatingAirflowUAInitializeForZoneFanCoil.restype = c_void_p
-        self.api.sizerHeatingAirflowUAInitializeForSystemOutdoorAir.argtypes = [c_void_p, RealEP, c_int]
-        self.api.sizerHeatingAirflowUAInitializeForSystemOutdoorAir.restype = c_void_p
-        self.api.sizerHeatingAirflowUAInitializeForSystemMainDuct.argtypes = [c_void_p, RealEP, RealEP, RealEP]
-        self.api.sizerHeatingAirflowUAInitializeForSystemMainDuct.restype = c_void_p
-        self.api.sizerHeatingAirflowUAInitializeForSystemCoolingDuct.argtypes = [c_void_p, RealEP]
-        self.api.sizerHeatingAirflowUAInitializeForSystemCoolingDuct.restype = c_void_p
-        self.api.sizerHeatingAirflowUAInitializeForSystemHeatingDuct.argtypes = [c_void_p, RealEP]
-        self.api.sizerHeatingAirflowUAInitializeForSystemHeatingDuct.restype = c_void_p
-        self.api.sizerHeatingAirflowUAInitializeForSystemOtherDuct.argtypes = [c_void_p, RealEP]
-        self.api.sizerHeatingAirflowUAInitializeForSystemOtherDuct.restype = c_void_p
+        self.api.sizerHeatingAirflowUAInitializeForZone.argtypes = [c_void_p, int, RealEP, RealEP, RealEP]
+        self.api.sizerHeatingAirflowUAInitializeForZone.restype = c_void_p
+        self.api.sizerHeatingAirflowUAInitializeForSystem.argtypes = [c_void_p, int, RealEP, RealEP, RealEP, int]
+        self.api.sizerHeatingAirflowUAInitializeForSystem.restype = c_void_p
         self.api.sizerHeatingAirflowUADelete.argtypes = [c_void_p]
         self.api.sizerHeatingAirflowUADelete.restype = c_void_p
-        self.api.sizerHeatingAirflowUACalculate.argtypes = [c_void_p]
-        self.api.sizerHeatingAirflowUACalculate.restype = int
+        self.api.sizerHeatingAirflowUASize.argtypes = [c_void_p]
+        self.api.sizerHeatingAirflowUASize.restype = int
         self.api.sizerHeatingAirflowUAValue.argtypes = [c_void_p]
         self.api.sizerHeatingAirflowUAValue.restype = RealEP
         self.base_worker = BaseSizerWorker(self.api)
@@ -61,37 +59,19 @@ class HeatingAirflowUASizer:
     def get_last_error_messages(self):
         return self.base_worker.get_error_messages(self.api, self.instance)
 
-    def initialize_for_zone_terminal_single_duct(self, elevation: float, main_flow_rate: float) -> None:
-        self.api.sizerHeatingAirflowUAInitializeForSingleDuctZoneTerminal(self.instance, elevation, main_flow_rate)
+    def initialize_for_zone(self, zone_config: int, elevation: float, representative_flow_rate: float, reheat_multiplier: float = 0.0) -> None:
+        self.api.sizerHeatingAirflowUAInitializeForZone(self.instance, zone_config, elevation, representative_flow_rate, reheat_multiplier)
 
-    def initialize_for_zone_terminal_induction_unit(self, elevation: float, main_flow_rate: float, reheat_mult: float) -> None:
-        self.api.sizerHeatingAirflowUAInitializeForZoneInductionUnit(self.instance, elevation, main_flow_rate, reheat_mult)
+    def initialize_for_system_outdoor_air(self, sys_config: int, elevation: float, representative_flow_rate: float, min_flow_rate_ratio: float, doas: bool) -> None:
+        self.api.sizerHeatingAirflowUAInitializeForSystem(self.instance, sys_config, elevation, representative_flow_rate, min_flow_rate_ratio, 1 if doas else 0)
 
-    def initialize_for_zone_terminal_fan_coil(self, elevation: float, design_heat_volume_flow_rate: float) -> None:
-        self.api.sizerHeatingAirflowUAInitializeForZoneFanCoil(self.instance, elevation, design_heat_volume_flow_rate)
-
-    def initialize_for_system_outdoor_air(self, elevation: float, overall_system_mass_flow: float, doas: bool) -> None:
-        self.api.sizerHeatingAirflowUAInitializeForSystemOutdoorAir(self.instance, elevation, overall_system_mass_flow, 1 if doas else 0)
-
-    def initialize_for_system_main_duct(self, elevation: float, overall_system_vol_flow: float, min_flow_rate_ratio: float) -> None:
-        self.api.sizerHeatingAirflowUAInitializeForSystemMainDuct(self.instance, elevation, overall_system_vol_flow, min_flow_rate_ratio)
-
-    def initialize_for_system_cooling_duct(self, elevation: float) -> None:
-        self.api.sizerHeatingAirflowUAInitializeForSystemCoolingDuct(self.instance, elevation)
-
-    def initialize_for_system_heating_duct(self, elevation: float) -> None:
-        self.api.sizerHeatingAirflowUAInitializeForSystemHeatingDuct(self.instance, elevation)
-
-    def initialize_for_system_other(self, elevation: float) -> None:
-        self.api.sizerHeatingAirflowUAInitializeForSystemOtherDuct(self.instance, elevation)
-
-    def calculate(self) -> bool:
+    def size(self) -> bool:
         """
         Performs autosizing calculations with the given initialized values
 
         :return: True if the sizing was successful, or False if not
         """
-        return True if self.api.sizerHeatingAirflowUACalculate(self.instance) == 0 else False
+        return True if self.api.sizerHeatingAirflowUASize(self.instance) == 0 else False
 
     def autosized_value(self) -> float:
         """

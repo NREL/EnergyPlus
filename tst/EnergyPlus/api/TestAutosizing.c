@@ -53,20 +53,21 @@
 
 int runSuccess() {
     Sizer s = sizerHeatingAirflowUANew();
-    sizerHeatingAirflowUAInitializeForZoneFanCoil(s, 0.0, 500);
-    int status = sizerHeatingAirflowUACalculate(s);
+    sizerHeatingAirflowUAInitializeForZone(s, 0, 0.0, 500, 0.0);
+    int status = sizerHeatingAirflowUASize(s);
     if (status == 0) {
         Real64 val = sizerHeatingAirflowUAValue(s);
         printf("Calculated successfully!  Value = %8.4f\n", val);
     } else {
         printf("Autosizing failed!");
     }
-    sizerHeatingAirflowUADelete(s);
     char *messages = sizerGetLastErrorMessages(s);
-    free(messages);
     if (strlen(messages) != 0) {
+       // free(messages);
         return 1;
     }
+    sizerHeatingAirflowUADelete(s);
+   // free(messages);
     return 0;
 }
 
