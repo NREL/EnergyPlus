@@ -64,7 +64,6 @@
 
 namespace EnergyPlus {
     // Forward declarations
-    struct EnergyPlusData;
     class OutputFiles;
 
     // Forward declarations
