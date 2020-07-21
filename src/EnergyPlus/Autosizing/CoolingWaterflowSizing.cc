@@ -85,9 +85,9 @@ Real64 CoolingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
                         (Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat) - Psychrometrics::PsyHFnTdbW(CoilOutTemp, CoilOutHumRat));
                     Real64 DesVolFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow / DataEnvironment::StdRhoAir;
                     // add fan heat to coil load
-                    DesCoilLoad += BaseSizerWithFanHeatInputs::calcFanDesHeatGain(DesVolFlow, this->fanCompModel);
+                    DesCoilLoad += BaseSizerWithFanHeatInputs::calcFanDesHeatGain(DesVolFlow);
                     if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
-                        if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= DataPlant::PlantLoop.size() &&
+                        if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= (int)DataPlant::PlantLoop.size() &&
                             this->dataWaterCoilSizCoolDeltaT > 0.0) {
                             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
                                                                                DataGlobals::CWInitConvTemp,
@@ -118,7 +118,7 @@ Real64 CoolingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
             } else {
                 if (this->curOASysNum > 0) CoilDesWaterDeltaT *= 0.5;
                 if (this->dataCapacityUsedForSizing >= DataHVACGlobals::SmallLoad) {
-                    if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= DataPlant::PlantLoop.size() && CoilDesWaterDeltaT > 0.0) {
+                    if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= (int)DataPlant::PlantLoop.size() && CoilDesWaterDeltaT > 0.0) {
                         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
                                                                            DataGlobals::CWInitConvTemp,
                                                                            DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
@@ -143,6 +143,11 @@ Real64 CoolingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
                 }
             }
         }
+    }
+    // bandaid - override sizing string for detailed coil model
+    if (this->compType == "Coil:Cooling:Water:DetailedGeometry") {
+        std::string const stringOverride = "Maximum Water Flow Rate [m3/s]";
+        this->overrideSizingString(stringOverride);
     }
     this->selectSizerOutput(errorsFound);
     if (this->getCoilReportObject) {

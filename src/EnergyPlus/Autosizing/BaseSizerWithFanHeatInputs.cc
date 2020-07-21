@@ -71,7 +71,8 @@ namespace EnergyPlus {
     }
 
 
-    Real64 BaseSizerWithFanHeatInputs::calcFanDesHeatGain(Real64 &airVolFlow, bool &fanCompModel) {
+    Real64 BaseSizerWithFanHeatInputs::calcFanDesHeatGain(Real64 &airVolFlow)
+    {
         Real64 designHeatGain = 0.0;
         if (this->dataFanEnumType < 0 || this->dataFanIndex < 0) return designHeatGain;
         if (this->dataFanEnumType == DataAirSystems::fanModelTypeNotYetSet) return designHeatGain;
@@ -79,22 +80,22 @@ namespace EnergyPlus {
             designHeatGain = this->fanShaftPow + (this->motInPower - this->fanShaftPow) * this->motInAirFrac;
         } else {
             Real64 fanPowerTot = (airVolFlow * this->deltaP) / this->totEff;
-            designHeatGain =
-                    this->motEff * fanPowerTot + (fanPowerTot - this->motEff * fanPowerTot) * this->motInAirFrac;
+            designHeatGain = this->motEff * fanPowerTot + (fanPowerTot - this->motEff * fanPowerTot) * this->motInAirFrac;
         }
         return designHeatGain;
     }
 
     void BaseSizerWithFanHeatInputs::getFanInputsForDesHeatGain(EnergyPlusData &state,
-                                                                int const &fanEnumType,
-                                                                int const &fanIndex,
-                                                                Real64 &deltaP,
-                                                                Real64 &motEff,
-                                                                Real64 &totEff,
-                                                                Real64 &motInAirFrac,
-                                                                Real64 &fanShaftPow,
-                                                                Real64 &motInPower,
-                                                                bool &fanCompModel) {
+                                               int const &fanEnumType,
+                                               int const &fanIndex,
+                                               Real64 &deltaP,
+                                               Real64 &motEff,
+                                               Real64 &totEff,
+                                               Real64 &motInAirFrac,
+                                               Real64 &fanShaftPow,
+                                               Real64 &motInPower,
+                                               bool &fanCompModel)
+    {
         deltaP = 0.0;
         motEff = 0.0;
         totEff = 0.0;
@@ -106,13 +107,11 @@ namespace EnergyPlus {
 
         switch (fanEnumType) {
             case DataAirSystems::structArrayLegacyFanModels: {
-                Fans::FanInputsForDesHeatGain(state, fanIndex, deltaP, motEff, totEff, motInAirFrac, fanShaftPow,
-                                              motInPower, fanCompModel);
+                Fans::FanInputsForDesHeatGain(state, fanIndex, deltaP, motEff, totEff, motInAirFrac, fanShaftPow, motInPower, fanCompModel);
                 break;
             }
             case DataAirSystems::objectVectorOOFanSystemModel: {
-                HVACFan::fanObjs[fanIndex]->FanInputsForDesignHeatGain(state, fanIndex, deltaP, motEff, totEff,
-                                                                       motInAirFrac);
+                HVACFan::fanObjs[fanIndex]->FanInputsForDesignHeatGain(state, deltaP, motEff, totEff, motInAirFrac);
                 break;
             }
             case DataAirSystems::fanModelTypeNotYetSet: {

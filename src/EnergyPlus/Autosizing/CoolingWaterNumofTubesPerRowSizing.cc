@@ -58,10 +58,10 @@ Real64 CoolingWaterNumofTubesPerRowSizer::size(Real64 _originalValue, bool &erro
 
     if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || this->plantSizData.size() == 0)) {
         this->autoSizedValue = _originalValue;
-    } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= this->plantSizData.size()) {
+    } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= (int)this->plantSizData.size()) {
         // result will be integerized external to this routine , add 0.5 to existing calc to round the result
         this->autoSizedValue = int(max(3.0, 13750.0 * this->dataWaterFlowUsedForSizing + 1.0));
-    } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= this->plantSizData.size()) {
+    } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= (int)this->plantSizData.size()) {
         // result will be integerized external to this routine , add 0.5 to existing calc to round the result
         this->autoSizedValue = int(max(3.0, 13750.0 * this->dataWaterFlowUsedForSizing + 1.0));
     } else {

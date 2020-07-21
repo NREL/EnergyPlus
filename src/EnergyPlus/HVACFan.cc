@@ -1125,7 +1125,7 @@ namespace HVACFan {
     }
 
     void FanSystem::FanInputsForDesignHeatGain(
-        EnergyPlusData &state, int const &fanIndex, Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac)
+        EnergyPlusData &state, Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac)
     {
         if (!m_objSizingFlag) {
             deltaP = deltaPress;

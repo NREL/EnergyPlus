@@ -172,7 +172,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
 
     // test fan heat
     Real64 desVolFlow = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolMassFlow / DataEnvironment::StdRhoAir;
-    Real64 desFanHeat = sizer.calcFanDesHeatGain(desVolFlow, sizer.fanCompModel);
+    Real64 desFanHeat = sizer.calcFanDesHeatGain(desVolFlow);
     EXPECT_FALSE(sizer.fanCompModel); // fan is not a component model type
     EXPECT_NEAR(237.5, desFanHeat, 0.001);
 
