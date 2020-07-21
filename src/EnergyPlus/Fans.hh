@@ -376,6 +376,16 @@ namespace Fans {
 
     void SetFanAirLoopNumber(int const FanIndex, int const AirLoopNum);
 
+    void FanInputsForDesHeatGain(EnergyPlusData &state,
+                                 int const &fanIndex,
+                                 Real64 &deltaP,
+                                 Real64 &motEff,
+                                 Real64 &totEff,
+                                 Real64 &motInAirFrac,
+                                 Real64 &fanShaftPow,
+                                 Real64 &motInPower,
+                                 bool &fanCompModel);
+
     // Clears the global data in Fans.
     // Needed for unit tests, should not be normally called.
     void clear_state();

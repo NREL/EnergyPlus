@@ -50,7 +50,9 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -96,6 +98,9 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->termUnitIU = DataSizing::TermUnitIU;
     this->zoneEqFanCoil = DataSizing::ZoneEqFanCoil;
     this->otherEqType = !(this->termUnitSingDuct || this->termUnitPIU || this->termUnitIU || this->zoneEqFanCoil);
+    this->zoneEqUnitHeater = DataSizing::ZoneEqUnitHeater;
+    this->zoneEqUnitVent = DataSizing::ZoneEqUnitVent;
+    this->zoneEqVentedSlab = DataSizing::ZoneEqVentedSlab;
     this->zoneSizingInput = DataSizing::ZoneSizingInput;
     this->unitarySysEqSizing = DataSizing::UnitarySysEqSizing;
     this->oaSysEqSizing = DataSizing::OASysEqSizing;
@@ -116,11 +121,18 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
 
     // global sizing data
     this->minOA = DataSizing::MinOA;
+    this->dataConstantUsedForSizing = DataSizing::DataConstantUsedForSizing;
+    this->dataFractionUsedForSizing = DataSizing::DataFractionUsedForSizing;
+    this->dataFanIndex = DataSizing::DataFanIndex;
+    this->dataFanEnumType = DataSizing::DataFanEnumType;
 
     // global Data* sizing constants
     this->dataPltSizHeatNum = DataSizing::DataPltSizHeatNum;
     this->dataWaterLoopNum = DataSizing::DataWaterLoopNum;
     this->dataPltSizCoolNum = DataSizing::DataPltSizCoolNum;
+    this->dataWaterCoilSizHeatDeltaT = DataSizing::DataWaterCoilSizHeatDeltaT;
+    this->dataWaterCoilSizCoolDeltaT = DataSizing::DataWaterCoilSizCoolDeltaT;
+    this->dataCapacityUsedForSizing = DataSizing::DataCapacityUsedForSizing;
 
     this->dataDesInletAirHumRat = DataSizing::DataDesInletAirHumRat;
     this->dataDesOutletAirHumRat = DataSizing::DataDesOutletAirHumRat;
@@ -128,6 +140,67 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->dataDesInletWaterTemp = DataSizing::DataDesInletWaterTemp;
     this->dataFlowUsedForSizing = DataSizing::DataFlowUsedForSizing;
     this->dataWaterFlowUsedForSizing = DataSizing::DataWaterFlowUsedForSizing;
+    this->getFanInputsForDesHeatGain(state,
+                                     this->dataFanEnumType,
+                                     this->dataFanIndex,
+                                     this->deltaP,
+                                     this->motEff,
+                                     this->totEff,
+                                     this->motInAirFrac,
+                                     this->fanShaftPow,
+                                     this->motInPower,
+                                     this->fanCompModel);
+}
+
+Real64 BaseSizer::calcFanDesHeatGain(Real64 &airVolFlow, bool &fanCompModel)
+{
+    Real64 designHeatGain = 0.0;
+    if (this->dataFanEnumType < 0 || this->dataFanIndex < 0) return designHeatGain;
+    if (this->dataFanEnumType == DataAirSystems::fanModelTypeNotYetSet) return designHeatGain;
+    if (this->fanCompModel) {
+        designHeatGain = this->fanShaftPow + (this->motInPower - this->fanShaftPow) * this->motInAirFrac;
+    } else {
+        Real64 fanPowerTot = (airVolFlow * this->deltaP) / this->totEff;
+        designHeatGain = this->motEff * fanPowerTot + (fanPowerTot - this->motEff * fanPowerTot) * this->motInAirFrac;
+    }
+    return designHeatGain;
+}
+
+void BaseSizer::getFanInputsForDesHeatGain(EnergyPlusData &state,
+                                           int const &fanEnumType,
+                                           int const &fanIndex,
+                                           Real64 &deltaP,
+                                           Real64 &motEff,
+                                           Real64 &totEff,
+                                           Real64 &motInAirFrac,
+                                           Real64 &fanShaftPow,
+                                           Real64 &motInPower,
+                                           bool &fanCompModel)
+{
+    deltaP = 0.0;
+    motEff = 0.0;
+    totEff = 0.0;
+    motInAirFrac = 0.0;
+    fanShaftPow = 0.0;
+    motInPower = 0.0;
+    fanCompModel = false;
+    if (fanEnumType < 0 || fanIndex < 0) return;
+
+    switch (fanEnumType) {
+    case DataAirSystems::structArrayLegacyFanModels: {
+        Fans::FanInputsForDesHeatGain(state, fanIndex, deltaP, motEff, totEff, motInAirFrac, fanShaftPow, motInPower, fanCompModel);
+        break;
+    }
+    case DataAirSystems::objectVectorOOFanSystemModel: {
+        HVACFan::fanObjs[fanIndex]->FanInputsForDesignHeatGain(state, fanIndex, deltaP, motEff, totEff, motInAirFrac);
+        break;
+    }
+    case DataAirSystems::fanModelTypeNotYetSet: {
+        // do nothing
+        break;
+    }
+    } // end switch
+    return;
 }
 
 void BaseSizer::initializeFromAPI(Real64 const elevation) {
@@ -160,9 +233,27 @@ void BaseSizer::preSize(Real64 const _originalValue)
         ShowFatalError("Sizing type causes fatal error.");
     }
     this->originalValue = _originalValue;
+    this->autoCalculate = false;
     this->errorType = EnergyPlus::AutoSizingResultType::NoError;
     this->initialized = false; // force use of Init then Size in subsequent calls
     this->hardSizeNoDesignRun = !(this->sysSizingRunDone || this->zoneSizingRunDone);
+
+    if (this->dataFractionUsedForSizing == 0.0 && this->dataConstantUsedForSizing > 0.0) {
+        this->errorType = AutoSizingResultType::ErrorType1;
+        this->autoSizedValue = 0.0;
+        this->autoCalculate = true;
+        this->hardSizeNoDesignRun = false;
+        std::string msg = "Sizing Library HeatingWaterflowSizer: DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " +
+                          this->sizingString + " must both be greater than 0.";
+        this->addErrorMessage(msg);
+        ShowSevereError(msg);
+        // flip data so sizer uses AutoCalculate?
+        // this->dataConstantUsedForSizing = 0.0;
+        // this->dataFractionUsedForSizing = 1.0;
+    } else if (this->dataFractionUsedForSizing > 0.0) {
+        this->autoCalculate = true;
+        this->hardSizeNoDesignRun = false;
+    }
 
     if (this->curSysNum > 0 && this->curSysNum <= this->numPrimaryAirSys) {
         if (this->sysSizingRunDone) {
@@ -193,13 +284,13 @@ void BaseSizer::preSize(Real64 const _originalValue)
                 }
             }
         }
-        hardSizeNoDesignRun = false;
+        this->hardSizeNoDesignRun = false;
     }
 
     if (this->originalValue == DataSizing::AutoSize) {
         this->wasAutoSized = true;
-        hardSizeNoDesignRun = false;
-        if (!this->sizingDesRunThisAirSys && this->curSysNum > 0 && this->sizingType != AutoSizingType::AutoCalculate) {
+        this->hardSizeNoDesignRun = false;
+        if (!this->sizingDesRunThisAirSys && this->curSysNum > 0 && !this->autoCalculate) {
             if (!this->sysSizingRunDone) {
                 std::string msg = "For autosizing of " + this->compType + ' ' + this->compName + ", a system sizing run must be done.";
                 this->addErrorMessage(msg);
@@ -217,8 +308,7 @@ void BaseSizer::preSize(Real64 const _originalValue)
                 ShowFatalError("Program terminates due to previously shown condition(s).");
             }
         }
-        if (!this->sizingDesRunThisZone && this->curZoneEqNum > 0 && !this->sizingDesValueFromParent &&
-            this->sizingType != AutoSizingType::AutoCalculate) {
+        if (!this->sizingDesRunThisZone && this->curZoneEqNum > 0 && !this->sizingDesValueFromParent && !this->autoCalculate) {
             if (!this->zoneSizingRunDone) {
                 std::string msg = "For autosizing of " + this->compType + ' ' + this->compName + ", a zone sizing run must be done.";
                 this->addErrorMessage(msg);
@@ -236,6 +326,8 @@ void BaseSizer::preSize(Real64 const _originalValue)
                 ShowFatalError("Program terminates due to previously shown condition(s).");
             }
         }
+    } else {
+        this->wasAutoSized = false;
     }
 }
 
@@ -280,14 +372,15 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
 void BaseSizer::selectSizerOutput(bool &errorsFound)
 {
     if (this->printWarningFlag) {
-        if (!this->wasAutoSized && ( this->autoSizedValue == this->originalValue) ) { // no sizing run done
+        if (!this->wasAutoSized && (this->autoSizedValue == this->originalValue)) { // no sizing run done
             this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->originalValue);
             this->autoSizedValue = this->originalValue;
-        } else if (!this->wasAutoSized && this->autoSizedValue >= 0.0 && this->originalValue == 0.0) { // input was blank
+        } else if (!this->wasAutoSized && this->autoSizedValue >= 0.0 && this->originalValue == 0.0) { // input was blank or zero
             this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->originalValue);
-        //} else if (this->wasAutoSized && this->autoSizedValue == 0.0) { // autosized to 0 - will this ever catch anything?
-        //    // might need: if (this->originalValue == 0.0) this->wasAutoSized = this->originalValue;
-        //    this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
+            this->autoSizedValue = this->originalValue;
+        } else if (this->wasAutoSized && this->autoSizedValue >= 0.0 && this->originalValue <= 0.0) { // autosized to 0 or greater and input is 0 or autosize
+            // might need more logic here to catch everything correctly
+            this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
         } else if (this->autoSizedValue >= 0.0 && this->originalValue > 0.0) {
             if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
                 this->reportSizerOutput(this->compType,
@@ -314,7 +407,7 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
             ShowContinueError("SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->originalValue, 1));
             this->errorType = AutoSizingResultType::ErrorType1;
         }
-    } else if (!this->wasAutoSized) {
+    } else if (!this->wasAutoSized && !this->autoCalculate) {
         this->autoSizedValue = this->originalValue;
     }
 

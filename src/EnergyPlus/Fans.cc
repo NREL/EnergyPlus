@@ -3261,6 +3261,42 @@ namespace Fans {
 
     } // FanDesHeatGain
 
+    void FanInputsForDesHeatGain(EnergyPlusData &state,
+                                 int const &fanIndex,
+                                 Real64 &deltaP,
+                                 Real64 &motEff,
+                                 Real64 &totEff,
+                                 Real64 &motInAirFrac,
+                                 Real64 &fanShaftPow,
+                                 Real64 &motInPower,
+                                 bool &fanCompModel)
+    {
+        deltaP = 0.0;
+        motEff = 0.0;
+        totEff = 0.0;
+        motInAirFrac = 0.0;
+        fanShaftPow = 0.0;
+        motInPower = 0.0;
+        fanCompModel = false;
+        if (fanIndex <= 0) {
+            return;
+        } else if (Fan(fanIndex).FanType_Num != FanType_ComponentModel) {
+            deltaP = Fan(fanIndex).DeltaPress;
+            motEff = Fan(fanIndex).MotEff;
+            totEff = Fan(fanIndex).FanEff;
+            motInAirFrac = Fan(fanIndex).MotInAirFrac;
+        } else {
+            if (!SysSizingCalc && MySizeFlag(fanIndex)) {
+                SizeFan(state, fanIndex);
+                MySizeFlag(fanIndex) = false;
+            }
+            fanCompModel = true;
+            fanShaftPow = Fan(fanIndex).FanShaftPower;
+            motInPower = Fan(fanIndex).MotorInputPower;
+            motInAirFrac = Fan(fanIndex).MotInAirFrac;
+        }
+    }
+
     // Clears the global data in Fans.
     // Needed for unit tests, should not be normally called.
     void clear_state()
