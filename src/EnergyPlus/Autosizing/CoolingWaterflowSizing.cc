@@ -65,7 +65,6 @@ Real64 CoolingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
     // AutoCalculate is not used for cooling coil water flow sizing
     if (this->dataFractionUsedForSizing > 0.0) {
         this->autoSizedValue = this->dataConstantUsedForSizing * this->dataFractionUsedForSizing;
-        if (this->wasAutoSized) this->originalValue = this->autoSizedValue;
     } else {
         if (this->curZoneEqNum > 0) {
             if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
