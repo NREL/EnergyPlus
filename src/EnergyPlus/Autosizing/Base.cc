@@ -152,7 +152,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
                                      this->fanCompModel);
 }
 
-Real64 BaseSizer::calcFanDesHeatGain(Real64 &airVolFlow, bool &fanCompModel)
+Real64 BaseSizer::calcFanDesHeatGain(Real64 &airVolFlow)
 {
     Real64 designHeatGain = 0.0;
     if (this->dataFanEnumType < 0 || this->dataFanIndex < 0) return designHeatGain;
@@ -192,7 +192,7 @@ void BaseSizer::getFanInputsForDesHeatGain(EnergyPlusData &state,
         break;
     }
     case DataAirSystems::objectVectorOOFanSystemModel: {
-        HVACFan::fanObjs[fanIndex]->FanInputsForDesignHeatGain(state, fanIndex, deltaP, motEff, totEff, motInAirFrac);
+        HVACFan::fanObjs[fanIndex]->FanInputsForDesignHeatGain(state, deltaP, motEff, totEff, motInAirFrac);
         break;
     }
     case DataAirSystems::fanModelTypeNotYetSet: {

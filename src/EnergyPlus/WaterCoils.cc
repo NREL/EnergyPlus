@@ -2150,7 +2150,6 @@ namespace WaterCoils {
         Real64 DesCoilInletWaterTempUsed(0.0); // coil design inlet water temp for UA sizing only
         Real64 Cp;
         bool NomCapUserInp = false; // flag for whether user has onput a nominal heating capacity
-        int SizingMethod;           // Integer representation of sizing method (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
 
         bool ErrorsFound = false;
         bool LoopErrorsFound = false;

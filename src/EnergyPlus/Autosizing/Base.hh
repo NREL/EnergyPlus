@@ -217,7 +217,7 @@ struct BaseSizer
                                     Real64 &motInPower,
                                     bool &fanCompModel);
 
-    Real64 calcFanDesHeatGain(Real64 &airVolFlow, bool &fanCompModel);
+    Real64 calcFanDesHeatGain(Real64 &airVolFlow);
 
 protected:
 

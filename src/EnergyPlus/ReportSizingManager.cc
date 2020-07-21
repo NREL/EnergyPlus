@@ -395,7 +395,6 @@ namespace ReportSizingManager {
         Real64 CpAirStd;                           // specific heat of air at standard conditions [J/kg-K]
         Real64 NominalCapacityDes;                 // Autosized nominal capacity for reporting [W]
         Real64 RatedVolFlowPerRatedTotCap;         // ratio of volume flow rate to capacity [m3/W]
-        Real64 CoilDesWaterDeltaT;                 // water coil delta T used for sizing [C]
         Real64 Cp;                                 // water loop fluid specific heat [J/kgK]
         Real64 rho;                                // water loop fluid density [kg/m3]
         Real64 T1Out;                              // water coil air outlet temperature [C]
