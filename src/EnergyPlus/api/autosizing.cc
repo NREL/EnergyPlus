@@ -67,39 +67,45 @@ Sizer sizerHeatingAirflowUANew() {
 void sizerHeatingAirflowUADelete(Sizer sizer) {
     delete reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
 }
-void sizerHeatingAirflowUAInitializeForSingleDuctZoneTerminal(Sizer sizer, Real64 elevation, Real64 mainFlowRate) {
+void sizerHeatingAirflowUAInitializeForZone(
+    Sizer sizer, HeatingAirflowUAZoneConfigType zoneConfig, Real64 elevation, Real64 representativeFlowRate, Real64 reheatMultiplier
+)
+{
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
-    s->initializeForSingleDuctZoneTerminal(elevation, mainFlowRate);
+    switch (zoneConfig) {
+    case Terminal:
+        s->initializeForSingleDuctZoneTerminal(elevation, representativeFlowRate);
+        break;
+    case InductionUnit:
+        s->initializeForZoneInductionUnit(elevation, representativeFlowRate, reheatMultiplier);
+        break;
+    case FanCoil:
+        s->initializeForZoneFanCoil(elevation, representativeFlowRate);
+        break;
+    }
 }
-void sizerHeatingAirflowUAInitializeForZoneInductionUnit(Sizer sizer, Real64 elevation, Real64 mainFlowRate, Real64 reheatMultiplier) {
+void sizerHeatingAirflowUAInitializeForSystem(Sizer sizer,
+                                              HeatingAirflowUASystemConfigType sysConfig,
+                                              Real64 elevation,
+                                              Real64 representativeFlowRate,
+                                              Real64 minFlowRateRatio,
+                                              int DOAS)
+{
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
-    s->initializeForZoneInductionUnit(elevation, mainFlowRate, reheatMultiplier);
+    switch (sysConfig) {
+    case OutdoorAir:
+        s->initializeForSystemOutdoorAir(elevation, representativeFlowRate, DOAS == 1);
+    case MainDuct:
+        s->initializeForSystemMainDuct(elevation, representativeFlowRate, minFlowRateRatio);
+    case CoolingDuct:
+        s->initializeForSystemCoolingDuct(elevation);
+    case HeatingDuct:
+        s->initializeForSystemHeatingDuct(elevation);
+    case OtherDuct:
+        s->initializeForSystemOtherDuct(elevation);
+    }
 }
-void sizerHeatingAirflowUAInitializeForZoneFanCoil(Sizer sizer, Real64 elevation, Real64 designHeatVolumeFlowRate) {
-    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
-    s->initializeForZoneFanCoil(elevation, designHeatVolumeFlowRate);
-}
-void sizerHeatingAirflowUAInitializeForSystemOutdoorAir(Sizer sizer, Real64 elevation, Real64 overallSystemMassFlowRate, int DOAS) {
-    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
-    s->initializeForSystemOutdoorAir(elevation, overallSystemMassFlowRate, DOAS == 1); // TODO: Verify true/false 0/1 status here
-}
-void sizerHeatingAirflowUAInitializeForSystemMainDuct(Sizer sizer, Real64 elevation, Real64 overallSystemVolFlow, Real64 minFlowRateRatio) {
-    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
-    s->initializeForSystemMainDuct(elevation, overallSystemVolFlow, minFlowRateRatio);
-}
-void sizerHeatingAirflowUAInitializeForSystemCoolingDuct(Sizer sizer, Real64 elevation) {
-    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
-    s->initializeForSystemCoolingDuct(elevation);
-}
-void sizerHeatingAirflowUAInitializeForSystemHeatingDuct(Sizer sizer, Real64 elevation) {
-    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
-    s->initializeForSystemHeatingDuct(elevation);
-}
-void sizerHeatingAirflowUAInitializeForSystemOtherDuct(Sizer sizer, Real64 elevation) {
-    auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
-    s->initializeForSystemOtherDuct(elevation);
-}
-int sizerHeatingAirflowUACalculate(Sizer sizer) {
+int sizerHeatingAirflowUASize(Sizer sizer) {
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
     bool errorsFound = false;
     s->size(EnergyPlus::DataSizing::AutoSize, errorsFound);

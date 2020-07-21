@@ -85,40 +85,63 @@ ENERGYPLUSLIB_API Sizer sizerHeatingAirflowUANew();
 /// \see Sizer
 /// \see sizerHeatingAirflowUANew
 ENERGYPLUSLIB_API void sizerHeatingAirflowUADelete(Sizer sizer);
-
-// TODO: These need work.  Need to decide if they should be more/less specific, and we need to test all of them
-// TODO: Also, some of the code paths appear to want a mass flow rate while others want a volume flow rate, need to verify that
-
-/// \brief Initializes the HeatingAirflowUA sizer class
-/// \details All required data for setting up the HeatingAirflowUA sizer is passed in as arguments to this function.
+/// \brief Defines the different possible zone sizing configurations
+enum HeatingAirflowUAZoneConfigType{Terminal = 0, InductionUnit = 1, FanCoil = 2}; // TODO: These need to be renamed/scoped
+/// \brief Initializes the HeatingAirflowUA sizer class for zone configurations
+/// \details This function allows the sizer to be used for zone sizing calculations, supporting 
+///          the configurations defined in the `HeatingAirflowUAZoneConfigType` enumeration.
 /// \param[in] sizer An instance of a Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
+/// \param[in] zoneConfig One zone configuration type from the `HeatingAirflowUAZoneConfigType` enumeration
 /// \param[in] elevation The elevation above sea level for evaluating fluid properties, in m
-/// \remark This must be called prior to each call to sizerHeatingAirflowUACalculate
+/// \param[in] representativeFlowRate The flow rate used for this configuration type.
+///            - Terminal: this flow rate should be the BLAHBLAHBLAH
+///            - InductionUnit: this flow rate should be the BLAHBLAHBLAH
+///            - FanCoil: this flow rate should be the BLAHBLAHBLAH
+/// \param[in] reheatMultiplier Define the reheat multiplier in BLAHBLAHBLAH configs, for other configs it will be ignored
+/// \remark This or another initialization function must be called prior to each call to sizerHeatingAirflowUASize
 /// \see Sizer
-/// \see sizerHeatingAirflowUACalculate
+/// \see sizerHeatingAirflowUASize
 /// \see sizerHeatingAirflowUADelete
-
-ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSingleDuctZoneTerminal(Sizer sizer, Real64 elevation, Real64 mainFlowRate);
-ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForZoneInductionUnit(Sizer sizer, Real64 elevation, Real64 mainFlowRate, Real64 reheatMultiplier);
-ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForZoneFanCoil(Sizer sizer, Real64 elevation, Real64 designHeatVolumeFlowRate);
-ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemOutdoorAir(Sizer sizer, Real64 elevation, Real64 overallSystemMassFlowRate, int DOAS);
-ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemMainDuct(Sizer sizer, Real64 elevation, Real64 overallSystemVolFlow, Real64 minFlowRateRatio);
-ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemCoolingDuct(Sizer sizer, Real64 elevation);
-ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemHeatingDuct(Sizer sizer, Real64 elevation);
-ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystemOtherDuct(Sizer sizer, Real64 elevation);
-
+/// \see HeatingAirflowUAZoneConfigType
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForZone(
+    Sizer sizer, enum HeatingAirflowUAZoneConfigType zoneConfig, Real64 elevation, Real64 representativeFlowRate, Real64 reheatMultiplier
+);
+/// \brief Defines the different possible system sizing configurations
+enum HeatingAirflowUASystemConfigType {OutdoorAir = 0, MainDuct = 1, CoolingDuct = 2, HeatingDuct = 3, OtherDuct = 4};
+/// \brief Initializes the HeatingAirflowUA sizer class for system configurations
+/// \details This function allows the sizer to be used for system sizing calculations, supporting
+///          the configurations defined in the `HeatingAirflowUASystemConfigType` enumeration.
+/// \param[in] sizer An instance of a Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
+/// \param[in] sysConfig One System configuration type from the `HeatingAirflowUASystemConfigType` enumeration
+/// \param[in] elevation The elevation above sea level for evaluating fluid properties, in m
+/// \param[in] representativeFlowRate The flow rate used for this configuration type.
+///            - OutdoorAir: this flow rate should be the BLAHBLAHBLAH
+///            - MainDuct: this flow rate should be the BLAHBLAHBLAH
+///            - CoolingDuct: this flow rate should be the BLAHBLAHBLAH
+///            - HeatingDuct: this flow rate should be the BLAHBLAHBLAH
+///            - OtherDuct: this flow rate should be the BLAHBLAHBLAH
+/// \param[in] minFlowRateRatio Define the ratio for BLAHBLAHBLAH configs, not used in other configs
+/// \param[in] DOAS Specify if this coil is placed in a DOAS loop (1 = true, 0 = false)
+/// \remark This or another initialization function must be called prior to each call to sizerHeatingAirflowUASize
+/// \see Sizer
+/// \see sizerHeatingAirflowUASize
+/// \see sizerHeatingAirflowUADelete
+/// \see HeatingAirflowUASystemConfigType
+ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForSystem(
+    Sizer sizer, enum HeatingAirflowUASystemConfigType sysConfig, Real64 elevation, Real64 representativeFlowRate, Real64 minFlowRateRatio, int DOAS
+);
 /// \brief Does calculation of the HeatingAirflowUA sizer
 /// \param[in] sizer An instance of a HeatingAirflowUA Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
 /// \returns This function returns true (0) if the autosizing calculation was successful, or false (1) if not.
 /// \see Sizer
 /// \see sizerHeatingAirflowUANew
-ENERGYPLUSLIB_API int sizerHeatingAirflowUACalculate(Sizer sizer);
-/// \brief Returns the resulting autosized value after sizerHeatingAirflowUACalculate() is called.
+ENERGYPLUSLIB_API int sizerHeatingAirflowUASize(Sizer sizer);
+/// \brief Returns the resulting autosized value after sizerHeatingAirflowUASize() is called.
 /// \param[in] sizer An instance of a HeatingAirflowUA Sizer class, which can be created by calling `sizerHeatingAirflowUANew`.
 /// \returns Autosized Heating Air Mass Flow Rate, in kg/s
 /// \see Sizer
 /// \see sizerHeatingAirflowUANew
-/// \see sizerHeatingAirflowUACalculate
+/// \see sizerHeatingAirflowUASize
 ENERGYPLUSLIB_API Real64 sizerHeatingAirflowUAValue(Sizer sizer);
 
 #ifdef __cplusplus

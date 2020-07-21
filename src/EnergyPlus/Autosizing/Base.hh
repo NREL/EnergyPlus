@@ -88,7 +88,7 @@ struct BaseSizer
 
     bool getCoilReportObject = false; // provides access to coil reporting
     bool initialized = false;     // indicates initializeWithinEP was called
-    AutoSizingResultType errorType;
+    AutoSizingResultType errorType = AutoSizingResultType::NoError;
     AutoSizingType sizingType = AutoSizingType::Unknown;
     std::string sizingString = "";
     Real64 originalValue = 0.0;
