@@ -127,15 +127,6 @@ struct BaseSizer
     bool zoneEqUnitVent = false;   // unit ventilator zone equipment
     bool zoneEqVentedSlab = false; // ventilated slab zone equipment
 
-    // fan data
-    Real64 deltaP = 0.0;
-    Real64 motEff = 0.0;
-    Real64 totEff = 0.0;
-    Real64 motInAirFrac = 0.0;
-    bool fanCompModel = false;
-    Real64 fanShaftPow = 0.0;
-    Real64 motInPower = 0.0;
-
     // error message handling
     std::string getLastErrorMessages();
 
@@ -206,19 +197,6 @@ struct BaseSizer
 
     void overrideSizingString(std::string const &string);
 
-    void getFanInputsForDesHeatGain(EnergyPlusData &state,
-                                    int const &fanEnumType,
-                                    int const &fanIndex,
-                                    Real64 &deltaP,
-                                    Real64 &motEff,
-                                    Real64 &totEff,
-                                    Real64 &motInAirFrac,
-                                    Real64 &fanShaftPow,
-                                    Real64 &motInPower,
-                                    bool &fanCompModel);
-
-    Real64 calcFanDesHeatGain(Real64 &airVolFlow, bool &fanCompModel);
-
 protected:
 
     std::string lastErrorMessages = "";
@@ -241,6 +219,8 @@ protected:
     static bool isValidCoilType(std::string const &compType);
 
     bool checkInitialized(bool &errorsFound);
+
+    void clearState();
 
 };
 

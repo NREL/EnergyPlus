@@ -73,13 +73,13 @@ void sizerHeatingAirflowUAInitializeForZone(
 {
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
     switch (zoneConfig) {
-    case Terminal:
+    case HeatingAirflowUAZoneTerminal:
         s->initializeForSingleDuctZoneTerminal(elevation, representativeFlowRate);
         break;
-    case InductionUnit:
+    case HeatingAirflowUAZoneInductionUnit:
         s->initializeForZoneInductionUnit(elevation, representativeFlowRate, reheatMultiplier);
         break;
-    case FanCoil:
+    case HeatingAirflowUAZoneFanCoil:
         s->initializeForZoneFanCoil(elevation, representativeFlowRate);
         break;
     }
@@ -93,16 +93,21 @@ void sizerHeatingAirflowUAInitializeForSystem(Sizer sizer,
 {
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
     switch (sysConfig) {
-    case OutdoorAir:
+    case HeatingAirflowUASystemConfigTypeOutdoorAir:
         s->initializeForSystemOutdoorAir(elevation, representativeFlowRate, DOAS == 1);
-    case MainDuct:
+        break;
+    case HeatingAirflowUASystemConfigTypeMainDuct:
         s->initializeForSystemMainDuct(elevation, representativeFlowRate, minFlowRateRatio);
-    case CoolingDuct:
+        break;
+    case HeatingAirflowUASystemConfigTypeCoolingDuct:
         s->initializeForSystemCoolingDuct(elevation);
-    case HeatingDuct:
+        break;
+    case HeatingAirflowUASystemConfigTypeHeatingDuct:
         s->initializeForSystemHeatingDuct(elevation);
-    case OtherDuct:
+        break;
+    case HeatingAirflowUASystemConfigTypeOtherDuct:
         s->initializeForSystemOtherDuct(elevation);
+        break;
     }
 }
 int sizerHeatingAirflowUASize(Sizer sizer) {

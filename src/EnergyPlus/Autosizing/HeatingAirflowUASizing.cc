@@ -100,8 +100,6 @@ namespace EnergyPlus {
         }
     }
 
-    // TODO: Probably need a reset() call to reinitialize all the flags back to zero/false/etc., call from each initialize method
-
     void HeatingAirflowUASizer::initializeForSystemMainDuct(Real64 const elevation, Real64 overallSystemVolFlow,
                                                             Real64 minFlowRateRatio) {
         this->initializeFromAPI(elevation);

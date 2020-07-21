@@ -50,9 +50,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -140,70 +138,10 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->dataDesInletWaterTemp = DataSizing::DataDesInletWaterTemp;
     this->dataFlowUsedForSizing = DataSizing::DataFlowUsedForSizing;
     this->dataWaterFlowUsedForSizing = DataSizing::DataWaterFlowUsedForSizing;
-    this->getFanInputsForDesHeatGain(state,
-                                     this->dataFanEnumType,
-                                     this->dataFanIndex,
-                                     this->deltaP,
-                                     this->motEff,
-                                     this->totEff,
-                                     this->motInAirFrac,
-                                     this->fanShaftPow,
-                                     this->motInPower,
-                                     this->fanCompModel);
-}
-
-Real64 BaseSizer::calcFanDesHeatGain(Real64 &airVolFlow, bool &fanCompModel)
-{
-    Real64 designHeatGain = 0.0;
-    if (this->dataFanEnumType < 0 || this->dataFanIndex < 0) return designHeatGain;
-    if (this->dataFanEnumType == DataAirSystems::fanModelTypeNotYetSet) return designHeatGain;
-    if (this->fanCompModel) {
-        designHeatGain = this->fanShaftPow + (this->motInPower - this->fanShaftPow) * this->motInAirFrac;
-    } else {
-        Real64 fanPowerTot = (airVolFlow * this->deltaP) / this->totEff;
-        designHeatGain = this->motEff * fanPowerTot + (fanPowerTot - this->motEff * fanPowerTot) * this->motInAirFrac;
-    }
-    return designHeatGain;
-}
-
-void BaseSizer::getFanInputsForDesHeatGain(EnergyPlusData &state,
-                                           int const &fanEnumType,
-                                           int const &fanIndex,
-                                           Real64 &deltaP,
-                                           Real64 &motEff,
-                                           Real64 &totEff,
-                                           Real64 &motInAirFrac,
-                                           Real64 &fanShaftPow,
-                                           Real64 &motInPower,
-                                           bool &fanCompModel)
-{
-    deltaP = 0.0;
-    motEff = 0.0;
-    totEff = 0.0;
-    motInAirFrac = 0.0;
-    fanShaftPow = 0.0;
-    motInPower = 0.0;
-    fanCompModel = false;
-    if (fanEnumType < 0 || fanIndex < 0) return;
-
-    switch (fanEnumType) {
-    case DataAirSystems::structArrayLegacyFanModels: {
-        Fans::FanInputsForDesHeatGain(state, fanIndex, deltaP, motEff, totEff, motInAirFrac, fanShaftPow, motInPower, fanCompModel);
-        break;
-    }
-    case DataAirSystems::objectVectorOOFanSystemModel: {
-        HVACFan::fanObjs[fanIndex]->FanInputsForDesignHeatGain(state, fanIndex, deltaP, motEff, totEff, motInAirFrac);
-        break;
-    }
-    case DataAirSystems::fanModelTypeNotYetSet: {
-        // do nothing
-        break;
-    }
-    } // end switch
-    return;
 }
 
 void BaseSizer::initializeFromAPI(Real64 const elevation) {
+    this->clearState();
     this->initialized = true;
     this->compType = "API_component_type";
     this->compName = "API_component_name";
@@ -443,5 +381,108 @@ void BaseSizer::overrideSizingString(std::string const &string)
 {
     this->sizingString = string;
 }
+
+
+    void BaseSizer::clearState() {
+        stdRhoAir = 0.0;
+
+        getCoilReportObject = false; // provides access to coil reporting
+        initialized = false;     // indicates initializeWithinEP was called
+        errorType = AutoSizingResultType::NoError;
+        sizingString = "";
+        originalValue = 0.0;
+        autoSizedValue = 0.0;
+        wasAutoSized = false;
+        hardSizeNoDesignRun = false;
+        sizingDesRunThisAirSys = false;
+        sizingDesRunThisZone = false;
+        sizingDesValueFromParent = false;
+        airLoopSysFlag = false;
+        oaSysFlag = false;
+        compType = "";
+        compName = "";
+
+        sysSizingRunDone = false;
+        zoneSizingRunDone = false;
+        curSysNum = 0;
+        curOASysNum = 0;
+        curZoneEqNum = 0;
+        curDuctType = 0;
+        curTermUnitSizingNum = 0; // index in zone equipment vector - for single duct, IU, and PIU
+        numPrimaryAirSys = 0;
+        numSysSizInput = 0;
+        doSystemSizing = false;
+        numZoneSizingInput = 0;
+        doZoneSizing = false;
+        autoCalculate = false; // indicator that AutoCalculate is used
+
+        // terminal units
+        termUnitSingDuct = false; // single duct terminal unit
+        termUnitPIU = false;      // powered induction unit
+        termUnitIU = false;       // induction terminal unit
+        zoneEqFanCoil = false;    // fan coil zone equipment
+        otherEqType = false;      // this covers the ELSE type switch
+        zoneEqUnitHeater = false; // unit heater zone equipment
+        zoneEqUnitVent = false;   // unit ventilator zone equipment
+        zoneEqVentedSlab = false; // ventilated slab zone equipment
+
+        // error message handling
+        getLastErrorMessages();
+
+        // global sizing data
+        minOA = 0.0;
+
+        // global Data* sizing constants
+
+        // HeatingWaterflowSizer
+        dataConstantUsedForSizing = 0.0;
+        dataFractionUsedForSizing = 0.0;
+
+        // HeatingWaterDesCoilWaterVolFlowUsedForUASizer
+        dataPltSizHeatNum = 0;
+        // HeatingWaterDesCoilWaterVolFlowUsedForUASizer, HeaterWaterflowSizing
+        dataWaterLoopNum = 0;
+        // CoolingWaterflowSizing
+        dataFanIndex = -1;
+        dataFanEnumType = -1;
+        dataWaterCoilSizCoolDeltaT = 0.0;
+        // HeaterWaterflowSizing
+        dataWaterCoilSizHeatDeltaT = 0.0;
+        dataCapacityUsedForSizing = 0.0;
+
+        // CoolingWaterDesWaterInletTempSizer, CoolingWaterNumofTubesPerRowSizer
+        dataPltSizCoolNum = 0;
+
+        // CoolingWaterDesAirInletHumRatSizer, CoolingWaterDesAirOutletHumRatSizer
+        dataDesInletAirHumRat = 0.0;
+
+        // CoolingWaterDesAirInletHumRatSizer, HeatingWaterDesAirInletHumRatSizer,
+        // HeatingWaterDesAirInletTempSizer
+        dataFlowUsedForSizing = 0.0;
+
+        // CoolingWaterDesAirOutletHumRatSizer
+        dataDesOutletAirHumRat = 0.0;
+        dataDesInletWaterTemp = 0.0;
+        dataDesOutletAirTemp = 0.0;
+
+        // CoolingWaterNumofTubesPerRowSizer, HeatingWaterDesCoilWaterVolFlowUsedForUASizer
+        dataWaterFlowUsedForSizing = 0.0;
+
+        printWarningFlag = false;
+        callingRoutine = "";
+        sysSizingInputData.clear();
+        zoneSizingInput.clear();
+        unitarySysEqSizing.clear();
+        oaSysEqSizing.clear();
+        zoneEqSizing.clear();
+        outsideAirSys.clear();
+        termUnitSizing.clear();
+        termUnitFinalZoneSizing.clear();
+        finalZoneSizing.clear();
+        finalSysSizing.clear();
+        plantSizData.clear();
+        primaryAirSystem.clear();
+        airloopDOAS.clear();
+    }
 
 } // namespace EnergyPlus

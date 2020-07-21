@@ -53,7 +53,7 @@
 
 int runSuccess() {
     Sizer s = sizerHeatingAirflowUANew();
-    sizerHeatingAirflowUAInitializeForZone(s, 0, 0.0, 500, 0.0);
+    sizerHeatingAirflowUAInitializeForZone(s, HeatingAirflowUAZoneTerminal, 0.0, 500, 0.0);
     int status = sizerHeatingAirflowUASize(s);
     if (status == 0) {
         Real64 val = sizerHeatingAirflowUAValue(s);
@@ -64,6 +64,32 @@ int runSuccess() {
     char *messages = sizerGetLastErrorMessages(s);
     if (strlen(messages) != 0) {
        // free(messages);
+        return 1;
+    }
+    sizerHeatingAirflowUAInitializeForZone(s, HeatingAirflowUAZoneInductionUnit, 0.0, 500, 1.0);
+    status = sizerHeatingAirflowUASize(s);
+    if (status == 0) {
+        Real64 val = sizerHeatingAirflowUAValue(s);
+        printf("Calculated successfully!  Value = %8.4f\n", val);
+    } else {
+        printf("Autosizing failed!");
+    }
+    messages = sizerGetLastErrorMessages(s);
+    if (strlen(messages) != 0) {
+        // free(messages);
+        return 1;
+    }
+    sizerHeatingAirflowUAInitializeForZone(s, HeatingAirflowUAZoneFanCoil, 0.0, 500, 1.0);
+    status = sizerHeatingAirflowUASize(s);
+    if (status == 0) {
+        Real64 val = sizerHeatingAirflowUAValue(s);
+        printf("Calculated successfully!  Value = %8.4f\n", val);
+    } else {
+        printf("Autosizing failed!");
+    }
+    messages = sizerGetLastErrorMessages(s);
+    if (strlen(messages) != 0) {
+        // free(messages);
         return 1;
     }
     sizerHeatingAirflowUADelete(s);

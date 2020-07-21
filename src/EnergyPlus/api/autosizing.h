@@ -86,7 +86,11 @@ ENERGYPLUSLIB_API Sizer sizerHeatingAirflowUANew();
 /// \see sizerHeatingAirflowUANew
 ENERGYPLUSLIB_API void sizerHeatingAirflowUADelete(Sizer sizer);
 /// \brief Defines the different possible zone sizing configurations
-enum HeatingAirflowUAZoneConfigType{Terminal = 0, InductionUnit = 1, FanCoil = 2}; // TODO: These need to be renamed/scoped
+enum HeatingAirflowUAZoneConfigType{
+    HeatingAirflowUAZoneTerminal = 0,
+    HeatingAirflowUAZoneInductionUnit = 1,
+    HeatingAirflowUAZoneFanCoil = 2
+};
 /// \brief Initializes the HeatingAirflowUA sizer class for zone configurations
 /// \details This function allows the sizer to be used for zone sizing calculations, supporting 
 ///          the configurations defined in the `HeatingAirflowUAZoneConfigType` enumeration.
@@ -107,7 +111,13 @@ ENERGYPLUSLIB_API void sizerHeatingAirflowUAInitializeForZone(
     Sizer sizer, enum HeatingAirflowUAZoneConfigType zoneConfig, Real64 elevation, Real64 representativeFlowRate, Real64 reheatMultiplier
 );
 /// \brief Defines the different possible system sizing configurations
-enum HeatingAirflowUASystemConfigType {OutdoorAir = 0, MainDuct = 1, CoolingDuct = 2, HeatingDuct = 3, OtherDuct = 4};
+enum HeatingAirflowUASystemConfigType {
+    HeatingAirflowUASystemConfigTypeOutdoorAir = 0,
+    HeatingAirflowUASystemConfigTypeMainDuct = 1,
+    HeatingAirflowUASystemConfigTypeCoolingDuct = 2,
+    HeatingAirflowUASystemConfigTypeHeatingDuct = 3,
+    HeatingAirflowUASystemConfigTypeOtherDuct = 4
+};
 /// \brief Initializes the HeatingAirflowUA sizer class for system configurations
 /// \details This function allows the sizer to be used for system sizing calculations, supporting
 ///          the configurations defined in the `HeatingAirflowUASystemConfigType` enumeration.

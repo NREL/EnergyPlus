@@ -85,7 +85,7 @@ Real64 CoolingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
                         (Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat) - Psychrometrics::PsyHFnTdbW(CoilOutTemp, CoilOutHumRat));
                     Real64 DesVolFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow / DataEnvironment::StdRhoAir;
                     // add fan heat to coil load
-                    DesCoilLoad += BaseSizer::calcFanDesHeatGain(DesVolFlow, this->fanCompModel);
+                    DesCoilLoad += BaseSizerWithFanHeatInputs::calcFanDesHeatGain(DesVolFlow, this->fanCompModel);
                     if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
                         if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= DataPlant::PlantLoop.size() &&
                             this->dataWaterCoilSizCoolDeltaT > 0.0) {
@@ -158,6 +158,11 @@ Real64 CoolingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
         }
     }
     return this->autoSizedValue;
+}
+
+void CoolingWaterflowSizer::clearState() {
+    BaseSizerWithFanHeatInputs::clearState();
+    this->someSpecialFlag = false;
 }
 
 } // namespace EnergyPlus

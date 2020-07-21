@@ -29,6 +29,8 @@ SET( SRC
   Autosizing/All_Simple_Sizing.hh
   Autosizing/Base.cc
   Autosizing/Base.hh
+  Autosizing/BaseSizerWithFanHeatInputs.cc
+  Autosizing/BaseSizerWithFanHeatInputs.hh
   Autosizing/CoolingWaterDesAirInletHumRatSizing.cc
   Autosizing/CoolingWaterDesAirInletHumRatSizing.hh
   Autosizing/CoolingWaterDesAirOutletHumRatSizing.cc

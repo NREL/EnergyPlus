@@ -45,27 +45,59 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef CoolingWaterflowSizing_hh_INCLUDED
-#define CoolingWaterflowSizing_hh_INCLUDED
+#ifndef BaseSizerWithFanHeatInputs_hh_INCLUDED
+#define BaseSizerWithFanHeatInputs_hh_INCLUDED
 
+#include <EnergyPlus/api/TypeDefs.h>
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
+#include <string>
 
 namespace EnergyPlus {
 
-struct CoolingWaterflowSizer : BaseSizerWithFanHeatInputs
-{
-    bool someSpecialFlag = false;
+    struct EnergyPlusData;
 
-    CoolingWaterflowSizer()
-    {
-        this->sizingType = AutoSizingType::HeatingWaterflowSizing;
-        this->sizingString = "Design Water Flow Rate [m3/s]";
+struct BaseSizerWithFanHeatInputs : BaseSizer {
+
+    // fan data
+    Real64 deltaP = 0.0;
+    Real64 motEff = 0.0;
+    Real64 totEff = 0.0;
+    Real64 motInAirFrac = 0.0;
+    bool fanCompModel = false;
+    Real64 fanShaftPow = 0.0;
+    Real64 motInPower = 0.0;
+
+    void getFanInputsForDesHeatGain(EnergyPlusData &state,
+                                    int const &fanEnumType,
+                                    int const &fanIndex,
+                                    Real64 &deltaP,
+                                    Real64 &motEff,
+                                    Real64 &totEff,
+                                    Real64 &motInAirFrac,
+                                    Real64 &fanShaftPow,
+                                    Real64 &motInPower,
+                                    bool &fanCompModel);
+
+    Real64 calcFanDesHeatGain(Real64 &airVolFlow, bool &fanCompModel);
+
+    void initializeWithinEP(EnergyPlusData &state,
+                            std::string const &_compType,
+                            std::string const &_compName,
+                            bool const &_printWarningFlag,
+                            std::string const &_callingRoutine) override;
+
+    void clearState() {
+        BaseSizer::clearState();
+        deltaP = 0.0;
+        motEff = 0.0;
+        totEff = 0.0;
+        motInAirFrac = 0.0;
+        fanCompModel = false;
+        fanShaftPow = 0.0;
+        motInPower = 0.0;
     }
-    ~CoolingWaterflowSizer() = default;
 
-    Real64 size(Real64 originalValue, bool &errorsFound) override;
-
-    void clearState();
 };
 
 } // namespace EnergyPlus

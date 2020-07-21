@@ -26,23 +26,23 @@ class HeatingAirflowUASizer:
     This sizer class wraps the internal HeatingAirflowUASizer class
     """
 
-	ZoneConfigTerminal = 0
-	ZoneConfigInductionUnit = 1
-	ZoneConfigFanCoil = 2
+    ZoneConfigTerminal = 0
+    ZoneConfigInductionUnit = 1
+    ZoneConfigFanCoil = 2
 
-	SysConfigOutdoorAir = 0
-	SysConfigMainDuct = 1
-	SysConfigCoolingDuct = 2
-	SysConfigHeatingDuct = 3
-	SysConfigOtherDuct = 4
-	
+    SysConfigOutdoorAir = 0
+    SysConfigMainDuct = 1
+    SysConfigCoolingDuct = 2
+    SysConfigHeatingDuct = 3
+    SysConfigOtherDuct = 4
+
     def __init__(self, api: cdll):
         self.api = api
         self.api.sizerHeatingAirflowUANew.argtypes = []
         self.api.sizerHeatingAirflowUANew.restype = c_void_p
-        self.api.sizerHeatingAirflowUAInitializeForZone.argtypes = [c_void_p, int, RealEP, RealEP, RealEP]
+        self.api.sizerHeatingAirflowUAInitializeForZone.argtypes = [c_void_p, c_int, RealEP, RealEP, RealEP]
         self.api.sizerHeatingAirflowUAInitializeForZone.restype = c_void_p
-        self.api.sizerHeatingAirflowUAInitializeForSystem.argtypes = [c_void_p, int, RealEP, RealEP, RealEP, int]
+        self.api.sizerHeatingAirflowUAInitializeForSystem.argtypes = [c_void_p, c_int, RealEP, RealEP, RealEP, c_int]
         self.api.sizerHeatingAirflowUAInitializeForSystem.restype = c_void_p
         self.api.sizerHeatingAirflowUADelete.argtypes = [c_void_p]
         self.api.sizerHeatingAirflowUADelete.restype = c_void_p
@@ -59,7 +59,7 @@ class HeatingAirflowUASizer:
     def get_last_error_messages(self):
         return self.base_worker.get_error_messages(self.api, self.instance)
 
-    def initialize_for_zone(self, zone_config: int, elevation: float, representative_flow_rate: float, reheat_multiplier: float = 0.0) -> None:
+    def initialize_for_zone(self, zone_config: int, elevation: float, representative_flow_rate: float, reheat_multiplier: float = 1.0) -> None:
         self.api.sizerHeatingAirflowUAInitializeForZone(self.instance, zone_config, elevation, representative_flow_rate, reheat_multiplier)
 
     def initialize_for_system_outdoor_air(self, sys_config: int, elevation: float, representative_flow_rate: float, min_flow_rate_ratio: float, doas: bool) -> None:
