@@ -59,7 +59,6 @@ namespace EnergyPlus {
 
 enum class AutoSizingType
 {
-    AutoCalculate,
     CoolingWaterDesAirInletHumRatSizing,
     CoolingWaterDesAirOutletHumRatSizing,
     CoolingWaterDesWaterInletTempSizing,
@@ -68,6 +67,7 @@ enum class AutoSizingType
     HeatingWaterDesAirInletHumRatSizing,
     HeatingWaterDesAirInletTempSizing,
     HeatingWaterDesCoilWaterVolFlowUsedForUASizing,
+    HeatingWaterflowSizing,
     MaxHeaterOutletTempSizing,
     ZoneCoolingLoadSizing,
     ZoneHeatingLoadSizing,
@@ -115,6 +115,7 @@ struct BaseSizer
     bool doSystemSizing = false;
     int numZoneSizingInput = 0;
     bool doZoneSizing = false;
+    bool autoCalculate = false; // indicator that AutoCalculate is used
 
     // terminal units
     bool termUnitSingDuct = false; // single duct terminal unit
@@ -122,6 +123,18 @@ struct BaseSizer
     bool termUnitIU = false;       // induction terminal unit
     bool zoneEqFanCoil = false;    // fan coil zone equipment
     bool otherEqType = false;      // this covers the ELSE type switch
+    bool zoneEqUnitHeater = false; // unit heater zone equipment
+    bool zoneEqUnitVent = false;   // unit ventilator zone equipment
+    bool zoneEqVentedSlab = false; // ventilated slab zone equipment
+
+    // fan data
+    Real64 deltaP = 0.0;
+    Real64 motEff = 0.0;
+    Real64 totEff = 0.0;
+    Real64 motInAirFrac = 0.0;
+    bool fanCompModel = false;
+    Real64 fanShaftPow = 0.0;
+    Real64 motInPower = 0.0;
 
     // error message handling
     std::string getLastErrorMessages();
@@ -131,12 +144,24 @@ struct BaseSizer
 
     // global Data* sizing constants
 
+    // HeatingWaterflowSizer
+    Real64 dataConstantUsedForSizing = 0.0;
+    Real64 dataFractionUsedForSizing = 0.0;
+
     // HeatingWaterDesCoilWaterVolFlowUsedForUASizer
-    Real64 dataPltSizHeatNum = 0.0;
-    Real64 dataWaterLoopNum = 0.0;
+    int dataPltSizHeatNum = 0;
+    // HeatingWaterDesCoilWaterVolFlowUsedForUASizer, HeaterWaterflowSizing
+    int dataWaterLoopNum = 0;
+    // CoolingWaterflowSizing
+    int dataFanIndex = -1;
+    int dataFanEnumType = -1;
+    Real64 dataWaterCoilSizCoolDeltaT = 0.0;
+    // HeaterWaterflowSizing
+    Real64 dataWaterCoilSizHeatDeltaT = 0.0;
+    Real64 dataCapacityUsedForSizing = 0.0;
 
     // CoolingWaterDesWaterInletTempSizer, CoolingWaterNumofTubesPerRowSizer
-    Real64 dataPltSizCoolNum = 0.0;
+    int dataPltSizCoolNum = 0;
 
     // CoolingWaterDesAirInletHumRatSizer, CoolingWaterDesAirOutletHumRatSizer
     Real64 dataDesInletAirHumRat = 0.0;
@@ -178,6 +203,21 @@ struct BaseSizer
     virtual Real64 size(Real64 originalValue, bool &errorsFound) = 0;
 
     static void clear_state();
+
+    void overrideSizingString(std::string const &string);
+
+    void getFanInputsForDesHeatGain(EnergyPlusData &state,
+                                    int const &fanEnumType,
+                                    int const &fanIndex,
+                                    Real64 &deltaP,
+                                    Real64 &motEff,
+                                    Real64 &totEff,
+                                    Real64 &motInAirFrac,
+                                    Real64 &fanShaftPow,
+                                    Real64 &motInPower,
+                                    bool &fanCompModel);
+
+    Real64 calcFanDesHeatGain(Real64 &airVolFlow, bool &fanCompModel);
 
 protected:
 

@@ -21,11 +21,13 @@ set( test_src
   Autosizing/CoolingWaterDesAirInletHumRatSizing.unit.cc
   Autosizing/CoolingWaterDesAirOutletHumRatSizing.unit.cc
   Autosizing/CoolingWaterDesWaterInletTempSizing.unit.cc
+  Autosizing/CoolingWaterflowSizing.unit.cc
   Autosizing/CoolingWaterNumofTubesPerRowSizing.unit.cc
   Autosizing/HeatingAirflowUASizing.unit.cc
   Autosizing/HeatingWaterDesAirInletHumRatSizing.unit.cc
   Autosizing/HeatingWaterDesAirInletTempSizing.unit.cc
   Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.unit.cc
+  Autosizing/HeatingWaterflowSizing.unit.cc
   BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
   BoilerSteam.unit.cc

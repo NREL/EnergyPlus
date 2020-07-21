@@ -56,11 +56,13 @@
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingWaterflowSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterNumofTubesPerRowSizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletTempSizing.hh>
 #include <EnergyPlus/Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh>
+#include <EnergyPlus/Autosizing/HeatingWaterflowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -2222,8 +2224,9 @@ namespace WaterCoils {
                 RequestSizing(state, CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName);
                 DataCapacityUsedForSizing = TempSize;
                 TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
-                RequestSizing(state, CompType, CompName, CoolingWaterflowSizing, SizingString, TempSize, bPRINT, RoutineName);
-                DataWaterFlowUsedForSizing = TempSize;
+                CoolingWaterflowSizer sizerCWWaterflow;
+                sizerCWWaterflow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                DataWaterFlowUsedForSizing = sizerCWWaterflow.size(TempSize, ErrorsFound);
                 // end pre-sizing data calculations
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
@@ -2260,12 +2263,9 @@ namespace WaterCoils {
                     if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
                         bPRINT = false;                                            // no field for detailed water coil, should print to eio anyway
                         TempSize = AutoSize;                                       // coil report
-                        SizingString.clear();                                      // doesn't matter
                     } else {
-                        FieldNum = 6; //  N6 , \field Design Inlet Air Humidity Ratio
                         bPRINT = true;
                         TempSize = WaterCoil(CoilNum).DesInletAirHumRat; // preserve input if entered
-                        SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [kgWater/kgDryAir]";
                     }
                     sizerCWDesInHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                     WaterCoil(CoilNum).DesInletAirHumRat = sizerCWDesInHumRat.size(TempSize, ErrorsFound);
@@ -2292,12 +2292,9 @@ namespace WaterCoils {
                     if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
                         bPRINT = false;       // no field for detailed water coil, should print this to eio anyway
                         TempSize = AutoSize;  // coil report
-                        SizingString.clear(); // doesn't matter
                     } else {
-                        FieldNum = 6; //  N6 , \field Design Inlet Air Humidity Ratio
                         bPRINT = true;
                         TempSize = WaterCoil(CoilNum).DesInletAirHumRat;
-                        SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [kgWater/kgDryAir]";
                     }
                     sizerCWDesInHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                     WaterCoil(CoilNum).DesInletAirHumRat = sizerCWDesInHumRat.size(TempSize, ErrorsFound);
@@ -2306,12 +2303,9 @@ namespace WaterCoils {
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;                                            // no field for detailed water coil, should print this to eio anyway
                     TempSize = AutoSize;                                       // coil report
-                    SizingString.clear();                                      // doesn't matter
                 } else {
-                    FieldNum = 7; //  N7 , \field Design Outlet Air Humidity Ratio
                     bPRINT = true;
                     TempSize = WaterCoil(CoilNum).DesOutletAirHumRat; // preserve input if entered
-                    SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [kgWater/kgDryAir]";
                 }
                 CoolingWaterDesAirOutletHumRatSizer sizerCWDesOutHumRat;
                 sizerCWDesOutHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
@@ -2334,12 +2328,10 @@ namespace WaterCoils {
                 // Why isn't the water volume flow rate based on the user inputs for inlet/outlet air/water temps? Water volume flow rate is
                 // always based on autosized inputs.
                 bPRINT = true;
-                FieldNum = 1; //  CoilModel_Detailed: N1 , \field Maximum Water Flow Rate, else: N1 , \field Design Water Flow Rate
-                SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m3/s]";
                 TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
-                RequestSizing(state, CompType, CompName, CoolingWaterflowSizing, SizingString, TempSize, bPRINT, RoutineName);
-                WaterCoil(CoilNum).MaxWaterVolFlowRate = TempSize;
-                DataWaterFlowUsedForSizing = TempSize;
+                sizerCWWaterflow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                WaterCoil(CoilNum).MaxWaterVolFlowRate = sizerCWWaterflow.size(TempSize, ErrorsFound);
+                DataWaterFlowUsedForSizing = WaterCoil(CoilNum).MaxWaterVolFlowRate;
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;       // do not print this sizing request since this coil does not have a design air flow rate input field (we
@@ -2568,10 +2560,7 @@ namespace WaterCoils {
                     DataFlowUsedForSizing = WaterCoil(CoilNum).DesAirVolFlowRate;
                 }
 
-                FieldNum = 2; // N2 , \field Maximum Water Flow Rate
-                SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m3/s]";
                 TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
-                SizingMethod = HeatingWaterflowSizing;
 
                 if (WaterCoil(CoilNum).CoilPerfInpMeth == NomCap && NomCapUserInp) {
                     if (WaterCoil(CoilNum).DesTotWaterCoilLoad > SmallLoad) {
@@ -2580,12 +2569,12 @@ namespace WaterCoils {
                     } else {
                         WaterCoil(CoilNum).MaxWaterVolFlowRate = 0.0;
                     }
-                    SizingMethod = AutoCalculateSizing;
                     DataConstantUsedForSizing = WaterCoil(CoilNum).MaxWaterVolFlowRate;
                     DataFractionUsedForSizing = 1.0;
                 }
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
-                WaterCoil(CoilNum).MaxWaterVolFlowRate = TempSize;
+                HeatingWaterflowSizer sizerHWWaterflow;
+                sizerHWWaterflow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                WaterCoil(CoilNum).MaxWaterVolFlowRate = sizerHWWaterflow.size(TempSize, ErrorsFound);
                 DataWaterFlowUsedForSizing = WaterCoil(CoilNum).MaxWaterVolFlowRate;
                 DataConstantUsedForSizing = 0.0; // reset these in case NomCapUserInp was true
                 DataFractionUsedForSizing = 0.0;

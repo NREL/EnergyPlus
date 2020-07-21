@@ -45,67 +45,25 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ZoneAirLoopEquipmentManager_hh_INCLUDED
-#define ZoneAirLoopEquipmentManager_hh_INCLUDED
+#ifndef HeatingWaterflowSizing_hh_INCLUDED
+#define HeatingWaterflowSizing_hh_INCLUDED
 
-// C++ Headers
-#include <string>
-
-// EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Autosizing/Base.hh>
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct ZoneAirLoopEquipmentManagerData;
+struct HeatingWaterflowSizer : BaseSizer
+{
 
-namespace ZoneAirLoopEquipmentManager {
+    HeatingWaterflowSizer()
+    {
+        this->sizingType = AutoSizingType::HeatingWaterflowSizing;
+        this->sizingString = "Maximum Water Flow Rate [m3/s]";
+    }
+    ~HeatingWaterflowSizer() = default;
 
-    void ManageZoneAirLoopEquipment(EnergyPlusData &state, std::string const &ZoneAirLoopEquipName,
-                                    bool const FirstHVACIteration,
-                                    Real64 &SysOutputProvided,
-                                    Real64 &NonAirSysOutput,
-                                    Real64 &LatOutputProvided, // Latent add/removal supplied by window AC (kg/s), dehumid = negative
-                                    int const ActualZoneNum,
-                                    int &ControlledZoneNum,
-                                    int &CompIndex);
-
-    void GetZoneAirLoopEquipment(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager);
-
-    void InitZoneAirLoopEquipment(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum);
-
-    void InitZoneAirLoopEquipmentTimeStep(int const AirDistUnitNum);
-
-    void SimZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum,
-                                 Real64 &SysOutputProvided,
-                                 Real64 &NonAirSysOutput,
-                                 Real64 &LatOutputProvided, // Latent add/removal provided by this unit (kg/s), dehumidify = negative
-                                 bool const FirstHVACIteration,
-                                 int const ControlledZoneNum,
-                                 int const ActualZoneNum);
-
-} // namespace ZoneAirLoopEquipmentManager
-
-    struct ZoneAirLoopEquipmentManagerData : BaseGlobalStruct {
-        bool MyOneTimeFlag;
-        bool GetAirDistUnitsFlag;  // If TRUE, Air Distribution Data has not been read in yet
-        bool InitAirDistUnitsFlag; // If TRUE, not all Air Distribution Units have been initialized
-        Array1D_bool EachOnceFlag;       // If TRUE, Air Distribution unit has not been initialized yet
-        int numADUInitialized;        // Count of ADUs that have been initialized
-
-        void clear_state() override {
-            GetAirDistUnitsFlag = true;
-            EachOnceFlag.deallocate();
-            MyOneTimeFlag = true;
-            InitAirDistUnitsFlag = true;
-            numADUInitialized = 0;
-        }
-
-        // Default Constructor
-        ZoneAirLoopEquipmentManagerData() : MyOneTimeFlag(true), GetAirDistUnitsFlag(true), InitAirDistUnitsFlag(true), numADUInitialized(0) {}
-    };
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
+};
 
 } // namespace EnergyPlus
 

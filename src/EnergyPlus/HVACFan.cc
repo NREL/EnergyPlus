@@ -1124,6 +1124,25 @@ namespace HVACFan {
         }
     }
 
+    void FanSystem::FanInputsForDesignHeatGain(
+        EnergyPlusData &state, int const &fanIndex, Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac)
+    {
+        if (!m_objSizingFlag) {
+            deltaP = deltaPress;
+            motEff = m_motorEff;
+            totEff = m_fanTotalEff;
+            motInAirFrac = m_motorInAirFrac;
+            return;
+        } else {
+            set_size(state);
+            deltaP = deltaPress;
+            motEff = m_motorEff;
+            totEff = m_fanTotalEff;
+            motInAirFrac = m_motorInAirFrac;
+            return;
+        }
+    }
+
     // void
     // FanSystem::fanIsSecondaryDriver()
     //{

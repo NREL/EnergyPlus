@@ -443,6 +443,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num;
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = WaterCoils::WaterCoil(CoilNum).Name;
     DataSizing::DataWaterLoopNum = 2;
+    DataSizing::PlantSizData(2).DeltaT = 5.0;
 
     WaterCoils::SizeWaterCoil(state, CoilNum);
 

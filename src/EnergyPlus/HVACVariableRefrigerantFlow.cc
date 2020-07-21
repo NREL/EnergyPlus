@@ -7638,59 +7638,12 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
-        IsAutoSize = false;
-        if (VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil == AutoSize) {
-            IsAutoSize = true;
-        }
-        if (CurZoneEqNum > 0) {
-            bool SizingDesRunThisZone;
-            CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
-            std::string cZoneHVAC_TU_VRF = DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num);
-            std::string ZoneHVAC_TU_VRF_Name = VRFTU(VRFTUNum).Name;
-
-            if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
-                if (VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil > 0.0) {
-                    ReportSizingOutput(cZoneHVAC_TU_VRF,
-                                       ZoneHVAC_TU_VRF_Name,
-                                       "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]",
-                                       VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil);
-                }
-            } else {
-                CheckZoneSizing(cZoneHVAC_TU_VRF, ZoneHVAC_TU_VRF_Name);
-                Real64 MaxSATSuppHeatDes = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
-                if (IsAutoSize) {
-                    VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil = MaxSATSuppHeatDes;
-                    ReportSizingOutput(cZoneHVAC_TU_VRF,
-                                       ZoneHVAC_TU_VRF_Name,
-                                       "Design Size Maximum Supply Air Temperature from Supplemental Heater [C]",
-                                       MaxSATSuppHeatDes);
-                } else {
-                    if (VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil > 0.0 && MaxSATSuppHeatDes > 0.0 && SizingDesRunThisZone) {
-                        Real64 MaxSATSuppHeatUser = VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil;
-                        ReportSizingOutput(cZoneHVAC_TU_VRF,
-                                           ZoneHVAC_TU_VRF_Name,
-                                           "Design Size Maximum Supply Air Temperature from Supplemental Heater [C]",
-                                           MaxSATSuppHeatDes,
-                                           "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]",
-                                           MaxSATSuppHeatUser);
-                        if (DisplayExtraWarnings) {
-                            if (std::abs(MaxSATSuppHeatDes - MaxSATSuppHeatUser) > (4.0 * AutoVsHardSizingDeltaTempThreshold)) {
-                                ShowMessage("SizePTUnit: Potential issue with equipment sizing for " + cZoneHVAC_TU_VRF + ' ' + ZoneHVAC_TU_VRF_Name);
-                                ShowContinueError("User-Specified Maximum Supply Air Temperature from Supplemental Heater of " +
-                                                  RoundSigDigits(MaxSATSuppHeatUser, 2) + " [C]");
-                                ShowContinueError("differs from Design Size Maximum Supply Air Temperature from Supplemental Heater of " +
-                                                  RoundSigDigits(MaxSATSuppHeatDes, 2) + " [C]");
-                                ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
+        if (VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
             bool ErrorsFound = false;
             TempSize = VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil;
             MaxHeaterOutletTempSizer sizerMaxHeaterOutTemp;
+            std::string const stringOverride = "Maximum Supply Air Temperature from Supplemental Heater [C]";
+            sizerMaxHeaterOutTemp.overrideSizingString(stringOverride);
             sizerMaxHeaterOutTemp.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil = sizerMaxHeaterOutTemp.size(TempSize, ErrorsFound);
         }
