@@ -129,12 +129,10 @@ namespace SingleDuct {
         Real64 AirTemp;                 // (C)
         Real64 AirHumRat;               // (Kg/Kg)
         Real64 AirEnthalpy;             // (J/Kg)
-        Real64 AirPressure;
 
         // Default Constructor
         SingleDuctAirTerminalFlowConditions()
-            : AirMassFlowRate(0.0), AirMassFlowRateMaxAvail(0.0), AirMassFlowRateMinAvail(0.0), AirTemp(0.0), AirHumRat(0.0), AirEnthalpy(0.0),
-            AirPressure(0.0)
+            : AirMassFlowRate(0.0), AirMassFlowRateMaxAvail(0.0), AirMassFlowRateMinAvail(0.0), AirTemp(0.0), AirHumRat(0.0), AirEnthalpy(0.0)
         {
         }
     };
