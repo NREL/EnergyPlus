@@ -248,9 +248,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate = MassFlowRateMaxAvail;
     Schedule(sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
     int const ZonePtr = sd_airterminal(SysNum).ActualZoneNum;
-    int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
     // run SimConstVolNoReheat() function
-    sd_airterminal(SysNum).SimConstVolNoReheat(ZoneAirNodeNum);
+    sd_airterminal(SysNum).SimConstVolNoReheat();
     // check the TA outlet air mass flow rate
     EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 }
