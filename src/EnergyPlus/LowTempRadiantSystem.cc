@@ -1601,7 +1601,7 @@ namespace LowTempRadiantSystem {
                 ShowWarningError("Surface referenced in " + currentModuleObject +
                                 " not in same zone as Radiant System, surface=" + Surface(this->SurfacePtr(SurfNum)).Name);
                 ShowContinueError("Surface in Zone=" + DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Name +
-                                  " Hydronic Radiant System in " + cAlphaField3 + " = " + alpha3);
+                                  " Radiant System in " + cAlphaField3 + " = " + alpha3);
                 ShowContinueError("Occurs in " + currentModuleObject + " = " + alpha1);
                 ShowContinueError("If this is intentionally a radiant system with surfaces in more than one thermal zone,");
                 ShowContinueError("then ignore this warning message.  Otherwise, check the surfaces in this radiant system.");
@@ -1620,7 +1620,7 @@ namespace LowTempRadiantSystem {
                         
             // make sure that this construction is defined with a source/sink--this must be the case or it can't serve as a radiant system surface
             if (!dataConstruction.Construct(Surface(this->SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
-                ShowSevereError("Construction referenced in Hydronic Radiant System Surface does not have a source/sink present");
+                ShowSevereError("Construction referenced in Radiant System Surface does not have a source/sink present");
                 ShowContinueError("Surface name= " + Surface(this->SurfacePtr(SurfNum)).Name +
                                   "  Construction name = " + dataConstruction.Construct(Surface(this->SurfacePtr(SurfNum)).Construction).Name);
                 ShowContinueError("Construction needs to be defined with a \"Construction:InternalSource\" object.");
