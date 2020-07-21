@@ -247,7 +247,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     Real64 MassFlowRateMaxAvail = sd_airterminal(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
     sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate = MassFlowRateMaxAvail;
     Schedule(sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
-    int const ZonePtr = sd_airterminal(SysNum).ActualZoneNum;
     // run SimConstVolNoReheat() function
     sd_airterminal(SysNum).SimConstVolNoReheat();
     // check the TA outlet air mass flow rate
