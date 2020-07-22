@@ -51,8 +51,6 @@
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/CrossVentMgr.hh>
-#include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -233,7 +231,6 @@
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 #include <EnergyPlus/WaterToAirHeatPump.hh>
-#include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindTurbine.hh>
 
@@ -246,8 +243,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     using namespace EnergyPlus;
     // A to Z order
     CoilCoolingDX::clear_state();
-    CrossVentMgr::clear_state();
-    CTElectricGenerator::clear_state();
     CurveManager::clear_state();
     AirflowNetwork::clear_state();
     dataAirflowNetworkBalanceManager.clear_state();
@@ -428,8 +423,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     WaterToAirHeatPump::clear_state();
     WaterToAirHeatPumpSimple::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
-    WaterUse::clear_state();
     WeatherManager::clear_state();
-    WindTurbine::clear_state();
     ResultsFramework::clear_state();
 }

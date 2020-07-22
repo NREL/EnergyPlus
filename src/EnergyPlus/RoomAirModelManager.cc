@@ -212,7 +212,7 @@ namespace RoomAirModelManager {
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDCV) { // UCSD Cross Ventilation model
                 // simulate room airflow using UCSDDV model
-                ManageUCSDCVModel(state.dataConvectionCoefficients, ZoneNum);
+                ManageUCSDCVModel(state.dataConvectionCoefficients, state.dataCrossVentMgr, ZoneNum);
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDUFI) { // UCSD UFAD interior zone model
                 // simulate room airflow using the UCSDUFI model
