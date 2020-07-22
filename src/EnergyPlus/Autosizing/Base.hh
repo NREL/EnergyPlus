@@ -127,9 +127,6 @@ struct BaseSizer
     bool zoneEqUnitVent = false;   // unit ventilator zone equipment
     bool zoneEqVentedSlab = false; // ventilated slab zone equipment
 
-    // error message handling
-    std::string getLastErrorMessages();
-
     // global sizing data
     Real64 minOA = 0.0;
 
@@ -185,6 +182,8 @@ struct BaseSizer
     Array1D<DataAirSystems::DefinePrimaryAirSystem> primaryAirSystem;
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
 
+    // public methods
+
     virtual void initializeWithinEP(EnergyPlusData &state,
                                     std::string const &_compType,
                                     std::string const &_compName,
@@ -193,7 +192,7 @@ struct BaseSizer
 
     virtual Real64 size(Real64 originalValue, bool &errorsFound) = 0;
 
-    static void clear_state();
+    std::string getLastErrorMessages();
 
     void overrideSizingString(std::string const &string);
 
@@ -223,6 +222,8 @@ protected:
     void clearState();
 
 };
+
+void autosizing_clear_state();
 
 extern bool oneTimeCompRptHeaderFlag;
 

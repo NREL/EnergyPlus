@@ -62,7 +62,7 @@ namespace EnergyPlus {
 
 bool oneTimeCompRptHeaderFlag = true;
 
-void BaseSizer::clear_state()
+void autosizing_clear_state()
 {
     oneTimeCompRptHeaderFlag = true;
 }

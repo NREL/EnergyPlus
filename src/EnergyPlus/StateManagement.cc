@@ -226,7 +226,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
 {
     using namespace EnergyPlus;
     // A to Z order
-    BaseSizer::clear_state();
+    autosizing_clear_state();
     CoilCoolingDX::clear_state();
     CurveManager::clear_state();
     AirflowNetwork::clear_state();
