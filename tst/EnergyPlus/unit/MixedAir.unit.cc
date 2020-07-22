@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -62,7 +63,6 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -170,7 +170,8 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
                                   cAlphaFields,
                                   cNumericFields);
 
-    ProcessOAControllerInputs(state, CurrentModuleObject,
+    ProcessOAControllerInputs(state,
+                              CurrentModuleObject,
                               ControllerNum,
                               AlphArray,
                               NumAlphas,
@@ -200,7 +201,8 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
                                   cNumericFields);
 
     ErrorsFound = false;
-    ProcessOAControllerInputs(state, CurrentModuleObject,
+    ProcessOAControllerInputs(state,
+                              CurrentModuleObject,
                               ControllerNum,
                               AlphArray,
                               NumAlphas,
@@ -1500,7 +1502,8 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
                                   cAlphaFields,
                                   cNumericFields);
 
-    ProcessOAControllerInputs(state, CurrentModuleObject,
+    ProcessOAControllerInputs(state,
+                              CurrentModuleObject,
                               ControllerNum,
                               AlphArray,
                               NumAlphas,
@@ -1564,7 +1567,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
         "    Zone1,                    !- Humidistat Control Zone Name",
         "    0.8,                      !- High Humidity Outdoor Air Flow Ratio",
         "    Yes;                      !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -1621,33 +1624,34 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     NumHumidityControlZones = 1;
 
     inputProcessor->getObjectItem(CurrentModuleObject,
-        ControllerNum,
-        AlphArray,
-        NumAlphas,
-        NumArray,
-        NumNums,
-        IOStat,
-        lNumericBlanks,
-        lAlphaBlanks,
-        cAlphaFields,
-        cNumericFields);
+                                  ControllerNum,
+                                  AlphArray,
+                                  NumAlphas,
+                                  NumArray,
+                                  NumNums,
+                                  IOStat,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
-    ProcessOAControllerInputs(state, CurrentModuleObject,
-        ControllerNum,
-        AlphArray,
-        NumAlphas,
-        NumArray,
-        NumNums,
-        lNumericBlanks,
-        lAlphaBlanks,
-        cAlphaFields,
-        cNumericFields,
-        ErrorsFound);
+    ProcessOAControllerInputs(state,
+                              CurrentModuleObject,
+                              ControllerNum,
+                              AlphArray,
+                              NumAlphas,
+                              NumArray,
+                              NumNums,
+                              lNumericBlanks,
+                              lAlphaBlanks,
+                              cAlphaFields,
+                              cNumericFields,
+                              ErrorsFound);
     // compare_err_stream( "" ); // just for debugging
 
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(OAController(ControllerNum)
-        .ModifyDuringHighOAMoisture); // "Control High Indoor Humidity Based on Outdoor Humidity Ratio = Yes" sets this to false
+                     .ModifyDuringHighOAMoisture); // "Control High Indoor Humidity Based on Outdoor Humidity Ratio = Yes" sets this to false
     EXPECT_FALSE(has_err_output(true));
     EXPECT_EQ(OAController(ControllerNum).HumidistatZoneNum, 1);
 
@@ -5669,6 +5673,20 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 
     EXPECT_NEAR(0.003183055786, OAController(1).OAMassFlow, 0.00001);
     EXPECT_NEAR(0.001560321463, OAController(1).MinOAFracLimit, 0.00001);
+
+    // #5846
+    OAController(1).MinOAMassFlowRate = 0.05;
+    DataGlobals::WarmupFlag = false;
+    OAController(1).CalcOAController(state, 1, true);
+    EXPECT_NEAR(0.006, OAController(1).OAMassFlow, 0.0001);
+    std::string const error_string = delimited_string({
+        "   ** Warning ** CalcOAController: Minimum OA fraction > Mechanical Ventilation Controller request for Controller:OutdoorAir=OA CONTROLLER 1, Min OA fraction is used.",
+        "   **   ~~~   ** This may be overriding desired ventilation controls. Check inputs for Minimum Outdoor Air Flow Rate, Minimum Outdoor Air Schedule Name and Controller:MechanicalVentilation",
+        "   **   ~~~   ** Minimum OA fraction = 2.9412E-003, Mech Vent OA fraction = 1.5603E-003",
+        "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 
     AirLoopControlInfo.deallocate();
     OARequirements.deallocate();
