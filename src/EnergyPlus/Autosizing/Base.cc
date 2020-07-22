@@ -433,39 +433,21 @@ void BaseSizer::overrideSizingString(std::string const &string)
         minOA = 0.0;
 
         // global Data* sizing constants
-
-        // HeatingWaterflowSizer
         dataConstantUsedForSizing = 0.0;
         dataFractionUsedForSizing = 0.0;
-
-        // HeatingWaterDesCoilWaterVolFlowUsedForUASizer
         dataPltSizHeatNum = 0;
-        // HeatingWaterDesCoilWaterVolFlowUsedForUASizer, HeaterWaterflowSizing
         dataWaterLoopNum = 0;
-        // CoolingWaterflowSizing
         dataFanIndex = -1;
         dataFanEnumType = -1;
         dataWaterCoilSizCoolDeltaT = 0.0;
-        // HeaterWaterflowSizing
         dataWaterCoilSizHeatDeltaT = 0.0;
         dataCapacityUsedForSizing = 0.0;
-
-        // CoolingWaterDesWaterInletTempSizer, CoolingWaterNumofTubesPerRowSizer
         dataPltSizCoolNum = 0;
-
-        // CoolingWaterDesAirInletHumRatSizer, CoolingWaterDesAirOutletHumRatSizer
         dataDesInletAirHumRat = 0.0;
-
-        // CoolingWaterDesAirInletHumRatSizer, HeatingWaterDesAirInletHumRatSizer,
-        // HeatingWaterDesAirInletTempSizer
         dataFlowUsedForSizing = 0.0;
-
-        // CoolingWaterDesAirOutletHumRatSizer
         dataDesOutletAirHumRat = 0.0;
         dataDesInletWaterTemp = 0.0;
         dataDesOutletAirTemp = 0.0;
-
-        // CoolingWaterNumofTubesPerRowSizer, HeatingWaterDesCoilWaterVolFlowUsedForUASizer
         dataWaterFlowUsedForSizing = 0.0;
 
         printWarningFlag = false;

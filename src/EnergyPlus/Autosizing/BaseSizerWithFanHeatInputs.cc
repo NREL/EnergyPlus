@@ -96,13 +96,6 @@ namespace EnergyPlus {
                                                Real64 &motInPower,
                                                bool &fanCompModel)
     {
-        deltaP = 0.0;
-        motEff = 0.0;
-        totEff = 0.0;
-        motInAirFrac = 0.0;
-        fanShaftPow = 0.0;
-        motInPower = 0.0;
-        fanCompModel = false;
         if (fanEnumType < 0 || fanIndex < 0) return;
 
         switch (fanEnumType) {

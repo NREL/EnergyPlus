@@ -166,7 +166,6 @@ Real64 CoolingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
 
 void CoolingWaterflowSizer::clearState() {
     BaseSizerWithFanHeatInputs::clearState();
-    this->someSpecialFlag = false;
 }
 
 } // namespace EnergyPlus

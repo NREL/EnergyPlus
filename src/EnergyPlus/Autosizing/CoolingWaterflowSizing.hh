@@ -54,8 +54,6 @@ namespace EnergyPlus {
 
 struct CoolingWaterflowSizer : BaseSizerWithFanHeatInputs
 {
-    bool someSpecialFlag = false;
-
     CoolingWaterflowSizer()
     {
         this->sizingType = AutoSizingType::HeatingWaterflowSizing;
