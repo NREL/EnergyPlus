@@ -287,6 +287,8 @@ namespace MixedAir {
         bool HighHumCtrlActive;            // if true high humidity control is active
         Array1D_int EconmizerFaultNum;     // index to economizer fault
         int NumFaultyEconomizer;           // total number of economizer faults
+        int CountMechVentFrac;             // Count when OA min fraction > mech vent fraction
+        int IndexMechVentFrac;             // Index when OA min fraction > mech vent fraction
 
         // Default Constructor
         OAControllerProps()
@@ -301,7 +303,7 @@ namespace MixedAir {
               OAFractionRpt(0.0), MinOAFracLimit(0.0), MechVentOAMassFlowRequest(0.0), EMSOverrideOARate(false), EMSOARateValue(0.0),
               HeatRecoveryBypassControlType(BypassWhenWithinEconomizerLimits), ManageDemand(false), DemandLimitFlowRate(0.0), MaxOAFracBySetPoint(0),
               MixedAirSPMNum(0), CoolCoilFreezeCheck(false), EconoActive(false), HighHumCtrlActive(false), EconmizerFaultNum(0),
-              NumFaultyEconomizer(0)
+              NumFaultyEconomizer(0), CountMechVentFrac(0), IndexMechVentFrac(0)
         {
         }
 
