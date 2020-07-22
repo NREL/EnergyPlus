@@ -247,10 +247,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     Real64 MassFlowRateMaxAvail = sd_airterminal(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
     sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate = MassFlowRateMaxAvail;
     Schedule(sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
-    int const ZonePtr = sd_airterminal(SysNum).ActualZoneNum;
-    int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
     // run SimConstVolNoReheat() function
-    sd_airterminal(SysNum).SimConstVolNoReheat(ZoneAirNodeNum);
+    sd_airterminal(SysNum).SimConstVolNoReheat();
     // check the TA outlet air mass flow rate
     EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 }
@@ -353,10 +351,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     Node(ZoneAirNodeNum).Temp = 20.0;
     Node(ZoneAirNodeNum).HumRat = 0.0075;
     Node(ZoneAirNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(ZoneAirNodeNum).Temp, Node(ZoneAirNodeNum).HumRat);
-    ;
-    // calculate the heating rate provided by TA unit
-    Real64 CpAir = PsyCpAirFnW(0.5 * (Node(InletNode).HumRat + Node(ZoneAirNodeNum).HumRat));
-    Real64 SensHeatRateProvided = MassFlowRateMaxAvail * CpAir * (Node(InletNode).Temp - Node(ZoneAirNodeNum).Temp);
 
     // set inlet mass flow rate to zero
     Node(InletNode).MassFlowRateMaxAvail = 0.0;
@@ -369,7 +363,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRateMaxAvail);        // maximum available mass flow rate
     EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);                // outlet mass flow rate is zero
     EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);               // outlet mass flow rate is zero
-    EXPECT_EQ(0.0, sd_airterminal(SysNum).HeatRate);                            // delivered heat rate is zero
 
     FirstHVACIteration = false;
     Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
@@ -379,8 +372,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     // check AT air mass flow rates
     EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
     EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
-    // check heating rate delivered
-    EXPECT_NEAR(SensHeatRateProvided, sd_airterminal(SysNum).HeatRate, 0.001);
     // outlet and inlet nodes air conditions must match exactly
     EXPECT_EQ(sd_airterminal(SysNum).sd_airterminalOutlet.AirTemp, sd_airterminal(SysNum).sd_airterminalInlet.AirTemp);
     EXPECT_EQ(sd_airterminal(SysNum).sd_airterminalOutlet.AirHumRat, sd_airterminal(SysNum).sd_airterminalInlet.AirHumRat);
@@ -547,7 +538,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRateMaxAvail);        // maximum available mass flow rate
     EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);                // outlet mass flow rate is zero
     EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);               // outlet mass flow rate is zero
-    EXPECT_EQ(0.0, sd_airterminal(SysNum).HeatRate);                            // delivered heat rate is zero
 
     DataGlobals::BeginEnvrnFlag = false;
     FirstHVACIteration = false;
@@ -892,7 +882,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     EXPECT_EQ(0.0, thisAirTerminalInlet.AirMassFlowRateMaxAvail);  // maximum available mass flow rate
     EXPECT_EQ(0.0, thisAirTerminalOutlet.AirMassFlowRate);         // outlet mass flow rate is zero
     EXPECT_EQ(0.0, thisAirTerminalOutlet.AirMassFlowRate);         // outlet mass flow rate is zero
-    EXPECT_EQ(0.0, thisAirTerminal.HeatRate);                      // delivered heat rate is zero
     EXPECT_EQ(0.0, thisAirTerminal.OutdoorAirFlowRate);            // OA volume flow rate is zero
 
     DataGlobals::BeginEnvrnFlag = false;
