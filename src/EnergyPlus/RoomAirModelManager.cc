@@ -206,19 +206,19 @@ namespace RoomAirModelManager {
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDDV) { // UCDV Displacement Ventilation model
                 // simulate room airflow using UCSDDV model
-                ManageUCSDDVModel(ZoneNum);
+                ManageUCSDDVModel(state.dataConvectionCoefficients, ZoneNum);
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDCV) { // UCSD Cross Ventilation model
                 // simulate room airflow using UCSDDV model
-                ManageUCSDCVModel(ZoneNum);
+                ManageUCSDCVModel(state.dataConvectionCoefficients, state.dataCrossVentMgr, ZoneNum);
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDUFI) { // UCSD UFAD interior zone model
                 // simulate room airflow using the UCSDUFI model
-                ManageUCSDUFModels(ZoneNum, RoomAirModel_UCSDUFI);
+                ManageUCSDUFModels(state.dataConvectionCoefficients, ZoneNum, RoomAirModel_UCSDUFI);
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDUFE) { // UCSD UFAD exterior zone model
                 // simulate room airflow using the UCSDUFE model
-                ManageUCSDUFModels(ZoneNum, RoomAirModel_UCSDUFE);
+                ManageUCSDUFModels(state.dataConvectionCoefficients, ZoneNum, RoomAirModel_UCSDUFE);
 
             } else if (SELECT_CASE_var == RoomAirModel_AirflowNetwork) { // RoomAirflowNetwork zone model
                 // simulate room airflow using the AirflowNetwork - based model

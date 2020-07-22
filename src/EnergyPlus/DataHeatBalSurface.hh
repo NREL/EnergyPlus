@@ -67,20 +67,40 @@ namespace DataHeatBalSurface {
     extern Real64 const DefaultSurfaceTempLimit;        // Highest inside surface temperature allowed in Celsius
     extern std::vector<bool> Zone_has_mixed_HT_models;  // True if any surfaces in zone use CondFD, HAMT, or Kiva
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalSurface
     // Integer Variables for the Heat Balance Simulation
     extern Array1D_int SUMH; // From Old Bldctf.inc
 
+    // Surface heat balance limits and convergence parameters
+    extern Real64 MaxSurfaceTempLimit;               // Highest inside surface temperature allowed in Celsius
+    extern Real64 MaxSurfaceTempLimitBeforeFatal;    // 2.5 times MaxSurfaceTempLimit
+    extern Real64 const IterDampConst;               // Damping constant for inside surface temperature iterations
+    extern int const ItersReevalConvCoeff;           // Number of iterations between inside convection coefficient reevaluations
+    extern int MinIterations;                        // Minimum number of iterations for surface heat balance
+    extern int const MaxIterations;                  // Maximum number of iterations allowed for inside surface temps
+    extern Real64 const PoolIsOperatingLimit;        // Limit to determine if swimming pool is operating or not
+    extern int const MinEMPDIterations;              // Minimum number of iterations required for EMPD solution
+    extern int const IterationsForCondFDRelaxChange; // number of iterations for inside temps that triggers a change
+
     // Variables Dimensioned to Max Number of Heat Transfer Surfaces (maxhts)
-    extern Real64 MaxSurfaceTempLimit;            // Highest inside surface temperature allowed in Celsius
-    extern Real64 MaxSurfaceTempLimitBeforeFatal; // 2.5 times MaxSurfaceTempLimit
     extern Array1D<Real64> CTFConstInPart;        // Constant Inside Portion of the CTF calculation
     extern Array1D<Real64> CTFConstOutPart;       // Constant Outside Portion of the CTF calculation
+    // This group of arrays (soon to be vectors) added to facilitate vectorizable loops in CalcHeatBalanceInsideSurf2CTFOnly
+    extern Array1D<Real64> CTFCross0;             // Construct.CTFCross(0)
+    extern Array1D<Real64> CTFInside0;            // Construct.CTFInside(0)
+    extern Array1D<Real64> CTFSourceIn0;          // Construct.CTFSourceIn(0)
+    extern Array1D<Real64> TH11Surf;              // TH(1,1,SurfNum)
+    extern Array1D<Real64> QsrcHistSurf1;         // QsrcHist(SurfNum, 1)
+    extern Array1D_int IsAdiabatic;               // 0 not adiabatic, 1 is adiabatic
+    extern Array1D_int IsNotAdiabatic;            // 1 not adiabatic, 0 is adiabatic
+    extern Array1D_int IsSource;                  // 0 no internal source/sink, 1 has internal source/sing
+    extern Array1D_int IsNotSource;               // 1 no internal source/sink, 0 has internal source/sing
+    extern Array1D_int IsPoolSurf;                // 0 not pool, 1 is pool
+    extern Array1D_int IsNotPoolSurf;             // 1 not pool, 0 is pool
+    extern Array1D<Real64> TempTermSurf;          // TempTerm for heatbalance equation
+    extern Array1D<Real64> TempDivSurf;           // Divisor for heatbalance equation
+    // end group added to support CalcHeatBalanceInsideSurf2CTFOnly
     extern Array1D<Real64> TempSurfIn;            // Temperature of the Inside Surface for each heat transfer surface
+    extern Array1D<Real64> TempInsOld;            // TempSurfIn from previous iteration for convergence check
     extern Array1D<Real64> TempSurfInTmp;         // Inside Surface Temperature Of Each Heat Transfer Surface
     extern Array1D<Real64> HcExtSurf;             // Outside Convection Coefficient
     extern Array1D<Real64> HAirExtSurf;           // Outside Convection Coefficient

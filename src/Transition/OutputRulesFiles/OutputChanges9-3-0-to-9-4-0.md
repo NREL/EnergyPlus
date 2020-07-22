@@ -83,3 +83,32 @@ Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Tur
 24,ZN_1_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000
 24,ZN_1_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000
 ```
+### Surface Order in Output Reports
+
+The internal ordering of surfaces has changed. Previously subsurfaces (doors and windows) immdediately followed their respective base surface. 
+Now subsurfaces are at the end of each group of zone surfaces.Many reports preserve the old order, but some outputs do not.
+Changed outputs include the rdd, edd, eso (and resulting csv), shd, and sci output files.
+
+See [PR#7847](https://github.com/NREL/EnergyPlus/pull/7847)
+
+### Report zero values with zero Zone Cooling and Heating Loads in Report: HVAC Sizing Summary
+
+When Zone Sensible Cooling = 0 or Zone Sensible Heating = 0, empty values are shown in the table:
+
+Zone Sensible Cooling
+
+	Calculated Design Load [W] 	User Design Load [W] 	User Design Load per Area [W/m2] 	Calculated Design Air Flow [m3/s] 	User Design Air Flow [m3/s] 	Design Day Name 	Date/Time Of Peak {TIMESTAMP} 	Thermostat Setpoint Temperature at Peak Load [C] 	Indoor Temperature at Peak Load [C] 	Indoor Humidity Ratio at Peak Load [kgWater/kgDryAir] 	Outdoor Temperature at Peak Load [C] 	Outdoor Humidity Ratio at Peak Load [kgWater/kgDryAir] 	Minimum Outdoor Air Flow Rate [m3/s] 	Heat Gain Rate from DOAS [W]
+None 	  	  	  	  	  	  	  	  	  	  	  	  	  	 
+
+This causes difficulty for SQLite to retrieve data.
+
+The fix reports zero values when loads = 0, so that SQLite is able to process non-empty values, shown as below:
+
+Zone Sensible Cooling
+
+	Calculated Design Load [W] 	User Design Load [W] 	User Design Load per Area [W/m2] 	Calculated Design Air Flow [m3/s] 	User Design Air Flow [m3/s] 	Design Day Name 	Date/Time Of Peak {TIMESTAMP} 	Thermostat Setpoint Temperature at Peak Load [C] 	Indoor Temperature at Peak Load [C] 	Indoor Humidity Ratio at Peak Load [kgWater/kgDryAir] 	Outdoor Temperature at Peak Load [C] 	Outdoor Humidity Ratio at Peak Load [kgWater/kgDryAir] 	Minimum Outdoor Air Flow Rate [m3/s] 	Heat Gain Rate from DOAS [W]
+LIVING SPACE 	0.0 	0.0 	0.0 	0.0 	0.0 	N/A 	N/A 	0.0 	0.0 	0.0 	0.0 	0.0 	0.0 	0.0
+
+The fix is applied both both tables of Zone Sensible Cooling abd Zone Sensible Heating.
+
+See [PR#8145](https://github.com/NREL/EnergyPlus/pull/8145)

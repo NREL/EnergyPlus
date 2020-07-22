@@ -159,11 +159,11 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // read project control data
+    GetProjectControlData(state, state.outputFiles, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
