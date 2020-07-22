@@ -5957,7 +5957,7 @@
     VAV_1 Supply Equipment Inlet Node,  !- Return Air Node Name
     VAV_1_OA-VAV_1_CoolCNode,!- Mixed Air Node Name
     VAV_1_OAInlet Node,      !- Actuator Node Name
-    AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Minimum Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
@@ -5968,7 +5968,7 @@
     -100.0,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
     NoLockout,               !- Lockout Type
     FixedMinimum,            !- Minimum Limit Type
-    MinOA_MotorizedDamper_Sched,  !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Outdoor Air Schedule Name
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     VAV_1_OA_MechVent;       !- Mechanical Ventilation Controller Name
@@ -6001,7 +6001,7 @@
     VAV_2 Supply Equipment Inlet Node,  !- Return Air Node Name
     VAV_2_OA-VAV_2_CoolCNode,!- Mixed Air Node Name
     VAV_2_OAInlet Node,      !- Actuator Node Name
-    AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Minimum Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
@@ -6012,7 +6012,7 @@
     -100.0,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
     NoLockout,               !- Lockout Type
     FixedMinimum,            !- Minimum Limit Type
-    MinOA_MotorizedDamper_Sched,  !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Outdoor Air Schedule Name
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     VAV_2_OA_MechVent;       !- Mechanical Ventilation Controller Name
@@ -6045,7 +6045,7 @@
     VAV_3 Supply Equipment Inlet Node,  !- Return Air Node Name
     VAV_3_OA-VAV_3_CoolCNode,!- Mixed Air Node Name
     VAV_3_OAInlet Node,      !- Actuator Node Name
-    AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Minimum Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
@@ -6056,7 +6056,7 @@
     -100.0,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
     NoLockout,               !- Lockout Type
     FixedMinimum,            !- Minimum Limit Type
-    MinOA_MotorizedDamper_Sched,  !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Outdoor Air Schedule Name
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     VAV_3_OA_MechVent;       !- Mechanical Ventilation Controller Name
@@ -6997,21 +6997,6 @@
     Until: 24:00,0.0,        !- Field 7
     For: Saturday WinterDesignDay, !- Field 9
     Until: 06:00,0.0,        !- Field 10
-    Until: 18:00,1.0,        !- Field 12
-    Until: 24:00,0.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,0.0;        !- Field 17
-
-  Schedule:Compact,
-    MinOA_MotorizedDamper_Sched,  !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay, !- Field 2
-    Until: 07:00,0.0,        !- Field 3
-    Until: 22:00,1.0,        !- Field 5
-    Until: 24:00,0.0,        !- Field 7
-    For: Saturday WinterDesignDay, !- Field 9
-    Until: 07:00,0.0,        !- Field 10
     Until: 18:00,1.0,        !- Field 12
     Until: 24:00,0.0,        !- Field 14
     For: AllOtherDays,       !- Field 16
