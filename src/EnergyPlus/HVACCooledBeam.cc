@@ -147,8 +147,13 @@ namespace HVACCooledBeam {
 
     // Object Data
     Array1D<CoolBeamData> CoolBeam;
+    bool GetInputFlag(true); // First time, input is "gotten"
 
-    // Functions
+    void clear_state() {
+        CheckEquipName.clear();
+        GetInputFlag = true;
+        NumCB = true;
+    }
 
     void SimCoolBeam(BranchInputManagerData &dataBranchInputManager,
                      std::string const &CompName,   // name of the cooled beam unit
@@ -175,7 +180,6 @@ namespace HVACCooledBeam {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CBNum;                      // index of cooled beam unit being simulated
-        static bool GetInputFlag(true); // First time, input is "gotten"
 
         // First time SimIndUnit is called, get the input for all the cooled beam units
         if (GetInputFlag) {

@@ -49,6 +49,7 @@
 #define ZoneContaminantPredictorCorrector_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 

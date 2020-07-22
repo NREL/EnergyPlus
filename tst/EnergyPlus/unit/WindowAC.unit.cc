@@ -461,9 +461,9 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     // check input processing
     EXPECT_EQ(compIndex, 1);
 
-    EXPECT_EQ(WindowAC::WindAC(1).DXCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
+    EXPECT_EQ(state.dataWindowAC.WindAC(1).DXCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
     // check Sizing
-    EXPECT_NEAR(WindowAC::WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
+    EXPECT_NEAR(state.dataWindowAC.WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -295.0;
     DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
@@ -471,4 +471,12 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     WindowAC::SimWindowAC(state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
     // check output
     EXPECT_NEAR(qDotMet, -295.0, 0.1);
+
+    // #8124 Retrieve zero value data without heating loads
+    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtCalcDesLd, "WEST ZONE"));
+    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtCalcDesAirFlow, "WEST ZONE"));
+    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtUserDesAirFlow, "WEST ZONE"));
+    EXPECT_EQ("N/A", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtDesDay, "WEST ZONE"));
+    EXPECT_EQ("N/A", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtPkTime, "WEST ZONE"));
+
 }
