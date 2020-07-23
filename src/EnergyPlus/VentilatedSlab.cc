@@ -903,7 +903,7 @@ namespace VentilatedSlab {
 
             if (HVACFan::checkIfFanNameIsAFanSystem(VentSlab(Item).FanName)) {
                 VentSlab(Item).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(VentSlab(Item).FanName));
+                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, VentSlab(Item).FanName));
                 VentSlab(Item).Fan_Index = HVACFan::getFanObjectVectorIndex(VentSlab(Item).FanName);
             } else {
                 bool isNotOkay(false);

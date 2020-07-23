@@ -447,15 +447,15 @@ namespace AirLoopHVACDOAS {
                         }
                     } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {
                         thisDOAS.m_FanTypeNum = SimAirServingZones::Fan_ComponentModel;
-                        Fans::GetFanIndex(state.fans, CompName, thisDOAS.m_FanIndex, errorsFound);
+                        Fans::GetFanIndex(state, state.fans, CompName, thisDOAS.m_FanIndex, errorsFound);
                         thisDOAS.FanName = CompName;
                         if (CompNum == 1) {
                             thisDOAS.FanBlowTroughFlag = true;
                         }
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
-                            Fans::GetFanInletNode(state.fans, SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
+                            Fans::GetFanInletNode(state, state.fans, SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
                         OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
-                            Fans::GetFanOutletNode(state.fans, SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
+                            Fans::GetFanOutletNode(state, state.fans, SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                         thisDOAS.m_FanInletNodeNum = OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum);
                         thisDOAS.m_FanOutletNodeNum = OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum);
                         if (!(CompNum == 1 || CompNum == OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents)) {
@@ -943,7 +943,7 @@ namespace AirLoopHVACDOAS {
         }
         bool errorsFound = false;
         if (this->m_FanIndex > 0 && this->m_FanTypeNum == SimAirServingZones::Fan_ComponentModel) {
-            Fans::SetFanData(state.fans, this->m_FanIndex, errorsFound, Name, sizingMassFlow / DataEnvironment::StdRhoAir, 0);
+            Fans::SetFanData(state, state.fans, this->m_FanIndex, errorsFound, Name, sizingMassFlow / DataEnvironment::StdRhoAir, 0);
             Fans::Fan(this->m_FanIndex).MaxAirMassFlowRate = sizingMassFlow;
             DataLoopNode::Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
             DataLoopNode::Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;

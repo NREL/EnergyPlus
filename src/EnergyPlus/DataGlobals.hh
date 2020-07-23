@@ -59,6 +59,8 @@
 
 namespace EnergyPlus {
 
+    struct EnergyPlusData;
+
 namespace DataGlobals {
 
     // Data
