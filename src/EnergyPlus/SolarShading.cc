@@ -10677,7 +10677,6 @@ namespace SolarShading {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int SurfNum;          // Surface number
         Real64 ElevSun;       // Sun elevation; angle between sun and horizontal
         Real64 ElevWin;       // Window elevation: angle between window outward normal and horizontal
         Real64 AzimWin;       // Window azimuth (radians)
@@ -10709,51 +10708,55 @@ namespace SolarShading {
         Real64 const cos_ElevSun = std::cos(ElevSun);
         Real64 const sin_ElevSun = std::sin(ElevSun);
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
 
-            if (Surface(SurfNum).Class != SurfaceClass_Window ||
-                (Surface(SurfNum).ExtBoundCond != ExternalEnvironment && Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt))
-                continue;
+                if (Surface(SurfNum).ExtBoundCond != ExternalEnvironment &&
+                    Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)
+                    continue;
 
-            SurfWinProfileAngHor(SurfNum) = 0.0;
-            SurfWinProfileAngVert(SurfNum) = 0.0;
-            if (CosIncAng(TimeStep, HourOfDay, SurfNum) <= 0.0) continue;
+                SurfWinProfileAngHor(SurfNum) = 0.0;
+                SurfWinProfileAngVert(SurfNum) = 0.0;
+                if (CosIncAng(TimeStep, HourOfDay, SurfNum) <= 0.0) continue;
 
-            ElevWin = PiOvr2 - Surface(SurfNum).Tilt * DegToRadians;
-            AzimWin = Surface(SurfNum).Azimuth * DegToRadians;
+                ElevWin = PiOvr2 - Surface(SurfNum).Tilt * DegToRadians;
+                AzimWin = Surface(SurfNum).Azimuth * DegToRadians;
 
-            ProfileAngHor = std::atan(sin_ElevSun / std::abs(cos_ElevSun * std::cos(AzimWin - AzimSun))) - ElevWin;
+                ProfileAngHor = std::atan(sin_ElevSun / std::abs(cos_ElevSun * std::cos(AzimWin - AzimSun))) - ElevWin;
 
-            // CR9280 - were having negative profile angles on west sides.  commenting out previous code (original code) for
-            // vertical windows
-            //  IF(ABS(ElevWin) < 0.1d0) THEN  ! Near-vertical window
-            //    ProfileAngVert = ABS(AzimWin-AzimSun)
-            //  ELSE
-            WinNorm = Surface(SurfNum).OutNormVec;
-            ThWin = AzimWin - PiOvr2;
-            Real64 const sin_Elevwin(std::sin(ElevWin));
-            WinNormCrossBase.x = -(sin_Elevwin * std::cos(ThWin));
-            WinNormCrossBase.y = sin_Elevwin * std::sin(ThWin);
-            WinNormCrossBase.z = std::cos(ElevWin);
-            SunPrime = SolCosVec - WinNormCrossBase * dot(SolCosVec, WinNormCrossBase);
-            dot1 = dot(WinNorm, SunPrime);
-            dot2 = SunPrime.magnitude();
-            dot3 = dot1 / dot2;
-            if (dot3 > 1.0) {
-                dot3 = 1.0;
-            } else if (dot3 < -1.0) {
-                dot3 = -1.0;
+                // CR9280 - were having negative profile angles on west sides.  commenting out previous code (original code) for
+                // vertical windows
+                //  IF(ABS(ElevWin) < 0.1d0) THEN  ! Near-vertical window
+                //    ProfileAngVert = ABS(AzimWin-AzimSun)
+                //  ELSE
+                WinNorm = Surface(SurfNum).OutNormVec;
+                ThWin = AzimWin - PiOvr2;
+                Real64 const sin_Elevwin(std::sin(ElevWin));
+                WinNormCrossBase.x = -(sin_Elevwin * std::cos(ThWin));
+                WinNormCrossBase.y = sin_Elevwin * std::sin(ThWin);
+                WinNormCrossBase.z = std::cos(ElevWin);
+                SunPrime = SolCosVec - WinNormCrossBase * dot(SolCosVec, WinNormCrossBase);
+                dot1 = dot(WinNorm, SunPrime);
+                dot2 = SunPrime.magnitude();
+                dot3 = dot1 / dot2;
+                if (dot3 > 1.0) {
+                    dot3 = 1.0;
+                } else if (dot3 < -1.0) {
+                    dot3 = -1.0;
+                }
+                //    ProfileAngVert = ABS(ACOS(DOT_PRODUCT(WinNorm,SunPrime)/SQRT(DOT_PRODUCT(SunPrime,SunPrime))))
+                ProfileAngVert = std::abs(std::acos(dot3));
+                //  END IF
+                // Constrain to 0 to pi
+                if (ProfileAngVert > Pi) ProfileAngVert = TwoPi - ProfileAngVert;
+
+                SurfWinProfileAngHor(SurfNum) = ProfileAngHor / DegToRadians;
+                SurfWinProfileAngVert(SurfNum) = ProfileAngVert / DegToRadians;
+                SurfWinTanProfileAngHor(SurfNum) = std::abs(std::tan(ProfileAngHor));
+                SurfWinTanProfileAngVert(SurfNum) = std::abs(std::tan(ProfileAngVert));
             }
-            //    ProfileAngVert = ABS(ACOS(DOT_PRODUCT(WinNorm,SunPrime)/SQRT(DOT_PRODUCT(SunPrime,SunPrime))))
-            ProfileAngVert = std::abs(std::acos(dot3));
-            //  END IF
-            // Constrain to 0 to pi
-            if (ProfileAngVert > Pi) ProfileAngVert = TwoPi - ProfileAngVert;
-
-            SurfWinProfileAngHor(SurfNum) = ProfileAngHor / DegToRadians;
-            SurfWinProfileAngVert(SurfNum) = ProfileAngVert / DegToRadians;
-            SurfWinTanProfileAngHor(SurfNum) = std::abs(std::tan(ProfileAngHor));
-            SurfWinTanProfileAngVert(SurfNum) = std::abs(std::tan(ProfileAngVert));
         }
     }
 
@@ -11895,7 +11898,10 @@ namespace SolarShading {
                 WinDifSolarDistTransmittedTotl = 0.0;
 
                 // Loop over all heat transfer surfaces in the current zone that might receive diffuse solar
-                for (int const HeatTransSurfNum : thisEnclosure.SurfacePtr) {
+                int const firstSurfOpague = Zone(enclosureNum).SurfaceFirst;
+                int const lastSurfOpague = Zone(enclosureNum).SurfaceLast;
+                for (int HeatTransSurfNum = firstSurfOpague; HeatTransSurfNum <= lastSurfOpague; ++HeatTransSurfNum) {
+//                for (int const HeatTransSurfNum : thisEnclosure.SurfacePtr) {
                     // Skip surfaces that are not heat transfer surfaces
                     // Skip tubular daylighting device domes
                     if (Surface(HeatTransSurfNum).Class == SurfaceClass_TDD_Dome) continue;
