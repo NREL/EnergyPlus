@@ -62,70 +62,80 @@ Real64 CoolingSHRSizer::size(Real64 _originalValue, bool &errorsFound)
     }
     this->preSize(_originalValue);
 
-    if (this->dataEMSOverrideON) {
-        this->autoSizedValue = this->dataEMSOverride;
+    if (this->dataFractionUsedForSizing > 0.0) {
+        this->autoSizedValue = this->dataConstantUsedForSizing * this->dataFractionUsedForSizing;
     } else {
-        if (!this->wasAutoSized &&
-            ((this->curZoneEqNum > 0 && !this->sizingDesRunThisZone) || (this->curSysNum > 0 && !this->sizingDesRunThisAirSys))) {
-            this->autoSizedValue = _originalValue;
+        if (this->dataEMSOverrideON) {
+            this->autoSizedValue = this->dataEMSOverride;
         } else {
-            if (this->dataFlowUsedForSizing >= DataHVACGlobals::SmallAirVolFlow && this->dataCapacityUsedForSizing > 0.0) {
-                // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
-                // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
-                // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
-                // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus
-                // rated SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a
-                // regression of flow/capacity ratio vs SHR for several actual coils.
-                Real64 RatedVolFlowPerRatedTotCap = this->dataFlowUsedForSizing / this->dataCapacityUsedForSizing;
-                if (DataHVACGlobals::DXCT == DataHVACGlobals::RegularDXCoil) {
-                    if (RatedVolFlowPerRatedTotCap > DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
-                        this->autoSizedValue = 0.431 + 6086.0 * DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
-                    } else if (RatedVolFlowPerRatedTotCap < DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
-                        this->autoSizedValue = 0.431 + 6086.0 * DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
-                    } else {
-                        this->autoSizedValue = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap;
-                    }
-                } else { // DOASDXCoil, or DXCT = 2
-                    if (RatedVolFlowPerRatedTotCap > DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
-                        this->autoSizedValue = 0.389 + 7684.0 * DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
-                    } else if (RatedVolFlowPerRatedTotCap < DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
-                        this->autoSizedValue = 0.389 + 7684.0 * DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
-                    } else {
-                        this->autoSizedValue = 0.389 + 7684.0 * RatedVolFlowPerRatedTotCap;
-                    }
-                }
-
-                // check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
-                this->autoSizedValue = DXCoils::ValidateADP(this->compType,
-                                                            this->compName,
-                                                            RatedInletAirTemp,
-                                                            RatedInletAirHumRat,
-                                                            this->dataCapacityUsedForSizing,
-                                                            this->dataFlowUsedForSizing,
-                                                            this->autoSizedValue,
-                                                            this->callingRoutine);
-                if (this->dataSizingFraction < 1.0) {
-                    this->autoSizedValue *= this->dataSizingFraction;
-                }
+            if (!this->wasAutoSized &&
+                ((this->curZoneEqNum > 0 && !this->sizingDesRunThisZone) || (this->curSysNum > 0 && !this->sizingDesRunThisAirSys))) {
+                this->autoSizedValue = _originalValue;
             } else {
-                if (this->wasAutoSized) {
-                    this->autoSizedValue = 1.0;
-                    std::string msg = "Developer Error: For autosizing of " + this->compType + ' ' + this->compName +
-                                      ", DataFlowUsedForSizing and DataCapacityUsedForSizing " + this->sizingString + " must both be greater than 0.";
-                    this->errorType = AutoSizingResultType::ErrorType1;
-                    this->addErrorMessage(msg);
+                if (this->dataFlowUsedForSizing >= DataHVACGlobals::SmallAirVolFlow && this->dataCapacityUsedForSizing > 0.0) {
+                    // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
+                    // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
+                    // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
+                    // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus
+                    // rated SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a
+                    // regression of flow/capacity ratio vs SHR for several actual coils.
+                    Real64 RatedVolFlowPerRatedTotCap = this->dataFlowUsedForSizing / this->dataCapacityUsedForSizing;
+                    if (DataHVACGlobals::DXCT == DataHVACGlobals::RegularDXCoil) {
+                        if (RatedVolFlowPerRatedTotCap > DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
+                            this->autoSizedValue = 0.431 + 6086.0 * DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
+                        } else if (RatedVolFlowPerRatedTotCap < DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
+                            this->autoSizedValue = 0.431 + 6086.0 * DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
+                        } else {
+                            this->autoSizedValue = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap;
+                        }
+                    } else { // DOASDXCoil, or DXCT = 2
+                        if (RatedVolFlowPerRatedTotCap > DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
+                            this->autoSizedValue = 0.389 + 7684.0 * DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
+                        } else if (RatedVolFlowPerRatedTotCap < DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
+                            this->autoSizedValue = 0.389 + 7684.0 * DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
+                        } else {
+                            this->autoSizedValue = 0.389 + 7684.0 * RatedVolFlowPerRatedTotCap;
+                        }
+                    }
+
+                    // check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
+                    this->autoSizedValue = DXCoils::ValidateADP(this->compType,
+                                                                this->compName,
+                                                                RatedInletAirTemp,
+                                                                RatedInletAirHumRat,
+                                                                this->dataCapacityUsedForSizing,
+                                                                this->dataFlowUsedForSizing,
+                                                                this->autoSizedValue,
+                                                                this->callingRoutine);
+                    if (this->dataSizingFraction < 1.0) {
+                        this->autoSizedValue *= this->dataSizingFraction;
+                    }
+                } else {
+                    if (this->wasAutoSized) {
+                        this->autoSizedValue = 1.0;
+                        std::string msg = "Developer Error: For autosizing of " + this->compType + ' ' + this->compName +
+                                          ", DataFlowUsedForSizing and DataCapacityUsedForSizing " + this->sizingString +
+                                          " must both be greater than 0.";
+                        this->errorType = AutoSizingResultType::ErrorType1;
+                        this->addErrorMessage(msg);
+                    }
                 }
             }
         }
     }
+    // bandaid - override sizingString to match existing text
     if (this->compType == "Coil:Cooling:DX:MultiSpeed") {
-        this->sizingString = "Speed " + General::TrimSigDigits(DataSizing::DataDXSpeedNum) + " Gross Rated Sensible Heat Ratio";
+        this->sizingString = "Speed " + General::TrimSigDigits(DataSizing::DataDXSpeedNum) + " Rated Sensible Heat Ratio";
     } else if (this->compType == "Coil:Cooling:DX:TwoSpeed") {
-        if (DataSizing::DataDXSpeedNum == 1) {
-            this->sizingString = "Low Speed Rated Sensible Heat Ratio";
-        } else if (DataSizing::DataDXSpeedNum == 2) {
+        if (DataSizing::DataDXSpeedNum == 1) { // mode 1 is high speed in DXCoils loop
             this->sizingString = "High Speed Rated Sensible Heat Ratio";
+        } else if (DataSizing::DataDXSpeedNum == 2) {
+            this->sizingString = "Low Speed Rated Sensible Heat Ratio";
         }
+    } else if (this->compType == "Coil:Cooling:DX:CurveFit:Speed") {
+        this->sizingString = "Gross Sensible Heat Ratio";
+    } else if (this->compType == "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl") {
+        this->sizingString = "Rated Sensible Heat Ratio";
     }
     this->selectSizerOutput(errorsFound);
     return this->autoSizedValue;
