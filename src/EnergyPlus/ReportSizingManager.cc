@@ -191,8 +191,7 @@ namespace ReportSizingManager {
                        std::string const &SizingString,   // string containing info for eio report
                        Real64 &SizingResult,              // result of the sizing procedure
                        bool const PrintWarningFlag,       // TRUE when requesting output (eio) reporting
-                       std::string const &CallingRoutine, // name of calling routine for warning messages
-                       Real64 const fraction)
+                       std::string const &CallingRoutine) // name of calling routine for warning messages
     {
         // SUBROUTINE INFORMATION :
         // AUTHOR         Richard Raustad, FSEC
@@ -406,8 +405,6 @@ namespace ReportSizingManager {
         Real64 FanCoolLoad;                        // load due to fan operation added to cooling load [W]
         Array1D<Real64> Par(4);                    // array passed to RegulaFalsi
         std::string ScalableSM;                    // scalable sizing methods label for reporting
-        Real64 const RatedInletAirTemp(26.6667);   // 26.6667C or 80F
-        Real64 const RatedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 
         std::string DDNameFanPeak;   // Name of the design day that produced the Peak
         std::string dateTimeFanPeak; // A String representing the DateTime of the Peak

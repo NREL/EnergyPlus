@@ -182,6 +182,8 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
     ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->ratedCondAirFlowRate = TempSize;
+    DataSizing::DataConstantUsedForSizing = 0.0;
+    DataSizing::DataFractionUsedForSizing = 0.0;
 
     for (auto &curSpeed : this->speeds) {
         curSpeed.parentModeRatedGrossTotalCap = this->ratedGrossTotalCap;

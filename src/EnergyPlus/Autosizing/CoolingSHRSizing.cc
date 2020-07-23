@@ -130,7 +130,7 @@ Real64 CoolingSHRSizer::size(Real64 _originalValue, bool &errorsFound)
         if (DataSizing::DataDXSpeedNum == 1) { // mode 1 is high speed in DXCoils loop
             this->sizingString = "High Speed Rated Sensible Heat Ratio";
         } else if (DataSizing::DataDXSpeedNum == 2) {
-            this->sizingString = "Low Speed Rated Sensible Heat Ratio";
+            this->sizingString = "Low Speed Gross Rated Sensible Heat Ratio";
         }
     } else if (this->compType == "Coil:Cooling:DX:CurveFit:Speed") {
         this->sizingString = "Gross Sensible Heat Ratio";
