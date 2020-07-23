@@ -490,7 +490,7 @@ namespace HVACDXSystem {
                 if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:SingleSpeed")) {
                     DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
                     GetDXCoilIndex(
-                        DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
+                        state, DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
                     if (ErrFound) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
@@ -506,7 +506,7 @@ namespace HVACDXSystem {
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:TwoSpeed")) {
                     DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingTwoSpeed;
                     GetDXCoilIndex(
-                        DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
+                        state, DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
                     if (ErrFound) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
@@ -531,7 +531,7 @@ namespace HVACDXSystem {
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                     DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingTwoStageWHumControl;
                     GetDXCoilIndex(
-                        DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
+                        state, DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
                     if (ErrFound) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
@@ -646,7 +646,7 @@ namespace HVACDXSystem {
             if (DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil) {
                 // set the system DX Coil application type to the child DX coil
                 if (!(DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed)) {
-                    SetDXCoilTypeData(DXCoolingSystem(DXCoolSysNum).CoolingCoilName);
+                    SetDXCoilTypeData(state, DXCoolingSystem(DXCoolSysNum).CoolingCoilName);
                 } else {
                     ShowWarningError("CoilSystem:Cooling:DX named " + DXCoolingSystem(DXCoolSysNum).Name +
                                      " entered with both variable speed DX coil and outdoor air mode set to YES, however VS coil model does not have "
@@ -660,7 +660,7 @@ namespace HVACDXSystem {
                 }
             }
             if (DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed) {
-                SetCoilSystemCoolingData(DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).Name);
+                SetCoilSystemCoolingData(state, DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).Name);
             }
 
             if (DataGlobals::DoCoilDirectSolutions && DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
@@ -3487,7 +3487,7 @@ namespace HVACDXSystem {
             DXCoolSysNum = UtilityRoutines::FindItemInList(DXCoilSysName, DXCoolingSystem);
             if (DXCoolSysNum > 0 && DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil) {
                 if (!(DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed)) {
-                    SetDXCoilTypeData(DXCoolingSystem(DXCoolSysNum).CoolingCoilName);
+                    SetDXCoilTypeData(state, DXCoolingSystem(DXCoolSysNum).CoolingCoilName);
                 }
             }
         }

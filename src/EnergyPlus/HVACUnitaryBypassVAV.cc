@@ -657,16 +657,16 @@ namespace HVACUnitaryBypassVAV {
             } else {
                 if (UtilityRoutines::SameString(CBVAV(CBVAVNum).FanType, "Fan:SystemModel")) {
                     CBVAV(CBVAVNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(CBVAV(CBVAVNum).FanName)); // call constructor
+                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, CBVAV(CBVAVNum).FanName)); // call constructor
                     CBVAV(CBVAVNum).FanIndex = HVACFan::getFanObjectVectorIndex(CBVAV(CBVAVNum).FanName);
                     CBVAV(CBVAVNum).FanInletNodeNum = HVACFan::fanObjs[CBVAV(CBVAVNum).FanIndex]->inletNodeNum;
                     fanOutletNode = HVACFan::fanObjs[CBVAV(CBVAVNum).FanIndex]->outletNodeNum;
                     CBVAV(CBVAVNum).FanVolFlow = HVACFan::fanObjs[CBVAV(CBVAVNum).FanIndex]->designAirVolFlowRate;
                 } else {
-                    Fans::GetFanType(state.fans, CBVAV(CBVAVNum).FanName, CBVAV(CBVAVNum).FanType_Num, FanErrFlag, CurrentModuleObject, CBVAV(CBVAVNum).Name);
-                    CBVAV(CBVAVNum).FanInletNodeNum = Fans::GetFanInletNode(state.fans, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, FanErrFlag);
-                    fanOutletNode = Fans::GetFanOutletNode(state.fans, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, ErrorsFound);
-                    Fans::GetFanIndex(state.fans, CBVAV(CBVAVNum).FanName, CBVAV(CBVAVNum).FanIndex, FanErrFlag);
+                    Fans::GetFanType(state, state.fans, CBVAV(CBVAVNum).FanName, CBVAV(CBVAVNum).FanType_Num, FanErrFlag, CurrentModuleObject, CBVAV(CBVAVNum).Name);
+                    CBVAV(CBVAVNum).FanInletNodeNum = Fans::GetFanInletNode(state, state.fans, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, FanErrFlag);
+                    fanOutletNode = Fans::GetFanOutletNode(state, state.fans, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, ErrorsFound);
+                    Fans::GetFanIndex(state, state.fans, CBVAV(CBVAVNum).FanName, CBVAV(CBVAVNum).FanIndex, FanErrFlag);
                     Fans::GetFanVolFlow(CBVAV(CBVAVNum).FanIndex, CBVAV(CBVAVNum).FanVolFlow);
                 }
             }
@@ -749,13 +749,13 @@ namespace HVACUnitaryBypassVAV {
 
                         DXCoilErrFlag = false;
                         DXCoils::GetDXCoilIndex(
-                            CBVAV(CBVAVNum).DXCoolCoilName, CBVAV(CBVAVNum).DXCoolCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).DXCoolCoilType);
+                            state, CBVAV(CBVAVNum).DXCoolCoilName, CBVAV(CBVAVNum).DXCoolCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).DXCoolCoilType);
                         if (DXCoilErrFlag) ShowContinueError("...occurs in " + CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
 
                         //         Mine outdoor condenser node from DX coil object
                         OANodeErrFlag = false;
                         CBVAV(CBVAVNum).CondenserNodeNum =
-                            DXCoils::GetCoilCondenserInletNode(CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, OANodeErrFlag);
+                            DXCoils::GetCoilCondenserInletNode(state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, OANodeErrFlag);
                         if (OANodeErrFlag) ShowContinueError("Occurs in " + CurrentModuleObject + " = " + CBVAV(CBVAVNum).Name);
                     }
                 } else if (UtilityRoutines::SameString(Alphas(14), "Coil:Cooling:DX:VariableSpeed")) {
@@ -796,7 +796,7 @@ namespace HVACUnitaryBypassVAV {
                         int ActualCoolCoilType = HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(state,
                             CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
                         if (ActualCoolCoilType == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-                            DXCoils::GetDXCoilIndex(HVACHXAssistedCoolingCoil::GetHXDXCoilName(state,
+                            DXCoils::GetDXCoilIndex(state, HVACHXAssistedCoolingCoil::GetHXDXCoilName(state,
                                                         CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXCoilErrFlag),
                                                     CBVAV(CBVAVNum).DXCoolCoilIndexNum,
                                                     DXCoilErrFlag,
@@ -806,7 +806,7 @@ namespace HVACUnitaryBypassVAV {
                             //         Mine outdoor condenser node from DX coil through HXAssistedDXCoil object
                             OANodeErrFlag = false;
                             CBVAV(CBVAVNum).CondenserNodeNum =
-                                DXCoils::GetCoilCondenserInletNode("Coil:Cooling:DX:SingleSpeed", HXDXCoolCoilName, OANodeErrFlag);
+                                DXCoils::GetCoilCondenserInletNode(state, "Coil:Cooling:DX:SingleSpeed", HXDXCoolCoilName, OANodeErrFlag);
                             if (OANodeErrFlag) ShowContinueError("Occurs in " + CurrentModuleObject + " = " + CBVAV(CBVAVNum).Name);
                         } else if (ActualCoolCoilType == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                             CBVAV(CBVAVNum).DXCoolCoilIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(
@@ -837,13 +837,13 @@ namespace HVACUnitaryBypassVAV {
 
                         DXCoilErrFlag = false;
                         DXCoils::GetDXCoilIndex(
-                            CBVAV(CBVAVNum).DXCoolCoilName, CBVAV(CBVAVNum).DXCoolCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).DXCoolCoilType);
+                            state, CBVAV(CBVAVNum).DXCoolCoilName, CBVAV(CBVAVNum).DXCoolCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).DXCoolCoilType);
                         if (DXCoilErrFlag) ShowContinueError("...occurs in " + CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
 
                         //         Mine outdoor condenser node from multimode DX coil object
                         OANodeErrFlag = false;
                         CBVAV(CBVAVNum).CondenserNodeNum =
-                            DXCoils::GetCoilCondenserInletNode(CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, OANodeErrFlag);
+                            DXCoils::GetCoilCondenserInletNode(state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, OANodeErrFlag);
                         if (OANodeErrFlag) ShowContinueError("Occurs in " + CurrentModuleObject + " = " + CBVAV(CBVAVNum).Name);
                     }
                 }
@@ -924,13 +924,13 @@ namespace HVACUnitaryBypassVAV {
                     CBVAV(CBVAVNum).HeatCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
                     DXCoilErrFlag = false;
                     CBVAV(CBVAVNum).MinOATCompressor =
-                        DXCoils::GetMinOATCompressor(CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
+                        DXCoils::GetMinOATCompressor(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
                     CBVAV(CBVAVNum).HeatingCoilInletNode =
                         DXCoils::GetCoilInletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
                     CBVAV(CBVAVNum).HeatingCoilOutletNode =
                         DXCoils::GetCoilOutletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
                     DXCoils::GetDXCoilIndex(
-                        CBVAV(CBVAVNum).HeatCoilName, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).HeatCoilType);
+                        state, CBVAV(CBVAVNum).HeatCoilName, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).HeatCoilType);
                     if (DXCoilErrFlag) ShowContinueError("...occurs in " + CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
 
                 } else if (UtilityRoutines::SameString(Alphas(16), "Coil:Heating:DX:VariableSpeed")) {

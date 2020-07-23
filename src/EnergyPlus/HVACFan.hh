@@ -75,7 +75,7 @@ namespace HVACFan {
 
     public: // Methods
         // Constructor
-        FanSystem(std::string const &objectName);
+        FanSystem(EnergyPlusData &state, std::string const &objectName);
 
         // Destructor
         ~FanSystem()

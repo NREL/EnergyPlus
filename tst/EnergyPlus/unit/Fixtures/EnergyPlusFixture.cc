@@ -95,8 +95,7 @@ void EnergyPlusFixture::openOutputFiles(OutputFiles &outputFiles)
 
 void EnergyPlusFixture::SetUp()
 {
-    EnergyPlus::clearThisState(state);
-    EnergyPlus::clearAllStates(state.outputFiles);
+    EnergyPlus::clearAllStates(state);
 
     show_message();
 
@@ -141,8 +140,7 @@ void EnergyPlusFixture::TearDown()
         state.outputFiles.shade.del();
     }
 
-    clearThisState(this->state);
-    clearAllStates(state.outputFiles);
+    clearAllStates(this->state);
 }
 
 std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)

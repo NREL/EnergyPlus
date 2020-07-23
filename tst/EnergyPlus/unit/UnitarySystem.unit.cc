@@ -11159,13 +11159,13 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     ASSERT_TRUE(process_idf(idf_objects));
 
     std::string fanName = "TEST FAN 1";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
 
     fanName = "TEST FAN 2";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
 
     fanName = "TEST FAN 3";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
@@ -11175,7 +11175,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     Real64 locDesignHeatGain3 = HVACFan::fanObjs[2]->getFanDesignHeatGain(state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain3, 402.0, 0.1);
 
-    Fans::GetFanInput(state.fans);
+    Fans::GetFanInput(state, state.fans);
     Real64 locDesignHeatGain4 = Fans::FanDesHeatGain(state, 1, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain4, 50.25, 0.1);
 
