@@ -180,13 +180,13 @@ json const &InputProcessor::getPatternProperties(json const &schema_obj)
 
 void InputProcessor::clear_state()
 {
-//    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
-//    data = std::unique_ptr<DataStorage>(new DataStorage());
-//    epJSON = json::object();
-//    objectCacheMap.clear();
-//    unusedInputs.clear();
-//
-//    validation = std::unique_ptr<Validation>(new Validation(&schema));
+    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
+    data = std::unique_ptr<DataStorage>(new DataStorage());
+    epJSON = json::object();
+    objectCacheMap.clear();
+    unusedInputs.clear();
+
+    validation = std::unique_ptr<Validation>(new Validation(&schema));
 }
 
 std::vector<std::string> const &InputProcessor::validationErrors()
