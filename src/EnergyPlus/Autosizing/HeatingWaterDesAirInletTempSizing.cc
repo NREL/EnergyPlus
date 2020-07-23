@@ -118,6 +118,7 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
             }
         }
     }
+    if (this->isEpJSON) this->sizingString = "rated_inlet_air_temperature";
     this->selectSizerOutput(errorsFound);
     // report not written for OA coils and needs to be corrected
     if (this->curSysNum <= this->numPrimaryAirSys) {

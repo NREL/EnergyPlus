@@ -103,6 +103,7 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &err
             }
         }
     }
+    if (this->isEpJSON) this->sizingString = "design_inlet_air_humidity_ratio [kgWater/kgDryAir]";
     this->selectSizerOutput(errorsFound);
     if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;

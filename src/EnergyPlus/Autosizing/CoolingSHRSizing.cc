@@ -125,17 +125,39 @@ Real64 CoolingSHRSizer::size(Real64 _originalValue, bool &errorsFound)
     }
     // bandaid - override sizingString to match existing text
     if (this->compType == "Coil:Cooling:DX:MultiSpeed") {
-        this->sizingString = "Speed " + General::TrimSigDigits(DataSizing::DataDXSpeedNum) + " Rated Sensible Heat Ratio";
+        if (this->isEpJSON) {
+            this->sizingString = "speed_" + General::TrimSigDigits(DataSizing::DataDXSpeedNum) + "_rated_sensible_heat_ratio";
+        } else {
+            this->sizingString = "Speed " + General::TrimSigDigits(DataSizing::DataDXSpeedNum) + " Rated Sensible Heat Ratio";
+        }
     } else if (this->compType == "Coil:Cooling:DX:TwoSpeed") {
         if (DataSizing::DataDXSpeedNum == 1) { // mode 1 is high speed in DXCoils loop
-            this->sizingString = "High Speed Rated Sensible Heat Ratio";
+            if (this->isEpJSON) {
+                this->sizingString = "high_speed_rated_sensible_heat_ratio";
+            } else {
+                this->sizingString = "High Speed Rated Sensible Heat Ratio";
+            }
         } else if (DataSizing::DataDXSpeedNum == 2) {
-            this->sizingString = "Low Speed Gross Rated Sensible Heat Ratio";
+            if (this->isEpJSON) {
+                this->sizingString = "low_speed_gross_rated_sensible_heat_ratio";
+            } else {
+                this->sizingString = "Low Speed Gross Rated Sensible Heat Ratio";
+            }
         }
     } else if (this->compType == "Coil:Cooling:DX:CurveFit:Speed") {
-        this->sizingString = "Gross Sensible Heat Ratio";
+        if (this->isEpJSON) {
+            this->sizingString = "gross_sensible_heat_ratio";
+        } else {
+            this->sizingString = "Gross Sensible Heat Ratio";
+        }
     } else if (this->compType == "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl") {
-        this->sizingString = "Rated Sensible Heat Ratio";
+        if (this->isEpJSON) {
+            this->sizingString = "rated_sensible_heat_ratio";
+        } else {
+            this->sizingString = "Rated Sensible Heat Ratio";
+        }
+    } else {
+        if (this->isEpJSON) this->sizingString = "gross_rated_sensible_heat_ratio";
     }
     this->selectSizerOutput(errorsFound);
     return this->autoSizedValue;

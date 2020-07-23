@@ -103,6 +103,7 @@ struct BaseSizer
     bool oaSysFlag = false;
     std::string compType = "";
     std::string compName = "";
+    bool isEpJSON = false;
 
     bool sysSizingRunDone = false;
     bool zoneSizingRunDone = false;

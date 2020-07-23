@@ -133,7 +133,7 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &er
             }
         }
     }
-
+    if (this->isEpJSON) this->sizingString = "Design Outlet Air Humidity Ratio [kgWater/kgDryAir]";
     this->selectSizerOutput(errorsFound);
     if (this->getCoilReportObject) coilSelectionReportObj->setCoilLvgAirHumRat(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
