@@ -128,6 +128,7 @@ namespace BaseboardElectric {
         void clear_state() override
         {
             NumBaseboards = 0;
+            getInputFlag = true;
             Baseboard.deallocate();
             BaseboardNumericFields.deallocate();
             MyOneTimeFlag = true;

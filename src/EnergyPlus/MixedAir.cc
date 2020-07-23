@@ -787,7 +787,7 @@ namespace MixedAir {
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == Coil_UserDefined) {
                 if (Sim) {
-                    SimCoilUserDefined(state.dataBranchInputManager, CompName, CompIndex, AirLoopNum, OAHeatingCoil, OACoolingCoil);
+                    SimCoilUserDefined(state, state.dataBranchInputManager, CompName, CompIndex, AirLoopNum, OAHeatingCoil, OACoolingCoil);
                 }
                 // Heat recovery
             } else if (SELECT_CASE_var == HeatXchngr) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent',
@@ -1244,7 +1244,7 @@ namespace MixedAir {
                     } else if (SELECT_CASE_var == "FAN:SYSTEMMODEL") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = Fan_System_Object;
                         // construct fan object
-                        HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(OutsideAirSys(OASysNum).ComponentName(CompNum)));
+                        HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, OutsideAirSys(OASysNum).ComponentName(CompNum)));
                         OutsideAirSys(OASysNum).ComponentIndex(CompNum) = HVACFan::fanObjs.size();
                         // cpw22Aug2010 Add Fan:ComponentModel (new)
                     } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {

@@ -234,12 +234,11 @@
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindTurbine.hh>
 
-void EnergyPlus::clearThisState(EnergyPlusData &state)
+void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
+    // clear the passed in state
     state.clear_state();
-}
-void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
-{
+    // then clear any other remaining global state, the number of these here will reduce over time
     using namespace EnergyPlus;
     // A to Z order
     CoilCoolingDX::clear_state();
@@ -257,7 +256,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     DataEnvironment::clear_state();
     DataErrorTracking::clear_state();
     DataGenerators::clear_state();
-    DataGlobals::clear_state(outputFiles);
+    DataGlobals::clear_state(state.outputFiles);
     DataHeatBalance::clear_state();
     DataHeatBalFanSys::clear_state();
     DataHeatBalSurface::clear_state();
