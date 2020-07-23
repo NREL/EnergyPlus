@@ -97,6 +97,7 @@ void EnergyPlusFixture::SetUp()
 {
     EnergyPlus::clearThisState(state);
     EnergyPlus::clearAllStates(state.outputFiles);
+    EnergyPlus::inputProcessor->clear_state();
 
     show_message();
 

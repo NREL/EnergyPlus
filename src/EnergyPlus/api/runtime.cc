@@ -48,6 +48,9 @@
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/runtime.h>
 #include <EnergyPlus/StateManagement.hh>
@@ -57,6 +60,7 @@ void cClearAllStates() {
     EnergyPlus::EnergyPlusData state;   //THIS IS TEMPORARY
     EnergyPlus::clearThisState(state);
     EnergyPlus::clearAllStates(state.outputFiles);
+    EnergyPlus::inputProcessor = EnergyPlus::InputProcessor::factory();
 }
 
 int energyplus(int argc, const char *argv[]) {

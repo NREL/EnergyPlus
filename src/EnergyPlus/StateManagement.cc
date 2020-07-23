@@ -340,7 +340,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     HybridModel::clear_state();
     HybridUnitaryAirConditioners::clear_state();
     HysteresisPhaseChange::clear_state();
-    EnergyPlus::inputProcessor->clear_state();
+    //EnergyPlus::inputProcessor->clear_state(); this is done by the unit test fixture, other reset approaches (API) should just get an entirely new inputprocessor instance
     IceThermalStorage::clear_state();
     IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
