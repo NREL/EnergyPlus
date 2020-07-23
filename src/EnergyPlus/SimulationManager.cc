@@ -450,7 +450,7 @@ namespace SimulationManager {
             }
             CreateEnergyReportStructure();
             bool anyEMSRan;
-            ManageEMS(emsCallFromSetupSimulation, anyEMSRan); // point to finish setup processing EMS, sensor ready now
+            ManageEMS(state, emsCallFromSetupSimulation, anyEMSRan); // point to finish setup processing EMS, sensor ready now
 
             ProduceRDDMDD();
 
@@ -538,7 +538,7 @@ namespace SimulationManager {
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
-            ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+            ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
@@ -602,7 +602,7 @@ namespace SimulationManager {
                         }
 
                         BeginTimeStepFlag = true;
-                        ExternalInterfaceExchangeVariables();
+                        ExternalInterfaceExchangeVariables(state);
 
                         // Set the End__Flag variables to true if necessary.  Note that
                         // each flag builds on the previous level.  EndDayFlag cannot be
@@ -648,7 +648,7 @@ namespace SimulationManager {
             } // ... End day loop.
 
             // Need one last call to send latest states to middleware
-            ExternalInterfaceExchangeVariables();
+            ExternalInterfaceExchangeVariables(state);
 
         } // ... End environment loop.
 
