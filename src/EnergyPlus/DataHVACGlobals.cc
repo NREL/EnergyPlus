@@ -103,7 +103,6 @@ namespace DataHVACGlobals {
     int const WaterHeatingCapacitySizing(19);                        // request sizing for water-side heating capacity
     int const WaterHeatingCoilUASizing(20);                          // request sizing for heating coil UA
     int const SystemCapacitySizing(21);                              // request sizing for system capacity
-    int const CoolingSHRSizing(22);                                  // request sizing for cooling SHR
     int const HeatingDefrostSizing(23);                              // request sizing for heating defrost capacity
     int const AutoCalculateSizing(25);                               // identifies an autocalulate input
     int const ASHRAEMinSATCoolingSizing(30);                         // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method

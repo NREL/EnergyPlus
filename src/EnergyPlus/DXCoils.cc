@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/CoolingSHRSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -7023,17 +7024,18 @@ namespace DXCoils {
                     } else {
                         CompName = DXCoil(DXCoilNum).Name;
                     }
-                    SizingMethod = CoolingSHRSizing;
                     CompType = DXCoil(DXCoilNum).DXCoilType;
-                    FieldNum = 2;
                     TempSize = DXCoil(DXCoilNum).RatedSHR(Mode);
-                    SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum);
+                    DataDXSpeedNum = Mode;
                     DataFlowUsedForSizing = DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode);
                     DataCapacityUsedForSizing = DXCoil(DXCoilNum).RatedTotCap(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedSHREMSOverrideOn(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedSHREMSOverrideValue(Mode);
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
-                    DXCoil(DXCoilNum).RatedSHR(Mode) = TempSize;
+                    bool ErrorsFound = false;
+                    CoolingSHRSizer sizerCoolingSHR;
+                    sizerCoolingSHR.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    DXCoil(DXCoilNum).RatedSHR(Mode) = sizerCoolingSHR.size(TempSize, ErrorsFound);
+                    DataDXSpeedNum = 0;
                     DataFlowUsedForSizing = 0.0;
                     DataCapacityUsedForSizing = 0.0;
                     DataEMSOverrideON = false;
@@ -7441,17 +7443,18 @@ namespace DXCoils {
                     IsAutoSize = true;
                 }
                 if (Mode == DXCoil(DXCoilNum).NumOfSpeeds) {
-                    SizingMethod = CoolingSHRSizing;
                     CompType = DXCoil(DXCoilNum).DXCoilType;
                     CompName = DXCoil(DXCoilNum).Name;
                     TempSize = DXCoil(DXCoilNum).MSRatedSHR(Mode);
-                    SizingString = "Speed " + TrimSigDigits(Mode) + " Rated Sensible Heat Ratio";
                     DataFlowUsedForSizing = MSRatedAirVolFlowRateDes;
                     DataCapacityUsedForSizing = MSRatedTotCapDesAtMaxSpeed;
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedSHREMSOverrideOn(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedSHREMSOverrideValue(Mode);
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
-                    DXCoil(DXCoilNum).MSRatedSHR(Mode) = TempSize;
+                    bool ErrorsFound = false;
+                    DataDXSpeedNum = Mode;
+                    CoolingSHRSizer sizerCoolingSHR;
+                    sizerCoolingSHR.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    DXCoil(DXCoilNum).MSRatedSHR(Mode) = sizerCoolingSHR.size(TempSize, ErrorsFound);
                     // added for rated sensible cooling capacity estimate for html reporting, issue #7381
                     DXCoil(DXCoilNum).RatedSHR(1) = DXCoil(DXCoilNum).MSRatedSHR(Mode);
                     // design SHR value at the maxiumum speed calculated above was supposed to be used for all speeds
@@ -7509,6 +7512,7 @@ namespace DXCoils {
             DataCapacityUsedForSizing = 0.0;
             DataEMSOverrideON = false;
             DataEMSOverride = 0.0;
+            DataDXSpeedNum = 0;
 
             // Rated Evapovative condenser airflow rates
             for (Mode = 1; Mode <= DXCoil(DXCoilNum).NumOfSpeeds; ++Mode) {
@@ -11368,7 +11372,7 @@ namespace DXCoils {
                     bReversePerturb = true;
                     if (SHR < 0.5)
                         bStillValidating = false; // have to stop somewhere, this is lower than the lower limit of SHR empirical model (see
-                                                  // ReportSizingManager SizingType == CoolingSHRSizing)
+                                                  // Autosizing/CoolingSHRSizing)
                 } else {
                     if (bReversePerturb) {
                         bStillValidating = false; // stop iterating once SHR causes ADP to cross back under saturation curve, take what you get
@@ -11377,8 +11381,8 @@ namespace DXCoils {
                     }
                 }
                 if (SHR > 0.8)
-                    bStillValidating = false; // have to stop somewhere, this is the upper limit of SHR empirical model (see ReportSizingManager
-                                              // SizingType == CoolingSHRSizing)
+                    bStillValidating =
+                        false; // have to stop somewhere, this is the upper limit of SHR empirical model (see Autosizing/CoolingSHRSizing)
             } else {
                 bStillValidating = false; // ADP temps are close enough. Normal input files hit this on first pass
             }

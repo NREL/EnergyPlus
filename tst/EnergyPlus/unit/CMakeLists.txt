@@ -18,6 +18,7 @@ set( test_src
   AirTerminalSingleDuctPIUReheat.unit.cc
   Autosizing/AutosizingFixture.hh
   Autosizing/All_Simple_Sizing.unit.cc
+  Autosizing/CoolingSHRSizing.unit.cc
   Autosizing/CoolingWaterDesAirInletHumRatSizing.unit.cc
   Autosizing/CoolingWaterDesAirOutletHumRatSizing.unit.cc
   Autosizing/CoolingWaterDesWaterInletTempSizing.unit.cc

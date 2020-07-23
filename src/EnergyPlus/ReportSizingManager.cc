@@ -53,7 +53,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -337,7 +336,6 @@ namespace ReportSizingManager {
         using namespace DataHVACGlobals;
         using DataPlant::PlantLoop;
         using DesiccantDehumidifiers::DesicDehum;
-        using DXCoils::ValidateADP;
         using Fans::FanDesDT;
         using Fans::FanDesHeatGain;
         using FluidProperties::GetDensityGlycol;
@@ -1744,48 +1742,6 @@ namespace ReportSizingManager {
                         ShowContinueError("    Tair,out = " + RoundSigDigits(AutosizeDes, 3));
                     }
                     bCheckForZero = false;
-                } else if (SizingType == CoolingSHRSizing) {
-                    if (DataFlowUsedForSizing >= SmallAirVolFlow && DataCapacityUsedForSizing > 0.0) {
-                        // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
-                        // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
-                        // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
-                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus
-                        // rated SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a
-                        // regression of flow/capacity ratio vs SHR for several actual coils.
-                        RatedVolFlowPerRatedTotCap = DataFlowUsedForSizing / DataCapacityUsedForSizing;
-                        if (DXCT == RegularDXCoil) {
-                            if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
-                                AutosizeDes = 0.431 + 6086.0 * MaxRatedVolFlowPerRatedTotCap(DXCT);
-                            } else if (RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap(DXCT)) {
-                                AutosizeDes = 0.431 + 6086.0 * MinRatedVolFlowPerRatedTotCap(DXCT);
-                            } else {
-                                AutosizeDes = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap;
-                            }
-                        } else { // DOASDXCoil, or DXCT = 2
-                            if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
-                                AutosizeDes = 0.389 + 7684.0 * MaxRatedVolFlowPerRatedTotCap(DXCT);
-                            } else if (RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap(DXCT)) {
-                                AutosizeDes = 0.389 + 7684.0 * MinRatedVolFlowPerRatedTotCap(DXCT);
-                            } else {
-                                AutosizeDes = 0.389 + 7684.0 * RatedVolFlowPerRatedTotCap;
-                            }
-                        }
-
-                        // check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
-                        AutosizeDes = ValidateADP(CompType,
-                                                  CompName,
-                                                  RatedInletAirTemp,
-                                                  RatedInletAirHumRat,
-                                                  DataCapacityUsedForSizing,
-                                                  DataFlowUsedForSizing,
-                                                  AutosizeDes,
-                                                  CallingRoutine);
-                        if (fraction < 1.0) {
-                            AutosizeDes *= fraction;
-                        }
-                    } else {
-                        AutosizeDes = 1.0;
-                    }
                 } else if (SizingType == CoolingCapacitySizing) {
                     if (ZoneEqSizing(CurZoneEqNum).CoolingCapacity) { // Parent object calculated capacity
                         AutosizeDes = ZoneEqSizing(CurZoneEqNum).DesCoolingLoad;
@@ -2645,53 +2601,6 @@ namespace ReportSizingManager {
                     }
 
                     bCheckForZero = false;
-                } else if (SizingType == CoolingSHRSizing) {
-                    if (DataFlowUsedForSizing >= SmallAirVolFlow && DataCapacityUsedForSizing > 0.0) {
-                        // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
-                        // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
-                        // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
-                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus
-                        // rated SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a
-                        // regression of flow/capacity ratio vs SHR for several actual coils.
-                        RatedVolFlowPerRatedTotCap = DataFlowUsedForSizing / DataCapacityUsedForSizing;
-                        if (DXCT == RegularDXCoil) {
-                            if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
-                                AutosizeDes = 0.431 + 6086.0 * MaxRatedVolFlowPerRatedTotCap(DXCT);
-                            } else if (RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap(DXCT)) {
-                                AutosizeDes = 0.431 + 6086.0 * MinRatedVolFlowPerRatedTotCap(DXCT);
-                            } else if (CurOASysNum > 0 && DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum > -1) {
-                                AutosizeDes = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap;
-                            } else {
-                                AutosizeDes = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap;
-                            }
-                        } else { // DOASDXCoil, or DXCT = 2
-                            if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
-                                AutosizeDes = 0.389 + 7684.0 * MaxRatedVolFlowPerRatedTotCap(DXCT);
-                            } else if (RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap(DXCT)) {
-                                AutosizeDes = 0.389 + 7684.0 * MinRatedVolFlowPerRatedTotCap(DXCT);
-                            } else {
-                                AutosizeDes = 0.389 + 7684.0 * RatedVolFlowPerRatedTotCap;
-                            }
-                        }
-
-                        // check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
-                        AutosizeDes = ValidateADP(CompType,
-                                                  CompName,
-                                                  RatedInletAirTemp,
-                                                  RatedInletAirHumRat,
-                                                  DataCapacityUsedForSizing,
-                                                  DataFlowUsedForSizing,
-                                                  AutosizeDes,
-                                                  CallingRoutine);
-                        if (fraction < 1.0) {
-                            AutosizeDes *= fraction;
-                        }
-                    } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName);
-                        ShowContinueError("... DataFlowUsedForSizing and DataCapacityUsedForSizing " + SizingString +
-                                          " must both be greater than 0.");
-                        ShowFatalError("Preceding conditions cause termination.");
-                    }
                 } else if (SizingType == CoolingCapacitySizing) {
                     DataFracOfAutosizedCoolingCapacity = 1.0;
                     if (OASysFlag) {
@@ -3608,8 +3517,6 @@ namespace ReportSizingManager {
             }
         } else if (CurSysNum <= NumPrimaryAirSys && SizingType == WaterHeatingCoilUASizing) {
             coilSelectionReportObj->setCoilUA(CompName, CompType, SizingResult, DataCapacityUsedForSizing, IsAutoSize, CurSysNum, CurZoneEqNum);
-
-        } else if (SizingType == CoolingSHRSizing) {
 
         } else if (SizingType == HeatingDefrostSizing) {
 

@@ -284,6 +284,7 @@ namespace DataSizing {
     extern Real64 DataConstantUsedForSizing;          // base value used for sizing inputs that are ratios of other inputs
     extern Real64 DataFractionUsedForSizing;          // fractional value of base value used for sizing inputs that are ratios of other inputs
     extern Real64 DataNonZoneNonAirloopValue;         // used when equipment is not located in a zone or airloop
+    extern Real64 DataSizingFraction;                 // used when ratios of sizing is required
     extern int DataZoneUsedForSizing;                 // pointer to control zone for air loop equipment
     extern int DataZoneNumber;                        // a pointer to a zone served by zoneHVAC equipment
     extern int NumZoneHVACSizing;                     // Number of design specification zone HVAC sizing objects
@@ -320,6 +321,7 @@ namespace DataSizing {
     extern int DataFanEnumType;                       // Fan type used during sizing
     extern int DataFanIndex;                          // Fan index used during sizing
     extern zoneFanPlacement DataFanPlacement;         // identifies location of fan wrt coil
+    extern int DataDXSpeedNum;                        // identifies multispeed DX max speed number
 
     // Types
 

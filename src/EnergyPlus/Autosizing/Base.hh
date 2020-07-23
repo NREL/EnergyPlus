@@ -59,6 +59,7 @@ namespace EnergyPlus {
 
 enum class AutoSizingType
 {
+    CoolingSHRSizing,
     CoolingWaterDesAirInletHumRatSizing,
     CoolingWaterDesAirOutletHumRatSizing,
     CoolingWaterDesWaterInletTempSizing,
@@ -134,6 +135,8 @@ struct BaseSizer
     Real64 minOA = 0.0;
 
     // global Data* sizing constants
+    bool dataEMSOverrideON = false;
+    Real64 dataEMSOverride = 0.0;
 
     // HeatingWaterflowSizer
     Real64 dataConstantUsedForSizing = 0.0;
@@ -168,6 +171,10 @@ struct BaseSizer
 
     // CoolingWaterNumofTubesPerRowSizer, HeatingWaterDesCoilWaterVolFlowUsedForUASizer
     Real64 dataWaterFlowUsedForSizing = 0.0;
+
+    // CoolingSHRSizing
+    Real64 dataSizingFraction = 1.0;
+    int dataDXSpeedNum = 0;
 
     bool printWarningFlag = false;
     std::string callingRoutine = "";

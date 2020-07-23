@@ -118,6 +118,8 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     }
 
     // global sizing data
+    dataEMSOverrideON = DataSizing::DataEMSOverrideON;
+    dataEMSOverride = DataSizing::DataEMSOverride;
     this->minOA = DataSizing::MinOA;
     this->dataConstantUsedForSizing = DataSizing::DataConstantUsedForSizing;
     this->dataFractionUsedForSizing = DataSizing::DataFractionUsedForSizing;
@@ -138,6 +140,9 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->dataDesInletWaterTemp = DataSizing::DataDesInletWaterTemp;
     this->dataFlowUsedForSizing = DataSizing::DataFlowUsedForSizing;
     this->dataWaterFlowUsedForSizing = DataSizing::DataWaterFlowUsedForSizing;
+
+    this->dataSizingFraction = DataSizing::DataSizingFraction;
+    this->dataDXSpeedNum = DataSizing::DataDXSpeedNum;
 }
 
 void BaseSizer::initializeFromAPI(Real64 const elevation) {
@@ -185,9 +190,6 @@ void BaseSizer::preSize(Real64 const _originalValue)
                           this->sizingString + " must both be greater than 0.";
         this->addErrorMessage(msg);
         ShowSevereError(msg);
-        // flip data so sizer uses AutoCalculate?
-        // this->dataConstantUsedForSizing = 0.0;
-        // this->dataFractionUsedForSizing = 1.0;
     } else if (this->dataFractionUsedForSizing > 0.0) {
         this->autoCalculate = true;
         this->hardSizeNoDesignRun = false;
@@ -433,6 +435,8 @@ void BaseSizer::overrideSizingString(std::string const &string)
         minOA = 0.0;
 
         // global Data* sizing constants
+        dataEMSOverrideON = false;
+        dataEMSOverride = 0.0;
         dataConstantUsedForSizing = 0.0;
         dataFractionUsedForSizing = 0.0;
         dataPltSizHeatNum = 0;
@@ -449,6 +453,8 @@ void BaseSizer::overrideSizingString(std::string const &string)
         dataDesInletWaterTemp = 0.0;
         dataDesOutletAirTemp = 0.0;
         dataWaterFlowUsedForSizing = 0.0;
+        dataSizingFraction = 1.0;
+        dataDXSpeedNum = 0.0;
 
         printWarningFlag = false;
         callingRoutine = "";
