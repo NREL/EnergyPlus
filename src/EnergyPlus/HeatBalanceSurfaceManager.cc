@@ -338,6 +338,7 @@ namespace HeatBalanceSurfaceManager {
         using InternalHeatGains::ManageInternalHeatGains;
         // RJH DElight Modification Begin
         using namespace DElightManagerF;
+        using namespace std::chrono;
         // RJH DElight Modification End
 
         // Locals
@@ -725,8 +726,14 @@ namespace HeatBalanceSurfaceManager {
 
         // The order of these initializations is important currently.  Over time we hope to
         //  take the appropriate parts of these inits to the other heat balance managers
+        high_resolution_clock::time_point t1 = high_resolution_clock::now();
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Solar Heat Gains");
         InitSolarHeatGains(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager);
+
+        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+        DataGlobals::solar_timer += time_span.count();
+
         if (SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0)) {
             for (NZ = 1; NZ <= NumOfZones; ++NZ) {
                 if (ZoneDaylight(NZ).TotalDaylRefPoints > 0) {
@@ -2259,7 +2266,6 @@ namespace HeatBalanceSurfaceManager {
         using namespace DataWindowEquivalentLayer;
         using SolarShading::SurfaceScheduledSolarInc;
         using SolarShading::WindowScheduledSolarAbs;
-        using namespace std::chrono;
 
         Real64 AbsExt;                                  // Absorptivity of outer most layer (or movable insulation if present)
         int ConstrNum;                                  // Index for the Construct derived type
@@ -2350,7 +2356,6 @@ namespace HeatBalanceSurfaceManager {
         int SurfSolIncPtr;           // Pointer to schedule surface gain object for interior side of the surface
 
         // Always initialize the shortwave quantities
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
         QRadSWOutAbs = 0.0;
         QRadSWInAbs = 0.0;
@@ -2576,16 +2581,12 @@ namespace HeatBalanceSurfaceManager {
             CalcWindowProfileAngles();
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface();
-            t1 = high_resolution_clock::now();
+
             if (dataWindowManager.inExtWindowModel->isExternalLibraryModel() && dataWindowManager.winOpticalModel->isSimplifiedModel()) {
                 CalcInteriorSolarDistributionWCE(dataWindowComplexManager, dataWindowManager);
             } else {
                 CalcInteriorSolarDistribution(dataWindowEquivalentLayer);
             }
-
-            high_resolution_clock::time_point t2 = high_resolution_clock::now();
-            duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-            DataGlobals::solar_timer += time_span.count();
 
             for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
 
@@ -3205,11 +3206,7 @@ namespace HeatBalanceSurfaceManager {
                 }
 
             } // End of surface loop
-
         } // End of sun-up check
-//        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-//        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-//        DataGlobals::solar_timer += time_span.count();
     }
 
     void InitIntSolarDistribution()
