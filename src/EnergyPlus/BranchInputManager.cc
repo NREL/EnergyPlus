@@ -1675,7 +1675,7 @@ namespace BranchInputManager {
         int Loop1;
         int Count;
         int Found;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         std::string TestName;
         std::string BranchListName;
         std::string FoundSupplyDemandAir;
@@ -1901,7 +1901,7 @@ namespace BranchInputManager {
         int Loop1;
         int Count;
         int Found;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         std::string TestName;
         std::string BranchListName;
         std::string FoundSupplyDemandAir;

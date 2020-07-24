@@ -535,6 +535,7 @@ namespace OutputReportTabular {
         bool GatherHeatGainReportfirstTime(true);
         bool AllocateLoadComponentArraysDoAllocate(true);
         bool initAdjFenDone(false);
+        int numPeopleAdaptive(0);
     } // namespace
 
     // Functions
@@ -711,6 +712,8 @@ namespace OutputReportTabular {
         UnitConv.deallocate();
 
         OutputReportTabular::ResetTabularReports();
+
+        numPeopleAdaptive = 0;
     }
 
     void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
@@ -11138,7 +11141,6 @@ namespace OutputReportTabular {
         Array1D_int columnWidth;
         Array1D_string rowHead;
         Array2D_string tableBody;
-        static int numPeopleAdaptive(0);
         int i;
         Array1D_int peopleInd; // Index the relevant people
 

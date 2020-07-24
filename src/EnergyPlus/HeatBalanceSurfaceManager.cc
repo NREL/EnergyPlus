@@ -4174,7 +4174,7 @@ namespace HeatBalanceSurfaceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool SurfPropOverridesPresent(false); // detect if EMS ever used for this and inits need to execute
+        bool SurfPropOverridesPresent(false); // detect if EMS ever used for this and inits need to execute
         int MaterNum;                                // do loop counter over materials
         int ConstrNum;                               // do loop counter over constructions
         int TotLayers;                               // count of material layers in a construction
@@ -4269,7 +4269,7 @@ namespace HeatBalanceSurfaceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool SurfConstructOverridesPresent(false); // detect if EMS ever used for this and inits need to execute
+        bool SurfConstructOverridesPresent(false); // detect if EMS ever used for this and inits need to execute
 
         if (std::any_of(Surface.begin(), Surface.end(), [](DataSurfaces::SurfaceData const &e) { return e.EMSConstructionOverrideON; }))
             SurfConstructOverridesPresent = true;

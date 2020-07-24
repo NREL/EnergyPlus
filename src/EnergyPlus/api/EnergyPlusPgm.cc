@@ -210,6 +210,7 @@
 #include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #ifdef _WIN32
@@ -224,9 +225,8 @@ int EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath
     return RunEnergyPlus(state, filepath);
 }
 
-int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath) {
+void commonInitialize(EnergyPlus::EnergyPlusData &state) {
     using namespace EnergyPlus;
-
     // Disable C++ i/o synching with C methods for speed
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
@@ -261,28 +261,11 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
 
     DataSystemVariables::processEnvironmentVariables(state.dataGlobals);
 
-    if (!filepath.empty()) {
-        // if filepath is not empty, then we are using E+ as a library API call
-        // change the directory to the specified folder, and pass in dummy args to command line parser
-        // this will initialize the paths throughout E+ to the defaults
-        DisplayString("EnergyPlus Library: Changing directory to: " + filepath);
-#ifdef _WIN32
-        int status = _chdir(filepath.c_str());
-#else
-        int status = chdir(filepath.c_str());
-#endif
-        if (status == 0) {
-            DisplayString("Directory change successful.");
-        } else {
-            DisplayString("Couldn't change directory; aborting EnergyPlus");
-            return EXIT_FAILURE;
-        }
-        DataStringGlobals::ProgramPath = filepath + DataStringGlobals::pathChar;
-        int dummy_argc = 1;
-        const char *dummy_argv[1] = {"energyplus"};
-        CommandLineInterface::ProcessArgs(state, dummy_argc, dummy_argv);
-    }
 
+}
+
+int commonRun(EnergyPlus::EnergyPlusData &state) {
+    using namespace EnergyPlus;
     int errStatus = initErrorFile();
     if (errStatus) {
         return errStatus;
@@ -310,64 +293,38 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
     return 0;
 }
 
-int initializeAsLibrary(EnergyPlus::EnergyPlusData &state) {
+int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath) {
     using namespace EnergyPlus;
+    commonInitialize(state);
 
-    // Disable C++ i/o synching with C methods for speed
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
-
-// Enable floating point exceptions
-#ifndef NDEBUG
-#ifdef __unix__
-    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+    if (!filepath.empty()) {
+        // if filepath is not empty, then we are using E+ as a library API call
+        // change the directory to the specified folder, and pass in dummy args to command line parser
+        // this will initialize the paths throughout E+ to the defaults
+        DisplayString("EnergyPlus Library: Changing directory to: " + filepath);
+#ifdef _WIN32
+        int status = _chdir(filepath.c_str());
+#else
+        int status = chdir(filepath.c_str());
 #endif
-#endif
-
-#ifdef _MSC_VER
-    #ifndef _DEBUG
-    // If _MSC_VER and not debug then prevent dialogs on error
-    SetErrorMode(SEM_NOGPFAULTERRORBOX);
-    _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
-    _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
-#endif
-#endif
-
-    DataSystemVariables::Time_Start = DataTimings::epElapsedTime();
-#ifdef EP_Detailed_Timings
-    epStartTime("EntireRun=");
-#endif
-
-    DataStringGlobals::CurrentDateTime = CreateCurrentDateTimeString();
-
-    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
-    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
-
-    DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
-
-    DataSystemVariables::processEnvironmentVariables(state.dataGlobals);
-
-    int errStatus = initErrorFile();
-    if (errStatus) {
-        return errStatus;
+        if (status == 0) {
+            DisplayString("Directory change successful.");
+        } else {
+            DisplayString("Couldn't change directory; aborting EnergyPlus");
+            return EXIT_FAILURE;
+        }
+        DataStringGlobals::ProgramPath = filepath + DataStringGlobals::pathChar;
+        int dummy_argc = 1;
+        const char *dummy_argv[1] = {"energyplus"};
+        CommandLineInterface::ProcessArgs(state, dummy_argc, dummy_argv);
     }
 
-    DataSystemVariables::TestAllPaths = true;
+    return commonRun(state);
+}
 
-    DisplayString("EnergyPlus Starting");
-    DisplayString(DataStringGlobals::VerString);
-
-    try {
-        EnergyPlus::inputProcessor = InputProcessor::factory();
-        EnergyPlus::inputProcessor->processInput();
-        ResultsFramework::OutputSchema->setupOutputOptions();
-    } catch (const FatalError &e) {
-        return AbortEnergyPlus(state);
-    } catch (const std::exception &e) {
-        ShowSevereError(e.what());
-        return AbortEnergyPlus(state);
-    }
-    return 0;
+int initializeAsLibrary(EnergyPlus::EnergyPlusData &state) {
+    commonInitialize(state);
+    return commonRun(state);
 }
 
 int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
@@ -383,6 +340,12 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         EnergyPlus::inputProcessor->reportOrphanRecordObjects();
         FluidProperties::ReportOrphanFluids();
         ScheduleManager::ReportOrphanSchedules();
+        if (EnergyPlus::sqlite) {
+            EnergyPlus::sqlite.reset();
+        }
+        if (EnergyPlus::inputProcessor) {
+            EnergyPlus::inputProcessor.reset();
+        }
 
         if (DataGlobals::runReadVars) {
             int status = CommandLineInterface::runReadVarsESO(state.outputFiles);

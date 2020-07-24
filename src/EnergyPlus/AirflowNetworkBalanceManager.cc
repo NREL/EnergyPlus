@@ -4753,13 +4753,11 @@ namespace AirflowNetworkBalanceManager {
         using DataHVACGlobals::TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool OneTimeFlag(true);
-        static bool MyEnvrnFlag(true);
         int i;
         int j;
         int ZoneNum;
 
-        if (OneTimeFlag) {
+        if (initializeOneTimeFlag) {
             exchangeData.allocate(AirflowNetworkBalanceManager::NumOfZones); // AirflowNetwork exchange data due to air-forced system
             for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
                 if (AirflowNetworkBalanceManager::DisSysCompCVFData(i).FanTypeNum == AirflowNetworkBalanceManager::FanType_SimpleOnOff) {
@@ -4768,7 +4766,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
 
-            OneTimeFlag = false;
+            initializeOneTimeFlag = false;
             if (AirflowNetworkBalanceManager::Contaminant.CO2Simulation) {
                 for (i = 1; i <= AirflowNetworkBalanceManager::NumOfZones; ++i) {
                     SetupOutputVariable("AFN Zone Outdoor Air Mass Flow Rate",
@@ -4841,7 +4839,7 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        if (AirflowNetworkBalanceManager::BeginEnvrnFlag && MyEnvrnFlag) {
+        if (AirflowNetworkBalanceManager::BeginEnvrnFlag && initializeMyEnvrnFlag) {
             // Assign node values
             for (i = 1; i <= AirflowNetworkBalanceManager::AirflowNetworkNumOfNodes; ++i) {
                 AirflowNetworkBalanceManager::AirflowNetworkNodeSimu(i).TZ = 23.0;
@@ -4888,10 +4886,10 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
 
-            MyEnvrnFlag = false;
+            initializeMyEnvrnFlag = false;
         }
         if (!AirflowNetworkBalanceManager::BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            initializeMyEnvrnFlag = true;
             if (AirflowNetworkBalanceManager::SimulateAirflowNetwork > AirflowNetworkBalanceManager::AirflowNetworkControlSimple) {
                 if (AirflowNetworkBalanceManager::RollBackFlag) {
                     for (i = 1; i <= AirflowNetworkBalanceManager::NumOfZones; ++i) {
@@ -5670,8 +5668,6 @@ namespace AirflowNetworkBalanceManager {
         int j;
         int n;
         int NodeNum;
-        static bool OneTimeFlag(true);
-        static bool ErrorsFound(false);
         Real64 GlobalOpenFactor;
         Real64 ZonePressure1;
         Real64 ZonePressure2;
@@ -5698,9 +5694,9 @@ namespace AirflowNetworkBalanceManager {
         int AirLoopNum;
 
         // Validate supply and return connections
-        if (OneTimeFlag) {
-            OneTimeFlag = false;
-            if (ErrorsFound) {
+        if (dataAirflowNetworkBalanceManager.CalcAirflowNetworkAirBalanceOneTimeFlag) {
+            dataAirflowNetworkBalanceManager.CalcAirflowNetworkAirBalanceOneTimeFlag = false;
+            if (dataAirflowNetworkBalanceManager.CalcAirflowNetworkAirBalanceErrorsFound) {
                 ShowFatalError("GetAirflowNetworkInput: Program terminates for preceding reason(s).");
             }
         }
@@ -5752,7 +5748,7 @@ namespace AirflowNetworkBalanceManager {
                 } else {
                     ShowSevereError("GetAirflowNetworkInput: AIRFLOWNETWORK:DISTRIBUTION:NODE: Invalid external node = " +
                                     AirflowNetworkNodeData(n).Name);
-                    ErrorsFound = true;
+                    dataAirflowNetworkBalanceManager.CalcAirflowNetworkAirBalanceErrorsFound = true;
                 }
             }
         }
@@ -8622,8 +8618,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 NodeMass;
         Real64 AFNMass;
         bool WriteFlag;
-        static bool MyOneTimeFlag(true);
-        static bool MyOneTimeFlag1(true);
+
 
         for (auto &e : dataAirflowNetworkBalanceManager.exchangeData) {
             e.SumMCp = 0.0;
@@ -8882,7 +8877,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // One time warning
-        if (MyOneTimeFlag) {
+        if (dataAirflowNetworkBalanceManager.UpdateAirflowNetworkMyOneTimeFlag) {
             for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
                 for (FanNum = 1; FanNum <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; ++FanNum) {
                     if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
@@ -8901,14 +8896,14 @@ namespace AirflowNetworkBalanceManager {
                             "The mass flow rate during HVAC operation = " + RoundSigDigits(AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate, 2) +
                             " The mass flow rate during no HVAC operation = " +
                             RoundSigDigits(AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate, 2));
-                        MyOneTimeFlag = false;
+                        dataAirflowNetworkBalanceManager.UpdateAirflowNetworkMyOneTimeFlag = false;
                     }
                 }
             }
         }
 
         // Check mass flow differences in the zone inlet zones and splitter nodes between node and AFN links
-        if (MyOneTimeFlag1) {
+        if (dataAirflowNetworkBalanceManager.UpdateAirflowNetworkMyOneTimeFlag1) {
             if ((!VAVSystem) && DisplayExtraWarnings) {
                 WriteFlag = false;
                 for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
@@ -8937,12 +8932,12 @@ namespace AirflowNetworkBalanceManager {
                         }
                     }
                 }
-                MyOneTimeFlag1 = false;
+                dataAirflowNetworkBalanceManager.UpdateAirflowNetworkMyOneTimeFlag1 = false;
                 if (WriteFlag) {
                     ShowWarningError("Please adjust the rate of Maximum Air Flow Rate field in the terminal objects or duct pressure resistance.");
                 }
             } else {
-                MyOneTimeFlag1 = false;
+                dataAirflowNetworkBalanceManager.UpdateAirflowNetworkMyOneTimeFlag1 = false;
             }
         }
 
@@ -10320,14 +10315,13 @@ namespace AirflowNetworkBalanceManager {
         int i;
         int j;
         int k;
-        static bool OneTimeFlag(true);
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         bool found;
         int EquipTypeNum; // Equipment type number
         std::string CurrentModuleObject;
 
         // Validate supply and return connections
-        if (OneTimeFlag) {
+        if (dataAirflowNetworkBalanceManager.ValidateExhaustFanInputOneTimeFlag) {
             CurrentModuleObject = "AirflowNetwork:MultiZone:Component:ZoneExhaustFan";
             if (std::any_of(
                     ZoneEquipConfig.begin(), ZoneEquipConfig.end(), [](DataZoneEquipment::EquipConfiguration const &e) { return e.IsControlled; })) {
@@ -10412,7 +10406,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
 
-            OneTimeFlag = false;
+            dataAirflowNetworkBalanceManager.ValidateExhaustFanInputOneTimeFlag = false;
             if (ErrorsFound) {
                 ShowFatalError(RoutineName + "Program terminates for preceding reason(s).");
             }

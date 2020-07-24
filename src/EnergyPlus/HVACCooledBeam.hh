@@ -141,6 +141,9 @@ namespace HVACCooledBeam {
         int ctrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
         int AirLoopNum;          // air loop index that terminal is attached to
         Real64 OutdoorAirFlowRate;  // zone outdoor air volume flow rate
+        bool MyEnvrnFlag;
+        bool MySizeFlag;
+        bool PlantLoopScanFlag;
 
         // Default Constructor
         CoolBeamData()
@@ -150,7 +153,7 @@ namespace HVACCooledBeam {
               InDiam(0.0), TWIn(0.0), TWOut(0.0), EnthWaterOut(0.0), BeamFlow(0.0), CoolWaterMassFlow(0.0), BeamCoolingEnergy(0.0),
               BeamCoolingRate(0.0), SupAirCoolingEnergy(0.0), SupAirCoolingRate(0.0), SupAirHeatingEnergy(0.0), SupAirHeatingRate(0.0), CWLoopNum(0),
               CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CBLoadReSimIndex(0), CBMassFlowReSimIndex(0), CBWaterOutletTempReSimIndex(0),
-              CtrlZoneNum(0), ctrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0)
+              CtrlZoneNum(0), ctrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0), MyEnvrnFlag(true), MySizeFlag(true), PlantLoopScanFlag(true)
         {
         }
 

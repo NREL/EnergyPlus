@@ -137,10 +137,11 @@ namespace UFADManager {
     Real64 ThickOccupiedSubzoneMin(0.2); // Minimum thickness of occupied subzone
     Real64 HeightIntMass(0.0);           // Height of internal mass surfaces, assumed vertical, cannot exceed ceiling height
     Real64 HeightIntMassDefault(2.0);    // Default height of internal mass surfaces
+    bool MyOneTimeFlag(true);
 
-    // SUBROUTINE SPECIFICATIONS:
-
-    // Functions
+    void clear_state() {
+        MyOneTimeFlag = true;
+    }
 
     void ManageUCSDUFModels(ConvectionCoefficientsData &dataConvectionCoefficients,
                             int const ZoneNum,      // index number for the specified zone
@@ -246,7 +247,6 @@ namespace UFADManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        static bool MyOneTimeFlag(true);
         static Array1D_bool MySizeFlag;
         static Real64 NumShadesDown(0.0);
         int UINum;             // index to underfloor interior zone model data
