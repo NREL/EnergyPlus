@@ -120,6 +120,11 @@ namespace ReportSizingManager {
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
     // Functions
+    bool MyOneTimeFlag(true);
+
+    void clear_state() {
+        MyOneTimeFlag = true;
+    }
 
     void ReportSizingOutput(std::string const &CompType,    // the type of the component
                             std::string const &CompName,    // the name of the component
@@ -163,7 +168,6 @@ namespace ReportSizingManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
 
         // Formats
         static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");

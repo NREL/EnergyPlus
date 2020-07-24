@@ -106,6 +106,7 @@ namespace UtilityRoutines {
 
     void clear_state()
     {
+        outputErrorHeader = true;
         appendPerfLog_headerRow = "";
         appendPerfLog_valuesRow = "";
     }

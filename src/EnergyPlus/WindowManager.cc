@@ -306,10 +306,8 @@ namespace WindowManager {
         Array1D<Real64> W3(3);
         Array1D<Real64> W21(3); // W1-W2, W3-W2, resp. (m)
         Array1D<Real64> W23(3);
-        static bool lSimpleGlazingSystem(false); // true if using simple glazing system block model
         static Real64 SimpleGlazingSHGC(0.0);    // value of SHGC for simple glazing system block model
         static Real64 SimpleGlazingU(0.0);       // value of U-factor for simple glazing system block model
-        static bool BGFlag(false);               // True if between-glass shade or blind
         static Real64 tmpTrans(0.0);             // solar transmittance calculated from spectral data
         static Real64 tmpTransVis(0.0);          // visible transmittance calculated from spectral data
         static Real64 tmpReflectSolBeamFront(0.0);
@@ -367,11 +365,11 @@ namespace WindowManager {
             BGBlind = false;
             ExtScreen = false;
             StormWinConst = false;
-            lSimpleGlazingSystem = false;
+            dataWindowManager.lSimpleGlazingSystem = false;
 
             if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowSimpleGlazing) {
                 // what if outside layer is shade, blind, or screen?
-                lSimpleGlazingSystem = true;
+                dataWindowManager.lSimpleGlazingSystem = true;
                 SimpleGlazingSHGC = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SimpleWindowSHGC;
                 SimpleGlazingU = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
             }
@@ -432,7 +430,7 @@ namespace WindowManager {
             ScreenOn = ExtScreen;
             BlindOn = IntBlind || ExtBlind || BGBlind;
             ShadeOn = IntShade || ExtShade || BGShade;
-            BGFlag = BGBlind || BGShade;
+            dataWindowManager.BGFlag = BGBlind || BGShade;
 
             // For construction with interior or exterior shade, get shade thermal absorptance (emissivity)
             // (accounting for inter-reflection with glazing) and correct the inside glass InsideAbsorpThermal
@@ -496,7 +494,7 @@ namespace WindowManager {
                 LayPtr = dataConstruction.Construct(ConstrNum).LayerPoint(LayNum);
                 SpecDataNum = dataMaterial.Material(LayPtr).GlassSpectralDataPtr;
                 if (SpecDataNum != 0) {
-                    if (!BGFlag) AllGlassIsSpectralAverage = false;
+                    if (!dataWindowManager.BGFlag) AllGlassIsSpectralAverage = false;
 
                     // Get the spectral data for the transmittance, front reflectance and
                     // back reflectance (all at normal incidence) for this layer.
@@ -508,14 +506,14 @@ namespace WindowManager {
                     for (ILam = 1; ILam <= numptDAT; ++ILam) {
                         dataWindowManager.wlt(IGlass, ILam) = SpectralData(SpecDataNum).WaveLength(ILam);
                         dataWindowManager.t(IGlass, ILam) = SpectralData(SpecDataNum).Trans(ILam);
-                        if ((IGlass == 1 || (IGlass == 2 && StormWinConst)) && (!BGFlag)) dataWindowManager.t(IGlass, ILam) *= dataMaterial.Material(LayPtr).GlassTransDirtFactor;
+                        if ((IGlass == 1 || (IGlass == 2 && StormWinConst)) && (!dataWindowManager.BGFlag)) dataWindowManager.t(IGlass, ILam) *= dataMaterial.Material(LayPtr).GlassTransDirtFactor;
                         dataWindowManager.rff(IGlass, ILam) = SpectralData(SpecDataNum).ReflFront(ILam);
                         dataWindowManager.rbb(IGlass, ILam) = SpectralData(SpecDataNum).ReflBack(ILam);
                     }
 
                     // TH 8/26/2010, CR 8206
                     // If there is spectral data for between-glass shades or blinds, calc the average spectral properties for use.
-                    if (BGFlag) {
+                    if (dataWindowManager.BGFlag) {
                         // 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
                         ShowWarningError("Window glazing material \"" + dataMaterial.Material(LayPtr).Name +
                                          "\" was defined with full spectral data and has been converted to average spectral data");
@@ -561,10 +559,10 @@ namespace WindowManager {
                     dataWindowManager.rbb(IGlass, 2) = dataMaterial.Material(LayPtr).ReflectVisBeamBack;
                 }
                 if (dataMaterial.Material(LayPtr).GlassSpectralAndAngle) {
-                    if (!BGFlag) AllGlassIsSpectralAverage = false;
+                    if (!dataWindowManager.BGFlag) AllGlassIsSpectralAverage = false;
                     numptDAT = dataWindowManager.wle.size();
                     dataWindowManager.numpt(IGlass) = numptDAT;
-                    if (BGFlag) {
+                    if (dataWindowManager.BGFlag) {
                         // 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
                         ShowWarningError("Window glazing material \"" + dataMaterial.Material(LayPtr).Name +
                                          "\" was defined with full spectral and angular data and has been converted to average spectral data");
@@ -636,7 +634,7 @@ namespace WindowManager {
                                               dataWindowManager.tPhi(IGlass, ILam),
                                               dataWindowManager.rfPhi(IGlass, ILam),
                                               dataWindowManager.rbPhi(IGlass, ILam),
-                                              lSimpleGlazingSystem,
+                                              dataWindowManager.lSimpleGlazingSystem,
                                               SimpleGlazingSHGC,
                                               SimpleGlazingU);
                         }
@@ -829,7 +827,7 @@ namespace WindowManager {
                                               dataWindowManager.tPhi(IGlass, ILam),
                                               dataWindowManager.rfPhi(IGlass, ILam),
                                               dataWindowManager.rbPhi(IGlass, ILam),
-                                              lSimpleGlazingSystem,
+                                              dataWindowManager.lSimpleGlazingSystem,
                                               SimpleGlazingSHGC,
                                               SimpleGlazingU);
                         }
@@ -2149,7 +2147,6 @@ namespace WindowManager {
         // New variables for thermochromic windows calc
         Real64 locTCSpecTemp;         // The temperature corresponding to the specified optical properties of the TC layer
         Real64 locTCLayerTemp;        // TC layer temperature at each time step. C
-        static bool locTCFlag(false); // True if this surface is a TC window
         static Array1D<Real64> deltaTemp(100, 0.0);
         int i;
         static Array1D_int iMinDT(1, 0);
@@ -2222,9 +2219,9 @@ namespace WindowManager {
             if (window.StormWinFlag > 0) ConstrNum = surface.StormWinConstruction;
 
             // Added for thermochromic windows
-            locTCFlag = (dataConstruction.Construct(ConstrNum).TCFlag == 1);
+            dataWindowManager.locTCFlag = (dataConstruction.Construct(ConstrNum).TCFlag == 1);
 
-            if (locTCFlag) {
+            if (dataWindowManager.locTCFlag) {
                 locTCSpecTemp = dataMaterial.Material(dataConstruction.Construct(ConstrNum).TCLayer).SpecTemp;
                 window.SpecTemp = locTCSpecTemp;
                 // Check to see whether needs to switch to a new TC window construction
@@ -2642,7 +2639,7 @@ namespace WindowManager {
             }
 
             // Added TH 12/23/2008 for thermochromic windows to save the current TC layer temperature
-            if (locTCFlag) {
+            if (dataWindowManager.locTCFlag) {
                 window.TCLayerTemp =
                     (dataWindowManager.thetas(2 * dataConstruction.Construct(ConstrNum).TCGlassID - 1) + dataWindowManager.thetas(2 * dataConstruction.Construct(ConstrNum).TCGlassID)) / 2 - dataWindowManager.TKelvin; // degree C
             }
@@ -6862,10 +6859,6 @@ namespace WindowManager {
         static Array1D_string const Roughness(6, {"VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"});
         static Array1D_string const GasTypeName({0, 4}, {"Custom", "Air", "Argon", "Krypton", "Xenon"});
 
-        static bool DoReport(false);
-        static bool HasWindows(false);
-        static bool HasComplexWindows(false);
-        static bool HasEQLWindows(false); // equivalent layer window defined
         static Real64 TempVar(0.0);       // just temporary usage for complex fenestration
 
         int ThisNum;
@@ -6897,7 +6890,7 @@ namespace WindowManager {
         std::string GapVentType;
 
 
-        ScanForReports("Constructions", DoReport, "Constructions");
+        ScanForReports("Constructions", dataWindowManager.DoReport, "Constructions");
 
         //  DO ThisNum=1,TotConstructs
         //    IF (.not. Construct(ThisNum)%TypeIsWindow) CYCLE
@@ -6905,11 +6898,11 @@ namespace WindowManager {
         //    EXIT
         //  ENDDO
 
-        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.TypeIsWindow; })) HasWindows = true;
+        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.TypeIsWindow; })) dataWindowManager.HasWindows = true;
         if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.WindowTypeBSDF; }))
-            HasComplexWindows = true; // Yes, this is a bit different than actually using them.
+            dataWindowManager.HasComplexWindows = true; // Yes, this is a bit different than actually using them.
         if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.WindowTypeEQL; }))
-            HasEQLWindows = true; // for reporting purpose only
+            dataWindowManager.HasEQLWindows = true; // for reporting purpose only
 
         //  DO ThisNum=1,TotSurfaces
         //    SurfConstr = Surface(ThisNum)%Construction
@@ -6921,7 +6914,7 @@ namespace WindowManager {
         //    END IF
         //  ENDDO
 
-        if (DoReport && (HasWindows || HasComplexWindows || HasEQLWindows)) {
+        if (dataWindowManager.DoReport && (dataWindowManager.HasWindows || dataWindowManager.HasComplexWindows || dataWindowManager.HasEQLWindows)) {
             //                                      Write Descriptions
 
             print(ioFiles.eio, "{}\n", "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},SHGC,Solar "
@@ -6946,10 +6939,10 @@ namespace WindowManager {
                                                      "{m},Slat Angle {deg},Slat Beam Solar Transmittance,Slat Beam Solar Front Reflectance,Blind To "
                                                      "Glass Distance {m}");
 
-            if (HasComplexWindows)
+            if (dataWindowManager.HasComplexWindows)
                 print(ioFiles.eio, "{}\n", "! <WindowConstruction:Complex>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC");
 
-            if (HasEQLWindows)
+            if (dataWindowManager.HasEQLWindows)
                 print(ioFiles.eio, "{}\n", "! <Construction:WindowEquivalentLayer>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC, "
                                                      "Solar Transmittance at Normal Incidence");
             if (W5GlsMatEQL > 0)
@@ -7284,7 +7277,7 @@ namespace WindowManager {
                 }
             }
 
-        } else if (HasWindows) {
+        } else if (dataWindowManager.HasWindows) {
 
             for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
 
@@ -8595,7 +8588,7 @@ namespace WindowManager {
         // Overwriting the default values
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         int NumAlphas;                  // Number of Alphas for each GetobjectItem call
         int NumNumbers;                 // Number of Numbers for each GetobjectItem call
         int NumArgs;
@@ -8603,17 +8596,16 @@ namespace WindowManager {
         Array1D_string cAlphaArgs;    // Alpha input items for object
         Array1D<Real64> rNumericArgs; // Numeric input items for object
 
-        static bool RunMeOnceFlag(false); // This subroutine only needs to be run once
         std::string cCurrentModuleObject;
         std::string cSolarSpectrum;
         std::string cVisibleSpectrum;
-        static int iSolarSpectrum(0);
-        static int iVisibleSpectrum(0);
-        static int NumSiteSpectrum(0);
+        int iSolarSpectrum(0);
+        int iVisibleSpectrum(0);
+        int NumSiteSpectrum(0);
         int Loop;
         int iTmp;
 
-        if (RunMeOnceFlag) return;
+        if (dataWindowManager.RunMeOnceFlag) return;
 
         // Step 1 - check whether there is custom solar or visible spectrum
         cCurrentModuleObject = "Site:SolarAndVisibleSpectrum";
@@ -8621,7 +8613,7 @@ namespace WindowManager {
 
         // no custom spectrum data, done!
         if (NumSiteSpectrum == 0) {
-            RunMeOnceFlag = true;
+            dataWindowManager.RunMeOnceFlag = true;
             return;
         }
 
@@ -8640,7 +8632,7 @@ namespace WindowManager {
 
             // use default spectrum data, done!
             if (UtilityRoutines::SameString(cAlphaArgs(2), "Default")) {
-                RunMeOnceFlag = true;
+                dataWindowManager.RunMeOnceFlag = true;
                 return;
             }
 
@@ -8716,7 +8708,7 @@ namespace WindowManager {
             ShowFatalError("Errors found in processing input for user-defined solar/visible spectrum");
         }
 
-        RunMeOnceFlag = true;
+        dataWindowManager.RunMeOnceFlag = true;
     }
 
     //*****************************************************************************************

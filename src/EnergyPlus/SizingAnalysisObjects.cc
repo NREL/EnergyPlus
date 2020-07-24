@@ -64,6 +64,13 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
+
+    bool eioHeaderDoneOnce(false);
+
+    void SizingAnalysisObjects_clear_state() {
+        eioHeaderDoneOnce = false;
+    }
+
 ZoneTimestepObject::ZoneTimestepObject()
 {
     kindOfSim = 0;
@@ -463,7 +470,6 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(IOFiles &ioFiles, int const
     std::string chSetSizes;
     std::string chDemandTrapUsed;
     bool changedByDemand(false);
-    static bool eioHeaderDoneOnce(false);
     bool nullStampProblem;
 
     // first make sure we have valid time stamps to work with

@@ -153,6 +153,9 @@ namespace UnitHeater {
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool InitUnitHeaterOneTimeFlag(true);
         bool GetUnitHeaterInputFlag(true);
+        bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
+        bool SetMassFlowRateToZero(false); // TRUE when mass flow rates need to be set to zero
+
     } // namespace
 
     bool HCoilOn;       // TRUE if the heating coil (gas or electric especially) should be running
@@ -180,6 +183,8 @@ namespace UnitHeater {
         UnitHeatNumericFields.deallocate();
         InitUnitHeaterOneTimeFlag = true;
         GetUnitHeaterInputFlag = true;
+        ZoneEquipmentListChecked = false;
+        SetMassFlowRateToZero = false;
     }
 
     void SimUnitHeater(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
@@ -749,7 +754,6 @@ namespace UnitHeater {
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyPlantScanFlag;
         static Array1D_bool MyZoneEqFlag;            // used to set up zone equipment availability managers
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
         int HotConNode; // hot water control node number in unit heater loop
         int InNode;     // inlet node number in unit heater loop
@@ -759,7 +763,6 @@ namespace UnitHeater {
         Real64 SteamDensity;
         Real64 rho; // local fluid density
         bool errFlag;
-        static bool SetMassFlowRateToZero(false); // TRUE when mass flow rates need to be set to zero
         // FLOW:
 
         // Do the one time initializations

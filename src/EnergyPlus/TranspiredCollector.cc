@@ -139,6 +139,8 @@ namespace TranspiredCollector {
 
     // Object Data
     Array1D<UTSCDataStruct> UTSC;
+    bool MyOneTimeFlag(true);
+    bool MySetPointCheckFlag(true);
 
     // Functions
     void clear_state()
@@ -146,6 +148,8 @@ namespace TranspiredCollector {
         NumUTSC = 0;
         GetInputFlag = true;
         UTSC.deallocate();
+        MyOneTimeFlag = true;
+        MySetPointCheckFlag = true;
     }
 
     void SimTranspiredCollector(ConvectionCoefficientsData &dataConvectionCoefficients,
@@ -290,7 +294,7 @@ namespace TranspiredCollector {
         int MaxNumNumbers;              // argumenet for call to GetObjectDefMaxArgs
         int Dummy;                      // argumenet for call to GetObjectDefMaxArgs
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int Found;
         int AlphaOffset; // local temp var
         std::string Roughness;
@@ -771,9 +775,7 @@ namespace TranspiredCollector {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
         int UTSCUnitNum;
-        static bool MySetPointCheckFlag(true);
         static Array1D_bool MyEnvrnFlag;
         int ControlNode;
         // unused  INTEGER             :: InletNode

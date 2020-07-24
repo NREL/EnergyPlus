@@ -125,6 +125,9 @@ namespace SizingManager {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumAirLoops(0);
+    bool ReportZoneSizingMyOneTimeFlag(true);
+    bool ReportSysSizingMyOneTimeFlag(true);
+    bool runZeroingOnce(true);
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
 
@@ -134,6 +137,9 @@ namespace SizingManager {
     void clear_state()
     {
         NumAirLoops = 0;
+        ReportZoneSizingMyOneTimeFlag = true;
+        ReportSysSizingMyOneTimeFlag = true;
+        runZeroingOnce = true;
     }
 
     void ManageSizing(EnergyPlusData &state)
@@ -202,7 +208,6 @@ namespace SizingManager {
         int NumSizingPeriodsPerformed;
         int numZoneSizeIter; // number of times to repeat zone sizing calcs. 1 normal, 2 load component reporting
         int iZoneCalcIter;   // index for repeating the zone sizing calcs
-        static bool runZeroingOnce(true);
         bool isUserReqCompLoadReport;
         Real64 DOASHeatGainRateAtHtPk(0.0); // zone heat gain rate from the DOAS at the heating peak [W]
         Real64 DOASHeatGainRateAtClPk(0.0); // zone heat gain rate from the DOAS at the cooling peak [W]
@@ -3906,11 +3911,8 @@ namespace SizingManager {
         using DataEnvironment::EndMonthFlag;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool Available(false); // an environment is available to process
 
-        //  return  ! remove comment to do "old way"
-
-        Available = true;
+        bool Available = true;
 
         CurOverallSimDay = 0;
         while (Available) { // do for each environment
@@ -4024,15 +4026,14 @@ namespace SizingManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
 
-        if (MyOneTimeFlag) {
+        if (ReportZoneSizingMyOneTimeFlag) {
             static constexpr auto Format_990("! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "
                                                   "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
                                                   "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
                                                   "Calc DOAS Heat Addition Rate {W}");
             print(ioFiles.eio, "{}\n", Format_990);
-            MyOneTimeFlag = false;
+            ReportZoneSizingMyOneTimeFlag = false;
         }
 
         static constexpr auto Format_991(" Zone Sizing Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
@@ -4086,13 +4087,11 @@ namespace SizingManager {
     {
         using General::RoundSigDigits;
 
-        static bool MyOneTimeFlag(true);
-
-        if (MyOneTimeFlag) {
+        if (ReportSysSizingMyOneTimeFlag) {
             print(ioFiles.eio, "{}\n",
                        "! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air "
                        "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak");
-            MyOneTimeFlag = false;
+            ReportSysSizingMyOneTimeFlag = false;
         }
         std::string dateHrMin = DesDayDate + " " + TimeIndexToHrMinString(TimeStepIndex);
         print(ioFiles.eio,

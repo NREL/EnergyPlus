@@ -793,18 +793,10 @@ namespace AirLoopHVACDOAS {
         int LoopOA;
         int NodeNum;
         Real64 SchAvailValue;
-        static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-        static bool MyOneTimeFlag(true); // Initialization flag
         std::string RoutineName = "AirLoopDOAS::initAirLoopDOAS";
         bool ErrorsFound = false;
 
-        if (MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(state.dataAirLoopHVACDOAS.numAirLoopDOAS);
-            MyEnvrnFlag = true;
-            MyOneTimeFlag = false;
-        }
-
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag(this->m_AirLoopDOASNum + 1)) {
+        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
             Real64 rho;
             DataSizing::CurSysNum = this->m_OASystemNum;
             for (int CompNum = 1; CompNum <= DataAirLoop::OutsideAirSys(this->m_OASystemNum).NumComponents; ++CompNum) {
@@ -867,14 +859,14 @@ namespace AirLoopHVACDOAS {
                 }
             }
 
-            MyEnvrnFlag(this->m_AirLoopDOASNum + 1) = false;
+            this->MyEnvrnFlag = false;
             if (ErrorsFound) {
                 ShowFatalError("initAirLoopDOAS: Previous errors cause termination.");
             }
         }
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(this->m_AirLoopDOASNum + 1) = true;
+            this->MyEnvrnFlag = true;
         }
 
         this->SumMassFlowRate = 0.0;

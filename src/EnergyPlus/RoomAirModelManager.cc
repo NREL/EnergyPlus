@@ -125,6 +125,7 @@ namespace RoomAirModelManager {
 
     bool GetUCSDDVDataFlag(true); // UCSD
     bool GetAirModelData(true);   // Used to "get" all air model data
+    bool MyOneTimeFlag(true);
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -136,6 +137,7 @@ namespace RoomAirModelManager {
     {
         GetUCSDDVDataFlag = true;
         GetAirModelData = true;
+        MyOneTimeFlag = true;
     }
 
     void ManageAirModel(EnergyPlusData &state, int &ZoneNum)
@@ -1935,7 +1937,6 @@ namespace RoomAirModelManager {
         Real64 AinCV;
         int AirflowNetworkSurfPtr;
         int NSides;
-        static bool MyOneTimeFlag(true);
         static Array1D_bool MyEnvrnFlag;
 
         static int CompNum(0);  // AirflowNetwork Component number

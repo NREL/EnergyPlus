@@ -102,8 +102,6 @@ namespace WindTurbine {
 
     static std::string const BlankString;
 
-    // Functions
-
     void SimWindTurbine(EnergyPlusData &state,
                         int const EP_UNUSED(GeneratorType), // Type of Generator
                         std::string const &GeneratorName,   // User specified name of Generator
@@ -127,13 +125,12 @@ namespace WindTurbine {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true);
         int WindTurbineNum;
         // Obtains and allocates heat balance related parameters from input
 
-        if (GetInputFlag) {
+        if (state.dataWindTurbine.GetInputFlag) {
             GetWindTurbineInput(state.dataWindTurbine);
-            GetInputFlag = false;
+            state.dataWindTurbine.GetInputFlag = false;
         }
 
         if (GeneratorIndex == 0) {
@@ -212,7 +209,7 @@ namespace WindTurbine {
         Real64 const DefaultH(50.0);       // Default of height for local wind speed
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         int WindTurbineNum;             // Wind turbine number
         int NumAlphas;                  // Number of Alphas for each GetobjectItem call
         int NumNumbers;                 // Number of Numbers for each GetobjectItem call
@@ -636,7 +633,6 @@ namespace WindTurbine {
 
         static char const TabChr('\t'); // Tab character
 
-        static bool MyOneTimeFlag(true);
         int mon;                      // loop counter
         bool wsStatFound;             // logical noting that wind stats were found
         bool warningShown;            // true if the <365 warning has already been shown
@@ -645,7 +641,7 @@ namespace WindTurbine {
         Real64 LocalTMYWS;              // Annual average wind speed at the rotor height
 
         // Estimate average annual wind speed once
-        if (MyOneTimeFlag) {
+        if (state.dataWindTurbine.MyOneTimeFlag) {
             wsStatFound = false;
 
             if (FileSystem::fileExists(state.files.inStatFileName.fileName)) {
@@ -704,7 +700,7 @@ namespace WindTurbine {
                 ShowWarningError("InitWindTurbine: stat file missing. TMY Wind Speed adjusted at the height is used.");
             }
 
-            MyOneTimeFlag = false;
+            state.dataWindTurbine.MyOneTimeFlag = false;
         }
 
         state.dataWindTurbine.WindTurbineSys(WindTurbineNum).AnnualTMYWS = AnnualTMYWS;

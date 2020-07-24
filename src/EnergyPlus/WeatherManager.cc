@@ -218,6 +218,10 @@ namespace WeatherManager {
         bool GetBranchInputOneTimeFlag(true);
         bool GetEnvironmentFirstCall(true);
         bool PrntEnvHeaders(true);
+        bool FirstCall(true);                 // Some things should only be done once
+        bool WaterMainsParameterReport(true); // should only be done once
+        bool PrintEnvrnStamp(false); // Set to true when the environment header should be printed
+        bool PrintDDHeader;
     } // namespace
     Real64 WeatherFileLatitude(0.0);
     Real64 WeatherFileLongitude(0.0);
@@ -554,7 +558,10 @@ namespace WeatherManager {
         DataPeriods.deallocate();
 
         underwaterBoundaries.clear();
-
+        FirstCall = true;
+        WaterMainsParameterReport = true;
+        PrintEnvrnStamp = false;
+        PrintDDHeader = true; // did not have an initialization in static function scope
     } // clear_state, for unit tests
 
     void ManageWeather(IOFiles &ioFiles)
@@ -594,8 +601,6 @@ namespace WeatherManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        static bool PrintEnvrnStamp(false); // Set to true when the environment header should be printed
 
         // FLOW:
 
@@ -2107,8 +2112,6 @@ namespace WeatherManager {
         int Loop;
         int FirstSimDayofYear; // Variable which tells when to skip the day in a multi year simulation.
 
-        static bool FirstCall(true);                 // Some things should only be done once
-        static bool WaterMainsParameterReport(true); // should only be done once
         //  LOGICAL, SAVE :: SetYear=.TRUE.
         int JDay5Start;
         int JDay5End;
@@ -4235,7 +4238,6 @@ namespace WeatherManager {
         Real64 WBRange;       // working copy of wet-bulb daily range. C (or 1 if input is difference)
 
         Array1D_int Date0(8);
-        static bool PrintDDHeader;
         std::string AlpUseRain;
         std::string AlpUseSnow;
         bool ConstantHumidityRatio;
@@ -5850,7 +5852,7 @@ namespace WeatherManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Env; // Environment Loop Counter
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int RPD1;
         int RPD2;
 

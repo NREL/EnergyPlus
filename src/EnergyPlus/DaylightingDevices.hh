@@ -104,6 +104,8 @@ namespace DaylightingDevices {
 
     void FigureTDDZoneGains();
 
+    void clear_state();
+
 } // namespace DaylightingDevices
 
 } // namespace EnergyPlus

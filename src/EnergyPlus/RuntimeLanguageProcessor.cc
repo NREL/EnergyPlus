@@ -171,6 +171,7 @@ namespace RuntimeLanguageProcessor {
     std::unordered_map<std::string, std::string> RuntimeReportVarUniqueNames;
 
     // MODULE SUBROUTINES:
+    bool WriteTraceMyOneTimeFlag(false);
 
     // Functions
     void clear_state()
@@ -208,6 +209,7 @@ namespace RuntimeLanguageProcessor {
         WarmUpFlagNum = 0;
         ErlStackUniqueNames.clear();
         RuntimeReportVarUniqueNames.clear();
+        WriteTraceMyOneTimeFlag = false;
     }
 
     void InitializeRuntimeLanguage(IOFiles &ioFiles)
@@ -1052,7 +1054,6 @@ namespace RuntimeLanguageProcessor {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(false);
         int LineNum;
         std::string NameString;
         std::string LineNumString;
@@ -1069,10 +1070,10 @@ namespace RuntimeLanguageProcessor {
             if (ReturnValue.Type != ValueError) return;
         }
 
-        if (!MyOneTimeFlag) {
+        if (!WriteTraceMyOneTimeFlag) {
             print(ioFiles.edd, "****  Begin EMS Language Processor Error and Trace Output  *** \n");
             print(ioFiles.edd, "<Erl program name, line #, line text, result, occurrence timing information ... >\n");
-            MyOneTimeFlag = true;
+            WriteTraceMyOneTimeFlag = true;
         }
         // if have not return'd yet then write out full trace
 
@@ -2485,7 +2486,7 @@ namespace RuntimeLanguageProcessor {
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int VariableNum(0); // temporary
         int RuntimeReportVarNum;
         // unused0909  INTEGER    :: Pos

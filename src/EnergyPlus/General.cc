@@ -120,10 +120,36 @@ namespace General {
     // PUBLIC  ErfFunction
 
     // Functions
-    static bool GetReportInput(true);
-
+    bool GetReportInput(true);
+    bool SurfVert(false);
+    bool SurfDet(false);
+    bool SurfDetWVert(false);
+    bool DXFReport(false);
+    bool DXFWFReport(false);
+    bool VRMLReport(false);
+    bool CostInfo(false);
+    bool ViewFactorInfo(false);
+    bool Constructions(false);
+    bool Materials(false);
+    bool LineRpt(false);
+    bool VarDict(false);
+    bool EMSoutput(false);
+    
     void clear_state() {
         GetReportInput = true;
+        SurfVert = false;
+        SurfDet = false;
+        SurfDetWVert = false;
+        DXFReport = false;
+        DXFWFReport = false;
+        VRMLReport = false;
+        CostInfo = false;
+        ViewFactorInfo = false;
+        Constructions = false;
+        Materials = false;
+        LineRpt = false;
+        VarDict = false;
+        EMSoutput = false;
     }
 
     void SolveRoot(Real64 const Eps, // required absolute accuracy
@@ -3200,27 +3226,14 @@ namespace General {
         int NumNames;
         int NumNumbers;
         int IOStat;
-        static bool SurfVert(false);
-        static bool SurfDet(false);
-        static bool SurfDetWVert(false);
-        static bool DXFReport(false);
         static std::string DXFOption1;
         static std::string DXFOption2;
-        static bool DXFWFReport(false);
         static std::string DXFWFOption1;
         static std::string DXFWFOption2;
-        static bool VRMLReport(false);
         static std::string VRMLOption1;
         static std::string VRMLOption2;
-        static bool CostInfo(false);
-        static bool ViewFactorInfo(false);
         static std::string ViewRptOption1;
-        static bool Constructions(false);
-        static bool Materials(false);
-        static bool LineRpt(false);
         static std::string LineRptOption1;
-        static bool VarDict(false);
-        static bool EMSoutput(false);
         static std::string VarDictOption1;
         static std::string VarDictOption2;
         //  LOGICAL,SAVE :: SchRpt = .FALSE.

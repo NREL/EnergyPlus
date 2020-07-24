@@ -105,6 +105,7 @@ namespace FuelCellElectricGenerator {
     bool getFuelCellInputFlag(true);
     Array1D_bool CheckEquipName;
     Array1D<FCDataStruct> FuelCell; // dimension to number of machines
+    bool MyEnvrnFlag(true);
 
     void clear_state()
     {
@@ -112,6 +113,7 @@ namespace FuelCellElectricGenerator {
         getFuelCellInputFlag = true;
         CheckEquipName.deallocate();
         FuelCell.deallocate();
+        MyEnvrnFlag = true;
     }
 
     PlantComponent *FCDataStruct::factory(IOFiles &ioFiles, std::string const &objectName)
@@ -3319,8 +3321,6 @@ namespace FuelCellElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // This routine adds up the various skin losses and then
         //  sets the values in the ZoneIntGain structure
-
-        static bool MyEnvrnFlag(true);
 
         if (NumFuelCellGenerators == 0) return;
 

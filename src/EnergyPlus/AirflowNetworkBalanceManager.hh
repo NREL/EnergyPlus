@@ -274,6 +274,14 @@ namespace AirflowNetworkBalanceManager {
         Array1D<Real64> LoopOnOffFanRunTimeFraction;
         Array1D<bool> LoopOnOffFlag;
 
+        bool ValidateExhaustFanInputOneTimeFlag = true;
+        bool initializeOneTimeFlag = true;
+        bool initializeMyEnvrnFlag = true;
+        bool CalcAirflowNetworkAirBalanceOneTimeFlag = true;
+        bool CalcAirflowNetworkAirBalanceErrorsFound = false;
+        bool UpdateAirflowNetworkMyOneTimeFlag = true;
+        bool UpdateAirflowNetworkMyOneTimeFlag1 = true;
+
         // Object Data
         Array1D<AirflowNetworkBalanceManager::AirflowNetworkReportVars> AirflowNetworkZnRpt;
         std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
@@ -340,6 +348,14 @@ namespace AirflowNetworkBalanceManager {
             LoopOnOffFanRunTimeFraction.deallocate();
             LoopOnOffFlag.deallocate();
             UniqueAirflowNetworkSurfaceName.clear();
+
+            ValidateExhaustFanInputOneTimeFlag = true;
+            initializeOneTimeFlag = true;
+            initializeMyEnvrnFlag = true;
+            CalcAirflowNetworkAirBalanceOneTimeFlag = true;
+            CalcAirflowNetworkAirBalanceErrorsFound = false;
+            UpdateAirflowNetworkMyOneTimeFlag = true;
+            UpdateAirflowNetworkMyOneTimeFlag1 = true;
 
             exchangeData.deallocate();
             multiExchangeData.deallocate();

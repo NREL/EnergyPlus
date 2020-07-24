@@ -190,10 +190,6 @@ namespace HeatBalanceAirManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        /////////// hoisted into namespace changed to ManageAirHeatBalanceGetInputFlag////////////
-        // static bool ManageAirHeatBalanceGetInputFlag( true );
-        /////////////////////////////////////////////
-        // FLOW:
 
         // Obtains and Allocates heat balance related parameters from input file
         if (ManageAirHeatBalanceGetInputFlag) {
@@ -248,7 +244,7 @@ namespace HeatBalanceAirManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         // FLOW:
 

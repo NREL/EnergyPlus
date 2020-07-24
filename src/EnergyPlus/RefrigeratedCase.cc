@@ -426,6 +426,11 @@ namespace RefrigeratedCase {
     Array1D<CoilCreditData> CoilSysCredit;
     Array1D<CaseWIZoneReportData> CaseWIZoneReport;
 
+    bool MyOneTimeFlag(true); // flag to skip first pass on next begin environment flag
+    bool InitRefrigerationMyBeginEnvrnFlag(true);
+    bool InitRefrigerationPlantConnectionsMyBeginEnvrnFlag(true);
+    bool FigureRefrigerationZoneGainsMyEnvrnFlag(true);
+
     void clear_state()
     {
         NumSimulationCondAir = 0;
@@ -506,6 +511,11 @@ namespace RefrigeratedCase {
         AirChillerSet.deallocate();
         CoilSysCredit.deallocate();
         CaseWIZoneReport.deallocate();
+
+        MyOneTimeFlag = true;
+        InitRefrigerationMyBeginEnvrnFlag = true;
+        InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = true;
+        FigureRefrigerationZoneGainsMyEnvrnFlag = true;
     }
 
     void ManageRefrigeratedCaseRacks(EnergyPlusData &state)
@@ -532,8 +542,6 @@ namespace RefrigeratedCase {
         // using manufacturer's data and rated performance curves.
         // Inter-system heat transfer via subcoolers and cascade condensers can be accommodated.
         // Secondary refrigeration cycles are also available.
-
-        static bool MyOneTimeFlag(true); // flag to skip first pass on next begin environment flag
 
         if (!ManageRefrigeration) return;
 
@@ -8884,7 +8892,6 @@ namespace RefrigeratedCase {
         // addition/subtraction to/from each accumulating variable.  If the time step is repeated,
         // this most recent addition/subtraction is reversed before the rest of the refrigeration simulation begins.
 
-        static bool MyBeginEnvrnFlag(true);
         // Used to adjust accumulative variables when time step is repeated
         static Real64 MyCurrentTimeSaved(0.0);   // Used to determine whether the zone time step is a repetition
         static Real64 MyStepStartTimeSaved(0.0); // Used to determine whether the system time step is a repetition
@@ -8998,7 +9005,7 @@ namespace RefrigeratedCase {
         }
 
         // Accumulative and carry-over variables are not zeroed at start of each time step, only at begining of environment
-        if (DataGlobals::BeginEnvrnFlag && MyBeginEnvrnFlag) {
+        if (DataGlobals::BeginEnvrnFlag && InitRefrigerationMyBeginEnvrnFlag) {
             if (NumSimulationCases > 0) {
                 for (int i = RefrigCase.l(), e = RefrigCase.u(); i <= e; ++i) {
                     RefrigCase(i).reset_init_accum();
@@ -9058,11 +9065,11 @@ namespace RefrigeratedCase {
             }
 
             if (DataGlobals::NumOfTimeStepInHour > 0.0) TimeStepFraction = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
-            MyBeginEnvrnFlag = false;
+            InitRefrigerationMyBeginEnvrnFlag = false;
 
         } // ( DataGlobals::BeginEnvrnFlag && MyBeginEnvrnFlag )
 
-        if (!DataGlobals::BeginEnvrnFlag) MyBeginEnvrnFlag = true;
+        if (!DataGlobals::BeginEnvrnFlag) InitRefrigerationMyBeginEnvrnFlag = true;
 
         // Avoid multiplying accumulation if go through zone/load time step more than once.
         if (!DataGlobals::WarmupFlag) { // because no accumulation is done during warm up
@@ -9225,7 +9232,6 @@ namespace RefrigeratedCase {
         // are entered from plant, for water cooled Condensers and Refrigeration Racks
 
         static std::string const RoutineName("InitRefrigerationPlantConnections");
-        static bool MyBeginEnvrnFlag(true);
 
         // initialize plant topology information, if applicable
         if (MyReferPlantScanFlag && allocated(DataPlant::PlantLoop)) {
@@ -9300,7 +9306,7 @@ namespace RefrigeratedCase {
             MyReferPlantScanFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && MyBeginEnvrnFlag) {
+        if (DataGlobals::BeginEnvrnFlag && InitRefrigerationPlantConnectionsMyBeginEnvrnFlag) {
 
             // do plant inits, if applicable
             if (!MyReferPlantScanFlag) {
@@ -9351,11 +9357,11 @@ namespace RefrigeratedCase {
                                        RefrigRack(RefCompRackLoop).PlantCompNum);
                 }
             }
-            MyBeginEnvrnFlag = false;
+            InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = false;
 
         } //(DataGlobals::BeginEnvrnFlag .AND. MyBeginEnvrnFlag)
 
-        if (!DataGlobals::BeginEnvrnFlag) MyBeginEnvrnFlag = true;
+        if (!DataGlobals::BeginEnvrnFlag) InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = true;
     }
 
     void RefrigRackData::CalcRackSystem()
@@ -14836,11 +14842,9 @@ namespace RefrigeratedCase {
         // PURPOSE OF THIS SUBROUTINE:
         // initialize zone gain terms at begin environment
 
-        static bool MyEnvrnFlag(true);
-
         CheckRefrigerationInput(state);
 
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
+        if (DataGlobals::BeginEnvrnFlag && FigureRefrigerationZoneGainsMyEnvrnFlag) {
 
             if (DataHeatBalance::NumRefrigSystems > 0) {
                 for (auto &e : System) {
@@ -14885,9 +14889,9 @@ namespace RefrigeratedCase {
                     e.LatHVACCreditRate = 0.0;
                 }
             }
-            MyEnvrnFlag = false;
+            FigureRefrigerationZoneGainsMyEnvrnFlag = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlag = true;
+        if (!DataGlobals::BeginEnvrnFlag) FigureRefrigerationZoneGainsMyEnvrnFlag = true;
     }
 
     void ZeroHVACValues()

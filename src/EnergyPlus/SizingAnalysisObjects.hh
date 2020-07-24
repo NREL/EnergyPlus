@@ -58,6 +58,8 @@
 
 namespace EnergyPlus {
 
+    void SizingAnalysisObjects_clear_state();
+
 class SystemTimestepObject
 {
 public:

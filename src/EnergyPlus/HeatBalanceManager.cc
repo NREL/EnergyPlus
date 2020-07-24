@@ -197,6 +197,12 @@ namespace HeatBalanceManager {
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool ManageHeatBalanceGetInputFlag(true);
+        bool DoReport(false);
+        bool ChangeSet(true); // Toggle for checking storm windows
+        bool FirstWarmupWrite(true);
+        bool WarmupConvergenceWarning(false);
+        bool SizingWarmupConvergenceWarning(false);
+        bool ReportWarmupConvergenceFirstWarmupWrite(true);
     } // namespace
 
     // Real Variables for the Heat Balance Simulation
@@ -281,6 +287,13 @@ namespace HeatBalanceManager {
         WarmupConvergenceValues.deallocate();
         UniqueMaterialNames.clear();
         UniqueConstructNames.clear();
+        surfaceOctree = SurfaceOctreeCube();
+        DoReport = false;
+        ChangeSet = true;
+        FirstWarmupWrite = true;
+        WarmupConvergenceWarning = false;
+        SizingWarmupConvergenceWarning = false;
+        ReportWarmupConvergenceFirstWarmupWrite = true;
     }
 
     void ManageHeatBalance(EnergyPlusData &state)
@@ -327,9 +340,6 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //////////// hoisted into namespace changed ManageHeatBalanceGetInputFlag////////////
-        // static bool GetInputFlag( true );
-        ////////////////////////////////////////////////
 
         // FLOW:
 
@@ -441,7 +451,7 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         bool ValidSimulationWithNoZones;
 
         // FLOW:
@@ -1520,7 +1530,6 @@ namespace HeatBalanceManager {
         Real64 ReflectivityVis;   // Glass reflectivity, visible
         Real64 TransmittivitySol; // Glass transmittivity, solar
         Real64 TransmittivityVis; // Glass transmittivity, visible
-        static bool DoReport(false);
         Real64 DenomRGas;   // Denominator for WindowGas calculations of NominalR
         Real64 Openness;    // insect screen openness fraction = (1-d/s)^2
         Real64 minAngValue; // minimum value of angle
@@ -5182,7 +5191,6 @@ namespace HeatBalanceManager {
         int StormWinNum; // Number of StormWindow object
         int SurfNum;     // Surface number
         int ZoneNum;
-        static bool ChangeSet(true); // Toggle for checking storm windows
 
         if (BeginSimFlag) {
             AllocateHeatBalArrays(); // Allocate the Module Arrays
@@ -5510,8 +5518,6 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
         int SurfNum;
-        static bool FirstWarmupWrite(true);
-
 
         // FLOW:
 
@@ -5607,8 +5613,6 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
-        static bool WarmupConvergenceWarning(false);
-        static bool SizingWarmupConvergenceWarning(false);
         bool ConvergenceChecksFailed;
 
         // Convergence criteria for warmup days:
@@ -5780,7 +5784,6 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
-        static bool FirstWarmupWrite(true);
         Real64 AverageZoneTemp;
         Real64 AverageZoneLoad;
         Real64 StdDevZoneTemp;
@@ -5797,9 +5800,9 @@ namespace HeatBalanceManager {
 
         if (!WarmupFlag) { // Report out average/std dev
             // Write Warmup Convervence Information to the initialization output file
-            if (FirstWarmupWrite && NumOfZones > 0) {
+            if (ReportWarmupConvergenceFirstWarmupWrite && NumOfZones > 0) {
                 print(ioFiles.eio, Format_730);
-                FirstWarmupWrite = false;
+                ReportWarmupConvergenceFirstWarmupWrite = false;
             }
 
             TempZoneRptStdDev = 0.0;
@@ -7900,7 +7903,7 @@ namespace HeatBalanceManager {
         static Real64 Ros(0.0);            // theraml resistance of exterior film coefficient under summer conditions (m2-K/W)
         static Real64 InflowFraction(0.0); // inward flowing fraction for SHGC, intermediate value non dimensional
         static Real64 SolarAbsorb(0.0);    // solar aborptance
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         static Real64 TsolLowSide(0.0);      // intermediate solar transmission for interpolating
         static Real64 TsolHiSide(0.0);       // intermediate solar transmission for interpolating
         static Real64 DeltaSHGCandTsol(0.0); // intermediate difference
@@ -9237,15 +9240,15 @@ namespace HeatBalanceManager {
 
     void InitConductionTransferFunctions(IOFiles &ioFiles)
     {
-        static bool ErrorsFound(false); // Flag for input error condition
+        bool ErrorsFound(false); // Flag for input error condition
         bool DoCTFErrorReport(false);
         for (auto & construction : dataConstruction.Construct) {
             construction.calculateTransferFunction(ErrorsFound, DoCTFErrorReport);
         }
 
-        bool DoReport;
-        General::ScanForReports("Constructions", DoReport, "Constructions");
-        if (DoReport || DoCTFErrorReport) {
+        bool InitCTFDoReport;
+        General::ScanForReports("Constructions", InitCTFDoReport, "Constructions");
+        if (InitCTFDoReport || DoCTFErrorReport) {
             print(ioFiles.eio,
                   "! <Construction CTF>,Construction Name,Index,#Layers,#CTFs,Time Step {{hours}},ThermalConductance "
                   "{{w/m2-K}},OuterThermalAbsorptance,InnerThermalAbsorptance,OuterSolarAbsorptance,InnerSolarAbsorptance,Roughness\n");

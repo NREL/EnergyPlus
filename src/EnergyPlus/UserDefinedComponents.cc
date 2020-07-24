@@ -113,6 +113,9 @@ namespace UserDefinedComponents {
 
     void clear_state()
     {
+        GetInput = true;
+        GetPlantCompInput = true;
+
         NumUserPlantComps = 0;
         NumUserCoils = 0;
         NumUserZoneAir = 0;

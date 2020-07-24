@@ -96,6 +96,7 @@ void EnergyPlusFixture::openOutputFiles(IOFiles &ioFiles)
 void EnergyPlusFixture::SetUp()
 {
     EnergyPlus::clearAllStates(state);
+    EnergyPlus::inputProcessor->clear_state();
 
     show_message();
 

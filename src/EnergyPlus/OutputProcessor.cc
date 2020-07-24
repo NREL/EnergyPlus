@@ -281,6 +281,11 @@ namespace OutputProcessor {
         Real64 LEndMin(-1.0);              // Helps set minutes for timestamp output
         bool GetMeterIndexFirstCall(true); // trigger setup in GetMeterIndex
         bool InitFlag(true);
+        Array1D_int keyVarIndexes; // Array index for specific key name
+        int curKeyVarIndexLimit;   // current limit for keyVarIndexes
+        Array1D_string varNames;  // stored variable names
+        Array1D_int ivarNames;    // pointers for sorted information
+        int numVarNames;          // number of variable names
     } // namespace
 
     // All routines should be listed here whether private or not
@@ -394,6 +399,11 @@ namespace OutputProcessor {
         EndUseCategory.deallocate();
         UniqueMeterNames.clear();
         apiVarRequests.clear();
+        keyVarIndexes.clear(); // Array index for specific key name
+        curKeyVarIndexLimit = 0;   // current limit for keyVarIndexes
+        varNames.clear();  // stored variable names
+        ivarNames.clear();    // pointers for sorted information
+        numVarNames = 0;          // number of variable names
     }
 
     void InitializeOutput(IOFiles &ioFiles)
@@ -8134,9 +8144,7 @@ void GetVariableKeyCountandType(std::string const &varName,                 // S
     using SortAndStringUtilities::SetupAndSort;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static Array1D_int keyVarIndexes; // Array index for specific key name
-    static int curKeyVarIndexLimit;   // current limit for keyVarIndexes
-    //////////// hoisted into namespace ////////////////////////////////////////////////
+    //////////// hoisted into namespace ///////////////////////////////////////////////
     // static bool InitFlag( true ); // for initting the keyVarIndexes array
     ////////////////////////////////////////////////////////////////////////////////////
     int Loop; // Loop counters
@@ -8147,9 +8155,6 @@ void GetVariableKeyCountandType(std::string const &varName,                 // S
     bool Duplicate;                  // True if keyname is a duplicate
     std::string VarKeyPlusName;      // Full variable name including keyname and units
     std::string varNameUpper;        // varName pushed to all upper case
-    static Array1D_string varNames;  // stored variable names
-    static Array1D_int ivarNames;    // pointers for sorted information
-    static int numVarNames;          // number of variable names
 
     // INITIALIZATIONS
     if (InitFlag) {
