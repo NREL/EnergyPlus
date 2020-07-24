@@ -2639,7 +2639,6 @@ namespace WindowManager {
             }
 
             // Added TH 12/23/2008 for thermochromic windows to save the current TC layer temperature
-
             if (dataWindowManager.locTCFlag) {
                 SurfWinTCLayerTemp(SurfNum) =
                     (dataWindowManager.thetas(2 * dataConstruction.Construct(ConstrNum).TCGlassID - 1) + dataWindowManager.thetas(2 * dataConstruction.Construct(ConstrNum).TCGlassID)) / 2 - dataWindowManager.TKelvin; // degree C

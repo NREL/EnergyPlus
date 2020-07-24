@@ -186,7 +186,6 @@ namespace DaylightingDevices {
     using DataSurfaces::SurfaceClass_TDD_Diffuser;
     using DataSurfaces::SurfaceClass_TDD_Dome;
     using DataSurfaces::SurfaceClass_Window;
-    using DataSurfaces::SurfaceWindow;
     using DataSurfaces::TotSurfaces;
     using namespace DataDaylightingDevices;
 

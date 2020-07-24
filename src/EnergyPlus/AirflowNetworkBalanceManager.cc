@@ -187,7 +187,6 @@ namespace AirflowNetworkBalanceManager {
     using DataSurfaces::SurfaceClass_Door;
     using DataSurfaces::SurfaceClass_GlassDoor;
     using DataSurfaces::SurfaceClass_Window;
-    using DataSurfaces::SurfaceWindow;
     using DataSurfaces::TotSurfaces;
     using DataSurfaces::WorldCoordSystem;
     using DataZoneEquipment::ZoneEquipConfig;
@@ -9200,7 +9199,6 @@ namespace AirflowNetworkBalanceManager {
         // as determined by the venting control method.
 
         // Using/Aliasing
-        using DataSurfaces::SurfaceWindow;
         using DataSurfaces::SurfWinInsideTempForVentingRep;
         using DataSurfaces::SurfWinVentingAvailabilityRep;
         using DataSurfaces::SurfWinVentingOpenFactorMultRep;

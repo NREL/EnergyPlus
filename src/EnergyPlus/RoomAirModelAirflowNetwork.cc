@@ -869,7 +869,6 @@ namespace RoomAirModelAirflowNetwork {
         using DataLoopNode::Node;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
-        using DataSurfaces::SurfaceWindow;
         using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumInternalConvectionGainsByIndices;
         //using InternalHeatGains::SumInternalConvectionGainsByTypes;

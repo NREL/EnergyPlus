@@ -1802,7 +1802,6 @@ namespace EMSManager {
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
-        using DataSurfaces::SurfaceWindow;
         using DataSurfaces::TotSurfaces;
         using DataSurfaces::WindowShadingControl;
         using DataSurfaces::WSC_ST_SwitchableGlazing;

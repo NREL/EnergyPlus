@@ -4383,7 +4383,6 @@ namespace ZoneEquipmentManager {
         using DataRoomAirModel::AirPatternZoneInfo;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceWindow;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
         using DataZoneEnergyDemands::DeadBandOrSetback;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;

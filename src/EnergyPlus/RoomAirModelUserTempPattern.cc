@@ -997,7 +997,6 @@ namespace RoomAirModelUserTempPattern {
         using DataSurfaces::AdjacentAirTemp;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceWindow;
         using DataSurfaces::ZoneMeanAirTemp;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using InternalHeatGains::SumAllReturnAirLatentGains;
