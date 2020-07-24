@@ -2259,6 +2259,7 @@ namespace HeatBalanceSurfaceManager {
         using namespace DataWindowEquivalentLayer;
         using SolarShading::SurfaceScheduledSolarInc;
         using SolarShading::WindowScheduledSolarAbs;
+        using namespace std::chrono;
 
         Real64 AbsExt;                                  // Absorptivity of outer most layer (or movable insulation if present)
         int ConstrNum;                                  // Index for the Construct derived type
@@ -2349,6 +2350,7 @@ namespace HeatBalanceSurfaceManager {
         int SurfSolIncPtr;           // Pointer to schedule surface gain object for interior side of the surface
 
         // Always initialize the shortwave quantities
+        high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
         QRadSWOutAbs = 0.0;
         QRadSWInAbs = 0.0;
@@ -3201,6 +3203,9 @@ namespace HeatBalanceSurfaceManager {
             } // End of surface loop
 
         } // End of sun-up check
+        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+        DataGlobals::solar_timer += time_span.count();
     }
 
     void InitIntSolarDistribution()
