@@ -2576,12 +2576,16 @@ namespace HeatBalanceSurfaceManager {
             CalcWindowProfileAngles();
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface();
-
+            t1 = high_resolution_clock::now();
             if (dataWindowManager.inExtWindowModel->isExternalLibraryModel() && dataWindowManager.winOpticalModel->isSimplifiedModel()) {
                 CalcInteriorSolarDistributionWCE(dataWindowComplexManager, dataWindowManager);
             } else {
                 CalcInteriorSolarDistribution(dataWindowEquivalentLayer);
             }
+
+            high_resolution_clock::time_point t2 = high_resolution_clock::now();
+            duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+            DataGlobals::solar_timer += time_span.count();
 
             for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
 
@@ -3203,9 +3207,9 @@ namespace HeatBalanceSurfaceManager {
             } // End of surface loop
 
         } // End of sun-up check
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-        DataGlobals::solar_timer += time_span.count();
+//        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+//        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+//        DataGlobals::solar_timer += time_span.count();
     }
 
     void InitIntSolarDistribution()
