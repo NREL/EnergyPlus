@@ -138,8 +138,6 @@ namespace WindTurbine {
         }
     };
 
-    // Functions
-
     void SimWindTurbine(WindTurbineData &dataWindTurbine, int const GeneratorType,          // Type of Generator
                         std::string const &GeneratorName, // User specified name of Generator
                         int &GeneratorIndex,              // Generator index
@@ -170,18 +168,21 @@ namespace WindTurbine {
 
     struct WindTurbineData : BaseGlobalStruct {
 
-
         int NumWindTurbines; // Total wind turbine statements in inputs
+        bool GetInputFlag;
+        bool MyOneTimeFlag;
         Array1D<WindTurbine::WindTurbineParams> WindTurbineSys;
 
         void clear_state() override
         {
             NumWindTurbines = 0;
+            GetInputFlag = true;
+            MyOneTimeFlag = true;
             WindTurbineSys.deallocate();
         }
 
         // Default Constructor
-        WindTurbineData() : NumWindTurbines(0) 
+        WindTurbineData() : NumWindTurbines(0), GetInputFlag(true), MyOneTimeFlag(true)
         {
         }
     };

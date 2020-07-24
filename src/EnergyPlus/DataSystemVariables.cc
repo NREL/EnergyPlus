@@ -197,6 +197,7 @@ namespace DataSystemVariables {
     int NumberIntRadThreads(1);
     int iNominalTotSurfaces(0);
     bool Threading(false);
+    bool firstTime(true);
 
     // Functions
 
@@ -242,7 +243,6 @@ namespace DataSystemVariables {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool FileExist(false);    // initialize to false, then override to true if present
-        static bool firstTime(true);
         std::string InputFileName; // save for changing out path characters
         std::string::size_type pos;
 
@@ -412,6 +412,7 @@ namespace DataSystemVariables {
         NumberIntRadThreads = 1;
         iNominalTotSurfaces = 0;
         Threading = false;
+        firstTime = true;
     }
 
     void processEnvironmentVariables(DataGlobal const &dataGlobals) {

@@ -156,6 +156,9 @@ namespace PoweredInductionUnits {
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool GetPIUInputFlag(true); // First time, input is "gotten"
+        bool MyOneTimeFlag(true);
+        bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
+
     }                               // namespace
 
     int NumPIUs(0);
@@ -174,6 +177,8 @@ namespace PoweredInductionUnits {
         GetPIUInputFlag = true;
         PiuUniqueNames.clear();
         PIU.deallocate();
+        MyOneTimeFlag = true;
+        ZoneEquipmentListChecked = false;
     }
 
     void SimPIU(EnergyPlusData &state, std::string const &CompName,   // name of the PIU
@@ -301,7 +306,7 @@ namespace PoweredInductionUnits {
         int NumAlphas;                  // Number of Alpha input fields for each GetObjectItem call
         int NumNumbers;                 // Number of Numeric input fields for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         bool IsNotOK;                   // Flag to verify name
         int CtrlZone;                   // controlled zome do loop index
         int SupAirIn;                   // controlled zone supply air inlet index
@@ -782,11 +787,9 @@ namespace PoweredInductionUnits {
         int HotConNode; // hot water control node number in PIU
         int OutletNode; // unit air outlet node number
         Real64 RhoAir;  // air density at outside pressure and standard temperature and humidity
-        static bool MyOneTimeFlag(true);
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MySizeFlag;
         static Array1D_bool MyPlantScanFlag;
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;                                    // Loop checking control variable
         Real64 rho;                                  // local plant fluid density
         bool errFlag;

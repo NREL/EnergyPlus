@@ -468,7 +468,9 @@ namespace EMSManager {
             (iCalledFrom == emsCallFromUserDefinedComponentModel)) {
 
             // another pass at trying to setup input data.
-            if (FinishProcessingUserInput) ProcessEMSInput(false);
+            if (FinishProcessingUserInput) {
+                ProcessEMSInput(false);
+            }
 
             // update internal data variables being used by Erl
             for (InternalVarUsedNum = 1; InternalVarUsedNum <= NumInternalVariablesUsed; ++InternalVarUsedNum) {
@@ -1082,7 +1084,7 @@ namespace EMSManager {
         //  INTEGER :: VariableNum  ! local do loop index
         int VarIndex;
         int VarType;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int ActuatorNum;
         bool FoundObjectType;
         bool FoundObjectName;
@@ -1671,9 +1673,7 @@ namespace EMSManager {
         std::string cControlTypeName;
         std::string cComponentTypeName;
         std::string cNodeName;
-        static bool FoundControl(false);
-
-        FoundControl = false;
+        bool FoundControl(false);
 
         cNodeName = NodeID(NodeNum);
         cComponentTypeName = "System Node Setpoint";

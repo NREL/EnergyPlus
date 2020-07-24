@@ -180,7 +180,8 @@ namespace UnitVentilator {
     Array1D<UnitVentilatorData> UnitVent;
     Array1D<UnitVentNumericFieldData> UnitVentNumericFields;
 
-    // Functions
+    bool MyOneTimeFlag = true;
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
     void clear_state()
     {
@@ -193,6 +194,9 @@ namespace UnitVentilator {
         CheckEquipName.deallocate();
         UnitVent.deallocate();
         UnitVentNumericFields.deallocate();
+        MyOneTimeFlag = true;
+        ZoneEquipmentListChecked = false;
+
     }
 
     void SimUnitVentilator(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
@@ -1292,8 +1296,6 @@ namespace UnitVentilator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirRelNode;  // relief air node number in unit ventilator loop
         int ColdConNode; // cold water control node number in unit ventilator loop
-        static bool MyOneTimeFlag(true);
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyPlantScanFlag;

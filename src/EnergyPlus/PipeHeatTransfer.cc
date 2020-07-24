@@ -160,6 +160,7 @@ namespace PipeHeatTransfer {
     int nsvNumInnerTimeSteps(0);      // the number of "inner" time steps for our model
 
     bool GetPipeInputFlag(true); // First time, input is "gotten"
+    bool MyEnvrnFlag;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -190,9 +191,12 @@ namespace PipeHeatTransfer {
         return nullptr;
     }
 
-    void PipeHTData::clear_state()
+    void clear_state()
     {
+        GetPipeInputFlag = true;
+        PipeHT.clear();
         PipeHTUniqueNames.clear();
+        MyEnvrnFlag = true;
     }
 
     void PipeHTData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -271,7 +275,7 @@ namespace PipeHeatTransfer {
         Real64 const HoursInDay(24.0);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // Set to true if errors in input,
+        bool ErrorsFound(false); // Set to true if errors in input,
 
         // fatal at end of routine
         int IOStatus; // Used in GetObjectItem
@@ -1606,14 +1610,6 @@ namespace PipeHeatTransfer {
         // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
 
-        // Locals
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  INTEGER :: PipeNum
-        //  INTEGER :: ZoneNum
-        static bool MyEnvrnFlag(true);
-        //  REAL(r64) :: QLossToZone
-
-        // FLOW:
         if (nsvNumOfPipeHT == 0) return;
 
         if (BeginEnvrnFlag && MyEnvrnFlag) {
@@ -1624,12 +1620,6 @@ namespace PipeHeatTransfer {
 
         if (!BeginEnvrnFlag) MyEnvrnFlag = true;
 
-        // this routine needs to model approx zone pipe gains for use during sizing
-        //  IF(DoingSizing)THEN
-        //    DO PipeNum = 1, NumOfPipeHT
-        //      PipeHT(pipeNum)%ZoneHeatGainRate =
-        //    ENDDO
-        //  ENDIF
     }
 
     //==============================================================================

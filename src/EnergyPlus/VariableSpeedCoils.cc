@@ -200,6 +200,7 @@ namespace VariableSpeedCoils {
 
     // Object Data
     Array1D<VariableSpeedCoilData> VarSpeedCoil;
+    bool firstTime(true);
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -231,6 +232,7 @@ namespace VariableSpeedCoils {
         VSHPWHHeatingCapacity = 0.0;
         VSHPWHHeatingCOP = 0.0;
         VarSpeedCoil.deallocate();
+        firstTime = true;
     }
 
     // Default Constructor
@@ -466,7 +468,7 @@ namespace VariableSpeedCoils {
         static int MaxAlphas(0); // Maximum number of alpha input fields
         int IOStat;
         int AlfaFieldIncre;              // increment number of Alfa field
-        static bool ErrorsFound(false);  // If errors detected in input
+        bool ErrorsFound(false);  // If errors detected in input
         Real64 CurveVal;                 // Used to verify modifier curves equal 1 at rated conditions
         Real64 WHInletAirTemp;           // Used to pass proper inlet air temp to HPWH DX coil performance curves
         Real64 WHInletWaterTemp;         // Used to pass proper inlet water temp to HPWH DX coil performance curves
@@ -3238,7 +3240,7 @@ namespace VariableSpeedCoils {
         Real64 Cp;    // local fluid specific heat
         int SpeedCal; // calculated speed level
         bool errFlag;
-        static bool ErrorsFound(false);    // TRUE when errors found, air loop initialization error
+        bool ErrorsFound(false);    // TRUE when errors found, air loop initialization error
         Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
         int Mode;                          // Performance mode for MultiMode DX coil; Always 1 for other coil types
         Real64 RatedHeatPumpIndoorAirTemp; // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
@@ -5088,7 +5090,6 @@ namespace VariableSpeedCoils {
         bool LatDegradModelSimFlag; // Latent degradation model simulation flag
         int NumIteration;           // Iteration Counter
         static int Count(0);        // No idea what this is for.
-        static bool firstTime(true);
         static Real64 LoadSideInletDBTemp_Init; // rated conditions
         static Real64 LoadSideInletWBTemp_Init; // rated conditions
         static Real64 LoadSideInletHumRat_Init; // rated conditions

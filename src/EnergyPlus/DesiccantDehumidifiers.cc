@@ -191,6 +191,9 @@ namespace DesiccantDehumidifiers {
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool GetInputDesiccantDehumidifier(true); // First time, input is "gotten"
         bool InitDesiccantDehumidifierOneTimeFlag(true);
+        bool MySetPointCheckFlag(true); // I think this actually needs to be a vector or a member variable on the struct, not just a single bool
+        bool CalcSolidDesiccantDehumidifierMyOneTimeFlag(true); // one time flag
+        bool CalcGenericDesiccantDehumidifierMyOneTimeFlag(true);
     } // namespace
 
     // Name Public routines, optionally name Private routines within this module
@@ -1735,7 +1738,6 @@ namespace DesiccantDehumidifiers {
         int ProcInNode;  // inlet node number
         int RegenInNode; // inlet node number
         int ControlNode; // control node number
-        static bool MySetPointCheckFlag(true);
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
 
@@ -2195,7 +2197,6 @@ namespace DesiccantDehumidifiers {
         Real64 PartLoad;             // fraction of dehumidification capacity required to meet setpoint
         bool UnitOn;                 // unit on flag
 
-        static bool MyOneTimeFlag(true); // one time flag
         static Real64 RhoAirStdInit;
 
         // Variables for hardwired coefficients for default performance model
@@ -2498,8 +2499,8 @@ namespace DesiccantDehumidifiers {
         // Verify is requestd flow was delivered (must do after heating coil has executed to pass flow to RegenAirInNode)
         if (Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate != RegenAirMassFlowRate) {
             // Initialize standard air density
-            if (MyOneTimeFlag) {
-                RhoAirStdInit = StdRhoAir;
+            if (CalcSolidDesiccantDehumidifierMyOneTimeFlag) {
+                RhoAirStdInit = StdRhoAir; // Uhh, this static flag is never set to false...
             }
             ShowRecurringSevereErrorAtEnd("Improper flow delivered by desiccant regen fan - RESULTS INVALID! Check regen fan capacity and schedule.",
                                           DesicDehum(DesicDehumNum).RegenFanErrorIndex1);
@@ -2614,7 +2615,6 @@ namespace DesiccantDehumidifiers {
         int RegenCoilIndex;              // index to regeneration heating coil, 0 when not used
         int CompanionCoilIndexNum;       // index for companion DX cooling coil, 0 when DX coil is not used
         std::string MinVol;              // character string used for error messages
-        static bool MyOneTimeFlag(true); // one time flag
         static Real64 RhoAirStdInit;     // standard air density (kg/m3)
         bool UnitOn;                     // unit on flag
         //  LOGICAL       :: SimFlag                    ! used to turn off additional simulation if DX Coil is off
@@ -2640,9 +2640,9 @@ namespace DesiccantDehumidifiers {
             CompanionCoilIndexNum = 0;
         }
 
-        if (MyOneTimeFlag) {
+        if (CalcGenericDesiccantDehumidifierMyOneTimeFlag) {
             RhoAirStdInit = StdRhoAir;
-            MyOneTimeFlag = false;
+            CalcGenericDesiccantDehumidifierMyOneTimeFlag = false;
         }
 
         if (HumRatNeeded < Node(DesicDehum(DesicDehumNum).ProcAirInNode).HumRat) {
@@ -3472,6 +3472,9 @@ namespace DesiccantDehumidifiers {
         InitDesiccantDehumidifierOneTimeFlag = true;
         DesicDehum.deallocate();
         UniqueDesicDehumNames.clear();
+        MySetPointCheckFlag = true;
+        CalcSolidDesiccantDehumidifierMyOneTimeFlag = true;
+        CalcGenericDesiccantDehumidifierMyOneTimeFlag = true;
     }
 
     int GetProcAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound)
