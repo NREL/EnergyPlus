@@ -3241,7 +3241,6 @@ namespace HeatBalanceSurfaceManager {
         using namespace HeatBalanceMovableInsulation;
         using DaylightingDevices::DistributeTDDAbsorbedSolar;
         using namespace DataWindowEquivalentLayer;
-
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
         // na
@@ -3260,7 +3259,6 @@ namespace HeatBalanceSurfaceManager {
         Real64 HMovInsul;       // Resistance or "h" value of movable insulation (from EvalOutsideMovableInsulation, not used)
         int RoughIndexMovInsul; // Roughness index of movable insulation
         int ConstrNum;          // Construction number
-//        int SurfNum;            // Surface number
         int ConstrNumSh;        // Shaded construction number
         int SurfNumAdjZone;     // Surface number in adjacent zone for interzone surfaces
         int IGlass;             // Glass layer counter
@@ -3379,38 +3377,24 @@ namespace HeatBalanceSurfaceManager {
                     QRadSWInAbs(SurfNum) += QS(solEnclosureNum) * AbsIntSurf;
                     QRadSWLightsInAbs(SurfNum) += QSLights(solEnclosureNum) * AbsIntSurfVis;
                 }
-                if (Surface(SurfNum).ExtBoundCond > 0) { // Interzone surface
 
-                    if (dataConstruction.Construct(ConstrNum).TransDiff > 0.0) { // Interzone window
-
-                        // Short-wave radiation absorbed in panes of corresponding window in adjacent zone
-                        SurfNumAdjZone = Surface(SurfNum).ExtBoundCond;
-
-                        if (SurfWinWindowModelType(SurfNumAdjZone) != WindowEQLModel) {
-                            for (IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
-                                QRadSWwinAbs(IGlass, SurfNumAdjZone) += QS(solEnclosureNum) *
-                                                                        dataConstruction.Construct(
-                                                                                Surface(SurfNumAdjZone).Construction).AbsDiff(
-                                                                                IGlass);
-                                // Note that AbsDiff rather than AbsDiffBack is used in the above since the
-                                // radiation from the current zone is incident on the outside of the adjacent
-                                // zone's window.
-                            }
-                        } else { // IF (SurfaceWindow(SurfNumAdjZone)%WindowModelType == WindowEQLModel) THEN
-                            ConstrNum = Surface(SurfNumAdjZone).Construction;
-                            EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
-                            for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
-                                QRadSWwinAbs(Lay, SurfNumAdjZone) += QS(solEnclosureNum) * dataConstruction.Construct(
-                                        ConstrNum).AbsDiffFrontEQL(Lay);
-                                // Note that AbsDiffFrontEQL rather than AbsDiffBackEQL is used in the above
-                                // since the radiation from the current zone is incident on the outside of the
-                                // adjacent zone's window.
-                            }
-                        }
+                if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque exterior surface
+                    // Calculate absorbed solar on outside if movable exterior insulation in place
+                    HMovInsul = 0.0;
+                    if (Surface(SurfNum).MaterialMovInsulExt > 0) EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+                    if (HMovInsul > 0) { // Movable outside insulation in place
+                        QRadSWOutMvIns(SurfNum) = QRadSWOutAbs(SurfNum) * AbsExt / dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
+                        // For transparent insulation, allow some sunlight to get through the movable insulation.
+                        // The equation below is derived by taking what is transmitted through the layer and applying
+                        // the fraction that is absorbed plus the back reflected portion (first order reflection only)
+                        // to the plane between the transparent insulation and the exterior surface face.
+                        QRadSWOutAbs(SurfNum) = dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).Trans * QRadSWOutMvIns(SurfNum) *
+                                                ((dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar / AbsExt) +
+                                                 (1 - dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar));
+                        SWOutAbsTotalReport(SurfNum) = QRadSWOutAbs(SurfNum) * Surface(SurfNum).Area;
+                        SWOutAbsEnergyReport(SurfNum) = SWOutAbsTotalReport(SurfNum) * TimeStepZoneSec;
                     }
-
                 }
-
                 // RJH 08/30/07 - Add InitialDifSolInAbs, InitialDifSolwinAbs, and InitialDifSolAbsByShade
                 // calced in CalcWinTransDifSolInitialDistribution to QRadSWInAbs, QRadSWwinAbs, and IntSWAbsByShade here
                 if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
@@ -3418,8 +3402,10 @@ namespace HeatBalanceSurfaceManager {
                 }
 
                 // Report
+                SWwinAbsTotalReport(SurfNum) = 0.0;
                 SWInAbsTotalReport(SurfNum) = 0.0;
                 InitialDifSolInAbsReport(SurfNum) = 0.0;
+                InitialDifSolInTransReport(SurfNum) = 0.0;
                 if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
                     // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
                     InitialDifSolInAbsReport(SurfNum) = InitialDifSolInAbs(SurfNum) * Surface(SurfNum).Area;
@@ -3589,35 +3575,39 @@ namespace HeatBalanceSurfaceManager {
 
                 } // end if for IF ( SurfaceWindow(SurfNum)%WindowModelType /= WindowEQLModel) THEN
 
-                if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque exterior surface
-                    // Calculate absorbed solar on outside if movable exterior insulation in place
-                    HMovInsul = 0.0;
-                    if (Surface(SurfNum).MaterialMovInsulExt > 0)
-                        EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
-                    if (HMovInsul > 0) { // Movable outside insulation in place
-                        QRadSWOutMvIns(SurfNum) = QRadSWOutAbs(SurfNum) * AbsExt / dataMaterial.Material(
-                                dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
-                        // For transparent insulation, allow some sunlight to get through the movable insulation.
-                        // The equation below is derived by taking what is transmitted through the layer and applying
-                        // the fraction that is absorbed plus the back reflected portion (first order reflection only)
-                        // to the plane between the transparent insulation and the exterior surface face.
-                        QRadSWOutAbs(SurfNum) = dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).Trans *
-                                                QRadSWOutMvIns(SurfNum) * ((dataMaterial.Material(
-                                dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar / AbsExt) + (1 -
-                                                                                                              dataMaterial.Material(
-                                                                                                                      dataConstruction.Construct(
-                                                                                                                              ConstrNum).LayerPoint(
-                                                                                                                              1)).AbsorpSolar));
-                        SWOutAbsTotalReport(SurfNum) = QRadSWOutAbs(SurfNum) * Surface(SurfNum).Area;
-                        SWOutAbsEnergyReport(SurfNum) = SWOutAbsTotalReport(SurfNum) * TimeStepZoneSec;
+
+                if (Surface(SurfNum).ExtBoundCond > 0) { // Interzone surface
+
+                    if (dataConstruction.Construct(ConstrNum).TransDiff > 0.0) { // Interzone window
+
+                        // Short-wave radiation absorbed in panes of corresponding window in adjacent zone
+                        SurfNumAdjZone = Surface(SurfNum).ExtBoundCond;
+
+                        if (SurfWinWindowModelType(SurfNumAdjZone) != WindowEQLModel) {
+                            for (IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
+                                QRadSWwinAbs(IGlass, SurfNumAdjZone) += QS(solEnclosureNum) *
+                                                                        dataConstruction.Construct(
+                                                                                Surface(SurfNumAdjZone).Construction).AbsDiff(
+                                                                                IGlass);
+                                // Note that AbsDiff rather than AbsDiffBack is used in the above since the
+                                // radiation from the current zone is incident on the outside of the adjacent
+                                // zone's window.
+                            }
+                        } else { // IF (SurfaceWindow(SurfNumAdjZone)%WindowModelType == WindowEQLModel) THEN
+                            ConstrNum = Surface(SurfNumAdjZone).Construction;
+                            EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
+                            for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
+                                QRadSWwinAbs(Lay, SurfNumAdjZone) += QS(solEnclosureNum) * dataConstruction.Construct(
+                                        ConstrNum).AbsDiffFrontEQL(Lay);
+                                // Note that AbsDiffFrontEQL rather than AbsDiffBackEQL is used in the above
+                                // since the radiation from the current zone is incident on the outside of the
+                                // adjacent zone's window.
+                            }
+                        }
                     }
                 }
 
-                // RJH 08/30/07 - Add InitialDifSolInAbs, InitialDifSolwinAbs, and InitialDifSolAbsByShade
-                // calced in CalcWinTransDifSolInitialDistribution to QRadSWInAbs, QRadSWwinAbs, and IntSWAbsByShade here
-
-                if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel &&
-                    SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
+                if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel && SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
                     ConstrNumSh = Surface(SurfNum).ShadedConstruction;
                     if (SurfWinStormWinFlag(SurfNum) == 1) {
                         ConstrNum = Surface(SurfNum).StormWinConstruction;
@@ -3725,7 +3715,6 @@ namespace HeatBalanceSurfaceManager {
                 }
             } // End of window
         }
-
         DistributeTDDAbsorbedSolar();
     }
 

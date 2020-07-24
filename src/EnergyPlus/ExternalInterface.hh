@@ -65,6 +65,8 @@ extern "C" {
 
 namespace EnergyPlus {
 
+    struct EnergyPlusData;
+
 namespace ExternalInterface {
 
     // MODULE VARIABLE DECLARATIONS:
@@ -320,7 +322,7 @@ namespace ExternalInterface {
 
     // Functions
 
-    void ExternalInterfaceExchangeVariables();
+    void ExternalInterfaceExchangeVariables(EnergyPlusData &state);
 
     void CloseSocket(int const FlagToWriteToSocket);
 
@@ -328,7 +330,7 @@ namespace ExternalInterface {
 
     void GetExternalInterfaceInput();
 
-    void CalcExternalInterface();
+    void CalcExternalInterface(EnergyPlusData &state);
 
     void ParseString(std::string const &str, Array1D_string &ele, int const nEle);
 
@@ -345,7 +347,7 @@ namespace ExternalInterface {
 
     void WarnIfExternalInterfaceObjectsAreUsed(std::string const &ObjectWord);
 
-    void CalcExternalInterfaceFMUImport();
+    void CalcExternalInterfaceFMUImport(EnergyPlusData &state);
 
     void InitExternalInterfaceFMUImport();
 
@@ -353,7 +355,7 @@ namespace ExternalInterface {
 
     void TerminateResetFreeFMUImport(int fmiEndSimulation);
 
-    void GetSetVariablesAndDoStepFMUImport();
+    void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state);
 
     void VerifyExternalInterfaceObject();
 

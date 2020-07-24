@@ -59,6 +59,8 @@
 
 namespace EnergyPlus {
 
+    struct EnergyPlusData;
+
 namespace DataGlobals {
 
     // Data
@@ -294,8 +296,8 @@ namespace DataGlobals {
     extern void (*messageCallback)(const char * message);
     extern void (*errorCallback)(const char * errorMessage);
     extern bool eplusRunningViaAPI; // a flag for capturing whether we are running via API - if so we can't do python plugins
-    extern double timer_solar;
 
+    extern double timer_solar;
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
     void clear_state(EnergyPlus::OutputFiles &outputFiles);

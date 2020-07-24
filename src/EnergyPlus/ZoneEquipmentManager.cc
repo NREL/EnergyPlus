@@ -1794,7 +1794,7 @@ namespace ZoneEquipmentManager {
 
                 // candidate EMS calling point to customize CalcFinalZoneSizing
                 bool anyEMSRan;
-                ManageEMS(emsCallFromZoneSizing, anyEMSRan);
+                ManageEMS(state, emsCallFromZoneSizing, anyEMSRan);
 
                 // now apply EMS overrides (if any)
 
@@ -3103,7 +3103,8 @@ namespace ZoneEquipmentManager {
                         NonAirSystemResponse(ActualZoneNum) += SysOutputProvided;
 
                     } else if (SELECT_CASE_var == UserDefinedZoneHVACForcedAir_Num) {
-                        SimZoneAirUserDefined(state.dataBranchInputManager,
+                        SimZoneAirUserDefined(state,
+                                              state.dataBranchInputManager,
                                               state.dataZoneEquipmentManager.PrioritySimOrder(EquipTypeNum).EquipName,
                                               ActualZoneNum,
                                               SysOutputProvided,

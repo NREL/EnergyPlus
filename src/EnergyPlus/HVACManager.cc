@@ -374,7 +374,7 @@ namespace HVACManager {
         FracTimeStepZone = TimeStepSys / TimeStepZone;
 
         bool anyEMSRan;
-        ManageEMS(emsCallFromBeginTimestepBeforePredictor, anyEMSRan); // calling point
+        ManageEMS(state, emsCallFromBeginTimestepBeforePredictor, anyEMSRan); // calling point
 
         SetOutAirNodes();
 
@@ -515,7 +515,7 @@ namespace HVACManager {
                 OutputReportTabular::CalcHeatEmissionReport(state);
             }
 
-            ManageEMS(emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan); // EMS calling point
+            ManageEMS(state, emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan); // EMS calling point
 
             // This is where output processor data is updated for System Timestep reporting
             if (!WarmupFlag) {
@@ -616,7 +616,7 @@ namespace HVACManager {
                 }
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
             }
-            ManageEMS(emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan); // EMS calling point
+            ManageEMS(state, emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan); // EMS calling point
             // UPDATE SYSTEM CLOCKS
             SysTimeElapsed += TimeStepSys;
 
@@ -870,7 +870,7 @@ namespace HVACManager {
         // Before the HVAC simulation, call ManageSetPoints to set all the HVAC
         // node setpoints
         bool anyEMSRan = false;
-        ManageEMS(emsCallFromBeforeHVACManagers, anyEMSRan); // calling point
+        ManageEMS(state, emsCallFromBeforeHVACManagers, anyEMSRan); // calling point
 
         ManageSetPoints(state);
 
@@ -881,8 +881,8 @@ namespace HVACManager {
         // the system on/off flags
         ManageSystemAvailability();
 
-        ManageEMS(emsCallFromAfterHVACManagers, anyEMSRan); // calling point
-        ManageEMS(emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
+        ManageEMS(state, emsCallFromAfterHVACManagers, anyEMSRan); // calling point
+        ManageEMS(state, emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
 
         // first explicitly call each system type with FirstHVACIteration,
 
@@ -910,7 +910,7 @@ namespace HVACManager {
         while ((SimAirLoopsFlag || SimZoneEquipmentFlag || SimNonZoneEquipmentFlag || SimPlantLoopsFlag || SimElecCircuitsFlag) &&
                (HVACManageIteration <= MaxIter)) {
 
-            ManageEMS(emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
+            ManageEMS(state, emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
 
             // Manages the various component simulations
             SimSelectedEquipment(state, SimAirLoopsFlag,
