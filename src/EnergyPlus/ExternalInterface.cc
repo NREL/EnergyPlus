@@ -162,8 +162,66 @@ namespace ExternalInterface {
     Array1D<checkFMUInstanceNameType> checkInstanceName; // Variable Types structure for checking instance names
 
     // Functions
+    bool firstCall(true);
+    bool showContinuationWithoutUpdate(true);
+    bool GetInputFlag(true); // First time, input is "gotten"
+    bool InitExternalInterfacefirstCall(true);
+    bool FirstCallGetSetDoStep(true); // Flag to check when External Interface is called first time
+    bool FirstCallIni(true); // First time, input has been read
+    bool FirstCallDesignDays(true); // Flag fo first call during warmup
+    bool FirstCallWUp(true);        // Flag fo first call during warmup
+    bool FirstCallTStep(true);      // Flag for first call during time stepping
+    int fmiEndSimulation(0);        // Flag to indicate end of simulation
 
-    void ExternalInterfaceExchangeVariables()
+    void clear_state() {
+
+        // Data
+        tComm = 0.0;
+        tStop = 3600.0;
+        tStart = 0.0;
+        hStep = 15.0;
+        FlagReIni = false;
+        FMURootWorkingFolder = "";
+        nInKeys = 3;
+        NumExternalInterfaces = 0;
+        NumExternalInterfacesBCVTB = 0;
+        NumExternalInterfacesFMUImport = 0;
+        NumExternalInterfacesFMUExport = 0;
+        NumFMUObjects = 0;
+        FMUExportActivate = 0;
+        haveExternalInterfaceBCVTB = false;
+        haveExternalInterfaceFMUImport = false;
+        haveExternalInterfaceFMUExport = false;
+        simulationStatus = 1;
+        keyVarIndexes.clear();
+        varTypes.clear();
+        varInd.clear();
+        socketFD = -1;
+        ErrorsFound = false;
+        noMoreValues = false;
+        varKeys.clear();
+        varNames.clear();
+        inpVarTypes.clear();
+        inpVarNames.clear();
+        configuredControlPoints = false;
+        useEMS = false;
+        FMU.clear();
+        UniqueFMUInputVarNames.clear();
+        FMUTemp.clear();
+        checkInstanceName.clear();
+        firstCall = true;
+        showContinuationWithoutUpdate = true;
+        GetInputFlag = true;
+        InitExternalInterfacefirstCall = true;
+        FirstCallGetSetDoStep = true;
+        FirstCallIni = true;
+        FirstCallDesignDays = true;
+        FirstCallWUp = true;
+        FirstCallTStep = true;
+        fmiEndSimulation = 0;
+    }
+
+    void ExternalInterfaceExchangeVariables(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -181,7 +239,6 @@ namespace ExternalInterface {
         using DataGlobals::WarmupFlag;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true); // First time, input is "gotten"
         std::string errorMessage;       // Error message
         int retValErrMsg;
 
@@ -196,7 +253,7 @@ namespace ExternalInterface {
             // Note that checking for ZoneSizingCalc SysSizingCalc does not work here, hence we
             // use the KindOfSim flag
             if (!WarmupFlag && (KindOfSim == ksRunPeriodWeather)) {
-                CalcExternalInterface();
+                CalcExternalInterface(state);
             }
         }
 
@@ -212,7 +269,7 @@ namespace ExternalInterface {
             InitExternalInterfaceFMUImport();
             // No Data exchange during design days
             // Data Exchange data during warmup and after warmup
-            CalcExternalInterfaceFMUImport();
+            CalcExternalInterfaceFMUImport(state);
         }
     }
 
@@ -475,7 +532,6 @@ namespace ExternalInterface {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
-        static bool firstCall(true);                                   // First time, input has been read
         std::string const simCfgFilNam("variables.cfg");               // Configuration file
         std::string const xmlStrInKey("schedule,variable,actuator\0"); // xml values in string, separated by ','
 
@@ -493,7 +549,7 @@ namespace ExternalInterface {
         bool simFileExist; // Set to true if simulation configuration
         // file exists
 
-        if (firstCall) {
+        if (InitExternalInterfacefirstCall) {
             DisplayString("ExternalInterface initializes.");
             // do one time initializations
 
@@ -637,7 +693,7 @@ namespace ExternalInterface {
             DisplayString("Number of outputs in ExternalInterface = " + TrimSigDigits(nOutVal));
             DisplayString("Number of inputs  in ExternalInterface = " + TrimSigDigits(nInpVar));
 
-            firstCall = false;
+            InitExternalInterfacefirstCall = false;
 
         } else if (!configuredControlPoints) {
             keyVarIndexes.allocate(nOutVal);
@@ -684,7 +740,7 @@ namespace ExternalInterface {
         StopExternalInterfaceIfError();
     }
 
-    void GetSetVariablesAndDoStepFMUImport()
+    void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
@@ -708,7 +764,6 @@ namespace ExternalInterface {
         using ScheduleManager::ExternalInterfaceSetSchedule;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static bool FirstCallGetSetDoStep(true); // Flag to check when External Interface is called first time
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i, j, k; // Loop counters
@@ -909,7 +964,7 @@ namespace ExternalInterface {
         // If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
         if (useEMS) {
             bool anyRan;
-            ManageEMS(emsCallFromExternalInterface, anyRan);
+            ManageEMS(state, emsCallFromExternalInterface, anyRan);
         }
 
         FirstCallGetSetDoStep = false;
@@ -1078,7 +1133,6 @@ namespace ExternalInterface {
         int retValfmiVersion;
         int retValfmiPathLib;
         Array1D_string NameListInstances(5);
-        static bool FirstCallIni(true); // First time, input has been read
         bool fileExist;
         std::string tempFullFileName;
         Array1D_string strippedFileName; // remove path from entered file name
@@ -1928,7 +1982,7 @@ namespace ExternalInterface {
         return simtime;
     }
 
-    void CalcExternalInterfaceFMUImport()
+    void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1961,11 +2015,6 @@ namespace ExternalInterface {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i, j, k; // Loop counter
-
-        static bool FirstCallDesignDays(true); // Flag fo first call during warmup
-        static bool FirstCallWUp(true);        // Flag fo first call during warmup
-        static bool FirstCallTStep(true);      // Flag for first call during time stepping
-        static int fmiEndSimulation(0);        // Flag to indicate end of simulation
 
         Array1D_string Alphas(5);
         Array1D_int keyIndexes(1);     // Array index for
@@ -2004,13 +2053,13 @@ namespace ExternalInterface {
                     }
                 }
 
-                GetSetVariablesAndDoStepFMUImport();
+                GetSetVariablesAndDoStepFMUImport(state);
                 tComm += hStep;
                 FirstCallWUp = false;
 
             } else {
                 if (tComm < tStop) {
-                    GetSetVariablesAndDoStepFMUImport();
+                    GetSetVariablesAndDoStepFMUImport(state);
                     // Advance the communication time step
                     tComm += hStep;
                 } else {
@@ -2093,7 +2142,7 @@ namespace ExternalInterface {
                     }
                     // set the flag to reinitialize states to be true
                     FlagReIni = true;
-                    GetSetVariablesAndDoStepFMUImport();
+                    GetSetVariablesAndDoStepFMUImport(state);
                     FlagReIni = false;
                     // advance one time step ahead for the next calculation
                     tComm += hStep;
@@ -2150,14 +2199,14 @@ namespace ExternalInterface {
                 }
                 // set the flag to reinitialize states to be true
                 FlagReIni = true;
-                GetSetVariablesAndDoStepFMUImport();
+                GetSetVariablesAndDoStepFMUImport(state);
                 FlagReIni = false;
                 // advance one time step ahead for the next calculation
                 tComm += hStep;
                 FirstCallTStep = false;
             } else {
                 if (tComm != tStop) {
-                    GetSetVariablesAndDoStepFMUImport();
+                    GetSetVariablesAndDoStepFMUImport(state);
                     tComm += hStep;
                 } else {
                     // Terminate reset and free Slaves
@@ -2243,7 +2292,7 @@ namespace ExternalInterface {
         }
     }
 
-    void CalcExternalInterface()
+    void CalcExternalInterface(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
@@ -2278,9 +2327,6 @@ namespace ExternalInterface {
         Array1D<Real64> dblValWri(nDblMax);
         Array1D<Real64> dblValRea(nDblMax);
         bool continueSimulation; // Flag, true if simulation should continue
-        static bool firstCall(true);
-        static bool showContinuationWithoutUpdate(true);
-
 
         if (firstCall) {
             DisplayString("ExternalInterface starts first data exchange.");
@@ -2379,7 +2425,7 @@ namespace ExternalInterface {
         // If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
         if (useEMS) {
             bool anyRan;
-            ManageEMS(emsCallFromExternalInterface, anyRan);
+            ManageEMS(state, emsCallFromExternalInterface, anyRan);
         }
 
         firstCall = false; // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui

@@ -125,6 +125,9 @@ namespace SizingManager {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumAirLoops(0);
+    bool ReportZoneSizingMyOneTimeFlag(true);
+    bool ReportSysSizingMyOneTimeFlag(true);
+    bool runZeroingOnce(true);
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
 
@@ -134,6 +137,9 @@ namespace SizingManager {
     void clear_state()
     {
         NumAirLoops = 0;
+        ReportZoneSizingMyOneTimeFlag = true;
+        ReportSysSizingMyOneTimeFlag = true;
+        runZeroingOnce = true;
     }
 
     void ManageSizing(EnergyPlusData &state)
@@ -202,7 +208,6 @@ namespace SizingManager {
         int NumSizingPeriodsPerformed;
         int numZoneSizeIter; // number of times to repeat zone sizing calcs. 1 normal, 2 load component reporting
         int iZoneCalcIter;   // index for repeating the zone sizing calcs
-        static bool runZeroingOnce(true);
         bool isUserReqCompLoadReport;
         Real64 DOASHeatGainRateAtHtPk(0.0); // zone heat gain rate from the DOAS at the heating peak [W]
         Real64 DOASHeatGainRateAtClPk(0.0); // zone heat gain rate from the DOAS at the cooling peak [W]
@@ -540,7 +545,7 @@ namespace SizingManager {
                             DisplayString("Calculating System sizing");
                             DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                         }
-                        UpdateSysSizing(state.outputFiles, BeginDay);
+                        UpdateSysSizing(state, state.outputFiles, BeginDay);
                     }
 
                     for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -569,7 +574,7 @@ namespace SizingManager {
 
                             ManageWeather();
 
-                            UpdateSysSizing(state.outputFiles, DuringDay);
+                            UpdateSysSizing(state, state.outputFiles, DuringDay);
 
                             BeginHourFlag = false;
                             BeginDayFlag = false;
@@ -581,7 +586,7 @@ namespace SizingManager {
 
                     } // ... End hour loop.
 
-                    if (EndDayFlag) UpdateSysSizing(state.outputFiles, EndDay);
+                    if (EndDayFlag) UpdateSysSizing(state, state.outputFiles, EndDay);
 
                     if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
                         ++CurOverallSimDay;
@@ -592,7 +597,7 @@ namespace SizingManager {
             } // ... End environment loop
 
             if (NumSizingPeriodsPerformed > 0) {
-                UpdateSysSizing(state.outputFiles, EndSysSizingCalc);
+                UpdateSysSizing(state, state.outputFiles, EndSysSizingCalc);
                 SysSizingRunDone = true;
             } else {
                 ShowSevereError(RoutineName + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
@@ -661,6 +666,22 @@ namespace SizingManager {
                     PreDefTableEntry(pdchZnClPkOAHum, curName, HumRatAtPeak, 5);
                     PreDefTableEntry(pdchZnClPkOAMinFlow, curName, FinalZoneSizing(CtrlZoneNum).MinOA, 3);
                     PreDefTableEntry(pdchZnClPkDOASHeatGain, curName, DOASHeatGainRateAtClPk);
+                } else {
+                    curName = FinalZoneSizing(CtrlZoneNum).ZoneName;
+                    PreDefTableEntry(pdchZnClCalcDesLd, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnClUserDesLd, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnClUserDesLdPerArea, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnClCalcDesAirFlow, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnClUserDesAirFlow, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnClDesDay, curName, "N/A");
+                    PreDefTableEntry(pdchZnClPkTime, curName, "N/A");
+                    PreDefTableEntry(pdchZnClPkTstatTemp, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnClPkIndTemp, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnClPkIndHum, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnClPkOATemp, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnClPkOAHum, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnClPkOAMinFlow, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnClPkDOASHeatGain, curName, 0.0, 1);
                 }
                 if (FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow > 0.0) {
                     TimeStepAtPeak = FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
@@ -708,6 +729,22 @@ namespace SizingManager {
                     PreDefTableEntry(pdchZnHtPkOAHum, curName, HumRatAtPeak, 5);
                     PreDefTableEntry(pdchZnHtPkOAMinFlow, curName, FinalZoneSizing(CtrlZoneNum).MinOA, 3);
                     PreDefTableEntry(pdchZnHtPkDOASHeatGain, curName, DOASHeatGainRateAtHtPk);
+                } else {
+                    curName = FinalZoneSizing(CtrlZoneNum).ZoneName;
+                    PreDefTableEntry(pdchZnHtCalcDesLd, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnHtUserDesLd, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnHtUserDesLdPerArea, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnHtCalcDesAirFlow, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnHtUserDesAirFlow, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnHtDesDay, curName, "N/A");
+                    PreDefTableEntry(pdchZnHtPkTime, curName, "N/A");
+                    PreDefTableEntry(pdchZnHtPkTstatTemp, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnHtPkIndTemp, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnHtPkIndHum, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnHtPkOATemp, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnHtPkOAHum, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnHtPkOAMinFlow, curName, 0.0, 1);
+                    PreDefTableEntry(pdchZnHtPkDOASHeatGain, curName, 0.0, 1);
                 }
             }
             // Deallocate arrays no longer needed
@@ -3874,11 +3911,8 @@ namespace SizingManager {
         using DataEnvironment::EndMonthFlag;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool Available(false); // an environment is available to process
 
-        //  return  ! remove comment to do "old way"
-
-        Available = true;
+        bool Available = true;
 
         CurOverallSimDay = 0;
         while (Available) { // do for each environment
@@ -3992,15 +4026,14 @@ namespace SizingManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
 
-        if (MyOneTimeFlag) {
+        if (ReportZoneSizingMyOneTimeFlag) {
             static constexpr auto Format_990("! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "
                                                   "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
                                                   "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
                                                   "Calc DOAS Heat Addition Rate {W}");
             print(outputFiles.eio, "{}\n", Format_990);
-            MyOneTimeFlag = false;
+            ReportZoneSizingMyOneTimeFlag = false;
         }
 
         static constexpr auto Format_991(" Zone Sizing Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
@@ -4054,13 +4087,11 @@ namespace SizingManager {
     {
         using General::RoundSigDigits;
 
-        static bool MyOneTimeFlag(true);
-
-        if (MyOneTimeFlag) {
+        if (ReportSysSizingMyOneTimeFlag) {
             print(outputFiles.eio, "{}\n",
                        "! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air "
                        "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak");
-            MyOneTimeFlag = false;
+            ReportSysSizingMyOneTimeFlag = false;
         }
         std::string dateHrMin = DesDayDate + " " + TimeIndexToHrMinString(TimeStepIndex);
         print(outputFiles.eio,

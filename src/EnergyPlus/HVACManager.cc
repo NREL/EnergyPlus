@@ -199,6 +199,14 @@ namespace HVACManager {
         bool SimHVACIterSetup(false);
         bool TriggerGetAFN(true);
         bool ReportAirHeatBalanceFirstTimeFlag(true);
+        bool MyOneTimeFlag(true);
+        bool PrintedWarmup(false);
+        bool MyEnvrnFlag(true);
+        bool DebugNamesReported(false);
+        bool MySetPointInit(true);
+        bool MyEnvrnFlag2(true);
+        bool FlowMaxAvailAlreadyReset(false);
+        bool FlowResolutionNeeded(false);
     } // namespace
     // SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
     // and zone equipment simulations
@@ -213,6 +221,14 @@ namespace HVACManager {
         SimHVACIterSetup = false;
         TriggerGetAFN = true;
         ReportAirHeatBalanceFirstTimeFlag = true;
+        MyOneTimeFlag = true;
+        PrintedWarmup = false;
+        MyEnvrnFlag = true;
+        DebugNamesReported = false;
+        MySetPointInit = true;
+        MyEnvrnFlag2 = true;
+        FlowMaxAvailAlreadyReset = false;
+        FlowResolutionNeeded = false;
     }
 
     void ManageHVAC(EnergyPlusData &state, OutputFiles &outputFiles)
@@ -315,11 +331,6 @@ namespace HVACManager {
         int NodeNum;
         bool ReportDebug;
         int ZoneNum;
-        static bool PrintedWarmup(false);
-
-        static bool MyEnvrnFlag(true);
-        static bool InitVentReportFlag(true);
-        static bool DebugNamesReported(false);
 
         static int ZTempTrendsNumSysSteps(0);
         static int SysTimestepLoop(0);
@@ -355,7 +366,6 @@ namespace HVACManager {
         if (BeginEnvrnFlag && MyEnvrnFlag) {
             AirLoopsSimOnce = false;
             MyEnvrnFlag = false;
-            InitVentReportFlag = true;
             NumOfSysTimeStepsLastZoneTimeStep = 1;
             PreviousTimeStep = TimeStepZone;
         }
@@ -374,7 +384,7 @@ namespace HVACManager {
         FracTimeStepZone = TimeStepSys / TimeStepZone;
 
         bool anyEMSRan;
-        ManageEMS(emsCallFromBeginTimestepBeforePredictor, anyEMSRan); // calling point
+        ManageEMS(state, emsCallFromBeginTimestepBeforePredictor, anyEMSRan); // calling point
 
         SetOutAirNodes();
 
@@ -515,7 +525,7 @@ namespace HVACManager {
                 OutputReportTabular::CalcHeatEmissionReport(state);
             }
 
-            ManageEMS(emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan); // EMS calling point
+            ManageEMS(state, emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan); // EMS calling point
 
             // This is where output processor data is updated for System Timestep reporting
             if (!WarmupFlag) {
@@ -616,7 +626,7 @@ namespace HVACManager {
                 }
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
             }
-            ManageEMS(emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan); // EMS calling point
+            ManageEMS(state, emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan); // EMS calling point
             // UPDATE SYSTEM CLOCKS
             SysTimeElapsed += TimeStepSys;
 
@@ -753,11 +763,7 @@ namespace HVACManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool FirstHVACIteration; // True when solution technique on first iteration
-        /////////// hoisted into namespace SimHVACIterSetup ////////////
-        // static bool IterSetup( false ); // Set to TRUE after the variable is setup for Output Reporting
-        /////////////////////////
         static int ErrCount(0); // Number of times that the maximum iterations was exceeded
-        static bool MySetPointInit(true);
         static int MaxErrCount(0);
         static std::string ErrEnvironmentName;
         int LoopNum;
@@ -870,7 +876,7 @@ namespace HVACManager {
         // Before the HVAC simulation, call ManageSetPoints to set all the HVAC
         // node setpoints
         bool anyEMSRan = false;
-        ManageEMS(emsCallFromBeforeHVACManagers, anyEMSRan); // calling point
+        ManageEMS(state, emsCallFromBeforeHVACManagers, anyEMSRan); // calling point
 
         ManageSetPoints(state);
 
@@ -881,8 +887,8 @@ namespace HVACManager {
         // the system on/off flags
         ManageSystemAvailability();
 
-        ManageEMS(emsCallFromAfterHVACManagers, anyEMSRan); // calling point
-        ManageEMS(emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
+        ManageEMS(state, emsCallFromAfterHVACManagers, anyEMSRan); // calling point
+        ManageEMS(state, emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
 
         // first explicitly call each system type with FirstHVACIteration,
 
@@ -910,7 +916,7 @@ namespace HVACManager {
         while ((SimAirLoopsFlag || SimZoneEquipmentFlag || SimNonZoneEquipmentFlag || SimPlantLoopsFlag || SimElecCircuitsFlag) &&
                (HVACManageIteration <= MaxIter)) {
 
-            ManageEMS(emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
+            ManageEMS(state, emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
 
             // Manages the various component simulations
             SimSelectedEquipment(state, SimAirLoopsFlag,
@@ -1813,9 +1819,6 @@ namespace HVACManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IterAir; // counts iterations to enforce maximum iteration limit
-        static bool MyEnvrnFlag(true);
-        static bool FlowMaxAvailAlreadyReset(false);
-        static bool FlowResolutionNeeded(false);
 
         // FLOW:
 
@@ -1831,17 +1834,17 @@ namespace HVACManager {
         }
         ResetAllPlantInterConnectFlags();
 
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (BeginEnvrnFlag && MyEnvrnFlag2) {
             // Following comment is incorrect!  (LKL) Even the first time through this does more than read in data.
             // Zone equipment data needs to be read in before air loop data to allow the
             // determination of which zones are connected to which air loops.
             // This call of ManageZoneEquipment does nothing except force the
             // zone equipment data to be read in.
             ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
-            MyEnvrnFlag = false;
+            MyEnvrnFlag2 = false;
         }
         if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            MyEnvrnFlag2 = true;
         }
 
         if (FirstHVACIteration) {
@@ -2948,8 +2951,7 @@ namespace HVACManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int AirLoopNum(0); // the air loop index
         int ControlledZoneNum;    // controlled zone index
-        static bool MyOneTimeFlag(true);
-        static bool CyclingFan(false);   // TRUE means air loop operates in cycling fan mode at some point
+        bool CyclingFan(false);   // TRUE means air loop operates in cycling fan mode at some point
         static int ZoneNum(0);           // zone index
         int LightNum;                    // Lights object index
         int SurfNum;                     // Surface index

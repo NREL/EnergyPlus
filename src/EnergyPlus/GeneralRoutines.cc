@@ -98,6 +98,11 @@
 
 namespace EnergyPlus {
 
+    bool MyICSEnvrnFlag(true);    // Local environment flag for ICS
+
+void GeneralRoutines_clear_state() {
+    MyICSEnvrnFlag = true;
+}
 
 // Integer constants for different system types handled by the routines in this file
 enum GeneralRoutinesEquipNums
@@ -1101,11 +1106,10 @@ void CalcPassiveExteriorBaffleGap(ConvectionCoefficientsData &dataConvectionCoef
     Real64 LocalOutDryBulbTemp;          // OutDryBulbTemp for here
     Real64 LocalWetBulbTemp;             // OutWetBulbTemp for here
     Real64 LocalOutHumRat;               // OutHumRat for here
-    static bool ICSCollectorIsOn(false); // ICS collector has OSCM on
+    bool ICSCollectorIsOn(false); // ICS collector has OSCM on
     int CollectorNum;                    // current solar collector index
     Real64 ICSWaterTemp;                 // ICS solar collector water temp
     Real64 ICSULossbottom;               // ICS solar collector bottom loss Conductance
-    static bool MyICSEnvrnFlag(true);    // Local environment flag for ICS
 
     Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, SurfPtrARR));
 

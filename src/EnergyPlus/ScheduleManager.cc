@@ -175,6 +175,7 @@ namespace ScheduleManager {
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool CheckScheduleValueMinMaxRunOnceOnly(true);
+        bool DoScheduleReportingSetup(true);
     } // namespace
 
     // Derived Types Variables
@@ -214,6 +215,7 @@ namespace ScheduleManager {
         UniqueWeekScheduleNames.clear();
         Schedule.deallocate();
         UniqueScheduleNames.clear();
+        DoScheduleReportingSetup = true;
     }
 
     void ProcessScheduleInput(OutputFiles &outputFiles)
@@ -324,7 +326,6 @@ namespace ScheduleManager {
         int UntilFld;
         int xxcount;
         //  REAL(r64) tempval
-        static bool FullYearSet(false);
         static std::string CurrentThrough;
         static std::string LastFor;
         static std::string errmsg;
@@ -1358,7 +1359,7 @@ namespace ScheduleManager {
             StartPointer = 1;
             WkCount = 0;
             DyCount = 0;
-            FullYearSet = false;
+            bool FullYearSet = false;
             while (NumField < NumAlphas) {
                 //   Process "Through"
                 if (!has_prefix(Alphas(NumField), "THROUGH:") && !has_prefix(Alphas(NumField), "THROUGH")) {
@@ -4850,7 +4851,6 @@ namespace ScheduleManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool DoScheduleReportingSetup(true);
 
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput(OutputFiles::getSingleton());
