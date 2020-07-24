@@ -6827,14 +6827,30 @@ namespace SolarShading {
             auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             // delete values from previous timestep
             if (AnyBSDF) AWinCFOverlap = 0.0;
+            std::vector<int> surfPtr;
+            std::vector<int> surfPtrWinTDD;
 
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
-                if (((Surface(SurfNum).ExtBoundCond != ExternalEnvironment) && (Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
+                if (((Surface(SurfNum).ExtBoundCond != ExternalEnvironment) &&
+                     (Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
                     SurfWinOriginalClass(SurfNum) != SurfaceClass_TDD_Diffuser)
                     continue;
                 if (!Surface(SurfNum).HeatTransSurf) continue;
                 // TH added 3/24/2010 while debugging CR 7872
                 if (!Surface(SurfNum).ExtSolar) continue;
+                surfPtr.push_back(SurfNum);
+                if (Surface(SurfNum).Class != SurfaceClass_Window && Surface(SurfNum).Class != SurfaceClass_TDD_Dome) continue;
+                surfPtrWinTDD.push_back(SurfNum);
+            }
+
+            for (int const SurfNum : surfPtr) {
+//                if (((Surface(SurfNum).ExtBoundCond != ExternalEnvironment) && (Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
+//                    SurfWinOriginalClass(SurfNum) != SurfaceClass_TDD_Diffuser)
+//                    continue;
+//                if (!Surface(SurfNum).HeatTransSurf) continue;
+//                // TH added 3/24/2010 while debugging CR 7872
+//                if (!Surface(SurfNum).ExtSolar) continue;
+
                 ConstrNum = Surface(SurfNum).Construction;
                 ConstrNumSh = SurfWinShadedConstruction(SurfNum);
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
@@ -6845,7 +6861,8 @@ namespace SolarShading {
                 ScNum = SurfWinScreenNumber(SurfNum);
                 ShadeFlag = SurfWinShadingFlag(SurfNum); // Set in subr. WindowShadingManager
                 ProfAng = 0.0;
-                if (ShadeFlag != ExtScreenOn && BlNum > 0) ProfileAngle(SurfNum, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
+                if (ShadeFlag != ExtScreenOn && BlNum > 0)
+                    ProfileAngle(SurfNum, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
                 SlatAng = SurfWinSlatAngThisTS(SurfNum);
                 VarSlats = SurfWinMovableSlats(SurfNum);
 
@@ -6878,12 +6895,13 @@ namespace SolarShading {
                     // Note: movable insulation, if present, is accounted for in subr. InitIntSolarDistribution,
                     // where QRadSWOutMvIns is calculated from QRadSWOutAbs and insulation solar absorptance
                 }
+            }
 
                 //-------------------------------------------------------------------------------------------
                 // EXTERIOR BEAM AND DIFFUSE SOLAR RADIATION ABSORBED IN THE GLASS LAYERS OF EXTERIOR WINDOWS
                 //-------------------------------------------------------------------------------------------
-
-                if (Surface(SurfNum).Class != SurfaceClass_Window && Surface(SurfNum).Class != SurfaceClass_TDD_Dome) continue;
+            for (int const SurfNum : surfPtrWinTDD) {
+//                if (Surface(SurfNum).Class != SurfaceClass_Window && Surface(SurfNum).Class != SurfaceClass_TDD_Dome) continue;
 
                 // Somewhat of a kludge
                 if (Surface(SurfNum).Class == SurfaceClass_TDD_Dome || SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser)
