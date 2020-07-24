@@ -156,6 +156,9 @@ namespace SurfaceGeometry {
 
         bool GetSurfaceDataOneTimeFlag(false);
         std::unordered_map<std::string, std::string> UniqueSurfaceNames;
+        bool firstTime(true);
+        bool noTransform(true);
+        bool CheckConvexityFirstTime(true);
     } // namespace
 
     // Following are used only during getting vertices, so are module variables here.
@@ -210,6 +213,10 @@ namespace SurfaceGeometry {
         SurfaceTmp.deallocate();
         GetSurfaceDataOneTimeFlag = false;
         UniqueSurfaceNames.clear();
+        kivaManager = HeatBalanceKivaManager::KivaManager();
+        firstTime = true;
+        noTransform = true;
+        CheckConvexityFirstTime = true;
     }
 
     void AllocateSurfaceWindows(int NumSurfaces) {
@@ -12473,8 +12480,6 @@ namespace SurfaceGeometry {
         int IOStat;
         static Real64 OldAspectRatio;
         static Real64 NewAspectRatio;
-        static bool firstTime(true);
-        static bool noTransform(true);
         static std::string transformPlane;
         int n;
         Real64 Xo;
@@ -13165,12 +13170,11 @@ namespace SurfaceGeometry {
         int J;   // Loop index
         int K;   // Loop index
         int Ind; // Location of surface vertex to be removed
-        static bool firstTime(true);
         static Real64 ACosZero; // set on firstTime
         bool SurfCollinearWarning;
         static std::string ErrLineOut; // Character string for producing error messages
 
-        if (firstTime) {
+        if (CheckConvexityFirstTime) {
             ACosZero = std::acos(0.0);
             X.allocate(MaxVerticesPerSurface + 2);
             Y.allocate(MaxVerticesPerSurface + 2);
@@ -13179,7 +13183,7 @@ namespace SurfaceGeometry {
             B.allocate(MaxVerticesPerSurface + 2);
             SurfCollinearVerts.allocate(MaxVerticesPerSurface);
             VertSize = MaxVerticesPerSurface;
-            firstTime = false;
+            CheckConvexityFirstTime = false;
         }
 
         if (NSides > VertSize) {

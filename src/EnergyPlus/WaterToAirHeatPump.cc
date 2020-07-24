@@ -131,26 +131,22 @@ namespace WaterToAirHeatPump {
     int RefrigIndex(0);           // Refrigerant index
     int WaterIndex(0);            // Water index
     bool GetCoilsInputFlag(true); // Flag set to make sure you get input once
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Computational routines
-
-    // Update routine to check convergence and update nodes
-
-    // Utility routines
+    bool MyOneTimeFlag(true);
+    bool firstTime(true);
 
     // Object Data
     Array1D<WatertoAirHPEquipConditions> WatertoAirHP;
 
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
+    void clear_state() {
+        NumWatertoAirHPs = 0;
+        CheckEquipName.clear();
+        RefrigIndex = 0;
+        WaterIndex = 0;
+        GetCoilsInputFlag = true;
+        MyOneTimeFlag = true;
+        firstTime = true;
+        WatertoAirHP.clear();
+    }
 
     void SimWatertoAirHP(BranchInputManagerData &dataBranchInputManager,
                          std::string const &CompName,   // component name
@@ -279,7 +275,7 @@ namespace WaterToAirHeatPump {
         static int MaxNums(0);   // Maximum number of numeric input fields
         static int MaxAlphas(0); // Maximum number of alpha input fields
         int IOStat;
-        static bool ErrorsFound(false);  // If errors detected in input
+        bool ErrorsFound(false);  // If errors detected in input
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string AlphArray;        // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
@@ -873,7 +869,6 @@ namespace WaterToAirHeatPump {
         int AirInletNode;   // air inlet node number
         int WaterInletNode; // water inlet node number
         int PlantOutletNode;
-        static bool MyOneTimeFlag(true);
         static Array1D_bool MyPlantScanFlag;
         static Array1D_bool MyEnvrnFlag;
         Real64 rho; // local fluid density
@@ -1246,7 +1241,6 @@ namespace WaterToAirHeatPump {
         Real64 SHReff;          // Effective sensible heat ratio at part-load condition
         Array1D<Real64> Par(4); // Parameter array passed to RegulaFalsi function
         int SolFlag;            // Solution flag returned from RegulaFalsi function
-        static bool firstTime(true);
         static Real64 LoadSideInletDBTemp_Init;  // rated conditions
         static Real64 LoadSideInletHumRat_Init;  // rated conditions
         static Real64 LoadSideAirInletEnth_Init; // rated conditions

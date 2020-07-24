@@ -150,6 +150,8 @@ namespace PondGroundHeatExchanger {
     // Object Data
     extern Array1D<PondGroundHeatExchangerData> PondGHE;
 
+    void clear_state();
+
     void GetPondGroundHeatExchanger();
 
 } // namespace PondGroundHeatExchanger

@@ -151,7 +151,8 @@ namespace PackagedTerminalHeatPump {
 
     namespace {
         // clear_state variables
-        static bool MyOneTimeFlag(true); // initialization flag
+        bool MyOneTimeFlag(true); // initialization flag
+        bool ZoneEquipmentListNotChecked(true); // False after the Zone Equipment List has been checked for items
     }                                    // namespace
 
     // Data
@@ -218,8 +219,30 @@ namespace PackagedTerminalHeatPump {
     void clear_state()
     {
         MyOneTimeFlag = true;
+        CheckEquipName.clear();
+        SupHeaterLoad = 0.0;
+        NumPTHP = 0;
+        NumPTAC = 0;
+        NumPTWSHP = 0;
+        NumPTUs = 0;
+        CompOnMassFlow = 0.0;
+        OACompOnMassFlow = 0.0;
+        CompOffMassFlow = 0.0;
+        OACompOffMassFlow = 0.0;
+        CompOnFlowRatio = 0.0;
+        CompOffFlowRatio = 0.0;
+        FanSpeedRatio = 0.0;
+        GetPTUnitInputFlag = true;
+        SaveCompressorPLR = 0.0;
+        SteamDensity = 0.0;
+        HeatingLoad = false;
+        CoolingLoad = false;
+        MinWaterFlow = 0.0;
+        TempSteamIn = 100.0;
         PTUnitUniqueNames.clear();
         PTUnit.deallocate();
+        PTUnitUNumericFields.clear();
+        ZoneEquipmentListNotChecked = true;
     }
 
     void SimPackagedTerminalUnit(EnergyPlusData &state, std::string const &CompName,   // name of the packaged terminal heat pump
@@ -3739,7 +3762,6 @@ namespace PackagedTerminalHeatPump {
         Real64 RhoAir;                                 // air density at InNode
         Real64 PartLoadFrac;                           // compressor part load fraction
         Real64 CoilMaxVolFlowRate;                     // water or steam max volumetric water flow rate
-        static bool ZoneEquipmentListNotChecked(true); // False after the Zone Equipment List has been checked for items
         int Loop;
         static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
         static Array1D_bool MySizeFlag;  // used for sizing PTHP inputs one time
@@ -3781,6 +3803,7 @@ namespace PackagedTerminalHeatPump {
             MyPlantScanFlag = true;
             MyZoneEqFlag = true;
             MyOneTimeFlag = false;
+            ZoneEquipmentListNotChecked = true;
         }
 
         if (allocated(ZoneComp)) {

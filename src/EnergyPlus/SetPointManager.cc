@@ -314,6 +314,17 @@ namespace SetPointManager {
         Real64 DCESPMCurrentLoad_Watts(0.0);
         Real64 DCESPMCondInletTemp(0.0);
         Real64 DCESPMEvapOutletTemp(0.0);
+        bool NoSurfaceGroundTempObjWarning(true); // This will cause a warning to be issued if no "surface" ground
+        // temperature object was input.
+        bool NoShallowGroundTempObjWarning(true); // This will cause a warning to be issued if no "shallow" ground
+        // temperature object was input.
+        bool NoDeepGroundTempObjWarning(true); // This will cause a warning to be issued if no "deep" ground
+        // temperature object was input.
+        bool NoFCGroundTempObjWarning(true); // This will cause a warning to be issued if no ground
+        // temperature object was input for FC Factor method
+        bool InitSetPointManagersMyEnvrnFlag(true); // flag for init once at start of environment
+        bool RunSubOptCondEntTemp(false);
+        bool RunFinalOptCondEntTemp(false);
     } // namespace
     // temperature-based flow control manager
     // Average Cooling Set Pt Mgr
@@ -449,6 +460,14 @@ namespace SetPointManager {
         ReturnWaterResetChWSetPtMgr.deallocate(); // return water reset
         ReturnWaterResetHWSetPtMgr.deallocate();  // hot-water return water reset
         SchTESSetPtMgr.deallocate();              // TES Scheduled setpoint Managers
+
+        NoSurfaceGroundTempObjWarning = true;
+        NoShallowGroundTempObjWarning = true;
+        NoDeepGroundTempObjWarning = true;
+        NoFCGroundTempObjWarning = true;
+        InitSetPointManagersMyEnvrnFlag = true;
+        RunSubOptCondEntTemp = false;
+        RunFinalOptCondEntTemp = false;
     }
 
     void ManageSetPoints(EnergyPlusData &state)
@@ -511,7 +530,7 @@ namespace SetPointManager {
     void GetSetPointManagerInputs(EnergyPlusData &state)
     {
         // wrapper for GetInput to allow unit testing when fatal inputs are detected
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         static std::string const RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
 
         GetSetPointManagerInputData(state, ErrorsFound);
@@ -603,17 +622,9 @@ namespace SetPointManager {
         int ZoneNum;        // loop index for zone nodes
         int NumNodes;
         Array1D_int NodeNums;
-        static bool NodeListError(false);
+        bool NodeListError(false);
         bool ErrInList;
         int Found;
-        static bool NoSurfaceGroundTempObjWarning(true); // This will cause a warning to be issued if no "surface" ground
-        // temperature object was input.
-        static bool NoShallowGroundTempObjWarning(true); // This will cause a warning to be issued if no "shallow" ground
-        // temperature object was input.
-        static bool NoDeepGroundTempObjWarning(true); // This will cause a warning to be issued if no "deep" ground
-        // temperature object was input.
-        static bool NoFCGroundTempObjWarning(true); // This will cause a warning to be issued if no ground
-        // temperature object was input for FC Factor method
 
         NumNodesCtrld = 0;
         CtrldNodeNum = 0;
@@ -3792,8 +3803,6 @@ namespace SetPointManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        static bool MyEnvrnFlag(true); // flag for init once at start of environment
-
         int SetZoneNum;
         int ControlledZoneNum;
         int ZoneNode;
@@ -3805,7 +3814,7 @@ namespace SetPointManager {
         int AirLoopNum;
         int LoopNum;
         int LoopNum2;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int ConZoneNum;
         int MixedAirNode;
         int BranchNum;
@@ -3813,7 +3822,6 @@ namespace SetPointManager {
         int InletBranchNum;
         int CompNum;
         int CompNum2;
-        static bool LookForFan(false);
         std::string CompType;
         std::string cSetPointManagerType;
         int FanNodeIn;
@@ -3981,7 +3989,7 @@ namespace SetPointManager {
                     AirLoopNum = 0;
                     InletBranchNum = 0;
                     LoopInNode = 0;
-                    LookForFan = false;
+                    bool LookForFan = false;
                     ZoneInletNode = SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum;
                     ZoneNode = SingZoneRhSetPtMgr(SetPtMgrNum).ZoneNodeNum;
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
@@ -4586,12 +4594,11 @@ namespace SetPointManager {
             InitSetPointManagersOneTimeFlag = false;
 
             if (ErrorsFound) {
-                ErrorsFound = false;
                 ShowFatalError("InitSetPointManagers: Errors found in getting SetPointManager input.");
             }
         }
 
-        if ((BeginEnvrnFlag && MyEnvrnFlag) || InitSetPointManagersOneTimeFlag2) {
+        if ((BeginEnvrnFlag && InitSetPointManagersMyEnvrnFlag) || InitSetPointManagersOneTimeFlag2) {
 
             ManagerOn = false;
 
@@ -5017,7 +5024,7 @@ namespace SetPointManager {
                     ReturnWaterResetHWSetPtMgr(SetPtMgrNum).maximumHotWaterSetpoint;
             }
 
-            MyEnvrnFlag = false;
+            InitSetPointManagersMyEnvrnFlag = false;
             if (!InitSetPointManagersOneTimeFlag) InitSetPointManagersOneTimeFlag2 = false;
 
             if (ErrorsFound) {
@@ -5026,7 +5033,7 @@ namespace SetPointManager {
 
         } // end begin environment inits
         if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            InitSetPointManagersMyEnvrnFlag = true;
         }
     }
 
@@ -6018,7 +6025,6 @@ namespace SetPointManager {
         Real64 MinSetPoint;     // minimum allowed setpoint
         Real64 MaxSetPoint;     // maximum allowed setpoint
         bool HumiditySetPoint;  // logical to indicate if this is a humidity setpoint
-        static bool LocalSetPointCheckFailed(false);
 
         RefNode = this->RefNode;
         MixedOutNode = this->MixedOutNode;
@@ -6063,7 +6069,7 @@ namespace SetPointManager {
                     ShowContinueError("use a Setpoint Manager to establish a setpoint at this node.");
                     ShowFatalError("Missing reference setpoint.");
                 } else {
-                    LocalSetPointCheckFailed = false;
+                    bool LocalSetPointCheckFailed = false;
                     {
                         auto const SELECT_CASE_var(this->CtrlTypeMode);
                         if (SELECT_CASE_var == iCtrlVarType_Temp) { // 'Temperature'
@@ -7434,8 +7440,6 @@ namespace SetPointManager {
         static Real64 CurLoad(0.0);           // Current cooling load, W
         static Real64 TotEnergy(0.0);         // Total energy consumptions at this time step
         static Real64 TotEnergyPre(0.0);      // Total energy consumptions at the previous time step
-        static bool RunSubOptCondEntTemp(false);
-        static bool RunFinalOptCondEntTemp(false);
 
         if (MetersHaveBeenInitialized) {
             // Setup meter vars

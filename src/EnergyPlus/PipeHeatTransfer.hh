@@ -243,8 +243,6 @@ namespace PipeHeatTransfer {
 
         static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
-        void clear_state();
-
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
         void PushInnerTimeStepArrays();
@@ -283,6 +281,8 @@ namespace PipeHeatTransfer {
 
     // Object Data
     extern Array1D<PipeHTData> PipeHT;
+
+    void clear_state();
 
     void GetPipesHeatTransfer(EnergyPlusData &state);
 

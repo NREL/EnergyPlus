@@ -153,7 +153,7 @@ namespace CTElectricGenerator {
         int IOStat;                     // IO Status when calling get input subroutine
         Array1D_string AlphArray(12);   // character string data
         Array1D<Real64> NumArray(12);   // numeric data
-        static bool ErrorsFound(false); // error flag
+        bool ErrorsFound(false); // error flag
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:CombustionTurbine";
         dataCTElectricGenerator.NumCTGenerators = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);

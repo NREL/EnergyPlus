@@ -126,7 +126,27 @@ namespace ElectricBaseboardRadiator {
     Array1D<ElecBaseboardParams> ElecBaseboard;
     Array1D<ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
 
+    bool GetInputFlag(true); // One time get input flag
+    bool MyOneTimeFlag(true);
+    bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
+
     // Functions
+    void clear_state() {
+        NumElecBaseboards = 0;
+        QBBElecRadSource.clear();
+        QBBElecRadSrcAvg.clear();
+        ZeroSourceSumHATsurf.clear();
+        LastQBBElecRadSrc.clear();
+        LastSysTimeElapsed.clear();
+        LastTimeStepSys.clear();
+        MySizeFlag.clear();
+        CheckEquipName.clear();
+        ElecBaseboard.clear();
+        ElecBaseboardNumericFields.clear();
+        GetInputFlag = true; // One time get input flag
+        MyOneTimeFlag = true;
+        ZoneEquipmentListChecked = false;
+    }
 
     void SimElecBaseboard(EnergyPlusData &state, std::string const &EquipName,
                           int const EP_UNUSED(ActualZoneNum),
@@ -152,7 +172,6 @@ namespace ElectricBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum;               // Index of unit in baseboard array
-        static bool GetInputFlag(true); // One time get input flag
 
         if (GetInputFlag) {
             GetElectricBaseboardInput();
@@ -245,7 +264,7 @@ namespace ElectricBaseboardRadiator {
         int NumNumbers;
         int SurfNum; // surface number that radiant heat delivered
         int IOStat;
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
 
         cCurrentModuleObject = cCMO_BBRadiator_Electric;
 
@@ -571,8 +590,6 @@ namespace ElectricBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNode;
-        static bool MyOneTimeFlag(true);
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int ZoneNum;
         int Loop;
         static Array1D_bool MyEnvrnFlag;
@@ -947,18 +964,6 @@ namespace ElectricBaseboardRadiator {
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int Iter(0);
-        static bool MyEnvrnFlag(true);
-
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
-            Iter = 0;
-            MyEnvrnFlag = false;
-        }
-        if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
-        }
 
         // First, update the running average if necessary...
         if (LastSysTimeElapsed(BaseboardNum) == SysTimeElapsed) {

@@ -134,7 +134,6 @@ namespace WindowComplexManager {
 
         using namespace Vectors;
 
-        static bool Once(true); // Flag for insuring things happen once
         static int IBasis(0);   // Index for identifying basis in dataWindowComplexManager.BasisList
         static int ISurf(0);    // Index for sorting thru Surface array
         static int IConst(0);   // Index for accessing Construct array
@@ -156,6 +155,24 @@ namespace WindowComplexManager {
         Array1D<Real64> V(3);   // vector array
         Real64 VLen;            // Length of vector array
         int NHold;              // No. values in the Temporary array
+
+        if (dataWindowComplexManager.resetAbunchOfStuff) {
+            IBasis = 0;
+            ISurf = 0;
+            IConst = 0;
+            IState = 0;
+            IWind = 0;
+            I = 0;
+            J = 0;
+            JSurf = 0;
+            K = 0;
+            KBkSurf = 0;
+            KBasis = 0;
+            NumBasis = 0;
+            NBkSurf = 0;
+            MatrixNo = 0;
+            dataWindowComplexManager.resetAbunchOfStuff = false;
+        }
 
         struct TempBasisIdx
         {
@@ -268,7 +285,7 @@ namespace WindowComplexManager {
                     if (K > NHold) break;
                     KBasis = IHold(K).Basis;
                     J = IHold(K).State;
-                    Once = true;
+                    dataWindowComplexManager.InitBSDFWindowsOnce = true;
                     for (I = J + 1; I <= dataWindowComplexManager.WindowList(IWind).NumStates; ++I) { // See if subsequent states have the same basis
                         if ((dataWindowComplexManager.WindowStateList(I, dataWindowComplexManager.NumComplexWind).InitInc == dataWindowComplexManager.Calculate_Geometry) &&
                             (dataWindowComplexManager.WindowStateList(I, dataWindowComplexManager.NumComplexWind).IncBasisIndx == KBasis)) {
@@ -279,8 +296,8 @@ namespace WindowComplexManager {
                             dataWindowComplexManager.WindowStateList(I, dataWindowComplexManager.NumComplexWind).InitTrn = dataWindowComplexManager.Copy_Geometry;
                             dataWindowComplexManager.WindowStateList(I, dataWindowComplexManager.NumComplexWind).CopyIncState = J;
                             dataWindowComplexManager.WindowStateList(I, dataWindowComplexManager.NumComplexWind).CopyTrnState = J;
-                        } else if (Once) {
-                            Once = false; // First occurrence of a different basis
+                        } else if (dataWindowComplexManager.InitBSDFWindowsOnce) {
+                            dataWindowComplexManager.InitBSDFWindowsOnce = false; // First occurrence of a different basis
                             ++NHold;
                             IHold(NHold).State = I;
                             IHold(NHold).Basis = dataWindowComplexManager.WindowStateList(I, IWind).IncBasisIndx;
@@ -513,11 +530,9 @@ namespace WindowComplexManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Extract simple init for Complex Windows
 
-        static bool Once(true); // Flag for insuring things happen once
-
         // One-time initialization
-        if (Once) {
-            Once = false;
+        if (dataWindowComplexManager.InitComplexWindowsOnce) {
+            dataWindowComplexManager.InitComplexWindowsOnce = false;
             InitBSDFWindows(dataWindowComplexManager);
             CalcStaticProperties(dataWindowComplexManager);
         }
@@ -960,15 +975,13 @@ namespace WindowComplexManager {
         // Calculates the basis length for a Window6 Non-Symmetric or Axisymmetric basis
         // from the input basis matrix
 
-        int ZoneNum;                 // Zone Number
-        int SurfNum;                 // Surface Number
-        static int NumSurfInZone(0); // Number of zone surfaces
-        static bool ComplexFenInZone(false);
+        int NumSurfInZone(0); // Number of zone surfaces
+        bool ComplexFenInZone(false);
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             ComplexFenInZone = false;
-            for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) ComplexFenInZone = true;
+            for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+                if (SurfaceWindow(SurfNum).WindowModelType == WindowBSDFModel) ComplexFenInZone = true;
             }
             if (ComplexFenInZone) {
                 NumSurfInZone = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1;
@@ -2548,7 +2561,6 @@ namespace WindowComplexManager {
         //     (A, B, C for max of 10 gasses) {maxgas x 3}
         static Array1D<Real64> wght(maxgas, 0.0); // Vector of Molecular weights for gasses {maxgas}
         static Array1D<Real64> gama(maxgas, 0.0); // Vector of spefic heat ration for low pressure calc {maxgas}
-        static bool feedData(false);              // flag to notify if data needs to be feed into gas arrays
         static Array1D_int nmix(maxlay + 1, 0);   // Vector of number of gasses in gas mixture of each gap {maxlay+1}
         static Real64 hin(0.0);                   // Indoor combined film coefficient (if non-zero) [W/m^2.K]
         static Real64 hout(0.0);                  // Outdoor combined film coefficient (if non-zero) [W/m^2.K]
@@ -3065,6 +3077,7 @@ namespace WindowComplexManager {
                     // to be correctly referenced by gap arrays
 
                     // First check if gas coefficients are already part of array.  Duplicates are not necessary
+                    bool feedData(false);
                     CheckGasCoefs(dataMaterial.Material(GasPointer).GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
                     if (feedData) {
                         wght(iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasWght(IMix);
@@ -3528,12 +3541,9 @@ namespace WindowComplexManager {
         // Argument array dimensioning
         EP_SIZE_CHECK(wght, maxgas);
 
-        static int counter(1);
-        static bool coeffFound(false);
-
         feedData = false;
-        coeffFound = false;
-        counter = 1;
+        bool coeffFound = false;
+        int counter = 1;
         while ((counter <= maxgas) && (wght(counter) != 0) && (!coeffFound)) {
             if (std::abs(currentWeight - wght(counter)) < 1.0e-5) {
                 coeffFound = true;

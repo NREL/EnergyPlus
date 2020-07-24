@@ -105,8 +105,6 @@ namespace WindTurbine {
 
     static std::string const BlankString;
 
-    // Functions
-
     void SimWindTurbine(WindTurbineData &dataWindTurbine, int const EP_UNUSED(GeneratorType), // Type of Generator
                         std::string const &GeneratorName,   // User specified name of Generator
                         int &GeneratorIndex,                // Generator index
@@ -129,13 +127,12 @@ namespace WindTurbine {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true);
         int WindTurbineNum;
         // Obtains and allocates heat balance related parameters from input
 
-        if (GetInputFlag) {
+        if (dataWindTurbine.GetInputFlag) {
             GetWindTurbineInput(dataWindTurbine);
-            GetInputFlag = false;
+            dataWindTurbine.GetInputFlag = false;
         }
 
         if (GeneratorIndex == 0) {
@@ -214,7 +211,7 @@ namespace WindTurbine {
         Real64 const DefaultH(50.0);       // Default of height for local wind speed
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         int WindTurbineNum;             // Wind turbine number
         int NumAlphas;                  // Number of Alphas for each GetobjectItem call
         int NumNumbers;                 // Number of Numbers for each GetobjectItem call
@@ -639,7 +636,6 @@ namespace WindTurbine {
         static char const TabChr('\t'); // Tab character
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
-        static bool MyOneTimeFlag(true);
         int ReadStatus;               // Reading status of stat file
         int statFile;                 // Weather Stat File
         std::string::size_type lnPtr; // scan pointer for Line input
@@ -653,7 +649,7 @@ namespace WindTurbine {
         Real64 LocalTMYWS;              // Annual average wind speed at the rotor height
 
         // Estimate average annual wind speed once
-        if (MyOneTimeFlag) {
+        if (dataWindTurbine.MyOneTimeFlag) {
             wsStatFound = false;
             {
                 IOFlags flags;
@@ -735,7 +731,7 @@ namespace WindTurbine {
                 ShowWarningError("InitWindTurbine: stat file missing. TMY Wind Speed adjusted at the height is used.");
             }
 
-            MyOneTimeFlag = false;
+            dataWindTurbine.MyOneTimeFlag = false;
         }
 
         dataWindTurbine.WindTurbineSys(WindTurbineNum).AnnualTMYWS = AnnualTMYWS;
