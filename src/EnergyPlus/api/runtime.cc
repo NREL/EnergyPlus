@@ -48,6 +48,7 @@
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Data/CommonIncludes.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/runtime.h>
 #include <EnergyPlus/StateManagement.hh>

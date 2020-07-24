@@ -45,39 +45,17 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/api/EnergyPlusPgm.hh>
-#include <EnergyPlus/Data/CommonIncludes.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <iostream>
+#ifndef ENERGYPLUS_DATA_COMMONINCLUDES
+#define ENERGYPLUS_DATA_COMMONINCLUDES
 
-void message_callback_handler(std::string const &message)
-{
-    std::cout << "EnergyPlusLibrary (message): " << message << std::endl;
-}
+// OK, now that we have split the EnergyPlusData class into a header and source file, and we are moving member
+// variables to pointer type, we no longer need to #include those headers in the Data header file.  But there are now
+// other places where we do need those includes, and multiple spots actually.  So I am putting all the required includes
+// here in this one file.  Basically, when a header inclusion is removed from EnergyPlusData.hh, put it here.
 
-void progress_callback_handler(int const progress)
-{
-    std::cout << "EnergyPlusLibrary (progress): " << progress << std::endl;
-}
+// these are needed so that we don't have incomplete types when we manage the EnergyPlusData instance
+#include <EnergyPlus/AirLoopHVACDOAS.hh>
+#include <EnergyPlus/BaseboardElectric.hh>
+#include <EnergyPlus/BaseboardRadiator.hh>
 
-int main(int argc, char *argv[])
-{
-    std::cout << "Using EnergyPlus as a library." << std::endl;
-    StoreMessageCallback(message_callback_handler);
-    StoreProgressCallback(progress_callback_handler);
-
-    int status(EXIT_FAILURE);
-    if (argc < 2) {
-        std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
-        return EXIT_FAILURE;
-    } else {
-        EnergyPlus::EnergyPlusData state;
-        status = RunEnergyPlus(state, argv[1]);
-    }
-    if (!std::cin.good()) std::cin.clear();
-    if (!std::cerr.good()) std::cerr.clear();
-    if (!std::cout.good()) std::cout.clear();
-    std::cerr << "Standard error is still available for use" << std::endl;
-    std::cout << "Standard output is still available for use" << std::endl;
-    return status;
-}
+#endif

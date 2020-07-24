@@ -1451,11 +1451,11 @@ namespace SimAirServingZones {
                                 PrimaryAirSystem(AirSysNum).Name);
         }
 
-        state.dataAirLoopHVACDOAS.numAirLoopDOAS = inputProcessor->getNumObjectsFound("AirLoopHVAC:DedicatedOutdoorAirSystem");
-        if (state.dataAirLoopHVACDOAS.numAirLoopDOAS > 0) {
-            if (state.dataAirLoopHVACDOAS.GetInputOnceFlag) {
+        state.dataAirLoopHVACDOAS->numAirLoopDOAS = inputProcessor->getNumObjectsFound("AirLoopHVAC:DedicatedOutdoorAirSystem");
+        if (state.dataAirLoopHVACDOAS->numAirLoopDOAS > 0) {
+            if (state.dataAirLoopHVACDOAS->GetInputOnceFlag) {
                 AirLoopHVACDOAS::getAirLoopHVACDOASInput(state);
-                state.dataAirLoopHVACDOAS.GetInputOnceFlag = false;
+                state.dataAirLoopHVACDOAS->GetInputOnceFlag = false;
             }
         }
     }
@@ -2632,11 +2632,11 @@ namespace SimAirServingZones {
 
         } // End of Air Loop iteration
 
-        if (state.dataAirLoopHVACDOAS.numAirLoopDOAS > 0) {
+        if (state.dataAirLoopHVACDOAS->numAirLoopDOAS > 0) {
             int index;
             Real64 OAMassFLowrate = 0.0;
-            for (std::size_t loop = 0; loop < state.dataAirLoopHVACDOAS.airloopDOAS.size(); ++loop) {
-                auto &thisAirLoopDOASObjec = state.dataAirLoopHVACDOAS.airloopDOAS[loop]; // <- regular reference variable, not a pointer
+            for (std::size_t loop = 0; loop < state.dataAirLoopHVACDOAS->airloopDOAS.size(); ++loop) {
+                auto &thisAirLoopDOASObjec = state.dataAirLoopHVACDOAS->airloopDOAS[loop]; // <- regular reference variable, not a pointer
                 if (thisAirLoopDOASObjec.m_AirLoopDOASNum > -1) {
                     index = thisAirLoopDOASObjec.m_AirLoopDOASNum;
                 } else {

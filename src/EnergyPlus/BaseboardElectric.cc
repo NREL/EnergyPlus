@@ -104,46 +104,46 @@ namespace BaseboardElectric {
         int BaseboardNum;               // index of unit in baseboard array
         Real64 QZnReq;                  // zone load not yet satisfied
 
-        if (state.dataBaseboardElectric.getInputFlag) {
-            GetBaseboardInput(state.dataBaseboardElectric);
-            state.dataBaseboardElectric.getInputFlag = false;
+        if (state.dataBaseboardElectric->getInputFlag) {
+            GetBaseboardInput(*state.dataBaseboardElectric);
+            state.dataBaseboardElectric->getInputFlag = false;
         }
 
         auto &baseboard = state.dataBaseboardElectric;
 
         // Find the correct Baseboard Equipment
         if (CompIndex == 0) {
-            BaseboardNum = UtilityRoutines::FindItemInList(EquipName, baseboard.Baseboard, &BaseboardParams::EquipName);
+            BaseboardNum = UtilityRoutines::FindItemInList(EquipName, baseboard->Baseboard, &BaseboardParams::EquipName);
             if (BaseboardNum == 0) {
                 ShowFatalError("SimElectricBaseboard: Unit not found=" + EquipName);
             }
             CompIndex = BaseboardNum;
         } else {
             BaseboardNum = CompIndex;
-            if (BaseboardNum > baseboard.NumBaseboards || BaseboardNum < 1) {
+            if (BaseboardNum > baseboard->NumBaseboards || BaseboardNum < 1) {
                 ShowFatalError("SimElectricBaseboard:  Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) +
-                               ", Number of Units=" + TrimSigDigits(baseboard.NumBaseboards) + ", Entered Unit name=" + EquipName);
+                               ", Number of Units=" + TrimSigDigits(baseboard->NumBaseboards) + ", Entered Unit name=" + EquipName);
             }
-            if (baseboard.Baseboard(BaseboardNum).CheckEquipName) {
-                if (EquipName != baseboard.Baseboard(BaseboardNum).EquipName) {
+            if (baseboard->Baseboard(BaseboardNum).CheckEquipName) {
+                if (EquipName != baseboard->Baseboard(BaseboardNum).EquipName) {
                     ShowFatalError("SimElectricBaseboard: Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) + ", Unit name=" + EquipName +
-                                   ", stored Unit Name for that index=" + baseboard.Baseboard(BaseboardNum).EquipName);
+                                   ", stored Unit Name for that index=" + baseboard->Baseboard(BaseboardNum).EquipName);
                 }
-                baseboard.Baseboard(BaseboardNum).CheckEquipName = false;
+                baseboard->Baseboard(BaseboardNum).CheckEquipName = false;
             }
         }
 
-        InitBaseboard(state, baseboard, BaseboardNum, ControlledZoneNum);
+        InitBaseboard(state, *baseboard, BaseboardNum, ControlledZoneNum);
 
         QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
 
         // Simulate baseboard
-        SimElectricConvective(baseboard, BaseboardNum, QZnReq);
+        SimElectricConvective(*baseboard, BaseboardNum, QZnReq);
 
-        PowerMet = baseboard.Baseboard(BaseboardNum).Power;
+        PowerMet = baseboard->Baseboard(BaseboardNum).Power;
 
-        baseboard.Baseboard(BaseboardNum).Energy = baseboard.Baseboard(BaseboardNum).Power * DataHVACGlobals::TimeStepSys * SecInHour;
-        baseboard.Baseboard(BaseboardNum).ElecUseLoad = baseboard.Baseboard(BaseboardNum).ElecUseRate * DataHVACGlobals::TimeStepSys * SecInHour;
+        baseboard->Baseboard(BaseboardNum).Energy = baseboard->Baseboard(BaseboardNum).Power * DataHVACGlobals::TimeStepSys * SecInHour;
+        baseboard->Baseboard(BaseboardNum).ElecUseLoad = baseboard->Baseboard(BaseboardNum).ElecUseRate * DataHVACGlobals::TimeStepSys * SecInHour;
     }
 
     void GetBaseboardInput(BaseboardElectricData &baseboard)

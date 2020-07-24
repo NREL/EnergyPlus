@@ -45,39 +45,59 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/api/EnergyPlusPgm.hh>
-#include <EnergyPlus/Data/CommonIncludes.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <iostream>
+#include <EnergyPlus/Data/CommonIncludes.hh>
+#include <EnergyPlus/OutputFiles.hh>
 
-void message_callback_handler(std::string const &message)
-{
-    std::cout << "EnergyPlusLibrary (message): " << message << std::endl;
-}
+#include <memory>
 
-void progress_callback_handler(int const progress)
-{
-    std::cout << "EnergyPlusLibrary (progress): " << progress << std::endl;
-}
+namespace EnergyPlus {
 
-int main(int argc, char *argv[])
-{
-    std::cout << "Using EnergyPlus as a library." << std::endl;
-    StoreMessageCallback(message_callback_handler);
-    StoreProgressCallback(progress_callback_handler);
-
-    int status(EXIT_FAILURE);
-    if (argc < 2) {
-        std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
-        return EXIT_FAILURE;
-    } else {
-        EnergyPlus::EnergyPlusData state;
-        status = RunEnergyPlus(state, argv[1]);
+    EnergyPlusData::EnergyPlusData() {
+        OutputFiles::setSingleton(&outputFiles);
+        this->dataAirLoopHVACDOAS = std::unique_ptr<AirLoopHVACDOASData>(new AirLoopHVACDOASData);
+        this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
+        this->dataBaseboardElectric =  std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
     }
-    if (!std::cin.good()) std::cin.clear();
-    if (!std::cerr.good()) std::cerr.clear();
-    if (!std::cout.good()) std::cout.clear();
-    std::cerr << "Standard error is still available for use" << std::endl;
-    std::cout << "Standard output is still available for use" << std::endl;
-    return status;
+
+    void EnergyPlusData::clear_state() {
+        dataAirLoopHVACDOAS->clear_state();
+        dataBaseboardElectric->clear_state();
+        dataBaseboardRadiator->clear_state();
+        dataBoilers.clear_state();
+        dataBranchInputManager.clear_state();
+        dataSteamBoilers.clear_state();
+        dataChilledCeilingPanelSimple.clear_state();
+        dataChillerAbsorbers.clear_state();
+        dataChillerElectricEIR.clear_state();
+        dataChillerExhaustAbsorption.clear_state();
+        dataChillerGasAbsorption.clear_state();
+        dataChillerIndirectAbsorption.clear_state();
+        dataChillerReformulatedEIR.clear_state();
+        dataConvectionCoefficients.clear_state();
+        dataCondenserLoopTowers.clear_state();
+        dataCostEstimateManager.clear_state();
+        dataCoolTower.clear_state();
+        dataCTElectricGenerator.clear_state();
+        dataCrossVentMgr.clear_state();
+        dataGlobals.clear_state();
+        exteriorEnergyUse.clear_state();
+        fans.clear_state();
+        //outputReportTabular.clear_state();
+        pipes.clear_state();
+        dataPlantChillers.clear_state();
+        dataWaterUse.clear_state();
+        dataWindowAC.clear_state();
+        dataWindowComplexManager.clear_state();
+        dataWindowEquivalentLayer.clear_state();
+        dataWindowManager.clear_state();
+        dataWindTurbine.clear_state();
+        dataZoneAirLoopEquipmentManager.clear_state();
+        dataZoneContaminantPredictorCorrector.clear_state();
+        dataZoneDehumidifier.clear_state();
+        dataZoneEquipmentManager.clear_state();
+        dataZonePlenum.clear_state();
+        dataZoneTempPredictorCorrector.clear_state();
+    }
+
 }
