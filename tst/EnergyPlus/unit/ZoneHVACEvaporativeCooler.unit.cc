@@ -199,7 +199,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     ScheduleManager::ProcessScheduleInput(state.files);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    Fans::GetFanInput(state.fans, state.files);
+    Fans::GetFanInput(state);
     ASSERT_FALSE(ErrorsFound);
     EvaporativeCoolers::GetEvapInput();
     ASSERT_FALSE(ErrorsFound);
@@ -323,7 +323,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     ScheduleManager::ProcessScheduleInput(state.files);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    Fans::GetFanInput(state.fans, state.files);
+    Fans::GetFanInput(state);
     ASSERT_FALSE(ErrorsFound);
     EvaporativeCoolers::GetEvapInput();
     ASSERT_FALSE(ErrorsFound);
@@ -452,7 +452,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     ScheduleManager::ProcessScheduleInput(state.files);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    Fans::GetFanInput(state.fans, state.files);
+    Fans::GetFanInput(state);
     ASSERT_FALSE(ErrorsFound);
     EvaporativeCoolers::GetEvapInput();
     ASSERT_FALSE(ErrorsFound);

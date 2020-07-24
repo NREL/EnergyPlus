@@ -737,8 +737,7 @@ namespace ZoneAirLoopEquipmentManager {
                     AirDistUnit(AirDistUnitNum).airTerminalPtr->simulate(state, FirstHVACIteration, NonAirSysOutput);
 
                 } else if (SELECT_CASE_var == SingleDuctUserDefined) {
-                    SimAirTerminalUserDefined(state.dataBranchInputManager,
-                                              state.files,
+                    SimAirTerminalUserDefined(state,
                                               AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                               FirstHVACIteration,
                                               ActualZoneNum,

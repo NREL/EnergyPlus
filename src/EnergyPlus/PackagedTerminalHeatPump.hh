@@ -525,7 +525,7 @@ namespace PackagedTerminalHeatPump {
                                     Real64 &PartLoadRatio          // coil part-load ratio
     );
 
-    void SetMinOATCompressor(IOFiles &ioFiles,
+    void SetMinOATCompressor(EnergyPlusData &state,
                              int const FurnaceNum,                    // index to furnace
                              std::string const &FurnaceName,          // name of furnace
                              std::string const &cCurrentModuleObject, // type of furnace

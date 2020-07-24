@@ -1168,7 +1168,7 @@ namespace Furnaces {
             FanType = Alphas(7);
             FanName = Alphas(8);
             errFlag = false;
-            GetFanType(state.fans, state.files, FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
+            GetFanType(state, FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
             if (errFlag) {
                 ErrorsFound = true;
             }
@@ -1183,7 +1183,7 @@ namespace Furnaces {
 
                     // Get the fan index
                     errFlag = false;
-                    GetFanIndex(state.fans, state.files, FanName, Furnace(FurnaceNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                    GetFanIndex(state, FanName, Furnace(FurnaceNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1191,7 +1191,7 @@ namespace Furnaces {
 
                     // Set the Design Fan Volume Flow Rate
                     errFlag = false;
-                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, state.files, FanType, FanName, errFlag);
+                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
                     Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
 
                     if (errFlag) {
@@ -1201,7 +1201,7 @@ namespace Furnaces {
 
                     // Get the Fan Inlet Node
                     errFlag = false;
-                    FanInletNode = GetFanInletNode(state.fans, state.files, FanType, FanName, errFlag);
+                    FanInletNode = GetFanInletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1209,7 +1209,7 @@ namespace Furnaces {
 
                     // Get the Fan Outlet Node
                     errFlag = false;
-                    FanOutletNode = GetFanOutletNode(state.fans, state.files, FanType, FanName, errFlag);
+                    FanOutletNode = GetFanOutletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1217,7 +1217,7 @@ namespace Furnaces {
 
                     // Get the fan's availabitlity schedule
                     errFlag = false;
-                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, state.files, FanType, FanName, errFlag);
+                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1559,7 +1559,7 @@ namespace Furnaces {
 
             // set minimum outdoor temperature for compressor operation
             SetMinOATCompressor(
-                state.files, FurnaceNum, Alphas(1), cCurrentModuleObject, Furnace(FurnaceNum).CoolingCoilIndex, Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
+                state, FurnaceNum, Alphas(1), cCurrentModuleObject, Furnace(FurnaceNum).CoolingCoilIndex, Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
 
         } // End of the HeatOnly Furnace Loop
 
@@ -1705,7 +1705,7 @@ namespace Furnaces {
             FanName = Alphas(8);
 
             errFlag = false;
-            GetFanType(state.fans, state.files, FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
+            GetFanType(state, FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
             if (errFlag) {
                 ErrorsFound = true;
             }
@@ -1720,7 +1720,7 @@ namespace Furnaces {
 
                     // Get the fan index
                     errFlag = false;
-                    GetFanIndex(state.fans, state.files, FanName, Furnace(FurnaceNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                    GetFanIndex(state, FanName, Furnace(FurnaceNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1728,7 +1728,7 @@ namespace Furnaces {
 
                     // Get the Design Fan Volume Flow Rate
                     errFlag = false;
-                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, state.files, FanType, FanName, errFlag);
+                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
                     Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1737,7 +1737,7 @@ namespace Furnaces {
 
                     // Get the Fan Inlet Node
                     errFlag = false;
-                    FanInletNode = GetFanInletNode(state.fans, state.files, FanType, FanName, errFlag);
+                    FanInletNode = GetFanInletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1745,7 +1745,7 @@ namespace Furnaces {
 
                     // Get the Fan Outlet Node
                     errFlag = false;
-                    FanOutletNode = GetFanOutletNode(state.fans, state.files, FanType, FanName, errFlag);
+                    FanOutletNode = GetFanOutletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1753,7 +1753,7 @@ namespace Furnaces {
 
                     // Get the fan's availability schedule
                     errFlag = false;
-                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, state.files, FanType, FanName, errFlag);
+                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1979,7 +1979,7 @@ namespace Furnaces {
                 Furnace(FurnaceNum).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
                 if (UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE")) Furnace(FurnaceNum).bIsIHP = true;
             } else {
-                Furnace(FurnaceNum).CoolingCoilType_Num = GetCoilTypeNum(state.files, CoolingCoilType, CoolingCoilName, errFlag, PrintMessage);
+                Furnace(FurnaceNum).CoolingCoilType_Num = GetCoilTypeNum(state, CoolingCoilType, CoolingCoilName, errFlag, PrintMessage);
             }
 
             // If coil type not found, check to see if a HX assisted cooling coil is used.
@@ -1997,7 +1997,7 @@ namespace Furnaces {
                 } else { // mine data from DX cooling coil
 
                     // Get DX cooling coil index
-                    GetDXCoilIndex(state.files,
+                    GetDXCoilIndex(state,
                                    CoolingCoilName,
                                    Furnace(FurnaceNum).CoolingCoilIndex,
                                    IsNotOK,
@@ -2036,7 +2036,7 @@ namespace Furnaces {
                             Furnace(FurnaceNum).CondenserNodeNum = GetVSCoilCondenserInletNode(CoolingCoilName, errFlag);
                         }
                     } else {
-                        Furnace(FurnaceNum).CondenserNodeNum = GetDXCoilCondenserInletNode(state.files, CoolingCoilType, CoolingCoilName, errFlag);
+                        Furnace(FurnaceNum).CondenserNodeNum = GetDXCoilCondenserInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     }
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
@@ -2094,7 +2094,7 @@ namespace Furnaces {
                         }
                     } else {
                         Furnace(FurnaceNum).CondenserNodeNum = GetDXCoilCondenserInletNode(
-                            state.files, "COIL:COOLING:DX:SINGLESPEED", GetHXDXCoilName(state, CoolingCoilType, CoolingCoilName, errFlag), errFlag);
+                                state, "COIL:COOLING:DX:SINGLESPEED", GetHXDXCoilName(state, CoolingCoilType, CoolingCoilName, errFlag), errFlag);
                     }
 
                     if (errFlag) {
@@ -2764,7 +2764,7 @@ namespace Furnaces {
 
             // set minimum outdoor temperature for compressor operation
             SetMinOATCompressor(
-                state.files, FurnaceNum, Alphas(1), cCurrentModuleObject, Furnace(FurnaceNum).CoolingCoilIndex, Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
+                state, FurnaceNum, Alphas(1), cCurrentModuleObject, Furnace(FurnaceNum).CoolingCoilIndex, Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
 
         } // End of the HeatCool Furnace Loop
 
@@ -2890,7 +2890,7 @@ namespace Furnaces {
             FanName = Alphas(7);
 
             errFlag = false;
-            GetFanType(state.fans, state.files, FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
+            GetFanType(state, FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
             if (errFlag) {
                 ErrorsFound = true;
             }
@@ -2905,7 +2905,7 @@ namespace Furnaces {
 
                     // Get the fan index
                     errFlag = false;
-                    GetFanIndex(state.fans, state.files, FanName, Furnace(FurnaceNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                    GetFanIndex(state, FanName, Furnace(FurnaceNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -2913,7 +2913,7 @@ namespace Furnaces {
 
                     // Get the fan inlet node number
                     errFlag = false;
-                    FanInletNode = GetFanInletNode(state.fans, state.files, FanType, FanName, errFlag);
+                    FanInletNode = GetFanInletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -2921,7 +2921,7 @@ namespace Furnaces {
 
                     // Get the fan outlet node number
                     errFlag = false;
-                    FanOutletNode = GetFanOutletNode(state.fans, state.files, FanType, FanName, errFlag);
+                    FanOutletNode = GetFanOutletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -2929,7 +2929,7 @@ namespace Furnaces {
 
                     // Get the fan availability schedule
                     errFlag = false;
-                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, state.files, FanType, FanName, errFlag);
+                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -2937,7 +2937,7 @@ namespace Furnaces {
 
                     // Get the Design Fan Volume Flow Rate
                     errFlag = false;
-                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, state.files, FanType, FanName, errFlag);
+                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
                     Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
@@ -2963,7 +2963,7 @@ namespace Furnaces {
                 Furnace(FurnaceNum).HeatingCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
                 if (UtilityRoutines::SameString(HeatingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE")) Furnace(FurnaceNum).bIsIHP = true;
             } else {
-                Furnace(FurnaceNum).HeatingCoilType_Num = GetCoilTypeNum(state.files, HeatingCoilType, HeatingCoilName, errFlag);
+                Furnace(FurnaceNum).HeatingCoilType_Num = GetCoilTypeNum(state, HeatingCoilType, HeatingCoilName, errFlag);
             }
 
             if (errFlag) {
@@ -2979,7 +2979,7 @@ namespace Furnaces {
 
                 } else { // mine data from DX heating coil
 
-                    GetDXCoilIndex(state.files,
+                    GetDXCoilIndex(state,
                                    HeatingCoilName,
                                    Furnace(FurnaceNum).HeatingCoilIndex,
                                    IsNotOK,
@@ -3054,7 +3054,7 @@ namespace Furnaces {
                 PrintMessage = false;
 
                 if (Furnace(FurnaceNum).CoolingCoilType_Num != Coil_CoolingAirToAirVariableSpeed) {
-                    Furnace(FurnaceNum).CoolingCoilType_Num = GetCoilTypeNum(state.files, CoolingCoilType, CoolingCoilName, errFlag, PrintMessage);
+                    Furnace(FurnaceNum).CoolingCoilType_Num = GetCoilTypeNum(state, CoolingCoilType, CoolingCoilName, errFlag, PrintMessage);
                 }
 
                 // If coil type not found, check to see if a HX assisted cooling coil is used.
@@ -3068,7 +3068,7 @@ namespace Furnaces {
 
                     // Get the cooling coil node numbers
                     errFlag = false;
-                    GetDXCoilIndex(state.files,
+                    GetDXCoilIndex(state,
                                    CoolingCoilName,
                                    Furnace(FurnaceNum).CoolingCoilIndex,
                                    errFlag,
@@ -3615,7 +3615,7 @@ namespace Furnaces {
             //       Mine heatpump outdoor condenser node from DX coil object
             errFlag = false;
             if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-                Furnace(FurnaceNum).CondenserNodeNum = GetDXCoilCondenserInletNode(state.files, CoolingCoilType, CoolingCoilName, errFlag);
+                Furnace(FurnaceNum).CondenserNodeNum = GetDXCoilCondenserInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
             } else if (Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
                 if (Furnace(FurnaceNum).bIsIHP) {
                     IHPCoilName = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).SCCoilName;
@@ -3625,7 +3625,7 @@ namespace Furnaces {
                 }
             } else {
                 Furnace(FurnaceNum).CondenserNodeNum =
-                    GetDXCoilCondenserInletNode(state.files, "Coil:Cooling:DX:SingleSpeed", GetHXDXCoilName(state, CoolingCoilType, CoolingCoilName, errFlag), errFlag);
+                    GetDXCoilCondenserInletNode(state, "Coil:Cooling:DX:SingleSpeed", GetHXDXCoilName(state, CoolingCoilType, CoolingCoilName, errFlag), errFlag);
             }
             if (errFlag) {
                 ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
@@ -3673,7 +3673,7 @@ namespace Furnaces {
 
             // set minimum outdoor temperature for compressor operation
             SetMinOATCompressor(
-                state.files, FurnaceNum, Alphas(1), cCurrentModuleObject, Furnace(FurnaceNum).CoolingCoilIndex, Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
+                state, FurnaceNum, Alphas(1), cCurrentModuleObject, Furnace(FurnaceNum).CoolingCoilIndex, Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
 
         } // End of the Unitary System HeatPump Loop
 
@@ -3798,7 +3798,7 @@ namespace Furnaces {
             FanType = Alphas(6);
             FanName = Alphas(7);
             errFlag = false;
-            GetFanType(state.fans, state.files, FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
+            GetFanType(state, FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
             if (errFlag) {
                 ErrorsFound = true;
             }
@@ -3810,25 +3810,25 @@ namespace Furnaces {
                     ErrorsFound = true;
                 } else {
                     errFlag = false;
-                    GetFanIndex(state.fans, state.files, FanName, Furnace(FurnaceNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                    GetFanIndex(state, FanName, Furnace(FurnaceNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
                     }
                     errFlag = false;
-                    FanInletNode = GetFanInletNode(state.fans, state.files, FanType, FanName, errFlag);
+                    FanInletNode = GetFanInletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
                     }
                     errFlag = false;
-                    FanOutletNode = GetFanOutletNode(state.fans, state.files, FanType, FanName, errFlag);
+                    FanOutletNode = GetFanOutletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
                     }
                     errFlag = false;
-                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, state.files, FanType, FanName, errFlag);
+                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -4321,7 +4321,7 @@ namespace Furnaces {
 
             // Set the Design Fan Volume Flow Rate
             errFlag = false;
-            FanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, state.files, FanType, FanName, errFlag);
+            FanVolFlowRate = GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
             Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
             if (errFlag) {
                 ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
@@ -4458,7 +4458,7 @@ namespace Furnaces {
 
             // set minimum outdoor temperature for compressor operation
             SetMinOATCompressor(
-                state.files, FurnaceNum, Alphas(1), cCurrentModuleObject, Furnace(FurnaceNum).CoolingCoilIndex, Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
+                state, FurnaceNum, Alphas(1), cCurrentModuleObject, Furnace(FurnaceNum).CoolingCoilIndex, Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
 
         } // End of the Unitary System WaterToAirHeatPump Loop
 
@@ -4702,7 +4702,7 @@ namespace Furnaces {
             }
         }
         bool anyRan;
-        ManageEMS(state.files, emsCallFromComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
+        ManageEMS(state, emsCallFromComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
     }
 
     // End of Get Input subroutines for this Module
@@ -4905,7 +4905,7 @@ namespace Furnaces {
         if (!DoingSizing && MySecondOneTimeFlag(FurnaceNum)) {
             // sizing all done.  check fan air flow rates
             errFlag = false;
-            FanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, state.files, BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);
+            FanVolFlowRate = GetFanDesignVolumeFlowRate(state, BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);
             Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
             if (errFlag) {
                 ShowContinueError("...occurs in " + cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " =" + Furnace(FurnaceNum).Name);
@@ -5180,7 +5180,7 @@ namespace Furnaces {
                     Furnace(FurnaceNum).CoolingSpeedRatio = Furnace(FurnaceNum).MaxCoolAirVolFlow / Furnace(FurnaceNum).ActualFanVolFlowRate;
                     Furnace(FurnaceNum).NoHeatCoolSpeedRatio = Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow / Furnace(FurnaceNum).ActualFanVolFlowRate;
                 }
-                if (GetFanSpeedRatioCurveIndex(state.fans, state.files, FanType, FanName, Furnace(FurnaceNum).FanIndex) > 0) {
+                if (GetFanSpeedRatioCurveIndex(state, FanType, FanName, Furnace(FurnaceNum).FanIndex) > 0) {
                     if (Furnace(FurnaceNum).ActualFanVolFlowRate == Furnace(FurnaceNum).MaxHeatAirVolFlow &&
                         Furnace(FurnaceNum).ActualFanVolFlowRate == Furnace(FurnaceNum).MaxCoolAirVolFlow &&
                         Furnace(FurnaceNum).ActualFanVolFlowRate == Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow) {
@@ -5197,7 +5197,7 @@ namespace Furnaces {
                 MyFanFlag(FurnaceNum) = false;
             } else {
                 Furnace(FurnaceNum).ActualFanVolFlowRate =
-                    GetFanDesignVolumeFlowRate(state.fans, state.files, BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);
+                    GetFanDesignVolumeFlowRate(state, BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);
             }
         }
 
@@ -6030,7 +6030,7 @@ namespace Furnaces {
         Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
         int IHPCoilIndex(0);      // refer to cooling or heating coil in IHP
         bool anyRan;
-        ManageEMS(state.files, emsCallFromUnitarySystemSizing, anyRan, ObjexxFCL::Optional_int_const()); // calling point
+        ManageEMS(state, emsCallFromUnitarySystemSizing, anyRan, ObjexxFCL::Optional_int_const()); // calling point
 
         ThisCtrlZoneNum = 0;
         DXCoolCap = 0.0;
@@ -11667,7 +11667,7 @@ namespace Furnaces {
         SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     }
 
-    void SetMinOATCompressor(IOFiles &ioFiles,
+    void SetMinOATCompressor(EnergyPlusData &state,
                              int const FurnaceNum,                    // index to furnace
                              std::string const &FurnaceName,          // name of furnace
                              std::string const &cCurrentModuleObject, // type of furnace
@@ -11682,9 +11682,9 @@ namespace Furnaces {
         // Set minimum OAT for heat pump compressor operation in heating mode
         errFlag = false;
         if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-            Furnace(FurnaceNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(ioFiles, CoolingCoilIndex, errFlag);
+            Furnace(FurnaceNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
         } else if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
-            Furnace(FurnaceNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(ioFiles, CoolingCoilIndex, errFlag);
+            Furnace(FurnaceNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
         } else if (Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
             Furnace(FurnaceNum).MinOATCompressorHeating = VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(CoolingCoilIndex, errFlag);
         } else {
@@ -11700,7 +11700,7 @@ namespace Furnaces {
         if (Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
             Furnace(FurnaceNum).MinOATCompressorHeating = VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(HeatingCoilIndex, errFlag);
         } else if (Furnace(FurnaceNum).HeatingCoilType_Num == CoilDX_HeatingEmpirical) {
-            Furnace(FurnaceNum).MinOATCompressorHeating = DXCoils::GetMinOATCompressorUsingIndex(ioFiles, HeatingCoilIndex, errFlag);
+            Furnace(FurnaceNum).MinOATCompressorHeating = DXCoils::GetMinOATCompressorUsingIndex(state, HeatingCoilIndex, errFlag);
         } else {
             Furnace(FurnaceNum).MinOATCompressorHeating = -1000.0;
         }

@@ -62,6 +62,7 @@ extern "C" {
 
 // EnergyPlus Headers
 #include "IOFiles.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
@@ -164,7 +165,7 @@ namespace ExternalInterface {
 
     // Functions
 
-    void ExternalInterfaceExchangeVariables(IOFiles &ioFiles)
+    void ExternalInterfaceExchangeVariables(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -197,7 +198,7 @@ namespace ExternalInterface {
             // Note that checking for ZoneSizingCalc SysSizingCalc does not work here, hence we
             // use the KindOfSim flag
             if (!WarmupFlag && (KindOfSim == ksRunPeriodWeather)) {
-                CalcExternalInterface(ioFiles);
+                CalcExternalInterface(state);
             }
         }
 
@@ -210,10 +211,10 @@ namespace ExternalInterface {
                 StopExternalInterfaceIfError();
             }
             // initialize the FunctionalMockupUnitImport interface
-            InitExternalInterfaceFMUImport(ioFiles);
+            InitExternalInterfaceFMUImport(state.files);
             // No Data exchange during design days
             // Data Exchange data during warmup and after warmup
-            CalcExternalInterfaceFMUImport(ioFiles);
+            CalcExternalInterfaceFMUImport(state);
         }
     }
 
@@ -667,7 +668,7 @@ namespace ExternalInterface {
         StopExternalInterfaceIfError();
     }
 
-    void GetSetVariablesAndDoStepFMUImport(IOFiles &ioFiles)
+    void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
@@ -892,7 +893,7 @@ namespace ExternalInterface {
         // If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
         if (useEMS) {
             bool anyRan;
-            ManageEMS(ioFiles, emsCallFromExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
+            ManageEMS(state, emsCallFromExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
         }
 
         FirstCallGetSetDoStep = false;
@@ -1911,7 +1912,7 @@ namespace ExternalInterface {
         return simtime;
     }
 
-    void CalcExternalInterfaceFMUImport(IOFiles &ioFiles)
+    void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1987,13 +1988,13 @@ namespace ExternalInterface {
                     }
                 }
 
-                GetSetVariablesAndDoStepFMUImport(ioFiles);
+                GetSetVariablesAndDoStepFMUImport(state);
                 tComm += hStep;
                 FirstCallWUp = false;
 
             } else {
                 if (tComm < tStop) {
-                    GetSetVariablesAndDoStepFMUImport(ioFiles);
+                    GetSetVariablesAndDoStepFMUImport(state);
                     // Advance the communication time step
                     tComm += hStep;
                 } else {
@@ -2076,7 +2077,7 @@ namespace ExternalInterface {
                     }
                     // set the flag to reinitialize states to be true
                     FlagReIni = true;
-                    GetSetVariablesAndDoStepFMUImport(ioFiles);
+                    GetSetVariablesAndDoStepFMUImport(state);
                     FlagReIni = false;
                     // advance one time step ahead for the next calculation
                     tComm += hStep;
@@ -2133,14 +2134,14 @@ namespace ExternalInterface {
                 }
                 // set the flag to reinitialize states to be true
                 FlagReIni = true;
-                GetSetVariablesAndDoStepFMUImport(ioFiles);
+                GetSetVariablesAndDoStepFMUImport(state);
                 FlagReIni = false;
                 // advance one time step ahead for the next calculation
                 tComm += hStep;
                 FirstCallTStep = false;
             } else {
                 if (tComm != tStop) {
-                    GetSetVariablesAndDoStepFMUImport(ioFiles);
+                    GetSetVariablesAndDoStepFMUImport(state);
                     tComm += hStep;
                 } else {
                     // Terminate reset and free Slaves
@@ -2226,7 +2227,7 @@ namespace ExternalInterface {
         }
     }
 
-    void CalcExternalInterface(IOFiles &ioFiles)
+    void CalcExternalInterface(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
@@ -2362,7 +2363,7 @@ namespace ExternalInterface {
         // If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
         if (useEMS) {
             bool anyRan;
-            ManageEMS(ioFiles, emsCallFromExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
+            ManageEMS(state, emsCallFromExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
         }
 
         firstCall = false; // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui

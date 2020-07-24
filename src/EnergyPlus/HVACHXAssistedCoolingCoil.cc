@@ -400,8 +400,7 @@ namespace HVACHXAssistedCoolingCoil {
                 HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType = CurrentModuleObject;
                 HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
                 CoolingCoilErrFlag = false;
-                GetDXCoilIndex(state.files,
-                               HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
+                GetDXCoilIndex(state, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                                HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,
                                CoolingCoilErrFlag,
                                HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,

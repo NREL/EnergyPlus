@@ -392,7 +392,7 @@ namespace UnitHeater {
                 ErrorsFound = true;
             } else {
                 if (!UtilityRoutines::SameString(UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
-                    GetFanType(state.fans, state.files,
+                    GetFanType(state,
                         UnitHeat(UnitHeatNum).FanName, UnitHeat(UnitHeatNum).FanType_Num, errFlag, CurrentModuleObject, UnitHeat(UnitHeatNum).Name);
 
                     {
@@ -401,7 +401,7 @@ namespace UnitHeater {
                             (SELECT_CASE_var == FanType_SimpleOnOff)) {
                             // Get fan outlet node
                             UnitHeat(UnitHeatNum).FanOutletNode =
-                                GetFanOutletNode(state.fans, state.files, UnitHeat(UnitHeatNum).FanType, UnitHeat(UnitHeatNum).FanName, errFlag);
+                                GetFanOutletNode(state, UnitHeat(UnitHeatNum).FanType, UnitHeat(UnitHeatNum).FanName, errFlag);
                             if (errFlag) {
                                 ShowContinueError("specified in " + CurrentModuleObject + " = \"" + UnitHeat(UnitHeatNum).Name + "\".");
                                 ErrorsFound = true;
@@ -413,7 +413,7 @@ namespace UnitHeater {
                         }
                     }
                     GetFanIndex(
-                        state.fans, state.files, UnitHeat(UnitHeatNum).FanName, UnitHeat(UnitHeatNum).Fan_Index, errFlag, CurrentModuleObject);
+                        state, UnitHeat(UnitHeatNum).FanName, UnitHeat(UnitHeatNum).Fan_Index, errFlag, CurrentModuleObject);
                     if (errFlag) {
                         ErrorsFound = true;
                     } else {
@@ -437,11 +437,11 @@ namespace UnitHeater {
                             ShowContinueError("...this can lead to unexpected results where the fan flow rate is less than required.");
                         }
                         UnitHeat(UnitHeatNum).FanAvailSchedPtr =
-                            GetFanAvailSchPtr(state.fans, state.files, UnitHeat(UnitHeatNum).FanType, UnitHeat(UnitHeatNum).FanName, errFlag);
+                            GetFanAvailSchPtr(state, UnitHeat(UnitHeatNum).FanType, UnitHeat(UnitHeatNum).FanName, errFlag);
                     }
                 } else if (UtilityRoutines::SameString(UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
                     UnitHeat(UnitHeatNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state.files, UnitHeat(UnitHeatNum).FanName));              // call constructor
+                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, UnitHeat(UnitHeatNum).FanName));              // call constructor
                     UnitHeat(UnitHeatNum).Fan_Index = HVACFan::getFanObjectVectorIndex(UnitHeat(UnitHeatNum).FanName); // zero-based
                     UnitHeat(UnitHeatNum).FanOutletNode = HVACFan::fanObjs[UnitHeat(UnitHeatNum).Fan_Index]->outletNodeNum;
                     FanVolFlow = HVACFan::fanObjs[UnitHeat(UnitHeatNum).Fan_Index]->designAirVolFlowRate;

@@ -255,7 +255,7 @@ namespace Fans {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetFanInput(FansData &fans, IOFiles &ioFiles);
+    void GetFanInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
@@ -309,15 +309,13 @@ namespace Fans {
     // Beginning of Utility subroutines for the Fan Module
     // *****************************************************************************
 
-    void GetFanIndex(
-        FansData &fans, IOFiles &ioFiles, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType = _);
+    void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType = _);
 
     void GetFanVolFlow(int const FanIndex, Real64 &FanVolFlow);
 
     Real64 GetFanPower(int const FanIndex);
 
-    void GetFanType(FansData &fans,
-                    IOFiles &ioFiles,
+    void GetFanType(EnergyPlusData &state,
                     std::string const &FanName,               // Fan name
                     int &FanType,                             // returned fantype number
                     bool &ErrorsFound,                        // error indicator
@@ -325,50 +323,43 @@ namespace Fans {
                     Optional_string_const ThisObjectName = _  // parent object name (for error message)
     );
 
-    Real64 GetFanDesignVolumeFlowRate(FansData &fans,
-                                      IOFiles &ioFiles,
+    Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
                                       std::string const &FanType,     // must match fan types in this module
                                       std::string const &FanName,     // must match fan names for the fan type
                                       bool &ErrorsFound,              // set to true if problem
                                       Optional_int_const FanIndex = _ // index to fan
     );
 
-    int GetFanInletNode(FansData &fans,
-                        IOFiles &ioFiles,
+    int GetFanInletNode(EnergyPlusData &state,
                         std::string const &FanType, // must match fan types in this module
                         std::string const &FanName, // must match fan names for the fan type
                         bool &ErrorsFound           // set to true if problem
     );
 
-    int getFanInNodeIndex(FansData &fans,
-                          IOFiles &ioFiles,
+    int getFanInNodeIndex(EnergyPlusData &state,
                           int const &FanIndex, // fan index
                           bool &ErrorsFound    // set to true if problem
     );
 
-    int GetFanOutletNode(FansData &fans,
-                         IOFiles &ioFiles,
+    int GetFanOutletNode(EnergyPlusData &state,
                          std::string const &FanType, // must match fan types in this module
                          std::string const &FanName, // must match fan names for the fan type
                          bool &ErrorsFound           // set to true if problem
     );
 
-    int GetFanAvailSchPtr(FansData &fans,
-                          IOFiles &ioFiles,
+    int GetFanAvailSchPtr(EnergyPlusData &state,
                           std::string const &FanType, // must match fan types in this module
                           std::string const &FanName, // must match fan names for the fan type
                           bool &ErrorsFound           // set to true if problem
     );
 
-    int GetFanSpeedRatioCurveIndex(FansData &fans,
-                                   IOFiles &ioFiles,
+    int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
                                    std::string &FanType,    // must match fan types in this module (set if nonzero index passed)
                                    std::string &FanName,    // must match fan names for the fan type (set if nonzero index passed)
                                    Optional_int IndexIn = _ // optional fan index if fan type and name are unknown or index needs setting
     );
 
-    void SetFanData(FansData &fans,
-                    IOFiles &ioFiles,
+    void SetFanData(EnergyPlusData &state,
                     int const FanNum,                         // Index of fan
                     bool &ErrorsFound,                        // Set to true if certain errors found
                     std::string const &FanName,               // Name of fan

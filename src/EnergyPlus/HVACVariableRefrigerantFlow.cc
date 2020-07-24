@@ -3314,7 +3314,7 @@ namespace HVACVariableRefrigerantFlow {
                     }
                 } else {
                     errFlag = false;
-                    GetFanType(state.fans, state.files, FanName, VRFTU(VRFTUNum).fanType_Num, errFlag, cCurrentModuleObject);
+                    GetFanType(state, FanName, VRFTU(VRFTUNum).fanType_Num, errFlag, cCurrentModuleObject);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                         ErrorsFound = true;
@@ -3369,7 +3369,7 @@ namespace HVACVariableRefrigerantFlow {
 
                         // Get the fan index
                         errFlag = false;
-                        GetFanIndex(state.fans, state.files, FanName, VRFTU(VRFTUNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                        GetFanIndex(state, FanName, VRFTU(VRFTUNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
                         if (errFlag) {
                             ShowContinueError("...occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;
@@ -3380,7 +3380,7 @@ namespace HVACVariableRefrigerantFlow {
 
                         // Set the Design Fan Volume Flow Rate
                         errFlag = false;
-                        FanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, state.files, FanType, FanName, errFlag);
+                        FanVolFlowRate = GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
                         VRFTU(VRFTUNum).ActualFanVolFlowRate = FanVolFlowRate;
 
                         if (errFlag) {
@@ -3390,7 +3390,7 @@ namespace HVACVariableRefrigerantFlow {
 
                         // Get the Fan Inlet node
                         errFlag = false;
-                        FanInletNodeNum = GetFanInletNode(state.fans, state.files, FanType, FanName, errFlag);
+                        FanInletNodeNum = GetFanInletNode(state, FanType, FanName, errFlag);
                         if (errFlag) {
                             ShowContinueError("...occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;
@@ -3398,7 +3398,7 @@ namespace HVACVariableRefrigerantFlow {
 
                         // Get the Fan Outlet node
                         errFlag = false;
-                        FanOutletNodeNum = GetFanOutletNode(state.fans, state.files, FanType, FanName, errFlag);
+                        FanOutletNodeNum = GetFanOutletNode(state, FanType, FanName, errFlag);
                         if (errFlag) {
                             ShowContinueError("...occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;
@@ -3406,7 +3406,7 @@ namespace HVACVariableRefrigerantFlow {
 
                         // Get the fan's availability schedule
                         errFlag = false;
-                        VRFTU(VRFTUNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, state.files, FanType, FanName, errFlag);
+                        VRFTU(VRFTUNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, FanType, FanName, errFlag);
                         if (errFlag) {
                             ShowContinueError("...occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;
@@ -3433,7 +3433,7 @@ namespace HVACVariableRefrigerantFlow {
                         ErrorsFound = true;
 
                     } else {                                                            // mine data from fan object
-                        HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state.files, FanName)); // call constructor
+                        HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, FanName)); // call constructor
                         VRFTU(VRFTUNum).FanIndex = HVACFan::getFanObjectVectorIndex(FanName);
                         VRFTU(VRFTUNum).ActualFanVolFlowRate = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->designAirVolFlowRate;
                         FanInletNodeNum = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->inletNodeNum;
@@ -3491,7 +3491,7 @@ namespace HVACVariableRefrigerantFlow {
             DXCoolingCoilType = cAlphaArgs(11);
 
             errFlag = false;
-            VRFTU(VRFTUNum).DXCoolCoilType_Num = GetCoilTypeNum(state.files, DXCoolingCoilType, cAlphaArgs(12), errFlag, false);
+            VRFTU(VRFTUNum).DXCoolCoilType_Num = GetCoilTypeNum(state, DXCoolingCoilType, cAlphaArgs(12), errFlag, false);
             if (VRFTU(VRFTUNum).DXCoolCoilType_Num == 0) {
                 VRFTU(VRFTUNum).CoolingCoilPresent = false;
                 if (VRFTU(VRFTUNum).TUListIndex > 0 && VRFTU(VRFTUNum).IndexToTUInTUList > 0) {
@@ -3507,9 +3507,9 @@ namespace HVACVariableRefrigerantFlow {
                             errFlag = false;
                             if (VRFTU(VRFTUNum).TUListIndex > 0 && VRFTU(VRFTUNum).IndexToTUInTUList > 0) {
                                 TerminalUnitList(VRFTU(VRFTUNum).TUListIndex).CoolingCoilAvailSchPtr(VRFTU(VRFTUNum).IndexToTUInTUList) =
-                                    GetDXCoilAvailSchPtr(state.files, DXCoolingCoilType, cAlphaArgs(12), errFlag);
+                                    GetDXCoilAvailSchPtr(state, DXCoolingCoilType, cAlphaArgs(12), errFlag);
                             }
-                            GetDXCoilIndex(state.files,
+                            GetDXCoilIndex(state,
                                            cAlphaArgs(12),
                                            VRFTU(VRFTUNum).CoolCoilIndex,
                                            errFlag,
@@ -3578,12 +3578,12 @@ namespace HVACVariableRefrigerantFlow {
                                                         DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling))) {
                             if (VRFTU(VRFTUNum).TUListIndex > 0 && VRFTU(VRFTUNum).IndexToTUInTUList > 0) {
                                 TerminalUnitList(VRFTU(VRFTUNum).TUListIndex).CoolingCoilAvailSchPtr(VRFTU(VRFTUNum).IndexToTUInTUList) =
-                                    GetDXCoilAvailSchPtr(state.files, DXCoolingCoilType, cAlphaArgs(12), errFlag);
+                                    GetDXCoilAvailSchPtr(state, DXCoolingCoilType, cAlphaArgs(12), errFlag);
                             } else {
                                 VRFTU(VRFTUNum).CoolingCoilPresent = false;
                             }
                             errFlag = false;
-                            GetDXCoilIndex(state.files,
+                            GetDXCoilIndex(state,
                                            cAlphaArgs(12),
                                            VRFTU(VRFTUNum).CoolCoilIndex,
                                            errFlag,
@@ -3631,7 +3631,7 @@ namespace HVACVariableRefrigerantFlow {
             }
 
             errFlag = false;
-            VRFTU(VRFTUNum).DXHeatCoilType_Num = GetCoilTypeNum(state.files, DXHeatingCoilType, cAlphaArgs(14), errFlag, false);
+            VRFTU(VRFTUNum).DXHeatCoilType_Num = GetCoilTypeNum(state, DXHeatingCoilType, cAlphaArgs(14), errFlag, false);
             if (VRFTU(VRFTUNum).DXHeatCoilType_Num == 0) {
                 VRFTU(VRFTUNum).HeatingCoilPresent = false;
                 if (VRFTU(VRFTUNum).TUListIndex > 0 && VRFTU(VRFTUNum).IndexToTUInTUList > 0) {
@@ -3647,9 +3647,9 @@ namespace HVACVariableRefrigerantFlow {
                             errFlag = false;
                             if (VRFTU(VRFTUNum).TUListIndex > 0 && VRFTU(VRFTUNum).IndexToTUInTUList > 0) {
                                 TerminalUnitList(VRFTU(VRFTUNum).TUListIndex).HeatingCoilAvailSchPtr(VRFTU(VRFTUNum).IndexToTUInTUList) =
-                                    GetDXCoilAvailSchPtr(state.files, DXHeatingCoilType, cAlphaArgs(14), errFlag);
+                                    GetDXCoilAvailSchPtr(state, DXHeatingCoilType, cAlphaArgs(14), errFlag);
                             }
-                            GetDXCoilIndex(state.files,
+                            GetDXCoilIndex(state,
                                            cAlphaArgs(14),
                                            VRFTU(VRFTUNum).HeatCoilIndex,
                                            errFlag,
@@ -3890,12 +3890,12 @@ namespace HVACVariableRefrigerantFlow {
                                                         DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating))) {
                             if (VRFTU(VRFTUNum).TUListIndex > 0 && VRFTU(VRFTUNum).IndexToTUInTUList > 0) {
                                 TerminalUnitList(VRFTU(VRFTUNum).TUListIndex).HeatingCoilAvailSchPtr(VRFTU(VRFTUNum).IndexToTUInTUList) =
-                                    GetDXCoilAvailSchPtr(state.files, DXHeatingCoilType, cAlphaArgs(14), errFlag);
+                                    GetDXCoilAvailSchPtr(state, DXHeatingCoilType, cAlphaArgs(14), errFlag);
                             } else {
                                 VRFTU(VRFTUNum).HeatingCoilPresent = false;
                             }
                             errFlag = false;
-                            GetDXCoilIndex(state.files,
+                            GetDXCoilIndex(state,
                                            cAlphaArgs(14),
                                            VRFTU(VRFTUNum).HeatCoilIndex,
                                            errFlag,
@@ -4073,31 +4073,31 @@ namespace HVACVariableRefrigerantFlow {
                             // Check VRF DX heating coil heating capacity as a fuction of temperature performance curve. Only report here for
                             // biquadratic curve type.
                             if (VRFTU(VRFTUNum).VRFSysNum > 0 && VRFTU(VRFTUNum).HeatCoilIndex > 0 &&
-                                CurveManager::PerfCurve(GetDXCoilCapFTCurveIndex(state.files, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound)).NumDims == 2) {
+                                CurveManager::PerfCurve(GetDXCoilCapFTCurveIndex(state, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound)).NumDims == 2) {
                                 if (VRF(VRFTU(VRFTUNum).VRFSysNum).HeatingPerformanceOATType == DataHVACGlobals::WetBulbIndicator) {
                                     checkCurveIsNormalizedToOne(
                                         "GetDXCoils: " + DataHVACGlobals::cAllCoilTypes(VRFTU(VRFTUNum).DXHeatCoilType_Num),
-                                        DXCoils::GetDXCoilName(state.files,
+                                        DXCoils::GetDXCoilName(state,
                                                                VRFTU(VRFTUNum).HeatCoilIndex,
                                                                ErrorsFound,
                                                                DataHVACGlobals::cAllCoilTypes(VRFTU(VRFTUNum).DXHeatCoilType_Num),
                                                                ObjexxFCL::Optional_bool_const()),
-                                        GetDXCoilCapFTCurveIndex(state.files, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound),
+                                        GetDXCoilCapFTCurveIndex(state, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound),
                                         "Heating Capacity Ratio Modifier Function of Temperature Curve Name",
-                                        CurveManager::GetCurveName(GetDXCoilCapFTCurveIndex(state.files, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound)),
+                                        CurveManager::GetCurveName(GetDXCoilCapFTCurveIndex(state, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound)),
                                         RatedInletAirTempHeat,
                                         RatedOutdoorWetBulbTempHeat);
                                 } else if (VRF(VRFTU(VRFTUNum).VRFSysNum).HeatingPerformanceOATType == DataHVACGlobals::DryBulbIndicator) {
                                     checkCurveIsNormalizedToOne(
                                         "GetDXCoils: " + DataHVACGlobals::cAllCoilTypes(VRFTU(VRFTUNum).DXHeatCoilType_Num),
-                                        DXCoils::GetDXCoilName(state.files,
+                                        DXCoils::GetDXCoilName(state,
                                                                VRFTU(VRFTUNum).HeatCoilIndex,
                                                                ErrorsFound,
                                                                DataHVACGlobals::cAllCoilTypes(VRFTU(VRFTUNum).DXHeatCoilType_Num),
                                                                ObjexxFCL::Optional_bool_const()),
-                                        GetDXCoilCapFTCurveIndex(state.files, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound),
+                                        GetDXCoilCapFTCurveIndex(state, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound),
                                         "Heating Capacity Ratio Modifier Function of Temperature Curve Name",
-                                        CurveManager::GetCurveName(GetDXCoilCapFTCurveIndex(state.files, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound)),
+                                        CurveManager::GetCurveName(GetDXCoilCapFTCurveIndex(state, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound)),
                                         RatedInletAirTempHeat,
                                         RatedOutdoorAirTempHeat);
                                 }
@@ -5741,12 +5741,12 @@ namespace HVACVariableRefrigerantFlow {
             if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 if (VRFTU(VRFTUNum).FanIndex > -1) FanInletNodeNum = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->inletNodeNum;
             } else {
-                if (VRFTU(VRFTUNum).FanIndex > 0) FanInletNodeNum = Fans::getFanInNodeIndex(state.fans, state.files, VRFTU(VRFTUNum).FanIndex, errFlag);
+                if (VRFTU(VRFTUNum).FanIndex > 0) FanInletNodeNum = Fans::getFanInNodeIndex(state, VRFTU(VRFTUNum).FanIndex, errFlag);
             }
-            int CCoilInletNodeNum = DXCoils::getCoilInNodeIndex(state.files, VRFTU(VRFTUNum).CoolCoilIndex, errFlag);
-            int CCoilOutletNodeNum = DXCoils::getCoilOutNodeIndex(state.files, VRFTU(VRFTUNum).CoolCoilIndex, errFlag);
-            int HCoilInletNodeNum = DXCoils::getCoilInNodeIndex(state.files, VRFTU(VRFTUNum).HeatCoilIndex, errFlag);
-            int HCoilOutletNodeNum = DXCoils::getCoilOutNodeIndex(state.files, VRFTU(VRFTUNum).HeatCoilIndex, errFlag);
+            int CCoilInletNodeNum = DXCoils::getCoilInNodeIndex(state, VRFTU(VRFTUNum).CoolCoilIndex, errFlag);
+            int CCoilOutletNodeNum = DXCoils::getCoilOutNodeIndex(state, VRFTU(VRFTUNum).CoolCoilIndex, errFlag);
+            int HCoilInletNodeNum = DXCoils::getCoilInNodeIndex(state, VRFTU(VRFTUNum).HeatCoilIndex, errFlag);
+            int HCoilOutletNodeNum = DXCoils::getCoilOutNodeIndex(state, VRFTU(VRFTUNum).HeatCoilIndex, errFlag);
             if (VRFTU(VRFTUNum).isInZone && VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
                 if (!VRFTU(VRFTUNum).ATMixerExists && VRFTU(VRFTUNum).OAMixerUsed) {
                     Array1D_int OANodeNums = MixedAir::GetOAMixerNodeNumbers(VRFTU(VRFTUNum).OAMixerName, errFlag);
@@ -7767,7 +7767,7 @@ namespace HVACVariableRefrigerantFlow {
             for (NumTU = 1; NumTU <= TerminalUnitList(TUListNum).NumTUInList; ++NumTU) {
                 TUIndex = TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
                 if (VRFTU(TUIndex).CoolCoilIndex > 0) {
-                    DXCoilCap = GetDXCoilCap(state.files, VRFTU(TUIndex).CoolCoilIndex, VRFTU(TUIndex).DXCoolCoilType_Num, errFlag);
+                    DXCoilCap = GetDXCoilCap(state, VRFTU(TUIndex).CoolCoilIndex, VRFTU(TUIndex).DXCoolCoilType_Num, errFlag);
                     TUCoolingCapacity += DXCoilCap;
                     if (DXCoilCap == AutoSize) {
                         FoundAll = false;
@@ -7775,7 +7775,7 @@ namespace HVACVariableRefrigerantFlow {
                     }
                 }
                 if (VRFTU(TUIndex).HeatCoilIndex > 0) {
-                    DXCoilCap = GetDXCoilCap(state.files, VRFTU(TUIndex).HeatCoilIndex, VRFTU(TUIndex).DXHeatCoilType_Num, errFlag);
+                    DXCoilCap = GetDXCoilCap(state, VRFTU(TUIndex).HeatCoilIndex, VRFTU(TUIndex).DXHeatCoilType_Num, errFlag);
                     TUHeatingCapacity += DXCoilCap;
                     if (DXCoilCap == AutoSize) {
                         FoundAll = false;

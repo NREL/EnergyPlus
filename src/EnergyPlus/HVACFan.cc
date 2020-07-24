@@ -363,7 +363,7 @@ namespace HVACFan {
         }
     }
 
-    FanSystem::FanSystem(IOFiles &ioFiles, std::string const &objectName)
+    FanSystem::FanSystem(EnergyPlusData &state, std::string const &objectName)
         : availSchedIndex(0), inletNodeNum(0), outletNodeNum(0), designAirVolFlowRate(0.0), speedControl(SpeedControlMethod::NotSet), deltaPress(0.0),
           designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), AirLoopNum(0), AirPathFlag(false), fanIsSecondaryDriver(false),
           m_fanType_Num(0), m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0), m_motorInAirFrac(0.0),
@@ -652,7 +652,7 @@ namespace HVACFan {
         isNumericFieldBlank.deallocate();
 
         bool anyEMSRan = false;
-        EMSManager::ManageEMS(ioFiles, DataGlobals::emsCallFromComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
+        EMSManager::ManageEMS(state, DataGlobals::emsCallFromComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
     }
 
     void

@@ -479,3 +479,25 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
     });
     EXPECT_TRUE(compare_err_stream(expectedError, true));
 }
+
+TEST_F(EnergyPlusFixture, SimulationManager_HVACSizingSimulationChoiceTest)
+{
+    std::string const idf_objects = delimited_string({
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    No,                      !- Run Simulation for Sizing Periods",
+        "    Yes,                     !- Run Simulation for Weather File Run Periods",
+        "    Yes;                     !- Do HVAC Sizing Simulation for Sizing Periods",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(state);
+
+    EXPECT_TRUE(DataGlobals::DoHVACSizingSimulation);
+    // get a default value
+    EXPECT_EQ(DataGlobals::HVACSizingSimMaxIterations, 1);   
+
+}

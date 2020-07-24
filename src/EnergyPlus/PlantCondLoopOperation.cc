@@ -58,6 +58,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -152,8 +153,7 @@ namespace PlantCondLoopOperation {
         LoadEquipListOneTimeFlag = true;
     }
 
-    void ManagePlantLoadDistribution(BranchInputManagerData &dataBranchInputManager,
-                                     IOFiles &ioFiles,
+    void ManagePlantLoadDistribution(EnergyPlusData &state,
                                      int const LoopNum,     // PlantLoop data structure loop counter
                                      int const LoopSideNum, // PlantLoop data structure LoopSide counter
                                      int const BranchNum,   // PlantLoop data structure branch counter
@@ -264,12 +264,12 @@ namespace PlantCondLoopOperation {
         if ((CurSchemeType == UncontrolledOpSchemeType) || (CurSchemeType == CompSetPtBasedSchemeType)) {
             // No RangeVariable specified for these types
         } else if (CurSchemeType == EMSOpSchemeType) {
-            InitLoadDistribution(dataBranchInputManager, ioFiles, FirstHVACIteration);
+            InitLoadDistribution(state, FirstHVACIteration);
             // No RangeVariable specified for these types
         } else if (CurSchemeType == HeatingRBOpSchemeType) {
             // For zero demand, we need to clean things out before we leave
             if (LoopDemand < SmallLoad) {
-                InitLoadDistribution(dataBranchInputManager, ioFiles, FirstHVACIteration);
+                InitLoadDistribution(state, FirstHVACIteration);
                 this_component.MyLoad = 0.0;
                 this_component.ON = false;
                 return;
@@ -278,7 +278,7 @@ namespace PlantCondLoopOperation {
         } else if (CurSchemeType == CoolingRBOpSchemeType) {
             // For zero demand, we need to clean things out before we leave
             if (LoopDemand > (-1.0 * SmallLoad)) {
-                InitLoadDistribution(dataBranchInputManager, ioFiles, FirstHVACIteration);
+                InitLoadDistribution(state, FirstHVACIteration);
                 this_component.MyLoad = 0.0;
                 this_component.ON = false;
                 return;
@@ -314,7 +314,7 @@ namespace PlantCondLoopOperation {
             FindCompSPLoad(LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum);
         } else if (CurSchemeType == EMSOpSchemeType) {
             TurnOnPlantLoopPipes(LoopNum, LoopSideNum);
-            DistributeUserDefinedPlantLoad(ioFiles, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
+            DistributeUserDefinedPlantLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
         } else { // it's a range based control type with multiple equipment lists
             CurListNum = 0;
             for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
@@ -1810,7 +1810,7 @@ namespace PlantCondLoopOperation {
     // Beginning Initialization Section of the Plant Loop Module
     //******************************************************************************
 
-    void InitLoadDistribution(BranchInputManagerData &dataBranchInputManager, IOFiles &ioFiles, bool const FirstHVACIteration)
+    void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -1892,7 +1892,7 @@ namespace PlantCondLoopOperation {
                             auto &this_equip(this_equip_list.Comp(EquipNum));
                             ThisTypeOfNum = UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes);
                             errFlag1 = false;
-                            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
                                                                     this_equip.Name,
                                                                     ThisTypeOfNum,
                                                                     DummyLoopNum,
@@ -2074,7 +2074,7 @@ namespace PlantCondLoopOperation {
                         if (BeginEnvrnFlag && this_op_scheme.MyEnvrnFlag) {
                             if (this_op_scheme.ErlInitProgramMngr > 0) {
                                 bool anyEMSRan;
-                                ManageEMS(ioFiles, emsCallFromUserDefinedComponentModel, anyEMSRan, this_op_scheme.ErlInitProgramMngr);
+                                ManageEMS(state, emsCallFromUserDefinedComponentModel, anyEMSRan, this_op_scheme.ErlInitProgramMngr);
                             } else if (this_op_scheme.initPluginLocation > -1) {
                                 EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(this_op_scheme.initPluginLocation);
                             }
@@ -3027,7 +3027,7 @@ namespace PlantCondLoopOperation {
         } // valid setpoint (TempSetPt /= SensedNodeFlagValue)
     }
 
-    void DistributeUserDefinedPlantLoad(IOFiles &ioFiles,
+    void DistributeUserDefinedPlantLoad(EnergyPlusData &state,
                                         int const LoopNum,
                                         int const LoopSideNum,
                                         int const BranchNum,
@@ -3083,7 +3083,7 @@ namespace PlantCondLoopOperation {
         // Call EMS program(s)
         if (PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr > 0) {
             bool anyEMSRan;
-            ManageEMS(ioFiles, emsCallFromUserDefinedComponentModel, anyEMSRan, PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr);
+            ManageEMS(state, emsCallFromUserDefinedComponentModel, anyEMSRan, PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr);
         } else if (PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation > -1) {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation);
         }

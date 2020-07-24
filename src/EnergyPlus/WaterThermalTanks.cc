@@ -697,7 +697,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    bool getDesuperHtrInput(IOFiles &ioFiles)
+    bool getDesuperHtrInput(EnergyPlusData &state)
     {
         bool ErrorsFound = false;
         std::string const RoutineName = "getDesuperHtrInput";
@@ -938,7 +938,7 @@ namespace WaterThermalTanks {
                 } else {
                     WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObjEnum::DXMultiSpeed;
                 }
-                DXCoils::GetDXCoilIndex(ioFiles,
+                DXCoils::GetDXCoilIndex(state,
                                         WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName,
                                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum,
                                         errFlag,
@@ -1405,7 +1405,7 @@ namespace WaterThermalTanks {
             // check that the DX Coil exists
             bool DXCoilErrFlag = false;
             bool bIsVScoil = false;
-            DXCoils::GetDXCoilIndex(state.files, HPWH.DXCoilName, HPWH.DXCoilNum, DXCoilErrFlag, DataIPShortCuts::cCurrentModuleObject, true);
+            DXCoils::GetDXCoilIndex(state, HPWH.DXCoilName, HPWH.DXCoilNum, DXCoilErrFlag, DataIPShortCuts::cCurrentModuleObject, true);
             if (DXCoilErrFlag) {
                 // This could be a variable speed heat pump water heater
                 bool bVSCoilErrFlag = false;
@@ -1577,13 +1577,13 @@ namespace WaterThermalTanks {
             } else {
                 if (UtilityRoutines::SameString(HPWH.FanType, "Fan:SystemModel")) {
                     HPWH.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state.files, HPWH.FanName)); // call constructor
+                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, HPWH.FanName)); // call constructor
                     HPWH.FanNum = HVACFan::getFanObjectVectorIndex(HPWH.FanName);
                     FanVolFlow = HVACFan::fanObjs[HPWH.FanNum]->designAirVolFlowRate;
 
                 } else {
-                    Fans::GetFanType(state.fans, state.files, HPWH.FanName, HPWH.FanType_Num, errFlag, DataIPShortCuts::cCurrentModuleObject, HPWH.Name);
-                    Fans::GetFanIndex(state.fans, state.files, HPWH.FanName, HPWH.FanNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
+                    Fans::GetFanType(state, HPWH.FanName, HPWH.FanType_Num, errFlag, DataIPShortCuts::cCurrentModuleObject, HPWH.Name);
+                    Fans::GetFanIndex(state, HPWH.FanName, HPWH.FanNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
                     Fans::GetFanVolFlow(HPWH.FanNum, FanVolFlow);
                 }
             }
@@ -2008,7 +2008,7 @@ namespace WaterThermalTanks {
                 FanOutletNodeNum = HVACFan::fanObjs[HPWH.FanNum]->outletNodeNum;
             } else {
                 errFlag = false;
-                FanOutletNodeNum = Fans::GetFanOutletNode(state.fans, state.files, HPWH.FanType, HPWH.FanName, errFlag);
+                FanOutletNodeNum = Fans::GetFanOutletNode(state, HPWH.FanType, HPWH.FanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in unit=\"" + HPWH.Name + "\".");
                     ErrorsFound = true;
@@ -2030,7 +2030,7 @@ namespace WaterThermalTanks {
                 FanInletNodeNum = HVACFan::fanObjs[HPWH.FanNum]->inletNodeNum;
             } else {
                 errFlag = false;
-                FanInletNodeNum = Fans::GetFanInletNode(state.fans, state.files, HPWH.FanType, HPWH.FanName, errFlag);
+                FanInletNodeNum = Fans::GetFanInletNode(state, HPWH.FanType, HPWH.FanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in unit=\"" + HPWH.Name + "\".");
                     ErrorsFound = true;
@@ -4106,7 +4106,7 @@ namespace WaterThermalTanks {
 
             // =======   Get Coil:WaterHeating:Desuperheater ======================================================================
             if (numWaterHeaterDesuperheater > 0) {
-                ErrorsFound |= getDesuperHtrInput(state.files);
+                ErrorsFound |= getDesuperHtrInput(state);
             }
 
             //  =======   Get HEAT PUMP:WATER HEATER ===============================================================================

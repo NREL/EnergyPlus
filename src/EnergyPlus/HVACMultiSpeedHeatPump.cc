@@ -781,17 +781,17 @@ namespace HVACMultiSpeedHeatPump {
                 if (UtilityRoutines::SameString(Alphas(6), "Fan:OnOff")) {
                     MSHeatPump(MSHPNum).FanType = FanType_SimpleOnOff;
                     SetUpCompSets(CurrentModuleObject, MSHeatPump(MSHPNum).Name, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, "UNDEFINED", "UNDEFINED");
-                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode(state.fans, state.files, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
-                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode(state.fans, state.files, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode(state, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode(state, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
                 } else {
                     MSHeatPump(MSHPNum).FanType = FanType_SimpleConstVolume;
                     SetUpCompSets(
                         CurrentModuleObject, MSHeatPump(MSHPNum).Name, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, "UNDEFINED", "UNDEFINED");
-                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode(state.fans, state.files, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
-                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode(state.fans, state.files, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode(state, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode(state, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
                 }
-                GetFanIndex(state.fans, state.files, Alphas(7), MSHeatPump(MSHPNum).FanNum, ErrorsFound, CurrentModuleObject);
-                GetFanType(state.fans, state.files, Alphas(7), FanType, ErrorsFound);
+                GetFanIndex(state, Alphas(7), MSHeatPump(MSHPNum).FanNum, ErrorsFound, CurrentModuleObject);
+                GetFanType(state, Alphas(7), FanType, ErrorsFound);
                 if (FanType != MSHeatPump(MSHPNum).FanType) {
                     ShowSevereError(CurrentModuleObject + ", \"" + MSHeatPump(MSHPNum).Name + "\", " + cAlphaFields(6) + " and " + cAlphaFields(7) +
                                     " do not match in Fan objects.");
@@ -850,7 +850,7 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                 }
                 LocalError = false;
-                GetDXCoilIndex(state.files,
+                GetDXCoilIndex(state,
                                MSHeatPump(MSHPNum).DXHeatCoilName,
                                MSHeatPump(MSHPNum).DXHeatCoilIndex,
                                LocalError,
@@ -876,7 +876,7 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                MSHeatPump(MSHPNum).MinOATCompressorHeating = DXCoils::GetMinOATCompressorUsingIndex(state.files, MSHeatPump(MSHPNum).DXHeatCoilIndex, LocalError);
+                MSHeatPump(MSHPNum).MinOATCompressorHeating = DXCoils::GetMinOATCompressorUsingIndex(state, MSHeatPump(MSHPNum).DXHeatCoilIndex, LocalError);
                 if (LocalError) {
                     ShowContinueError("...for heating coil. Occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     LocalError = false;
@@ -1082,7 +1082,7 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                 }
                 LocalError = false;
-                GetDXCoilIndex(state.files,
+                GetDXCoilIndex(state,
                                MSHeatPump(MSHPNum).DXCoolCoilName,
                                MSHeatPump(MSHPNum).DXCoolCoilIndex,
                                LocalError,
@@ -1108,7 +1108,7 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                MSHeatPump(MSHPNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(state.files, MSHeatPump(MSHPNum).DXCoolCoilIndex, LocalError);
+                MSHeatPump(MSHPNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(state, MSHeatPump(MSHPNum).DXCoolCoilIndex, LocalError);
                 if (LocalError) {
                     ShowContinueError("...for cooling coil. Occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     LocalError = false;
@@ -1586,7 +1586,7 @@ namespace HVACMultiSpeedHeatPump {
 
             // Ensure the numbers of speeds defined in the parent object are equal to the numbers defined in coil objects
             if (MSHeatPump(MSHPNum).HeatCoilType == MultiSpeedHeatingCoil) {
-                i = GetDXCoilNumberOfSpeeds(state.files, Alphas(10), Alphas(11), ErrorsFound);
+                i = GetDXCoilNumberOfSpeeds(state, Alphas(10), Alphas(11), ErrorsFound);
                 if (MSHeatPump(MSHPNum).NumOfSpeedHeating != i) {
                     ShowSevereError("For " + CurrentModuleObject + " \"" + MSHeatPump(MSHPNum).Name + "\"");
                     ShowContinueError("The " + cNumericFields(9) + " is not equal to the number defined in " + cAlphaFields(11) + " = " + Alphas(11));
@@ -1601,7 +1601,7 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                 }
             }
-            i = GetDXCoilNumberOfSpeeds(state.files, Alphas(12), Alphas(13), ErrorsFound);
+            i = GetDXCoilNumberOfSpeeds(state, Alphas(12), Alphas(13), ErrorsFound);
             if (MSHeatPump(MSHPNum).NumOfSpeedCooling != i) {
                 ShowSevereError("For " + CurrentModuleObject + " \"" + MSHeatPump(MSHPNum).Name + "\"");
                 ShowContinueError("The " + cNumericFields(10) + " is not equal to the number defined in " + cAlphaFields(13) + " = " + Alphas(13));
@@ -2463,7 +2463,7 @@ namespace HVACMultiSpeedHeatPump {
         if (GetCurrentScheduleValue(MSHeatPump(MSHeatPumpNum).AvaiSchedPtr) > 0.0) {
             if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == CoolingMode) {
                 CoilAvailSchPtr = GetDXCoilAvailSchPtr( // TODO: Why isn't this stored on the struct?
-                    state.files, "Coil:Cooling:DX:MultiSpeed", MSHeatPump(MSHeatPumpNum).DXCoolCoilName, ErrorsFound, MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex);
+                    state, "Coil:Cooling:DX:MultiSpeed", MSHeatPump(MSHeatPumpNum).DXCoolCoilName, ErrorsFound, MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex);
                 if (ErrorsFound) {
                     ShowFatalError("InitMSHeatPump, The previous error causes termination.");
                 }
@@ -2485,7 +2485,7 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == HeatingMode && MSHeatPump(MSHeatPumpNum).HeatCoilType == MultiSpeedHeatingCoil) {
                 CoilAvailSchPtr = GetDXCoilAvailSchPtr(
-                    state.files, "Coil:Heating:DX:MultiSpeed", MSHeatPump(MSHeatPumpNum).DXHeatCoilName, ErrorsFound, MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex);
+                    state, "Coil:Heating:DX:MultiSpeed", MSHeatPump(MSHeatPumpNum).DXHeatCoilName, ErrorsFound, MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex);
                 if (ErrorsFound) {
                     ShowFatalError("InitMSHeatPump, The previous error causes termination.");
                 }
