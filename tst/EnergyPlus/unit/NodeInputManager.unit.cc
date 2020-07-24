@@ -104,7 +104,7 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
     EMSManager::FinishProcessingUserInput = true;
 
     bool anyEMSRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyEMSRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyEMSRan);
 
     DataLoopNode::Node(1).Temp = 20.0;
     DataLoopNode::Node(1).HumRat = 0.01;

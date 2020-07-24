@@ -56,7 +56,7 @@ int outdoorTempSensor = -1;
 int outdoorDewPointSensor = -1;
 int handlesRetrieved = 0;
 
-void afterZoneTimeStepHandler()
+void afterZoneTimeStepHandler(EnergyPlusState state)
 {
     printf("STARTING A NEW TIME STEP\n");
     if (handlesRetrieved == 0) {
@@ -78,9 +78,10 @@ void afterZoneTimeStepHandler()
 }
 
 int main(int argc, const char * argv[]) {
-    callbackEndOfZoneTimeStepAfterZoneReporting(afterZoneTimeStepHandler);
+    EnergyPlusState state = stateNew();
+    callbackEndOfZoneTimeStepAfterZoneReporting(state, afterZoneTimeStepHandler);
     requestVariable("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
     requestVariable("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
-    energyplus(argc, argv);
+    energyplus(state, argc, argv);
     return 0;
 }

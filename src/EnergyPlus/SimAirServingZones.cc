@@ -217,6 +217,8 @@ namespace SimAirServingZones {
         int TestUniqueNodesNum(0);
         bool SizeAirLoopsOneTimeFlag(true);
         bool InitAirLoopsBranchSizingFlag(true);
+        bool OutputSetupFlag(false);
+        bool MyEnvrnFlag(true);
     } // namespace
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
@@ -241,6 +243,8 @@ namespace SimAirServingZones {
         InitAirLoopsBranchSizingFlag = true;
         NumOfTimeStepInDay = 0;
         TestUniqueNodesNum = 0;
+        OutputSetupFlag = false;
+        MyEnvrnFlag = true;
     }
 
     void ManageAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
@@ -1263,7 +1267,7 @@ namespace SimAirServingZones {
                             // Construct fan object
                             if (HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false) < 0) {
                                 HVACFan::fanObjs.emplace_back(
-                                    new HVACFan::FanSystem(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
+                                    new HVACFan::FanSystem(state, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
                             }
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex =
                                 HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) +
@@ -1561,13 +1565,6 @@ namespace SimAirServingZones {
         static Array1D_int SupNodeType;
 
         // Dimension the local subcomponent arrays
-
-        // Simulation Flags
-        static bool MyEnvrnFlag(true);
-        /////////// hoisted into namespace InitAirLoopsOneTimeFlag////////////
-        // static bool MyOneTimeFlag( true );
-        // static bool MyBranchSizingFlag( true ); //InitAirLoopsBranchSizingFlag
-        ///////////////////////////
 
         bool ErrorsFound;
         static Real64 OAReliefDiff(0.0); // local for massflow change across OA system, kg/s
@@ -2066,16 +2063,16 @@ namespace SimAirServingZones {
                             if (PrimaryAirSystem(AirLoopNum).OASysExists && !PrimaryAirSystem(AirLoopNum).isAllOA) {
                                 if (FoundOASys) {
                                     if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3) {
-                                        GetFanIndex(state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
+                                        GetFanIndex(state, state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
                                         supFanModelType = structArrayLegacyFanModels;
                                         goto EndOfAirLoop;
                                     }
                                 } else {
-                                    GetFanIndex(state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, RetFanIndex, ErrorsFound);
+                                    GetFanIndex(state, state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, RetFanIndex, ErrorsFound);
                                     retFanModelType = structArrayLegacyFanModels;
                                 }
                             } else {
-                                GetFanIndex(state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
+                                GetFanIndex(state, state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
                                 supFanModelType = structArrayLegacyFanModels;
                                 goto EndOfAirLoop;
                             }
@@ -2535,8 +2532,6 @@ namespace SimAirServingZones {
         int AirSysOutNum;
         // DO loop index; there are 2 passes - the 2nd is done only if mass balance fails
         int AirLoopPass;
-        // Output variable setup flag
-        static bool OutputSetupFlag(false);
         // Flag set by ResolveSysFlow; if TRUE, mass balance failed and there must be a second pass
         bool SysReSim;
         int CalledFrom;
@@ -3623,7 +3618,7 @@ namespace SimAirServingZones {
                 if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
             } else if (SELECT_CASE_var == CoilUserDefined) { // Coil:UserDefined
-                SimCoilUserDefined(state.dataBranchInputManager, CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
+                SimCoilUserDefined(state, state.dataBranchInputManager, CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
 
             } else if (SELECT_CASE_var == UnitarySystemModel) { // 'AirLoopHVAC:UnitarySystem'
                 Real64 sensOut = 0.0;
@@ -5245,7 +5240,7 @@ namespace SimAirServingZones {
         // have moved std 62.1 table report writing to ManageSystemVentilationAdjustments in SizingManager
     }
 
-    void UpdateSysSizing(OutputFiles &outputFiles, int const CallIndicator)
+    void UpdateSysSizing(EnergyPlusData &state, OutputFiles &outputFiles, int const CallIndicator)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7079,7 +7074,7 @@ namespace SimAirServingZones {
 
                 // EMS calling point to customize system sizing results
                 bool anyEMSRan;
-                ManageEMS(emsCallFromSystemSizing, anyEMSRan);
+                ManageEMS(state, emsCallFromSystemSizing, anyEMSRan);
 
                 // EMS override point
                 if (AnyEnergyManagementSystemInModel) {

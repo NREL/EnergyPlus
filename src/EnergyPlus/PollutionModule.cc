@@ -671,7 +671,7 @@ namespace PollutionModule {
         int NumNums;
         int Loop;
         int IOStat;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         if (!GetInputFlagPollution) return; // Input already gotten
 

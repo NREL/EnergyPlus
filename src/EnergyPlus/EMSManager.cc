@@ -246,7 +246,8 @@ namespace EMSManager {
 
     // MODULE SUBROUTINES:
 
-    void ManageEMS(int const iCalledFrom,                 // indicates where subroutine was called from, parameters in DataGlobals.
+    void ManageEMS(EnergyPlusData &state,
+                   int const iCalledFrom,                 // indicates where subroutine was called from, parameters in DataGlobals.
                    bool &anyProgramRan,                   // true if any Erl programs ran for this call
                    Optional_int_const ProgramManagerToRun // specific program manager to run
     )
@@ -302,7 +303,7 @@ namespace EMSManager {
         // also call plugins and callbacks here for convenience
         bool anyPluginsOrCallbacksRan = false;
         if (iCalledFrom != DataGlobals::emsCallFromUserDefinedComponentModel) { // don't run user-defined component plugins this way
-            PluginManagement::runAnyRegisteredCallbacks(iCalledFrom, anyPluginsOrCallbacksRan);
+            PluginManagement::runAnyRegisteredCallbacks(state, iCalledFrom, anyPluginsOrCallbacksRan);
             if (anyPluginsOrCallbacksRan) {
                 anyProgramRan = true;
             }
@@ -467,7 +468,9 @@ namespace EMSManager {
             (iCalledFrom == emsCallFromUserDefinedComponentModel)) {
 
             // another pass at trying to setup input data.
-            if (FinishProcessingUserInput) ProcessEMSInput(false);
+            if (FinishProcessingUserInput) {
+                ProcessEMSInput(false);
+            }
 
             // update internal data variables being used by Erl
             for (InternalVarUsedNum = 1; InternalVarUsedNum <= NumInternalVariablesUsed; ++InternalVarUsedNum) {
@@ -1081,7 +1084,7 @@ namespace EMSManager {
         //  INTEGER :: VariableNum  ! local do loop index
         int VarIndex;
         int VarType;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int ActuatorNum;
         bool FoundObjectType;
         bool FoundObjectName;
@@ -1670,9 +1673,7 @@ namespace EMSManager {
         std::string cControlTypeName;
         std::string cComponentTypeName;
         std::string cNodeName;
-        static bool FoundControl(false);
-
-        FoundControl = false;
+        bool FoundControl(false);
 
         cNodeName = NodeID(NodeNum);
         cComponentTypeName = "System Node Setpoint";

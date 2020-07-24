@@ -107,7 +107,7 @@ namespace PhotovoltaicThermalCollectors {
 
     Real64 const SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
-    static bool GetInputFlag(true); // First time, input is "gotten"
+    bool GetInputFlag(true); // First time, input is "gotten"
 
     int NumPVT(0); // count of all types of PVT in input file
 

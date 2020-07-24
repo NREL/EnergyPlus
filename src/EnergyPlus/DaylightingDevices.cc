@@ -197,10 +197,17 @@ namespace DaylightingDevices {
 
     // MODULE VARIABLE DECLARATIONS:
     Array1D<Real64> COSAngle(NumOfAngles); // List of cosines of incident angle
+    bool ShelfReported = false;
 
     // SUBROUTINE SPECIFICATIONS:
 
     // MODULE SUBROUTINES:
+
+    void clear_state() {
+        COSAngle.clear();
+        COSAngle.allocate(NumOfAngles);
+        ShelfReported = false;
+    }
 
     // Functions
 
@@ -247,8 +254,7 @@ namespace DaylightingDevices {
         int ShelfSurf; // Daylighting shelf surface number
         int WinSurf;   // Window surface number
 
-        static int NumStored(0); // Counter for number of pipes stored as they are calculated
-        static bool ShelfReported(false);
+        int NumStored(0); // Counter for number of pipes stored as they are calculated
 
         struct TDDPipeStoredData
         {

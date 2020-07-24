@@ -810,7 +810,7 @@ namespace ZoneEquipmentManager {
         static Real64 OAFromArea(0.0);   // min OA calculated from zone area and OA flow per area [m3/s]
         int ZoneIndex;                   // index of Zone Sizing zone name in zone array
         int ZoneSizIndex;                // zone sizing do loop index
-        static bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
         static Real64 SchMax(0.0);       // maximum people multiplier value
         Real64 OAVolumeFlowRate;         // outside air flow rate (m3/s)
         bool UseOccSchFlag;              // flag to use occupancy schedule when calculating OA
@@ -1794,7 +1794,7 @@ namespace ZoneEquipmentManager {
 
                 // candidate EMS calling point to customize CalcFinalZoneSizing
                 bool anyEMSRan;
-                ManageEMS(emsCallFromZoneSizing, anyEMSRan);
+                ManageEMS(state, emsCallFromZoneSizing, anyEMSRan);
 
                 // now apply EMS overrides (if any)
 
@@ -2659,10 +2659,9 @@ namespace ZoneEquipmentManager {
         int ZoneEquipTypeNum;
         int ZoneCompNum;
 
-        static bool SupPathInletChanged(false);
-        static bool FirstCall; // indicates first call to supply air path components
+        bool SupPathInletChanged(false);
+        bool FirstCall; // indicates first call to supply air path components
         bool ErrorFlag;
-        static bool ValidSAMComp(false);
 
         Real64 SysOutputProvided; // sensible output delivered by zone equipment (W)
         Real64 LatOutputProvided; // latent output delivered by zone equipment (kg/s)
@@ -2779,7 +2778,7 @@ namespace ZoneEquipmentManager {
 
                 ZoneCompNum = ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr);
 
-                ValidSAMComp = false;
+                bool ValidSAMComp = false;
 
                 if (ZoneEquipTypeNum <= NumValidSysAvailZoneComponents) ValidSAMComp = true;
 
@@ -3103,7 +3102,8 @@ namespace ZoneEquipmentManager {
                         NonAirSystemResponse(ActualZoneNum) += SysOutputProvided;
 
                     } else if (SELECT_CASE_var == UserDefinedZoneHVACForcedAir_Num) {
-                        SimZoneAirUserDefined(state.dataBranchInputManager,
+                        SimZoneAirUserDefined(state,
+                                              state.dataBranchInputManager,
                                               state.dataZoneEquipmentManager.PrioritySimOrder(EquipTypeNum).EquipName,
                                               ActualZoneNum,
                                               SysOutputProvided,
