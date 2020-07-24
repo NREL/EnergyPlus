@@ -338,7 +338,7 @@ namespace HeatBalanceSurfaceManager {
         using InternalHeatGains::ManageInternalHeatGains;
         // RJH DElight Modification Begin
         using namespace DElightManagerF;
-//        using namespace std::chrono;
+        using namespace std::chrono;
         // RJH DElight Modification End
 
         // Locals
@@ -726,13 +726,13 @@ namespace HeatBalanceSurfaceManager {
 
         // The order of these initializations is important currently.  Over time we hope to
         //  take the appropriate parts of these inits to the other heat balance managers
-//        high_resolution_clock::time_point t1 = high_resolution_clock::now();
+        high_resolution_clock::time_point t1 = high_resolution_clock::now();
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Solar Heat Gains");
         InitSolarHeatGains(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager);
 
-//        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-//        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-//        DataGlobals::solar_timer += time_span.count();
+        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+        DataGlobals::solar_timer += time_span.count();
 
         if (SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0)) {
             for (NZ = 1; NZ <= NumOfZones; ++NZ) {
@@ -2566,16 +2566,22 @@ namespace HeatBalanceSurfaceManager {
 
                     // For Complex Fenestrations:
                     SurfWinSkyGndSolarInc(SurfNum) = DifSolarRad * GndReflectance * ReflFacSkySolGnd(SurfNum);
-                    SurfWinBmGndSolarInc(SurfNum) = BeamSolarRad * SOLCOS(3) * GndReflectance * BmToDiffReflFacGnd(SurfNum);
-                    BmToBmReflFacObs(SurfNum) = WeightNow * ReflFacBmToBmSolObs[lSH] + WeightPreviousHour * ReflFacBmToBmSolObs[lSP];
-                    BmToDiffReflFacObs(SurfNum) = WeightNow * ReflFacBmToDiffSolObs[lSH] + WeightPreviousHour * ReflFacBmToDiffSolObs[lSP];
-                    BmToDiffReflFacGnd(SurfNum) = WeightNow * ReflFacBmToDiffSolGnd[lSH] + WeightPreviousHour * ReflFacBmToDiffSolGnd[lSP];
+                    SurfWinBmGndSolarInc(SurfNum) =
+                            BeamSolarRad * SOLCOS(3) * GndReflectance * BmToDiffReflFacGnd(SurfNum);
+                    BmToBmReflFacObs(SurfNum) =
+                            WeightNow * ReflFacBmToBmSolObs[lSH] + WeightPreviousHour * ReflFacBmToBmSolObs[lSP];
+                    BmToDiffReflFacObs(SurfNum) =
+                            WeightNow * ReflFacBmToDiffSolObs[lSH] + WeightPreviousHour * ReflFacBmToDiffSolObs[lSP];
+                    BmToDiffReflFacGnd(SurfNum) =
+                            WeightNow * ReflFacBmToDiffSolGnd[lSH] + WeightPreviousHour * ReflFacBmToDiffSolGnd[lSP];
 
                     // TH2 CR 9056
                     SurfWinSkySolarInc(SurfNum) +=
-                        BeamSolarRad * (BmToBmReflFacObs(SurfNum) + BmToDiffReflFacObs(SurfNum)) + DifSolarRad * ReflFacSkySolObs(SurfNum);
-                    SurfWinGndSolarInc(SurfNum) = BeamSolarRad * SOLCOS(3) * GndReflectance * BmToDiffReflFacGnd(SurfNum) +
-                                                         DifSolarRad * GndReflectance * ReflFacSkySolGnd(SurfNum);
+                            BeamSolarRad * (BmToBmReflFacObs(SurfNum) + BmToDiffReflFacObs(SurfNum)) +
+                            DifSolarRad * ReflFacSkySolObs(SurfNum);
+                    SurfWinGndSolarInc(SurfNum) =
+                            BeamSolarRad * SOLCOS(3) * GndReflectance * BmToDiffReflFacGnd(SurfNum) +
+                            DifSolarRad * GndReflectance * ReflFacSkySolGnd(SurfNum);
 
                     ++lSH;
                     ++lSP;
@@ -2586,7 +2592,8 @@ namespace HeatBalanceSurfaceManager {
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface();
 
-            if (dataWindowManager.inExtWindowModel->isExternalLibraryModel() && dataWindowManager.winOpticalModel->isSimplifiedModel()) {
+            if (dataWindowManager.inExtWindowModel->isExternalLibraryModel() &&
+                dataWindowManager.winOpticalModel->isSimplifiedModel()) {
                 CalcInteriorSolarDistributionWCE(dataWindowComplexManager, dataWindowManager);
             } else {
                 CalcInteriorSolarDistribution(dataWindowEquivalentLayer);
@@ -2612,8 +2619,8 @@ namespace HeatBalanceSurfaceManager {
                 //  DBZone needs to subtract this part since it is already counted in DBZone.
                 //  Use InitialZoneDifSolReflW (Rob's previous work) as it better counts initial distribution of
                 //   diffuse solar rather than using weighted area*absorptance
-                QDforDaylight(ZoneNum) =
-                    (DBZone(ZoneNum) - DBZoneIntWin(ZoneNum)) * BeamSolarRad + DBZoneSSG(ZoneNum) + InitialZoneDifSolReflW(ZoneNum);
+                QDforDaylight(ZoneNum) = (DBZone(ZoneNum) - DBZoneIntWin(ZoneNum)) * BeamSolarRad + DBZoneSSG(ZoneNum) +
+                                         InitialZoneDifSolReflW(ZoneNum);
 
                 // RJH 08/30/07 - Substitute InitialZoneDifSolReflW(ZoneNum) for DSZone and DGZone here
                 // to exclude diffuse solar now absorbed/transmitted in CalcWinTransDifSolInitialDistribution
@@ -2638,9 +2645,11 @@ namespace HeatBalanceSurfaceManager {
                     if (RecDifShortFromZ(enclNum)) {
                         Real64 QSDifSol_sum(0.0);                        // Accumulator
                         auto lZone(FractDifShortZtoZ.index(enclNum, 1)); // Tuned Linear indexing
-                        for (int otherEnclNum = 1; otherEnclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++otherEnclNum, ++lZone) {
+                        for (int otherEnclNum = 1;
+                             otherEnclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++otherEnclNum, ++lZone) {
                             if ((otherEnclNum != enclNum) && (RecDifShortFromZ(otherEnclNum))) {
-                                QSDifSol_sum += FractDifShortZtoZ[lZone] * QDforDaylight(otherEnclNum); // [ lZone ] == ( enclNum, otherEnclNum )
+                                QSDifSol_sum += FractDifShortZtoZ[lZone] *
+                                                QDforDaylight(otherEnclNum); // [ lZone ] == ( enclNum, otherEnclNum )
                             }
                         }
                         QSDifSol(enclNum) += QSDifSol_sum;
@@ -2694,12 +2703,14 @@ namespace HeatBalanceSurfaceManager {
 
                         // Reconstruct the beam, sky, and ground radiation transmittance of just the TDD:DOME and TDD pipe
                         // by dividing out diffuse solar transmittance of TDD:DIFFUSER
-                        BeamSolar = BeamSolarRad * TransTDD(PipeNum, CosInc, SolarBeam) / dataConstruction.Construct(ConstrNum).TransDiff;
+                        BeamSolar = BeamSolarRad * TransTDD(PipeNum, CosInc, SolarBeam) /
+                                    dataConstruction.Construct(ConstrNum).TransDiff;
 
-                        SkySolarInc = DifSolarRad * AnisoSkyMult(SurfNum2) * TransTDD(PipeNum, CosInc, SolarAniso) / dataConstruction.Construct(ConstrNum).TransDiff;
+                        SkySolarInc = DifSolarRad * AnisoSkyMult(SurfNum2) * TransTDD(PipeNum, CosInc, SolarAniso) /
+                                      dataConstruction.Construct(ConstrNum).TransDiff;
 
-                        GndSolarInc =
-                            GndSolarRad * Surface(SurfNum2).ViewFactorGround * TDDPipe(PipeNum).TransSolIso / dataConstruction.Construct(ConstrNum).TransDiff;
+                        GndSolarInc = GndSolarRad * Surface(SurfNum2).ViewFactorGround * TDDPipe(PipeNum).TransSolIso /
+                                      dataConstruction.Construct(ConstrNum).TransDiff;
 
                     } else if (OutShelfSurf > 0) { // Outside daylighting shelf
                         SurfNum2 = SurfNum;
@@ -2709,13 +2720,14 @@ namespace HeatBalanceSurfaceManager {
                         BeamSolar = BeamSolarRad;
                         SkySolarInc = DifSolarRad * AnisoSkyMult(SurfNum);
 
-                        ShelfSolarRad = (BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, OutShelfSurf) * CosIncAng(TimeStep, HourOfDay, OutShelfSurf) +
-                                         DifSolarRad * AnisoSkyMult(OutShelfSurf)) *
-                                        Shelf(ShelfNum).OutReflectSol;
+                        ShelfSolarRad = (BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, OutShelfSurf) *
+                                         CosIncAng(TimeStep, HourOfDay, OutShelfSurf) +
+                                         DifSolarRad * AnisoSkyMult(OutShelfSurf)) * Shelf(ShelfNum).OutReflectSol;
 
                         // Add all reflected solar from the outside shelf to the ground solar
                         // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!
-                        GndSolarInc = GndSolarRad * Surface(SurfNum).ViewFactorGround + ShelfSolarRad * Shelf(ShelfNum).ViewFactor;
+                        GndSolarInc = GndSolarRad * Surface(SurfNum).ViewFactorGround +
+                                      ShelfSolarRad * Shelf(ShelfNum).ViewFactor;
 
                     } else { // Regular surface
                         SurfNum2 = SurfNum;
@@ -2731,7 +2743,8 @@ namespace HeatBalanceSurfaceManager {
                     // Report variables for various incident solar quantities
 
                     // Incident direct (unreflected) beam
-                    QRadSWOutIncidentBeam(SurfNum) = BeamSolar * SunlitFrac(TimeStep, HourOfDay, SurfNum2) * CosInc; // NOTE: SurfNum2
+                    QRadSWOutIncidentBeam(SurfNum) =
+                            BeamSolar * SunlitFrac(TimeStep, HourOfDay, SurfNum2) * CosInc; // NOTE: SurfNum2
 
                     // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
                     if (SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
@@ -2743,15 +2756,18 @@ namespace HeatBalanceSurfaceManager {
                     QRadSWOutIncidentGndDiffuse(SurfNum) = GndSolarInc;
                     // Incident diffuse solar from beam-to-diffuse reflection from ground
                     if (CalcSolRefl) {
-                        QRadSWOutIncBmToDiffReflGnd(SurfNum) = BeamSolarRad * SOLCOS(3) * GndReflectance * BmToDiffReflFacGnd(SurfNum);
+                        QRadSWOutIncBmToDiffReflGnd(SurfNum) =
+                                BeamSolarRad * SOLCOS(3) * GndReflectance * BmToDiffReflFacGnd(SurfNum);
                     } else {
-                        QRadSWOutIncBmToDiffReflGnd(SurfNum) = BeamSolarRad * SOLCOS(3) * GndReflectance * Surface(SurfNum).ViewFactorGround;
+                        QRadSWOutIncBmToDiffReflGnd(SurfNum) =
+                                BeamSolarRad * SOLCOS(3) * GndReflectance * Surface(SurfNum).ViewFactorGround;
                     }
                     // Incident diffuse solar from sky diffuse reflection from ground
                     if (CalcSolRefl) {
                         QRadSWOutIncSkyDiffReflGnd(SurfNum) = DifSolarRad * GndReflectance * ReflFacSkySolGnd(SurfNum);
                     } else {
-                        QRadSWOutIncSkyDiffReflGnd(SurfNum) = DifSolarRad * GndReflectance * Surface(SurfNum).ViewFactorGround;
+                        QRadSWOutIncSkyDiffReflGnd(SurfNum) =
+                                DifSolarRad * GndReflectance * Surface(SurfNum).ViewFactorGround;
                     }
                     // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
                     // in SkySolarInc.
@@ -2759,7 +2775,8 @@ namespace HeatBalanceSurfaceManager {
 
                     // TH2 CR 9056
                     QRadSWOutIncident(SurfNum) = QRadSWOutIncidentBeam(SurfNum) + QRadSWOutIncidentSkyDiffuse(SurfNum) +
-                                                 QRadSWOutIncBmToDiffReflGnd(SurfNum) + QRadSWOutIncSkyDiffReflGnd(SurfNum);
+                                                 QRadSWOutIncBmToDiffReflGnd(SurfNum) +
+                                                 QRadSWOutIncSkyDiffReflGnd(SurfNum);
 
                     if (CalcSolRefl) {
                         // Incident beam solar from beam-to-beam (specular) reflection from obstructions
@@ -2770,25 +2787,52 @@ namespace HeatBalanceSurfaceManager {
                         QRadSWOutIncSkyDiffReflObs(SurfNum) = DifSolarRad * ReflFacSkySolObs(SurfNum);
                         // TH2 CR 9056: Add reflections from obstructions to the total incident
                         QRadSWOutIncident(SurfNum) +=
-                            QRadSWOutIncBmToBmReflObs(SurfNum) + QRadSWOutIncBmToDiffReflObs(SurfNum) + QRadSWOutIncSkyDiffReflObs(SurfNum);
+                                QRadSWOutIncBmToBmReflObs(SurfNum) + QRadSWOutIncBmToDiffReflObs(SurfNum) +
+                                QRadSWOutIncSkyDiffReflObs(SurfNum);
                     }
+                }
+            }
+            for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+                int const firstSurfOpague = Zone(zoneNum).NonWindowSurfaceFirst;
+                int const lastSurfOpague = Zone(zoneNum).NonWindowSurfaceLast;
+                for (int SurfNum = firstSurfOpague; SurfNum <= lastSurfOpague; ++SurfNum) {
+                    if (Surface(SurfNum).ExtSolar || SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
 
-                    if (Surface(SurfNum).HeatTransSurf) { // Exclude special shading surfaces which required QRadSWOut calculations above
+                        if (Surface(
+                                SurfNum).HeatTransSurf) { // Exclude special shading surfaces which required QRadSWOut calculations above
 
-                        RoughIndexMovInsul = 0;
+                            RoughIndexMovInsul = 0;
 
-                        if (Surface(SurfNum).MaterialMovInsulExt > 0) EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+                            if (Surface(SurfNum).MaterialMovInsulExt > 0)
+                                EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
 
-                        if (RoughIndexMovInsul <= 0) { // No movable insulation present
+                            if (RoughIndexMovInsul <= 0) { // No movable insulation present
 
-                            if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
+                                AbsExt = dataMaterial.Material(
+                                        dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
 
-                                AbsExt = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
+                            }
+                        }
+                    }
+                }
+                int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+                int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                    if (Surface(SurfNum).ExtSolar || SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
 
-                            } else { // Exterior window
+                        if (Surface(
+                                SurfNum).HeatTransSurf) { // Exclude special shading surfaces which required QRadSWOut calculations above
+
+                            RoughIndexMovInsul = 0;
+
+                            if (Surface(SurfNum).MaterialMovInsulExt > 0)
+                                EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+
+                            if (RoughIndexMovInsul <= 0) { // No movable insulation present
 
                                 if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel &&
-                                    SurfWinWindowModelType(SurfNum) != WindowEQLModel && !dataWindowManager.inExtWindowModel->isExternalLibraryModel()) {
+                                    SurfWinWindowModelType(SurfNum) != WindowEQLModel &&
+                                    !dataWindowManager.inExtWindowModel->isExternalLibraryModel()) {
                                     TotGlassLay = dataConstruction.Construct(ConstrNum).TotGlassLayers;
                                     for (Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                         AbsDiffWin(Lay) = dataConstruction.Construct(ConstrNum).AbsDiff(Lay);
@@ -2798,58 +2842,80 @@ namespace HeatBalanceSurfaceManager {
 
                                     if (ShadeFlag > 0) { // Shaded window
                                         ConstrNumSh = Surface(SurfNum).ShadedConstruction;
-                                        if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
+                                        if (SurfWinStormWinFlag(SurfNum) == 1)
+                                            ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
 
-                                        if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn ||
-                                            ShadeFlag == ExtScreenOn) { // Shade/screen on
+                                        if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn ||
+                                            ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn) { // Shade/screen on
 
                                             for (Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                                 AbsDiffWin(Lay) = dataConstruction.Construct(ConstrNumSh).AbsDiff(Lay);
                                             }
                                             SurfWinExtDiffAbsByShade(SurfNum) =
-                                                dataConstruction.Construct(ConstrNumSh).AbsDiffShade * (SkySolarInc + GndSolarInc);
+                                                    dataConstruction.Construct(ConstrNumSh).AbsDiffShade *
+                                                    (SkySolarInc + GndSolarInc);
                                         }
 
-                                        if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) { // Blind on
+                                        if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ||
+                                            ShadeFlag == BGBlindOn) { // Blind on
                                             for (Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                                 AbsDiffWin(Lay) = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
                                                                                 SurfWinMovableSlats(SurfNum),
-                                                                                dataConstruction.Construct(ConstrNumSh).BlAbsDiff({1, MaxSlatAngs}, Lay));
+                                                                                dataConstruction.Construct(
+                                                                                        ConstrNumSh).BlAbsDiff(
+                                                                                        {1, MaxSlatAngs}, Lay));
                                                 AbsDiffWinGnd(Lay) = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
                                                                                    SurfWinMovableSlats(SurfNum),
-                                                                                   dataConstruction.Construct(ConstrNumSh).BlAbsDiffGnd({1, MaxSlatAngs}, Lay));
+                                                                                   dataConstruction.Construct(
+                                                                                           ConstrNumSh).BlAbsDiffGnd(
+                                                                                           {1, MaxSlatAngs}, Lay));
                                                 AbsDiffWinSky(Lay) = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
                                                                                    SurfWinMovableSlats(SurfNum),
-                                                                                   dataConstruction.Construct(ConstrNumSh).BlAbsDiffSky({1, MaxSlatAngs}, Lay));
+                                                                                   dataConstruction.Construct(
+                                                                                           ConstrNumSh).BlAbsDiffSky(
+                                                                                           {1, MaxSlatAngs}, Lay));
                                             }
-                                            SurfWinExtDiffAbsByShade(SurfNum) = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
-                                                                                                     SurfWinMovableSlats(SurfNum),
-                                                                                                     dataConstruction.Construct(ConstrNumSh).AbsDiffBlind) *
-                                                                                       (SkySolarInc + GndSolarInc);
+                                            SurfWinExtDiffAbsByShade(SurfNum) =
+                                                    InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
+                                                                  SurfWinMovableSlats(SurfNum),
+                                                                  dataConstruction.Construct(
+                                                                          ConstrNumSh).AbsDiffBlind) *
+                                                    (SkySolarInc + GndSolarInc);
                                             if (Blind(SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
                                                 ACosTlt = std::abs(Surface(SurfNum).CosTilt);
                                                 AbsDiffBlindGnd = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
                                                                                 SurfWinMovableSlats(SurfNum),
-                                                                                dataConstruction.Construct(ConstrNumSh).AbsDiffBlindGnd);
+                                                                                dataConstruction.Construct(
+                                                                                        ConstrNumSh).AbsDiffBlindGnd);
                                                 AbsDiffBlindSky = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
                                                                                 SurfWinMovableSlats(SurfNum),
-                                                                                dataConstruction.Construct(ConstrNumSh).AbsDiffBlindSky);
-                                                SurfWinExtDiffAbsByShade(SurfNum) =
-                                                    SkySolarInc * (0.5 * ACosTlt * AbsDiffBlindGnd + (1.0 - 0.5 * ACosTlt) * AbsDiffBlindSky) +
-                                                    GndSolarInc * ((1.0 - 0.5 * ACosTlt) * AbsDiffBlindGnd + 0.5 * ACosTlt * AbsDiffBlindSky);
+                                                                                dataConstruction.Construct(
+                                                                                        ConstrNumSh).AbsDiffBlindSky);
+                                                SurfWinExtDiffAbsByShade(SurfNum) = SkySolarInc *
+                                                                                    (0.5 * ACosTlt * AbsDiffBlindGnd +
+                                                                                     (1.0 - 0.5 * ACosTlt) *
+                                                                                     AbsDiffBlindSky) + GndSolarInc *
+                                                                                                        ((1.0 - 0.5 *
+                                                                                                                ACosTlt) *
+                                                                                                         AbsDiffBlindGnd +
+                                                                                                         0.5 * ACosTlt *
+                                                                                                         AbsDiffBlindSky);
                                             }
                                         }
 
                                         // Correct for shadowing of divider onto interior shading device (note that dividers are
                                         // not allowed in windows with between-glass shade/blind)
 
-                                        if ((ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) && SurfWinDividerArea(SurfNum) > 0.0)
+                                        if ((ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) &&
+                                            SurfWinDividerArea(SurfNum) > 0.0)
                                             SurfWinExtDiffAbsByShade(SurfNum) *= SurfWinGlazedFrac(SurfNum);
 
                                         if (ShadeFlag == SwitchableGlazing) { // Switchable glazing
                                             SwitchFac = SurfWinSwitchingFactor(SurfNum);
                                             for (Lay = 1; Lay <= TotGlassLay; ++Lay) {
-                                                AbsDiffWin(Lay) = InterpSw(SwitchFac, AbsDiffWin(Lay), dataConstruction.Construct(ConstrNumSh).AbsDiff(Lay));
+                                                AbsDiffWin(Lay) = InterpSw(SwitchFac, AbsDiffWin(Lay),
+                                                                           dataConstruction.Construct(
+                                                                                   ConstrNumSh).AbsDiff(Lay));
                                             }
                                         }
 
@@ -2858,24 +2924,37 @@ namespace HeatBalanceSurfaceManager {
                                     QRadSWwinAbsTot(SurfNum) = 0.0;
                                     for (Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                         QRadSWwinAbs(Lay, SurfNum) = AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc) +
-                                                                     AWinSurf(Lay, SurfNum) * BeamSolar; // AWinSurf is from InteriorSolarDistribution
-                                        if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
+                                                                     AWinSurf(Lay, SurfNum) *
+                                                                     BeamSolar; // AWinSurf is from InteriorSolarDistribution
+                                        if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ||
+                                            ShadeFlag == BGBlindOn) {
                                             if (Blind(SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
                                                 AbsDiffGlassLayGnd = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
                                                                                    SurfWinMovableSlats(SurfNum),
-                                                                                   dataConstruction.Construct(ConstrNumSh).BlAbsDiffGnd({1, 19}, Lay));
+                                                                                   dataConstruction.Construct(
+                                                                                           ConstrNumSh).BlAbsDiffGnd(
+                                                                                           {1, 19}, Lay));
                                                 AbsDiffGlassLaySky = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
                                                                                    SurfWinMovableSlats(SurfNum),
-                                                                                   dataConstruction.Construct(ConstrNumSh).BlAbsDiffSky({1, 19}, Lay));
-                                                QRadSWwinAbs(Lay, SurfNum) =
-                                                    SkySolarInc * (0.5 * ACosTlt * AbsDiffGlassLayGnd + (1.0 - 0.5 * ACosTlt) * AbsDiffGlassLaySky) +
-                                                    GndSolarInc * ((1.0 - 0.5 * ACosTlt) * AbsDiffGlassLayGnd + 0.5 * ACosTlt * AbsDiffGlassLaySky) +
-                                                    AWinSurf(Lay, SurfNum) * BeamSolar;
+                                                                                   dataConstruction.Construct(
+                                                                                           ConstrNumSh).BlAbsDiffSky(
+                                                                                           {1, 19}, Lay));
+                                                QRadSWwinAbs(Lay, SurfNum) = SkySolarInc *
+                                                                             (0.5 * ACosTlt * AbsDiffGlassLayGnd +
+                                                                              (1.0 - 0.5 * ACosTlt) *
+                                                                              AbsDiffGlassLaySky) + GndSolarInc *
+                                                                                                    ((1.0 -
+                                                                                                      0.5 * ACosTlt) *
+                                                                                                     AbsDiffGlassLayGnd +
+                                                                                                     0.5 * ACosTlt *
+                                                                                                     AbsDiffGlassLaySky) +
+                                                                             AWinSurf(Lay, SurfNum) * BeamSolar;
                                             }
                                         }
 
                                         // Total solar absorbed in solid layer (W), for reporting
-                                        QRadSWwinAbsLayer(Lay, SurfNum) = QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                                        QRadSWwinAbsLayer(Lay, SurfNum) =
+                                                QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
 
                                         // Total solar absorbed in all glass layers (W), for reporting
                                         QRadSWwinAbsTot(SurfNum) += QRadSWwinAbsLayer(Lay, SurfNum);
@@ -2899,7 +2978,8 @@ namespace HeatBalanceSurfaceManager {
 
                                     for (Lay = 1; Lay <= TotSolidLay; ++Lay) {
                                         if (SurfSolAbs != 0) {
-                                            AWinSurf(Lay, SurfNum) = GetCurrentScheduleValue(FenLayAbsSSG(SurfSolAbs).SchedPtrs(Lay));
+                                            AWinSurf(Lay, SurfNum) = GetCurrentScheduleValue(
+                                                    FenLayAbsSSG(SurfSolAbs).SchedPtrs(Lay));
                                             // ABWin(Lay) = AWinSurf(SurfNum,Lay)
                                             QRadSWwinAbs(Lay, SurfNum) = AWinSurf(Lay, SurfNum);
                                         } else {
@@ -2909,12 +2989,15 @@ namespace HeatBalanceSurfaceManager {
                                             // accounting for absorptances from beam hitting back of the window which passes through rest of exterior
                                             // windows
                                             QRadSWwinAbs(Lay, SurfNum) =
-                                                SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyFtAbs(Lay) * SkySolarInc +
-                                                SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyGndAbs(Lay) * GndSolarInc +
-                                                AWinSurf(Lay, SurfNum) * BeamSolar + AWinCFOverlap(Lay, SurfNum) * BeamSolar;
+                                                    SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyFtAbs(
+                                                            Lay) * SkySolarInc +
+                                                    SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyGndAbs(
+                                                            Lay) * GndSolarInc + AWinSurf(Lay, SurfNum) * BeamSolar +
+                                                    AWinCFOverlap(Lay, SurfNum) * BeamSolar;
                                         }
                                         // Total solar absorbed in solid layer (W), for reporting
-                                        QRadSWwinAbsLayer(Lay, SurfNum) = QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                                        QRadSWwinAbsLayer(Lay, SurfNum) =
+                                                QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
 
                                         // Total solar absorbed in all glass layers (W), for reporting
                                         QRadSWwinAbsTot(SurfNum) += QRadSWwinAbsLayer(Lay, SurfNum);
@@ -2926,7 +3009,8 @@ namespace HeatBalanceSurfaceManager {
                                 } else if (SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
                                     QRadSWwinAbsTot(SurfNum) = 0.0;
                                     // EQLNum = Construct(Surface(SurfNum)%Construction)%EQLConsPtr
-                                    TotSolidLay = CFS(dataConstruction.Construct(Surface(SurfNum).Construction).EQLConsPtr).NL;
+                                    TotSolidLay = CFS(
+                                            dataConstruction.Construct(Surface(SurfNum).Construction).EQLConsPtr).NL;
                                     for (Lay = 1; Lay <= TotSolidLay; ++Lay) {
                                         // Absorbed window components include:
                                         // (1) beam solar radiation absorbed by all layers in the fenestration
@@ -2934,33 +3018,40 @@ namespace HeatBalanceSurfaceManager {
                                         // (3) diffuse short wave incident on the inside face of the fenestration.  The short wave internal sources
                                         //     include light, ...
                                         AbsDiffWin(Lay) = dataConstruction.Construct(ConstrNum).AbsDiffFrontEQL(Lay);
-                                        QRadSWwinAbs(Lay, SurfNum) =
-                                            AWinSurf(Lay, SurfNum) * BeamSolar + AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc);
+                                        QRadSWwinAbs(Lay, SurfNum) = AWinSurf(Lay, SurfNum) * BeamSolar +
+                                                                     AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc);
 
                                         // Total solar absorbed in solid layer (W), for reporting
-                                        QRadSWwinAbsLayer(Lay, SurfNum) = QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                                        QRadSWwinAbsLayer(Lay, SurfNum) =
+                                                QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
 
                                         // Total solar absorbed in all glass layers (W), for reporting
                                         QRadSWwinAbsTot(SurfNum) += QRadSWwinAbsLayer(Lay, SurfNum);
                                     }
                                     QRadSWwinAbsTotEnergy(SurfNum) = QRadSWwinAbsTot(SurfNum) * TimeStepZoneSec;
                                 } else if (dataWindowManager.inExtWindowModel->isExternalLibraryModel()) {
-                                    std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(dataWindowComplexManager, SurfNum2, BSDFHemisphere::Incoming);
+                                    std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(dataWindowComplexManager,
+                                                                                              SurfNum2,
+                                                                                              BSDFHemisphere::Incoming);
                                     Real64 Theta = incomingAngle.first;
                                     Real64 Phi = incomingAngle.second;
 
-                                    std::shared_ptr<CMultiLayerScattered> aLayer =
-                                        CWindowConstructionsSimplified::instance().getEquivalentLayer(dataWindowManager, WavelengthRange::Solar, ConstrNum);
+                                    std::shared_ptr<CMultiLayerScattered> aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(
+                                            dataWindowManager, WavelengthRange::Solar, ConstrNum);
 
                                     size_t totLayers = aLayer->getNumOfLayers();
                                     for (size_t Lay = 1; Lay <= totLayers; ++Lay) {
 
-                                        Real64 AbWinDiff = aLayer->getAbsorptanceLayer(Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi);
+                                        Real64 AbWinDiff = aLayer->getAbsorptanceLayer(Lay, Side::Front,
+                                                                                       ScatteringSimple::Diffuse, Theta,
+                                                                                       Phi);
 
-                                        QRadSWwinAbs(Lay, SurfNum) = AbWinDiff * (SkySolarInc + GndSolarInc) + AWinSurf(Lay, SurfNum) * BeamSolar;
+                                        QRadSWwinAbs(Lay, SurfNum) = AbWinDiff * (SkySolarInc + GndSolarInc) +
+                                                                     AWinSurf(Lay, SurfNum) * BeamSolar;
 
                                         // Total solar absorbed in solid layer (W), for reporting
-                                        QRadSWwinAbsLayer(Lay, SurfNum) = QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                                        QRadSWwinAbsLayer(Lay, SurfNum) =
+                                                QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
 
                                         // Total solar absorbed in all glass layers (W), for reporting
                                         QRadSWwinAbsTot(SurfNum) += QRadSWwinAbsLayer(Lay, SurfNum);
@@ -3004,13 +3095,15 @@ namespace HeatBalanceSurfaceManager {
                                         // Note that SOLCOS is the current timestep's solar direction cosines.
                                         //                  PhiWin = ASIN(WALCOS(3,SurfNum))
                                         PhiWin = std::asin(Surface(SurfNum).OutNormVec(3));
-                                        ThWin = std::atan2(Surface(SurfNum).OutNormVec(2), Surface(SurfNum).OutNormVec(1));
+                                        ThWin = std::atan2(Surface(SurfNum).OutNormVec(2),
+                                                           Surface(SurfNum).OutNormVec(1));
                                         PhiSun = std::asin(SOLCOS(3));
                                         ThSun = std::atan2(SOLCOS(2), SOLCOS(1));
                                         Real64 const cos_PhiWin(std::cos(PhiWin));
                                         Real64 const cos_PhiSun(std::cos(PhiSun));
-                                        CosIncAngHorProj =
-                                            std::abs(std::sin(PhiWin) * cos_PhiSun * std::cos(ThWin - ThSun) - cos_PhiWin * std::sin(PhiSun));
+                                        CosIncAngHorProj = std::abs(
+                                                std::sin(PhiWin) * cos_PhiSun * std::cos(ThWin - ThSun) -
+                                                cos_PhiWin * std::sin(PhiSun));
                                         CosIncAngVertProj = std::abs(cos_PhiWin * cos_PhiSun * std::sin(ThWin - ThSun));
                                     }
                                 }
@@ -3024,19 +3117,24 @@ namespace HeatBalanceSurfaceManager {
                                     FrIncSolarIn = 0.0;
                                     TransDiffGl = 0.0;
                                     if (FrProjOut > 0.0 || FrProjIn > 0.0) {
-                                        BeamFrHorFaceInc = BeamSolarRad * CosIncAngHorProj *
-                                                           (Surface(SurfNum).Width - FrameDivider(FrDivNum).VertDividers * DivWidth) * FracSunLit /
+                                        BeamFrHorFaceInc = BeamSolarRad * CosIncAngHorProj * (Surface(SurfNum).Width -
+                                                                                              FrameDivider(
+                                                                                                      FrDivNum).VertDividers *
+                                                                                              DivWidth) * FracSunLit /
                                                            FrArea;
                                         BeamFrVertFaceInc = BeamSolarRad * CosIncAngVertProj *
-                                                            (Surface(SurfNum).Height - FrameDivider(FrDivNum).HorDividers * DivWidth) * FracSunLit /
-                                                            FrArea;
+                                                            (Surface(SurfNum).Height -
+                                                             FrameDivider(FrDivNum).HorDividers * DivWidth) *
+                                                            FracSunLit / FrArea;
                                         // Beam solar on outside of frame
                                         FrIncSolarOut += (BeamFrHorFaceInc + BeamFrVertFaceInc) * FrProjOut;
                                         if (FrProjIn > 0.0) {
-                                            TransGl = POLYF(CosInc, dataConstruction.Construct(ConstrNum).TransSolBeamCoef);
+                                            TransGl = POLYF(CosInc,
+                                                            dataConstruction.Construct(ConstrNum).TransSolBeamCoef);
                                             TransDiffGl = dataConstruction.Construct(ConstrNum).TransDiff;
                                             if (ShadeFlag == SwitchableGlazing) { // Switchable glazing
-                                                TransGlSh = POLYF(CosInc, dataConstruction.Construct(ConstrNumSh).TransSolBeamCoef);
+                                                TransGlSh = POLYF(CosInc, dataConstruction.Construct(
+                                                        ConstrNumSh).TransSolBeamCoef);
                                                 TransGl = InterpSw(SwitchFac, TransGl, TransGlSh);
                                                 TransDiffGlSh = dataConstruction.Construct(ConstrNumSh).TransDiff;
                                                 TransDiffGl = InterpSw(SwitchFac, TransDiffGl, TransDiffGlSh);
@@ -3050,14 +3148,16 @@ namespace HeatBalanceSurfaceManager {
                                     SurfWinFrameQRadOutAbs(SurfNum) = FrIncSolarOut * SurfWinFrameSolAbsorp(SurfNum);
                                     // Add diffuse from beam reflected from window outside reveal surfaces
                                     SurfWinFrameQRadOutAbs(SurfNum) +=
-                                        BeamSolarRad * SurfWinOutsRevealDiffOntoFrame(SurfNum) * SurfWinFrameSolAbsorp(SurfNum);
+                                            BeamSolarRad * SurfWinOutsRevealDiffOntoFrame(SurfNum) *
+                                            SurfWinFrameSolAbsorp(SurfNum);
 
                                     // Beam plus diffuse solar on inside of frame
                                     FrIncSolarIn += DifSolarFaceInc * TransDiffGl * 0.5 * SurfWinProjCorrFrIn(SurfNum);
                                     SurfWinFrameQRadInAbs(SurfNum) = FrIncSolarIn * SurfWinFrameSolAbsorp(SurfNum);
                                     // Add diffuse from beam reflected from window inside reveal surfaces
                                     SurfWinFrameQRadInAbs(SurfNum) +=
-                                        BeamSolarRad * SurfWinInsRevealDiffOntoFrame(SurfNum) * SurfWinFrameSolAbsorp(SurfNum);
+                                            BeamSolarRad * SurfWinInsRevealDiffOntoFrame(SurfNum) *
+                                            SurfWinFrameSolAbsorp(SurfNum);
                                 }
 
                                 // Divider solar
@@ -3085,133 +3185,161 @@ namespace HeatBalanceSurfaceManager {
                                             AbsGl = InterpSw(SwitchFac, AbsGl, AbsGlSh);
                                         }
                                         DividerRefl = 1.0 - DividerAbs;
-                                        DividerAbs = AbsGl + TransGl * (DividerAbs + DividerRefl * AbsGl) / (1.0 - DividerRefl * ReflGl);
+                                        DividerAbs = AbsGl + TransGl * (DividerAbs + DividerRefl * AbsGl) /
+                                                             (1.0 - DividerRefl * ReflGl);
                                     }
 
                                     BeamDivHorFaceInc = 0.0;
                                     BeamDivVertFaceInc = 0.0;
                                     // Beam incident on horizontal and vertical projection faces of divider if no exterior shading
-                                    if (DivProjOut > 0.0 && ShadeFlag != ExtShadeOn && ShadeFlag != ExtBlindOn && ShadeFlag != ExtScreenOn) {
-                                        BeamDivHorFaceInc = BeamSolarRad * CosIncAngHorProj * FrameDivider(FrDivNum).HorDividers * DivProjOut *
-                                                            (Surface(SurfNum).Width - FrameDivider(FrDivNum).VertDividers * DivWidth) * FracSunLit /
-                                                            DivArea;
-                                        BeamDivVertFaceInc = BeamSolarRad * CosIncAngVertProj * FrameDivider(FrDivNum).VertDividers * DivProjOut *
-                                                             (Surface(SurfNum).Height - FrameDivider(FrDivNum).HorDividers * DivWidth) * FracSunLit /
-                                                             DivArea;
+                                    if (DivProjOut > 0.0 && ShadeFlag != ExtShadeOn && ShadeFlag != ExtBlindOn &&
+                                        ShadeFlag != ExtScreenOn) {
+                                        BeamDivHorFaceInc =
+                                                BeamSolarRad * CosIncAngHorProj * FrameDivider(FrDivNum).HorDividers *
+                                                DivProjOut * (Surface(SurfNum).Width -
+                                                              FrameDivider(FrDivNum).VertDividers * DivWidth) *
+                                                FracSunLit / DivArea;
+                                        BeamDivVertFaceInc =
+                                                BeamSolarRad * CosIncAngVertProj * FrameDivider(FrDivNum).VertDividers *
+                                                DivProjOut * (Surface(SurfNum).Height -
+                                                              FrameDivider(FrDivNum).HorDividers * DivWidth) *
+                                                FracSunLit / DivArea;
                                     }
                                     DivIncSolarOutBm = 0.0;
                                     DivIncSolarOutDif = 0.0;
                                     DivIncSolarInBm = 0.0;
                                     DivIncSolarInDif = 0.0;
-                                    if (ShadeFlag != ExtShadeOn && ShadeFlag != ExtBlindOn && ShadeFlag != BGShadeOn && ShadeFlag != BGBlindOn &&
+                                    if (ShadeFlag != ExtShadeOn && ShadeFlag != ExtBlindOn && ShadeFlag != BGShadeOn &&
+                                        ShadeFlag != BGBlindOn &&
                                         ShadeFlag != ExtScreenOn) { // No exterior or between-glass shading
                                         DivIncSolarOutBm = BeamFaceInc + BeamDivHorFaceInc + BeamDivVertFaceInc;
                                         DivIncSolarOutDif = DifSolarFaceInc * (1.0 + SurfWinProjCorrDivOut(SurfNum));
                                         if (DivProjIn > 0.0) {
-                                            TransGl = POLYF(CosInc, dataConstruction.Construct(ConstrNum).TransSolBeamCoef);
+                                            TransGl = POLYF(CosInc,
+                                                            dataConstruction.Construct(ConstrNum).TransSolBeamCoef);
                                             TransDiffGl = dataConstruction.Construct(ConstrNum).TransDiff;
                                             if (ShadeFlag == SwitchableGlazing) { // Switchable glazing
-                                                TransGlSh = POLYF(CosInc, dataConstruction.Construct(ConstrNumSh).TransSolBeamCoef);
+                                                TransGlSh = POLYF(CosInc, dataConstruction.Construct(
+                                                        ConstrNumSh).TransSolBeamCoef);
                                                 TransGl = InterpSw(SwitchFac, TransGl, TransGlSh);
                                                 TransDiffGlSh = dataConstruction.Construct(ConstrNumSh).TransDiff;
                                                 TransDiffGl = InterpSw(SwitchFac, TransDiffGl, TransDiffGlSh);
                                             }
                                             // Beam plus diffuse solar on inside of divider
-                                            BeamDivHorFaceIncIn = BeamSolarRad * CosIncAngHorProj * FrameDivider(FrDivNum).HorDividers * DivProjIn *
-                                                                  (Surface(SurfNum).Width - FrameDivider(FrDivNum).VertDividers * DivWidth) *
+                                            BeamDivHorFaceIncIn = BeamSolarRad * CosIncAngHorProj *
+                                                                  FrameDivider(FrDivNum).HorDividers * DivProjIn *
+                                                                  (Surface(SurfNum).Width -
+                                                                   FrameDivider(FrDivNum).VertDividers * DivWidth) *
                                                                   FracSunLit / DivArea;
-                                            BeamDivVertFaceIncIn =
-                                                BeamSolarRad * CosIncAngVertProj * FrameDivider(FrDivNum).VertDividers * DivProjIn *
-                                                (Surface(SurfNum).Height - FrameDivider(FrDivNum).HorDividers * DivWidth) * FracSunLit / DivArea;
+                                            BeamDivVertFaceIncIn = BeamSolarRad * CosIncAngVertProj *
+                                                                   FrameDivider(FrDivNum).VertDividers * DivProjIn *
+                                                                   (Surface(SurfNum).Height -
+                                                                    FrameDivider(FrDivNum).HorDividers * DivWidth) *
+                                                                   FracSunLit / DivArea;
                                             DivIncSolarInBm = TransGl * (BeamDivHorFaceIncIn + BeamDivVertFaceIncIn);
-                                            DivIncSolarInDif = TransDiffGl * DifSolarFaceInc * SurfWinProjCorrDivIn(SurfNum);
+                                            DivIncSolarInDif =
+                                                    TransDiffGl * DifSolarFaceInc * SurfWinProjCorrDivIn(SurfNum);
                                         }
                                     } else { // Exterior shade, screen or blind present
                                         DivIncSolarOutBm = BeamFaceInc * (1.0 + SurfWinProjCorrDivOut(SurfNum));
                                         DivIncSolarOutDif = DifSolarFaceInc * (1.0 + SurfWinProjCorrDivOut(SurfNum));
-                                        DivIncSolarInBm = BeamFaceInc * SurfWinProjCorrDivIn(SurfNum) * dataConstruction.Construct(ConstrNum).TransDiff;
-                                        DivIncSolarInDif = DifSolarFaceInc * SurfWinProjCorrDivIn(SurfNum) * dataConstruction.Construct(ConstrNum).TransDiff;
+                                        DivIncSolarInBm = BeamFaceInc * SurfWinProjCorrDivIn(SurfNum) *
+                                                          dataConstruction.Construct(ConstrNum).TransDiff;
+                                        DivIncSolarInDif = DifSolarFaceInc * SurfWinProjCorrDivIn(SurfNum) *
+                                                           dataConstruction.Construct(ConstrNum).TransDiff;
                                     }
 
-                                    if (ShadeFlag != ExtShadeOn && ShadeFlag != ExtBlindOn && ShadeFlag != ExtScreenOn && ShadeFlag != BGShadeOn &&
+                                    if (ShadeFlag != ExtShadeOn && ShadeFlag != ExtBlindOn &&
+                                        ShadeFlag != ExtScreenOn && ShadeFlag != BGShadeOn &&
                                         ShadeFlag != BGBlindOn) { // No exterior or between-glass shade, screen or blind
-                                        SurfWinDividerQRadOutAbs(SurfNum) = DividerAbs * (DivIncSolarOutBm + DivIncSolarOutDif);
-                                        SurfWinDividerQRadInAbs(SurfNum) = DividerAbs * (DivIncSolarInBm + DivIncSolarInDif);
+                                        SurfWinDividerQRadOutAbs(SurfNum) =
+                                                DividerAbs * (DivIncSolarOutBm + DivIncSolarOutDif);
+                                        SurfWinDividerQRadInAbs(SurfNum) =
+                                                DividerAbs * (DivIncSolarInBm + DivIncSolarInDif);
                                         // Exterior shade, screen or blind
-                                    } else if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
+                                    } else if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn ||
+                                               ShadeFlag == ExtScreenOn) {
 
                                         if (ShadeFlag == ExtBlindOn) { // Exterior blind
                                             BlNum = SurfWinBlindNumber(SurfNum);
                                             ProfileAngle(SurfNum, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
                                             SlatAng = SurfWinSlatAngThisTS(SurfNum);
-                                            TBlBmBm = BlindBeamBeamTrans(
-                                                ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
-                                            TBlBmDif = InterpProfSlatAng(
-                                                ProfAng, SlatAng, SurfWinMovableSlats(SurfNum), Blind(BlNum).SolFrontBeamDiffTrans);
-                                            SurfWinDividerQRadOutAbs(SurfNum) =
-                                                DividerAbs *
-                                                (DivIncSolarOutBm * (TBlBmBm + TBlBmDif) +
-                                                 DivIncSolarOutDif *
-                                                     InterpSlatAng(SlatAng, SurfWinMovableSlats(SurfNum), Blind(BlNum).SolFrontDiffDiffTrans));
-                                            SurfWinDividerQRadInAbs(SurfNum) =
-                                                DividerAbs *
-                                                (DivIncSolarInBm * (TBlBmBm + TBlBmDif) +
-                                                 DivIncSolarInDif *
-                                                     InterpSlatAng(SlatAng, SurfWinMovableSlats(SurfNum), Blind(BlNum).SolFrontDiffDiffTrans));
+                                            TBlBmBm = BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth,
+                                                                         Blind(BlNum).SlatSeparation,
+                                                                         Blind(BlNum).SlatThickness);
+                                            TBlBmDif = InterpProfSlatAng(ProfAng, SlatAng, SurfWinMovableSlats(SurfNum),
+                                                                         Blind(BlNum).SolFrontBeamDiffTrans);
+                                            SurfWinDividerQRadOutAbs(SurfNum) = DividerAbs * (DivIncSolarOutBm *
+                                                                                              (TBlBmBm + TBlBmDif) +
+                                                                                              DivIncSolarOutDif *
+                                                                                              InterpSlatAng(SlatAng,
+                                                                                                            SurfWinMovableSlats(
+                                                                                                                    SurfNum),
+                                                                                                            Blind(BlNum).SolFrontDiffDiffTrans));
+                                            SurfWinDividerQRadInAbs(SurfNum) = DividerAbs *
+                                                                               (DivIncSolarInBm * (TBlBmBm + TBlBmDif) +
+                                                                                DivIncSolarInDif *
+                                                                                InterpSlatAng(SlatAng,
+                                                                                              SurfWinMovableSlats(
+                                                                                                      SurfNum),
+                                                                                              Blind(BlNum).SolFrontDiffDiffTrans));
 
                                         } else if (ShadeFlag == ExtShadeOn) { // Exterior shade
-                                            SurfWinDividerQRadOutAbs(SurfNum) = DividerAbs *
-                                                                                       dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Trans *
-                                                                                       (DivIncSolarOutBm + DivIncSolarOutDif);
-                                            SurfWinDividerQRadInAbs(SurfNum) = DividerAbs *
-                                                                                      dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Trans *
-                                                                                      (DivIncSolarInBm + DivIncSolarInDif);
+                                            SurfWinDividerQRadOutAbs(SurfNum) = DividerAbs * dataMaterial.Material(
+                                                    dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Trans *
+                                                                                (DivIncSolarOutBm + DivIncSolarOutDif);
+                                            SurfWinDividerQRadInAbs(SurfNum) = DividerAbs * dataMaterial.Material(
+                                                    dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Trans *
+                                                                               (DivIncSolarInBm + DivIncSolarInDif);
                                         } else if (ShadeFlag == ExtScreenOn) { // Exterior screen
-                                            SurfWinDividerQRadOutAbs(SurfNum) =
-                                                DividerAbs *
-                                                (SurfaceScreens(SurfWinScreenNumber(SurfNum)).BmBmTrans +
-                                                 SurfaceScreens(SurfWinScreenNumber(SurfNum)).BmDifTrans) *
-                                                (DivIncSolarOutBm + DivIncSolarOutDif);
-                                            SurfWinDividerQRadInAbs(SurfNum) =
-                                                DividerAbs *
-                                                (SurfaceScreens(SurfWinScreenNumber(SurfNum)).BmBmTrans +
-                                                 SurfaceScreens(SurfWinScreenNumber(SurfNum)).BmDifTrans) *
-                                                (DivIncSolarInBm + DivIncSolarInDif);
+                                            SurfWinDividerQRadOutAbs(SurfNum) = DividerAbs * (SurfaceScreens(
+                                                    SurfWinScreenNumber(SurfNum)).BmBmTrans + SurfaceScreens(
+                                                    SurfWinScreenNumber(SurfNum)).BmDifTrans) *
+                                                                                (DivIncSolarOutBm + DivIncSolarOutDif);
+                                            SurfWinDividerQRadInAbs(SurfNum) = DividerAbs * (SurfaceScreens(
+                                                    SurfWinScreenNumber(SurfNum)).BmBmTrans + SurfaceScreens(
+                                                    SurfWinScreenNumber(SurfNum)).BmDifTrans) *
+                                                                               (DivIncSolarInBm + DivIncSolarInDif);
                                         }
                                     }
                                 }
+
+                            } // RoughIndexMovInsul <= 0, no movable insulation
+
+                            if (Surface(SurfNum).HeatTransSurf && dataConstruction.Construct(ConstrNum).TransDiff <=
+                                                                  0.0) { // Opaque heat transfer surface
+                                QRadSWOutAbs(SurfNum) =
+                                        AOSurf(SurfNum) * BeamSolarRad + AbsExt * (SkySolarInc + GndSolarInc);
+                                SWOutAbsTotalReport(SurfNum) = QRadSWOutAbs(SurfNum) * Surface(SurfNum).Area;
+                                SWOutAbsEnergyReport(SurfNum) = SWOutAbsTotalReport(SurfNum) * TimeStepZoneSec;
                             }
+                        } // Surface(SurfNum)%HeatTransSurf
 
-                        } // RoughIndexMovInsul <= 0, no movable insulation
+                    } // Surface(SurfNum)%ExtSolar
 
-                        if (Surface(SurfNum).HeatTransSurf && dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque heat transfer surface
-                            QRadSWOutAbs(SurfNum) = AOSurf(SurfNum) * BeamSolarRad + AbsExt * (SkySolarInc + GndSolarInc);
-                            SWOutAbsTotalReport(SurfNum) = QRadSWOutAbs(SurfNum) * Surface(SurfNum).Area;
-                            SWOutAbsEnergyReport(SurfNum) = SWOutAbsTotalReport(SurfNum) * TimeStepZoneSec;
-                        }
-                    } // Surface(SurfNum)%HeatTransSurf
-
-                } // Surface(SurfNum)%ExtSolar
-
-                if (Surface(SurfNum).HeatTransSurf && ConstrNum > 0) {
-                    SurfSolIncPtr = SurfaceScheduledSolarInc(SurfNum, ConstrNum);
-                    if (SurfSolIncPtr == 0) {
-                        if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
-                            QRadSWInAbs(SurfNum) += AISurf(SurfNum) * BeamSolarRad;
-                            if (InShelfSurf > 0) { // Inside daylighting shelf
-                                // Shelf surface area is divided by 2 because only one side sees beam (Area was multiplied by 2 during init)
-                                OpaqSurfInsFaceBeamSolAbsorbed(SurfNum) = AISurf(SurfNum) * BeamSolarRad * (0.5 * Surface(SurfNum).Area);
-                            } else { // Regular surface
-                                OpaqSurfInsFaceBeamSolAbsorbed(SurfNum) = AISurf(SurfNum) * BeamSolarRad * Surface(SurfNum).Area;
+                    if (Surface(SurfNum).HeatTransSurf && ConstrNum > 0) {
+                        SurfSolIncPtr = SurfaceScheduledSolarInc(SurfNum, ConstrNum);
+                        if (SurfSolIncPtr == 0) {
+                            if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
+                                QRadSWInAbs(SurfNum) += AISurf(SurfNum) * BeamSolarRad;
+                                if (InShelfSurf > 0) { // Inside daylighting shelf
+                                    // Shelf surface area is divided by 2 because only one side sees beam (Area was multiplied by 2 during init)
+                                    OpaqSurfInsFaceBeamSolAbsorbed(SurfNum) =
+                                            AISurf(SurfNum) * BeamSolarRad * (0.5 * Surface(SurfNum).Area);
+                                } else { // Regular surface
+                                    OpaqSurfInsFaceBeamSolAbsorbed(SurfNum) =
+                                            AISurf(SurfNum) * BeamSolarRad * Surface(SurfNum).Area;
+                                }
                             }
+                        } else {
+                            QRadSWInAbs(SurfNum) += AISurf(SurfNum);
                         }
-                    } else {
-                        QRadSWInAbs(SurfNum) += AISurf(SurfNum);
                     }
-                }
 
-            } // End of surface loop
-        } // End of sun-up check
+                } // End of surface loop
+
+            } // End of sun-up check
+        }
     }
 
     void InitIntSolarDistribution()
