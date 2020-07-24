@@ -6803,7 +6803,7 @@ namespace DXCoils {
                         DataFractionUsedForSizing = 0.00005035;
                         TempSize = AutoSize;
                         AutoCalculateSizer sizerHPRatedAirVolFlow;
-                        std::string stringOverride = "Evaporator Air Flow Rate [m3/s]";
+                        std::string stringOverride = "Rated Evaporator Air Flow Rate [m3/s]";
                         sizerHPRatedAirVolFlow.overrideSizingString(stringOverride);
                         sizerHPRatedAirVolFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = sizerHPRatedAirVolFlow.size(TempSize, ErrorsFound);
@@ -6820,7 +6820,7 @@ namespace DXCoils {
                         DataFractionUsedForSizing = 0.00000004487;
                         TempSize = AutoSize;
                         AutoCalculateSizer sizerHPWHCondWaterFlow;
-                        std::string stringOverride = "Condenser Water Flow Rate [m3/s]";
+                        std::string stringOverride = "Rated Condenser Water Flow Rate [m3/s]";
                         sizerHPWHCondWaterFlow.overrideSizingString(stringOverride);
                         sizerHPWHCondWaterFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DXCoil(DXCoilNum).RatedHPWHCondWaterFlow = sizerHPWHCondWaterFlow.size(TempSize, ErrorsFound);
@@ -7182,6 +7182,7 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).RatedAirVolFlowRate2;
                     AutoCalculateSizer sizerLowSpdAirFlow;
                     std::string stringOverride = "Low Speed Rated Air Flow Rate [m3/s]";
+                    if (DataGlobals::isEpJSON) stringOverride = "low_speed_rated_air_flow_rate [m3/s]";
                     sizerLowSpdAirFlow.overrideSizingString(stringOverride);
                     sizerLowSpdAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).RatedAirVolFlowRate2 = sizerLowSpdAirFlow.size(TempSize, ErrorsFound);
@@ -7197,6 +7198,7 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).RatedTotCap2;
                     AutoCalculateSizer sizerLowSpdCap;
                     std::string stringOverride = "Low Speed Gross Rated Total Cooling Capacity [W]";
+                    if (DataGlobals::isEpJSON) stringOverride = "low_speed_gross_rated_total_cooling_capacity [W]";
                     sizerLowSpdCap.overrideSizingString(stringOverride);
                     sizerLowSpdCap.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).RatedTotCap2 = sizerLowSpdCap.size(TempSize, ErrorsFound);
