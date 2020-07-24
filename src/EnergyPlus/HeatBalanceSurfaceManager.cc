@@ -2580,16 +2580,12 @@ namespace HeatBalanceSurfaceManager {
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface();
 
-            t1 = high_resolution_clock::now();
             if (dataWindowManager.inExtWindowModel->isExternalLibraryModel() && dataWindowManager.winOpticalModel->isSimplifiedModel()) {
                 CalcInteriorSolarDistributionWCE(dataWindowComplexManager, dataWindowManager);
             } else {
                 CalcInteriorSolarDistribution(dataWindowEquivalentLayer);
             }
 
-            high_resolution_clock::time_point t2 = high_resolution_clock::now();
-            duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-            DataGlobals::timer_solar += time_span.count();
 
             for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
 
@@ -3211,9 +3207,9 @@ namespace HeatBalanceSurfaceManager {
             } // End of surface loop
 
         } // End of sun-up check
-//        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-//        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-//        DataGlobals::timer_solar += time_span.count();
+        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+        DataGlobals::timer_solar += time_span.count();
     }
 
     void InitIntSolarDistribution()
@@ -3365,8 +3361,6 @@ namespace HeatBalanceSurfaceManager {
             int const radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
             int const solEnclosureNum = Zone(zoneNum).SolarEnclosureNum;
             for (int SurfNum = firstSurfOpague; SurfNum <= lastSurfOpague; ++SurfNum) {
-//          for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-//              int const zoneNum = Surface(SurfNum).Zone;
                 if (!Surface(SurfNum).HeatTransSurf || zoneNum == 0) continue; // Skip non-heat transfer surfaces
                 if (Surface(SurfNum).Class == SurfaceClass_TDD_Dome) continue; // Skip tubular daylighting device domes
                 ConstrNum = Surface(SurfNum).Construction;
