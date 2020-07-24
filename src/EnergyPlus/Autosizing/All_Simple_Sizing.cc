@@ -49,20 +49,34 @@
 
 namespace EnergyPlus {
 
-Real64 MaxHeaterOutletTempSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 AutoCalculateSizer::size(Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
     this->preSize(_originalValue);
-    if (this->curZoneEqNum > 0) {
-        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
+    if (this->dataEMSOverrideON) {
+        this->autoSizedValue = this->dataEMSOverride;
+    } else {
+        this->autoSizedValue = this->dataConstantUsedForSizing * this->dataFractionUsedForSizing;
+    }
+    this->selectSizerOutput(errorsFound);
+    return this->autoSizedValue;
+}
+
+Real64 MaxHeaterOutletTempSizer::size(Real64 _originalValue, bool& errorsFound) {
+    if ( !this->checkInitialized(errorsFound) ) {
+        return 0.0;
+    }
+    this->preSize(_originalValue);
+    if ( this->curZoneEqNum > 0 ) {
+        if ( !this->wasAutoSized && !this->sizingDesRunThisZone ) {
             this->autoSizedValue = _originalValue;
         } else {
             this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp;
         }
-    } else if (this->curSysNum > 0) {
-        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+    } else if ( this->curSysNum > 0 ) {
+        if ( !this->wasAutoSized && !this->sizingDesRunThisAirSys ) {
             this->autoSizedValue = _originalValue;
         } else {
             this->autoSizedValue = this->finalSysSizing(this->curSysNum).HeatSupTemp;

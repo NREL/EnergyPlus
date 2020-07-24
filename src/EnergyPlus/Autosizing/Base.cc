@@ -124,6 +124,9 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->minOA = DataSizing::MinOA;
     this->dataConstantUsedForSizing = DataSizing::DataConstantUsedForSizing;
     this->dataFractionUsedForSizing = DataSizing::DataFractionUsedForSizing;
+    DataSizing::DataConstantUsedForSizing = 0.0; // reset here instead of in component model
+    DataSizing::DataFractionUsedForSizing = 0.0;
+
     this->dataFanIndex = DataSizing::DataFanIndex;
     this->dataFanEnumType = DataSizing::DataFanEnumType;
 
@@ -380,7 +383,7 @@ bool BaseSizer::checkInitialized(bool &errorsFound) {
     return true;
 }
 
-void BaseSizer::overrideSizingString(std::string const &string)
+void BaseSizer::overrideSizingString(std::string &string)
 {
     this->sizingString = string;
 }

@@ -55,6 +55,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -1433,17 +1434,16 @@ namespace ChillerElectricEIR {
 
                 // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    int SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                     std::string CompType = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_Chiller_ElectricEIR);
-                    std::string SizingString = "Reference Condenser Fluid Flow Rate  [m3/s]";
                     DataSizing::DataConstantUsedForSizing = this->RefCap;
                     DataSizing::DataFractionUsedForSizing = 0.000114;
                     Real64 TempSize = this->CondVolFlowRate;
                     bool bPRINT = true; // TRUE if sizing is reported to output (eio)
-                    ReportSizingManager::RequestSizing(state, CompType, this->Name, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
-                    this->CondVolFlowRate = TempSize;
-                    DataSizing::DataConstantUsedForSizing = 0.0;
-                    DataSizing::DataFractionUsedForSizing = 0.0;
+                    AutoCalculateSizer sizerCondAirFlow;
+                    std::string stringOverride = "Reference Condenser Fluid Flow Rate  [m3/s]";
+                    sizerCondAirFlow.overrideSizingString(stringOverride);
+                    sizerCondAirFlow.initializeWithinEP(state, CompType, this->Name, bPRINT, RoutineName);
+                    this->CondVolFlowRate = sizerCondAirFlow.size(TempSize, ErrorsFound);
                 }
             }
         }

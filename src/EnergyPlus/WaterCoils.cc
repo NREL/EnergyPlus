@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
@@ -2364,23 +2365,28 @@ namespace WaterCoils {
                     sizerCWNumofTubesPerRow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                     WaterCoil(CoilNum).NumOfTubesPerRow = sizerCWNumofTubesPerRow.size(TempSize, ErrorsFound);
 
-                    FieldNum = 7; //  N7 , \field Fin Diameter
-                    SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m]";
                     // Auto size water coil fin diameter = 0.335 * WaterCoil( CoilNum ).InletAirMassFlowRate
                     DataConstantUsedForSizing = WaterCoil(CoilNum).InletAirMassFlowRate;
                     DataFractionUsedForSizing = 0.335;
                     TempSize = WaterCoil(CoilNum).FinDiam;
-                    RequestSizing(state, CompType, CompName, AutoCalculateSizing, SizingString, TempSize, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).FinDiam = TempSize;
 
-                    FieldNum = 5; //  N5 , \field Minimum Airflow Area
-                    SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m2]";
+                    AutoCalculateSizer sizerFinDiameter;
+                    std::string stringOverride = "Fin Diameter [m]";
+                    sizerFinDiameter.overrideSizingString(stringOverride);
+                    sizerFinDiameter.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    WaterCoil(CoilNum).FinDiam = sizerFinDiameter.size(TempSize, ErrorsFound);
+
                     // Auto size water coil minimum airflow area = 0.44 * WaterCoil( CoilNum ).InletAirMassFlowRate
                     DataConstantUsedForSizing = WaterCoil(CoilNum).InletAirMassFlowRate;
                     DataFractionUsedForSizing = 0.44;
                     TempSize = WaterCoil(CoilNum).MinAirFlowArea;
-                    RequestSizing(state, CompType, CompName, AutoCalculateSizing, SizingString, TempSize, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).MinAirFlowArea = TempSize;
+
+                    AutoCalculateSizer sizerMinAirFlowArea;
+                    stringOverride = "Minimum Airflow Area [m2]";
+                    sizerMinAirFlowArea.overrideSizingString(stringOverride);
+                    sizerMinAirFlowArea.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    WaterCoil(CoilNum).MinAirFlowArea = sizerMinAirFlowArea.size(TempSize, ErrorsFound);
+
                     if (WaterCoil(CoilNum).MinAirFlowArea <= 0.0) {
                         ShowSevereError("Coil:Cooling:Water:DetailedGeometry: \"" + WaterCoil(CoilNum).Name + "\"");
                         ShowContinueError("Coil Minimum Airflow Area must be greater than 0. Coil area = " +
@@ -2388,37 +2394,44 @@ namespace WaterCoils {
                         ErrorsFound = true;
                     }
 
-                    FieldNum = 4; //  N4 , \field Fin Surface Area
-                    SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m2]";
                     // Auto size water coil finned surface area = 78.5 * WaterCoil( CoilNum ).InletAirMassFlowRate
                     DataConstantUsedForSizing =
                         WaterCoil(CoilNum).InletAirMassFlowRate; // actual autosized air mass flow rate, not calculated from user input
                     DataFractionUsedForSizing = 78.5;
                     TempSize = WaterCoil(CoilNum).FinSurfArea;
-                    RequestSizing(state, CompType, CompName, AutoCalculateSizing, SizingString, TempSize, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).FinSurfArea = TempSize;
 
-                    FieldNum = 3; //  N3 , \field Total Tube Inside Area
-                    SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m2]";
+                    AutoCalculateSizer sizerFinSurfaceArea;
+                    stringOverride = "Fin Surface Area [m2]";
+                    sizerFinSurfaceArea.overrideSizingString(stringOverride);
+                    sizerFinSurfaceArea.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    WaterCoil(CoilNum).FinSurfArea = sizerFinSurfaceArea.size(TempSize, ErrorsFound);
+
                     // Auto size water coil total tube inside surface area = 4.4 * WaterCoil( CoilNum ).TubeInsideDiam * WaterCoil( CoilNum
                     // ).NumOfTubeRows * WaterCoil( CoilNum ).NumOfTubesPerRow
                     DataConstantUsedForSizing =
                         WaterCoil(CoilNum).TubeInsideDiam * WaterCoil(CoilNum).NumOfTubeRows * WaterCoil(CoilNum).NumOfTubesPerRow;
                     DataFractionUsedForSizing = 4.4;
                     TempSize = WaterCoil(CoilNum).TotTubeInsideArea;
-                    RequestSizing(state, CompType, CompName, AutoCalculateSizing, SizingString, TempSize, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).TotTubeInsideArea = TempSize;
 
-                    FieldNum = 2; //  N2 , \field Tube Outside Surface Area
-                    SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m2]";
+                    AutoCalculateSizer sizerTubeInsideArea;
+                    stringOverride = "Total Tube Inside Area [m2]";
+                    sizerTubeInsideArea.overrideSizingString(stringOverride);
+                    sizerTubeInsideArea.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    WaterCoil(CoilNum).TotTubeInsideArea = sizerTubeInsideArea.size(TempSize, ErrorsFound);
+
                     // Auto size water coil total tube outside surface area = 4.1 * WaterCoil( CoilNum ).TubeOutsideDiam * WaterCoil( CoilNum
                     // ).NumOfTubeRows * WaterCoil( CoilNum ).NumOfTubesPerRow
                     DataConstantUsedForSizing =
                         WaterCoil(CoilNum).TubeOutsideDiam * WaterCoil(CoilNum).NumOfTubeRows * WaterCoil(CoilNum).NumOfTubesPerRow;
                     DataFractionUsedForSizing = 4.1;
                     TempSize = WaterCoil(CoilNum).TubeOutsideSurfArea;
-                    RequestSizing(state, CompType, CompName, AutoCalculateSizing, SizingString, TempSize, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).TubeOutsideSurfArea = TempSize;
+
+                    AutoCalculateSizer sizerTubeOutsideArea;
+                    stringOverride = "Tube Outside Surface Area [m2]";
+                    sizerTubeOutsideArea.overrideSizingString(stringOverride);
+                    sizerTubeOutsideArea.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    WaterCoil(CoilNum).TubeOutsideSurfArea = sizerTubeOutsideArea.size(TempSize, ErrorsFound);
+
                     if ((WaterCoil(CoilNum).FinSurfArea + WaterCoil(CoilNum).TubeOutsideSurfArea) <= 0.0) {
                         ShowSevereError("Coil:Cooling:Water:DetailedGeometry: \"" + WaterCoil(CoilNum).Name + "\"");
                         ShowContinueError("Coil Fin Surface Area plus Coil Tube Outside Surface Area must be greater than 0. Total surface area = " +
@@ -2426,14 +2439,16 @@ namespace WaterCoils {
                         ErrorsFound = true;
                     }
 
-                    FieldNum = 6; //  N6 , \field Coil Depth
-                    SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m]";
                     // Auto size water coil coil depth = WaterCoil( CoilNum ).TubeDepthSpacing * WaterCoil( CoilNum ).NumOfTubeRows
                     DataConstantUsedForSizing = WaterCoil(CoilNum).TubeDepthSpacing;
                     DataFractionUsedForSizing = WaterCoil(CoilNum).NumOfTubeRows;
                     TempSize = WaterCoil(CoilNum).CoilDepth;
-                    RequestSizing(state, CompType, CompName, AutoCalculateSizing, SizingString, TempSize, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).CoilDepth = TempSize;
+
+                    AutoCalculateSizer sizerCoilDepth;
+                    stringOverride = "Coil Depth [m]";
+                    sizerCoilDepth.overrideSizingString(stringOverride);
+                    sizerCoilDepth.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    WaterCoil(CoilNum).CoilDepth = sizerCoilDepth.size(TempSize, ErrorsFound);
                 }
                 DataPltSizCoolNum = 0; // reset all globals to 0 to ensure correct sizing for other child components
                 DataWaterLoopNum = 0;

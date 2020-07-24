@@ -59,6 +59,7 @@ namespace EnergyPlus {
 
 enum class AutoSizingType
 {
+    AutoCalculateSizing,
     CoolingSHRSizing,
     CoolingWaterDesAirInletHumRatSizing,
     CoolingWaterDesAirOutletHumRatSizing,
@@ -203,7 +204,7 @@ struct BaseSizer
 
     static void clear_state();
 
-    void overrideSizingString(std::string const &string);
+    void overrideSizingString(std::string &string);
 
 protected:
 

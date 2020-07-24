@@ -52,6 +52,18 @@
 
 namespace EnergyPlus {
 
+struct AutoCalculateSizer : BaseSizer
+{
+    AutoCalculateSizer()
+    {
+        this->sizingType = AutoSizingType::AutoCalculateSizing;
+        this->sizingString = "Set String in Component Model using overrideSizingString";
+    }
+    ~AutoCalculateSizer() = default;
+
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
+};
+
 struct MaxHeaterOutletTempSizer : BaseSizer
 {
     MaxHeaterOutletTempSizer()
