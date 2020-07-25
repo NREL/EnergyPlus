@@ -56,6 +56,8 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -75,13 +77,14 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -208,7 +211,7 @@ namespace ZoneTempPredictorCorrector {
         // temperature setpoint for each zone from the schedule manager.
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.outputFiles);
+            GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.files);
             GetZoneAirStatsInputFlag = false;
         }
 
@@ -218,7 +221,7 @@ namespace ZoneTempPredictorCorrector {
             auto const SELECT_CASE_var(UpdateType);
 
             if (SELECT_CASE_var == iGetZoneSetPoints) {
-                CalcZoneAirTempSetPoints(state.dataZoneTempPredictorCorrector);
+                CalcZoneAirTempSetPoints(state.dataZoneTempPredictorCorrector, state.files);
 
             } else if (SELECT_CASE_var == iPredictStep) {
                 PredictSystemLoads(state, state.dataZoneTempPredictorCorrector, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
@@ -238,7 +241,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void GetZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles)
+    void GetZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1738,8 +1741,8 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        print(outputFiles.eio, Header);
-        print(outputFiles.eio, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
+        print(ioFiles.eio, Header);
+        print(ioFiles.eio, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
 
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::OTTStat));
         NumOpTempControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -1833,7 +1836,7 @@ namespace ZoneTempPredictorCorrector {
                                     if (!dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.initialized) {
                                         Array1D<Real64> runningAverageASH(NumDaysInYear, 0.0);
                                         Array1D<Real64> runningAverageCEN(NumDaysInYear, 0.0);
-                                        CalculateMonthlyRunningAverageDryBulb(runningAverageASH, runningAverageCEN);
+                                        CalculateMonthlyRunningAverageDryBulb(ioFiles, runningAverageASH, runningAverageCEN);
                                         CalculateAdaptiveComfortSetPointSchl(dataZoneTempPredictorCorrector, runningAverageASH, runningAverageCEN);
                                     }
                                 }
@@ -1925,7 +1928,7 @@ namespace ZoneTempPredictorCorrector {
                                     if (!dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.initialized) {
                                         Array1D<Real64> runningAverageASH(NumDaysInYear, 0.0);
                                         Array1D<Real64> runningAverageCEN(NumDaysInYear, 0.0);
-                                        CalculateMonthlyRunningAverageDryBulb(runningAverageASH, runningAverageCEN);
+                                        CalculateMonthlyRunningAverageDryBulb(ioFiles, runningAverageASH, runningAverageCEN);
                                         CalculateAdaptiveComfortSetPointSchl(dataZoneTempPredictorCorrector, runningAverageASH, runningAverageCEN);
                                     }
                                 }
@@ -2349,7 +2352,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalculateMonthlyRunningAverageDryBulb(Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN)
+    void CalculateMonthlyRunningAverageDryBulb(IOFiles &ioFiles, Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xuan Luo
@@ -2361,7 +2364,6 @@ namespace ZoneTempPredictorCorrector {
 
         // Using/Aliasing
 
-        using DataStringGlobals::inStatFileName;
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
         using WeatherManager::NumDaysInYear;
@@ -2378,9 +2380,6 @@ namespace ZoneTempPredictorCorrector {
         Real64 dryBulb;
         Real64 avgDryBulb;
 
-        int epwFile;
-        bool epwFileExists;
-
         int readStat;
         int calcEndDay;
         int calcStartDayASH;
@@ -2393,39 +2392,16 @@ namespace ZoneTempPredictorCorrector {
         Array1D<Real64> dailyDryTemp(NumDaysInYear, 0.0);
 
         readStat = 0;
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
-            epwFileExists = flags.exists();
-        }
-
-        if (epwFileExists) {
+        if (FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName)) {
             // Read hourly dry bulb temperature first
-            epwFile = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.ACTION("READ");
-                ObjexxFCL::gio::open(epwFile, DataStringGlobals::inputWeatherFileName, flags);
-                readStat = flags.ios();
-            }
-            if (readStat != 0) {
-                ShowFatalError("CalcThermalComfortAdaptive: Could not open file " + DataStringGlobals::inputWeatherFileName + " for input (read).");
-            }
+            auto epwFile = ioFiles.inputWeatherFileName.open("CalcThermalComfortAdaptive");
             for (i = 1; i <= 9; ++i) { // Headers
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(epwFile, fmtA, flags);
-                    readStat = flags.ios();
-                }
+                epwFile.readLine();
             }
             for (i = 1; i <= NumDaysInYear; ++i) {
                 avgDryBulb = 0.0;
                 for (j = 1; j <= 24; ++j) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
-                        readStat = flags.ios();
-                    }
+                    epwLine = epwFile.readLine().data;
                     for (ind = 1; ind <= 6; ++ind) {
                         pos = index(epwLine, ',');
                         epwLine.erase(0, pos + 1);
@@ -2436,7 +2412,7 @@ namespace ZoneTempPredictorCorrector {
                 }
                 dailyDryTemp(i) = avgDryBulb;
             }
-            ObjexxFCL::gio::close(epwFile);
+            epwFile.close();
 
             // Calculate monthly running average dry bulb temperature.
             int dayOfYear = 0;
@@ -2485,7 +2461,7 @@ namespace ZoneTempPredictorCorrector {
                 }
             }
         } else {
-            ShowFatalError("CalcThermalComfortAdaptive: Could not open file " + DataStringGlobals::inputWeatherFileName + " for input (read).");
+            ShowFatalError("CalcThermalComfortAdaptive: Could not open file " + ioFiles.inputWeatherFileName.fileName + " for input (read). (File does not exist)");
         }
     }
 
@@ -3706,7 +3682,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalcZoneAirTempSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
+    void CalcZoneAirTempSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3931,7 +3907,7 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        if (NumComfortControlledZones > 0) CalcZoneAirComfortSetPoints(dataZoneTempPredictorCorrector);
+        if (NumComfortControlledZones > 0) CalcZoneAirComfortSetPoints(dataZoneTempPredictorCorrector, ioFiles);
         OverrideAirSetPointsforEMSCntrl();
     }
 
@@ -6719,7 +6695,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, std::string const &ZoneName) // Zone to verify
+    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, std::string const &ZoneName) // Zone to verify
     {
 
         // FUNCTION INFORMATION:
@@ -6736,7 +6712,7 @@ namespace ZoneTempPredictorCorrector {
         bool HasThermostat; // True if does, false if not.
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints(dataZoneTempPredictorCorrector, OutputFiles::getSingleton());
+            GetZoneAirSetPoints(dataZoneTempPredictorCorrector, ioFiles);
             GetZoneAirStatsInputFlag = false;
         }
         if (NumTempControlledZones > 0) {
@@ -7024,7 +7000,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalcZoneAirComfortSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
+    void CalcZoneAirComfortSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7062,7 +7038,7 @@ namespace ZoneTempPredictorCorrector {
         // FLOW:
         // Call thermal comfort module to read zone control comfort object
         if (dataZoneTempPredictorCorrector.CalcZoneAirComfortSetPointsFirstTimeFlag) {
-            ManageThermalComfort(dataZoneTempPredictorCorrector, true);
+            ManageThermalComfort(dataZoneTempPredictorCorrector, ioFiles, true);
             dataZoneTempPredictorCorrector.CalcZoneAirComfortSetPointsFirstTimeFlag = false;
         }
 
@@ -7202,7 +7178,7 @@ namespace ZoneTempPredictorCorrector {
                         SetPointLo /= PeopleCount;
                         if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) SetPointHi /= PeopleCount;
                     } else {
-                        // reccurring warnings
+                        // recurring warnings
                         //          ComfortControlledZone(RelativeZoneNum)%PeopleAverageErrCount = &
                         //                                           ComfortControlledZone(RelativeZoneNum)%PeopleAverageErrCount + 1
                         if (ComfortControlledZone(RelativeZoneNum).PeopleAverageErrIndex == 0) {

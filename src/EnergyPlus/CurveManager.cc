@@ -1857,7 +1857,7 @@ namespace CurveManager {
                             std::size_t rowNum = indVarInstance.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
                             if (!btwxtManager.tableFiles.count(filePath)) {
-                                btwxtManager.tableFiles.emplace(filePath, filePath);
+                                btwxtManager.tableFiles.emplace(filePath, TableFile{IOFiles::getSingleton(), filePath});
                             }
 
                             axis = btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
@@ -2047,7 +2047,7 @@ namespace CurveManager {
                     std::size_t rowNum = fields.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
                     if (!btwxtManager.tableFiles.count(filePath)) {
-                        btwxtManager.tableFiles.emplace(filePath, filePath);
+                        btwxtManager.tableFiles.emplace(filePath, TableFile{IOFiles::getSingleton(), filePath});
                     }
 
                     lookupValues = btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
@@ -2146,15 +2146,17 @@ namespace CurveManager {
         tableFiles.clear();
     }
 
-    TableFile::TableFile(std::string path) {
-        load(path);
+    TableFile::TableFile(IOFiles &ioFiles, std::string path)
+    {
+        load(ioFiles, path);
     }
 
-    void TableFile::load(std::string path) {
+    void TableFile::load(IOFiles &ioFiles, std::string path)
+    {
         filePath = path;
         bool fileFound;
         std::string fullPath;
-        DataSystemVariables::CheckForActualFileName(OutputFiles::getSingleton(), path, fileFound, fullPath);
+        DataSystemVariables::CheckForActualFileName(ioFiles, path, fileFound, fullPath);
         if (!fileFound) {
             ShowFatalError("File \"" + filePath + "\" : File not found.");
         }

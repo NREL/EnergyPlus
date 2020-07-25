@@ -60,26 +60,26 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WindowManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -434,10 +434,10 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
     Psychrometrics::InitializePsychRoutines();
@@ -2453,10 +2453,10 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    SimulationManager::GetProjectData(state);
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
@@ -2465,19 +2465,19 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     HeatBalanceManager::GetWindowGlassSpectralData(FoundError);
     EXPECT_FALSE(FoundError);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, FoundError);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(FoundError);
+    HeatBalanceManager::GetConstructData(state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(4);
@@ -2498,10 +2498,10 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
-    WindowManager::InitGlassOpticalCalculations(state.dataWindowComplexManager, state.dataWindowManager, state.outputFiles);
+    WindowManager::InitGlassOpticalCalculations(state.dataWindowComplexManager, state.dataWindowManager, state.files);
 
     int NumAngles = 10; // Number of incident angles
     Real64 sum;
@@ -2653,15 +2653,15 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
                           "  autocalculate;           !- Volume {m3}"});
 
     ASSERT_TRUE(process_idf(idf_objects));
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state.files);
     DataHeatBalance::ZoneIntGain.allocate(1);
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
@@ -2829,7 +2829,7 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_found = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, errors_found);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errors_found);
     EXPECT_FALSE(errors_found);
     EXPECT_EQ(DataHeatBalance::ComplexShade(1).Name, "SHADE_14_LAYER");
     EXPECT_EQ(DataHeatBalance::ComplexShade(1).LayerType, 1);

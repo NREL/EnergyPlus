@@ -59,8 +59,8 @@
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
-#include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
@@ -77,7 +77,7 @@
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/WaterUse.hh>
@@ -95,6 +95,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 namespace EnergyPlus {
 
@@ -128,10 +129,7 @@ namespace EnergyPlus {
         PlantChillersData dataPlantChillers;
         //OutputReportTabular outputReportTabular;
 
-        // todo: move this from a reference to an object value
-        // after we have eliminated all calls to getSingleton
-        // after we've plumbed enough of the functions to allow
-        OutputFiles outputFiles;
+        IOFiles files;
 
         WaterUseData dataWaterUse;
         WindowACData dataWindowAC;
@@ -147,11 +145,13 @@ namespace EnergyPlus {
         ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
 
         EnergyPlusData() {
-            OutputFiles::setSingleton(&outputFiles);
+            // todo, try to eliminate the need for the singleton
+            IOFiles::setSingleton(&files);
         }
 
+
         // Cannot safely copy or delete this until we eradicate all remaining
-        // calls to OutputFiles::getSingleton and OutputFiles::setSingleton
+        // calls to IOFiles::getSingleton and IOFiles::setSingleton
         EnergyPlusData(const EnergyPlusData &) = delete;
         EnergyPlusData(EnergyPlusData &&) = delete;
 

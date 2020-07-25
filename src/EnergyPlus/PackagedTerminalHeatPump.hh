@@ -60,6 +60,7 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
+    class IOFiles;
 
 namespace PackagedTerminalHeatPump {
 

@@ -330,11 +330,11 @@ namespace DataTimings {
 
     void epSummaryTimes(
 #ifdef EP_NO_Timings
-        OutputFile &,
+        InputOutputFile &,
         Real64 &EP_UNUSED(TimeUsed_CPUTime)
 #endif
 #ifdef EP_Timings
-        OutputFile &auditFile,
+        InputOutputFile &auditFile,
         Real64 &TimeUsed_CPUTime
 #endif
     )

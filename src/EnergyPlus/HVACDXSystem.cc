@@ -489,8 +489,12 @@ namespace HVACDXSystem {
                 ErrFound = false;
                 if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:SingleSpeed")) {
                     DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
-                    GetDXCoilIndex(
-                        state, DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
+                    GetDXCoilIndex(state,
+                                   DXCoolingSystem(DXCoolSysNum).CoolingCoilName,
+                                   DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex,
+                                   ErrFound,
+                                   CurrentModuleObject,
+                                   ObjexxFCL::Optional_bool_const());
                     if (ErrFound) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
@@ -505,8 +509,12 @@ namespace HVACDXSystem {
                     }
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:TwoSpeed")) {
                     DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingTwoSpeed;
-                    GetDXCoilIndex(
-                        state, DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
+                    GetDXCoilIndex(state,
+                                   DXCoolingSystem(DXCoolSysNum).CoolingCoilName,
+                                   DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex,
+                                   ErrFound,
+                                   CurrentModuleObject,
+                                   ObjexxFCL::Optional_bool_const());
                     if (ErrFound) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
@@ -530,8 +538,12 @@ namespace HVACDXSystem {
 
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                     DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingTwoStageWHumControl;
-                    GetDXCoilIndex(
-                        state, DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
+                    GetDXCoilIndex(state,
+                                   DXCoolingSystem(DXCoolSysNum).CoolingCoilName,
+                                   DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex,
+                                   ErrFound,
+                                   CurrentModuleObject,
+                                   ObjexxFCL::Optional_bool_const());
                     if (ErrFound) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
