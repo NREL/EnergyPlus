@@ -321,7 +321,7 @@ namespace Construction {
 
         void calculateFinalCoefficients();
 
-        void reportTransferFunction(OutputFiles &outputFiles, int const cCounter);
+        void reportTransferFunction(IOFiles &ioFiles, int const cCounter);
 
         bool isGlazingConstruction() const;
 

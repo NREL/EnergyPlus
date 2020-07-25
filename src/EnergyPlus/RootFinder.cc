@@ -2470,7 +2470,7 @@ namespace RootFinder {
         return BrentMethod;
     }
 
-    void WriteRootFinderTraceHeader(OutputFile &TraceFile) // Unit for trace file
+    void WriteRootFinderTraceHeader(InputOutputFile &TraceFile) // Unit for trace file
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
@@ -2539,7 +2539,7 @@ namespace RootFinder {
               "History(3)%Y");
     }
 
-    void WriteRootFinderTrace(OutputFile &TraceFile,                 // Unit for trace file
+    void WriteRootFinderTrace(InputOutputFile &TraceFile,                 // Unit for trace file
                               RootFinderDataType const &RootFinderData // Data used by root finding algorithm
     )
     {
@@ -2598,7 +2598,7 @@ namespace RootFinder {
         WritePoint(TraceFile, RootFinderData.History(3), false);
     }
 
-    void WritePoint(OutputFile &TraceFile,    // Unit for trace file
+    void WritePoint(InputOutputFile &TraceFile,    // Unit for trace file
                     PointType const &PointData, // Point data structure
                     bool const ShowXValue)
     {
@@ -2649,7 +2649,7 @@ namespace RootFinder {
         }
     }
 
-    void DebugRootFinder(OutputFile &DebugFile,                   // File unit where to write debugging info
+    void DebugRootFinder(InputOutputFile &DebugFile,                   // File unit where to write debugging info
                          RootFinderDataType const &RootFinderData // Data used by root finding algorithm
     )
     {
@@ -2710,7 +2710,7 @@ namespace RootFinder {
         print(DebugFile, "\n");
     }
 
-    void WriteRootFinderStatus(OutputFile &File,                      // File unit where to write the status description
+    void WriteRootFinderStatus(InputOutputFile &File,                      // File unit where to write the status description
                                RootFinderDataType const &RootFinderData // Data used by root finding algorithm
     )
     {

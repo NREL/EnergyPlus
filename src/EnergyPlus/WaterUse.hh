@@ -261,6 +261,7 @@ namespace WaterUse {
         int numWaterEquipment;
         int numWaterConnections;
         bool getWaterUseInputFlag;
+        bool MyEnvrnFlagLocal;
         Array1D_bool CheckEquipName;
         Array1D<WaterUse::WaterEquipmentType> WaterEquipment;
         Array1D<WaterUse::WaterConnectionsType> WaterConnections;
@@ -270,13 +271,14 @@ namespace WaterUse {
             numWaterEquipment = 0;
             numWaterConnections = 0;
             getWaterUseInputFlag = true;
+            MyEnvrnFlagLocal = true;
             CheckEquipName.deallocate();
             WaterEquipment.deallocate();
             WaterConnections.deallocate();
         }
 
         // Default Constructor
-        WaterUseData() : numWaterEquipment(0), numWaterConnections(0), getWaterUseInputFlag(true)
+        WaterUseData() : numWaterEquipment(0), numWaterConnections(0), getWaterUseInputFlag(true), MyEnvrnFlagLocal(true)
         {
         }
     };

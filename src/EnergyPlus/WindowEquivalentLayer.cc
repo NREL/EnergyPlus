@@ -6897,10 +6897,8 @@ namespace WindowEquivalentLayer {
 
         Real64 RAT_1MR; // adjustment factors, see Specular_OffNormal()
         Real64 RAT_TAU; // adjustment factors, see Specular_OffNormal()
-        static bool Specular_OffNormalReturn(true);
 
-        Specular_OffNormalReturn = Specular_OffNormal(OMEGA, RAT_1MR, RAT_TAU);
-
+        bool Specular_OffNormalReturn = Specular_OffNormal(OMEGA, RAT_1MR, RAT_TAU);
         if (Specular_OffNormalReturn) {
             Specular_Adjust(SWP, RAT_1MR, RAT_TAU);
         }
@@ -6979,10 +6977,9 @@ namespace WindowEquivalentLayer {
 
         Real64 RAT_TAU;
         Real64 RAT_1MR;
-        static bool Specular_OffNormalReturn(true);
 
         // Modified by BAN April 19, 2013
-        Specular_OffNormalReturn = Specular_OffNormal(THETA, RAT_1MR, RAT_TAU);
+        Specular_OffNormal(THETA, RAT_1MR, RAT_TAU);
 
         if (OPT == dataWindowEquivalentLayer.hipRHO) {
             Specular_F = RAT_1MR;

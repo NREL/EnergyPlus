@@ -91,16 +91,17 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -535,6 +536,7 @@ namespace OutputReportTabular {
         bool GatherHeatGainReportfirstTime(true);
         bool AllocateLoadComponentArraysDoAllocate(true);
         bool initAdjFenDone(false);
+        int numPeopleAdaptive(0);
     } // namespace
 
     // Functions
@@ -711,6 +713,8 @@ namespace OutputReportTabular {
         UnitConv.deallocate();
 
         OutputReportTabular::ResetTabularReports();
+
+        numPeopleAdaptive = 0;
     }
 
     void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
@@ -757,7 +761,7 @@ namespace OutputReportTabular {
             OutputReportTabularAnnual::GetInputTabularAnnual();
             OutputReportTabularAnnual::checkAggregationOrderForAnnual();
             GetInputTabularTimeBins();
-            GetInputTabularStyle(state.outputFiles);
+            GetInputTabularStyle(state.files);
             GetInputOutputTableSummaryReports();
             // noel -- noticed this was called once and very slow -- sped up a little by caching keys
             InitializeTabularMonthly();
@@ -1730,7 +1734,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GetInputTabularStyle(OutputFiles &outputFiles)
+    void GetInputTabularStyle(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1885,13 +1889,13 @@ namespace OutputReportTabular {
         }
 
         if (WriteTabularFiles) {
-            print(outputFiles.eio, "! <Tabular Report>,Style,Unit Conversion\n");
+            print(ioFiles.eio, "! <Tabular Report>,Style,Unit Conversion\n");
             if (AlphArray(1) != "HTML") {
                 ConvertCaseToLower(AlphArray(1), AlphArray(2));
                 AlphArray(1).erase(1);
                 AlphArray(1) += AlphArray(2).substr(1);
             }
-            print(outputFiles.eio, "Tabular Report,{},{}\n", AlphArray(1), AlphArray(2));
+            print(ioFiles.eio, "Tabular Report,{},{}\n", AlphArray(1), AlphArray(2));
         }
     }
 
@@ -5662,22 +5666,21 @@ namespace OutputReportTabular {
         //   types of tabular reports are each created. If another type of
         //   report is added it can be added to the list here.
 
-
-        FillWeatherPredefinedEntries();
+        FillWeatherPredefinedEntries(state.files);
         FillRemainingPredefinedEntries(state);
 
         if (WriteTabularFiles) {
             // call each type of report in turn
             WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector);
             WriteTableOfContents(state);
-            WriteVeriSumTable(state.dataCostEstimateManager,state.outputFiles);
+            WriteVeriSumTable(state.dataCostEstimateManager, state.files);
             WriteDemandEndUseSummary(state.dataCostEstimateManager);
             WriteSourceEnergyEndUseSummary(state.dataCostEstimateManager);
             WriteComponentSizing(state.dataCostEstimateManager);
             WriteSurfaceShadowing(state.dataCostEstimateManager);
             WriteCompCostTable(state.dataCostEstimateManager);
             WriteAdaptiveComfortTable(state.dataCostEstimateManager);
-            WriteEioTables(state.dataCostEstimateManager,state.outputFiles);
+            WriteEioTables(state.dataCostEstimateManager, state.files);
             WriteLoadComponentSummaryTables(state.dataCostEstimateManager);
             WriteHeatEmissionTable(state.dataCostEstimateManager);
 
@@ -5692,23 +5695,23 @@ namespace OutputReportTabular {
         }
 
         constexpr static auto variable_fmt{" {}={:12}\n"};
-        state.outputFiles.audit.ensure_open("WriteTabularReports");
-        print(state.outputFiles.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
-        print(state.outputFiles.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
-        print(state.outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
-        print(state.outputFiles.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
-        print(state.outputFiles.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
-        print(state.outputFiles.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
-        print(state.outputFiles.audit, variable_fmt, "sizeReportName", sizeReportName);
-        print(state.outputFiles.audit, variable_fmt, "numReportName", numReportName);
-        print(state.outputFiles.audit, variable_fmt, "sizeSubTable", sizeSubTable);
-        print(state.outputFiles.audit, variable_fmt, "numSubTable", numSubTable);
-        print(state.outputFiles.audit, variable_fmt, "sizeColumnTag", sizeColumnTag);
-        print(state.outputFiles.audit, variable_fmt, "numColumnTag", numColumnTag);
-        print(state.outputFiles.audit, variable_fmt, "sizeTableEntry", sizeTableEntry);
-        print(state.outputFiles.audit, variable_fmt, "numTableEntry", numTableEntry);
-        print(state.outputFiles.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
-        print(state.outputFiles.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
+        state.files.audit.ensure_open("WriteTabularReports");
+        print(state.files.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
+        print(state.files.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
+        print(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
+        print(state.files.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
+        print(state.files.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
+        print(state.files.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
+        print(state.files.audit, variable_fmt, "sizeReportName", sizeReportName);
+        print(state.files.audit, variable_fmt, "numReportName", numReportName);
+        print(state.files.audit, variable_fmt, "sizeSubTable", sizeSubTable);
+        print(state.files.audit, variable_fmt, "numSubTable", numSubTable);
+        print(state.files.audit, variable_fmt, "sizeColumnTag", sizeColumnTag);
+        print(state.files.audit, variable_fmt, "numColumnTag", numColumnTag);
+        print(state.files.audit, variable_fmt, "sizeTableEntry", sizeTableEntry);
+        print(state.files.audit, variable_fmt, "numTableEntry", numTableEntry);
+        print(state.files.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
+        print(state.files.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
     }
 
     void parseStatLine(const std::string &lineIn,
@@ -5776,7 +5779,7 @@ namespace OutputReportTabular {
         if (has(lineIn, "ASHRAE Standard")) lineType = StatLineType::AshStdLine;
     }
 
-    void FillWeatherPredefinedEntries()
+    void FillWeatherPredefinedEntries(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -5797,12 +5800,8 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        std::string lineIn;
-        int statFile;
-        bool fileExists;
         StatLineType lineType = StatLineType::Initialized;
         StatLineType lineTypeinterim = StatLineType::Initialized;
-        int readStat;
         bool isASHRAE;
         bool iscalc;
         bool isKoppen;
@@ -5828,12 +5827,6 @@ namespace OutputReportTabular {
         bool coolingDesignlinepassed;
         bool desConditionlinepassed;
 
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(DataStringGlobals::inStatFileName, flags);
-            fileExists = flags.exists();
-        }
-        readStat = 0;
         isASHRAE = false;
         iscalc = false;
         isKoppen = false;
@@ -5843,22 +5836,11 @@ namespace OutputReportTabular {
         storeASHRAEHDD = "";
         storeASHRAECDD = "";
         lineTypeinterim = StatLineType::Initialized;
-        if (fileExists) {
-            statFile = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.ACTION("READ");
-                ObjexxFCL::gio::open(statFile, DataStringGlobals::inStatFileName, flags);
-                readStat = flags.ios();
-            }
-            if (readStat != 0) {
-                ShowFatalError("FillWeatherPredefinedEntries: Could not open file " + DataStringGlobals::inStatFileName + " for input (read).");
-            }
-            IOFlags flags;
-            while (readStat == 0) { // end of file, or error
+        if (FileSystem::fileExists(ioFiles.inStatFileName.fileName)) {
+            auto statFile = ioFiles.inStatFileName.open("FillWeatherPredefinedEntries");
+            while (statFile.good()) { // end of file, or error
                 lineType = lineTypeinterim;
-                ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
-                readStat = flags.ios();
+                auto lineIn = statFile.readLine().data;
                 // reconcile line with different versions of stat file
                 // v7.1 added version as first line.
                 strip(lineIn);
@@ -6343,7 +6325,6 @@ namespace OutputReportTabular {
                 if (lineType == StatLineType::KoppenDes1Line) lineTypeinterim = StatLineType::KoppenDes1Line;
                 if (lineType == StatLineType::KoppenLine) lineTypeinterim = StatLineType::KoppenLine;
             }
-            ObjexxFCL::gio::close(statFile);
         }
     }
 
@@ -10244,7 +10225,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteVeriSumTable(CostEstimateManagerData &dataCostEstimateManager, OutputFiles &outputFiles)
+    void WriteVeriSumTable(CostEstimateManagerData &dataCostEstimateManager, IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -10573,8 +10554,8 @@ namespace OutputReportTabular {
             DetailedWWR = (inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
 
             if (DetailedWWR) {
-                print(outputFiles.debug, "{}\n", "======90.1 Classification [>=60 & <=120] tilt = wall==================");
-                print(outputFiles.debug, "{}\n", "SurfName,Class,Area,Tilt");
+                print(ioFiles.debug, "{}\n", "======90.1 Classification [>=60 & <=120] tilt = wall==================");
+                print(ioFiles.debug, "{}\n", "SurfName,Class,Area,Tilt");
             }
 
             for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
@@ -10637,7 +10618,7 @@ namespace OutputReportTabular {
                                     }
                                 }
                                 if (DetailedWWR) {
-                                    print(outputFiles.debug, "{},Wall,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
+                                    print(ioFiles.debug, "{},Wall,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
                                 }
                             } else if ((SELECT_CASE_var == SurfaceClass_Window) || (SELECT_CASE_var == SurfaceClass_TDD_Dome)) {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
@@ -10658,7 +10639,7 @@ namespace OutputReportTabular {
                                     curArea * Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
                                 zoneGlassArea(zonePt) += Surface(iSurf).GrossArea * Surface(iSurf).Multiplier;
                                 if (DetailedWWR) {
-                                    print(outputFiles.debug, "{},Window,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
+                                    print(ioFiles.debug, "{},Window,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
                                 }
                             }
                         }
@@ -10670,13 +10651,13 @@ namespace OutputReportTabular {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
                                 roofArea += curArea * mult;
                                 if (DetailedWWR) {
-                                    print(outputFiles.debug, "{},Roof,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
+                                    print(ioFiles.debug, "{},Roof,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
                                 }
                             } else if ((SELECT_CASE_var == SurfaceClass_Window) || (SELECT_CASE_var == SurfaceClass_TDD_Dome)) {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
                                 skylightArea += curArea * mult;
                                 if (DetailedWWR) {
-                                    print(outputFiles.debug, "{},Skylight,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
+                                    print(ioFiles.debug, "{},Skylight,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
                                 }
                             }
                         }
@@ -10690,11 +10671,11 @@ namespace OutputReportTabular {
             TotalAboveGroundWallArea = aboveGroundWallAreaN + aboveGroundWallAreaS + aboveGroundWallAreaE + aboveGroundWallAreaW;
             TotalWindowArea = windowAreaN + windowAreaS + windowAreaE + windowAreaW;
             if (DetailedWWR) {
-                print(outputFiles.debug, "{}\n", "========================");
-                print(outputFiles.debug, "{}\n", "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW");
-                print(outputFiles.debug, "{}\n", "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW");
-                print(outputFiles.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWallArea, wallAreaN, wallAreaS, wallAreaE, wallAreaW);
-                print(outputFiles.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWindowArea, windowAreaN, windowAreaS, windowAreaE, windowAreaW);
+                print(ioFiles.debug, "{}\n", "========================");
+                print(ioFiles.debug, "{}\n", "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW");
+                print(ioFiles.debug, "{}\n", "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW");
+                print(ioFiles.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWallArea, wallAreaN, wallAreaS, wallAreaE, wallAreaW);
+                print(ioFiles.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWindowArea, windowAreaN, windowAreaS, windowAreaE, windowAreaW);
             }
 
             tableBody = "";
@@ -10822,9 +10803,9 @@ namespace OutputReportTabular {
             rowHead(3) = "Skylight-Roof Ratio [%]";
 
             if (DetailedWWR) {
-                print(outputFiles.debug, "{}\n", "========================");
-                print(outputFiles.debug, "{}\n", "TotalRoofArea,SkylightArea");
-                print(outputFiles.debug, "{:.2R},{:.2R}\n", roofArea, skylightArea);
+                print(ioFiles.debug, "{}\n", "========================");
+                print(ioFiles.debug, "{}\n", "TotalRoofArea,SkylightArea");
+                print(ioFiles.debug, "{:.2R},{:.2R}\n", roofArea, skylightArea);
             }
 
             tableBody(1, 1) = RealToStr(roofArea * m2_unitConv, 2);
@@ -11138,7 +11119,6 @@ namespace OutputReportTabular {
         Array1D_int columnWidth;
         Array1D_string rowHead;
         Array2D_string tableBody;
-        static int numPeopleAdaptive(0);
         int i;
         Array1D_int peopleInd; // Index the relevant people
 
@@ -11852,7 +11832,7 @@ namespace OutputReportTabular {
 
     // Parses the contents of the EIO (initializations) file and creates subtables for each type of record in the tabular output files
     // Glazer - November 2016
-    void WriteEioTables(CostEstimateManagerData &dataCostEstimateManager, OutputFiles &outputFiles)
+    void WriteEioTables(CostEstimateManagerData &dataCostEstimateManager, IOFiles &ioFiles)
     {
 
         if (displayEioSummary) {
@@ -11867,7 +11847,7 @@ namespace OutputReportTabular {
 
             std::vector<std::string> headerLines; // holds the lines that describe each type of records - each starts with ! symbol
             std::vector<std::string> bodyLines;   // holds the data records only
-            for (auto const &line : outputFiles.eio.getLines()) {
+            for (auto const &line : ioFiles.eio.getLines()) {
                 if (line.at(0) == '!') {
                     headerLines.push_back(line);
                 } else {
@@ -12218,7 +12198,7 @@ namespace OutputReportTabular {
         // need for reporting  DEALLOCATE(decayCurveHeat)
     }
 
-    void ComputeLoadComponentDecayCurve(OutputFiles &outputFiles)
+    void ComputeLoadComponentDecayCurve(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -12319,32 +12299,32 @@ namespace OutputReportTabular {
 
         if (ShowDecayCurvesInEIO) {
             // show the line definition for the decay curves
-            print(outputFiles.eio,
+            print(ioFiles.eio,
                   "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
                   "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36\n");
-            print(outputFiles.eio,
+            print(ioFiles.eio,
                   "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
                   "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36\n");
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
                 for (int kSurf : DataSurfaces::AllSurfaceListReportOrder) {
                     if (Surface(kSurf).Zone != iZone) continue;
-                    print(outputFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", Zone(iZone).Name, Surface(kSurf).Name);
+                    print(ioFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
-                        print(outputFiles.eio, ",{:6.3F}", decayCurveCool(jTime, kSurf));
+                        print(ioFiles.eio, ",{:6.3F}", decayCurveCool(jTime, kSurf));
                     }
                     // put a line feed at the end of the line
-                    print(outputFiles.eio, "\n");
+                    print(ioFiles.eio, "\n");
                 }
 
                 for (int kSurf : DataSurfaces::AllSurfaceListReportOrder) {
                     if (Surface(kSurf).Zone != iZone) continue;
-                    print(outputFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", Zone(iZone).Name, Surface(kSurf).Name);
+                    print(ioFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
-                        print(outputFiles.eio, ",{:6.3F}", decayCurveHeat(jTime, kSurf));
+                        print(ioFiles.eio, ",{:6.3F}", decayCurveHeat(jTime, kSurf));
                     }
                     // put a line feed at the end of the line
-                    print(outputFiles.eio, "\n");
+                    print(ioFiles.eio, "\n");
                 }
             }
         }

@@ -58,9 +58,9 @@
 #include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
+    class IOFiles;
     struct ZoneTempPredictorCorrectorData;
-    class OutputFiles;
-    
+
 namespace HeatBalanceKivaManager {
 
     const int KIVAZONE_UNCONTROLLED = 0;
@@ -127,8 +127,8 @@ namespace HeatBalanceKivaManager {
     public:
         KivaManager();
         virtual ~KivaManager();
-        void readWeatherData();
-        bool setupKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles);
+        void readWeatherData(IOFiles &ioFiles);
+        bool setupKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles);
         void initKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
         void calcKivaInstances();
         void defineDefaultFoundation();

@@ -52,10 +52,10 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -64,10 +64,10 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
@@ -159,7 +159,7 @@ void HVACSizingSimulationManager::PostProcessLogs()
     }
 }
 
-void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(int const HVACSizingIterCount)
+void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(IOFiles &ioFiles, int const HVACSizingIterCount)
 {
     using namespace DataPlant;
     using namespace PlantManager;
@@ -180,7 +180,7 @@ void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(int cons
         P.peakDemandMassFlow = sizingLogger.logObjs[P.supplyInletNodeFlow_LogIndex].GetLogVariableDataAtTimestamp(P.NewFoundMaxDemandTimeStamp);
         P.peakDemandReturnTemp = sizingLogger.logObjs[P.supplyInletNodeTemp_LogIndex].GetLogVariableDataAtTimestamp(P.NewFoundMaxDemandTimeStamp);
 
-        P.ResolveDesignFlowRate(OutputFiles::getSingleton(), HVACSizingIterCount);
+        P.ResolveDesignFlowRate(ioFiles, HVACSizingIterCount);
         if (P.anotherIterationDesired) {
             plantCoinAnalyRequestsAnotherIteration = true;
         }
@@ -304,7 +304,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
             NumOfWarmupDays = 0;
 
             bool anyEMSRan;
-            ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+            ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
@@ -329,7 +329,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                 } else if (DayOfSim == 1) {
                     DisplayString("Starting HVAC Sizing Simulation at " + CurMnDy + " for " + EnvironmentName);
                     static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
-                    print(state.outputFiles.eio, Format_700, NumOfWarmupDays);
+                    print(state.files.eio, Format_700, NumOfWarmupDays);
                 } else if (DisplayPerfSimulationFlag) {
                     DisplayString("Continuing Simulation at " + CurMnDy + " for " + EnvironmentName);
                     DisplayPerfSimulationFlag = false;
@@ -364,7 +364,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                             }
                         }
 
-                        ManageWeather();
+                        ManageWeather(state.files);
 
                         ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
@@ -394,7 +394,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
         hvacSizingSimulationManager->PostProcessLogs();
 
-        hvacSizingSimulationManager->ProcessCoincidentPlantSizeAdjustments(HVACSizingIterCount);
+        hvacSizingSimulationManager->ProcessCoincidentPlantSizeAdjustments(state.files, HVACSizingIterCount);
 
         hvacSizingSimulationManager->RedoKickOffAndResize(state);
 

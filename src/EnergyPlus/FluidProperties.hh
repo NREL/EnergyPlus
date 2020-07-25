@@ -57,7 +57,7 @@
 #include <ObjexxFCL/Array2S.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include "IOFiles.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -414,11 +414,11 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void ReportAndTestGlycols(EnergyPlus::OutputFiles &outputFiles);
+    void ReportAndTestGlycols(EnergyPlus::IOFiles &ioFiles);
 
     //*****************************************************************************
 
-    void ReportAndTestRefrigerants(OutputFiles &outputFiles);
+    void ReportAndTestRefrigerants(IOFiles &ioFiles);
 
     //*****************************************************************************
 

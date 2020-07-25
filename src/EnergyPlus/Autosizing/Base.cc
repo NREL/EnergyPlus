@@ -51,7 +51,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -288,7 +287,7 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
 
     // to do, make this a parameter. Unfortunately this function is used in MANY
     // places so it involves touching most of E+
-    auto &outputFiles = EnergyPlus::OutputFiles::getSingleton();
+    auto &outputFiles = EnergyPlus::IOFiles::getSingleton();
     if (oneTimeCompRptHeaderFlag) {
         if (ReportSizingManager::MyOneTimeFlag) print(outputFiles.eio, Format_990);
         ReportSizingManager::MyOneTimeFlag = false;

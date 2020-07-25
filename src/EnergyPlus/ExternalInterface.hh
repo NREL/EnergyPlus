@@ -94,6 +94,8 @@ namespace ExternalInterface {
     extern std::string const socCfgFilNam; // socket configuration file
     extern std::string const BlankString;
 
+    void clear_state();
+
     struct fmuInputVariableType
     {
 
@@ -349,7 +351,7 @@ namespace ExternalInterface {
 
     void CalcExternalInterfaceFMUImport(EnergyPlusData &state);
 
-    void InitExternalInterfaceFMUImport();
+    void InitExternalInterfaceFMUImport(IOFiles &ioFiles);
 
     void InstantiateInitializeFMUImport();
 

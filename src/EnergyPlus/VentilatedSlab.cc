@@ -195,6 +195,8 @@ namespace VentilatedSlab {
     Array1D_bool CheckEquipName;
 
     // Autosizing variables
+    bool GetInputFlag(true);
+    bool MyOneTimeFlag(true);
     Array1D_bool MySizeFlag;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE VentilatedSlab
@@ -208,6 +210,8 @@ namespace VentilatedSlab {
 
     void clear_state()
     {
+        MyOneTimeFlag = true;
+        GetInputFlag = true;
         HCoilOn = false;
         NumOfVentSlabs = 0;
         OAMassFlowRate = 0.0;
@@ -251,7 +255,6 @@ namespace VentilatedSlab {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;                       // index of ventilated slab being simulated
-        static bool GetInputFlag(true); // First time, input is "gotten"
 
         // FLOW:
         if (GetInputFlag) {
@@ -1415,7 +1418,6 @@ namespace VentilatedSlab {
 
         int AirRelNode;  // relief air node number in Ventilated Slab loop
         int ColdConNode; // cold water control node number in Ventilated Slab loop
-        static bool MyOneTimeFlag(true);
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyPlantScanFlag;
@@ -3895,7 +3897,7 @@ namespace VentilatedSlab {
                 // the new SumHATsurf value for the zone.  Note that the difference between the new
                 // SumHATsurf and the value originally calculated by the heat balance with a zero
                 // source for all radiant systems in the zone is the load met by the system (approximately).
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
             } // SYSCONFIG. SLABONLY&SLABANDZONE
@@ -4135,7 +4137,7 @@ namespace VentilatedSlab {
                 // SumHATsurf and the value originally calculated by the heat balance with a zero
                 // source for all radiant systems in the zone is the load met by the system (approximately).
 
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
             } // SeriesSlabs
