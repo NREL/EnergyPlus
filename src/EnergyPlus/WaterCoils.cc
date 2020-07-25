@@ -2372,6 +2372,7 @@ namespace WaterCoils {
 
                     AutoCalculateSizer sizerFinDiameter;
                     std::string stringOverride = "Fin Diameter [m]";
+                    if (DataGlobals::isEpJSON) stringOverride = "fin_diameter [m]";
                     sizerFinDiameter.overrideSizingString(stringOverride);
                     sizerFinDiameter.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                     WaterCoil(CoilNum).FinDiam = sizerFinDiameter.size(TempSize, ErrorsFound);
@@ -2383,6 +2384,7 @@ namespace WaterCoils {
 
                     AutoCalculateSizer sizerMinAirFlowArea;
                     stringOverride = "Minimum Airflow Area [m2]";
+                    if (DataGlobals::isEpJSON) stringOverride = "minimum_airflow_area [m2]";
                     sizerMinAirFlowArea.overrideSizingString(stringOverride);
                     sizerMinAirFlowArea.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                     WaterCoil(CoilNum).MinAirFlowArea = sizerMinAirFlowArea.size(TempSize, ErrorsFound);
@@ -2402,6 +2404,7 @@ namespace WaterCoils {
 
                     AutoCalculateSizer sizerFinSurfaceArea;
                     stringOverride = "Fin Surface Area [m2]";
+                    if (DataGlobals::isEpJSON) stringOverride = "fin_surface_area [m2]";
                     sizerFinSurfaceArea.overrideSizingString(stringOverride);
                     sizerFinSurfaceArea.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                     WaterCoil(CoilNum).FinSurfArea = sizerFinSurfaceArea.size(TempSize, ErrorsFound);
@@ -2415,6 +2418,7 @@ namespace WaterCoils {
 
                     AutoCalculateSizer sizerTubeInsideArea;
                     stringOverride = "Total Tube Inside Area [m2]";
+                    if (DataGlobals::isEpJSON) stringOverride = "total_tube_inside_area [m2]";
                     sizerTubeInsideArea.overrideSizingString(stringOverride);
                     sizerTubeInsideArea.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                     WaterCoil(CoilNum).TotTubeInsideArea = sizerTubeInsideArea.size(TempSize, ErrorsFound);
@@ -2428,6 +2432,7 @@ namespace WaterCoils {
 
                     AutoCalculateSizer sizerTubeOutsideArea;
                     stringOverride = "Tube Outside Surface Area [m2]";
+                    if (DataGlobals::isEpJSON) stringOverride = "tube_outside_surface_area [m2]";
                     sizerTubeOutsideArea.overrideSizingString(stringOverride);
                     sizerTubeOutsideArea.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                     WaterCoil(CoilNum).TubeOutsideSurfArea = sizerTubeOutsideArea.size(TempSize, ErrorsFound);
@@ -2446,6 +2451,7 @@ namespace WaterCoils {
 
                     AutoCalculateSizer sizerCoilDepth;
                     stringOverride = "Coil Depth [m]";
+                    if (DataGlobals::isEpJSON) stringOverride = "coil_depth [m]";
                     sizerCoilDepth.overrideSizingString(stringOverride);
                     sizerCoilDepth.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                     WaterCoil(CoilNum).CoilDepth = sizerCoilDepth.size(TempSize, ErrorsFound);

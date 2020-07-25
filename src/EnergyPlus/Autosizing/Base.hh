@@ -102,6 +102,7 @@ struct BaseSizer
     bool sizingDesValueFromParent = false;
     bool airLoopSysFlag = false;
     bool oaSysFlag = false;
+    int coilType_Num = 0;
     std::string compType = "";
     std::string compName = "";
     bool isEpJSON = false;
@@ -225,7 +226,7 @@ protected:
 
     void selectSizerOutput(bool &errorsFound);
 
-    static bool isValidCoilType(std::string const &compType);
+    bool isValidCoilType(std::string const &compType);
 
     bool checkInitialized(bool &errorsFound);
 

@@ -363,11 +363,15 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
 }
 bool BaseSizer::isValidCoilType(std::string const &_compType)
 {
+    int coilNum = 0;
     for (auto const &coilType : DataHVACGlobals::cAllCoilTypes) {
+        coilNum += 1;
         if (UtilityRoutines::SameString(_compType, coilType)) {
+            this->coilType_Num = coilNum;
             return true;
         }
     }
+    this->coilType_Num = 0;
     return false;
 }
 
@@ -405,6 +409,7 @@ void BaseSizer::overrideSizingString(std::string &string)
         sizingDesValueFromParent = false;
         airLoopSysFlag = false;
         oaSysFlag = false;
+        coilType_Num = 0;
         compType = "";
         compName = "";
         isEpJSON = false;

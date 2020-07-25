@@ -183,6 +183,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     bool errorsFound = false;
     AutoCalculateSizer sizerCondAirFlow;
     std::string stringOverride = "Rated Condenser Air Flow Rate";
+    if(DataGlobals::isEpJSON) stringOverride = "rated_condenser_air_flow_rate";
     sizerCondAirFlow.overrideSizingString(stringOverride);
     sizerCondAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     this->ratedCondAirFlowRate = sizerCondAirFlow.size(TempSize, errorsFound);

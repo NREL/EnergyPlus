@@ -7643,6 +7643,7 @@ namespace HVACVariableRefrigerantFlow {
             TempSize = VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil;
             MaxHeaterOutletTempSizer sizerMaxHeaterOutTemp;
             std::string stringOverride = "Maximum Supply Air Temperature from Supplemental Heater [C]";
+            if (DataGlobals::isEpJSON) stringOverride = "maximum_supply_air_temperature_from_supplemental_heater [C]";
             sizerMaxHeaterOutTemp.overrideSizingString(stringOverride);
             sizerMaxHeaterOutTemp.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil = sizerMaxHeaterOutTemp.size(TempSize, ErrorsFound);

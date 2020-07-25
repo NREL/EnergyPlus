@@ -6804,6 +6804,7 @@ namespace DXCoils {
                         TempSize = AutoSize;
                         AutoCalculateSizer sizerHPRatedAirVolFlow;
                         std::string stringOverride = "Rated Evaporator Air Flow Rate [m3/s]";
+                        if (DataGlobals::isEpJSON) stringOverride = "rated_evaporator_air_flow_rate [m3/s]";
                         sizerHPRatedAirVolFlow.overrideSizingString(stringOverride);
                         sizerHPRatedAirVolFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = sizerHPRatedAirVolFlow.size(TempSize, ErrorsFound);
@@ -6821,6 +6822,7 @@ namespace DXCoils {
                         TempSize = AutoSize;
                         AutoCalculateSizer sizerHPWHCondWaterFlow;
                         std::string stringOverride = "Rated Condenser Water Flow Rate [m3/s]";
+                        if (DataGlobals::isEpJSON) stringOverride = "rated_condenser_water_flow_rate [m3/s]";
                         sizerHPWHCondWaterFlow.overrideSizingString(stringOverride);
                         sizerHPWHCondWaterFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DXCoil(DXCoilNum).RatedHPWHCondWaterFlow = sizerHPWHCondWaterFlow.size(TempSize, ErrorsFound);
@@ -7050,14 +7052,17 @@ namespace DXCoils {
 
                     AutoCalculateSizer sizerEvapCondAirFlow;
                     std::string stringOverride = "Evaporative Condenser Air Flow Rate [m3/s]";
+                    if (DataGlobals::isEpJSON) stringOverride = "evaporative_condenser_air_flow_rate [m3/s]";
                     if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
                         CompName = DXCoil(DXCoilNum).Name + ":" + DXCoil(DXCoilNum).CoilPerformanceName(Mode);
                     } else {
                         CompName = DXCoil(DXCoilNum).Name;
                         if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
                             stringOverride = "High Speed Evaporative Condenser Air Flow Rate [m3/s]";
+                            if (DataGlobals::isEpJSON) stringOverride = "high_speed_evaporative_condenser_air_flow_rate [m3/s]";
                         } else {
                             stringOverride = "Evaporative Condenser Air Flow Rate [m3/s]";
+                            if (DataGlobals::isEpJSON) stringOverride = "evaporative_condenser_air_flow_rate [m3/s]";
                         }
                     }
                     CompType = DXCoil(DXCoilNum).DXCoilType;
@@ -7123,6 +7128,7 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).EvapCondAirFlow2;
                     AutoCalculateSizer sizerEvapCondAirFlow2;
                     std::string stringOverride = "Low Speed Evaporative Condenser Air Flow Rate [m3/s]";
+                    if (DataGlobals::isEpJSON) stringOverride = "low_speed_evaporative_condenser_air_flow_rate [m3/s]";
                     sizerEvapCondAirFlow2.overrideSizingString(stringOverride);
                     sizerEvapCondAirFlow2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).EvapCondAirFlow2 = sizerEvapCondAirFlow2.size(TempSize, ErrorsFound);
@@ -7135,14 +7141,17 @@ namespace DXCoils {
 
                     AutoCalculateSizer sizerEvapCondPumpPower;
                     std::string stringOverride = "Evaporative Condenser Pump Rated Power Consumption [W]";
+                    if (DataGlobals::isEpJSON) stringOverride = "evaporative_condenser_pump_rated_power_consumption [W]";
                     if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
                         CompName = DXCoil(DXCoilNum).Name + ":" + DXCoil(DXCoilNum).CoilPerformanceName(Mode);
                     } else {
                         CompName = DXCoil(DXCoilNum).Name;
                         if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
                             stringOverride = "High Speed Evaporative Condenser Pump Rated Power Consumption [W]";
+                            if (DataGlobals::isEpJSON) stringOverride = "high_speed_evaporative_condenser_pump_rated_power_consumption [W]";
                         } else {
                             stringOverride = "Evaporative Condenser Pump Rated Power Consumption [W]";
+                            if (DataGlobals::isEpJSON)stringOverride = "evaporative_condenser_pump_rated_power_consumption [W]";
                         }
                     }
                     SizingMethod = AutoCalculateSizing;
@@ -7167,6 +7176,7 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).EvapCondPumpElecNomPower2;
                     AutoCalculateSizer sizerEvapCondPumpPower2;
                     std::string stringOverride = "Low Speed Evaporative Condenser Pump Rated Power Consumption [W]";
+                    if (DataGlobals::isEpJSON) stringOverride = "low_speed_evaporative_condenser_pump_rated_power_consumption [W]";
                     sizerEvapCondPumpPower2.overrideSizingString(stringOverride);
                     sizerEvapCondPumpPower2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).EvapCondPumpElecNomPower2 = sizerEvapCondPumpPower2.size(TempSize, ErrorsFound);
@@ -7274,6 +7284,7 @@ namespace DXCoils {
                         TempSize = DXCoil(DXCoilNum).DefrostCapacity;
                         AutoCalculateSizer sizerResDefCap;
                         std::string stringOverride = "Resistive Defrost Heater Capacity [W]";
+                        if (DataGlobals::isEpJSON) stringOverride = "resistive_defrost_heater_capacity [W]";
                         sizerResDefCap.overrideSizingString(stringOverride);
                         sizerResDefCap.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DXCoil(DXCoilNum).DefrostCapacity = sizerResDefCap.size(TempSize, ErrorsFound);

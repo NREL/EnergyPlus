@@ -144,7 +144,7 @@ Real64 CoolingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
         }
     }
     // bandaid - override sizing string for detailed coil model
-    if (this->compType == "Coil:Cooling:Water:DetailedGeometry") {
+    if (this->coilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed ) {
         if (this->isEpJSON) {
             this->sizingString = "maximum_water_flow_rate [m3/s]";
         } else {

@@ -124,37 +124,37 @@ Real64 CoolingSHRSizer::size(Real64 _originalValue, bool &errorsFound)
         }
     }
     // bandaid - override sizingString to match existing text
-    if (this->compType == "Coil:Cooling:DX:MultiSpeed") {
-        if (this->isEpJSON) {
-            this->sizingString = "speed_" + General::TrimSigDigits(DataSizing::DataDXSpeedNum) + "_rated_sensible_heat_ratio";
-        } else {
-            this->sizingString = "Speed " + General::TrimSigDigits(DataSizing::DataDXSpeedNum) + " Rated Sensible Heat Ratio";
-        }
-    } else if (this->compType == "Coil:Cooling:DX:TwoSpeed") {
-        if (DataSizing::DataDXSpeedNum == 1) { // mode 1 is high speed in DXCoils loop
+    if (this->coilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
+        if (this->dataDXSpeedNum == 1) { // mode 1 is high speed in DXCoils loop
             if (this->isEpJSON) {
                 this->sizingString = "high_speed_rated_sensible_heat_ratio";
             } else {
                 this->sizingString = "High Speed Rated Sensible Heat Ratio";
             }
-        } else if (DataSizing::DataDXSpeedNum == 2) {
+        } else if (this->dataDXSpeedNum == 2) {
             if (this->isEpJSON) {
                 this->sizingString = "low_speed_gross_rated_sensible_heat_ratio";
             } else {
                 this->sizingString = "Low Speed Gross Rated Sensible Heat Ratio";
             }
         }
-    } else if (this->compType == "Coil:Cooling:DX:CurveFit:Speed") {
+    } else if (this->coilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
         if (this->isEpJSON) {
-            this->sizingString = "gross_sensible_heat_ratio";
+            this->sizingString = "speed_" + General::TrimSigDigits(DataSizing::DataDXSpeedNum) + "_rated_sensible_heat_ratio";
         } else {
-            this->sizingString = "Gross Sensible Heat Ratio";
+            this->sizingString = "Speed " + General::TrimSigDigits(DataSizing::DataDXSpeedNum) + " Rated Sensible Heat Ratio";
         }
-    } else if (this->compType == "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl") {
+    } else if (this->coilType_Num == DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling) {
         if (this->isEpJSON) {
             this->sizingString = "rated_sensible_heat_ratio";
         } else {
             this->sizingString = "Rated Sensible Heat Ratio";
+        }
+    } else if (this->coilType_Num == DataHVACGlobals::CoilDX_CurveFit_Speed) {
+        if (this->isEpJSON) {
+            this->sizingString = "gross_sensible_heat_ratio";
+        } else {
+            this->sizingString = "Gross Sensible Heat Ratio";
         }
     } else {
         if (this->isEpJSON) this->sizingString = "gross_rated_sensible_heat_ratio";
