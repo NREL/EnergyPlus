@@ -68,8 +68,8 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
@@ -211,7 +211,7 @@ namespace DaylightingDevices {
 
     // Functions
 
-    void InitDaylightingDevices(OutputFiles &outputFiles)
+    void InitDaylightingDevices(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -448,11 +448,11 @@ namespace DaylightingDevices {
 
                 // Report calculated view factor so that user knows what to make the view factor to ground
                 if (!ShelfReported) {
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                         "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground\n");
                     ShelfReported = true;
                 }
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       "{},{:.2R},{},{:.2R},{:.2R}\n",
                       Shelf(ShelfNum).Name,
                       Shelf(ShelfNum).ViewFactor,

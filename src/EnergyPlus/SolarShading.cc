@@ -82,9 +82,9 @@
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -92,12 +92,12 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
-#include <WCEMultiLayerOptics.hpp>
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <EnergyPlus/WindowModel.hh>
+#include <WCEMultiLayerOptics.hpp>
 
 namespace EnergyPlus {
 
@@ -373,7 +373,7 @@ namespace SolarShading {
         SHDGSSOneTimeFlag = true;
     }
 
-    void InitSolarCalculations()
+    void InitSolarCalculations(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -419,7 +419,7 @@ namespace SolarShading {
             }
 
             if (GetInputFlag) {
-                GetShadowingInput(OutputFiles::getSingleton());
+                GetShadowingInput(ioFiles);
                 GetInputFlag = false;
                 MaxHCV = (((max(15, MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
                 assert((MaxHCV + 1) % 16 == 0);
@@ -577,7 +577,7 @@ namespace SolarShading {
         firstTime = false;
     }
 
-    void GetShadowingInput(OutputFiles &outputFiles)
+    void GetShadowingInput(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -941,14 +941,14 @@ namespace SolarShading {
             }
         }
 
-        print(outputFiles.eio,
+        print(ioFiles.eio,
               "{}",
               "! <Shadowing/Sun Position Calculations Annual Simulations>, Shading Calculation Method, "
               "Shading Calculation Update Frequency Method, Shading Calculation Update Frequency {days}, "
               "Maximum Figures in Shadow Overlap Calculations {}, Polygon Clipping Algorithm, Pixel Counting Resolution, Sky Diffuse Modeling "
               "Algorithm, Output External Shading Calculation Results, Disable "
               "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones\n");
-        print(outputFiles.eio,
+        print(ioFiles.eio,
               "Shadowing/Sun Position Calculations Annual Simulations,{},{},{},{},{},{},{},{},{},{}\n",
               cAlphaArgs(1),
               cAlphaArgs(2),
@@ -9152,7 +9152,7 @@ namespace SolarShading {
         return SurfaceScheduledSolarInc;
     }
 
-    void PerformSolarCalculations(WindowComplexManagerData &dataWindowComplexManager)
+    void PerformSolarCalculations(WindowComplexManagerData &dataWindowComplexManager, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9275,7 +9275,7 @@ namespace SolarShading {
             }
 
             //  Calculate daylighting coefficients
-            CalcDayltgCoefficients(OutputFiles::getSingleton());
+            CalcDayltgCoefficients(ioFiles);
         }
 
         if (!WarmupFlag) {
@@ -9285,7 +9285,7 @@ namespace SolarShading {
         // Recalculate daylighting coefficients if storm window has been added
         // or removed from one or more windows at beginning of day
         if (TotWindowsWithDayl > 0 && !BeginSimFlag && !BeginEnvrnFlag && !WarmupFlag && TotStormWin > 0 && StormWinChangeThisDay) {
-            CalcDayltgCoefficients(OutputFiles::getSingleton());
+            CalcDayltgCoefficients(ioFiles);
         }
     }
 

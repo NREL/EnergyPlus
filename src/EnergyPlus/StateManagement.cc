@@ -256,7 +256,7 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataEnvironment::clear_state();
     DataErrorTracking::clear_state();
     DataGenerators::clear_state();
-    DataGlobals::clear_state(state.outputFiles);
+    DataGlobals::clear_state(state.files);
     DataHeatBalance::clear_state();
     DataHeatBalFanSys::clear_state();
     DataHeatBalSurface::clear_state();

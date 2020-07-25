@@ -311,7 +311,6 @@ namespace UserDefinedComponents {
     void clear_state();
 
     void SimCoilUserDefined(EnergyPlusData &state,
-                            BranchInputManagerData &dataBranchInputManager,
                             std::string const &EquipName, // user name for component
                             int &CompIndex,
                             int AirLoopNum,
@@ -319,7 +318,6 @@ namespace UserDefinedComponents {
                             bool &CoolingActive);
 
     void SimZoneAirUserDefined(EnergyPlusData &state,
-                               BranchInputManagerData &dataBranchInputManager,
                                std::string const &CompName,    // name of the packaged terminal heat pump
                                int ZoneNum,                    // number of zone being served
                                Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
@@ -327,7 +325,7 @@ namespace UserDefinedComponents {
                                int &CompIndex                  // index to zone hvac unit
     );
 
-    void SimAirTerminalUserDefined(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager,
+    void SimAirTerminalUserDefined(EnergyPlusData &state,
                                    std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
     void GetUserDefinedPlantComponents();

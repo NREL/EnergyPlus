@@ -723,13 +723,13 @@ namespace DesiccantDehumidifiers {
                 DesicDehum(DesicDehumNum).RegenFanOutNode = HVACFan::fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->outletNodeNum;
 
             } else {
-                GetFanType(state, state.fans, DesicDehum(DesicDehumNum).RegenFanName,
+                GetFanType(state, DesicDehum(DesicDehumNum).RegenFanName,
                            DesicDehum(DesicDehumNum).regenFanType_Num,
                            errFlag,
                            CurrentModuleObject,
                            DesicDehum(DesicDehumNum).Name);
                 DesicDehum(DesicDehumNum).RegenFanInNode =
-                    GetFanInletNode(state, state.fans, DesicDehum(DesicDehumNum).RegenFanType, DesicDehum(DesicDehumNum).RegenFanName, ErrorsFound2);
+                    GetFanInletNode(state, DesicDehum(DesicDehumNum).RegenFanType, DesicDehum(DesicDehumNum).RegenFanName, ErrorsFound2);
                 if (ErrorsFound2) {
                     ShowContinueError("...occurs in " + DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).Name + "\"");
                     ErrorsFoundGeneric = true;
@@ -737,8 +737,9 @@ namespace DesiccantDehumidifiers {
 
                 ErrorsFound2 = false;
                 DesicDehum(DesicDehumNum).RegenFanOutNode =
-                    GetFanOutletNode(state, state.fans, DesicDehum(DesicDehumNum).RegenFanType, DesicDehum(DesicDehumNum).RegenFanName, ErrorsFound2);
-                GetFanIndex(state, state.fans, DesicDehum(DesicDehumNum).RegenFanName,
+                    GetFanOutletNode(state, DesicDehum(DesicDehumNum).RegenFanType, DesicDehum(DesicDehumNum).RegenFanName, ErrorsFound2);
+                GetFanIndex(state,
+                            DesicDehum(DesicDehumNum).RegenFanName,
                             DesicDehum(DesicDehumNum).RegenFanIndex,
                             ErrorsFound2,
                             DesicDehum(DesicDehumNum).RegenFanType);
@@ -916,13 +917,13 @@ namespace DesiccantDehumidifiers {
                 DesicDehum(DesicDehumNum).RegenFanInNode = HVACFan::fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->inletNodeNum;
                 DesicDehum(DesicDehumNum).RegenFanOutNode = HVACFan::fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->outletNodeNum;
             } else {
-                GetFanType(state, state.fans, DesicDehum(DesicDehumNum).RegenFanName,
+                GetFanType(state, DesicDehum(DesicDehumNum).RegenFanName,
                            DesicDehum(DesicDehumNum).regenFanType_Num,
                            errFlag,
                            CurrentModuleObject,
                            DesicDehum(DesicDehumNum).Name);
                 DesicDehum(DesicDehumNum).RegenFanInNode =
-                    GetFanInletNode(state, state.fans, DesicDehum(DesicDehumNum).RegenFanType, DesicDehum(DesicDehumNum).RegenFanName, ErrorsFound2);
+                    GetFanInletNode(state, DesicDehum(DesicDehumNum).RegenFanType, DesicDehum(DesicDehumNum).RegenFanName, ErrorsFound2);
                 if (ErrorsFound2) {
                     ShowContinueError("...occurs in " + DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).Name + "\"");
                     ErrorsFoundGeneric = true;
@@ -930,8 +931,9 @@ namespace DesiccantDehumidifiers {
 
                 ErrorsFound2 = false;
                 DesicDehum(DesicDehumNum).RegenFanOutNode =
-                    GetFanOutletNode(state, state.fans, DesicDehum(DesicDehumNum).RegenFanType, DesicDehum(DesicDehumNum).RegenFanName, ErrorsFound2);
-                GetFanIndex(state, state.fans, DesicDehum(DesicDehumNum).RegenFanName,
+                    GetFanOutletNode(state, DesicDehum(DesicDehumNum).RegenFanType, DesicDehum(DesicDehumNum).RegenFanName, ErrorsFound2);
+                GetFanIndex(state,
+                            DesicDehum(DesicDehumNum).RegenFanName,
                             DesicDehum(DesicDehumNum).RegenFanIndex,
                             ErrorsFound2,
                             DesicDehum(DesicDehumNum).RegenFanType);
@@ -1333,10 +1335,12 @@ namespace DesiccantDehumidifiers {
                                           "\"");
 
                     ErrorsFound2 = false;
-                    GetDXCoilIndex(state, DesicDehum(DesicDehumNum).CoolingCoilName,
+                    GetDXCoilIndex(state,
+                                   DesicDehum(DesicDehumNum).CoolingCoilName,
                                    DesicDehum(DesicDehumNum).DXCoilIndex,
                                    ErrorsFound2,
-                                   DesicDehum(DesicDehumNum).CoolingCoilType);
+                                   DesicDehum(DesicDehumNum).CoolingCoilType,
+                                   ObjexxFCL::Optional_bool_const());
                     if (ErrorsFound2)
                         ShowContinueError("...occurs in " + DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).CoolingCoilName +
                                           "\"");

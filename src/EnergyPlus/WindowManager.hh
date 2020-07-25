@@ -64,7 +64,7 @@
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
     // Forward Declarations
     struct EnergyPlusData;
@@ -82,9 +82,9 @@ namespace WindowManager {
     //   Optical Calculation Routines
     //   Heat Balance Routines
 
-    void InitWindowOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
+    void InitWindowOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
 
-    void InitGlassOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
+    void InitGlassOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
 
     //*****************************************************************************************
 
@@ -339,7 +339,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void ReportGlass(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
+    void ReportGlass(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
 
     //*************************************************************************************
 
@@ -347,7 +347,7 @@ namespace WindowManager {
 
     //*************************************************************************************
 
-    void CalcWindowScreenProperties(OutputFiles &outputFiles);
+    void CalcWindowScreenProperties(IOFiles &ioFiles);
 
     void BlindOpticsDiffuse(int const BlindNum,      // Blind number
                             int const ISolVis,       // 1 = solar and IR calculation; 2 = visible calculation

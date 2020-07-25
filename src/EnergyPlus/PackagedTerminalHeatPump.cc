@@ -863,19 +863,19 @@ namespace PackagedTerminalHeatPump {
                 PTUnit(PTUnitNum).FanAvailSchedPtr = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->availSchedIndex;
             } else {
                 errFlag = false;
-                GetFanType(state, state.fans, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, PTUnit(PTUnitNum).Name);
+                GetFanType(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, PTUnit(PTUnitNum).Name);
                 FanVolFlow = 0.0;
                 if (errFlag) {
                     ShowContinueError("specified in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                     ErrorsFound = true;
                 } else {
-                    GetFanIndex(state, state.fans, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
-                    FanInletNodeNum = GetFanInletNode(state, state.fans, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
-                    FanOutletNodeNum = GetFanOutletNode(state, state.fans, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                    GetFanIndex(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
+                    FanInletNodeNum = GetFanInletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                    FanOutletNodeNum = GetFanOutletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                     GetFanVolFlow(PTUnit(PTUnitNum).FanIndex, FanVolFlow);
                     PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
                     // Get the fan's availability schedule
-                    PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, state.fans, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                    PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...specified in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                         ErrorsFound = true;
@@ -898,7 +898,12 @@ namespace PackagedTerminalHeatPump {
                 PTUnit(PTUnitNum).DXHeatCoilType = Alphas(9);
                 PTUnit(PTUnitNum).DXHeatCoilType_Num = CoilDX_HeatingEmpirical;
                 errFlag = false;
-                GetDXCoilIndex(state, PTUnit(PTUnitNum).DXHeatCoilName, PTUnit(PTUnitNum).DXHeatCoilIndexNum, errFlag, PTUnit(PTUnitNum).DXHeatCoilType);
+                GetDXCoilIndex(state,
+                               PTUnit(PTUnitNum).DXHeatCoilName,
+                               PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                               errFlag,
+                               PTUnit(PTUnitNum).DXHeatCoilType,
+                               ObjexxFCL::Optional_bool_const());
                 HeatCoilInletNodeNum = GetDXCoilInletNode(state, PTUnit(PTUnitNum).DXHeatCoilType, PTUnit(PTUnitNum).DXHeatCoilName, errFlag);
                 HeatCoilOutletNodeNum = GetDXCoilOutletNode(state, PTUnit(PTUnitNum).DXHeatCoilType, PTUnit(PTUnitNum).DXHeatCoilName, errFlag);
                 if (errFlag) ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
@@ -941,7 +946,12 @@ namespace PackagedTerminalHeatPump {
                 if (UtilityRoutines::SameString(Alphas(11), "Coil:Cooling:DX:SingleSpeed")) {
                     PTUnit(PTUnitNum).DXCoolCoilType_Num = CoilDX_CoolingSingleSpeed;
                     errFlag = false;
-                    GetDXCoilIndex(state, PTUnit(PTUnitNum).DXCoolCoilName, PTUnit(PTUnitNum).DXCoolCoilIndexNum, errFlag, PTUnit(PTUnitNum).DXCoolCoilType);
+                    GetDXCoilIndex(state,
+                                   PTUnit(PTUnitNum).DXCoolCoilName,
+                                   PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                   errFlag,
+                                   PTUnit(PTUnitNum).DXCoolCoilType,
+                                   ObjexxFCL::Optional_bool_const());
                     CoolCoilInletNodeNum = GetDXCoilInletNode(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                     CoolCoilOutletNodeNum = GetDXCoilOutletNode(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                     PTUnit(PTUnitNum).CondenserNodeNum =
@@ -950,14 +960,17 @@ namespace PackagedTerminalHeatPump {
                 } else if (UtilityRoutines::SameString(Alphas(11), "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
                     PTUnit(PTUnitNum).DXCoolCoilType_Num = CoilDX_CoolingHXAssisted;
                     errFlag = false;
-                    GetDXCoilIndex(state, GetHXDXCoilName(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
+                    GetDXCoilIndex(state,
+                                   GetHXDXCoilName(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
                                    PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                    errFlag,
-                                   "Coil:Cooling:DX:SingleSpeed");
+                                   "Coil:Cooling:DX:SingleSpeed",
+                                   ObjexxFCL::Optional_bool_const());
                     CoolCoilInletNodeNum = GetHXDXCoilInletNode(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                     CoolCoilOutletNodeNum = GetHXDXCoilOutletNode(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                     PTUnit(PTUnitNum).CondenserNodeNum =
-                        GetCoilCondenserInletNode(state, "Coil:Cooling:DX:SingleSpeed",
+                        GetCoilCondenserInletNode(state,
+                                                  "Coil:Cooling:DX:SingleSpeed",
                                                   GetHXDXCoilName(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
                                                   errFlag);
                     if (errFlag) ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
@@ -1001,7 +1014,8 @@ namespace PackagedTerminalHeatPump {
             }
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(state, PTUnitNum,
+            SetMinOATCompressor(state,
+                                PTUnitNum,
                                 PTUnit(PTUnitNum).Name,
                                 CurrentModuleObject,
                                 PTUnit(PTUnitNum).DXCoolCoilIndexNum,
@@ -1747,22 +1761,22 @@ namespace PackagedTerminalHeatPump {
 
                 // Get the fan's availability schedule
                 errFlag = false;
-                PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, state.fans, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...specified in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                     ErrorsFound = true;
                 }
 
                 errFlag = false;
-                GetFanType(state, state.fans, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, PTUnit(PTUnitNum).Name);
+                GetFanType(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, PTUnit(PTUnitNum).Name);
                 FanVolFlow = 0.0;
                 if (errFlag) {
                     ShowContinueError("...specified in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                     ErrorsFound = true;
                 } else {
-                    GetFanIndex(state, state.fans, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
-                    FanInletNodeNum = GetFanInletNode(state, state.fans, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
-                    FanOutletNodeNum = GetFanOutletNode(state, state.fans, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                    GetFanIndex(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
+                    FanInletNodeNum = GetFanInletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                    FanOutletNodeNum = GetFanOutletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                     GetFanVolFlow(PTUnit(PTUnitNum).FanIndex, FanVolFlow);
                     PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
                 }
@@ -1856,7 +1870,12 @@ namespace PackagedTerminalHeatPump {
                 if (UtilityRoutines::SameString(Alphas(11), "Coil:Cooling:DX:SingleSpeed")) {
                     PTUnit(PTUnitNum).DXCoolCoilType_Num = CoilDX_CoolingSingleSpeed;
                     errFlag = false;
-                    GetDXCoilIndex(state, PTUnit(PTUnitNum).DXCoolCoilName, PTUnit(PTUnitNum).DXCoolCoilIndexNum, errFlag, PTUnit(PTUnitNum).DXCoolCoilType);
+                    GetDXCoilIndex(state,
+                                   PTUnit(PTUnitNum).DXCoolCoilName,
+                                   PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                   errFlag,
+                                   PTUnit(PTUnitNum).DXCoolCoilType,
+                                   ObjexxFCL::Optional_bool_const());
                     CoolCoilInletNodeNum = GetDXCoilInletNode(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                     CoolCoilOutletNodeNum = GetDXCoilOutletNode(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                     PTUnit(PTUnitNum).CondenserNodeNum =
@@ -1868,14 +1887,17 @@ namespace PackagedTerminalHeatPump {
                 } else if (UtilityRoutines::SameString(Alphas(11), "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
                     PTUnit(PTUnitNum).DXCoolCoilType_Num = CoilDX_CoolingHXAssisted;
                     errFlag = false;
-                    GetDXCoilIndex(state, GetHXDXCoilName(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
+                    GetDXCoilIndex(state,
+                                   GetHXDXCoilName(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
                                    PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                    errFlag,
-                                   "Coil:Cooling:DX:SingleSpeed");
+                                   "Coil:Cooling:DX:SingleSpeed",
+                                   ObjexxFCL::Optional_bool_const());
                     CoolCoilInletNodeNum = GetHXDXCoilInletNode(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                     CoolCoilOutletNodeNum = GetHXDXCoilOutletNode(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                     PTUnit(PTUnitNum).CondenserNodeNum =
-                        GetCoilCondenserInletNode(state, "Coil:Cooling:DX:SingleSpeed",
+                        GetCoilCondenserInletNode(state,
+                                                  "Coil:Cooling:DX:SingleSpeed",
                                                   GetHXDXCoilName(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
                                                   errFlag);
                     if (errFlag) {
@@ -1925,7 +1947,8 @@ namespace PackagedTerminalHeatPump {
             }
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(state, PTUnitNum,
+            SetMinOATCompressor(state,
+                                PTUnitNum,
                                 PTUnit(PTUnitNum).Name,
                                 CurrentModuleObject,
                                 PTUnit(PTUnitNum).DXCoolCoilIndexNum,
@@ -2480,7 +2503,7 @@ namespace PackagedTerminalHeatPump {
                     PTUnit(PTUnitNum).FanAvailSchedPtr = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->availSchedIndex;
                 } else {
                     errFlag = false;
-                    GetFanType(state, state.fans, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
+                    GetFanType(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
                     FanVolFlow = 0.0;
                     if (errFlag) {
                         ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\".");
@@ -2490,19 +2513,23 @@ namespace PackagedTerminalHeatPump {
                     if (PTUnit(PTUnitNum).FanType_Num == FanType_SimpleOnOff) {
 
                         errFlag = false;
-                        GetFanIndex(state, state.fans, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag);
+                        GetFanIndex(state,
+                                    PTUnit(PTUnitNum).FanName,
+                                    PTUnit(PTUnitNum).FanIndex,
+                                    errFlag,
+                                    ObjexxFCL::Optional_string_const());
                         if (errFlag) {
                             ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                             ErrorsFound = true;
                         }
                         errFlag = false;
-                        FanInletNodeNum = GetFanInletNode(state, state.fans, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                        FanInletNodeNum = GetFanInletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                         if (errFlag) {
                             ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                             ErrorsFound = true;
                         }
                         errFlag = false;
-                        FanOutletNodeNum = GetFanOutletNode(state, state.fans, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                        FanOutletNodeNum = GetFanOutletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                         if (errFlag) {
                             ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                             ErrorsFound = true;
@@ -2511,7 +2538,7 @@ namespace PackagedTerminalHeatPump {
                             PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
                         }
                         errFlag = false;
-                        PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, state.fans, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                        PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                         if (errFlag) {
                             ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                             ErrorsFound = true;
@@ -2652,7 +2679,8 @@ namespace PackagedTerminalHeatPump {
             }
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(state, PTUnitNum,
+            SetMinOATCompressor(state,
+                                PTUnitNum,
                                 PTUnit(PTUnitNum).Name,
                                 CurrentModuleObject,
                                 PTUnit(PTUnitNum).DXCoolCoilIndexNum,

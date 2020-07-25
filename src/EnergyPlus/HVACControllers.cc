@@ -2506,7 +2506,7 @@ namespace HVACControllers {
             return;
         }
 
-        OutputFiles::OutputFileName StatisticsFileName{"statistics.HVACControllers.csv"};
+        InputOutputFileName StatisticsFileName{"statistics.HVACControllers.csv"};
         auto statisticsFile = StatisticsFileName.open("DumpAirLoopStatistics");
 
         // note that the AirLoopStats object does not seem to be initialized when this code
@@ -2517,7 +2517,7 @@ namespace HVACControllers {
 
     }
 
-    void WriteAirLoopStatistics(OutputFile &statisticsFile, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats)
+    void WriteAirLoopStatistics(InputOutputFile &statisticsFile, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2810,7 +2810,7 @@ namespace HVACControllers {
     }
 
     void TraceIterationStamp(
-        OutputFile &TraceFile, bool const FirstHVACIteration, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls)
+        InputOutputFile &TraceFile, bool const FirstHVACIteration, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2874,7 +2874,7 @@ namespace HVACControllers {
               LogicalToInteger(AirLoopConverged));
     }
 
-    void TraceAirLoopController(OutputFile &TraceFile, int const ControlNum)
+    void TraceAirLoopController(InputOutputFile &TraceFile, int const ControlNum)
     {
 
         // SUBROUTINE INFORMATION:
