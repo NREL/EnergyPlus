@@ -123,6 +123,13 @@ Real64 CoolingSHRSizer::size(Real64 _originalValue, bool &errorsFound)
             }
         }
     }
+    this->setSizingString();
+    this->selectSizerOutput(errorsFound);
+    return this->autoSizedValue;
+}
+
+void CoolingSHRSizer::setSizingString()
+{
     // bandaid - override sizingString to match existing text
     if (this->coilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
         if (this->dataDXSpeedNum == 1) { // mode 1 is high speed in DXCoils loop
@@ -159,8 +166,6 @@ Real64 CoolingSHRSizer::size(Real64 _originalValue, bool &errorsFound)
     } else {
         if (this->isEpJSON) this->sizingString = "gross_rated_sensible_heat_ratio";
     }
-    this->selectSizerOutput(errorsFound);
-    return this->autoSizedValue;
 }
 
 } // namespace EnergyPlus

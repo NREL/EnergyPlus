@@ -63,6 +63,9 @@ struct CoolingSHRSizer : BaseSizer
     ~CoolingSHRSizer() = default;
 
     Real64 size(Real64 originalValue, bool &errorsFound) override;
+
+    void setSizingString();
+
 };
 
 } // namespace EnergyPlus
