@@ -3516,10 +3516,11 @@ namespace WeatherManager {
                     TomorrowLiquidPrecip(CurTimeStep, Hour) = LiquidPrecip;
                     TomorrowTotalSkyCover(CurTimeStep, Hour) = TotalSkyCover;
                     TomorrowOpaqueSkyCover(CurTimeStep, Hour) = OpaqueSkyCover;
-                    HrIRHoriz_Weather(Hour) = IRHoriz;
 
-                    calcSky(TomorrowHorizIRSky(CurTimeStep, Hour),
-                            TomorrowSkyTemp(CurTimeStep, Hour),
+                    if (NumIntervalsPerHour == 1 && NumOfTimeStepInHour > 1) 
+                        HrIRHoriz_Weather(Hour) = IRHoriz;
+
+                    calcSky(TomorrowHorizIRSky(CurTimeStep, Hour), TomorrowSkyTemp(CurTimeStep, Hour),
                                  OpaqueSkyCover,
                                  DryBulb,
                                  DewPoint,
@@ -3685,8 +3686,7 @@ namespace WeatherManager {
                     TomorrowOpaqueSkyCover(TS, Hour) = LastHrOpaqueSkyCover * WtPrevHour + Wthr.OpaqueSkyCover(Hour) * WtNow;
 
                     // Sky emissivity now takes interpolated timestep inputs rather than interpolated calcation esky results
-                    calcSky(TomorrowHorizIRSky(TS, Hour),
-                            TomorrowSkyTemp(TS, Hour),
+                    calcSky(TomorrowHorizIRSky(TS, Hour), TomorrowSkyTemp(TS, Hour),
                             TomorrowOpaqueSkyCover(TS, Hour),
                             TomorrowOutDryBulbTemp(TS, Hour),
                             TomorrowOutDewPointTemp(TS, Hour),
