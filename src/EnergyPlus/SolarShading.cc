@@ -11864,7 +11864,7 @@ namespace SolarShading {
 
         // Loop over all zones doing initial distribution of diffuse solar to interior heat transfer surfaces
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
-            auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+//            auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             // Init Zone accumulators for debugging
             ZoneDifSolarTrans = 0.0;
             ZoneDifSolarDistAbsorbedTotl = 0.0;
@@ -11872,7 +11872,11 @@ namespace SolarShading {
             ZoneDifSolarDistTransmittedTotl = 0.0;
 
             // Loop over all diffuse solar transmitting surfaces (i.e., exterior windows and TDDs) in the current zone
-            for (int const DifTransSurfNum : thisEnclosure.SurfacePtr) {
+            int const firstSurfWin = Zone(enclosureNum).WindowSurfaceFirst;
+            int const lastSurfWin = Zone(enclosureNum).WindowSurfaceLast;
+            for (int DifTransSurfNum = firstSurfWin; DifTransSurfNum <= lastSurfWin; ++DifTransSurfNum) { // Window
+
+//                for (int const DifTransSurfNum : thisEnclosure.SurfacePtr) {
                 // Skip surfaces that are not exterior, except for TDD_Diffusers
                 if (((Surface(DifTransSurfNum).ExtBoundCond != ExternalEnvironment) &&
                      (Surface(DifTransSurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
@@ -11884,9 +11888,9 @@ namespace SolarShading {
                 //				}
 
                 // Skip surfaces that are not exterior windows or TDD diffusers
-                if (Surface(DifTransSurfNum).Class != SurfaceClass_Window &&
-                    SurfWinOriginalClass(DifTransSurfNum) != SurfaceClass_TDD_Diffuser)
-                    continue;
+//                if (Surface(DifTransSurfNum).Class != SurfaceClass_Window &&
+//                    SurfWinOriginalClass(DifTransSurfNum) != SurfaceClass_TDD_Diffuser)
+//                    continue;
 
                 //----------------------------------------------------------------------------------------------------------
                 // DISTRIBUTE TRANSMITTED DIFFUSE SOLAR THROUGH EXTERIOR WINDOWS AND TDDS TO INTERIOR HEAT TRANSFER SURFACES
