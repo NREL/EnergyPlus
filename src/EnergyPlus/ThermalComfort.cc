@@ -2960,6 +2960,13 @@ namespace ThermalComfort {
             }
             readStat = 0;
             if (epwFileExists) {
+                // determine number of days in year
+                int DaysInYear;
+                if (DataEnvironment::CurrentYearIsLeapYear) {
+                    DaysInYear = 366;
+                } else {
+                    DaysInYear = 365;
+                }
                 epwFile = GetNewUnitNumber();
                 {
                     IOFlags flags;
@@ -2971,7 +2978,7 @@ namespace ThermalComfort {
                     ShowFatalError("CalcThermalComfortAdaptiveCEN15251: Could not open file " + DataStringGlobals::inputWeatherFileName +
                                    " for input (read).");
                 }
-                for (i = 1; i <= 9; ++i) { // Headers
+                for (i = 1; i <= 8; ++i) { // Headers
                     {
                         IOFlags flags;
                         ObjexxFCL::gio::read(epwFile, fmtA, flags);
@@ -2981,7 +2988,7 @@ namespace ThermalComfort {
                 jStartDay = DayOfYear - 1;
                 calcStartDay = jStartDay - 7;
                 if (calcStartDay > 0) {
-                    calcStartHr = 24 * (calcStartDay - 1) + 1;
+                    calcStartHr = 24 * calcStartDay + 1;
                     for (i = 1; i <= calcStartHr - 1; ++i) {
                         {
                             IOFlags flags;
@@ -3010,9 +3017,9 @@ namespace ThermalComfort {
                     }
                 } else { // Do special things for wrapping the epw
                     calcEndDay = jStartDay;
-                    calcStartDay += 365;
+                    calcStartDay += DaysInYear;
                     calcEndHr = 24 * calcEndDay;
-                    calcStartHr = 24 * (calcStartDay - 1) + 1;
+                    calcStartHr = 24 * calcStartDay + 1;
                     for (i = 1; i <= calcEndDay; ++i) {
                         avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
@@ -3071,7 +3078,7 @@ namespace ThermalComfort {
 
         if (BeginDayFlag && !firstDaySet) {
             // Update the running average, reset the daily avg
-            runningAverageCEN = 0.2 * runningAverageCEN + 0.8 * avgDryBulbCEN;
+            runningAverageCEN = alpha * runningAverageCEN + (1.0 - alpha) * avgDryBulbCEN;
             avgDryBulbCEN = 0.0;
         }
 
