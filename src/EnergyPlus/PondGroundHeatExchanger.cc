@@ -122,6 +122,12 @@ namespace PondGroundHeatExchanger {
     bool GetInputFlag(true);
     Array1D<PondGroundHeatExchangerData> PondGHE;
 
+    void clear_state() {
+        NumOfPondGHEs = 0;
+        GetInputFlag = true;
+        PondGHE.clear();
+    }
+
     void PondGroundHeatExchangerData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                                bool const FirstHVACIteration,
                                                Real64 &EP_UNUSED(CurLoad),
@@ -178,7 +184,7 @@ namespace PondGroundHeatExchanger {
         // from the user input file.  This will contain all of the information
         // needed to define and simulate the pond.
 
-        static bool ErrorsFound(false); // Set to true if errors in input,
+        bool ErrorsFound(false); // Set to true if errors in input,
 
         int IOStatus;   // Used in GetObjectItem
         int Item;       // Item to be "gotten"

@@ -62,9 +62,9 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/OutputFiles.hh>
 // TODO: move DetermineMinuteForReporting to avoid bringing this one in
 #include <EnergyPlus/OutputProcessor.hh>
 
@@ -120,10 +120,36 @@ namespace General {
     // PUBLIC  ErfFunction
 
     // Functions
-    static bool GetReportInput(true);
-
+    bool GetReportInput(true);
+    bool SurfVert(false);
+    bool SurfDet(false);
+    bool SurfDetWVert(false);
+    bool DXFReport(false);
+    bool DXFWFReport(false);
+    bool VRMLReport(false);
+    bool CostInfo(false);
+    bool ViewFactorInfo(false);
+    bool Constructions(false);
+    bool Materials(false);
+    bool LineRpt(false);
+    bool VarDict(false);
+    bool EMSoutput(false);
+    
     void clear_state() {
         GetReportInput = true;
+        SurfVert = false;
+        SurfDet = false;
+        SurfDetWVert = false;
+        DXFReport = false;
+        DXFWFReport = false;
+        VRMLReport = false;
+        CostInfo = false;
+        ViewFactorInfo = false;
+        Constructions = false;
+        Materials = false;
+        LineRpt = false;
+        VarDict = false;
+        EMSoutput = false;
     }
 
     void SolveRoot(Real64 const Eps, // required absolute accuracy
@@ -2428,7 +2454,8 @@ namespace General {
 
     // END SUBROUTINE SaveCompDesWaterFlow
 
-    void Invert3By3Matrix(Array2A<Real64> const A, // Input 3X3 Matrix
+    void Invert3By3Matrix(IOFiles &ioFiles,
+                          Array2A<Real64> const A, // Input 3X3 Matrix
                           Array2A<Real64> InverseA // Output 3X3 Matrix - Inverse Of A
     )
     {
@@ -2474,7 +2501,7 @@ namespace General {
                       A(1, 2) * A(2, 1) * A(3, 3) - A(1, 3) * A(2, 2) * A(3, 1);
 
         if (std::abs(Determinant) < .1E-12) {
-            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{OutputFiles::getSingleton().eso});
+            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{ioFiles.eso});
         }
 
         // Compute Inverse
@@ -3199,27 +3226,14 @@ namespace General {
         int NumNames;
         int NumNumbers;
         int IOStat;
-        static bool SurfVert(false);
-        static bool SurfDet(false);
-        static bool SurfDetWVert(false);
-        static bool DXFReport(false);
         static std::string DXFOption1;
         static std::string DXFOption2;
-        static bool DXFWFReport(false);
         static std::string DXFWFOption1;
         static std::string DXFWFOption2;
-        static bool VRMLReport(false);
         static std::string VRMLOption1;
         static std::string VRMLOption2;
-        static bool CostInfo(false);
-        static bool ViewFactorInfo(false);
         static std::string ViewRptOption1;
-        static bool Constructions(false);
-        static bool Materials(false);
-        static bool LineRpt(false);
         static std::string LineRptOption1;
-        static bool VarDict(false);
-        static bool EMSoutput(false);
         static std::string VarDictOption1;
         static std::string VarDictOption2;
         //  LOGICAL,SAVE :: SchRpt = .FALSE.

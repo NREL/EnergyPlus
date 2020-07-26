@@ -164,12 +164,19 @@ namespace PackagedThermalStorageCoil {
     int NumTESCoils;
     Array1D_bool CheckEquipName;
     bool GetTESInputFlag(true);
+    bool MyOneTimeFlag(true);  // One time flag used to allocate MyEnvrnFlag and MySizeFlag
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
     // Object Data
     Array1D<PackagedTESCoolingCoilStruct> TESCoil;
 
-    // Functions
+    void clear_state() {
+        NumTESCoils = 0;
+        CheckEquipName.clear();
+        GetTESInputFlag = true;
+        MyOneTimeFlag = true;
+        TESCoil.clear();
+    }
 
     void SimTESCoil(EnergyPlusData &state, std::string const &CompName, // name of the fan coil unit
                     int &CompIndex,
@@ -1856,7 +1863,6 @@ namespace PackagedThermalStorageCoil {
         static Array1D_bool MySizeFlag;   // One time sizing flag
         static Array1D_bool MyEnvrnFlag;  // flag for init once at start of environment
         static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
-        static bool MyOneTimeFlag(true);  // One time flag used to allocate MyEnvrnFlag and MySizeFlag
         bool errFlag;
         int plloopnum;
         int lsnum;

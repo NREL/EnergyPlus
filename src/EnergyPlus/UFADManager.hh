@@ -76,6 +76,8 @@ namespace UFADManager {
 
     // Functions
 
+    void clear_state();
+
     void ManageUCSDUFModels(ConvectionCoefficientsData &dataConvectionCoefficients,
                             int const ZoneNum,      // index number for the specified zone
                             int const ZoneModelType // type of zone model; UCSDUFI = 6

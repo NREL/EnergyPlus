@@ -61,16 +61,15 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
@@ -78,6 +77,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -118,6 +118,7 @@ namespace ConvectionCoefficients {
     Array1D<Real64> const RoughnessMultiplier(6, {2.17, 1.67, 1.52, 1.13, 1.11, 1.0});
 
     void InitInteriorConvectionCoeffs(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                      IOFiles &ioFiles,
                                       const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                       Optional_int_const ZoneToResimulate         // if passed in, then only calculate surfaces that have this zone
     )
@@ -168,7 +169,7 @@ namespace ConvectionCoefficients {
 
         // FLOW:
         if (dataConvectionCoefficients.GetUserSuppliedConvectionCoeffs) {
-            GetUserConvectionCoefficients(dataConvectionCoefficients, OutputFiles::getSingleton());
+            GetUserConvectionCoefficients(dataConvectionCoefficients, ioFiles);
             dataConvectionCoefficients.GetUserSuppliedConvectionCoeffs = false;
         }
 
@@ -324,6 +325,7 @@ namespace ConvectionCoefficients {
     }
 
     void InitExteriorConvectionCoeff(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                     IOFiles &ioFiles,
                                      int const SurfNum,      // Surface number (in Surface derived type)
                                      Real64 const HMovInsul, // Equivalent convection coefficient of movable insulation
                                      int const Roughness,    // Roughness index (1-6), see DataHeatBalance parameters
@@ -379,7 +381,7 @@ namespace ConvectionCoefficients {
 
         // FLOW:
         if (dataConvectionCoefficients.GetUserSuppliedConvectionCoeffs) {
-            GetUserConvectionCoefficients(dataConvectionCoefficients, OutputFiles::getSingleton());
+            GetUserConvectionCoefficients(dataConvectionCoefficients, ioFiles);
             dataConvectionCoefficients.GetUserSuppliedConvectionCoeffs = false;
         }
 
@@ -708,7 +710,7 @@ namespace ConvectionCoefficients {
     }
 
     void GetUserConvectionCoefficients(ConvectionCoefficientsData &dataConvectionCoefficients,
-                                       OutputFiles &outputFiles)
+                                       IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1827,7 +1829,7 @@ namespace ConvectionCoefficients {
             ShowFatalError(RoutineName + "Errors found getting input.  Program termination.");
         }
 
-        SetupAdaptiveConvectionStaticMetaData(dataConvectionCoefficients, outputFiles);
+        SetupAdaptiveConvectionStaticMetaData(dataConvectionCoefficients, ioFiles);
     }
 
     void ApplyConvectionValue(std::string const &SurfaceTypes, std::string const &ConvectionType, int const Value)
@@ -3364,7 +3366,7 @@ namespace ConvectionCoefficients {
         if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
     }
 
-    void SetupAdaptiveConvectionStaticMetaData(ConvectionCoefficientsData &dataConvectionCoefficients, OutputFiles &outputFiles)
+    void SetupAdaptiveConvectionStaticMetaData(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3938,7 +3940,7 @@ namespace ConvectionCoefficients {
                 "! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside Area [m2], Outside Perimeter [m], Outside Height "
                 "[m], Inside Model Assignment, Inside Height [m], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio, "
                 "Window Location, Near Radiant {{Yes/No}}, Has Active HVAC {{Yes/No}}\n");
-            print(outputFiles.eio, Format_900); // header
+            print(ioFiles.eio, Format_900); // header
             for (int SurfLoop : DataSurfaces::AllSurfaceListReportOrder) {
                 if (!Surface(SurfLoop).HeatTransSurf) continue;
                 if (Surface(SurfLoop).IntConvSurfGetsRadiantHeat) {
@@ -3953,7 +3955,7 @@ namespace ConvectionCoefficients {
                 }
                 static constexpr auto Format_901(
                     "Surface Convection Parameters,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_901,
                       Surface(SurfLoop).Name,
                       Surface(SurfLoop).ExtConvCoeff,
@@ -3978,9 +3980,9 @@ namespace ConvectionCoefficients {
             if (DisplayAdvancedReportVariables) {
                 static constexpr auto Format_8000(
                     "! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-                print(outputFiles.eio, Format_8000); // header for north facade
+                print(ioFiles.eio, Format_8000); // header for north facade
                 static constexpr auto Format_8001("Building Convection Parameters:North Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_8001,
                       NorthFacade.Perimeter,
                       NorthFacade.Height,
@@ -3992,10 +3994,10 @@ namespace ConvectionCoefficients {
                       NorthFacade.Zmax);
                 static constexpr auto Format_8100(
                     "! <Building Convection Parameters:Northeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-                print(outputFiles.eio, Format_8100); // header for northeast facade
+                print(ioFiles.eio, Format_8100); // header for northeast facade
                 static constexpr auto Format_8101(
                     "Building Convection Parameters:Northeast Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_8101,
                       NorthEastFacade.Perimeter,
                       NorthEastFacade.Height,
@@ -4007,10 +4009,10 @@ namespace ConvectionCoefficients {
                       NorthEastFacade.Zmax);
                 static constexpr auto Format_8200(
                     "! <Building Convection Parameters:East Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-                print(outputFiles.eio, Format_8200); // header for east facade
+                print(ioFiles.eio, Format_8200); // header for east facade
                 static constexpr auto Format_8201(
                     "Building Convection Parameters:East Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_8201,
                       EastFacade.Perimeter,
                       EastFacade.Height,
@@ -4023,10 +4025,10 @@ namespace ConvectionCoefficients {
 
                 static constexpr auto Format_8300(
                     "! <Building Convection Parameters:Southeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-                print(outputFiles.eio, Format_8300); // header for southeast facade
+                print(ioFiles.eio, Format_8300); // header for southeast facade
                 static constexpr auto Format_8301(
                     "Building Convection Parameters:Southeast Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_8301,
                       SouthEastFacade.Perimeter,
                       SouthEastFacade.Height,
@@ -4039,10 +4041,10 @@ namespace ConvectionCoefficients {
 
                 static constexpr auto Format_8400(
                     "! <Building Convection Parameters:South Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-                print(outputFiles.eio, Format_8400); // header for south facade
+                print(ioFiles.eio, Format_8400); // header for south facade
                 static constexpr auto Format_8401(
                     "Building Convection Parameters:South Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_8401,
                       SouthFacade.Perimeter,
                       SouthFacade.Height,
@@ -4054,10 +4056,10 @@ namespace ConvectionCoefficients {
                       SouthFacade.Zmax);
                 static constexpr auto Format_8500(
                     "! <Building Convection Parameters:Southwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-                print(outputFiles.eio, Format_8500); // header for southwest facade
+                print(ioFiles.eio, Format_8500); // header for southwest facade
                 static constexpr auto Format_8501(
                     "Building Convection Parameters:Southwest Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_8501,
                       SouthWestFacade.Perimeter,
                       SouthWestFacade.Height,
@@ -4069,10 +4071,10 @@ namespace ConvectionCoefficients {
                       SouthWestFacade.Zmax);
                 static constexpr auto Format_8600(
                     "! <Building Convection Parameters:West Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-                print(outputFiles.eio, Format_8600); // header for west facade
+                print(ioFiles.eio, Format_8600); // header for west facade
                 static constexpr auto Format_8601(
                     "Building Convection Parameters:West Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_8601,
                       WestFacade.Perimeter,
                       WestFacade.Height,
@@ -4084,10 +4086,10 @@ namespace ConvectionCoefficients {
                       WestFacade.Zmax);
                 static constexpr auto Format_8700(
                     "! <Building Convection Parameters:Northwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-                print(outputFiles.eio, Format_8700); // header for northwest facade
+                print(ioFiles.eio, Format_8700); // header for northwest facade
                 static constexpr auto Format_8701(
                     "Building Convection Parameters:NorthwWest Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_8701,
                       NorthWestFacade.Perimeter,
                       NorthWestFacade.Height,
@@ -4101,10 +4103,10 @@ namespace ConvectionCoefficients {
                     "! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], XdYdZd:X, XdYdZd:Y, XdYdZd:Z,XdYdZu:X, XdYdZu:Y, "
                     "XdYdZu:Z,XdYuZd:X, XdYuZd:Y, XdYuZd:Z,XdYuZu:X, XdYuZu:Y, XdYuZu:Z,XuYdZd:X, XuYdZd:Y, XuYdZd:Z,XuYuZd:X, XuYuZd:Y, "
                     "XuYuZd:Z,XuYdZu:X, XuYdZu:Y, XuYdZu:Z,XuYuZu:X, XuYuZu:Y, XuYuZu:Z\n");
-                print(outputFiles.eio, Format_8800); // header for roof
+                print(ioFiles.eio, Format_8800); // header for roof
                 static constexpr auto Format_8801(
                     "Building Convection Parameters:Roof,{:.2R},{:.2R},{:.2R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_8801,
                       dataConvectionCoefficients.RoofGeo.Area,
                       dataConvectionCoefficients.RoofGeo.Perimeter,
@@ -4117,7 +4119,7 @@ namespace ConvectionCoefficients {
                       dataConvectionCoefficients.RoofGeo.XdYdZu.Vertex.z,
                       dataConvectionCoefficients.RoofGeo.XdYuZd.Vertex.x);
                 static constexpr auto Format_88012("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_88012,
                       dataConvectionCoefficients.RoofGeo.XdYuZd.Vertex.y,
                       dataConvectionCoefficients.RoofGeo.XdYuZd.Vertex.z,
@@ -4130,7 +4132,7 @@ namespace ConvectionCoefficients {
                       dataConvectionCoefficients.RoofGeo.XuYuZd.Vertex.x,
                       dataConvectionCoefficients.RoofGeo.XuYuZd.Vertex.y);
                 static constexpr auto Format_88013("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_88013,
                       dataConvectionCoefficients.RoofGeo.XuYuZd.Vertex.z,
                       dataConvectionCoefficients.RoofGeo.XuYdZu.Vertex.x,
