@@ -710,11 +710,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     HVACDXSystem::ControlDXSystem(DXSystemNum, FirstHVACIteration, HXUnitOn);
     Real64 SHR = VariableSpeedCoils::VarSpeedCoil(1).QSensible / VariableSpeedCoils::VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.811509, 0.0001);
+    DataLoopNode::Node(InletNode).MassFlowRate = 1.61576817;
     VariableSpeedCoils::VarSpeedCoil(1).Twet_Rated = 1000.0;
     VariableSpeedCoils::VarSpeedCoil(1).Gamma_Rated = 1.5;
     HVACDXSystem::ControlDXSystem(DXSystemNum, FirstHVACIteration, HXUnitOn);
     SHR = VariableSpeedCoils::VarSpeedCoil(1).QSensible / VariableSpeedCoils::VarSpeedCoil(1).QLoadTotal;
-    EXPECT_NEAR(SHR, 0.878975, 0.0001);
+    EXPECT_NEAR(SHR, 1.0, 0.0001);
 }
 
 } // namespace EnergyPlus
