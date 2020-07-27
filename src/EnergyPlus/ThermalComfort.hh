@@ -168,8 +168,10 @@ namespace ThermalComfort {
     extern Array1D<Real64> ZoneOccHrs;
     extern bool useEpwData;
     extern Array1D<Real64> DailyAveOutTemp;
+    extern Real64 avgDryBulbCEN;
 
     extern Real64 runningAverageASH;
+    extern Real64 runningAverageCEN;
 
     // Subroutine Specifications for the Thermal Comfort module
 

@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -997,4 +998,26 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     EXPECT_NEAR(ThermalComfortData(1).PiercePMVSET, -3.350, 0.005);
     EXPECT_NEAR(ThermalComfortData(1).PierceSET, 23.62, 0.01);
 
+}
+
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveCEN15251)
+{
+    state.files.inputWeatherFileName.fileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/ThermalComfortCEN15251Test.epw";
+
+    // test the initialisation
+    DayOfYear = 1;
+    CurrentYearIsLeapYear = false;
+    CalcThermalComfortAdaptiveCEN15251(state.files, true, true, 0.0);
+    EXPECT_NEAR(ThermalComfort::runningAverageCEN, -1.3671408, 0.01);
+    
+    // skip the first day
+    BeginDayFlag = true;
+    CalcThermalComfortAdaptiveCEN15251(state.files, false);
+
+    // test the second day
+    DayOfYear += 1;
+    avgDryBulbCEN = -6.4875;
+    CalcThermalComfortAdaptiveCEN15251(state.files, false);
+    EXPECT_NEAR(ThermalComfort::runningAverageCEN, -2.39121263999999, 0.01);
+    BeginDayFlag = false;
 }

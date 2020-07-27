@@ -243,6 +243,7 @@ namespace ThermalComfort {
     Array1D<Real64> ZoneOccHrs;
     bool useEpwData(false);
     Array1D<Real64> DailyAveOutTemp(30, 0.0);
+    Real64 avgDryBulbCEN(0.0);
 
     // Subroutine Specifications for the Thermal Comfort module
 
@@ -253,6 +254,7 @@ namespace ThermalComfort {
     Array1D<AngleFactorData> AngleFactorList; // Angle Factor List data for each Angle Factor List
 
     Real64 runningAverageASH(0.0);
+    Real64 runningAverageCEN(0.0);
 
     // Functions
     void clear_state()
@@ -260,6 +262,7 @@ namespace ThermalComfort {
         FirstTimeFlag = true;
         FirstTimeSurfaceWeightedFlag = true;
         runningAverageASH = 0.0;
+        runningAverageCEN = 0.0;
         AbsAirTemp = 0.0;
         AbsCloSurfTemp = 0.0;
         AbsRadTemp = 0.0;
@@ -2853,13 +2856,10 @@ namespace ThermalComfort {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string epwLine;
-        static Real64 avgDryBulbCEN(0.0);
         Real64 dryBulb;
         Real64 tComf;
         Real64 tComfLow;
-        static Real64 runningAverageCEN(0.0);
         Real64 numOccupants;
-        static bool useEpwData(false);
         static bool firstDaySet(false); // first day is set with initiate -- so do not update
         int readStat;
         int jStartDay;
