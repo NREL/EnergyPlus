@@ -946,7 +946,6 @@ namespace WeatherManager {
     extern AnnualMonthlyDryBulbWeatherData OADryBulbAverage;
 
     void ReportWaterMainsTempParameters(IOFiles &ioFiles);
-    void ReportWaterMainsTempParameters();
     void calcSky(Real64 &TmrHorizIRSky, Real64 &TmrSkyTemp, Real64 OpaqueSkyCover, Real64 DryBulb, Real64 DewPoint, Real64 RelHum, Real64 IRHoriz);
 
 } // namespace WeatherManager
