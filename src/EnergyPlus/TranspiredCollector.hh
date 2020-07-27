@@ -172,7 +172,9 @@ namespace TranspiredCollector {
     // Functions
     void clear_state();
 
-    void SimTranspiredCollector(std::string const &CompName, // component name
+    void SimTranspiredCollector(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                IOFiles &ioFiles,
+                                std::string const &CompName, // component name
                                 int &CompIndex               // component index (to reduce string compares during simulation)
     );
 
@@ -180,9 +182,9 @@ namespace TranspiredCollector {
 
     void InitTranspiredCollector(int const UTSCNum); // compindex already checked in calling routine
 
-    void CalcActiveTranspiredCollector(int const UTSCNum);
+    void CalcActiveTranspiredCollector(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum);
 
-    void CalcPassiveTranspiredCollector(int const UTSCNum);
+    void CalcPassiveTranspiredCollector(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum);
 
     void UpdateTranspiredCollector(int const UTSCNum);
 

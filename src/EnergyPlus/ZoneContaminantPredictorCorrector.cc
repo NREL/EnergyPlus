@@ -211,7 +211,7 @@ namespace ZoneContaminantPredictorCorrector {
         int MaxNumber;
         int Loop;
         int ZonePtr;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         Array1D_bool RepVarSet;
         std::string CurrentModuleObject;
 
@@ -1076,7 +1076,7 @@ namespace ZoneContaminantPredictorCorrector {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         bool ValidScheduleType;
 
         struct NeededControlTypes
@@ -1281,18 +1281,14 @@ namespace ZoneContaminantPredictorCorrector {
         int Loop;
         int ZoneNum;
         int SurfNum;
-        static bool MyOneTimeFlag(true);
-        static bool MyEnvrnFlag(true);
-        static bool MyDayFlag(true);
         Real64 GCGain; // Zone generic contaminant gain
         Real64 Pi;     // Pressue at zone i
         Real64 Pj;     // Pressue at zone j
         Real64 Sch;    // Schedule value
         Real64 Cs;     // Surface concentration level for the Boundary Layer Diffusion Controlled Model
-        static bool MyConfigOneTimeFlag(true);
         int ContZoneNum;
         int I;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         if (Contaminant.CO2Simulation) {
             OutdoorCO2 = GetCurrentScheduleValue(Contaminant.CO2OutdoorSchedPtr);
@@ -1302,7 +1298,7 @@ namespace ZoneContaminantPredictorCorrector {
             OutdoorGC = GetCurrentScheduleValue(Contaminant.GenericContamOutdoorSchedPtr);
         }
 
-        if (MyOneTimeFlag) {
+        if (dataZoneContaminantPredictorCorrector.MyOneTimeFlag) {
             // CO2
             if (Contaminant.CO2Simulation) {
                 ZoneCO2SetPoint.dimension(NumOfZones, 0.0);
@@ -1420,11 +1416,11 @@ namespace ZoneContaminantPredictorCorrector {
                 }
             } // Loop
 
-            MyOneTimeFlag = false;
+            dataZoneContaminantPredictorCorrector.MyOneTimeFlag = false;
         }
 
         // Do the Begin Environment initializations
-        if (MyEnvrnFlag && BeginEnvrnFlag) {
+        if (dataZoneContaminantPredictorCorrector.MyEnvrnFlag && BeginEnvrnFlag) {
             if (Contaminant.CO2Simulation) {
                 CONTRAT = 0.0;
                 CO2ZoneTimeMinus1 = OutdoorCO2;
@@ -1473,23 +1469,23 @@ namespace ZoneContaminantPredictorCorrector {
                     for (auto &e : ZoneContamGenericDecay)
                         e.GCTime = 0.0;
             }
-            MyEnvrnFlag = false;
+            dataZoneContaminantPredictorCorrector.MyEnvrnFlag = false;
         }
 
         if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            dataZoneContaminantPredictorCorrector.MyEnvrnFlag = true;
         }
 
         // Do the Begin Day initializations
-        if (MyDayFlag && BeginDayFlag) {
-            MyDayFlag = false;
+        if (dataZoneContaminantPredictorCorrector.MyDayFlag && BeginDayFlag) {
+            dataZoneContaminantPredictorCorrector.MyDayFlag = false;
         }
 
         if (!BeginDayFlag) {
-            MyDayFlag = true;
+            dataZoneContaminantPredictorCorrector.MyDayFlag = true;
         }
 
-        if (allocated(ZoneEquipConfig) && MyConfigOneTimeFlag) {
+        if (allocated(ZoneEquipConfig) && dataZoneContaminantPredictorCorrector.MyConfigOneTimeFlag) {
             for (ContZoneNum = 1; ContZoneNum <= NumContControlledZones; ++ContZoneNum) {
                 ZoneNum = ContaminantControlledZone(ContZoneNum).ActualZoneNum;
                 for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++zoneInNode) {
@@ -1524,7 +1520,7 @@ namespace ZoneContaminantPredictorCorrector {
                     }
                 }
             }
-            MyConfigOneTimeFlag = false;
+            dataZoneContaminantPredictorCorrector.MyConfigOneTimeFlag = false;
             if (ErrorsFound) {
                 ShowFatalError("ZoneControl:ContaminantController: Program terminates for preceding reason(s).");
             }

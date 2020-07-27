@@ -54,8 +54,10 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ScheduleManager;
@@ -779,7 +781,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
     DataEnvironment::Month = 5;
     DataEnvironment::DayOfMonth = 31;
@@ -803,4 +805,440 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
     EXPECT_EQ(3.0, ScheduleManager::Schedule(1).CurrentValue);
     EXPECT_EQ(3.0, ScheduleManager::GetCurrentScheduleValue(1));
     EXPECT_EQ(3.0, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+}
+
+TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_SouthernHemisphere)
+{
+    std::string const idf_objects = delimited_string({
+        "Schedule:Compact,",
+        "  Electricity Season Schedule,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  1,                       !- Field 4",
+        "  Through: 12/31,          !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  2;                       !- Field 8",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataGlobals::NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
+    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    DataGlobals::TimeStepZone = 0.25;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
+
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+
+    DataEnvironment::Month = 12;
+    DataEnvironment::DayOfMonth = 31;
+    DataGlobals::HourOfDay = 24;
+    DataEnvironment::DayOfWeek = 4;
+    DataEnvironment::DayOfWeekTomorrow = 5;
+    DataEnvironment::HolidayIndex = 0;
+    DataGlobals::TimeStep = 1;
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+
+    DataEnvironment::DSTIndicator = 0; // DST IS OFF
+    ScheduleManager::UpdateScheduleValues();
+    EXPECT_EQ(2.0, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+    EXPECT_EQ(2.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(2.0, ScheduleManager::GetCurrentScheduleValue(1));
+
+    DataEnvironment::DSTIndicator = 1; // DST IS ON
+    ScheduleManager::UpdateScheduleValues();
+    // Since DST is on, you're actually on the next day, which in this specific case should be 1/1 at 0:15
+    // so it **should** return 1.0
+    EXPECT_EQ(1.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(1));
+    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+}
+
+
+TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
+
+    // So here we'll mimic using a Schedule:Compact that ramps up constantly
+
+    // Schedule:Compact,
+    //   RampingUp,                 !- Name
+    //   Any Number,                !- Schedule Type Limits Name
+    //   Through: 1/1,
+    //   For: AllDays,
+    //    Until: 1:00, 1,
+    //    Until: 2:00, 2,
+    //    [...]
+    //    Until: 24:00, 24,
+    //   Through: 1/2,
+    //   For: AllDays,
+    //    Until: 1:00, 25,
+    //    Until: 2:00, 26,
+    //    Until: 3:00, 27,
+    //    [...]
+    //   Through: 12/31,
+    //   For: AllDays,
+    //    Until: 1:00, 8761,
+    //    [...]
+    //    Until: 24:00, 8784;
+
+    // # 'THROUGH" => Number of additional week schedules
+    // # 'FOR' => Number of additional day schedules
+    // So we use 366 Week Schedules, all with one day (LeapYear)
+    DataEnvironment::CurrentYearIsLeapYear = true;
+    WeatherManager::WFAllowsLeapYears = true;
+    WeatherManager::LeapYearAdd = 1;
+
+    int nDays = 366;
+    int NumOfTimeStepInHour = 4;
+
+    ScheduleManager::ScheduleInputProcessed = true;
+    EXPECT_TRUE(ScheduleManager::ScheduleInputProcessed);
+    ScheduleManager::NumSchedules = 1;
+    ScheduleManager::Schedule.allocate(ScheduleManager::NumSchedules);
+
+    ScheduleManager::Schedule(1).WeekSchedulePointer.allocate(nDays);
+    ScheduleManager::WeekSchedule.allocate(nDays);
+    ScheduleManager::DaySchedule.allocate(nDays);
+
+    for (int ScheduleIndex = 1; ScheduleIndex <= ScheduleManager::NumSchedules; ScheduleIndex++) {
+        for (int day = 1; day <= nDays; ++day) {
+            // int DayOfWeek = ((day-1) % 7) + 1;
+            ScheduleManager::Schedule(ScheduleIndex).WeekSchedulePointer(day) = day;
+            ScheduleManager::WeekSchedule(day).DaySchedulePointer.allocate(7);
+            for (int d = 1; d <= 7; ++d) {
+                ScheduleManager::WeekSchedule(day).DaySchedulePointer(d) = day;
+            }
+            ScheduleManager::DaySchedule(day).TSValue.allocate(4, 24);
+            for (int whichHour = 1; whichHour <= 24; whichHour++) {
+                for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+                    ScheduleManager::DaySchedule(day).TSValue(TS, whichHour) = whichHour + (day-1) * 24;
+                }
+            }
+        }
+    }
+
+    EXPECT_EQ(366, ScheduleManager::Schedule(1).WeekSchedulePointer(366));
+    EXPECT_EQ(366, ScheduleManager::WeekSchedule(366).DaySchedulePointer(2));
+    EXPECT_EQ(8784.0, ScheduleManager::DaySchedule(366).TSValue(4, 24));
+
+    DataGlobals::NumOfTimeStepInHour = NumOfTimeStepInHour;    // must initialize this to get schedules initialized
+    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    DataGlobals::TimeStepZone = 0.25;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
+
+    DataEnvironment::Month = 12;
+    DataEnvironment::DayOfMonth = 31;
+    DataGlobals::HourOfDay = 24;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::DayOfWeekTomorrow = 3;
+    DataEnvironment::HolidayIndex = 0;
+    DataGlobals::TimeStep = 1;
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    EXPECT_EQ(366,  DataEnvironment::DayOfYear_Schedule);
+
+    DataEnvironment::DSTIndicator = 0; // DST IS OFF
+    ScheduleManager::UpdateScheduleValues();
+    EXPECT_EQ(8784.0, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+    EXPECT_EQ(8784.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(8784.0, ScheduleManager::GetCurrentScheduleValue(1));
+
+    DataEnvironment::DSTIndicator = 1; // DST IS ON
+    ScheduleManager::UpdateScheduleValues();
+    // Since DST is on, you're actually on the next day, which in this specific case should be 1/1 at 0:15
+    // so it **should** return 1.0
+    EXPECT_EQ(1.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(1));
+    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+
+    Array1D_int EndDayOfMonth(12, {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31});
+
+
+    {
+        DataEnvironment::DSTIndicator = 0; // DST IS OFF
+        DataEnvironment::DayOfWeek = 0;
+        DataEnvironment::DayOfWeekTomorrow = 1;
+
+        Real64 HourOfYear = 0.0;
+
+        for (int month=1; month <= 12; ++month) {
+            DataEnvironment::Month = month;
+            for (int day = 1; day <= EndDayOfMonth(month); ++day) {
+                DataEnvironment::DayOfMonth = day;
+                ++DataEnvironment::DayOfWeek;
+                if (DataEnvironment::DayOfWeek > 7) {
+                    DataEnvironment::DayOfWeek = 1;
+                }
+                ++DataEnvironment::DayOfWeekTomorrow;
+                if (DataEnvironment::DayOfWeekTomorrow > 7) {
+                    DataEnvironment::DayOfWeekTomorrow = 1;
+                }
+
+                DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+
+                for (int hr = 1; hr <= 24; ++hr) {
+                    ++HourOfYear;
+                    DataGlobals::HourOfDay = hr;
+                    for (int ts = 1; ts <= 4; ++ts) {
+                        DataGlobals::TimeStep = ts;
+
+                        ScheduleManager::UpdateScheduleValues();
+                        EXPECT_EQ(HourOfYear, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+                        EXPECT_EQ(HourOfYear, ScheduleManager::Schedule(1).CurrentValue);
+                        EXPECT_EQ(HourOfYear, ScheduleManager::GetCurrentScheduleValue(1));
+                    }
+                }
+            }
+        }
+
+        EXPECT_EQ(8784.0, HourOfYear);
+    }
+
+    {
+        DataEnvironment::DSTIndicator = 1; // DST IS ON
+        DataEnvironment::DayOfWeek = 0;
+        DataEnvironment::DayOfWeekTomorrow = 1;
+
+        Real64 HourOfYear = 0.0;
+        for (int month=1; month <= 12; ++month) {
+            DataEnvironment::Month = month;
+            for (int day = 1; day <= EndDayOfMonth(month); ++day) {
+                DataEnvironment::DayOfMonth = day;
+                ++DataEnvironment::DayOfWeek;
+                if (DataEnvironment::DayOfWeek > 7) {
+                    DataEnvironment::DayOfWeek = 1;
+                }
+                ++DataEnvironment::DayOfWeekTomorrow;
+                if (DataEnvironment::DayOfWeekTomorrow > 7) {
+                    DataEnvironment::DayOfWeekTomorrow = 1;
+                }
+
+                DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+
+                for (int hr = 1; hr <= 24; ++hr) {
+                    ++HourOfYear;
+                    DataGlobals::HourOfDay = hr;
+                    for (int ts = 1; ts <= 4; ++ts) {
+                        DataGlobals::TimeStep = ts;
+
+                        ScheduleManager::UpdateScheduleValues();
+                        int thisHourOfYear = HourOfYear + 1;
+                        if (thisHourOfYear > 8784.0) {
+                            thisHourOfYear = 1;
+                        }
+                        EXPECT_EQ(thisHourOfYear, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+                        EXPECT_EQ(thisHourOfYear, ScheduleManager::Schedule(1).CurrentValue);
+                        EXPECT_EQ(thisHourOfYear, ScheduleManager::GetCurrentScheduleValue(1));
+                    }
+                }
+            }
+        }
+
+        EXPECT_EQ(8784.0, HourOfYear);
+    }
+}
+
+TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
+
+    // So here we'll mimic using a Schedule:Compact that ramps up constantly
+
+    // Schedule:Compact,
+    //   RampingUp,                 !- Name
+    //   Any Number,                !- Schedule Type Limits Name
+    //   Through: 1/1,
+    //   For: AllDays,
+    //    Until: 1:00, 1,
+    //    Until: 2:00, 2,
+    //    [...]
+    //    Until: 24:00, 24,
+    //   Through: 1/2,
+    //   For: AllDays,
+    //    Until: 1:00, 25,
+    //    Until: 2:00, 26,
+    //    Until: 3:00, 27,
+    //    [...]
+    //   Through: 12/31,
+    //   For: AllDays,
+    //    Until: 1:00, 8737,
+    //    [...]
+    //    Until: 24:00, 8760.0;
+
+    // # 'THROUGH" => Number of additional week schedules
+    // # 'FOR' => Number of additional day schedules
+    // So we use 366 Week Schedules, all with one day (LeapYear)
+    DataEnvironment::CurrentYearIsLeapYear = false;
+    WeatherManager::WFAllowsLeapYears = false;
+    WeatherManager::LeapYearAdd = 0;
+
+    // ScheduleManager always assume LeapYear really.
+    int nDays = 365;
+    int NumOfTimeStepInHour = 4;
+
+    ScheduleManager::ScheduleInputProcessed = true;
+    EXPECT_TRUE(ScheduleManager::ScheduleInputProcessed);
+    ScheduleManager::NumSchedules = 1;
+    ScheduleManager::Schedule.allocate(ScheduleManager::NumSchedules);
+
+    ScheduleManager::Schedule(1).WeekSchedulePointer.allocate(366);
+    ScheduleManager::Schedule(1).WeekSchedulePointer = -1;
+    ScheduleManager::WeekSchedule.allocate(366);
+    ScheduleManager::DaySchedule.allocate(nDays); // Here only creating 365 ScheduleDays
+
+    Array1D_int EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31});
+
+    int dayOfYear = 0;
+    for (int month=1; month <= 12; ++month) {
+        for (int day = 1; day <= EndDayOfMonth(month); ++day) {
+            ++dayOfYear;
+            int DayOfYear_Schedule = General::OrdinalDay(month, day, 1);
+            if (month <= 2) {
+                EXPECT_EQ(dayOfYear, DayOfYear_Schedule);
+            } else {
+                EXPECT_EQ(dayOfYear+1, DayOfYear_Schedule);
+            }
+
+            ScheduleManager::Schedule(1).WeekSchedulePointer(DayOfYear_Schedule) = DayOfYear_Schedule;
+            ScheduleManager::WeekSchedule(DayOfYear_Schedule).DaySchedulePointer.allocate(7);
+            for (int d = 1; d <= 7; ++d) {
+                ScheduleManager::WeekSchedule(DayOfYear_Schedule).DaySchedulePointer(d) = dayOfYear;
+            }
+            ScheduleManager::DaySchedule(dayOfYear).TSValue.allocate(4, 24);
+            for (int whichHour = 1; whichHour <= 24; whichHour++) {
+                for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+                    ScheduleManager::DaySchedule(dayOfYear).TSValue(TS, whichHour) = whichHour + (dayOfYear-1) * 24;
+                }
+            }
+        }
+    }
+
+    // Feb 28
+    EXPECT_EQ(59, ScheduleManager::Schedule(1).WeekSchedulePointer(59));
+    EXPECT_EQ(59, ScheduleManager::WeekSchedule(59).DaySchedulePointer(1));
+    EXPECT_EQ(59*24.0, ScheduleManager::DaySchedule(59).TSValue(4, 24));
+
+    // Feb 29: doesn't exist, and I default initialized everything above to -1
+    EXPECT_EQ(-1, ScheduleManager::Schedule(1).WeekSchedulePointer(60));
+    // ProcessSchedule would have treated the "Until: 3/1" to include the 2/29, so do that too.
+    ScheduleManager::Schedule(1).WeekSchedulePointer(60) = 61;
+
+    // March 1
+    EXPECT_EQ(61, ScheduleManager::Schedule(1).WeekSchedulePointer(61));
+    EXPECT_EQ(60, ScheduleManager::WeekSchedule(61).DaySchedulePointer(1));
+    EXPECT_EQ(60*24.0, ScheduleManager::DaySchedule(60).TSValue(4, 24));
+
+
+    EXPECT_EQ(366, ScheduleManager::Schedule(1).WeekSchedulePointer(366));
+    EXPECT_EQ(365, ScheduleManager::WeekSchedule(366).DaySchedulePointer(1));
+    EXPECT_EQ(8760.0, ScheduleManager::DaySchedule(365).TSValue(4, 24));
+
+    DataGlobals::NumOfTimeStepInHour = NumOfTimeStepInHour;    // must initialize this to get schedules initialized
+    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    DataGlobals::TimeStepZone = 0.25;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
+
+    DataEnvironment::Month = 12;
+    DataEnvironment::DayOfMonth = 31;
+    DataGlobals::HourOfDay = 24;
+    DataEnvironment::DayOfWeek = 1;
+    DataEnvironment::DayOfWeekTomorrow = 2;
+    DataEnvironment::HolidayIndex = 0;
+    DataGlobals::TimeStep = 1;
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    EXPECT_EQ(366,  DataEnvironment::DayOfYear_Schedule);
+
+    DataEnvironment::DSTIndicator = 0; // DST IS OFF
+    ScheduleManager::UpdateScheduleValues();
+    EXPECT_EQ(8760.0, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+    EXPECT_EQ(8760.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(8760.0, ScheduleManager::GetCurrentScheduleValue(1));
+
+    DataEnvironment::DSTIndicator = 1; // DST IS ON
+    ScheduleManager::UpdateScheduleValues();
+    // Since DST is on, you're actually on the next day, which in this specific case should be 1/1 at 0:15
+    // so it **should** return 1.0
+    EXPECT_EQ(1.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(1));
+    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+
+    {
+        DataEnvironment::DSTIndicator = 0; // DST IS OFF
+        DataEnvironment::DayOfWeek = 0;
+        DataEnvironment::DayOfWeekTomorrow = 1;
+
+        Real64 HourOfYear = 0.0;
+        for (int month=1; month <= 12; ++month) {
+            DataEnvironment::Month = month;
+            for (int day = 1; day <= EndDayOfMonth(month); ++day) {
+                DataEnvironment::DayOfMonth = day;
+                ++DataEnvironment::DayOfWeek;
+                if (DataEnvironment::DayOfWeek > 7) {
+                    DataEnvironment::DayOfWeek = 1;
+                }
+                ++DataEnvironment::DayOfWeekTomorrow;
+                if (DataEnvironment::DayOfWeekTomorrow > 7) {
+                    DataEnvironment::DayOfWeekTomorrow = 1;
+                }
+
+                DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+
+                for (int hr = 1; hr <= 24; ++hr) {
+                    ++HourOfYear;
+                    DataGlobals::HourOfDay = hr;
+                    for (int ts = 1; ts <= 4; ++ts) {
+                        DataGlobals::TimeStep = ts;
+
+                        ScheduleManager::UpdateScheduleValues();
+                        EXPECT_EQ(HourOfYear, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+                        EXPECT_EQ(HourOfYear, ScheduleManager::Schedule(1).CurrentValue);
+                        EXPECT_EQ(HourOfYear, ScheduleManager::GetCurrentScheduleValue(1));
+                    }
+                }
+            }
+        }
+
+        EXPECT_EQ(8760.0, HourOfYear);
+    }
+
+    {
+        DataEnvironment::DSTIndicator = 1; // DST IS ON
+        DataEnvironment::DayOfWeek = 0;
+        DataEnvironment::DayOfWeekTomorrow = 1;
+
+        Real64 HourOfYear = 0.0;
+        for (int month=1; month <= 12; ++month) {
+            DataEnvironment::Month = month;
+            for (int day = 1; day <= EndDayOfMonth(month); ++day) {
+                DataEnvironment::DayOfMonth = day;
+                ++DataEnvironment::DayOfWeek;
+                if (DataEnvironment::DayOfWeek > 7) {
+                    DataEnvironment::DayOfWeek = 1;
+                }
+                ++DataEnvironment::DayOfWeekTomorrow;
+                if (DataEnvironment::DayOfWeekTomorrow > 7) {
+                    DataEnvironment::DayOfWeekTomorrow = 1;
+                }
+
+                DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+
+                for (int hr = 1; hr <= 24; ++hr) {
+                    ++HourOfYear;
+                    DataGlobals::HourOfDay = hr;
+                    for (int ts = 1; ts <= 4; ++ts) {
+                        DataGlobals::TimeStep = ts;
+
+                        ScheduleManager::UpdateScheduleValues();
+                        int thisHourOfYear = HourOfYear + 1;
+                        if (thisHourOfYear > 8760.0) {
+                            thisHourOfYear = 1;
+                        }
+                        EXPECT_EQ(thisHourOfYear, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+                        EXPECT_EQ(thisHourOfYear, ScheduleManager::Schedule(1).CurrentValue);
+                        EXPECT_EQ(thisHourOfYear, ScheduleManager::GetCurrentScheduleValue(1));
+                    }
+                }
+            }
+        }
+
+        EXPECT_EQ(8760.0, HourOfYear);
+    }
 }

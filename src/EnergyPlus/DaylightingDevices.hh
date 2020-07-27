@@ -52,7 +52,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 namespace DaylightingDevices {
 
@@ -68,7 +68,7 @@ namespace DaylightingDevices {
 
     // Functions
 
-    void InitDaylightingDevices(OutputFiles &outputFiles);
+    void InitDaylightingDevices(IOFiles &ioFiles);
 
     void GetTDDInput();
 
@@ -103,6 +103,8 @@ namespace DaylightingDevices {
     void CalcViewFactorToShelf(int const ShelfNum); // Daylighting shelf object number
 
     void FigureTDDZoneGains();
+
+    void clear_state();
 
 } // namespace DaylightingDevices
 

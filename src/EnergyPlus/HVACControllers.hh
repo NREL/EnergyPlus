@@ -384,7 +384,7 @@ namespace HVACControllers {
 
     void DumpAirLoopStatistics();
 
-    void WriteAirLoopStatistics(OutputFile &statisticsFile, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats);
+    void WriteAirLoopStatistics(InputOutputFile &statisticsFile, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats);
 
     // Beginning of Tracing subroutines for the Controller Module
     // *****************************************************************************
@@ -395,9 +395,9 @@ namespace HVACControllers {
         bool const FirstHVACIteration, int const AirLoopNum, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls);
 
     void TraceIterationStamp(
-        OutputFile &TraceFile, bool const FirstHVACIteration, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls);
+        InputOutputFile &TraceFile, bool const FirstHVACIteration, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls);
 
-    void TraceAirLoopController(OutputFile &TraceFile, int const ControlNum);
+    void TraceAirLoopController(InputOutputFile &TraceFile, int const ControlNum);
 
     void SetupIndividualControllerTracer(int const ControlNum);
 
