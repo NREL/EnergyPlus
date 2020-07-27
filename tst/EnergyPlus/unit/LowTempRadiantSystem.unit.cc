@@ -2281,16 +2281,15 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     // because calculateCurrentDailyAverageODB is called by calculateRunningMeanAverageTemperature
     Real64 expectedResult;
     Real64 acceptibleError = 0.001;
-    int firstTimeStepIndex = 1;
     
     CFloRadSys.allocate(1);
     auto &thisCFloSys (CFloRadSys(1));
     
-    NumOfTimeStepInHour = 6;
+    NumOfTimeStepInHour = 1;
     WeatherManager::TodayOutDryBulbTemp.allocate(NumOfTimeStepInHour, DataGlobals::HoursInDay);
     WeatherManager::TodayOutDryBulbTemp = 0.0;
     for (int hourNumber = 1; hourNumber <= DataGlobals::HoursInDay; ++hourNumber) {
-        WeatherManager::TodayOutDryBulbTemp(firstTimeStepIndex,hourNumber) = double(hourNumber);
+        WeatherManager::TodayOutDryBulbTemp(NumOfTimeStepInHour,hourNumber) = double(hourNumber);
     }
     
     // Test 1: First day of the simulation and it's in warmup-->everything set to the same temperature

@@ -1912,8 +1912,8 @@
     Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
-    RunningMeanOutdoorAirTemperature,      !- Temperature Control Type
-    0.8,                     !- Running Mean Outdoor Air Temperature Weighting Factor
+    RunningMeanOutdoorDryBulbTemperature,      !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Dry Bulb Temperature Weighting Factor
     0.0004,                  !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     75000,                   !- Rated Pump Head {Pa}
@@ -1944,8 +1944,8 @@
     Zn002:Flr001,            !- Surface Name or Radiant Surface Group Name
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
-    RunningMeanOutdoorAirTemperature,      !- Temperature Control Type
-    0.6,                     !- Running Mean Outdoor Air Temperature Weighting Factor
+    RunningMeanOutdoorDryBulbTemperature,      !- Temperature Control Type
+    0.6,                     !- Running Mean Outdoor Dry Bulb Temperature Weighting Factor
     0.0004,                  !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     75000,                   !- Rated Pump Head {Pa}
@@ -1976,8 +1976,8 @@
     Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
-    RunningMeanOutdoorAirTemperature,      !- Temperature Control Type
-    0.5,                     !- Running Mean Outdoor Air Temperature Weighting Factor
+    RunningMeanOutdoorDryBulbTemperature,      !- Temperature Control Type
+    0.5,                     !- Running Mean Outdoor Dry Bulb Temperature Weighting Factor
     0.0005,                  !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     75000,                   !- Rated Pump Head {Pa}
@@ -2063,11 +2063,11 @@
 
   Output:Variable,*,Surface Internal Source Location Temperature,timestep;
 
-  Output:Variable,*,Constant Flow Previous Day Running Mean Outdoor Air Temperature,timestep;
+  Output:Variable,*,Zone Radiant HVAC Previous Day Running Mean Outdoor Dry Bulb Temperature,timestep;
 
-  Output:Variable,*,Constant Flow Previous Day Average Outdoor Air Temperature,timestep;
+  Output:Variable,*,Zone Radiant HVAC Previous Day Average Outdoor Dry Bulb Temperature,timestep;
 
-  Output:Variable,*,Constant Flow Running Mean Outdoor Air Temperature,timestep;
+  Output:Variable,*,Zone Radiant HVAC Running Mean Outdoor Dry Bulb Temperature,timestep;
 
   Output:Variable,*,HVAC System Solver Iteration Count,timestep;
 

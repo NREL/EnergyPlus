@@ -1553,24 +1553,26 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Sum",
                                 thisCFloSys.Name);
-            SetupOutputVariable("Constant Flow Running Mean Outdoor Air Temperature",
-                                OutputProcessor::Unit::C,
-                                thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature,
-                                "System",
-                                "Average",
-                                thisCFloSys.Name);
-            SetupOutputVariable("Constant Flow Previous Day Running Mean Outdoor Air Temperature",
-                                OutputProcessor::Unit::C,
-                                thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature,
-                                "System",
-                                "Average",
-                                thisCFloSys.Name);
-            SetupOutputVariable("Constant Flow Previous Day Average Outdoor Air Temperature",
-                                OutputProcessor::Unit::C,
-                                thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature,
-                                "System",
-                                "Average",
-                                thisCFloSys.Name);
+            if (anyRadiantSystemUsingRunningMeanAverage) {
+                SetupOutputVariable("Zone Radiant HVAC Running Mean Outdoor Dry Bulb Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature,
+                                    "System",
+                                    "Average",
+                                    thisCFloSys.Name);
+                SetupOutputVariable("Zone Radiant HVAC Previous Day Running Mean Outdoor Dry Bulb Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature,
+                                    "System",
+                                    "Average",
+                                    thisCFloSys.Name);
+                SetupOutputVariable("Zone Radiant HVAC Previous Day Average Outdoor Dry Bulb Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature,
+                                    "System",
+                                    "Average",
+                                    thisCFloSys.Name);
+            }
             if (AnyEnergyManagementSystemInModel) {
                 SetupEMSInternalVariable(
                     "Constant Flow Low Temp Radiant Design Water Mass Flow Rate", thisCFloSys.Name, "[m3/s]", thisCFloSys.WaterVolFlowMax);
@@ -1636,7 +1638,7 @@ namespace LowTempRadiantSystem {
             return LowTempRadiantControlTypes::SurfFaceTempControl;
         } else if (UtilityRoutines::SameString(controlInput, "SurfaceInteriorTemperature")) {
              return LowTempRadiantControlTypes::SurfIntTempControl;
-        } else if (UtilityRoutines::SameString(controlInput, "RunningMeanOutdoorAirTemperature") && typeOfRadiantSystem == ConstantFlowSystem) {
+        } else if (UtilityRoutines::SameString(controlInput, "RunningMeanOutdoorDryBulbTemperature") && typeOfRadiantSystem == ConstantFlowSystem) {
             anyRadiantSystemUsingRunningMeanAverage = true;
             return LowTempRadiantControlTypes::RunningMeanODBControl;
         } else {
@@ -2097,18 +2099,19 @@ namespace LowTempRadiantSystem {
                 }
                 MyEnvrnFlagCFlo(RadSysNum) = false;
             }
+            
+            if (anyRadiantSystemUsingRunningMeanAverage) {
+                if (DataGlobals::BeginDayFlag && CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
+                    CFloRadSys(RadSysNum).calculateRunningMeanAverageTemperature();
+                    CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay = false; // only set these once per system
+                } else if (!DataGlobals::BeginDayFlag && !CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
+                    CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay = true;  // reset so that the next time BeginDayFlag is true this can get set
+                }
+            }
+            
         } // NumOfCFloLowTempRadSys > 0
         if (!BeginEnvrnFlag && SystemType == ConstantFlowSystem) MyEnvrnFlagCFlo(RadSysNum) = true;
         
-        if (DataGlobals::BeginDayFlag && SystemType == ConstantFlowSystem &&
-            anyRadiantSystemUsingRunningMeanAverage && CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
-            CFloRadSys(RadSysNum).calculateRunningMeanAverageTemperature();
-            CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay = false; // only set these once per system
-        } else if (!DataGlobals::BeginDayFlag && SystemType == ConstantFlowSystem &&
-                   anyRadiantSystemUsingRunningMeanAverage && !CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
-            CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay = true;  // reset so that the next time BeginDayFlag is true this can get set
-        }
-
         if (SystemType == ElectricSystem) {
             if (BeginEnvrnFlag && MyEnvrnFlagElec(RadSysNum)) {
                 ElecRadSys(RadSysNum).HeatPower = 0.0;
@@ -4736,6 +4739,10 @@ namespace LowTempRadiantSystem {
 
     void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature()
     {
+        // This routine grabs the current weather data since it is currently available at this point in the simulation.  Note, however,
+        // that the formula that calculates the running mean average (dry bulb) temperature uses the values from "yesterday".  So, today's
+        // values are calculated and then shifted at the beginning of the next day to the tomorrow variables.  It is these tomorrow variables
+        // that are then used in the formula.  So, that is why some of the assignments are done in the order that they are in below.
         if (DataGlobals::DayOfSim == 1 && DataGlobals::WarmupFlag) {
             // there is no "history" here--assume everything that came before was the same (this applies to design days also--weather is always the same
             this->todayAverageOutdoorDryBulbTemperature = this->calculateCurrentDailyAverageODB();
@@ -4748,9 +4755,6 @@ namespace LowTempRadiantSystem {
             this->yesterdayAverageOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
             this->yesterdayRunningMeanOutdoorDryBulbTemperature = this->todayRunningMeanOutdoorDryBulbTemperature;
             // Now update the running mean and average outdoor air temperatures
-            //NOTES: ALPHA COULD BE DIFFERENT FOR EACH SYSTEM BECAUSE IT WILL BE A FACTOR OF EACH SYSTEM--NEED TO CHANGE LOCATION OF SOME OF THESE VARIABLES
-            //       AS A RESULT (RUNNING MEAN TEMPERATURES).  alpha WILL NEED TO BE REPLACED BY APPROPRIATE TERM IN CONSTANT FLOW DATA AND STILL NEED TO READ
-            //       THIS VALUE IN IN THE GET ROUTINE (AND MODIFY IDD, INPUT FILES, TRANSITION, ETC.)
             this->todayRunningMeanOutdoorDryBulbTemperature = (1.0 - this->runningMeanOutdoorAirTemperatureWeightingFactor) * this->yesterdayAverageOutdoorDryBulbTemperature
                                                               + this->runningMeanOutdoorAirTemperatureWeightingFactor * this->yesterdayRunningMeanOutdoorDryBulbTemperature;
             this->todayAverageOutdoorDryBulbTemperature = this->calculateCurrentDailyAverageODB();
@@ -4759,12 +4763,13 @@ namespace LowTempRadiantSystem {
 
     Real64 ConstantFlowRadiantSystemData::calculateCurrentDailyAverageODB()
     {
-        int const firstTimeStepIndex = 1;
         Real64 sum = 0.0;
         for (int hourNumber = 1; hourNumber <= DataGlobals::HoursInDay; ++hourNumber) {
-            sum += WeatherManager::TodayOutDryBulbTemp(firstTimeStepIndex,hourNumber);
+            for (int timeStepNumber = 1; timeStepNumber <= DataGlobals::NumOfTimeStepInHour; ++timeStepNumber) {
+                sum += WeatherManager::TodayOutDryBulbTemp(timeStepNumber,hourNumber);
+            }
         }
-        return sum/double(DataGlobals::HoursInDay);
+        return sum/double(DataGlobals::HoursInDay*DataGlobals::NumOfTimeStepInHour);
     }
     
 
