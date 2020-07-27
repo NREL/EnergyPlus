@@ -2864,7 +2864,7 @@ namespace RoomAirModelManager {
             SupplyNodeName = Alphas(4);
             ReturnNodeName = "";   // Zone return node
         } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_EnergyRecoveryVentilator) { // ZoneHVAC : EnergyRecoveryVentilator
-            I = GetFanOutletNode(state, state.fans, "Fan:OnOff", Alphas(4), errorfound);
+            I = GetFanOutletNode(state, "Fan:OnOff", Alphas(4), errorfound);
             if (errorfound) {
             }
             SupplyNodeName = NodeID(I); // ?????

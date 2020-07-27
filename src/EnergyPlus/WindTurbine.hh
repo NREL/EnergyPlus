@@ -138,7 +138,8 @@ namespace WindTurbine {
         }
     };
 
-    void SimWindTurbine(WindTurbineData &dataWindTurbine, int const GeneratorType,          // Type of Generator
+    void SimWindTurbine(EnergyPlusData &state,
+                        int const GeneratorType,          // Type of Generator
                         std::string const &GeneratorName, // User specified name of Generator
                         int &GeneratorIndex,              // Generator index
                         bool const RunFlag,               // ON or OFF
@@ -154,7 +155,7 @@ namespace WindTurbine {
 
     void GetWindTurbineInput(WindTurbineData &dataWindTurbine);
 
-    void InitWindTurbine(WindTurbineData &dataWindTurbine, int const WindTurbineNum);
+    void InitWindTurbine(EnergyPlusData &state, int const WindTurbineNum);
 
     void CalcWindTurbine(WindTurbineData &dataWindTurbine, int const WindTurbineNum, // System is on
                          bool const RunFlag        // System is on

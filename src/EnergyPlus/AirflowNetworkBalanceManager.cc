@@ -88,11 +88,11 @@
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -500,7 +500,7 @@ namespace AirflowNetworkBalanceManager {
                 // This breaks the component model, need to fix
                 bool fanErrorFound = false;
                 int fanIndex;
-                GetFanIndex(state, state.fans, thisObjectName, fanIndex, fanErrorFound);
+                GetFanIndex(state, thisObjectName, fanIndex, fanErrorFound, ObjexxFCL::Optional_string_const());
                 if (fanErrorFound) {
                     ShowSevereError(RoutineName + ": " + CurrentModuleObject + " = " + thisObjectName + " is not found in Fan:ZoneExhaust objects.");
                     success = false;
@@ -510,13 +510,13 @@ namespace AirflowNetworkBalanceManager {
                 GetFanVolFlow(fanIndex, flowRate);
                 flowRate *= StdRhoAir;
                 bool nodeErrorsFound{false};
-                int inletNode = GetFanInletNode(state, state.fans, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
-                int outletNode = GetFanOutletNode(state, state.fans, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
+                int inletNode = GetFanInletNode(state, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
+                int outletNode = GetFanOutletNode(state, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
                 if (nodeErrorsFound) {
                     success = false;
                 }
                 int fanType_Num;
-                GetFanType(state, state.fans, thisObjectName, fanType_Num, fanErrorFound);
+                GetFanType(state, thisObjectName, fanType_Num, fanErrorFound);
                 if (fanType_Num != FanType_ZoneExhaust) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " = " + thisObjectName + ". The specified " + "Name" +
                                     " is not found as a valid Fan:ZoneExhaust object.");
@@ -1313,7 +1313,7 @@ namespace AirflowNetworkBalanceManager {
 
                 } else {
 
-                    GetFanIndex(state, state.fans, fan_name, fanIndex, FanErrorFound);
+                    GetFanIndex(state, fan_name, fanIndex, FanErrorFound, ObjexxFCL::Optional_string_const());
 
                     if (FanErrorFound) {
                         ShowSevereError("...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).name);
@@ -1323,7 +1323,7 @@ namespace AirflowNetworkBalanceManager {
                     GetFanVolFlow(fanIndex, flowRate);
                     flowRate *= StdRhoAir;
 
-                    GetFanType(state, state.fans, fan_name, fanType_Num, FanErrorFound);
+                    GetFanType(state, fan_name, fanType_Num, FanErrorFound);
                     dataAirflowNetworkBalanceManager.SupplyFanType = fanType_Num;
                 }
 
@@ -1346,16 +1346,16 @@ namespace AirflowNetworkBalanceManager {
                 }
                 bool ErrorsFound{false};
                 if (fanType_Num == FanType_SimpleConstVolume) {
-                    inletNode = GetFanInletNode(state, state.fans, "Fan:ConstantVolume", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode(state, state.fans, "Fan:ConstantVolume", fan_name, ErrorsFound);
+                    inletNode = GetFanInletNode(state, "Fan:ConstantVolume", fan_name, ErrorsFound);
+                    outletNode = GetFanOutletNode(state, "Fan:ConstantVolume", fan_name, ErrorsFound);
                 }
                 if (fanType_Num == FanType_SimpleOnOff && !DisSysCompCVFData(i).FanModelFlag) {
-                    inletNode = GetFanInletNode(state, state.fans, "Fan:OnOff", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode(state, state.fans, "Fan:OnOff", fan_name, ErrorsFound);
+                    inletNode = GetFanInletNode(state, "Fan:OnOff", fan_name, ErrorsFound);
+                    outletNode = GetFanOutletNode(state, "Fan:OnOff", fan_name, ErrorsFound);
                 }
                 if (fanType_Num == FanType_SimpleVAV && !DisSysCompCVFData(i).FanModelFlag) {
-                    inletNode = GetFanInletNode(state, state.fans, "Fan:VariableVolume", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode(state, state.fans, "Fan:VariableVolume", fan_name, ErrorsFound);
+                    inletNode = GetFanInletNode(state, "Fan:VariableVolume", fan_name, ErrorsFound);
+                    outletNode = GetFanOutletNode(state, "Fan:VariableVolume", fan_name, ErrorsFound);
                     VAVSystem = true;
                 }
 
@@ -1811,8 +1811,8 @@ namespace AirflowNetworkBalanceManager {
         dataAirflowNetworkBalanceManager.NumAirflowNetwork = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (dataAirflowNetworkBalanceManager.NumAirflowNetwork == 0) {
             SimulateAirflowNetwork = AirflowNetworkControlSimple;
-            print(state.outputFiles.eio, Format_110);
-            print(state.outputFiles.eio, Format_120, "NoMultizoneOrDistribution");
+            print(state.files.eio, Format_110);
+            print(state.files.eio, Format_120, "NoMultizoneOrDistribution");
             return;
         }
         if (dataAirflowNetworkBalanceManager.NumAirflowNetwork > 1) {
@@ -1876,8 +1876,8 @@ namespace AirflowNetworkBalanceManager {
                 dataAirflowNetworkBalanceManager.LoopOnOffFlag = false;
             }
         }
-        print(state.outputFiles.eio, Format_110);
-        print(state.outputFiles.eio, Format_120, SimAirNetworkKey);
+        print(state.files.eio, Format_110);
+        print(state.files.eio, Format_120, SimAirNetworkKey);
 
         // Check whether there are any objects from infiltration, ventilation, mixing and cross mixing
         if (SimulateAirflowNetwork == AirflowNetworkControlSimple || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
@@ -2778,13 +2778,13 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
             if (MultizoneSurfaceData(i).NonRectangular) {
                 if (found) {
-                    print(state.outputFiles.eio,
+                    print(state.files.eio,
                           "! <AirflowNetwork Model:Equivalent Rectangle Surface>, Name, Equivalent Height {{m}}, Equivalent Width {{m}} "
                           "AirflowNetwork "
                           "Model:Equivalent Rectangle\n");
                     found = false;
                 }
-                print(state.outputFiles.eio,
+                print(state.files.eio,
                       "AirflowNetwork Model:Equivalent Rectangle Surface, {}, {:.2R},{:.2R}\n",
                       MultizoneSurfaceData(i).SurfName,
                       MultizoneSurfaceData(i).Height,
@@ -3058,8 +3058,8 @@ namespace AirflowNetworkBalanceManager {
         if (ErrorsFound) ShowFatalError(RoutineName + "Errors found getting inputs. Previous error(s) cause program termination.");
 
         // Write wind pressure coefficients in the EIO file
-        print(state.outputFiles.eio, "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)\n");
-        print(state.outputFiles.eio, "AirflowNetwork Model:Wind Direction, ");
+        print(state.files.eio, "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)\n");
+        print(state.files.eio, "AirflowNetwork Model:Wind Direction, ");
 
         int numWinDirs = 11;
         Real64 angleDelta = 30.0;
@@ -3069,11 +3069,11 @@ namespace AirflowNetworkBalanceManager {
         }
 
         for (int i = 0; i < numWinDirs; ++i) {
-            print(state.outputFiles.eio, "{:.1R},", i * angleDelta);
+            print(state.files.eio, "{:.1R},", i * angleDelta);
         }
-        print(state.outputFiles.eio, "{:.1R}\n", numWinDirs * angleDelta);
+        print(state.files.eio, "{:.1R}\n", numWinDirs * angleDelta);
 
-        print(state.outputFiles.eio, "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, Wind Pressure Coefficients #1 to n (dimensionless)\n");
+        print(state.files.eio, "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, Wind Pressure Coefficients #1 to n (dimensionless)\n");
 
         // The old version used to write info with single-sided natural ventilation specific labeling, this version no longer does that.
         std::set<int> curves;
@@ -3081,24 +3081,24 @@ namespace AirflowNetworkBalanceManager {
             curves.insert(MultizoneExternalNodeData(i).curve);
         }
         for (auto index : curves) {
-            print(state.outputFiles.eio, "AirflowNetwork Model:Wind Pressure Coefficients, {}, ", CurveManager::GetCurveName(index));
+            print(state.files.eio, "AirflowNetwork Model:Wind Pressure Coefficients, {}, ", CurveManager::GetCurveName(index));
 
             for (j = 0; j < numWinDirs; ++j) {
-                print(state.outputFiles.eio, "{:.2R},", CurveManager::CurveValue(index, j * angleDelta));
+                print(state.files.eio, "{:.2R},", CurveManager::CurveValue(index, j * angleDelta));
             }
-            print(state.outputFiles.eio, "{:.2R}\n", CurveManager::CurveValue(index, numWinDirs * angleDelta));
+            print(state.files.eio, "{:.2R}\n", CurveManager::CurveValue(index, numWinDirs * angleDelta));
         }
 
         if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSingleSideZones > 0) {
             for (int i = 1; i <= AirflowNetworkNumOfZones; ++i) {
                 if (MultizoneZoneData(i).SingleSidedCpType == "ADVANCED") {
-                    print(state.outputFiles.eio,
+                    print(state.files.eio,
                           "AirflowNetwork: Advanced Single-Sided Model: Difference in Opening Wind Pressure Coefficients (DeltaCP), ");
-                    print(state.outputFiles.eio, "{}, ", MultizoneZoneData(i).ZoneName);
+                    print(state.files.eio, "{}, ", MultizoneZoneData(i).ZoneName);
                     for (unsigned j = 1; j <= EPDeltaCP(i).WindDir.size() - 1; ++j) {
-                        print(state.outputFiles.eio, "{:.2R},", EPDeltaCP(i).WindDir(j));
+                        print(state.files.eio, "{:.2R},", EPDeltaCP(i).WindDir(j));
                     }
-                    print(state.outputFiles.eio, "{:.2R}\n", EPDeltaCP(i).WindDir(EPDeltaCP(i).WindDir.size()));
+                    print(state.files.eio, "{:.2R}\n", EPDeltaCP(i).WindDir(EPDeltaCP(i).WindDir.size()));
                 }
             }
         }

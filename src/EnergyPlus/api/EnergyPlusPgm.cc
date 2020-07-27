@@ -191,20 +191,19 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/api/EnergyPlusPgm.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/DataStorage.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ResultsSchema.hh>
@@ -212,6 +211,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/api/EnergyPlusPgm.hh>
 
 #ifdef _WIN32
 #include <direct.h>
@@ -261,12 +261,11 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 
     DataSystemVariables::processEnvironmentVariables(state.dataGlobals);
 
-
 }
 
 int commonRun(EnergyPlus::EnergyPlusData &state) {
     using namespace EnergyPlus;
-    int errStatus = initErrorFile();
+    int errStatus = initErrorFile(state.files);
     if (errStatus) {
         return errStatus;
     }
@@ -281,7 +280,7 @@ int commonRun(EnergyPlus::EnergyPlusData &state) {
         EnergyPlus::inputProcessor->processInput();
         if (DataGlobals::outputEpJSONConversionOnly) {
             DisplayString("Converted input file format. Exiting.");
-            return EndEnergyPlus(state.outputFiles);
+            return EndEnergyPlus(state.files);
         }
         ResultsFramework::OutputSchema->setupOutputOptions();
     } catch (const FatalError &e) {
@@ -335,7 +334,7 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
 
         GenOutputVariablesAuditReport();
 
-        Psychrometrics::ShowPsychrometricSummary(state.outputFiles.audit);
+        Psychrometrics::ShowPsychrometricSummary(state.files.audit);
 
         EnergyPlus::inputProcessor->reportOrphanRecordObjects();
         FluidProperties::ReportOrphanFluids();
@@ -348,7 +347,7 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         }
 
         if (DataGlobals::runReadVars) {
-            int status = CommandLineInterface::runReadVarsESO(state.outputFiles);
+            int status = CommandLineInterface::runReadVarsESO(state.files);
             if (status) {
                 return status;
             }
@@ -360,7 +359,7 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         return AbortEnergyPlus(state);
     }
 
-    return EndEnergyPlus(state.outputFiles);
+    return EndEnergyPlus(state.files);
 }
 
 int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath)

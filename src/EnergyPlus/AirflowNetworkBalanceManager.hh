@@ -64,7 +64,7 @@
 namespace EnergyPlus {
 
     // Forward declarations
-    class OutputFiles;
+    class IOFiles;
     struct EnergyPlusData;
 
 namespace AirflowNetworkBalanceManager {
