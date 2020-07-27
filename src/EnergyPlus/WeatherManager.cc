@@ -1304,9 +1304,8 @@ namespace WeatherManager {
 
     void AddDesignSetToEnvironmentStruct(int const HVACSizingIterCount)
     {
-        int OrigNumOfEnvrn;
+        int OrigNumOfEnvrn{NumOfEnvrn};
 
-        OrigNumOfEnvrn = NumOfEnvrn;
         for (int i = 1; i <= OrigNumOfEnvrn; ++i) {
             if (Environment(i).KindOfEnvrn == DataGlobals::ksDesignDay) {
                 Environment.redimension(++NumOfEnvrn);
@@ -1342,42 +1341,34 @@ namespace WeatherManager {
         // Argument array dimensioning
         EP_SIZE_CHECK(WeekDays, 12);  // NOLINT(misc-static-assert)
 
-        int Loop;
-        int CurWeekDay;
-
         // Set 1st day of Start Month
-        CurWeekDay = StWeekDay;
-        for (Loop = 1; Loop <= StDay - 1; ++Loop) {
+        int CurWeekDay{StWeekDay};
+        for (int i = 1; i <= StDay - 1; ++i) {
             --CurWeekDay;
             if (CurWeekDay == 0) CurWeekDay = 7;
         }
 
         WeekDays(StMon) = CurWeekDay;
-        for (Loop = StMon + 1; Loop <= 12; ++Loop) {
+        for (int i = StMon + 1; i <= 12; ++i) {
 
-            {
-                auto const SELECT_CASE_var(Loop);
-                if (SELECT_CASE_var == 2) {
-                    CurWeekDay += EndDayOfMonth(1);
-                    while (CurWeekDay > 7) {
-                        CurWeekDay -= 7;
-                    }
-                    WeekDays(Loop) = CurWeekDay;
-
-                } else if (SELECT_CASE_var == 3) {
-                    CurWeekDay += EndDayOfMonth(Loop - 1) + LeapYearAdd;
-                    while (CurWeekDay > 7) {
-                        CurWeekDay -= 7;
-                    }
-                    WeekDays(Loop) = CurWeekDay;
-
-                } else if ((SELECT_CASE_var >= 4) && (SELECT_CASE_var <= 12)) {
-                    CurWeekDay += EndDayOfMonth(Loop - 1);
-                    while (CurWeekDay > 7) {
-                        CurWeekDay -= 7;
-                    }
-                    WeekDays(Loop) = CurWeekDay;
+            if (i == 2) {
+                CurWeekDay += EndDayOfMonth(1);
+                while (CurWeekDay > 7) {
+                    CurWeekDay -= 7;
                 }
+                WeekDays(i) = CurWeekDay;
+            } else if (i == 3) {
+                CurWeekDay += EndDayOfMonth(i - 1) + LeapYearAdd;
+                while (CurWeekDay > 7) {
+                    CurWeekDay -= 7;
+                }
+                WeekDays(i) = CurWeekDay;
+            } else if ((i >= 4) && (i <= 12)) {
+                CurWeekDay += EndDayOfMonth(i - 1);
+                while (CurWeekDay > 7) {
+                    CurWeekDay -= 7;
+                }
+                WeekDays(i) = CurWeekDay;
             }
         }
 
@@ -1385,37 +1376,31 @@ namespace WeatherManager {
             // need to start at StMon and go backwards.
             // EndDayOfMonth is also "days" in month.  (without leapyear day in February)
             CurWeekDay = StWeekDay;
-            for (Loop = 1; Loop <= StDay - 1; ++Loop) {
+            for (int i = 1; i <= StDay - 1; ++i) {
                 --CurWeekDay;
                 if (CurWeekDay == 0) CurWeekDay = 7;
             }
 
-            for (Loop = StMon - 1; Loop >= 1; --Loop) {
+            for (int i = StMon - 1; i >= 1; --i) {
 
-                {
-                    auto const SELECT_CASE_var(Loop);
-
-                    if (SELECT_CASE_var == 1) {
-                        CurWeekDay -= EndDayOfMonth(1);
-                        while (CurWeekDay <= 0) {
-                            CurWeekDay += 7;
-                        }
-                        WeekDays(Loop) = CurWeekDay;
-
-                    } else if (SELECT_CASE_var == 2) {
-                        CurWeekDay = CurWeekDay - EndDayOfMonth(2) + LeapYearAdd;
-                        while (CurWeekDay <= 0) {
-                            CurWeekDay += 7;
-                        }
-                        WeekDays(Loop) = CurWeekDay;
-
-                    } else if ((SELECT_CASE_var >= 3) && (SELECT_CASE_var <= 12)) {
-                        CurWeekDay -= EndDayOfMonth(Loop);
-                        while (CurWeekDay <= 0) {
-                            CurWeekDay += 7;
-                        }
-                        WeekDays(Loop) = CurWeekDay;
+                if (i == 1) {
+                    CurWeekDay -= EndDayOfMonth(1);
+                    while (CurWeekDay <= 0) {
+                        CurWeekDay += 7;
                     }
+                    WeekDays(i) = CurWeekDay;
+                } else if (i == 2) {
+                    CurWeekDay = CurWeekDay - EndDayOfMonth(2) + LeapYearAdd;
+                    while (CurWeekDay <= 0) {
+                        CurWeekDay += 7;
+                    }
+                    WeekDays(i) = CurWeekDay;
+                } else if ((i >= 3) && (i <= 12)) {
+                    CurWeekDay -= EndDayOfMonth(i);
+                    while (CurWeekDay <= 0) {
+                        CurWeekDay += 7;
+                    }
+                    WeekDays(i) = CurWeekDay;
                 }
             }
         }
@@ -1429,7 +1414,7 @@ namespace WeatherManager {
                               int const EndMonth,
                               int const EndMonthDay,
                               bool const Rollover,
-                              Optional_bool_const MidSimReset)
+                              bool const MidSimReset)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1445,15 +1430,10 @@ namespace WeatherManager {
         EP_SIZE_CHECK(WeekDays, 12);  // NOLINT(misc-static-assert)
 
         Array1D_int WeekDaysCopy(12);
-        int Loop;
         int CurWeekDay;
-        bool ResetMidSimulation;
-
-        ResetMidSimulation = false;
-        if (present(MidSimReset)) ResetMidSimulation = MidSimReset;
 
         WeekDaysCopy = WeekDays;
-        if (!ResetMidSimulation) {
+        if (!MidSimReset) {
             if (Rollover) {
                 if (StartMonth == 1) {
                     CurWeekDay = WeekDays(12) + EndDayOfMonth(12) + StartMonthDay - 1;
@@ -1469,30 +1449,25 @@ namespace WeatherManager {
 
             WeekDays = 0;
             WeekDays(StartMonth) = CurWeekDay;
-            for (Loop = StartMonth + 1; Loop <= 12; ++Loop) {
-                {
-                    auto const SELECT_CASE_var(Loop);
-                    if (SELECT_CASE_var == 2) {
-                        CurWeekDay += EndDayOfMonth(1);
-                        while (CurWeekDay > 7) {
-                            CurWeekDay -= 7;
-                        }
-                        WeekDays(Loop) = CurWeekDay;
-
-                    } else if (SELECT_CASE_var == 3) {
-                        CurWeekDay += EndDayOfMonth(Loop - 1) + AddLeapYear;
-                        while (CurWeekDay > 7) {
-                            CurWeekDay -= 7;
-                        }
-                        WeekDays(Loop) = CurWeekDay;
-
-                    } else if ((SELECT_CASE_var >= 4) && (SELECT_CASE_var <= 12)) {
-                        CurWeekDay += EndDayOfMonth(Loop - 1);
-                        while (CurWeekDay > 7) {
-                            CurWeekDay -= 7;
-                        }
-                        WeekDays(Loop) = CurWeekDay;
+            for (int i = StartMonth + 1; i <= 12; ++i) {
+                if (i == 2) {
+                    CurWeekDay += EndDayOfMonth(1);
+                    while (CurWeekDay > 7) {
+                        CurWeekDay -= 7;
                     }
+                    WeekDays(i) = CurWeekDay;
+                } else if (i == 3) {
+                    CurWeekDay += EndDayOfMonth(i - 1) + AddLeapYear;
+                    while (CurWeekDay > 7) {
+                        CurWeekDay -= 7;
+                    }
+                    WeekDays(i) = CurWeekDay;
+                } else if ((i >= 4) && (i <= 12)) {
+                    CurWeekDay += EndDayOfMonth(i - 1);
+                    while (CurWeekDay > 7) {
+                        CurWeekDay -= 7;
+                    }
+                    WeekDays(i) = CurWeekDay;
                 }
             }
 
@@ -1500,37 +1475,31 @@ namespace WeatherManager {
                 // need to start at StMon and go backwards.
                 // EndDayOfMonth is also "days" in month.  (without leapyear day in February)
                 CurWeekDay = WeekDays(StartMonth);
-                for (Loop = 1; Loop <= StartMonthDay - 1; ++Loop) {
+                for (int i = 1; i <= StartMonthDay - 1; ++i) {
                     --CurWeekDay;
                     if (CurWeekDay == 0) CurWeekDay = 7;
                 }
 
-                for (Loop = StartMonth - 1; Loop >= 1; --Loop) {
+                for (int i = StartMonth - 1; i >= 1; --i) {
 
-                    {
-                        auto const SELECT_CASE_var(Loop);
-
-                        if (SELECT_CASE_var == 1) {
-                            CurWeekDay -= EndDayOfMonth(1);
-                            while (CurWeekDay <= 0) {
-                                CurWeekDay += 7;
-                            }
-                            WeekDays(Loop) = CurWeekDay;
-
-                        } else if (SELECT_CASE_var == 2) {
-                            CurWeekDay = CurWeekDay - EndDayOfMonth(2) + AddLeapYear;
-                            while (CurWeekDay <= 0) {
-                                CurWeekDay += 7;
-                            }
-                            WeekDays(Loop) = CurWeekDay;
-
-                        } else if ((SELECT_CASE_var >= 3) && (SELECT_CASE_var <= 12)) {
-                            CurWeekDay -= EndDayOfMonth(Loop);
-                            while (CurWeekDay <= 0) {
-                                CurWeekDay += 7;
-                            }
-                            WeekDays(Loop) = CurWeekDay;
+                    if (i == 1) {
+                        CurWeekDay -= EndDayOfMonth(1);
+                        while (CurWeekDay <= 0) {
+                            CurWeekDay += 7;
                         }
+                        WeekDays(i) = CurWeekDay;
+                    } else if (i == 2) {
+                        CurWeekDay = CurWeekDay - EndDayOfMonth(2) + AddLeapYear;
+                        while (CurWeekDay <= 0) {
+                            CurWeekDay += 7;
+                        }
+                        WeekDays(i) = CurWeekDay;
+                    } else if ((i >= 3) && (i <= 12)) {
+                        CurWeekDay -= EndDayOfMonth(i);
+                        while (CurWeekDay <= 0) {
+                            CurWeekDay += 7;
+                        }
+                        WeekDays(i) = CurWeekDay;
                     }
                 }
             }
@@ -1565,40 +1534,35 @@ namespace WeatherManager {
                     CurWeekDay -= 7;
                 }
                 WeekDays(3) = CurWeekDay;
-                for (Loop = 4; Loop <= 12; ++Loop) {
-                    CurWeekDay += EndDayOfMonth(Loop - 1);
+                for (int i = 4; i <= 12; ++i) {
+                    CurWeekDay += EndDayOfMonth(i - 1);
                     while (CurWeekDay > 7) {
                         CurWeekDay -= 7;
                     }
-                    WeekDays(Loop) = CurWeekDay;
+                    WeekDays(i) = CurWeekDay;
                 }
             } else {
                 WeekDays = 0;
                 WeekDays(StartMonth) = CurWeekDay;
-                for (Loop = StartMonth + 1; Loop <= 12; ++Loop) {
-                    {
-                        auto const SELECT_CASE_var(Loop);
-                        if (SELECT_CASE_var == 2) {
-                            CurWeekDay += EndDayOfMonth(1);
-                            while (CurWeekDay > 7) {
-                                CurWeekDay -= 7;
-                            }
-                            WeekDays(Loop) = CurWeekDay;
-
-                        } else if (SELECT_CASE_var == 3) {
-                            CurWeekDay += EndDayOfMonth(Loop - 1) + AddLeapYear;
-                            while (CurWeekDay > 7) {
-                                CurWeekDay -= 7;
-                            }
-                            WeekDays(Loop) = CurWeekDay;
-
-                        } else if ((SELECT_CASE_var >= 4) && (SELECT_CASE_var <= 12)) {
-                            CurWeekDay += EndDayOfMonth(Loop - 1);
-                            while (CurWeekDay > 7) {
-                                CurWeekDay -= 7;
-                            }
-                            WeekDays(Loop) = CurWeekDay;
+                for (int i = StartMonth + 1; i <= 12; ++i) {
+                    if (i == 2) {
+                        CurWeekDay += EndDayOfMonth(1);
+                        while (CurWeekDay > 7) {
+                            CurWeekDay -= 7;
                         }
+                        WeekDays(i) = CurWeekDay;
+                    } else if (i == 3) {
+                        CurWeekDay += EndDayOfMonth(i - 1) + AddLeapYear;
+                        while (CurWeekDay > 7) {
+                            CurWeekDay -= 7;
+                        }
+                        WeekDays(i) = CurWeekDay;
+                    } else if ((i >= 4) && (i <= 12)) {
+                        CurWeekDay += EndDayOfMonth(i - 1);
+                        while (CurWeekDay > 7) {
+                            CurWeekDay -= 7;
+                        }
+                        WeekDays(i) = CurWeekDay;
                     }
                 }
 
@@ -1606,37 +1570,31 @@ namespace WeatherManager {
                     // need to start at StMon and go backwards.
                     // EndDayOfMonth is also "days" in month.  (without leapyear day in February)
                     CurWeekDay = WeekDays(StartMonth);
-                    for (Loop = 1; Loop <= StartMonthDay - 1; ++Loop) {
+                    for (int i = 1; i <= StartMonthDay - 1; ++i) {
                         --CurWeekDay;
                         if (CurWeekDay == 0) CurWeekDay = 7;
                     }
 
-                    for (Loop = StartMonth - 1; Loop >= 1; --Loop) {
+                    for (int i = StartMonth - 1; i >= 1; --i) {
 
-                        {
-                            auto const SELECT_CASE_var(Loop);
-
-                            if (SELECT_CASE_var == 1) {
-                                CurWeekDay -= EndDayOfMonth(1);
-                                while (CurWeekDay <= 0) {
-                                    CurWeekDay += 7;
-                                }
-                                WeekDays(Loop) = CurWeekDay;
-
-                            } else if (SELECT_CASE_var == 2) {
-                                CurWeekDay = CurWeekDay - EndDayOfMonth(2) + AddLeapYear;
-                                while (CurWeekDay <= 0) {
-                                    CurWeekDay += 7;
-                                }
-                                WeekDays(Loop) = CurWeekDay;
-
-                            } else if ((SELECT_CASE_var >= 3) && (SELECT_CASE_var <= 12)) {
-                                CurWeekDay -= EndDayOfMonth(Loop);
-                                while (CurWeekDay <= 0) {
-                                    CurWeekDay += 7;
-                                }
-                                WeekDays(Loop) = CurWeekDay;
+                        if (i == 1) {
+                            CurWeekDay -= EndDayOfMonth(1);
+                            while (CurWeekDay <= 0) {
+                                CurWeekDay += 7;
                             }
+                            WeekDays(i) = CurWeekDay;
+                        } else if (i == 2) {
+                            CurWeekDay = CurWeekDay - EndDayOfMonth(2) + AddLeapYear;
+                            while (CurWeekDay <= 0) {
+                                CurWeekDay += 7;
+                            }
+                            WeekDays(i) = CurWeekDay;
+                        } else if ((i >= 3) && (i <= 12)) {
+                            CurWeekDay -= EndDayOfMonth(i);
+                            while (CurWeekDay <= 0) {
+                                CurWeekDay += 7;
+                            }
+                            WeekDays(i) = CurWeekDay;
                         }
                     }
                 }
@@ -1669,20 +1627,16 @@ namespace WeatherManager {
         int ActStartDay;   // Actual Start Day of Month
         int ActEndMonth;   // Actual End Month
         int ActEndDay;     // Actual End Day of Month
-        int ThisDay;       // Day of Month
-        int JDay;
-        int JDay1;
-        bool ErrorsFound;
         Array1D_int ActEndDayOfMonth(12);
 
-        ErrorsFound = false;
+        bool ErrorsFound = false;
         ActEndDayOfMonth = EndDayOfMonth;
         ActEndDayOfMonth(2) = EndDayOfMonth(2) + LeapYearAdd;
         if (DST.StDateType == DateType::MonthDay) {
             ActStartMonth = DST.StMon;
             ActStartDay = DST.StDay;
         } else if (DST.StDateType == DateType::NthDayInMonth) {
-            ThisDay = DST.StWeekDay - MonWeekDay(DST.StMon) + 1;
+            int ThisDay = DST.StWeekDay - MonWeekDay(DST.StMon) + 1;
             while (ThisDay <= 0) {
                 ThisDay += 7;
             }
@@ -1695,7 +1649,7 @@ namespace WeatherManager {
                 ActStartDay = ThisDay;
             }
         } else { // LastWeekDayInMonth
-            ThisDay = DST.StWeekDay - MonWeekDay(DST.StMon) + 1;
+            int ThisDay = DST.StWeekDay - MonWeekDay(DST.StMon) + 1;
             while (ThisDay + 7 <= ActEndDayOfMonth(DST.StMon)) {
                 ThisDay += 7;
             }
@@ -1707,7 +1661,7 @@ namespace WeatherManager {
             ActEndMonth = DST.EnMon;
             ActEndDay = DST.EnDay;
         } else if (DST.EnDateType == DateType::NthDayInMonth) {
-            ThisDay = DST.EnWeekDay - MonWeekDay(DST.EnMon) + 1;
+            int ThisDay = DST.EnWeekDay - MonWeekDay(DST.EnMon) + 1;
             while (ThisDay <= 0) {
                 ThisDay += 7;
             }
@@ -1722,7 +1676,7 @@ namespace WeatherManager {
                 ActEndDay = ThisDay;
             }
         } else { // LastWeekDayInMonth
-            ThisDay = DST.EnWeekDay - MonWeekDay(DST.EnMon) + 1;
+            int ThisDay = DST.EnWeekDay - MonWeekDay(DST.EnMon) + 1;
             while (ThisDay + 7 <= ActEndDayOfMonth(DST.EnMon)) {
                 ThisDay += 7;
             }
@@ -1742,8 +1696,8 @@ namespace WeatherManager {
         }
 
         DSTIdx = 0;
-        JDay = General::OrdinalDay(ActStartMonth, ActStartDay, LeapYearAdd);
-        JDay1 = General::OrdinalDay(ActEndMonth, ActEndDay, LeapYearAdd);
+        int JDay = General::OrdinalDay(ActStartMonth, ActStartDay, LeapYearAdd);
+        int JDay1 = General::OrdinalDay(ActEndMonth, ActEndDay, LeapYearAdd);
         if (JDay1 >= JDay) {
             DSTIdx({JDay, JDay1}) = 1;
         } else {
@@ -1768,23 +1722,18 @@ namespace WeatherManager {
 
         static std::string const RoutineName("SetSpecialDayDates: ");
 
-        int Loop;
-        int ThisDay;
         int JDay;
-        int JDay1;
-        int Loop1;
-        bool ErrorsFound;
         Array1D_int ActEndDayOfMonth(12);
 
-        ErrorsFound = false;
+        bool ErrorsFound = false;
         ActEndDayOfMonth = EndDayOfMonth;
         ActEndDayOfMonth(2) = EndDayOfMonth(2) + LeapYearAdd;
         SpecialDayTypes = 0;
-        for (Loop = 1; Loop <= NumSpecialDays; ++Loop) {
-            if (SpecialDays(Loop).WthrFile && !UseSpecialDays) continue;
-            if (SpecialDays(Loop).DateType <= DateType::MonthDay) {
-                JDay = General::OrdinalDay(SpecialDays(Loop).Month, SpecialDays(Loop).Day, LeapYearAdd);
-                if (SpecialDays(Loop).Duration == 1 && Environment(Envrn).ApplyWeekendRule) {
+        for (int i = 1; i <= NumSpecialDays; ++i) {
+            if (SpecialDays(i).WthrFile && !UseSpecialDays) continue;
+            if (SpecialDays(i).DateType <= DateType::MonthDay) {
+                JDay = General::OrdinalDay(SpecialDays(i).Month, SpecialDays(i).Day, LeapYearAdd);
+                if (SpecialDays(i).Duration == 1 && Environment(Envrn).ApplyWeekendRule) {
                     if (WeekDayTypes(JDay) == 1) {
                         // Sunday, must go to Monday
                         ++JDay;
@@ -1796,45 +1745,44 @@ namespace WeatherManager {
                         if (JDay == 366 && LeapYearAdd == 0) JDay = 1;
                     }
                 }
-                General::InvOrdinalDay(JDay, SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay, LeapYearAdd);
-            } else if (SpecialDays(Loop).DateType == DateType::NthDayInMonth) {
-                if (SpecialDays(Loop).WeekDay >= MonWeekDay(SpecialDays(Loop).Month)) {
-                    ThisDay = SpecialDays(Loop).WeekDay - MonWeekDay(SpecialDays(Loop).Month) + 1;
-                } else {
-                    ThisDay = SpecialDays(Loop).WeekDay - MonWeekDay(SpecialDays(Loop).Month) + 1 + 7;
+                General::InvOrdinalDay(JDay, SpecialDays(i).ActStMon, SpecialDays(i).ActStDay, LeapYearAdd);
+            } else if (SpecialDays(i).DateType == DateType::NthDayInMonth) {
+                int ThisDay = SpecialDays(i).WeekDay - MonWeekDay(SpecialDays(i).Month) + 1;
+                if (SpecialDays(i).WeekDay >= MonWeekDay(SpecialDays(i).Month)) {
+                    ThisDay += 7;
                 }
-                ThisDay += 7 * (SpecialDays(Loop).Day - 1);
-                if (ThisDay > ActEndDayOfMonth(SpecialDays(Loop).Month)) {
-                    ShowSevereError(RoutineName + "Special Day Date, Nth Day of Month, not enough Nths, for SpecialDay=" + SpecialDays(Loop).Name);
+                ThisDay += 7 * (SpecialDays(i).Day - 1);
+                if (ThisDay > ActEndDayOfMonth(SpecialDays(i).Month)) {
+                    ShowSevereError(RoutineName + "Special Day Date, Nth Day of Month, not enough Nths, for SpecialDay=" + SpecialDays(i).Name);
                     ErrorsFound = true;
                     continue;
                 }
-                SpecialDays(Loop).ActStMon = SpecialDays(Loop).Month;
-                SpecialDays(Loop).ActStDay = ThisDay;
-                JDay = General::OrdinalDay(SpecialDays(Loop).Month, ThisDay, LeapYearAdd);
+                SpecialDays(i).ActStMon = SpecialDays(i).Month;
+                SpecialDays(i).ActStDay = ThisDay;
+                JDay = General::OrdinalDay(SpecialDays(i).Month, ThisDay, LeapYearAdd);
             } else { // LastWeekDayInMonth
-                ThisDay = SpecialDays(Loop).WeekDay - MonWeekDay(SpecialDays(Loop).Month) + 1;
-                while (ThisDay + 7 <= ActEndDayOfMonth(SpecialDays(Loop).Month)) {
+                int ThisDay = SpecialDays(i).WeekDay - MonWeekDay(SpecialDays(i).Month) + 1;
+                while (ThisDay + 7 <= ActEndDayOfMonth(SpecialDays(i).Month)) {
                     ThisDay += 7;
                 }
-                SpecialDays(Loop).ActStMon = SpecialDays(Loop).Month;
-                SpecialDays(Loop).ActStDay = ThisDay;
-                JDay = General::OrdinalDay(SpecialDays(Loop).Month, ThisDay, LeapYearAdd);
+                SpecialDays(i).ActStMon = SpecialDays(i).Month;
+                SpecialDays(i).ActStDay = ThisDay;
+                JDay = General::OrdinalDay(SpecialDays(i).Month, ThisDay, LeapYearAdd);
             }
             if (SpecialDayTypes(JDay) != 0) {
-                ShowWarningError(RoutineName + "Special Day definition (" + SpecialDays(Loop).Name +
+                ShowWarningError(RoutineName + "Special Day definition (" + SpecialDays(i).Name +
                                  ") is overwriting previously entered special day period");
                 if (UseSpecialDays) {
                     ShowContinueError("...This could be caused by definitions on the Weather File.");
                 }
                 ShowContinueError("...This could be caused by duplicate definitions in the Input File.");
             }
-            JDay1 = JDay - 1;
-            for (Loop1 = 0; Loop1 <= SpecialDays(Loop).Duration - 1; ++Loop1) {
+            int JDay1 = JDay - 1;
+            for (int j = 0; j <= SpecialDays(i).Duration - 1; ++j) {
                 ++JDay1;
                 if (JDay1 == 366 && LeapYearAdd == 0) JDay1 = 1;
                 if (JDay1 == 367) JDay1 = 1;
-                SpecialDayTypes(JDay1) = SpecialDays(Loop).DayType;
+                SpecialDayTypes(JDay1) = SpecialDays(i).DayType;
             }
         }
 
@@ -1843,7 +1791,7 @@ namespace WeatherManager {
         }
     }
 
-    void InitializeWeather(bool &PrintEnvrnStamp) // Set to true when the environment header should be printed
+    void InitializeWeather(bool &printEnvrnStamp) // Set to true when the environment header should be printed
     {
 
         // SUBROUTINE INFORMATION:
@@ -1856,15 +1804,6 @@ namespace WeatherManager {
         // This subroutine is the main driver of the weather initializations.
         // Most of the weather handling can be described as "initializations"
         // so most of the work is done via this subroutine.
-
-        int Loop;
-        int FirstSimDayofYear; // Variable which tells when to skip the day in a multi year simulation.
-
-        int JDay5Start;
-        int JDay5End;
-        int TWeekDay;
-
-        // FLOW:
 
         if (DataGlobals::BeginSimFlag && FirstCall) {
 
@@ -1932,11 +1871,11 @@ namespace WeatherManager {
             OutOfRange.DiffuseRad = 0;
 
             if (!RPReadAllWeatherData) {
-                PrintEnvrnStamp = true; // Set this to true so that on first non-warmup day (only) the environment header will print out
+                printEnvrnStamp = true; // Set this to true so that on first non-warmup day (only) the environment header will print out
             }
 
-            for (Loop = 1; Loop <= NumSpecialDays; ++Loop) {
-                SpecialDays(Loop).Used = false;
+            for (int i = 1; i <= NumSpecialDays; ++i) {
+                SpecialDays(i).Used = false;
             }
 
             if ((DataGlobals::KindOfSim != DataGlobals::ksDesignDay) && (DataGlobals::KindOfSim != DataGlobals::ksHVACSizeDesignDay)) {
@@ -1980,8 +1919,7 @@ namespace WeatherManager {
                             SetSpecialDayDates(Environment(Envrn).MonWeekDay);
                         }
                         ++YearOfSim;
-                        FirstSimDayofYear = 1;
-                        ReadWeatherForDay(FirstSimDayofYear, Envrn, false); // Read tomorrow's weather
+                        ReadWeatherForDay(1, Envrn, false); // Read tomorrow's weather
                     } else {
                         ReadWeatherForDay(DataGlobals::DayOfSim + 1, Envrn, false); // Read tomorrow's weather
                     }
@@ -2018,24 +1956,21 @@ namespace WeatherManager {
                                 LeapYearAdd = 0;
                             }
                             // need to reset MonWeekDay and WeekDayTypes
-                            if (!DataEnvironment::CurrentYearIsLeapYear) {
-                                JDay5Start = General::OrdinalDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, 0);
-                                JDay5End = General::OrdinalDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, 0);
-                            } else {
-                                JDay5Start = General::OrdinalDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
-                                JDay5End = General::OrdinalDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
-                            }
+                            int JDay5Start = General::OrdinalDay(Environment(Envrn).StartMonth, Environment(Envrn).StartDay, LeapYearAdd);
+                            int JDay5End = General::OrdinalDay(Environment(Envrn).EndMonth, Environment(Envrn).EndDay, LeapYearAdd);
                             if (!Environment(Envrn).ActualWeather)
                                 curSimDayForEndOfRunPeriod = DataGlobals::DayOfSim + Environment(Envrn).RawSimDays + LeapYearAdd - 1;
 
-                            Loop = JDay5Start;
-                            TWeekDay = DataEnvironment::DayOfWeek;
-                            while (true) {
-                                WeekDayTypes(Loop) = TWeekDay;
-                                TWeekDay = mod(TWeekDay, 7) + 1;
-                                ++Loop;
-                                if (Loop > 366) Loop = 1;
-                                if (Loop == JDay5End) break;
+                            {
+                                int i = JDay5Start;
+                                int TWeekDay = DataEnvironment::DayOfWeek;
+                                while (true) {
+                                    WeekDayTypes(i) = TWeekDay;
+                                    TWeekDay = mod(TWeekDay, 7) + 1;
+                                    ++i;
+                                    if (i > 366) i = 1;
+                                    if (i == JDay5End) break;
+                                }
                             }
                             ResetWeekDaysByMonth(Environment(Envrn).MonWeekDay,
                                                  LeapYearAdd,
@@ -2213,9 +2148,6 @@ namespace WeatherManager {
 
         static std::string const RoutineName("SetCurrentWeather");
 
-        Real64 TempVal;
-        Real64 TempDPVal;
-
         NextHour = DataGlobals::HourOfDay + 1;
 
         if (DataGlobals::HourOfDay == 24) { // Should investigate whether EndDayFlag is always set here and use that instead
@@ -2279,9 +2211,8 @@ namespace WeatherManager {
         DataEnvironment::OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat, DataEnvironment::OutBaroPress);
         if (DataEnvironment::OutDryBulbTemp < DataEnvironment::OutWetBulbTemp) {
             DataEnvironment::OutWetBulbTemp = DataEnvironment::OutDryBulbTemp;
-            TempVal = Psychrometrics::PsyWFnTdbTwbPb(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
-            TempDPVal = Psychrometrics::PsyTdpFnWPb(TempVal, DataEnvironment::OutBaroPress);
-            DataEnvironment::OutDewPointTemp = TempDPVal;
+            Real64 TempVal = Psychrometrics::PsyWFnTdbTwbPb(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
+            DataEnvironment::OutDewPointTemp = Psychrometrics::PsyTdpFnWPb(TempVal, DataEnvironment::OutBaroPress);
         }
 
         if (DataEnvironment::OutDewPointTemp > DataEnvironment::OutWetBulbTemp) {
