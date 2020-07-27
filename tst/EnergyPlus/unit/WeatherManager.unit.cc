@@ -1090,10 +1090,10 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
     ErrorsFound = false;
 
     WeatherManager::WeatherFileExists = true;
-    DataStringGlobals::inputWeatherFileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+    state.files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    SimulationManager::GetProjectData(state);
 
     bool Available(true);
     Available = true;
@@ -1127,8 +1127,8 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
     Environment(1).UseWeatherFileHorizontalIR = false;
 
     AllocateWeatherData();
-    OpenWeatherFile(ErrorsFound);
-    ReadWeatherForDay(1, 1, true);
+    OpenWeatherFile(state, ErrorsFound);
+    ReadWeatherForDay(state.files, 1, 1, true);
 
     // Test the feature of interpolating some weather inputs to calc sky temp
     Real64 expected_SkyTemp = -20.8188538296;
