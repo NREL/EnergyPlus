@@ -82,19 +82,8 @@ namespace WaterToAirHeatPump {
     extern int WaterIndex;         // Water index
     extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
     // Subroutine Specifications for the Module
-    // Driver/Manager Routines
 
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Computational routines
-
-    // Update routine to check convergence and update nodes
-
-    // Utility routines
-
-    // Types
+    void clear_state();
 
     struct WatertoAirHPEquipConditions
     {

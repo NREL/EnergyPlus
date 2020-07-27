@@ -93,7 +93,7 @@ public:
 
     void RedoKickOffAndResize(EnergyPlusData &state);
     void PostProcessLogs();
-    void ProcessCoincidentPlantSizeAdjustments(int const HVACSizingIterCount);
+    void ProcessCoincidentPlantSizeAdjustments(IOFiles &ioFiles, int const HVACSizingIterCount);
 
     void UpdateSizingLogsZoneStep();
     void UpdateSizingLogsSystemStep();

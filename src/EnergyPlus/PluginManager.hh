@@ -59,10 +59,12 @@ typedef void* PyObjectWrap;
 
 namespace EnergyPlus {
 
+    struct EnergyPlusData;
+
 namespace PluginManagement {
 
-    void registerNewCallback(int iCalledFrom, const std::function<void ()>& f);
-    void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan);
+    void registerNewCallback(EnergyPlusData &state, int iCalledFrom, const std::function<void (void *)>& f);
+    void runAnyRegisteredCallbacks(EnergyPlusData &state, int iCalledFrom, bool &anyRan);
     void onBeginEnvironment();
     std::string pythonStringForUsage();
 

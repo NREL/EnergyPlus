@@ -67,14 +67,10 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/Boilers.hh>
-#include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/ChillerReformulatedEIR.hh>
-#include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataCostEstimate.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -95,16 +91,17 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -539,6 +536,7 @@ namespace OutputReportTabular {
         bool GatherHeatGainReportfirstTime(true);
         bool AllocateLoadComponentArraysDoAllocate(true);
         bool initAdjFenDone(false);
+        int numPeopleAdaptive(0);
     } // namespace
 
     // Functions
@@ -715,6 +713,8 @@ namespace OutputReportTabular {
         UnitConv.deallocate();
 
         OutputReportTabular::ResetTabularReports();
+
+        numPeopleAdaptive = 0;
     }
 
     void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
@@ -761,7 +761,7 @@ namespace OutputReportTabular {
             OutputReportTabularAnnual::GetInputTabularAnnual();
             OutputReportTabularAnnual::checkAggregationOrderForAnnual();
             GetInputTabularTimeBins();
-            GetInputTabularStyle(state.outputFiles);
+            GetInputTabularStyle(state.files);
             GetInputOutputTableSummaryReports();
             // noel -- noticed this was called once and very slow -- sped up a little by caching keys
             InitializeTabularMonthly();
@@ -1734,7 +1734,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GetInputTabularStyle(OutputFiles &outputFiles)
+    void GetInputTabularStyle(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1889,13 +1889,13 @@ namespace OutputReportTabular {
         }
 
         if (WriteTabularFiles) {
-            print(outputFiles.eio, "! <Tabular Report>,Style,Unit Conversion\n");
+            print(ioFiles.eio, "! <Tabular Report>,Style,Unit Conversion\n");
             if (AlphArray(1) != "HTML") {
                 ConvertCaseToLower(AlphArray(1), AlphArray(2));
                 AlphArray(1).erase(1);
                 AlphArray(1) += AlphArray(2).substr(1);
             }
-            print(outputFiles.eio, "Tabular Report,{},{}\n", AlphArray(1), AlphArray(2));
+            print(ioFiles.eio, "Tabular Report,{},{}\n", AlphArray(1), AlphArray(2));
         }
     }
 
@@ -3695,7 +3695,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteTableOfContents()
+    void WriteTableOfContents(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -3713,7 +3713,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataCostEstimate::DoCostEstimate;
         using EconomicLifeCycleCost::LCCparamPresent;
         using OutputReportPredefined::numReportName;
         using OutputReportPredefined::reportName;
@@ -3782,7 +3781,7 @@ namespace OutputReportTabular {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Source_Energy_End_Use_Components_Summary, Entire_Facility)
                                << "\">Source Energy End Use Components Summary</a>\n";
                 }
-                if (DoCostEstimate) {
+                if (state.dataCostEstimateManager.DoCostEstimate) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Component_Cost_Economics_Summary, Entire_Facility)
                                << "\">Component Cost Economics Summary</a>\n";
                 }
@@ -5667,53 +5666,52 @@ namespace OutputReportTabular {
         //   types of tabular reports are each created. If another type of
         //   report is added it can be added to the list here.
 
-
-        FillWeatherPredefinedEntries();
+        FillWeatherPredefinedEntries(state.files);
         FillRemainingPredefinedEntries(state);
 
         if (WriteTabularFiles) {
             // call each type of report in turn
-            WriteBEPSTable(state.dataZoneTempPredictorCorrector);
-            WriteTableOfContents();
-            WriteVeriSumTable(state.outputFiles);
-            WriteDemandEndUseSummary();
-            WriteSourceEnergyEndUseSummary();
-            WriteComponentSizing();
-            WriteSurfaceShadowing();
-            WriteCompCostTable();
-            WriteAdaptiveComfortTable();
-            WriteEioTables(state.outputFiles);
-            WriteLoadComponentSummaryTables();
-            WriteHeatEmissionTable();
+            WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector);
+            WriteTableOfContents(state);
+            WriteVeriSumTable(state.dataCostEstimateManager, state.files);
+            WriteDemandEndUseSummary(state.dataCostEstimateManager);
+            WriteSourceEnergyEndUseSummary(state.dataCostEstimateManager);
+            WriteComponentSizing(state.dataCostEstimateManager);
+            WriteSurfaceShadowing(state.dataCostEstimateManager);
+            WriteCompCostTable(state.dataCostEstimateManager);
+            WriteAdaptiveComfortTable(state.dataCostEstimateManager);
+            WriteEioTables(state.dataCostEstimateManager, state.files);
+            WriteLoadComponentSummaryTables(state.dataCostEstimateManager);
+            WriteHeatEmissionTable(state.dataCostEstimateManager);
 
             coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
-            WritePredefinedTables();                                // moved to come after zone load components is finished
+            WritePredefinedTables(state.dataCostEstimateManager);                                // moved to come after zone load components is finished
 
             if (DoWeathSim) {
-                WriteMonthlyTables();
-                WriteTimeBinTables();
-                OutputReportTabularAnnual::WriteAnnualTables();
+                WriteMonthlyTables(state.dataCostEstimateManager);
+                WriteTimeBinTables(state.dataCostEstimateManager);
+                OutputReportTabularAnnual::WriteAnnualTables(state.dataCostEstimateManager);
             }
         }
 
         constexpr static auto variable_fmt{" {}={:12}\n"};
-        state.outputFiles.audit.ensure_open("WriteTabularReports");
-        print(state.outputFiles.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
-        print(state.outputFiles.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
-        print(state.outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
-        print(state.outputFiles.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
-        print(state.outputFiles.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
-        print(state.outputFiles.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
-        print(state.outputFiles.audit, variable_fmt, "sizeReportName", sizeReportName);
-        print(state.outputFiles.audit, variable_fmt, "numReportName", numReportName);
-        print(state.outputFiles.audit, variable_fmt, "sizeSubTable", sizeSubTable);
-        print(state.outputFiles.audit, variable_fmt, "numSubTable", numSubTable);
-        print(state.outputFiles.audit, variable_fmt, "sizeColumnTag", sizeColumnTag);
-        print(state.outputFiles.audit, variable_fmt, "numColumnTag", numColumnTag);
-        print(state.outputFiles.audit, variable_fmt, "sizeTableEntry", sizeTableEntry);
-        print(state.outputFiles.audit, variable_fmt, "numTableEntry", numTableEntry);
-        print(state.outputFiles.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
-        print(state.outputFiles.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
+        state.files.audit.ensure_open("WriteTabularReports");
+        print(state.files.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
+        print(state.files.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
+        print(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
+        print(state.files.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
+        print(state.files.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
+        print(state.files.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
+        print(state.files.audit, variable_fmt, "sizeReportName", sizeReportName);
+        print(state.files.audit, variable_fmt, "numReportName", numReportName);
+        print(state.files.audit, variable_fmt, "sizeSubTable", sizeSubTable);
+        print(state.files.audit, variable_fmt, "numSubTable", numSubTable);
+        print(state.files.audit, variable_fmt, "sizeColumnTag", sizeColumnTag);
+        print(state.files.audit, variable_fmt, "numColumnTag", numColumnTag);
+        print(state.files.audit, variable_fmt, "sizeTableEntry", sizeTableEntry);
+        print(state.files.audit, variable_fmt, "numTableEntry", numTableEntry);
+        print(state.files.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
+        print(state.files.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
     }
 
     void parseStatLine(const std::string &lineIn,
@@ -5781,7 +5779,7 @@ namespace OutputReportTabular {
         if (has(lineIn, "ASHRAE Standard")) lineType = StatLineType::AshStdLine;
     }
 
-    void FillWeatherPredefinedEntries()
+    void FillWeatherPredefinedEntries(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -5802,12 +5800,8 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        std::string lineIn;
-        int statFile;
-        bool fileExists;
         StatLineType lineType = StatLineType::Initialized;
         StatLineType lineTypeinterim = StatLineType::Initialized;
-        int readStat;
         bool isASHRAE;
         bool iscalc;
         bool isKoppen;
@@ -5833,12 +5827,6 @@ namespace OutputReportTabular {
         bool coolingDesignlinepassed;
         bool desConditionlinepassed;
 
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(DataStringGlobals::inStatFileName, flags);
-            fileExists = flags.exists();
-        }
-        readStat = 0;
         isASHRAE = false;
         iscalc = false;
         isKoppen = false;
@@ -5848,22 +5836,11 @@ namespace OutputReportTabular {
         storeASHRAEHDD = "";
         storeASHRAECDD = "";
         lineTypeinterim = StatLineType::Initialized;
-        if (fileExists) {
-            statFile = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.ACTION("READ");
-                ObjexxFCL::gio::open(statFile, DataStringGlobals::inStatFileName, flags);
-                readStat = flags.ios();
-            }
-            if (readStat != 0) {
-                ShowFatalError("FillWeatherPredefinedEntries: Could not open file " + DataStringGlobals::inStatFileName + " for input (read).");
-            }
-            IOFlags flags;
-            while (readStat == 0) { // end of file, or error
+        if (FileSystem::fileExists(ioFiles.inStatFileName.fileName)) {
+            auto statFile = ioFiles.inStatFileName.open("FillWeatherPredefinedEntries");
+            while (statFile.good()) { // end of file, or error
                 lineType = lineTypeinterim;
-                ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
-                readStat = flags.ios();
+                auto lineIn = statFile.readLine().data;
                 // reconcile line with different versions of stat file
                 // v7.1 added version as first line.
                 strip(lineIn);
@@ -6348,7 +6325,6 @@ namespace OutputReportTabular {
                 if (lineType == StatLineType::KoppenDes1Line) lineTypeinterim = StatLineType::KoppenDes1Line;
                 if (lineType == StatLineType::KoppenLine) lineTypeinterim = StatLineType::KoppenLine;
             }
-            ObjexxFCL::gio::close(statFile);
         }
     }
 
@@ -6805,7 +6781,7 @@ namespace OutputReportTabular {
         ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints(state.dataZoneTempPredictorCorrector);
     }
 
-    void WriteMonthlyTables()
+    void WriteMonthlyTables(CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -7176,7 +7152,7 @@ namespace OutputReportTabular {
                 } // KColumn
                 WriteReportHeaders(MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue, OutputProcessor::StoreType::Averaged);
                 WriteSubtitle("Custom Monthly Report");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth, true); // transpose monthly XML tables.
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth, true); // transpose monthly XML tables.
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue, "Custom Monthly Report");
@@ -7189,7 +7165,7 @@ namespace OutputReportTabular {
         }     // iInput
     }
 
-    void WriteTimeBinTables()
+    void WriteTimeBinTables(CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -7379,7 +7355,7 @@ namespace OutputReportTabular {
                 WriteTextLine("Values in table are in hours.");
                 WriteTextLine("");
                 WriteSubtitle("Time Bin Results");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth, true); // transpose XML tables
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth, true); // transpose XML tables
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
@@ -7427,7 +7403,7 @@ namespace OutputReportTabular {
                     tableBodyStat(1, 6) = RealToStr(repStDev, 2);
                 }
                 WriteSubtitle("Statistics");
-                WriteTable(tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true); // transpose XML table
+                WriteTable(dataCostEstimateManager, tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true); // transpose XML table
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Statistics");
@@ -7440,7 +7416,8 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteBEPSTable(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
+    void WriteBEPSTable(CostEstimateManagerData &dataCostEstimateManager,
+                        ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -7930,7 +7907,7 @@ namespace OutputReportTabular {
             // heading for the entire sub-table
             if (displayTabularBEPS) {
                 WriteSubtitle("Site and Source Energy");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy");
@@ -8080,7 +8057,7 @@ namespace OutputReportTabular {
             // heading for the entire sub-table
             if (displayTabularBEPS) {
                 WriteSubtitle("Site to Source Energy Conversion Factors");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody,
                                                            rowHead,
@@ -8135,7 +8112,7 @@ namespace OutputReportTabular {
             // heading for the entire sub-table
             if (displayTabularBEPS) {
                 WriteSubtitle("Building Area");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area");
@@ -8391,7 +8368,7 @@ namespace OutputReportTabular {
             // heading for the entire sub-table
             if (displayTabularBEPS) {
                 WriteSubtitle("End Uses");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
@@ -8544,7 +8521,7 @@ namespace OutputReportTabular {
             // heading for the entire sub-table
             if (displayTabularBEPS) {
                 WriteSubtitle("End Uses By Subcategory");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
 
                 Array1D_string rowHeadTemp(rowHead);
                 // Before outputing to SQL, we forward fill the End use column (rowHead)
@@ -8723,7 +8700,7 @@ namespace OutputReportTabular {
             // heading for the entire sub-table
             if (displayTabularBEPS) {
                 WriteSubtitle("Utility Use Per Conditioned Floor Area");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody,
                                                            rowHead,
@@ -8753,7 +8730,7 @@ namespace OutputReportTabular {
             // heading for the entire sub-table
             if (displayTabularBEPS) {
                 WriteSubtitle("Utility Use Per Total Floor Area");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody,
                                                            rowHead,
@@ -8845,7 +8822,7 @@ namespace OutputReportTabular {
             // heading for the entire sub-table
             if (displayTabularBEPS) {
                 WriteSubtitle("Electric Loads Satisfied");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied");
@@ -8921,7 +8898,7 @@ namespace OutputReportTabular {
             // heading for the entire sub-table
             if (displayTabularBEPS) {
                 WriteSubtitle("On-Site Thermal Sources");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources");
@@ -9016,7 +8993,7 @@ namespace OutputReportTabular {
             //  ! heading for the entire sub-table
             if (displayTabularBEPS) {
                 WriteSubtitle("Water Source Summary");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary");
@@ -9055,7 +9032,7 @@ namespace OutputReportTabular {
                     tableBody(1, 2) = RealToStr(ConvertIPdelta(indexUnitConv, deviationFromSetPtThresholdClg), 2);
                 }
 
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria");
@@ -9094,7 +9071,7 @@ namespace OutputReportTabular {
             tableBody(1, 3) = RealToStr(TotalTimeNotSimpleASH55EitherForABUPS, 2);
 
             if (displayTabularBEPS) {
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody,
                                                            rowHead,
@@ -9134,7 +9111,7 @@ namespace OutputReportTabular {
         return WaterTotal / ConversionFactor;
     }
 
-    void WriteSourceEnergyEndUseSummary()
+    void WriteSourceEnergyEndUseSummary(CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mangesh Basarkar
@@ -9354,7 +9331,7 @@ namespace OutputReportTabular {
 
             // heading for the entire sub-table
             WriteSubtitle("Source Energy End Use Components Summary");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
                                                        rowHead,
@@ -9436,7 +9413,7 @@ namespace OutputReportTabular {
 
                 // heading for the entire sub-table
                 WriteSubtitle("Source Energy End Use Components Per Conditioned Floor Area");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody,
                                                            rowHead,
@@ -9472,7 +9449,7 @@ namespace OutputReportTabular {
 
                 // heading for the entire sub-table
                 WriteSubtitle("Source Energy End Use Components Per Total Floor Area");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody,
                                                            rowHead,
@@ -9494,7 +9471,7 @@ namespace OutputReportTabular {
         } // end if displaySourceEnergyEndUseSummary
     }
 
-    void WriteDemandEndUseSummary()
+    void WriteDemandEndUseSummary(CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -9806,7 +9783,7 @@ namespace OutputReportTabular {
             unconvert = 1 / powerConversion;
 
             WriteSubtitle("End Uses");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth, false, footnote);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
@@ -9915,7 +9892,7 @@ namespace OutputReportTabular {
 
             // heading for the entire sub-table
             WriteSubtitle("End Uses By Subcategory");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth, false, footnote);
 
             Array1D_string rowHeadTemp(rowHead);
             // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
@@ -10005,7 +9982,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteCompCostTable()
+     void WriteCompCostTable(CostEstimateManagerData &dataCostEstimateManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10025,7 +10002,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using namespace DataCostEstimate;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10060,7 +10036,7 @@ namespace OutputReportTabular {
         Real64 IPsingleValue;
         Real64 IPvaluePer;
 
-        if (!DoCostEstimate) return;
+        if (!dataCostEstimateManager.DoCostEstimate) return;
 
         WriteReportHeaders("Component Cost Economics Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
@@ -10101,14 +10077,14 @@ namespace OutputReportTabular {
         TableBodyData = 0.0;
         tableBody = "";
 
-        TableBodyData(1, 1) = RefrncBldg.LineItemTot;
+        TableBodyData(1, 1) = dataCostEstimateManager.RefrncBldg.LineItemTot;
         tableBody(1, 1) = RealToStr(TableBodyData(1, 1), 2);
-        TableBodyData(1, 2) = RefrncBldg.MiscCostperSqMeter * buildingConditionedFloorArea;
+        TableBodyData(1, 2) = dataCostEstimateManager.RefrncBldg.MiscCostperSqMeter * buildingConditionedFloorArea;
         tableBody(1, 2) = RealToStr(TableBodyData(1, 2), 2);
 
-        if (RefrncBldg.RegionalModifier != 1.0) {
+        if (dataCostEstimateManager.RefrncBldg.RegionalModifier != 1.0) {
             TableBodyData(1, 3) =
-                (RefrncBldg.LineItemTot + RefrncBldg.MiscCostperSqMeter * buildingConditionedFloorArea) * (RefrncBldg.RegionalModifier - 1.0);
+                (dataCostEstimateManager.RefrncBldg.LineItemTot + dataCostEstimateManager.RefrncBldg.MiscCostperSqMeter * buildingConditionedFloorArea) * (dataCostEstimateManager.RefrncBldg.RegionalModifier - 1.0);
         } else {
             TableBodyData(1, 3) = 0.0;
         }
@@ -10116,31 +10092,31 @@ namespace OutputReportTabular {
         RefBldgConstCost = sum(TableBodyData(1, {1, 3}));
 
         tableBody(1, 3) = RealToStr(TableBodyData(1, 3), 2);
-        TableBodyData(1, 4) = RefBldgConstCost * RefrncBldg.DesignFeeFrac;
+        TableBodyData(1, 4) = RefBldgConstCost * dataCostEstimateManager.RefrncBldg.DesignFeeFrac;
         tableBody(1, 4) = RealToStr(TableBodyData(1, 4), 2);
-        TableBodyData(1, 5) = RefBldgConstCost * RefrncBldg.ContractorFeeFrac;
+        TableBodyData(1, 5) = RefBldgConstCost * dataCostEstimateManager.RefrncBldg.ContractorFeeFrac;
         tableBody(1, 5) = RealToStr(TableBodyData(1, 5), 2);
-        TableBodyData(1, 6) = RefBldgConstCost * RefrncBldg.ContingencyFrac;
+        TableBodyData(1, 6) = RefBldgConstCost * dataCostEstimateManager.RefrncBldg.ContingencyFrac;
         tableBody(1, 6) = RealToStr(TableBodyData(1, 6), 2);
-        TableBodyData(1, 7) = RefBldgConstCost * RefrncBldg.BondCostFrac;
+        TableBodyData(1, 7) = RefBldgConstCost * dataCostEstimateManager.RefrncBldg.BondCostFrac;
         tableBody(1, 7) = RealToStr(TableBodyData(1, 7), 2);
-        TableBodyData(1, 8) = RefBldgConstCost * RefrncBldg.CommissioningFrac;
+        TableBodyData(1, 8) = RefBldgConstCost * dataCostEstimateManager.RefrncBldg.CommissioningFrac;
         tableBody(1, 8) = RealToStr(TableBodyData(1, 8), 2);
-        RefrncBldg.GrandTotal = sum(TableBodyData(1, {1, 8}));
-        TableBodyData(1, 9) = RefrncBldg.GrandTotal;
+        dataCostEstimateManager.RefrncBldg.GrandTotal = sum(TableBodyData(1, {1, 8}));
+        TableBodyData(1, 9) = dataCostEstimateManager.RefrncBldg.GrandTotal;
         tableBody(1, 9) = RealToStr(TableBodyData(1, 9), 2);
         if (buildingConditionedFloorArea > 0.0) {
             TableBodyData(1, 10) = TableBodyData(1, 9) / (buildingConditionedFloorArea * m2_unitConv);
         }
         tableBody(1, 10) = RealToStr(TableBodyData(1, 10), 2);
 
-        TableBodyData(2, 1) = CurntBldg.LineItemTot;
+        TableBodyData(2, 1) = dataCostEstimateManager.CurntBldg.LineItemTot;
         tableBody(2, 1) = RealToStr(TableBodyData(2, 1), 2);
-        TableBodyData(2, 2) = CurntBldg.MiscCostperSqMeter * buildingConditionedFloorArea;
+        TableBodyData(2, 2) = dataCostEstimateManager.CurntBldg.MiscCostperSqMeter * buildingConditionedFloorArea;
         tableBody(2, 2) = RealToStr(TableBodyData(2, 2), 2);
-        if (CurntBldg.RegionalModifier != 1.0) {
+        if (dataCostEstimateManager.CurntBldg.RegionalModifier != 1.0) {
             TableBodyData(2, 3) =
-                (CurntBldg.LineItemTot + CurntBldg.MiscCostperSqMeter * buildingConditionedFloorArea) * (CurntBldg.RegionalModifier - 1.0);
+                (dataCostEstimateManager.CurntBldg.LineItemTot + dataCostEstimateManager.CurntBldg.MiscCostperSqMeter * buildingConditionedFloorArea) * (dataCostEstimateManager.CurntBldg.RegionalModifier - 1.0);
         } else {
             TableBodyData(2, 3) = 0.0;
         }
@@ -10148,20 +10124,20 @@ namespace OutputReportTabular {
 
         CurntBldgConstCost = sum(TableBodyData(2, {1, 3}));
 
-        TableBodyData(2, 4) = CurntBldgConstCost * CurntBldg.DesignFeeFrac;
+        TableBodyData(2, 4) = CurntBldgConstCost * dataCostEstimateManager.CurntBldg.DesignFeeFrac;
         tableBody(2, 4) = RealToStr(TableBodyData(2, 4), 2);
 
-        TableBodyData(2, 5) = CurntBldgConstCost * CurntBldg.ContractorFeeFrac;
+        TableBodyData(2, 5) = CurntBldgConstCost * dataCostEstimateManager.CurntBldg.ContractorFeeFrac;
         tableBody(2, 5) = RealToStr(TableBodyData(2, 5), 2);
-        TableBodyData(2, 6) = CurntBldgConstCost * CurntBldg.ContingencyFrac;
+        TableBodyData(2, 6) = CurntBldgConstCost * dataCostEstimateManager.CurntBldg.ContingencyFrac;
         tableBody(2, 6) = RealToStr(TableBodyData(2, 6), 2);
-        TableBodyData(2, 7) = CurntBldgConstCost * CurntBldg.BondCostFrac;
+        TableBodyData(2, 7) = CurntBldgConstCost * dataCostEstimateManager.CurntBldg.BondCostFrac;
         tableBody(2, 7) = RealToStr(TableBodyData(2, 7), 2);
-        TableBodyData(2, 8) = CurntBldgConstCost * CurntBldg.CommissioningFrac;
+        TableBodyData(2, 8) = CurntBldgConstCost * dataCostEstimateManager.CurntBldg.CommissioningFrac;
         tableBody(2, 8) = RealToStr(TableBodyData(2, 8), 2);
 
-        CurntBldg.GrandTotal = sum(TableBodyData(2, {1, 8}));
-        TableBodyData(2, 9) = CurntBldg.GrandTotal;
+        dataCostEstimateManager.CurntBldg.GrandTotal = sum(TableBodyData(2, {1, 8}));
+        TableBodyData(2, 9) = dataCostEstimateManager.CurntBldg.GrandTotal;
         tableBody(2, 9) = RealToStr(TableBodyData(2, 9), 2);
         if (buildingConditionedFloorArea > 0) {
             TableBodyData(2, 10) = TableBodyData(2, 9) / (buildingConditionedFloorArea * m2_unitConv);
@@ -10181,7 +10157,7 @@ namespace OutputReportTabular {
         tableBody(3, 10) = RealToStr(TableBodyData(3, 10), 2);
 
         WriteSubtitle("Construction Cost Estimate Summary");
-        WriteTable(tableBody, rowHead, columnHead, columnWidth);
+        WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
         if (sqlite) {
             sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
@@ -10191,7 +10167,7 @@ namespace OutputReportTabular {
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
         }
 
-        NumRows = NumLineItems + 1; // body will have the total and line items
+        NumRows = dataCostEstimateManager.NumLineItems + 1; // body will have the total and line items
         NumCols = 6;                // Line no., Line name, Qty, Units, ValperQty, Subtotal
         rowHead.allocate(NumRows);
         columnHead.allocate(NumCols);
@@ -10210,35 +10186,35 @@ namespace OutputReportTabular {
 
         columnWidth = {7, 30, 16, 10, 16, 16}; // array assignment - for all columns
 
-        for (item = 1; item <= NumLineItems; ++item) {
-            tableBody(1, item) = std::to_string(CostLineItem(item).LineNumber);
-            tableBody(2, item) = CostLineItem(item).LineName;
+        for (item = 1; item <= dataCostEstimateManager.NumLineItems; ++item) {
+            tableBody(1, item) = std::to_string(dataCostEstimateManager.CostLineItem(item).LineNumber);
+            tableBody(2, item) = dataCostEstimateManager.CostLineItem(item).LineName;
             if (unitsStyle == unitsStyleInchPound) {
-                LookupSItoIP(CostLineItem(item).Units, unitConvIndex, IPunitName);
+                LookupSItoIP(dataCostEstimateManager.CostLineItem(item).Units, unitConvIndex, IPunitName);
                 if (unitConvIndex != 0) {
-                    IPqty = ConvertIP(unitConvIndex, CostLineItem(item).Qty);
+                    IPqty = ConvertIP(unitConvIndex, dataCostEstimateManager.CostLineItem(item).Qty);
                     tableBody(3, item) = RealToStr(IPqty, 2);
                     tableBody(4, item) = IPunitName;
                     IPsingleValue = ConvertIP(unitConvIndex, 1.0);
                     if (IPsingleValue != 0.0) {
-                        IPvaluePer = CostLineItem(item).ValuePer / IPsingleValue;
+                        IPvaluePer = dataCostEstimateManager.CostLineItem(item).ValuePer / IPsingleValue;
                         tableBody(5, item) = RealToStr(IPvaluePer, 2);
                     }
                 } else {
-                    tableBody(3, item) = RealToStr(CostLineItem(item).Qty, 2);
-                    tableBody(4, item) = CostLineItem(item).Units;
-                    tableBody(5, item) = RealToStr(CostLineItem(item).ValuePer, 2);
+                    tableBody(3, item) = RealToStr(dataCostEstimateManager.CostLineItem(item).Qty, 2);
+                    tableBody(4, item) = dataCostEstimateManager.CostLineItem(item).Units;
+                    tableBody(5, item) = RealToStr(dataCostEstimateManager.CostLineItem(item).ValuePer, 2);
                 }
             } else {
-                tableBody(3, item) = RealToStr(CostLineItem(item).Qty, 2);
-                tableBody(4, item) = CostLineItem(item).Units;
-                tableBody(5, item) = RealToStr(CostLineItem(item).ValuePer, 2);
+                tableBody(3, item) = RealToStr(dataCostEstimateManager.CostLineItem(item).Qty, 2);
+                tableBody(4, item) = dataCostEstimateManager.CostLineItem(item).Units;
+                tableBody(5, item) = RealToStr(dataCostEstimateManager.CostLineItem(item).ValuePer, 2);
             }
-            tableBody(6, item) = RealToStr(CostLineItem(item).LineSubTotal, 2);
+            tableBody(6, item) = RealToStr(dataCostEstimateManager.CostLineItem(item).LineSubTotal, 2);
         }
-        tableBody(6, NumRows) = RealToStr(CurntBldg.LineItemTot, 2);
+        tableBody(6, NumRows) = RealToStr(dataCostEstimateManager.CurntBldg.LineItemTot, 2);
         WriteSubtitle("Cost Line Item Details"); //: '//TRIM(RealToStr(CostEstimateTotal, 2)))
-        WriteTable(tableBody, rowHead, columnHead, columnWidth);
+        WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
         if (sqlite) {
             sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
@@ -10249,7 +10225,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteVeriSumTable(OutputFiles &outputFiles)
+    void WriteVeriSumTable(CostEstimateManagerData &dataCostEstimateManager, IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -10513,7 +10489,7 @@ namespace OutputReportTabular {
             //  tableBody(9,1) = TRIM(std::to_string(numTableEntry)) !number of table entries for predefined tables
 
             WriteSubtitle("General");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
@@ -10578,8 +10554,8 @@ namespace OutputReportTabular {
             DetailedWWR = (inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
 
             if (DetailedWWR) {
-                print(outputFiles.debug, "{}\n", "======90.1 Classification [>=60 & <=120] tilt = wall==================");
-                print(outputFiles.debug, "{}\n", "SurfName,Class,Area,Tilt");
+                print(ioFiles.debug, "{}\n", "======90.1 Classification [>=60 & <=120] tilt = wall==================");
+                print(ioFiles.debug, "{}\n", "SurfName,Class,Area,Tilt");
             }
 
             for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
@@ -10642,7 +10618,7 @@ namespace OutputReportTabular {
                                     }
                                 }
                                 if (DetailedWWR) {
-                                    print(outputFiles.debug, "{},Wall,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
+                                    print(ioFiles.debug, "{},Wall,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
                                 }
                             } else if ((SELECT_CASE_var == SurfaceClass_Window) || (SELECT_CASE_var == SurfaceClass_TDD_Dome)) {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
@@ -10663,7 +10639,7 @@ namespace OutputReportTabular {
                                     curArea * Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
                                 zoneGlassArea(zonePt) += Surface(iSurf).GrossArea * Surface(iSurf).Multiplier;
                                 if (DetailedWWR) {
-                                    print(outputFiles.debug, "{},Window,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
+                                    print(ioFiles.debug, "{},Window,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
                                 }
                             }
                         }
@@ -10675,13 +10651,13 @@ namespace OutputReportTabular {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
                                 roofArea += curArea * mult;
                                 if (DetailedWWR) {
-                                    print(outputFiles.debug, "{},Roof,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
+                                    print(ioFiles.debug, "{},Roof,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
                                 }
                             } else if ((SELECT_CASE_var == SurfaceClass_Window) || (SELECT_CASE_var == SurfaceClass_TDD_Dome)) {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
                                 skylightArea += curArea * mult;
                                 if (DetailedWWR) {
-                                    print(outputFiles.debug, "{},Skylight,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
+                                    print(ioFiles.debug, "{},Skylight,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
                                 }
                             }
                         }
@@ -10695,11 +10671,11 @@ namespace OutputReportTabular {
             TotalAboveGroundWallArea = aboveGroundWallAreaN + aboveGroundWallAreaS + aboveGroundWallAreaE + aboveGroundWallAreaW;
             TotalWindowArea = windowAreaN + windowAreaS + windowAreaE + windowAreaW;
             if (DetailedWWR) {
-                print(outputFiles.debug, "{}\n", "========================");
-                print(outputFiles.debug, "{}\n", "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW");
-                print(outputFiles.debug, "{}\n", "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW");
-                print(outputFiles.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWallArea, wallAreaN, wallAreaS, wallAreaE, wallAreaW);
-                print(outputFiles.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWindowArea, windowAreaN, windowAreaS, windowAreaE, windowAreaW);
+                print(ioFiles.debug, "{}\n", "========================");
+                print(ioFiles.debug, "{}\n", "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW");
+                print(ioFiles.debug, "{}\n", "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW");
+                print(ioFiles.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWallArea, wallAreaN, wallAreaS, wallAreaE, wallAreaW);
+                print(ioFiles.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWindowArea, windowAreaN, windowAreaS, windowAreaE, windowAreaW);
             }
 
             tableBody = "";
@@ -10735,7 +10711,7 @@ namespace OutputReportTabular {
             tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
 
             WriteSubtitle("Window-Wall Ratio");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
@@ -10803,7 +10779,7 @@ namespace OutputReportTabular {
             tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
 
             WriteSubtitle("Conditioned Window-Wall Ratio");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
@@ -10827,9 +10803,9 @@ namespace OutputReportTabular {
             rowHead(3) = "Skylight-Roof Ratio [%]";
 
             if (DetailedWWR) {
-                print(outputFiles.debug, "{}\n", "========================");
-                print(outputFiles.debug, "{}\n", "TotalRoofArea,SkylightArea");
-                print(outputFiles.debug, "{:.2R},{:.2R}\n", roofArea, skylightArea);
+                print(ioFiles.debug, "{}\n", "========================");
+                print(ioFiles.debug, "{}\n", "TotalRoofArea,SkylightArea");
+                print(ioFiles.debug, "{:.2R},{:.2R}\n", roofArea, skylightArea);
             }
 
             tableBody(1, 1) = RealToStr(roofArea * m2_unitConv, 2);
@@ -10837,7 +10813,7 @@ namespace OutputReportTabular {
             tableBody(1, 3) = RealToStr(100.0 * SafeDivide(skylightArea, roofArea), 2);
 
             WriteSubtitle("Skylight-Roof Ratio");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
@@ -10873,7 +10849,7 @@ namespace OutputReportTabular {
                 }
 
                 WriteSubtitle("Hybrid Model: Internal Thermal Mass");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody,
                                                            rowHead,
@@ -11090,7 +11066,7 @@ namespace OutputReportTabular {
             PreDefTableEntry(pdchLeedSutUnArea, "Totals", zstArea(uncondTotal), 2);
 
             WriteSubtitle("Zone Summary");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
@@ -11102,7 +11078,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteAdaptiveComfortTable()
+    void WriteAdaptiveComfortTable(CostEstimateManagerData &dataCostEstimateManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11143,7 +11119,6 @@ namespace OutputReportTabular {
         Array1D_int columnWidth;
         Array1D_string rowHead;
         Array2D_string tableBody;
-        static int numPeopleAdaptive(0);
         int i;
         Array1D_int peopleInd; // Index the relevant people
 
@@ -11187,7 +11162,7 @@ namespace OutputReportTabular {
                 }
             }
 
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
             }
@@ -11198,7 +11173,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteHeatEmissionTable()
+    void WriteHeatEmissionTable(CostEstimateManagerData &dataCostEstimateManager)
     {
 
         Array1D_string columnHead(6);
@@ -11233,7 +11208,7 @@ namespace OutputReportTabular {
             tableBody(5, 1) = RealToStr(BuildingPreDefRep.emiHVACReject, 2);
             tableBody(6, 1) = RealToStr(BuildingPreDefRep.emiTotHeat, 2);
 
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "AnnualHeatEmissionsReport", "Entire Facility", "Annual Heat Emissions Summary");
@@ -11241,7 +11216,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WritePredefinedTables()
+    void WritePredefinedTables(CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -11446,7 +11421,7 @@ namespace OutputReportTabular {
                         }
                         // create the actual output table
                         WriteSubtitle(subTable(jSubTable).name);
-                        WriteTable(tableBody, rowHead, columnHead, columnWidth, false, subTable(jSubTable).footnote);
+                        WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth, false, subTable(jSubTable).footnote);
                         if (sqlite) {
                             sqlite->createSQLiteTabularDataRecords(
                                 tableBody, rowHead, columnHead, reportName(iReportName).name, "Entire Facility", subTable(jSubTable).name);
@@ -11461,7 +11436,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteComponentSizing()
+    void WriteComponentSizing(CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -11655,7 +11630,7 @@ namespace OutputReportTabular {
                 WriteSubtitle(CompSizeTableEntry(foundEntry).typeField);
                 if (CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:Reheat" ||
                     CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:NoReheat") {
-                    WriteTable(tableBody,
+                    WriteTable(dataCostEstimateManager, tableBody,
                                rowHead,
                                columnHead,
                                columnWidth,
@@ -11663,7 +11638,7 @@ namespace OutputReportTabular {
                                "User-Specified values were used. Design Size values were used if no User-Specified values were provided. Design Size "
                                "values may be derived from alternate User-Specified values.");
                 } else {
-                    WriteTable(tableBody,
+                    WriteTable(dataCostEstimateManager, tableBody,
                                rowHead,
                                columnHead,
                                columnWidth,
@@ -11688,7 +11663,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteSurfaceShadowing()
+    void WriteSurfaceShadowing(CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -11850,14 +11825,14 @@ namespace OutputReportTabular {
                             "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
                     }
                 }
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             }
         }
     }
 
     // Parses the contents of the EIO (initializations) file and creates subtables for each type of record in the tabular output files
     // Glazer - November 2016
-    void WriteEioTables(OutputFiles &outputFiles)
+    void WriteEioTables(CostEstimateManagerData &dataCostEstimateManager, IOFiles &ioFiles)
     {
 
         if (displayEioSummary) {
@@ -11872,7 +11847,7 @@ namespace OutputReportTabular {
 
             std::vector<std::string> headerLines; // holds the lines that describe each type of records - each starts with ! symbol
             std::vector<std::string> bodyLines;   // holds the data records only
-            for (auto const &line : outputFiles.eio.getLines()) {
+            for (auto const &line : ioFiles.eio.getLines()) {
                 if (line.at(0) == '!') {
                     headerLines.push_back(line);
                 } else {
@@ -11953,7 +11928,7 @@ namespace OutputReportTabular {
                     }
 
                     WriteSubtitle(tableName);
-                    WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                    WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName);
@@ -12223,7 +12198,7 @@ namespace OutputReportTabular {
         // need for reporting  DEALLOCATE(decayCurveHeat)
     }
 
-    void ComputeLoadComponentDecayCurve(OutputFiles &outputFiles)
+    void ComputeLoadComponentDecayCurve(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -12324,32 +12299,32 @@ namespace OutputReportTabular {
 
         if (ShowDecayCurvesInEIO) {
             // show the line definition for the decay curves
-            print(outputFiles.eio,
+            print(ioFiles.eio,
                   "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
                   "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36\n");
-            print(outputFiles.eio,
+            print(ioFiles.eio,
                   "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
                   "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36\n");
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
                 for (int kSurf : DataSurfaces::AllSurfaceListReportOrder) {
                     if (Surface(kSurf).Zone != iZone) continue;
-                    print(outputFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", Zone(iZone).Name, Surface(kSurf).Name);
+                    print(ioFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
-                        print(outputFiles.eio, ",{:6.3F}", decayCurveCool(jTime, kSurf));
+                        print(ioFiles.eio, ",{:6.3F}", decayCurveCool(jTime, kSurf));
                     }
                     // put a line feed at the end of the line
-                    print(outputFiles.eio, "\n");
+                    print(ioFiles.eio, "\n");
                 }
 
                 for (int kSurf : DataSurfaces::AllSurfaceListReportOrder) {
                     if (Surface(kSurf).Zone != iZone) continue;
-                    print(outputFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", Zone(iZone).Name, Surface(kSurf).Name);
+                    print(ioFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
-                        print(outputFiles.eio, ",{:6.3F}", decayCurveHeat(jTime, kSurf));
+                        print(ioFiles.eio, ",{:6.3F}", decayCurveHeat(jTime, kSurf));
                     }
                     // put a line feed at the end of the line
-                    print(outputFiles.eio, "\n");
+                    print(ioFiles.eio, "\n");
                 }
             }
         }
@@ -12526,7 +12501,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteLoadComponentSummaryTables()
+    void WriteLoadComponentSummaryTables(CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -13000,7 +12975,7 @@ namespace OutputReportTabular {
                 LoadSummaryUnitConversion(AirLoopCoolCompLoadTables(iAirLoop));
                 LoadSummaryUnitConversion(AirLoopHeatCompLoadTables(iAirLoop));
 
-                OutputCompLoadSummary(airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop);
+                OutputCompLoadSummary(dataCostEstimateManager, airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop);
             }
         }
 
@@ -13101,7 +13076,7 @@ namespace OutputReportTabular {
             LoadSummaryUnitConversion(FacilityCoolCompLoadTables);
             LoadSummaryUnitConversion(FacilityHeatCompLoadTables);
 
-            OutputCompLoadSummary(facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
+            OutputCompLoadSummary(dataCostEstimateManager, facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
         }
 
         // ZoneComponentLoadSummary: Now we convert and Display
@@ -13112,7 +13087,7 @@ namespace OutputReportTabular {
                     LoadSummaryUnitConversion(ZoneCoolCompLoadTables(iZone));
                     LoadSummaryUnitConversion(ZoneHeatCompLoadTables(iZone));
 
-                    OutputCompLoadSummary(zoneOuput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
+                    OutputCompLoadSummary(dataCostEstimateManager, zoneOuput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
                 }
             }
         }
@@ -13940,7 +13915,8 @@ namespace OutputReportTabular {
     }
 
     // provide output from the load component summary tables
-    void OutputCompLoadSummary(int const &kind, // zone=1, airloop=2, facility=3
+    void OutputCompLoadSummary(CostEstimateManagerData &dataCostEstimateManager,
+                               int const &kind, // zone=1, airloop=2, facility=3
                                CompLoadTablesType const &compLoadCool,
                                CompLoadTablesType const &compLoadHeat,
                                int const &zoneOrAirLoopIndex)
@@ -14057,7 +14033,7 @@ namespace OutputReportTabular {
                 columnWidth.dimension(cPerArea, 14); // array assignment - same for all columns
 
                 WriteSubtitle(peakLoadCompName);
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
                 }
@@ -14139,7 +14115,7 @@ namespace OutputReportTabular {
                 tableBody(1, 16) = RealToStr(curCompLoad.diffPeakEst, 2);        // Difference
 
                 WriteSubtitle(peakCondName);
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
                 }
@@ -14187,7 +14163,7 @@ namespace OutputReportTabular {
                 tableBody(1, 6) = fmt::format("{:.{}f}", curCompLoad.numPeople, 1);       // number of people
 
                 WriteSubtitle(engineeringCheckName);
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
                 }
@@ -14221,7 +14197,7 @@ namespace OutputReportTabular {
                     }
 
                     WriteSubtitle(zonesIncludedName);
-                    WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                    WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
@@ -14399,7 +14375,8 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteTable(Array2S_string const body, // row,column
+    void WriteTable(CostEstimateManagerData &dataCostEstimateManager,
+                    Array2S_string const body, // row,column
                     const Array1D_string &rowLabels,
                     const Array1D_string &columnLabels,
                     Array1D_int &widthColumn,
@@ -14565,7 +14542,7 @@ namespace OutputReportTabular {
                     for (iCol = 1; iCol <= colsColumnLabels; ++iCol) {
                         outputLine += curDel + stripped(colLabelMulti(iCol, jRow));
                     }
-                    tbl_stream << InsertCurrencySymbol(outputLine, false) << '\n';
+                    tbl_stream << InsertCurrencySymbol(dataCostEstimateManager, outputLine, false) << '\n';
                 }
                 // body with row headers
                 for (jRow = 1; jRow <= rowsBody; ++jRow) {
@@ -14573,7 +14550,7 @@ namespace OutputReportTabular {
                     for (iCol = 1; iCol <= colsBody; ++iCol) {
                         outputLine += curDel + stripped(body(iCol, jRow));
                     }
-                    tbl_stream << InsertCurrencySymbol(outputLine, false) << '\n';
+                    tbl_stream << InsertCurrencySymbol(dataCostEstimateManager, outputLine, false) << '\n';
                 }
                 if (present(footnoteText)) {
                     if (!footnoteText().empty()) {
@@ -14594,7 +14571,7 @@ namespace OutputReportTabular {
                             outputLine = std::string(col1start - 1, ' ') + "  " + rjustified(sized(colLabelMulti(iCol, jRow), widthColumn(iCol)));
                         }
                     }
-                    tbl_stream << InsertCurrencySymbol(outputLine, false) << '\n';
+                    tbl_stream << InsertCurrencySymbol(dataCostEstimateManager, outputLine, false) << '\n';
                 }
                 // body with row headers
                 for (jRow = 1; jRow <= rowsBody; ++jRow) {
@@ -14607,7 +14584,7 @@ namespace OutputReportTabular {
                             outputLine += "   " + rjustified(sized(body(iCol, jRow), widthColumn(iCol)));
                         }
                     }
-                    tbl_stream << InsertCurrencySymbol(outputLine, false) << '\n';
+                    tbl_stream << InsertCurrencySymbol(dataCostEstimateManager, outputLine, false) << '\n';
                 }
                 if (present(footnoteText)) {
                     if (!footnoteText().empty()) {
@@ -14629,20 +14606,20 @@ namespace OutputReportTabular {
                             outputLine += "<br>";
                         }
                     }
-                    tbl_stream << InsertCurrencySymbol(outputLine, true) << "</td>\n";
+                    tbl_stream << InsertCurrencySymbol(dataCostEstimateManager, outputLine, true) << "</td>\n";
                 }
                 tbl_stream << "  </tr>\n";
                 // body with row headers
                 for (jRow = 1; jRow <= rowsBody; ++jRow) {
                     tbl_stream << "  <tr>\n";
                     if (rowLabels(jRow) != "") {
-                        tbl_stream << "    <td align=\"right\">" << InsertCurrencySymbol(rowLabels(jRow), true) << "</td>\n";
+                        tbl_stream << "    <td align=\"right\">" << InsertCurrencySymbol(dataCostEstimateManager, rowLabels(jRow), true) << "</td>\n";
                     } else {
                         tbl_stream << "    <td align=\"right\">&nbsp;</td>\n";
                     }
                     for (iCol = 1; iCol <= colsBody; ++iCol) {
                         if (body(iCol, jRow) != "") {
-                            tbl_stream << "    <td align=\"right\">" << InsertCurrencySymbol(body(iCol, jRow), true) << "</td>\n";
+                            tbl_stream << "    <td align=\"right\">" << InsertCurrencySymbol(dataCostEstimateManager, body(iCol, jRow), true) << "</td>\n";
                         } else {
                             tbl_stream << "    <td align=\"right\">&nbsp;</td>\n";
                         }
@@ -14843,7 +14820,8 @@ namespace OutputReportTabular {
         return StringOut;
     }
 
-    std::string InsertCurrencySymbol(std::string const &inString, // Input String
+    std::string InsertCurrencySymbol(CostEstimateManagerData &dataCostEstimateManager,
+                                     std::string const &inString, // Input String
                                      bool const isHTML            // True if an HTML string
     )
     {
@@ -14859,7 +14837,6 @@ namespace OutputReportTabular {
         // METHODOLOGY EMPLOYED:
         //   na
         // Using/Aliasing
-        using namespace DataCostEstimate;
 
         // Return value
 
@@ -14881,9 +14858,9 @@ namespace OutputReportTabular {
         std::string::size_type loc = index(outSt, "~~$~~");
         while (loc != std::string::npos) {
             if (isHTML) {
-                outSt = inString.substr(0, loc) + monetaryUnit(selectedMonetaryUnit).html + outSt.substr(loc + 5);
+                outSt = inString.substr(0, loc) + dataCostEstimateManager.monetaryUnit(dataCostEstimateManager.selectedMonetaryUnit).html + outSt.substr(loc + 5);
             } else {
-                outSt = inString.substr(0, loc) + monetaryUnit(selectedMonetaryUnit).txt + outSt.substr(loc + 5);
+                outSt = inString.substr(0, loc) + dataCostEstimateManager.monetaryUnit(dataCostEstimateManager.selectedMonetaryUnit).txt + outSt.substr(loc + 5);
             }
             loc = index(outSt, "~~$~~");
         }

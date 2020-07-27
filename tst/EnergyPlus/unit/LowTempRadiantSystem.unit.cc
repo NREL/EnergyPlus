@@ -61,12 +61,12 @@
 
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -1103,7 +1103,7 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetProjectControlData(state, state.outputFiles, ErrorsFound);
+    GetProjectControlData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneData(ErrorsFound);
@@ -1111,14 +1111,14 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_EQ("WEST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
+    GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    GetConstructData(ErrorsFound);
+    GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetPlantSizingInput();

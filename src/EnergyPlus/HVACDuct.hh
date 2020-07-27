@@ -93,7 +93,7 @@ namespace HVACDuct {
     // Object Data
     extern Array1D<DuctData> Duct;
 
-    // Functions
+    void clear_state();
 
     void SimDuct(std::string const &CompName,   // name of the duct component
                  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208

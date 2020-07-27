@@ -76,7 +76,7 @@ namespace DisplacementVentMgr {
 
     // SUBROUTINE SPECIFICATIONS:
 
-    // Functions
+    void clear_state();
 
     void ManageUCSDDVModel(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // index number for the specified zone
 

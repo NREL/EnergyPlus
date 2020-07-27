@@ -433,7 +433,7 @@ namespace PollutionModule {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void SetupPollutionCalculations();
+    void SetupPollutionCalculations(IOFiles &ioFiles);
 
     void GetPollutionFactorInput();
 
