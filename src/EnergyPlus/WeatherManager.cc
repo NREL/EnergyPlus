@@ -2348,8 +2348,6 @@ namespace WeatherManager {
         static ObjexxFCL::gio::Fmt const YMDHFmt("(I4.4,2('/',I2.2),1X,I2.2,':',I2.2)");
         static ObjexxFCL::gio::Fmt const YMDHFmt1("(I4.4,2('/',I2.2),1X,'hour=',I2.2,' - expected hour=',I2.2)");
 
-        int Hour;
-        int TS;
         int WYear;
         int WMonth;
         int WDay;
@@ -2384,31 +2382,6 @@ namespace WeatherManager {
         int PresWeathObs;
         Array1D_int PresWeathConds(9);
         std::string WeatherDataLine;
-        bool Ready;
-        int CurTimeStep;
-        int Item;
-
-        Real64 A;
-        Real64 B;
-        Real64 C;
-        Real64 AVSC;
-        Real64 SkyTemp;
-        bool SkipThisDay; // Used when LeapYear is/is not in effect
-        bool TryAgain;
-        int ReadStatus;
-        int NumRewinds;
-        std::string BadRecord;
-        bool ErrorsFound;
-        Real64 HourRep;
-        Real64 ESky;
-        bool ErrorFound;
-        int NxtHour;
-        Real64 WtNow;
-        Real64 WtPrevHour;
-        Real64 WgtHourNow;
-        Real64 WgtPrevHour;
-        Real64 WgtNextHour;
-        bool RecordDateMatch;
 
         struct HourlyWeatherData
         {
@@ -2444,8 +2417,8 @@ namespace WeatherManager {
             // Checks whether Weather file contains just one year of data. If yes then rewind and position to first
             // day of weather file. The rest of code appropriately positions to the start day.
 
-            Ready = false;
-            NumRewinds = 0;
+            bool Ready = false;
+            int NumRewinds = 0;
             //     Must position file to proper day
             //     File already position to first data record
             //          Set Current Day of Week to "start of Data Period"
@@ -2458,12 +2431,14 @@ namespace WeatherManager {
             WMinute = 0;
             LastHourSet = false;
             while (!Ready) {
+                int ReadStatus;
                 {
                     IOFlags flags;
                     ObjexxFCL::gio::read(WeatherFileUnitNumber, fmtA, flags) >> WeatherDataLine;
                     ReadStatus = flags.ios();
                 }
                 if (ReadStatus == 0) {
+                    bool ErrorFound;
                     InterpretWeatherDataLine(WeatherDataLine,
                                              ErrorFound,
                                              WYear,
@@ -2515,6 +2490,7 @@ namespace WeatherManager {
                             ObjexxFCL::gio::read(WeatherFileUnitNumber, fmtA, flags) >> WeatherDataLine;
                             ReadStatus = flags.ios();
                         }
+                        bool ErrorFound;
                         InterpretWeatherDataLine(WeatherDataLine,
                                                  ErrorFound,
                                                  WYear,
@@ -2553,7 +2529,7 @@ namespace WeatherManager {
                     }
                 }
                 if (ReadStatus != 0) {
-                    BadRecord = General::RoundSigDigits(WYear) + '/' + General::RoundSigDigits(WMonth) + '/' + General::RoundSigDigits(WDay) + ' ' + General::RoundSigDigits(WHour) +
+                    std::string BadRecord = General::RoundSigDigits(WYear) + '/' + General::RoundSigDigits(WMonth) + '/' + General::RoundSigDigits(WDay) + ' ' + General::RoundSigDigits(WHour) +
                                 ':' + General::RoundSigDigits(WMinute);
                     ShowFatalError("Error occurred on EPW while searching for first day, stopped at " + BadRecord +
                                        " IO Error=" + General::RoundSigDigits(ReadStatus),
@@ -2562,7 +2538,7 @@ namespace WeatherManager {
                 if (CurDayOfWeek <= 7) {
                     CurDayOfWeek = mod(CurDayOfWeek, 7) + 1;
                 }
-                RecordDateMatch = (WMonth == Environment(Environ).StartMonth && WDay == Environment(Environ).StartDay && !Environment(Environ).MatchYear) ||
+                bool RecordDateMatch = (WMonth == Environment(Environ).StartMonth && WDay == Environment(Environ).StartDay && !Environment(Environ).MatchYear) ||
                         (WMonth == Environment(Environ).StartMonth && WDay == Environment(Environ).StartDay && Environment(Environ).MatchYear && WYear == Environment(Environ).StartYear);
                 if (RecordDateMatch) {
                     ObjexxFCL::gio::backspace(WeatherFileUnitNumber);
@@ -2571,7 +2547,7 @@ namespace WeatherManager {
                         --CurDayOfWeek;
                     }
                     // Do the range checks on the first set of fields -- no others.
-                    ErrorsFound = false;
+                    bool ErrorsFound = false;
                     if (DryBulb >= 99.9)
                         inputProcessor->rangeCheck(ErrorsFound,
                                                    "DryBulb Temperature",
@@ -2657,7 +2633,7 @@ namespace WeatherManager {
                     }
                 } else {
                     //  Must skip this day
-                    for (Item = 2; Item <= NumIntervalsPerHour; ++Item) {
+                    for (int i = 2; i <= NumIntervalsPerHour; ++i) {
                         {
                             IOFlags flags;
                             ObjexxFCL::gio::read(WeatherFileUnitNumber, fmtA, flags) >> WeatherDataLine;
@@ -2665,14 +2641,14 @@ namespace WeatherManager {
                         }
                         if (ReadStatus != 0) {
                             ObjexxFCL::gio::read(WeatherDataLine, fmtLD) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
-                            BadRecord = General::RoundSigDigits(WYear) + '/' + General::RoundSigDigits(WMonth) + '/' + General::RoundSigDigits(WDay) + BlankString +
+                            std::string BadRecord = General::RoundSigDigits(WYear) + '/' + General::RoundSigDigits(WMonth) + '/' + General::RoundSigDigits(WDay) + BlankString +
                                     General::RoundSigDigits(WHour) + ':' + General::RoundSigDigits(WMinute);
                             ShowFatalError("Error occurred on EPW while searching for first day, stopped at " + BadRecord +
                                                " IO Error=" + General::RoundSigDigits(ReadStatus),
                                            OptionalOutputFileRef{outputFiles.eso});
                         }
                     }
-                    for (Item = 1; Item <= 23 * NumIntervalsPerHour; ++Item) {
+                    for (int i = 1; i <= 23 * NumIntervalsPerHour; ++i) {
                         {
                             IOFlags flags;
                             ObjexxFCL::gio::read(WeatherFileUnitNumber, fmtA, flags) >> WeatherDataLine;
@@ -2680,7 +2656,7 @@ namespace WeatherManager {
                         }
                         if (ReadStatus != 0) {
                             ObjexxFCL::gio::read(WeatherDataLine, fmtLD) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
-                            BadRecord = General::RoundSigDigits(WYear) + '/' + General::RoundSigDigits(WMonth) + '/' + General::RoundSigDigits(WDay) + BlankString +
+                            std::string BadRecord = General::RoundSigDigits(WYear) + '/' + General::RoundSigDigits(WMonth) + '/' + General::RoundSigDigits(WDay) + BlankString +
                                         General::RoundSigDigits(WHour) + ':' + General::RoundSigDigits(WMinute);
                             ShowFatalError("Error occurred on EPW while searching for first day, stopped at " + BadRecord +
                                                " IO Error=" + General::RoundSigDigits(ReadStatus),
@@ -2714,8 +2690,8 @@ namespace WeatherManager {
             }
         }
 
-        TryAgain = true;
-        SkipThisDay = false;
+        bool TryAgain = true;
+        bool SkipThisDay = false;
 
         while (TryAgain) {
 
@@ -2736,9 +2712,9 @@ namespace WeatherManager {
             TomorrowIsRain = false;
             TomorrowIsSnow = false;
 
-            for (Hour = 1; Hour <= 24; ++Hour) {
-                for (CurTimeStep = 1; CurTimeStep <= NumIntervalsPerHour; ++CurTimeStep) {
-                    HourRep = double(Hour - 1) + (ReadEPlusWeatherCurTime * double(CurTimeStep));
+            for (int hour = 1; hour <= 24; ++hour) {
+                for (int CurTimeStep = 1; CurTimeStep <= NumIntervalsPerHour; ++CurTimeStep) {
+                    int ReadStatus;
                     {
                         IOFlags flags;
                         ObjexxFCL::gio::read(WeatherFileUnitNumber, fmtA, flags) >> WeatherDataLine;
@@ -2746,13 +2722,14 @@ namespace WeatherManager {
                     }
                     if (ReadStatus != 0) WeatherDataLine = BlankString;
                     if (WeatherDataLine == BlankString) {
-                        if (Hour == 1) {
+                        if (hour == 1) {
                             ReadStatus = -1;
                         } else {
                             ReadStatus = 99;
                         }
                     }
                     if (ReadStatus == 0) {
+                        bool ErrorFound;
                         InterpretWeatherDataLine(WeatherDataLine,
                                                  ErrorFound,
                                                  WYear,
@@ -2798,7 +2775,7 @@ namespace WeatherManager {
                                     ObjexxFCL::gio::read(WeatherFileUnitNumber, fmtA, flags) >> WeatherDataLine;
                                     ReadStatus = flags.ios();
                                 }
-
+                                bool ErrorFound;
                                 InterpretWeatherDataLine(WeatherDataLine,
                                                          ErrorFound,
                                                          WYear,
@@ -2835,20 +2812,20 @@ namespace WeatherManager {
                                                          Albedo,
                                                          LiquidPrecip);
                             } else {
-                                BadRecord = General::RoundSigDigits(WYear) + '/' + General::RoundSigDigits(WMonth) + '/' + General::RoundSigDigits(WDay) + BlankString +
+                                std::string BadRecord = General::RoundSigDigits(WYear) + '/' + General::RoundSigDigits(WMonth) + '/' + General::RoundSigDigits(WDay) + BlankString +
                                             General::RoundSigDigits(WHour) + ':' + General::RoundSigDigits(WMinute);
                                 ShowFatalError("End-of-File encountered after " + BadRecord +
                                                ", starting from first day of Weather File would not be \"next day\"");
                             }
                         } else {
-                            BadRecord = General::RoundSigDigits(WYear) + '/' + General::RoundSigDigits(WMonth) + '/' + General::RoundSigDigits(WDay) + BlankString +
+                            std::string BadRecord = General::RoundSigDigits(WYear) + '/' + General::RoundSigDigits(WMonth) + '/' + General::RoundSigDigits(WDay) + BlankString +
                                         General::RoundSigDigits(WHour) + ':' + General::RoundSigDigits(WMinute);
                             ShowFatalError("Unexpected error condition in middle of reading EPW file, stopped at " + BadRecord, OptionalOutputFileRef{outputFiles.eso});
                         }
                     }
 
-                    if (Hour != WHour) {
-                        BadRecord = General::RoundSigDigits(WYear) + '/' + General::RoundSigDigits(WMonth) + '/' + General::RoundSigDigits(WDay) + BlankString +
+                    if (hour != WHour) {
+                        std::string BadRecord = General::RoundSigDigits(WYear) + '/' + General::RoundSigDigits(WMonth) + '/' + General::RoundSigDigits(WDay) + BlankString +
                                     General::RoundSigDigits(WHour) + ':' + General::RoundSigDigits(WMinute);
                         ShowFatalError("Unexpected error condition in middle of reading EPW file, " + BadRecord, OptionalOutputFileRef{outputFiles.eso});
                     }
@@ -2894,7 +2871,7 @@ namespace WeatherManager {
                     if (Albedo < 0.0) Albedo = 999.0;
                     if (LiquidPrecip < 0.0) LiquidPrecip = 999.0;
 
-                    if (Hour == 1 && CurTimeStep == 1) {
+                    if (hour == 1 && CurTimeStep == 1) {
                         if (WMonth == 2 && WDay == 29 && (!DataEnvironment::CurrentYearIsLeapYear || !WFAllowsLeapYears)) {
                             EndDayOfMonth(2) = 28;
                             SkipThisDay = true;
@@ -2921,6 +2898,10 @@ namespace WeatherManager {
                         TomorrowVariables.DayOfMonth = WDay;
                         TomorrowVariables.DayOfYear = General::OrdinalDay(WMonth, WDay, LeapYearAdd);
                         TomorrowVariables.DayOfYear_Schedule = General::OrdinalDay(WMonth, WDay, 1);
+                        Real64 A;
+                        Real64 B;
+                        Real64 C;
+                        Real64 AVSC;
                         CalculateDailySolarCoeffs(TomorrowVariables.DayOfYear,
                                                   A,
                                                   B,
@@ -3015,22 +2996,23 @@ namespace WeatherManager {
                         ++Missed.LiquidPrecip;
                     }
 
-                    TomorrowOutDryBulbTemp(CurTimeStep, Hour) = DryBulb;
-                    TomorrowOutDewPointTemp(CurTimeStep, Hour) = DewPoint;
-                    TomorrowOutBaroPress(CurTimeStep, Hour) = AtmPress;
-                    TomorrowOutRelHum(CurTimeStep, Hour) = RelHum;
+                    TomorrowOutDryBulbTemp(CurTimeStep, hour) = DryBulb;
+                    TomorrowOutDewPointTemp(CurTimeStep, hour) = DewPoint;
+                    TomorrowOutBaroPress(CurTimeStep, hour) = AtmPress;
+                    TomorrowOutRelHum(CurTimeStep, hour) = RelHum;
                     RelHum *= 0.01;
-                    TomorrowWindSpeed(CurTimeStep, Hour) = WindSpeed;
-                    TomorrowWindDir(CurTimeStep, Hour) = WindDir;
-                    TomorrowLiquidPrecip(CurTimeStep, Hour) = LiquidPrecip;
+                    TomorrowWindSpeed(CurTimeStep, hour) = WindSpeed;
+                    TomorrowWindDir(CurTimeStep, hour) = WindDir;
+                    TomorrowLiquidPrecip(CurTimeStep, hour) = LiquidPrecip;
 
-                    ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
+                    Real64 ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
                     if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
-                        TomorrowHorizIRSky(CurTimeStep, Hour) = ESky * Sigma * pow_4(DryBulb + DataGlobals::KelvinConv);
+                        TomorrowHorizIRSky(CurTimeStep, hour) = ESky * Sigma * pow_4(DryBulb + DataGlobals::KelvinConv);
                     } else {
-                        TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
+                        TomorrowHorizIRSky(CurTimeStep, hour) = IRHoriz;
                     }
 
+                    Real64 SkyTemp;
                     if (Environment(Envrn).SkyTempModel == EmissivityCalcType::BruntModel || Environment(Envrn).SkyTempModel == EmissivityCalcType::IdsoModel || Environment(Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel || Environment(Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA || Environment(Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
                         // Calculate sky temperature, use IRHoriz if not missing
                         if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
@@ -3044,7 +3026,7 @@ namespace WeatherManager {
                         SkyTemp = 0.0; // dealt with later
                     }
 
-                    TomorrowSkyTemp(CurTimeStep, Hour) = SkyTemp;
+                    TomorrowSkyTemp(CurTimeStep, hour) = SkyTemp;
 
                     if (ETHoriz >= 9999.0) ETHoriz = 0.0;
                     if (ETDirect >= 9999.0) ETDirect = 0.0;
@@ -3067,20 +3049,20 @@ namespace WeatherManager {
                         DiffuseRad = 0.0;
                     }
 
-                    TomorrowBeamSolarRad(CurTimeStep, Hour) = DirectRad;
-                    TomorrowDifSolarRad(CurTimeStep, Hour) = DiffuseRad;
+                    TomorrowBeamSolarRad(CurTimeStep, hour) = DirectRad;
+                    TomorrowDifSolarRad(CurTimeStep, hour) = DiffuseRad;
 
-                    TomorrowIsRain(CurTimeStep, Hour) = false;
+                    TomorrowIsRain(CurTimeStep, hour) = false;
                     if (PresWeathObs == 0) {
-                        if (PresWeathConds(1) < 9 || PresWeathConds(2) < 9 || PresWeathConds(3) < 9) TomorrowIsRain(CurTimeStep, Hour) = true;
+                        if (PresWeathConds(1) < 9 || PresWeathConds(2) < 9 || PresWeathConds(3) < 9) TomorrowIsRain(CurTimeStep, hour) = true;
                     } else {
-                        TomorrowIsRain(CurTimeStep, Hour) = false;
+                        TomorrowIsRain(CurTimeStep, hour) = false;
                     }
-                    TomorrowIsSnow(CurTimeStep, Hour) = (SnowDepth > 0.0);
+                    TomorrowIsSnow(CurTimeStep, hour) = (SnowDepth > 0.0);
 
                     // default if rain but none on weather file
-                    if (TomorrowIsRain(CurTimeStep, Hour) && TomorrowLiquidPrecip(CurTimeStep, Hour) == 0.0)
-                        TomorrowLiquidPrecip(CurTimeStep, Hour) = 2.0; // 2mm in an hour ~ .08 inch
+                    if (TomorrowIsRain(CurTimeStep, hour) && TomorrowLiquidPrecip(CurTimeStep, hour) == 0.0)
+                        TomorrowLiquidPrecip(CurTimeStep, hour) = 2.0; // 2mm in an hour ~ .08 inch
 
                     Missing.DryBulb = DryBulb;
                     Missing.DewPoint = DewPoint;
@@ -3111,21 +3093,21 @@ namespace WeatherManager {
         if (NumIntervalsPerHour == 1 && DataGlobals::NumOfTimeStepInHour > 1) {
             // Create interpolated weather for timestep orientation
             // First copy ts=1 (hourly) from data arrays to Wthr structure
-            for (Hour = 1; Hour <= 24; ++Hour) {
-                Wthr.OutDryBulbTemp(Hour) = TomorrowOutDryBulbTemp(1, Hour);
-                Wthr.OutDewPointTemp(Hour) = TomorrowOutDewPointTemp(1, Hour);
-                Wthr.OutBaroPress(Hour) = TomorrowOutBaroPress(1, Hour);
-                Wthr.OutRelHum(Hour) = TomorrowOutRelHum(1, Hour);
-                Wthr.WindSpeed(Hour) = TomorrowWindSpeed(1, Hour);
-                Wthr.WindDir(Hour) = TomorrowWindDir(1, Hour);
-                Wthr.SkyTemp(Hour) = TomorrowSkyTemp(1, Hour);
-                Wthr.HorizIRSky(Hour) = TomorrowHorizIRSky(1, Hour);
-                Wthr.BeamSolarRad(Hour) = TomorrowBeamSolarRad(1, Hour);
-                Wthr.DifSolarRad(Hour) = TomorrowDifSolarRad(1, Hour);
-                Wthr.IsRain(Hour) = TomorrowIsRain(1, Hour);
-                Wthr.IsSnow(Hour) = TomorrowIsSnow(1, Hour);
-                Wthr.Albedo(Hour) = TomorrowAlbedo(1, Hour);
-                Wthr.LiquidPrecip(Hour) = TomorrowLiquidPrecip(1, Hour);
+            for (int hour = 1; hour <= 24; ++hour) {
+                Wthr.OutDryBulbTemp(hour) = TomorrowOutDryBulbTemp(1, hour);
+                Wthr.OutDewPointTemp(hour) = TomorrowOutDewPointTemp(1, hour);
+                Wthr.OutBaroPress(hour) = TomorrowOutBaroPress(1, hour);
+                Wthr.OutRelHum(hour) = TomorrowOutRelHum(1, hour);
+                Wthr.WindSpeed(hour) = TomorrowWindSpeed(1, hour);
+                Wthr.WindDir(hour) = TomorrowWindDir(1, hour);
+                Wthr.SkyTemp(hour) = TomorrowSkyTemp(1, hour);
+                Wthr.HorizIRSky(hour) = TomorrowHorizIRSky(1, hour);
+                Wthr.BeamSolarRad(hour) = TomorrowBeamSolarRad(1, hour);
+                Wthr.DifSolarRad(hour) = TomorrowDifSolarRad(1, hour);
+                Wthr.IsRain(hour) = TomorrowIsRain(1, hour);
+                Wthr.IsSnow(hour) = TomorrowIsSnow(1, hour);
+                Wthr.Albedo(hour) = TomorrowAlbedo(1, hour);
+                Wthr.LiquidPrecip(hour) = TomorrowLiquidPrecip(1, hour);
             }
 
             if (!LastHourSet) {
@@ -3146,24 +3128,26 @@ namespace WeatherManager {
                 LastHourSet = true;
             }
 
-            for (Hour = 1; Hour <= 24; ++Hour) {
+            for (int hour = 1; hour <= 24; ++hour) {
 
-                NxtHour = Hour + 1;
-                if (Hour == 24) {
+                int NxtHour = hour + 1;
+                if (hour == 24) {
                     NxtHour = 1;
                 }
                 NextHrBeamSolarRad = Wthr.BeamSolarRad(NxtHour);
                 NextHrDifSolarRad = Wthr.DifSolarRad(NxtHour);
                 NextHrLiquidPrecip = Wthr.LiquidPrecip(NxtHour);
 
-                for (TS = 1; TS <= DataGlobals::NumOfTimeStepInHour; ++TS) {
+                for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
 
-                    WtNow = Interpolation(TS);
-                    WtPrevHour = 1.0 - WtNow;
+                    Real64 WtNow = Interpolation(ts);
+                    Real64 WtPrevHour = 1.0 - WtNow;
 
                     // Do Solar "weighting"
 
-                    WgtHourNow = SolarInterpolation(TS);
+                    Real64 WgtHourNow = SolarInterpolation(ts);
+                    Real64 WgtPrevHour;
+                    Real64 WgtNextHour;
 
                     if (DataGlobals::NumOfTimeStepInHour == 1) {
                         WgtNextHour = 1.0 - WgtHourNow;
@@ -3173,7 +3157,7 @@ namespace WeatherManager {
                             //  It's at the half hour
                             WgtNextHour = 0.0;
                             WgtPrevHour = 0.0;
-                        } else if (TS * TimeStepFraction < 0.5) {
+                        } else if (ts * TimeStepFraction < 0.5) {
                             WgtNextHour = 0.0;
                             WgtPrevHour = 1.0 - WgtHourNow;
                         } else { // After the half hour
@@ -3182,40 +3166,40 @@ namespace WeatherManager {
                         }
                     }
 
-                    TomorrowOutDryBulbTemp(TS, Hour) = LastHrOutDryBulbTemp * WtPrevHour + Wthr.OutDryBulbTemp(Hour) * WtNow;
-                    TomorrowOutBaroPress(TS, Hour) = LastHrOutBaroPress * WtPrevHour + Wthr.OutBaroPress(Hour) * WtNow;
-                    TomorrowOutDewPointTemp(TS, Hour) = LastHrOutDewPointTemp * WtPrevHour + Wthr.OutDewPointTemp(Hour) * WtNow;
-                    TomorrowOutRelHum(TS, Hour) = LastHrOutRelHum * WtPrevHour + Wthr.OutRelHum(Hour) * WtNow;
-                    TomorrowWindSpeed(TS, Hour) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed(Hour) * WtNow;
-                    TomorrowWindDir(TS, Hour) = interpolateWindDirection(LastHrWindDir, Wthr.WindDir(Hour), WtNow);
-                    TomorrowHorizIRSky(TS, Hour) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(Hour) * WtNow;
+                    TomorrowOutDryBulbTemp(ts, hour) = LastHrOutDryBulbTemp * WtPrevHour + Wthr.OutDryBulbTemp(hour) * WtNow;
+                    TomorrowOutBaroPress(ts, hour) = LastHrOutBaroPress * WtPrevHour + Wthr.OutBaroPress(hour) * WtNow;
+                    TomorrowOutDewPointTemp(ts, hour) = LastHrOutDewPointTemp * WtPrevHour + Wthr.OutDewPointTemp(hour) * WtNow;
+                    TomorrowOutRelHum(ts, hour) = LastHrOutRelHum * WtPrevHour + Wthr.OutRelHum(hour) * WtNow;
+                    TomorrowWindSpeed(ts, hour) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed(hour) * WtNow;
+                    TomorrowWindDir(ts, hour) = interpolateWindDirection(LastHrWindDir, Wthr.WindDir(hour), WtNow);
+                    TomorrowHorizIRSky(ts, hour) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(hour) * WtNow;
                     if (Environment(Envrn).SkyTempModel == EmissivityCalcType::BruntModel || Environment(Envrn).SkyTempModel == EmissivityCalcType::IdsoModel || Environment(Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel || Environment(Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA || Environment(Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
-                        TomorrowSkyTemp(TS, Hour) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp(Hour) * WtNow;
+                        TomorrowSkyTemp(ts, hour) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp(hour) * WtNow;
                     }
-                    TomorrowDifSolarRad(TS, Hour) =
-                        LastHrDifSolarRad * WgtPrevHour + Wthr.DifSolarRad(Hour) * WgtHourNow + NextHrDifSolarRad * WgtNextHour;
-                    TomorrowBeamSolarRad(TS, Hour) =
-                        LastHrBeamSolarRad * WgtPrevHour + Wthr.BeamSolarRad(Hour) * WgtHourNow + NextHrBeamSolarRad * WgtNextHour;
+                    TomorrowDifSolarRad(ts, hour) =
+                        LastHrDifSolarRad * WgtPrevHour + Wthr.DifSolarRad(hour) * WgtHourNow + NextHrDifSolarRad * WgtNextHour;
+                    TomorrowBeamSolarRad(ts, hour) =
+                        LastHrBeamSolarRad * WgtPrevHour + Wthr.BeamSolarRad(hour) * WgtHourNow + NextHrBeamSolarRad * WgtNextHour;
 
-                    TomorrowLiquidPrecip(TS, Hour) = LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip(Hour) * WtNow;
-                    TomorrowLiquidPrecip(TS, Hour) /= double(DataGlobals::NumOfTimeStepInHour);
+                    TomorrowLiquidPrecip(ts, hour) = LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip(hour) * WtNow;
+                    TomorrowLiquidPrecip(ts, hour) /= double(DataGlobals::NumOfTimeStepInHour);
 
-                    TomorrowIsRain(TS, Hour) = TomorrowLiquidPrecip(TS, Hour) >= (0.8 / double(DataGlobals::NumOfTimeStepInHour)); // Wthr%IsRain(Hour)
-                    TomorrowIsSnow(TS, Hour) = Wthr.IsSnow(Hour);
+                    TomorrowIsRain(ts, hour) = TomorrowLiquidPrecip(ts, hour) >= (0.8 / double(DataGlobals::NumOfTimeStepInHour)); // Wthr%IsRain(Hour)
+                    TomorrowIsSnow(ts, hour) = Wthr.IsSnow(hour);
                 } // End of TS Loop
 
-                LastHrOutDryBulbTemp = Wthr.OutDryBulbTemp(Hour);
-                LastHrOutDewPointTemp = Wthr.OutDewPointTemp(Hour);
-                LastHrOutBaroPress = Wthr.OutBaroPress(Hour);
-                LastHrOutRelHum = Wthr.OutRelHum(Hour);
-                LastHrWindSpeed = Wthr.WindSpeed(Hour);
-                LastHrWindDir = Wthr.WindDir(Hour);
-                LastHrHorizIRSky = Wthr.HorizIRSky(Hour);
-                LastHrSkyTemp = Wthr.SkyTemp(Hour);
-                LastHrBeamSolarRad = Wthr.BeamSolarRad(Hour);
-                LastHrDifSolarRad = Wthr.DifSolarRad(Hour);
-                LastHrAlbedo = Wthr.Albedo(Hour);
-                LastHrLiquidPrecip = Wthr.LiquidPrecip(Hour);
+                LastHrOutDryBulbTemp = Wthr.OutDryBulbTemp(hour);
+                LastHrOutDewPointTemp = Wthr.OutDewPointTemp(hour);
+                LastHrOutBaroPress = Wthr.OutBaroPress(hour);
+                LastHrOutRelHum = Wthr.OutRelHum(hour);
+                LastHrWindSpeed = Wthr.WindSpeed(hour);
+                LastHrWindDir = Wthr.WindDir(hour);
+                LastHrHorizIRSky = Wthr.HorizIRSky(hour);
+                LastHrSkyTemp = Wthr.SkyTemp(hour);
+                LastHrBeamSolarRad = Wthr.BeamSolarRad(hour);
+                LastHrDifSolarRad = Wthr.DifSolarRad(hour);
+                LastHrAlbedo = Wthr.Albedo(hour);
+                LastHrLiquidPrecip = Wthr.LiquidPrecip(hour);
 
             } // End of Hour Loop
         }
@@ -3234,9 +3218,9 @@ namespace WeatherManager {
                                             TomorrowSkyTemp,
                                             TomorrowVariables.DayOfYear_Schedule,
                                             CurDayOfWeek);
-                    for (Hour = 1; Hour <= 24; ++Hour) {
-                        for (TS = 1; TS <= DataGlobals::NumOfTimeStepInHour; ++TS) {
-                            TomorrowSkyTemp(TS, Hour) = TomorrowOutDryBulbTemp(TS, Hour) - TomorrowSkyTemp(TS, Hour);
+                    for (int hour = 1; hour <= 24; ++hour) {
+                        for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
+                            TomorrowSkyTemp(ts, hour) = TomorrowOutDryBulbTemp(ts, hour) - TomorrowSkyTemp(ts, hour);
                         }
                     }
 
@@ -3245,9 +3229,9 @@ namespace WeatherManager {
                                             TomorrowSkyTemp,
                                             TomorrowVariables.DayOfYear_Schedule,
                                             CurDayOfWeek);
-                    for (Hour = 1; Hour <= 24; ++Hour) {
-                        for (TS = 1; TS <= DataGlobals::NumOfTimeStepInHour; ++TS) {
-                            TomorrowSkyTemp(TS, Hour) = TomorrowOutDewPointTemp(TS, Hour) - TomorrowSkyTemp(TS, Hour);
+                    for (int hour = 1; hour <= 24; ++hour) {
+                        for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
+                            TomorrowSkyTemp(ts, hour) = TomorrowOutDewPointTemp(ts, hour) - TomorrowSkyTemp(ts, hour);
                         }
                     }
 
