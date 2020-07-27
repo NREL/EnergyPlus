@@ -51,24 +51,24 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -795,7 +795,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -803,7 +803,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment();
+    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -1147,7 +1147,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -1155,7 +1155,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment();
+    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 

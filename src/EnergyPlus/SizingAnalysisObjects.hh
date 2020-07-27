@@ -58,6 +58,8 @@
 
 namespace EnergyPlus {
 
+    void SizingAnalysisObjects_clear_state();
+
 class SystemTimestepObject
 {
 public:
@@ -182,7 +184,7 @@ public:
 
     PlantCoinicidentAnalysis(std::string loopName, int loopIndex, int nodeNum, Real64 density, Real64 cp, int numStepsInAvg, int sizingIndex);
 
-    void ResolveDesignFlowRate(OutputFiles &outputFiles, int const HVACSizingIterCount);
+    void ResolveDesignFlowRate(IOFiles &ioFiles, int const HVACSizingIterCount);
 
 private:
     std::string name = "";                // name of analysis object

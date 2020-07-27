@@ -101,6 +101,12 @@ namespace MicroturbineElectricGenerator {
     // Object Data
     Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
 
+    void clear_state() {
+        NumMTGenerators = 0;
+        GetMTInput = true;
+        MTGenerator.clear();
+    }
+
     PlantComponent *MTGeneratorSpecs::factory(std::string const &objectName)
     {
         // Process the input data for generator if it hasn't been done already
@@ -318,23 +324,14 @@ namespace MicroturbineElectricGenerator {
                 }
             }
 
-            // Fuel Type case statement
-            {
-                auto const SELECT_CASE_var(AlphArray(5));
-                if (is_blank(SELECT_CASE_var)) { // If blank, then the default is Natural Gas
-                    MTGenerator(GeneratorNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "NATURALGAS") {
-                    MTGenerator(GeneratorNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    MTGenerator(GeneratorNum).FuelType = "Propane";
-
-                } else {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));
-                    ErrorsFound = true;
-                }
+            // Validate fuel type input
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(AlphArray(5), MTGenerator(GeneratorNum).FuelType, FuelTypeError);
+            if (FuelTypeError) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));
+                ErrorsFound = true;
+                FuelTypeError = false;
             }
 
             MTGenerator(GeneratorNum).FuelHigherHeatingValue = NumArray(8);
@@ -890,7 +887,8 @@ namespace MicroturbineElectricGenerator {
         OptLoad = 0.0;
     }
 
-    void MTGeneratorSpecs::InitMTGenerators(bool const RunFlag,
+    void MTGeneratorSpecs::InitMTGenerators(BranchInputManagerData &dataBranchInputManager,
+                                            bool const RunFlag,
                                             Real64 const MyLoad, // electrical load in W
                                             bool const FirstHVACIteration)
     {
@@ -917,7 +915,8 @@ namespace MicroturbineElectricGenerator {
 
         if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_Generator_MicroTurbine,
                                                     this->HRLoopNum,
                                                     this->HRLoopSideNum,

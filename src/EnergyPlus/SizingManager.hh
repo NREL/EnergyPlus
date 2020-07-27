@@ -54,10 +54,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
+    struct EnergyPlusData;
+
 namespace SizingManager {
 
     // Using/Aliasing
@@ -92,7 +93,7 @@ namespace SizingManager {
     // Functions
     void clear_state();
 
-    void ManageSizing(EnergyPlusData &state, OutputFiles &outputFiles);
+    void ManageSizing(EnergyPlusData &state);
 
     bool CalcdoLoadComponentPulseNow(bool const isPulseZoneSizing,
                                      bool const WarmupFlag,
@@ -129,7 +130,7 @@ namespace SizingManager {
 
     void GetAirTerminalSizing();
 
-    void GetSizingParams(OutputFiles &outputFiles);
+    void GetSizingParams(IOFiles &ioFiles);
 
     void GetZoneSizingInput();
 
@@ -140,9 +141,9 @@ namespace SizingManager {
 
     void GetPlantSizingInput();
 
-    void SetupZoneSizing(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound);
+    void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound);
 
-    void ReportZoneSizing(OutputFiles &outputFiles,
+    void ReportZoneSizing(IOFiles &ioFiles,
                           std::string const &ZoneName,   // the name of the zone
                           std::string const &LoadType,   // the description of the input variable
                           Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
@@ -159,7 +160,7 @@ namespace SizingManager {
                           Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
     );
 
-    void ReportSysSizing(OutputFiles &outputFiles,
+    void ReportSysSizing(IOFiles &ioFiles,
                          std::string const &SysName,      // the name of the zone
                          std::string const &LoadType,     // either "Cooling" or "Heating"
                          std::string const &PeakLoadType, // either "Sensible" or "Total"

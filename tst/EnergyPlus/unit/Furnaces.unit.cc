@@ -51,23 +51,23 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataAirLoop.hh>
-#include <AirflowNetwork/Solver.hpp>
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataLoopNode.hh>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/Furnaces.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
-#include <EnergyPlus/ScheduleManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -1169,7 +1169,7 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
     bool FirstHVACIteration(false);
 
     // OutputProcessor::TimeValue.allocate(2);
-    ManageSimulation(state, outputFiles());
+    ManageSimulation(state);
     // check the design max air outlet temperature
     EXPECT_DOUBLE_EQ(45.0, Furnace(1).DesignMaxOutletTemp);
 

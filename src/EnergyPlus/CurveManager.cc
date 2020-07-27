@@ -178,6 +178,8 @@ namespace CurveManager {
     Array1D<PerfomanceCurveData> PerfCurve;
     BtwxtManager btwxtManager;
     std::unordered_map<std::string, std::string> UniqueCurveNames;
+    bool CurveValueMyBeginTimeStepFlag;
+    bool FrictionFactorErrorHasOccurred = false;
 
     // Functions
     void BtwxtMessageCallback(
@@ -211,6 +213,8 @@ namespace CurveManager {
         UniqueCurveNames.clear();
         PerfCurve.deallocate();
         btwxtManager.clear();
+        CurveValueMyBeginTimeStepFlag = true;  // uhh, this static wasn't initialized inside the CurveValue function
+        FrictionFactorErrorHasOccurred = false;
     }
 
     void ResetPerformanceCurveOutput()
@@ -303,18 +307,15 @@ namespace CurveManager {
         // DERIVED TYPE DEFINITIONS
         // na
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static bool MyBeginTimeStepFlag;
-
         // need to be careful on where and how resetting curve outputs to some "iactive value" is done
         // EMS can intercept curves and modify output
-        if (BeginEnvrnFlag && MyBeginTimeStepFlag) {
+        if (BeginEnvrnFlag && CurveValueMyBeginTimeStepFlag) {
             ResetPerformanceCurveOutput();
-            MyBeginTimeStepFlag = false;
+            CurveValueMyBeginTimeStepFlag = false;
         }
 
         if (!BeginEnvrnFlag) {
-            MyBeginTimeStepFlag = true;
+            CurveValueMyBeginTimeStepFlag = true;
         }
 
         if ((CurveIndex <= 0) || (CurveIndex > NumCurves)) {
@@ -1856,7 +1857,7 @@ namespace CurveManager {
                             std::size_t rowNum = indVarInstance.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
                             if (!btwxtManager.tableFiles.count(filePath)) {
-                                btwxtManager.tableFiles.emplace(filePath, filePath);
+                                btwxtManager.tableFiles.emplace(filePath, TableFile{IOFiles::getSingleton(), filePath});
                             }
 
                             axis = btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
@@ -2046,7 +2047,7 @@ namespace CurveManager {
                     std::size_t rowNum = fields.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
                     if (!btwxtManager.tableFiles.count(filePath)) {
-                        btwxtManager.tableFiles.emplace(filePath, filePath);
+                        btwxtManager.tableFiles.emplace(filePath, TableFile{IOFiles::getSingleton(), filePath});
                     }
 
                     lookupValues = btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
@@ -2145,15 +2146,17 @@ namespace CurveManager {
         tableFiles.clear();
     }
 
-    TableFile::TableFile(std::string path) {
-        load(path);
+    TableFile::TableFile(IOFiles &ioFiles, std::string path)
+    {
+        load(ioFiles, path);
     }
 
-    void TableFile::load(std::string path) {
+    void TableFile::load(IOFiles &ioFiles, std::string path)
+    {
         filePath = path;
         bool fileFound;
         std::string fullPath;
-        DataSystemVariables::CheckForActualFileName(path, fileFound, fullPath);
+        DataSystemVariables::CheckForActualFileName(ioFiles, path, fileFound, fullPath);
         if (!fileFound) {
             ShowFatalError("File \"" + filePath + "\" : File not found.");
         }
@@ -2920,7 +2923,7 @@ namespace CurveManager {
         int NumAlphas;                // Number of Alphas for each GetObjectItem call
         int NumNumbers;               // Number of Numbers for each GetObjectItem call
         int IOStatus;                 // Used in GetObjectItem
-        static bool ErrsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrsFound(false); // Set to true if errors in input, fatal at end of routine
         int CurveNum;
 
         NumPressure = inputProcessor->getNumObjectsFound(CurveObjectName);
@@ -3190,7 +3193,6 @@ namespace CurveManager {
         Real64 Term3;
         std::string RR;
         std::string Re;
-        static bool FrictionFactorErrorHasOccurred(false);
 
         // Check for no flow before calculating values
         if (ReynoldsNumber == 0.0) {

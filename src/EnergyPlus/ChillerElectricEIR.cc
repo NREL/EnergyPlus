@@ -58,12 +58,12 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
@@ -71,13 +71,13 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -134,7 +134,7 @@ namespace ChillerElectricEIR {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void ElectricEIRChillerSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ElectricEIRChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -148,7 +148,7 @@ namespace ChillerElectricEIR {
         //  up reporting variables.
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->initialize(RunFlag, CurLoad);
+            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
             this->calculate(CurLoad, RunFlag);
             this->update(CurLoad, RunFlag);
 
@@ -207,7 +207,7 @@ namespace ChillerElectricEIR {
         bool runFlag = true;
         Real64 myLoad = 0.0;
 
-        this->initialize(runFlag, myLoad);
+        this->initialize(state.dataBranchInputManager, runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->size(state);
@@ -914,7 +914,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void ElectricEIRChillerSpecs::initialize(bool const RunFlag, Real64 const MyLoad)
+    void ElectricEIRChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -938,7 +938,8 @@ namespace ChillerElectricEIR {
 
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_Chiller_ElectricEIR,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
@@ -951,7 +952,8 @@ namespace ChillerElectricEIR {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         DataPlant::TypeOf_Chiller_ElectricEIR,
                                                         this->CDLoopNum,
                                                         this->CDLoopSideNum,
@@ -967,7 +969,8 @@ namespace ChillerElectricEIR {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_ElectricEIR, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         DataPlant::TypeOf_Chiller_ElectricEIR,
                                                         this->HRLoopNum,
                                                         this->HRLoopSideNum,
@@ -1503,7 +1506,7 @@ namespace ChillerElectricEIR {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             if (this->IPLVFlag) {
                 Real64 IPLV;
-                StandardRatings::CalcChillerIPLV(OutputFiles::getSingleton(),
+                StandardRatings::CalcChillerIPLV(state.files,
                                                  this->Name,
                                                  DataPlant::TypeOf_Chiller_ElectricEIR,
                                                  this->RefCap,

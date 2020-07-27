@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -62,12 +63,11 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
@@ -170,7 +170,8 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
                                   cAlphaFields,
                                   cNumericFields);
 
-    ProcessOAControllerInputs(state, CurrentModuleObject,
+    ProcessOAControllerInputs(state,
+                              CurrentModuleObject,
                               ControllerNum,
                               AlphArray,
                               NumAlphas,
@@ -200,7 +201,8 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
                                   cNumericFields);
 
     ErrorsFound = false;
-    ProcessOAControllerInputs(state, CurrentModuleObject,
+    ProcessOAControllerInputs(state,
+                              CurrentModuleObject,
                               ControllerNum,
                               AlphArray,
                               NumAlphas,
@@ -487,7 +489,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
     EXPECT_EQ(2, OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
 
@@ -753,7 +755,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     AirLoopFlow(1).OAFrac = 0.01;    // DataAirLoop variable (AirloopHVAC)
     AirLoopFlow(1).OAMinFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
 
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
 
     EXPECT_EQ(7, VentilationMechanical(1).SystemOAMethod);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
@@ -959,7 +961,7 @@ TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
     GetZoneAirDistribution();
     GetZoneSizingInput();
     DataGlobals::DoZoneSizing = true;
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
 
     EXPECT_EQ(0.00944, VentilationMechanical(1).ZoneOAPeopleRate(1));
     EXPECT_EQ(0.00, VentilationMechanical(1).ZoneOAAreaRate(1));
@@ -1304,7 +1306,7 @@ TEST_F(EnergyPlusFixture, FreezingCheckTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
 
     AirLoopControlInfo.allocate(1); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
     AirLoopFlow.allocate(1);        // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
@@ -1500,7 +1502,8 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
                                   cAlphaFields,
                                   cNumericFields);
 
-    ProcessOAControllerInputs(state, CurrentModuleObject,
+    ProcessOAControllerInputs(state,
+                              CurrentModuleObject,
                               ControllerNum,
                               AlphArray,
                               NumAlphas,
@@ -1564,7 +1567,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
         "    Zone1,                    !- Humidistat Control Zone Name",
         "    0.8,                      !- High Humidity Outdoor Air Flow Ratio",
         "    Yes;                      !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -1621,33 +1624,34 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     NumHumidityControlZones = 1;
 
     inputProcessor->getObjectItem(CurrentModuleObject,
-        ControllerNum,
-        AlphArray,
-        NumAlphas,
-        NumArray,
-        NumNums,
-        IOStat,
-        lNumericBlanks,
-        lAlphaBlanks,
-        cAlphaFields,
-        cNumericFields);
+                                  ControllerNum,
+                                  AlphArray,
+                                  NumAlphas,
+                                  NumArray,
+                                  NumNums,
+                                  IOStat,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
 
-    ProcessOAControllerInputs(state, CurrentModuleObject,
-        ControllerNum,
-        AlphArray,
-        NumAlphas,
-        NumArray,
-        NumNums,
-        lNumericBlanks,
-        lAlphaBlanks,
-        cAlphaFields,
-        cNumericFields,
-        ErrorsFound);
+    ProcessOAControllerInputs(state,
+                              CurrentModuleObject,
+                              ControllerNum,
+                              AlphArray,
+                              NumAlphas,
+                              NumArray,
+                              NumNums,
+                              lNumericBlanks,
+                              lAlphaBlanks,
+                              cAlphaFields,
+                              cNumericFields,
+                              ErrorsFound);
     // compare_err_stream( "" ); // just for debugging
 
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(OAController(ControllerNum)
-        .ModifyDuringHighOAMoisture); // "Control High Indoor Humidity Based on Outdoor Humidity Ratio = Yes" sets this to false
+                     .ModifyDuringHighOAMoisture); // "Control High Indoor Humidity Based on Outdoor Humidity Ratio = Yes" sets this to false
     EXPECT_FALSE(has_err_output(true));
     EXPECT_EQ(OAController(ControllerNum).HumidistatZoneNum, 1);
 
@@ -1737,7 +1741,7 @@ TEST_F(EnergyPlusFixture, OAControllerMixedAirSPTest)
     AirLoopControlInfo.allocate(1);
     AirLoopControlInfo(1).LoopFlowRateSet = true;
 
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
 
     StdRhoAir = 1.2;
     OAController(1).MixMassFlow = 1.7 * StdRhoAir;
@@ -1881,7 +1885,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart1)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
 
     EXPECT_EQ(1, GetNumOAMixers());
     EXPECT_EQ(1, GetNumOAControllers());
@@ -5209,7 +5213,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
 
     EXPECT_EQ(6, GetNumOAMixers());
     EXPECT_EQ(1, GetNumOAControllers());
@@ -5259,7 +5263,7 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     DataContaminantBalance::ZoneSysContDemand(1).OutputRequiredToGCSP = 1.0;
     DataContaminantBalance::ZoneSysContDemand(2).OutputRequiredToGCSP = 0.5;
 
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
 
     // Case 1 - System OA method = IndoorAirQualityProcedure, SOAM_IAQP, controls to OutputRequiredToCO2SP
     OAMassFlow = 0.0;
@@ -5467,7 +5471,7 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
     DataHeatBalance::ZoneIntGain(6).NOFOCC = 6;
 
     SizingManager::GetOARequirements();
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
     EXPECT_EQ(SOAM_ZoneSum, VentilationMechanical(1).SystemOAMethod);
 
     // Summary of inputs and expected OA flow rate for each zone, StdRho = 1, so mass flow = volume flow for these tests
@@ -5615,7 +5619,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     AirLoopFlow(1).OAFrac = 0.01;    // DataAirLoop variable (AirloopHVAC)
     AirLoopFlow(1).OAMinFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
 
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
 
     EXPECT_EQ(8, VentilationMechanical(1).SystemOAMethod);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
@@ -5669,6 +5673,20 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 
     EXPECT_NEAR(0.003183055786, OAController(1).OAMassFlow, 0.00001);
     EXPECT_NEAR(0.001560321463, OAController(1).MinOAFracLimit, 0.00001);
+
+    // #5846
+    OAController(1).MinOAMassFlowRate = 0.05;
+    DataGlobals::WarmupFlag = false;
+    OAController(1).CalcOAController(state, 1, true);
+    EXPECT_NEAR(0.006, OAController(1).OAMassFlow, 0.0001);
+    std::string const error_string = delimited_string({
+        "   ** Warning ** CalcOAController: Minimum OA fraction > Mechanical Ventilation Controller request for Controller:OutdoorAir=OA CONTROLLER 1, Min OA fraction is used.",
+        "   **   ~~~   ** This may be overriding desired ventilation controls. Check inputs for Minimum Outdoor Air Flow Rate, Minimum Outdoor Air Schedule Name and Controller:MechanicalVentilation",
+        "   **   ~~~   ** Minimum OA fraction = 2.9412E-003, Mech Vent OA fraction = 1.5603E-003",
+        "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 
     AirLoopControlInfo.deallocate();
     OARequirements.deallocate();
@@ -5906,7 +5924,7 @@ TEST_F(EnergyPlusFixture, MixedAir_OAControllerOrderInControllersListTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
 
     GetOutsideAirSysInputs(state);
 
@@ -5988,7 +6006,7 @@ TEST_F(EnergyPlusFixture, OAController_ProportionalMinimum_HXBypassTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
     EXPECT_EQ(2, OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
 
@@ -6182,7 +6200,7 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
     EXPECT_EQ("OA HEAT RECOVERY", OutsideAirSys(1).ComponentName(1));
     EXPECT_EQ("OA MIXER", OutsideAirSys(1).ComponentName(2));
 
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
     EXPECT_EQ(5, OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
 
@@ -6390,7 +6408,7 @@ TEST_F(EnergyPlusFixture, OAController_HighExhaustMassFlowTest)
     EXPECT_EQ("OA SYS HEATING COIL", OutsideAirSys(1).ComponentName(2));
     EXPECT_EQ("OA MIXER", OutsideAirSys(1).ComponentName(3));
 
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
     EXPECT_EQ(5, OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
 
@@ -6641,7 +6659,7 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
     EXPECT_EQ("OA SYS HEATING COIL", OutsideAirSys(1).ComponentName(2));
     EXPECT_EQ("OA MIXER", OutsideAirSys(1).ComponentName(3));
 
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
     EXPECT_EQ(5, OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
 

@@ -53,6 +53,7 @@
 
 #include <map>
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -65,7 +66,7 @@ namespace EnergyPlus {
 namespace PluginManagement {
     std::unique_ptr<PluginManager> pluginManager;
 
-    std::map<int, std::vector<std::function<void()>>> callbacks;
+    std::map<int, std::vector<std::function<void(void *)>>> callbacks;
     std::vector<PluginInstance> plugins;
     std::vector<PluginTrendVariable> trends;
     std::vector<std::string> globalVariableNames;
@@ -127,7 +128,7 @@ namespace PluginManagement {
         // In this case, the current executable path will be the E+ install root
         // Which is where we find the Python Wrapper Shared Library
         if (wrapperDLLHandle) return; // already found
-        std::string programPath = FileSystem::getProgramPath();
+        std::string programPath = FileSystem::getAbsolutePath(FileSystem::getProgramPath());
         std::string programDir = FileSystem::getParentDirectoryPath(programPath);
         std::string sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
         // set the path to the python library
@@ -402,7 +403,7 @@ namespace PluginManagement {
 #endif
     }
 
-    void registerNewCallback(int iCalledFrom, const std::function<void()> &f)
+    void registerNewCallback(EnergyPlusData &EP_UNUSED(state), int iCalledFrom, const std::function<void(void *)> &f)
     {
         callbacks[iCalledFrom].push_back(f);
     }
@@ -423,11 +424,11 @@ namespace PluginManagement {
         return (int)callbacks.size();
     }
 
-    void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan)
+    void runAnyRegisteredCallbacks(EnergyPlusData &state, int iCalledFrom, bool &anyRan)
     {
         if (DataGlobals::KickOffSimulation) return;
         for (auto const &cb : callbacks[iCalledFrom]) {
-            cb();
+            cb((void *) &state);
             anyRan = true;
         }
 #if LINK_WITH_PYTHON == 1
@@ -777,7 +778,7 @@ namespace PluginManagement {
     {
 #if LINK_WITH_PYTHON == 1
         // we'll need the program directory for a few things so get it once here at the top and sanitize it
-        std::string programPath = FileSystem::getProgramPath();
+        std::string programPath = FileSystem::getAbsolutePath(FileSystem::getProgramPath());
         std::string programDir = FileSystem::getParentDirectoryPath(programPath);
         std::string sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
 
@@ -905,21 +906,9 @@ namespace PluginManagement {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
-                // TODO: Make this an extensible object
-                if (fields.find("variable_name_1") != fields.end()) {
-                    this->addGlobalVariable(fields.at("variable_name_1"));
-                }
-                if (fields.find("variable_name_2") != fields.end()) {
-                    this->addGlobalVariable(fields.at("variable_name_2"));
-                }
-                if (fields.find("variable_name_3") != fields.end()) {
-                    this->addGlobalVariable(fields.at("variable_name_3"));
-                }
-                if (fields.find("variable_name_4") != fields.end()) {
-                    this->addGlobalVariable(fields.at("variable_name_4"));
-                }
-                if (fields.find("variable_name_5") != fields.end()) {
-                    this->addGlobalVariable(fields.at("variable_name_5"));
+                auto const vars = fields.at("global_py_vars");
+                for (const auto &var : vars) {
+                    this->addGlobalVariable(var.at("variable_name"));
                 }
             }
         }

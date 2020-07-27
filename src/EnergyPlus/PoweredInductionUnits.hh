@@ -54,9 +54,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
 
 namespace PoweredInductionUnits {
 
@@ -149,6 +152,7 @@ namespace PoweredInductionUnits {
         int CtrlZoneNum;         // index to control zone
         int ctrlZoneInNodeIndex; // index to the control zone inlet node
         int AirLoopNum;          // index for the air loop that this terminal is connected to.
+        Real64 OutdoorAirFlowRate;  // zone outdoor air volume flow rate
 
         // Default Constructor
         PowIndUnitData()
@@ -159,9 +163,11 @@ namespace PoweredInductionUnits {
               HCoil_FluidIndex(0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0),
               MinVolHotWaterFlow(0.0), MinHotSteamFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0),
               HotControlOffset(0.0), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), ADUNum(0), InducesPlenumAir(false), HeatingRate(0.0),
-              HeatingEnergy(0.0), SensCoolRate(0.0), SensCoolEnergy(0.0), CtrlZoneNum(0), AirLoopNum(0)
+              HeatingEnergy(0.0), SensCoolRate(0.0), SensCoolEnergy(0.0), CtrlZoneNum(0), AirLoopNum(0), OutdoorAirFlowRate(0.0)
         {
         }
+
+        void CalcOutdoorAirVolumeFlowRate();
     };
 
     // Object Data
@@ -180,7 +186,8 @@ namespace PoweredInductionUnits {
 
     void GetPIUs(EnergyPlusData &state);
 
-    void InitPIU(int const PIUNum,             // number of the current fan coil unit being simulated
+    void InitPIU(BranchInputManagerData &dataBranchInputManager,
+                 int const PIUNum,             // number of the current fan coil unit being simulated
                  bool const FirstHVACIteration // TRUE if first zone equip this HVAC step
     );
 

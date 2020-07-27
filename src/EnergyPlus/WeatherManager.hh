@@ -59,10 +59,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
+    struct EnergyPlusData;
+
 namespace WeatherManager {
 
     // Using/Aliasing
@@ -144,7 +145,6 @@ namespace WeatherManager {
     extern Real64 WeatherFileLongitude;
     extern Real64 WeatherFileTimeZone;
     extern Real64 WeatherFileElevation;
-    extern int WeatherFileUnitNumber;                  // File unit number for the weather file
     extern Array1D<Real64> GroundTempsFCFromEPWHeader; // F or C factor method
     extern Array1D<Real64> GroundReflectances;         // User Specified Ground Reflectances
     extern Real64 SnowGndRefModifier;                  // Modifier to ground reflectance during snow
@@ -683,14 +683,11 @@ namespace WeatherManager {
     // Functions
     void clear_state();
 
-    void ManageWeather();
+    void ManageWeather(IOFiles &ioFiles);
 
     void ResetEnvironmentCounter();
 
-    bool GetNextEnvironment(DataGlobal &dataGlobals, OutputFiles &outputFiles,
-                            bool &Available,  // true if there is another environment, false if the end
-                            bool &ErrorsFound // will be set to true if severe errors are found in inputs
-    );
+    bool GetNextEnvironment(EnergyPlusData &state, bool &Available, bool &ErrorsFound);
 
     void AddDesignSetToEnvironmentStruct(
         int const HVACSizingIterCount // Counter for number of times HVAC Sizing Simulation of Design Period set is being rerun
@@ -727,18 +724,19 @@ namespace WeatherManager {
 
     void SetSpecialDayDates(Array1D_int &MonWeekDay); // Weekday of each day 1 of month
 
-    void InitializeWeather(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
+    void InitializeWeather(IOFiles &ioFiles, bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
     void UpdateWeatherData();
 
     void SetCurrentWeather();
 
-    void ReadWeatherForDay(int const DayToRead,          // =1 when starting out, otherwise signifies next day
+    void ReadWeatherForDay(IOFiles &ioFiles,
+                           int const DayToRead,          // =1 when starting out, otherwise signifies next day
                            int const Environ,            // Environment being simulated
                            bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
     );
 
-    void ReadEPlusWeatherForDay(OutputFiles &outputFiles,
+    void ReadEPlusWeatherForDay(IOFiles &ioFiles,
                                 int const DayToRead,          // =1 when starting out, otherwise signifies next day
                                 int const Environ,            // Environment being simulated
                                 bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
@@ -788,7 +786,7 @@ namespace WeatherManager {
                                   Real64 &RField27        // LiquidPrecip
     );
 
-    void SetUpDesignDay(OutputFiles &outputFiles, int const EnvrnNum); // Environment number passed into the routine
+    void SetUpDesignDay(IOFiles &ioFiles, int const EnvrnNum); // Environment number passed into the routine
 
     //------------------------------------------------------------------------------
 
@@ -828,27 +826,27 @@ namespace WeatherManager {
 
     void DetermineSunUpDown(Array1D<Real64> &SunDirectionCosines);
 
-    void OpenWeatherFile(bool &ErrorsFound);
+    void OpenWeatherFile(EnergyPlusData &state, bool &ErrorsFound);
 
-    void OpenEPlusWeatherFile(OutputFiles &outputFiles,
+    void OpenEPlusWeatherFile(EnergyPlusData &state,
                               bool &ErrorsFound,       // Will be set to true if errors found
                               bool const ProcessHeader // Set to true when headers should be processed (rather than just read)
     );
 
-    void CloseWeatherFile();
+    void CloseWeatherFile(IOFiles &ioFiles);
 
-    void ResolveLocationInformation(OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if no location evident
+    void ResolveLocationInformation(IOFiles &ioFiles, bool &ErrorsFound); // Set to true if no location evident
 
     void CheckLocationValidity();
 
     void CheckWeatherFileValidity();
 
-    void ReportOutputFileHeaders(OutputFiles &outputFiles);
+    void ReportOutputFileHeaders(IOFiles &ioFiles);
 
-    void ReportWeatherAndTimeInformation(OutputFiles &outputFiles,
+    void ReportWeatherAndTimeInformation(IOFiles &ioFiles,
                                          bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
-    void ReadUserWeatherInput(DataGlobal &dataGlobals, OutputFiles &outputFiles);
+    void ReadUserWeatherInput(EnergyPlusData &state);
 
     void GetRunPeriodData(int &TotRunPers, // Total number of Run Periods requested
                           bool &ErrorsFound);
@@ -868,11 +866,11 @@ namespace WeatherManager {
 
     void GetWeatherProperties(bool &ErrorsFound);
 
-    void GetGroundTemps(DataGlobal &dataGlobals, bool &ErrorsFound);
+    void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetGroundReflectances(OutputFiles &outputFiles, bool &ErrorsFound);
+    void GetGroundReflectances(IOFiles &ioFiles, bool &ErrorsFound);
 
-    void GetSnowGroundRefModifiers(OutputFiles &outputFiles, bool &ErrorsFound);
+    void GetSnowGroundRefModifiers(IOFiles &ioFiles, bool &ErrorsFound);
 
     void GetWaterMainsTemperatures(bool &ErrorsFound);
 
@@ -883,7 +881,7 @@ namespace WeatherManager {
                                   Real64 const MonthlyOAAvgDryBulbTempMaxDiff // monthly daily average OA drybulb temperature maximum difference
     );
 
-    void GetWeatherStation(OutputFiles &outputFiles, bool &ErrorsFound);
+    void GetWeatherStation(IOFiles &ioFiles, bool &ErrorsFound);
 
     void DayltgCurrentExtHorizIllum();
 
@@ -893,12 +891,9 @@ namespace WeatherManager {
 
     Real64 GetSTM(Real64 const Longitude); // Longitude from user input
 
-    void ProcessEPWHeader(std::string const &HeaderString,
-                          std::string &Line,
-                          bool &ErrorsFound         // Set to true when errors were found, unchanged otherwise
-    );
+    void ProcessEPWHeader(IOFiles &ioFiles, std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
 
-    void SkipEPlusWFHeader();
+    void SkipEPlusWFHeader(IOFiles &ioFiles);
 
     void ReportMissing_RangeData();
 
@@ -941,12 +936,12 @@ namespace WeatherManager {
               MonthlyDailyAverageDryBulbTemp(12, 0.0)
         {
         }
-        void CalcAnnualAndMonthlyDryBulbTemp(); // true if this is CorrelationFromWeatherFile
+        void CalcAnnualAndMonthlyDryBulbTemp(IOFiles &ioFiles); // true if this is CorrelationFromWeatherFile
     };
 
     extern AnnualMonthlyDryBulbWeatherData OADryBulbAverage;
 
-    void ReportWaterMainsTempParameters();
+    void ReportWaterMainsTempParameters(IOFiles &ioFiles);
 
 } // namespace WeatherManager
 

@@ -54,13 +54,13 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
+    struct EnergyPlusData;
 
 namespace WaterThermalTanks {
 
@@ -609,6 +609,7 @@ namespace WaterThermalTanks {
         std::string OutletNodeName2;
 
         bool myOneTimeInitFlag;
+        bool scanPlantLoopsFlag;
 
         int callerLoopNum;
 
@@ -645,19 +646,19 @@ namespace WaterThermalTanks {
               OffCycParaEnergyToTank(0.0), OnCycParaFuelEnergy(0.0), OnCycParaEnergyToTank(0.0), NetHeatTransferEnergy(0.0), FirstRecoveryDone(false),
               FirstRecoveryFuel(0.0), HeatPumpNum(0), DesuperheaterNum(0), ShowSetPointWarning(true), MaxCycleErrorIndex(0), FreezingErrorIndex(0),
               FluidIndex(0), MyOneTimeFlagWH(true), MyTwoTimeFlagWH(true), MyEnvrnFlag(true), WarmupFlag(false), SetLoopIndexFlag(true),
-              AlreadyReported(false), AlreadyRated(false), MyHPSizeFlag(true), CheckWTTEquipName(true), myOneTimeInitFlag(true), callerLoopNum(0)
+              AlreadyReported(false), AlreadyRated(false), MyHPSizeFlag(true), CheckWTTEquipName(true), myOneTimeInitFlag(true), scanPlantLoopsFlag(true), callerLoopNum(0)
         {
         }
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void setupOutputVars();
+        void setupOutputVars(IOFiles &ioFiles);
 
         void setupZoneInternalGains();
 
-        void setupChilledWaterTankOutputVars(OutputFiles &outputFiles);
+        void setupChilledWaterTankOutputVars(IOFiles &ioFiles);
 
-        void setupWaterHeaterOutputVars(OutputFiles &outputFiles);
+        void setupWaterHeaterOutputVars(IOFiles &ioFiles);
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -693,9 +694,9 @@ namespace WaterThermalTanks {
 
         void CalcWaterThermalTankMixed(); // Water Heater being simulated
 
-        void CalcStandardRatings(EnergyPlusData &state, OutputFiles &outputFiles);
+        void CalcStandardRatings(EnergyPlusData &state);
 
-        void ReportCWTankInits(OutputFiles &outputFiles);
+        void ReportCWTankInits(IOFiles &ioFiles);
 
         Real64 GetHPWHSensedTankTemp();
 
@@ -889,7 +890,7 @@ namespace WaterThermalTanks {
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
                                 int &CompIndex);
 
-    bool getDesuperHtrInput();
+    bool getDesuperHtrInput(EnergyPlusData &state);
 
     bool getHPWaterHeaterInput(EnergyPlusData &state);
 
@@ -901,7 +902,7 @@ namespace WaterThermalTanks {
 
     bool getWaterTankStratifiedInput();
 
-    bool GetWaterThermalTankInput(EnergyPlusData &state, OutputFiles &outputFiles);
+    bool GetWaterThermalTankInput(EnergyPlusData &state);
 
     void CalcWaterThermalTankZoneGains(EnergyPlusData &state);
 

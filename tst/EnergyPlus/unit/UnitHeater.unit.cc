@@ -51,12 +51,12 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -65,12 +65,12 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -1108,16 +1108,16 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
 
     NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
-    ProcessScheduleInput(outputFiles());  // read schedule data
+    ProcessScheduleInput(state.files);  // read schedule data
 
     ErrorsFound = false;
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData(outputFiles());
+    GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
 
@@ -1125,7 +1125,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     createFacilityElectricPowerServiceObject();
-    SizingManager::ManageSizing(state, outputFiles());
+    SizingManager::ManageSizing(state);
 
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, NumOfUnitHeats);
@@ -1136,7 +1136,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     DataSizing::CurZoneEqNum = 1;
 
     InitUnitHeater(state, UnitHeatNum, ZoneNum, FirstHVACIteration);
-    InitWaterCoil(state, outputFiles(), CoilNum, FirstHVACIteration); // init hot water heating coil
+    InitWaterCoil(state, CoilNum, FirstHVACIteration); // init hot water heating coil
 
     PltSizHeatNum = PlantUtilities::MyPlantSizingIndex("Coil:Heating:Water",
                                                        UnitHeat(UnitHeatNum).HCoilName,
@@ -1282,7 +1282,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
 
     NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
-    ProcessScheduleInput(outputFiles());  // read schedule data
+    ProcessScheduleInput(state.files);  // read schedule data
 
     ErrorsFound = false;
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
@@ -1298,7 +1298,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     GetWaterCoilsInputFlag = false;
 
     ErrorsFound = false;
-    GetFanInput(state.fans);
+    GetFanInput(state);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
@@ -2428,16 +2428,16 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    ManageSimulation(state, outputFiles());
+    ManageSimulation(state);
 
     EXPECT_EQ(ZoneEquipList(1).NumOfEquipTypes, 2);
     // first priority zone equipment is zone ADU
-    EXPECT_EQ(ZoneEquipmentManager::PrioritySimOrder(1).EquipType, "ZONEHVAC:AIRDISTRIBUTIONUNIT");
-    EXPECT_EQ(ZoneEquipmentManager::PrioritySimOrder(1).EquipName, "MAIN ZONE ATU");
+    EXPECT_EQ(state.dataZoneEquipmentManager.PrioritySimOrder(1).EquipType, "ZONEHVAC:AIRDISTRIBUTIONUNIT");
+    EXPECT_EQ(state.dataZoneEquipmentManager.PrioritySimOrder(1).EquipName, "MAIN ZONE ATU");
     EXPECT_EQ(HeatingCoils::HeatingCoil(1).Name, "MAIN ZONE REHEAT COIL");
     // second priority zone equipment is unit heater
-    EXPECT_EQ(ZoneEquipmentManager::PrioritySimOrder(2).EquipType, "ZONEHVAC:UNITHEATER");
-    EXPECT_EQ(ZoneEquipmentManager::PrioritySimOrder(2).EquipName, "UNITHEATER");
+    EXPECT_EQ(state.dataZoneEquipmentManager.PrioritySimOrder(2).EquipType, "ZONEHVAC:UNITHEATER");
+    EXPECT_EQ(state.dataZoneEquipmentManager.PrioritySimOrder(2).EquipName, "UNITHEATER");
     EXPECT_EQ(HeatingCoils::HeatingCoil(2).Name, "UNITHEATER_ELECTRICHEATER");
     // check the reheat coil output
     EXPECT_NEAR(HeatingCoils::HeatingCoil(1).HeatingCoilRate, 7028.9, 1.0);

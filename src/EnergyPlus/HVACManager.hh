@@ -53,10 +53,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
+    struct EnergyPlusData;
 
 namespace HVACManager {
 
@@ -75,7 +75,7 @@ namespace HVACManager {
     // Functions
     void clear_state();
 
-    void ManageHVAC(EnergyPlusData &state, OutputFiles &outputFiles);
+    void ManageHVAC(EnergyPlusData &state);
 
     void SimHVAC(EnergyPlusData &state);
 

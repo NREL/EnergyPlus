@@ -62,38 +62,9 @@ namespace DataStringGlobals {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-    extern std::string outputEndFileName;
     extern std::string outputErrFileName;
 
-    extern std::string outputJsonFileName;
-    extern std::string outputTSHvacJsonFileName;
-    extern std::string outputTSZoneJsonFileName;
-    extern std::string outputTSJsonFileName;
-    extern std::string outputYRJsonFileName;
-    extern std::string outputMNJsonFileName;
-    extern std::string outputDYJsonFileName;
-    extern std::string outputHRJsonFileName;
-    extern std::string outputSMJsonFileName;
-    extern std::string outputCborFileName;
-    extern std::string outputTSHvacCborFileName;
-    extern std::string outputTSZoneCborFileName;
-    extern std::string outputTSCborFileName;
-    extern std::string outputYRCborFileName;
-    extern std::string outputMNCborFileName;
-    extern std::string outputDYCborFileName;
-    extern std::string outputHRCborFileName;
-    extern std::string outputSMCborFileName;
-    extern std::string outputMsgPackFileName;
-    extern std::string outputTSHvacMsgPackFileName;
-    extern std::string outputTSZoneMsgPackFileName;
-    extern std::string outputTSMsgPackFileName;
-    extern std::string outputYRMsgPackFileName;
-    extern std::string outputMNMsgPackFileName;
-    extern std::string outputDYMsgPackFileName;
-    extern std::string outputHRMsgPackFileName;
-    extern std::string outputSMMsgPackFileName;
 
-    extern std::string outputMtdFileName;
     extern std::string outputMddFileName;
     extern std::string outputRddFileName;
     extern std::string outputShdFileName;
@@ -106,30 +77,17 @@ namespace DataStringGlobals {
     extern std::string inputIddFileName;
     extern std::string inputEpJSONSchemaFileName;
     extern std::string inputEpJSONSchemaFileName;
-    extern std::string inputWeatherFileName;
     extern std::string outputAdsFileName;
     extern std::string outputGLHEFileName;
-    extern std::string outputDelightInFileName;
     extern std::string outputDelightOutFileName;
-    extern std::string outputDelightEldmpFileName;
-    extern std::string outputDelightDfdmpFileName;
-    extern std::string outputMapTabFileName;
-    extern std::string outputMapCsvFileName;
-    extern std::string outputMapTxtFileName;
-    extern std::string outputEddFileName;
     extern std::string outputIperrFileName;
     extern std::string outputPerfLogFileName;
-    extern std::string outputScreenCsvFileName;
     extern std::string outputSqlFileName;
     extern std::string outputSqliteErrFileName;
-    extern std::string EnergyPlusIniFileName;
-    extern std::string inStatFileName;
-    extern std::string TarcogIterationsFileName;
     extern std::string eplusADSFileName;
     extern std::string outputCsvFileName;
     extern std::string outputMtrCsvFileName;
     extern std::string outputRvauditFileName;
-    extern std::string outputExtShdFracFileName;
 
     extern std::string weatherFileNameOnly;
     extern std::string idfDirPathName;

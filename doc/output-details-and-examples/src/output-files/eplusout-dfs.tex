@@ -1,103 +1,66 @@
 \section{eplusout.dfs}\label{eplusout.dfs}
 
-The daylight factors report contains the pre-calculated hourly daylight factors for the four CIE sky types (clear, clear turbid, intermediate, and overcast sky) and two daylight reference points for each exterior window of a daylight zone. The file is CSV formatted -- ready for spreadsheet viewing. The input for requesting the report is simple:
+The daylight factors report contains the pre-calculated hourly daylight factors for the four CIE sky types (clear, clear turbid, intermediate, and overcast sky), for each daylight reference points for each exterior window of a daylight zone. The file is CSV formatted -- ready for spreadsheet viewing. The input for requesting the report is simple:
+
+\begin{lstlisting}
+Output:DaylightFactors,
+  SizingDays;    !- Reporting Days
+\end{lstlisting}
 
 The following shows an excerpt the daylight factors for a window without shade:
 
-This file contains daylight factors for all exterior windows of daylight zones.
-
-If only one reference point the last 4 columns in the data will be zero.
-
 \begin{lstlisting}
+This file contains daylight factors for all exterior windows of daylight zones.
 MonthAndDay,Zone Name,Window Name,Window State
-
-Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1,Daylight Factor for Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at Reference point 2,Daylight Factor for Overcast Sky at Reference point 2
-
-01/21,PERIMETER\_BOT\_ZN\_1,PERIMETER\_BOT\_ZN\_1\_WALL\_SOUTH\_WINDOW,Base Window
-
-1,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-2,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-3,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-4,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-5,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-6,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-7,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-8,5.08810E-002,5.78633E-002,2.59271E-002,1.42712E-002,0.00000,0.00000,0.00000,0.00000
-
-9,5.85018E-002,6.68126E-002,3.02054E-002,1.42712E-002,0.00000,0.00000,0.00000,0.00000
-
-10,6.26710E-002,7.12830E-002,3.37475E-002,1.42712E-002,0.00000,0.00000,0.00000,0.00000
-
-11,6.35876E-002,7.17181E-002,3.59982E-002,1.42712E-002,0.00000,0.00000,0.00000,0.00000
-
-12,6.23746E-002,6.98139E-002,3.66365E-002,1.42712E-002,0.00000,0.00000,0.00000,0.00000
-
-13,6.39669E-002,7.21972E-002,3.61684E-002,1.42712E-002,0.00000,0.00000,0.00000,0.00000
-
-14,6.25455E-002,7.10272E-002,3.39911E-002,1.42712E-002,0.00000,0.00000,0.00000,0.00000
-
-15,5.85994E-002,6.67866E-002,3.05581E-002,1.42712E-002,0.00000,0.00000,0.00000,0.00000
-
-16,5.17581E-002,5.89493E-002,2.63461E-002,1.42712E-002,0.00000,0.00000,0.00000,0.00000
-
-17,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-18,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-19,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-20,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-21,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-22,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-23,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
-
-24,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000
+Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,Daylight Factor for Intermediate Sky,Daylight Factor for Overcast Sky
+01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,Base Window
+1,ZN_1_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000
+1,ZN_1_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000
+1,ZN_1_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000
+[...]
+9,ZN_1_DAYLREFPT1,2.14657E-002,1.73681E-002,1.38241E-002,1.41272E-002
+9,ZN_1_DAYLREFPT2,2.14657E-002,1.73680E-002,1.38240E-002,1.41273E-002
+9,ZN_1_DAYLREFPT3,2.14655E-002,1.73678E-002,1.38239E-002,1.41274E-002
+[...]
+24,ZN_1_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000
+24,ZN_1_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000
+24,ZN_1_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000
 \end{lstlisting}
 
-The first line describes the data in the eplusout.dfs file. The second line describes the header of the daily row:
+The first line describes the data in the \textbf{eplusout.dfs} file.
+
+The second line describes the header of the daily row:
 
 {\scriptsize
-\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
-\toprule 
-Month and Day & Zone Name & Window Name & Window State \tabularnewline
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{2.5in}>{\raggedright}p{1.5in}}
+\toprule
+MonthAndDay & Zone Name & Window Name & Window State \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
-Month and Day & Zone Name & Window Name & Window State \tabularnewline
+\toprule
+MonthAndDay & Zone Name & Window Name & Window State \tabularnewline
 \midrule
 \endhead
 
-01/21 & PERIMETER\-\_BOT\-\_ZN\-\_1 & PERIMETER\-\_BOT\-\_ZN\-\_1\-\_WALL\-\_SOUTH\-\_WINDOW & Base Window \tabularnewline
+01/21 & ZN\_1 & ZN\_1\_WALL\_NORTH\_WINDOW & Base Window \tabularnewline
 \bottomrule
 \end{longtable}}
 
-The Window State column has three possible outputs -- Base Window indicating windows without shades; a numeric value, from 0.0 to 180.0 for every 10.0 step, indicating the slat angle (in degrees) of the blind shading the window; blink indicating windows in shaded state by shades, screens, and blinds with fixed slat angle.
+The Window State column has three possible outputs -- ``Base Window'' indicating windows without shades; a numeric value, from 0.0 to 180.0 for every 10.0 step, indicating the slat angle (in degrees) of the blind shading the window; ``Blind or Slat Applied'' indicating windows in shaded state by shades, screens, and blinds with fixed slat angle.
 
-The third line describes the hourly daylight factors. Note that the last 4 columns are 0.0 because there is only one daylight reference point.:
+The lines after it describes the hourly daylight factors at each reference point:
 
 {\scriptsize
-\begin{longtable}[c]{>{\raggedright}p{0.5in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}}
-\toprule 
-Hour & Daylight factor for clear sky at reference point 1 & Daylight factor for clear turbid sky at reference point 1 & Daylight factor for intermediate sky at reference point 1 & Daylight factor for overcast sky at reference point 1 & Daylight factor for clear sky at reference point 2 & Daylight factor for clear turbid sky at reference point 2 & Daylight factor for intermediate sky at reference point 2 & Daylight factor for overcast sky at reference point 2 \tabularnewline
-\midrule
-\endfirsthead
-
-\toprule 
-Hour & Daylight factor for clear sky at reference point 1 & Daylight factor for clear turbid sky at reference point 1 & Daylight factor for intermediate sky at reference point 1 & Daylight factor for overcast sky at reference point 1 & Daylight factor for clear sky at reference point 2 & Daylight factor for clear turbid sky at reference point 2 & Daylight factor for intermediate sky at reference point 2 & Daylight factor for overcast sky at reference point 2 \tabularnewline
-\midrule
+\begin{longtable}[c]{p{0.2in}p{1.5in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
+\caption{Hourly Daylight Factors for the considered window at each reference point and 4 CIE Sky Conditions}
+\label{tab:dfs-output-at-each-ref-pt}\\
+\hline
+Hour & Reference Point & Daylight Factor for Clear Sky & Daylight Factor for Clear Turbid Sky & Daylight Factor for Intermediate Sky & Daylight Factor for Overcast Sky \\ \hline
 \endhead
-
-10 & 0.06239 & 0.07088 & 0.03377 & 0.01427 & 0.0 & 0.0 & 0.0 & 0.0 \tabularnewline
-\bottomrule
+%
+9 & ZN\_1\_DAYLREFPT1 & 0.021466 & 0.017368 & 0.013824 & 0.014127 \\ \hline
+9 & ZN\_1\_DAYLREFPT2 & 0.021466 & 0.017368 & 0.013824 & 0.014127 \\ \hline
+9 & ZN\_1\_DAYLREFPT3 & 0.021465 & 0.017368 & 0.013824 & 0.014127 \\ \hline
+10 & ZN\_1\_DAYLREFPT1 & 0.020245 & 0.016029 & 0.012201 & 0.014127 \\ \hline
 \end{longtable}}

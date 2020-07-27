@@ -48,10 +48,13 @@
 #ifndef ExteriorEnergyUse_hh_INCLUDED
 #define ExteriorEnergyUse_hh_INCLUDED
 
+#include <unordered_map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -121,7 +124,7 @@ namespace ExteriorEnergyUse {
         bool ManageDemand;  // Flag to indicate whether to use demand limiting
         Real64 DemandLimit; // Demand limit set by demand manager [W]
 
-                            // Default Constructor
+        // Default Constructor
         ExteriorEquipmentUsage() : FuelType(ExteriorFuelUsage::Unknown), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
         {
         }
@@ -142,6 +145,27 @@ namespace ExteriorEnergyUse {
     void ReportExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse);
 
 } // namespace ExteriorEnergyUse
+
+    struct ExteriorEnergyUseData : BaseGlobalStruct {
+
+        int NumExteriorLights; // Number of Exterior Light Inputs
+        int NumExteriorEqs;    // Number of Exterior Equipment Inputs
+        Array1D<ExteriorEnergyUse::ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
+        Array1D<ExteriorEnergyUse::ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
+        std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
+        bool GetExteriorEnergyInputFlag; // First time, input is "gotten"
+
+        void clear_state() override {
+            NumExteriorLights = 0;
+            NumExteriorEqs = 0;
+            ExteriorLights.deallocate();
+            ExteriorEquipment.deallocate();
+            UniqueExteriorEquipNames.clear();
+            GetExteriorEnergyInputFlag = true;
+        }
+        // Default Constructor
+        ExteriorEnergyUseData() : NumExteriorLights(0), NumExteriorEqs(0), GetExteriorEnergyInputFlag(true){}
+    };
 
 } // namespace EnergyPlus
 

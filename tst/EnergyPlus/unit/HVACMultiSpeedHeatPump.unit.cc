@@ -55,8 +55,9 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
 
-
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -65,14 +66,12 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
-#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SingleDuct.hh>
@@ -1252,7 +1251,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     ASSERT_TRUE(process_idf(idf_objects));
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.files);
 
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet
@@ -1262,18 +1261,18 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 2; // 1st zone is 402, so this is 2nd direct air unit
     DataZoneEquipment::ZoneEquipList(2).EquipIndex(1) = 1; // 2nd zone is 401, so this is 1st direct air unit
     MixedAir::GetOutsideAirSysInputs(state);
-    MixedAir::GetOAControllerInputs(state, outputFiles());
+    MixedAir::GetOAControllerInputs(state);
     SplitterComponent::GetSplitterInput();
-    BranchInputManager::GetMixerInput();
-    BranchInputManager::ManageBranchInput();
-    GetZoneAirLoopEquipment();
+    BranchInputManager::GetMixerInput(state.dataBranchInputManager);
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
+    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     SingleDuct::GetSysInput(state);
 
     // Get Air Loop HVAC Data
     SimAirServingZones::GetAirPathData(state);
     SimAirServingZones::InitAirLoops(state, FirstHVACIteration);
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(outputFiles());
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.files);
 
     CurDeadBandOrSetback.allocate(2);
     CurDeadBandOrSetback(1) = false;

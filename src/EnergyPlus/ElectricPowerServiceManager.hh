@@ -53,18 +53,17 @@
 #include <string>
 #include <vector>
 
-// ObjexxFCL Headers
-//#include <ObjexxFCL/Array1.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct BranchInputManagerData;
 
 enum class ThermalLossDestination : int
 {
@@ -475,11 +474,12 @@ class GeneratorController
 
 public: // Method
     // Constructor
-    GeneratorController(std::string const &objectName,
+    GeneratorController(IOFiles &ioFiles,
+                        std::string const &objectName,
                         std::string const &objectType,
-                        Real64 const ratedElecPowerOutput,
+                        Real64 ratedElecPowerOutput,
                         std::string const &availSchedName,
-                        Real64 const thermalToElectRatio);
+                        Real64 thermalToElectRatio);
 
     void simGeneratorGetPowerOutput(EnergyPlusData &state, bool const runFlag,             // true if generator is on
                                     Real64 const myElecLoadRequest, // target electric power production request
@@ -542,7 +542,7 @@ class ElectPowerLoadCenter
 
 public: // Methods
     // Constructor
-    ElectPowerLoadCenter(int const objectNum);
+    ElectPowerLoadCenter(IOFiles &ioFiles, int const objectNum);
 
     void manageElecLoadCenter(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingPowerDemand);
 
@@ -563,7 +563,7 @@ private: // Methods
 
     void dispatchStorage(Real64 const remainingPowerDemand);
 
-    Real64 calcLoadCenterThermalLoad(); // returns heat rate called for from cogenerator(watts)
+    Real64 calcLoadCenterThermalLoad(BranchInputManagerData &dataBranchInputManager); // returns heat rate called for from cogenerator(watts)
 
 public: // data public for unit test
     enum class ElectricBussType : int
@@ -700,7 +700,7 @@ public: // Methods
     void verifyCustomMetersElecPowerMgr();
 
 private: // Methods
-    void getPowerManagerInput();
+    void getPowerManagerInput(IOFiles &ioFiles);
 
     void setupMeterIndices();
 

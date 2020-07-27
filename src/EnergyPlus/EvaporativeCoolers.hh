@@ -55,9 +55,10 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace EvaporativeCoolers {
 
@@ -80,7 +81,6 @@ namespace EvaporativeCoolers {
     // MODULE VARIABLE DECLARATIONS:
     extern bool GetInputEvapComponentsFlag; // Flag set to make sure you get input once
     extern int NumEvapCool;                 // The Number of Evap Coolers found in the Input
-    extern Array1D_bool MySizeFlag;
     extern Array1D_bool CheckEquipName;
 
     extern int NumZoneEvapUnits;
@@ -199,6 +199,7 @@ namespace EvaporativeCoolers {
         bool FaultyEvapCoolerFoulingFlag;     // True if the evaporative cooler has fouling fault
         int FaultyEvapCoolerFoulingIndex;     // Index of the fault object corresponding to the evaporative cooler
         Real64 FaultyEvapCoolerFoulingFactor; // Evaporative cooler fouling factor
+        bool MySizeFlag;
 
         // Default Constructor
         EvapConditions()
@@ -219,7 +220,7 @@ namespace EvaporativeCoolers {
               DryCoilMaxEfficiency(0.0), IndirectFanPower(0.0), FanSizingSpecificPower(0.0), RecircPumpSizingFactor(0.0),
               IndirectVolFlowScalingFactor(0.0), WetbulbEffecCurveIndex(0), DrybulbEffecCurveIndex(0), FanPowerModifierCurveIndex(0),
               PumpPowerModifierCurveIndex(0), IECOperatingStatus(0), IterationLimit(0), IterationFailed(0), EvapCoolerRDDOperatingMode(0),
-              FaultyEvapCoolerFoulingFlag(false), FaultyEvapCoolerFoulingIndex(0), FaultyEvapCoolerFoulingFactor(1.0)
+              FaultyEvapCoolerFoulingFlag(false), FaultyEvapCoolerFoulingIndex(0), FaultyEvapCoolerFoulingFactor(1.0), MySizeFlag(true)
         {
         }
     };

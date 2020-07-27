@@ -60,20 +60,20 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -337,7 +337,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     ASSERT_TRUE(process_idf(idf_objects));
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    ScheduleManager::ProcessScheduleInput(outputFiles());
+    ScheduleManager::ProcessScheduleInput(state.files);
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
@@ -546,7 +546,7 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     ASSERT_TRUE(process_idf(idf_contents));
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    ScheduleManager::ProcessScheduleInput(outputFiles());
+    ScheduleManager::ProcessScheduleInput(state.files);
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
@@ -1195,18 +1195,18 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
 
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput(outputFiles());
+    ScheduleManager::ProcessScheduleInput(state.files);
 
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet
     DataZoneEquipment::GetZoneEquipmentData(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     SingleDuct::GetSysInput(state);
 
     MixedAir::GetOutsideAirSysInputs(state);
     SplitterComponent::GetSplitterInput();
-    BranchInputManager::GetMixerInput();
-    BranchInputManager::ManageBranchInput();
+    BranchInputManager::GetMixerInput(state.dataBranchInputManager);
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
 
     DataGlobals::SysSizingCalc = true;
     SimAirServingZones::GetAirPathData(state);

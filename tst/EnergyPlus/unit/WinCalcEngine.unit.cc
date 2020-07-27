@@ -53,13 +53,9 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <WCEMultiLayerOptics.hpp>
@@ -100,14 +96,14 @@ TEST_F(EnergyPlusFixture, WCEClear)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
-    WindowManager::initWindowModel();
-    WindowManager::InitWindowOpticalCalculations();
-    HeatBalanceManager::InitHeatBalance();
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    WindowManager::initWindowModel(state.dataWindowManager);
+    WindowManager::InitWindowOpticalCalculations(state.dataWindowComplexManager, state.dataWindowManager, state.files);
+    HeatBalanceManager::InitHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files);
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
-    auto solarLayer = aWinConstSimp.getEquivalentLayer(FenestrationCommon::WavelengthRange::Solar, 1);
+    auto solarLayer = aWinConstSimp.getEquivalentLayer(state.dataWindowManager, FenestrationCommon::WavelengthRange::Solar, 1);
 
     // Transmittance Front
     const auto Tfront = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front,
@@ -192,14 +188,14 @@ TEST_F(EnergyPlusFixture, WCEVenetian)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
-    WindowManager::initWindowModel();
-    WindowManager::InitWindowOpticalCalculations();
-    HeatBalanceManager::InitHeatBalance();
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    WindowManager::initWindowModel(state.dataWindowManager);
+    WindowManager::InitWindowOpticalCalculations(state.dataWindowComplexManager, state.dataWindowManager, state.files);
+    HeatBalanceManager::InitHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files);
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
-    auto solarLayer = aWinConstSimp.getEquivalentLayer(FenestrationCommon::WavelengthRange::Solar, 1);
+    auto solarLayer = aWinConstSimp.getEquivalentLayer(state.dataWindowManager, FenestrationCommon::WavelengthRange::Solar, 1);
 
     // Transmittance Front
     const auto Tfront = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front,
@@ -270,14 +266,14 @@ TEST_F(EnergyPlusFixture, WCEShade)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
-    WindowManager::initWindowModel();
-    WindowManager::InitWindowOpticalCalculations();
-    HeatBalanceManager::InitHeatBalance();
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    WindowManager::initWindowModel(state.dataWindowManager);
+    WindowManager::InitWindowOpticalCalculations(state.dataWindowComplexManager, state.dataWindowManager, state.files);
+    HeatBalanceManager::InitHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files);
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
-    auto solarLayer = aWinConstSimp.getEquivalentLayer(FenestrationCommon::WavelengthRange::Solar, 1);
+    auto solarLayer = aWinConstSimp.getEquivalentLayer(state.dataWindowManager, FenestrationCommon::WavelengthRange::Solar, 1);
 
     // Transmittance Front
     const auto Tfront_dir_dir = solarLayer->getPropertySimple(FenestrationCommon::PropertySimple::T, FenestrationCommon::Side::Front,

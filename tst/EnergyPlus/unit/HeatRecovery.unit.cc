@@ -51,8 +51,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
 #include "EnergyPlus/DataAirLoop.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -60,10 +61,9 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatRecovery.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
@@ -3817,7 +3817,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2); //
-    ManageSimulation(state, outputFiles());                     // run the design day
+    ManageSimulation(state);                     // run the design day
 
     ASSERT_EQ("DOAS HEAT RECOVERY", ExchCond(1).Name);                       // Name of Heat Recovery Exchange On Main Air Loop
     ASSERT_EQ(ExchCond(1).Name, PrimaryAirSystem(1).Branch(1).Comp(2).Name); // Heat Recovery Exchange On Main Air Loop
@@ -4046,9 +4046,9 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(outputFiles());
+    ScheduleManager::ProcessScheduleInput(state.files);
     // get OA Controller
-    MixedAir::GetOAControllerInputs(state, outputFiles());
+    MixedAir::GetOAControllerInputs(state);
     int OAContrllerNum = 1;
     auto &thisOAController(MixedAir::OAController(OAContrllerNum));
     EXPECT_EQ(1, MixedAir::NumOAControllers);

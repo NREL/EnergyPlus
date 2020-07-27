@@ -54,13 +54,13 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -184,13 +184,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIUReheat_GetInputtest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(outputFiles());  // read schedules
+    ProcessScheduleInput(state.files);  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment();
+    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
 
     GetPIUs(state);
 
@@ -293,13 +293,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(outputFiles());  // read schedules
+    ProcessScheduleInput(state.files);  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment();
+    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
 
     GetPIUs(state);
 
@@ -1477,7 +1477,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    ManageSimulation(state, outputFiles()); // run the design day over the warmup period (24 hrs, 25 days)
+    ManageSimulation(state); // run the design day over the warmup period (24 hrs, 25 days)
 
     int const PIUNum = 1;
     int const ADUNum = 1;

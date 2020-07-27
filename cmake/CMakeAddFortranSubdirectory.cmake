@@ -155,6 +155,9 @@ function(cmake_add_fortran_subdirectory subdir)
     -P ${build_dir}/build_mingw.cmake
     INSTALL_COMMAND ""
     )
+
+  set_target_properties(${project_name}_build PROPERTIES FOLDER Auxiliary)
+
   # make the external project always run make with each build
   externalproject_add_step(${project_name}_build forcebuild
     COMMAND ${CMAKE_COMMAND}

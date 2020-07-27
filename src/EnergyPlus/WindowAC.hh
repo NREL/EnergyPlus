@@ -52,40 +52,16 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    struct WindowACData;
 
 namespace WindowAC {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern int const WindowAC_UnitType;
-    extern std::string const cWindowAC_UnitType;
-    extern Array1D_string const cWindowAC_UnitTypes;
-
-    // Compressor operation
-    extern int const On;  // normal compressor operation
-    extern int const Off; // signal DXCoil that compressor shouldn't run
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumWindAC;
-    extern int NumWindACCyc;
-    extern Array1D_bool MySizeFlag;
-    extern bool GetWindowACInputFlag; // First time, input is "gotten"
-    extern bool CoolingLoad;          // defines a cooling load
-    extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Types
 
     struct WindACData
     {
@@ -172,13 +148,7 @@ namespace WindowAC {
         }
     };
 
-    // Object Data
-    extern Array1D<WindACData> WindAC;
-    extern Array1D<WindACNumericFieldData> WindACNumericFields; // holds window AC numeric input fields character field name
-
     // Functions
-
-    void clear_state();
 
     void SimWindowAC(EnergyPlusData &state, std::string const &CompName,   // name of the window AC unit
                      int const ZoneNum,             // number of zone being served
@@ -206,7 +176,7 @@ namespace WindowAC {
                             Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     );
 
-    void ReportWindowAC(int const WindACNum); // number of the current AC unit being simulated
+    void ReportWindowAC(WindowACData &dataWindowAC, int const WindACNum); // number of the current AC unit being simulated
 
     void CalcWindowACOutput(EnergyPlusData &state, int const WindACNum,           // Unit index in fan coil array
                             bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
@@ -233,6 +203,55 @@ namespace WindowAC {
     int GetWindowACMixedAirNode(EnergyPlusData &state, int const WindACNum);
 
 } // namespace WindowAC
+
+    struct WindowACData : BaseGlobalStruct {
+
+        // MODULE PARAMETER DEFINITIONS
+        int const WindowAC_UnitType;
+        std::string const cWindowAC_UnitType;
+        Array1D_string const cWindowAC_UnitTypes;
+
+        // Compressor operation
+        int const On;  // normal compressor operation
+        int const Off; // signal DXCoil that compressor shouldn't run
+
+        bool MyOneTimeFlag;
+        bool ZoneEquipmentListChecked;
+
+        int NumWindAC;
+        int NumWindACCyc;
+        Array1D_bool MySizeFlag;
+        bool GetWindowACInputFlag; // First time, input is "gotten"
+        bool CoolingLoad;         // defines a cooling load
+        Array1D_bool CheckEquipName;
+        // Object Data
+        Array1D<WindowAC::WindACData> WindAC;
+        Array1D<WindowAC::WindACNumericFieldData> WindACNumericFields; // holds window AC numeric input fields character field name
+
+
+        void clear_state() override
+        {
+            NumWindAC = 0;
+            NumWindACCyc = 0;
+            GetWindowACInputFlag = true;
+            CoolingLoad = false;
+            MyOneTimeFlag = true;
+            ZoneEquipmentListChecked = false;
+            MySizeFlag.deallocate();
+            CheckEquipName.deallocate();
+            WindAC.deallocate();
+            WindACNumericFields.deallocate();
+        }
+
+        // Default Constructor
+        WindowACData()
+            : WindowAC_UnitType(1), cWindowAC_UnitType("ZoneHVAC:WindowAirConditioner"), 
+              cWindowAC_UnitTypes(1, cWindowAC_UnitType), On(1), Off(0), MyOneTimeFlag(true),
+              ZoneEquipmentListChecked(false), NumWindAC(0), NumWindACCyc(0), GetWindowACInputFlag(true),
+              CoolingLoad(false)
+        {
+        }
+    };
 
 } // namespace EnergyPlus
 
