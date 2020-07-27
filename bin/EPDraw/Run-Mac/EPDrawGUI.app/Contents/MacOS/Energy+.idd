@@ -14987,7 +14987,7 @@ SurfaceProperty:ExteriorNaturalVentedCavity,
        \object-list AllShadingAndHTSurfNames
 
 ZoneProperty:UserViewFactors,
-       \obsolete New=>ZoneProperty:UserViewFactors:bySurfaceName
+       \obsolete New=>ZoneProperty:UserViewFactors:BySurfaceName
        \memo The numbers listed in here (fields i,j) are surface numbers AFTER
        \memo EnergyPlus has read them in and massaged them. If you add a surface
        \memo into the zone, you will need to redo the surface numbers. Surface**2
@@ -15360,7 +15360,7 @@ ZoneProperty:UserViewFactors,
   N358,N359,N360, \note fields as indicated
   N361,N362,N363; \note fields as indicated
 
-ZoneProperty:UserViewFactors:bySurfaceName,
+ZoneProperty:UserViewFactors:BySurfaceName,
        \memo View factors for Surface to Surface in a zone.
        \memo (Number of Surfaces)**2 must be entered.
        \extensible:3 - copy last three fields, remembering to remove ;

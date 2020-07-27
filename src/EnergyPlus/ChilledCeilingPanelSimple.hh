@@ -58,10 +58,11 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct EnergyPlusData;
-struct ChilledCeilingPanelSimpleData;
-struct ZoneTempPredictorCorrectorData;
+    // Forward Declarations
+    struct EnergyPlusData;
+    struct ChilledCeilingPanelSimpleData;
+    struct WindowManagerData;
+    struct ZoneTempPredictorCorrectorData;
 
 namespace CoolingPanelSimple {
 
@@ -155,9 +156,7 @@ namespace CoolingPanelSimple {
         {
         }
 
-        void CalcCoolingPanel(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
-                              ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
-                              int CoolingPanelNum);
+        void CalcCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum);
 
         void SetCoolingPanelControlTemp(Real64 &ControlTemp, int ZoneNum);
 
@@ -224,6 +223,8 @@ struct ChilledCeilingPanelSimpleData : BaseGlobalStruct {
     Array1D<CoolingPanelSimple::CoolingPanelParams> CoolingPanel;
     Array1D<CoolingPanelSimple::CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
 
+    bool ZoneEquipmentListChecked = false;
+
     void clear_state() override
     {
         GetInputFlag = true;
@@ -240,6 +241,7 @@ struct ChilledCeilingPanelSimpleData : BaseGlobalStruct {
         MySizeFlagCoolPanel.deallocate();
         CoolingPanel.deallocate();
         CoolingPanelSysNumericFields.deallocate();
+        ZoneEquipmentListChecked = false;
     }
 };
 

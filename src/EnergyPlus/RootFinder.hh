@@ -54,7 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataRootFinder.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
@@ -174,21 +174,21 @@ namespace RootFinder {
 
     Real64 BrentMethod(RootFinderDataType &RootFinderData); // Data used by root finding algorithm
 
-    void WriteRootFinderTraceHeader(OutputFile &TraceFileUnit); // Unit for trace file
+    void WriteRootFinderTraceHeader(InputOutputFile &TraceFileUnit); // Unit for trace file
 
-    void WriteRootFinderTrace(OutputFile &TraceFile,                 // Unit for trace file
+    void WriteRootFinderTrace(InputOutputFile &TraceFile,                 // Unit for trace file
                               RootFinderDataType const &RootFinderData // Data used by root finding algorithm
     );
 
-    void WritePoint(OutputFile &TraceFile,    // Unit for trace file
+    void WritePoint(InputOutputFile &TraceFile,    // Unit for trace file
                     PointType const &PointData, // Point data structure
                     bool const ShowXValue);
 
-    void DebugRootFinder(OutputFile &DebugFile,                   // File unit where to write debugging info
+    void DebugRootFinder(InputOutputFile &DebugFile,                   // File unit where to write debugging info
                          RootFinderDataType const &RootFinderData // Data used by root finding algorithm
     );
 
-    void WriteRootFinderStatus(OutputFile &File,                      // File unit where to write the status description
+    void WriteRootFinderStatus(InputOutputFile &File,                      // File unit where to write the status description
                                RootFinderDataType const &RootFinderData // Data used by root finding algorithm
     );
 

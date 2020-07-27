@@ -106,8 +106,8 @@ namespace ChillerAbsorption {
     // to generate the coefficients for the model.
 
     int constexpr waterIndex(1);
-    constexpr auto calcChillerAbsorption("CALC Chiller:Absorption ");
-    constexpr auto moduleObjectType("Chiller:Absorption");
+    const char * calcChillerAbsorption("CALC Chiller:Absorption ");
+    const char * moduleObjectType("Chiller:Absorption");
 
     const char * fluidNameWater = "WATER";
     const char * fluidNameSteam = "STEAM";
@@ -233,7 +233,7 @@ namespace ChillerAbsorption {
         int NumAlphas;   // Number of elements in the alpha array
         int NumNums;     // Number of elements in the numeric array
         int IOStat;      // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         DataIPShortCuts::cCurrentModuleObject = moduleObjectType;
 

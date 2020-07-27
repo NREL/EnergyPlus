@@ -56,6 +56,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -64,17 +65,16 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneratorFuelSupply.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -105,6 +105,7 @@ namespace FuelCellElectricGenerator {
     bool getFuelCellInputFlag(true);
     Array1D_bool CheckEquipName;
     Array1D<FCDataStruct> FuelCell; // dimension to number of machines
+    bool MyEnvrnFlag(true);
 
     void clear_state()
     {
@@ -112,13 +113,14 @@ namespace FuelCellElectricGenerator {
         getFuelCellInputFlag = true;
         CheckEquipName.deallocate();
         FuelCell.deallocate();
+        MyEnvrnFlag = true;
     }
 
-    PlantComponent *FCDataStruct::factory(std::string const &objectName)
+    PlantComponent *FCDataStruct::factory(IOFiles &ioFiles, std::string const &objectName)
     {
         // Process the input data
         if (getFuelCellInputFlag) {
-            getFuelCellInput();
+            getFuelCellInput(ioFiles);
             getFuelCellInputFlag = false;
         }
 
@@ -134,11 +136,11 @@ namespace FuelCellElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    PlantComponent *FCDataStruct::factory_exhaust(std::string const &objectName)
+    PlantComponent *FCDataStruct::factory_exhaust(IOFiles &ioFiles, std::string const &objectName)
     {
         // Process the input data
         if (getFuelCellInputFlag) {
-            getFuelCellInput();
+            getFuelCellInput(ioFiles);
             getFuelCellInputFlag = false;
         }
 
@@ -174,7 +176,7 @@ namespace FuelCellElectricGenerator {
         this->UpdateFuelCellGeneratorRecords();
     }
 
-    void getFuelCellInput()
+    void getFuelCellInput(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brent Griffith
@@ -366,10 +368,10 @@ namespace FuelCellElectricGenerator {
             }
         } // loop over NumFuelCellPMs
 
-        GeneratorFuelSupply::GetGeneratorFuelSupplyInput();
+        GeneratorFuelSupply::GetGeneratorFuelSupplyInput(ioFiles);
 
         for (int FuelSupNum = 1; FuelSupNum <= DataGenerators::NumGeneratorFuelSups; ++FuelSupNum) {
-            GeneratorFuelSupply::SetupFuelConstituentData(OutputFiles::getSingleton(), FuelSupNum, ErrorsFound);
+            GeneratorFuelSupply::SetupFuelConstituentData(ioFiles, FuelSupNum, ErrorsFound);
         }
 
         // set fuel supply ID in Fuel cell structure
@@ -3319,8 +3321,6 @@ namespace FuelCellElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // This routine adds up the various skin losses and then
         //  sets the values in the ZoneIntGain structure
-
-        static bool MyEnvrnFlag(true);
 
         if (NumFuelCellGenerators == 0) return;
 

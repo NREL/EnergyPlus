@@ -60,6 +60,7 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -76,14 +77,11 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
-#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
@@ -93,15 +91,16 @@
 #include <EnergyPlus/HVACInterfaceManager.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -111,6 +110,7 @@
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -217,6 +217,8 @@ namespace SimAirServingZones {
         int TestUniqueNodesNum(0);
         bool SizeAirLoopsOneTimeFlag(true);
         bool InitAirLoopsBranchSizingFlag(true);
+        bool OutputSetupFlag(false);
+        bool MyEnvrnFlag(true);
     } // namespace
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
@@ -241,6 +243,8 @@ namespace SimAirServingZones {
         InitAirLoopsBranchSizingFlag = true;
         NumOfTimeStepInDay = 0;
         TestUniqueNodesNum = 0;
+        OutputSetupFlag = false;
+        MyEnvrnFlag = true;
     }
 
     void ManageAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
@@ -1263,7 +1267,7 @@ namespace SimAirServingZones {
                             // Construct fan object
                             if (HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false) < 0) {
                                 HVACFan::fanObjs.emplace_back(
-                                    new HVACFan::FanSystem(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
+                                    new HVACFan::FanSystem(state, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
                             }
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex =
                                 HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) +
@@ -1561,13 +1565,6 @@ namespace SimAirServingZones {
         static Array1D_int SupNodeType;
 
         // Dimension the local subcomponent arrays
-
-        // Simulation Flags
-        static bool MyEnvrnFlag(true);
-        /////////// hoisted into namespace InitAirLoopsOneTimeFlag////////////
-        // static bool MyOneTimeFlag( true );
-        // static bool MyBranchSizingFlag( true ); //InitAirLoopsBranchSizingFlag
-        ///////////////////////////
 
         bool ErrorsFound;
         static Real64 OAReliefDiff(0.0); // local for massflow change across OA system, kg/s
@@ -2066,16 +2063,28 @@ namespace SimAirServingZones {
                             if (PrimaryAirSystem(AirLoopNum).OASysExists && !PrimaryAirSystem(AirLoopNum).isAllOA) {
                                 if (FoundOASys) {
                                     if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3) {
-                                        GetFanIndex(state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
+                                        GetFanIndex(state,
+                                                    PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                                    SupFanIndex,
+                                                    ErrorsFound,
+                                                    ObjexxFCL::Optional_string_const());
                                         supFanModelType = structArrayLegacyFanModels;
                                         goto EndOfAirLoop;
                                     }
                                 } else {
-                                    GetFanIndex(state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, RetFanIndex, ErrorsFound);
+                                    GetFanIndex(state,
+                                                PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                                RetFanIndex,
+                                                ErrorsFound,
+                                                ObjexxFCL::Optional_string_const());
                                     retFanModelType = structArrayLegacyFanModels;
                                 }
                             } else {
-                                GetFanIndex(state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
+                                GetFanIndex(state,
+                                            PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                            SupFanIndex,
+                                            ErrorsFound,
+                                            ObjexxFCL::Optional_string_const());
                                 supFanModelType = structArrayLegacyFanModels;
                                 goto EndOfAirLoop;
                             }
@@ -2535,8 +2544,6 @@ namespace SimAirServingZones {
         int AirSysOutNum;
         // DO loop index; there are 2 passes - the 2nd is done only if mass balance fails
         int AirLoopPass;
-        // Output variable setup flag
-        static bool OutputSetupFlag(false);
         // Flag set by ResolveSysFlow; if TRUE, mass balance failed and there must be a second pass
         bool SysReSim;
         int CalledFrom;
@@ -3623,7 +3630,7 @@ namespace SimAirServingZones {
                 if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
             } else if (SELECT_CASE_var == CoilUserDefined) { // Coil:UserDefined
-                SimCoilUserDefined(state.dataBranchInputManager, CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
+                SimCoilUserDefined(state, CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
 
             } else if (SELECT_CASE_var == UnitarySystemModel) { // 'AirLoopHVAC:UnitarySystem'
                 Real64 sensOut = 0.0;
@@ -5245,7 +5252,7 @@ namespace SimAirServingZones {
         // have moved std 62.1 table report writing to ManageSystemVentilationAdjustments in SizingManager
     }
 
-    void UpdateSysSizing(OutputFiles &outputFiles, int const CallIndicator)
+    void UpdateSysSizing(EnergyPlusData &state, int const CallIndicator)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7079,7 +7086,7 @@ namespace SimAirServingZones {
 
                 // EMS calling point to customize system sizing results
                 bool anyEMSRan;
-                ManageEMS(emsCallFromSystemSizing, anyEMSRan);
+                ManageEMS(state, emsCallFromSystemSizing, anyEMSRan, ObjexxFCL::Optional_int_const());
 
                 // EMS override point
                 if (AnyEnergyManagementSystemInModel) {
@@ -7114,7 +7121,7 @@ namespace SimAirServingZones {
                 // write out the sys design calc results
 
 
-                print(outputFiles.ssz, "Time");
+                print(state.files.ssz, "Time");
                 // static ObjexxFCL::gio::Fmt SSizeFmt11("(A1,A,A,A1,A,A,A1,A,A,A1,A,A)");
                 // for ( I = 1; I <= NumPrimaryAirSys; ++I ) {
                 // 	{ IOFlags flags; flags.ADVANCE( "No" ); ObjexxFCL::gio::write( OutputFileSysSizing, SSizeFmt11, flags ) << SizingFileColSep <<
@@ -7125,7 +7132,7 @@ namespace SimAirServingZones {
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
                     for (J = 1; J <= TotDesDays + TotRunDesPersDays; ++J) {
                         static constexpr auto SSizeFmt12("{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}");
-                        print(outputFiles.ssz,
+                        print(state.files.ssz,
                               SSizeFmt12,
                               SizingFileColSep,
                               CalcSysSizing(I).AirPriLoopName,
@@ -7154,7 +7161,7 @@ namespace SimAirServingZones {
                               ":Des Tot Cool Cap [W]");
                     }
                 }
-                print(outputFiles.ssz, "\n");
+                print(state.files.ssz, "\n");
                 //      HourFrac = 0.0
                 Minutes = 0;
                 TimeStepIndex = 0;
@@ -7169,12 +7176,12 @@ namespace SimAirServingZones {
                             HourPrint = HourCounter - 1;
                         }
                         static constexpr auto SSizeFmt20("{:02}:{:02}:00");
-                        print(outputFiles.ssz, SSizeFmt20, HourPrint, Minutes);
+                        print(state.files.ssz, SSizeFmt20, HourPrint, Minutes);
                         for (I = 1; I <= NumPrimaryAirSys; ++I) {
                             for (J = 1; J <= TotDesDays + TotRunDesPersDays; ++J) {
                                 static constexpr auto SSizeFmt22("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
 
-                                print(outputFiles.ssz,
+                                print(state.files.ssz,
                                       SSizeFmt22,
                                       SizingFileColSep,
                                       SysSizing(J, I).HeatFlowSeq(TimeStepIndex),
@@ -7188,14 +7195,14 @@ namespace SimAirServingZones {
                                       SysSizing(J, I).TotCoolCapSeq(TimeStepIndex));
                             }
                         }
-                        print(outputFiles.ssz, "\n");
+                        print(state.files.ssz, "\n");
                     }
                 }
 
                 static constexpr auto SSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
-                print(outputFiles.ssz, "Coinc Peak   ");
+                print(state.files.ssz, "Coinc Peak   ");
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
-                    print(outputFiles.ssz,
+                    print(state.files.ssz,
                           SSizeFmt31,
                           SizingFileColSep,
                           CalcSysSizing(I).CoinHeatMassFlow,
@@ -7206,11 +7213,11 @@ namespace SimAirServingZones {
                           SizingFileColSep,
                           CalcSysSizing(I).SensCoolCap);
                 }
-                print(outputFiles.ssz, "\n");
+                print(state.files.ssz, "\n");
 
-                print(outputFiles.ssz, "NonCoinc Peak");
+                print(state.files.ssz, "NonCoinc Peak");
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
-                    print(outputFiles.ssz,
+                    print(state.files.ssz,
                           SSizeFmt31,
                           SizingFileColSep,
                           CalcSysSizing(I).NonCoinHeatMassFlow,
@@ -7221,7 +7228,7 @@ namespace SimAirServingZones {
                           SizingFileColSep,
                           CalcSysSizing(I).SensCoolCap);
                 }
-                print(outputFiles.ssz, "\n");
+                print(state.files.ssz, "\n");
 
                 // have moved a big section to later in calling order, write predefined standard 62.1 report data
             }

@@ -210,6 +210,7 @@ namespace SingleDuct {
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool InitSysFlag(true);     // Flag set to make sure you do begin simulation initializaztions once
         bool InitATMixerFlag(true); // Flag set to make sure you do begin simulation initializaztions once for mixer
+        bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
     }                               // namespace
 
     // MODULE SUBROUTINES:
@@ -226,6 +227,7 @@ namespace SingleDuct {
         SysATMixer.deallocate();
         sd_airterminal.deallocate();
         InitATMixerFlag = true;
+        ZoneEquipmentListChecked = false;
     }
 
     void SimulateSingleDuct(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
@@ -294,7 +296,7 @@ namespace SingleDuct {
                 thisATU.SimConstVol(state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
 
             } else if (SELECT_CASE_var == SingleDuctConstVolNoReheat) { // AirTerminal:SingleDuct:ConstantVolume:NoReheat
-                thisATU.SimConstVolNoReheat(ZoneNodeNum);
+                thisATU.SimConstVolNoReheat();
             } else if (SELECT_CASE_var == SingleDuctVAVReheat) { // SINGLE DUCT:VAV:REHEAT
                 thisATU.SimVAV(state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
 
@@ -375,7 +377,7 @@ namespace SingleDuct {
         int NumZoneSiz;
         int ZoneSizIndex;
         int IOStat;
-        static bool ErrorsFound(false);  // If errors detected in input
+        bool ErrorsFound(false);  // If errors detected in input
         bool IsNotOK;                    // Flag to verify name
         int CtrlZone;                    // controlled zone do loop index
         int SupAirIn;                    // controlled zone supply air inlet index
@@ -735,12 +737,6 @@ namespace SingleDuct {
             SetupOutputVariable("Zone Air Terminal Minimum Air Flow Fraction",
                                 OutputProcessor::Unit::None,
                                 sd_airterminal(SysNum).ZoneMinAirFracReport,
-                                "System",
-                                "Average",
-                                sd_airterminal(SysNum).SysName);
-            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
-                                sd_airterminal(SysNum).OutdoorAirFlowRate,
                                 "System",
                                 "Average",
                                 sd_airterminal(SysNum).SysName);
@@ -1154,14 +1150,6 @@ namespace SingleDuct {
             //  CALL SetupOutputVariable('Damper Position', Sys(SysNum)%DamperPosition, &
             //                        'System','Average',Sys(SysNum)%SysName)
 
-            // Setup output for the air terminal single duct constant volume no reheat.
-            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
-                OutputProcessor::Unit::m3_s,
-                sd_airterminal(SysNum).OutdoorAirFlowRate,
-                "System",
-                "Average",
-                sd_airterminal(SysNum).SysName);
-
         } // End Number of Sys Loop
 
         CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:NoReheat";
@@ -1302,14 +1290,6 @@ namespace SingleDuct {
                     ShowContinueError("..invalid " + cAlphaFields(6) + "=\"" + Alphas(6) + "\". The default input of CurrentOccupancy is assigned");
                 }
             }
-
-            // Setup output for the air terminal single duct constant volume no reheat.
-            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
-                                sd_airterminal(SysNum).OutdoorAirFlowRate,
-                                "System",
-                                "Average",
-                                sd_airterminal(SysNum).SysName);
 
             if (DataGlobals::AnyEnergyManagementSystemInModel) {
                 // model results related actuators
@@ -1529,12 +1509,6 @@ namespace SingleDuct {
                                 "System",
                                 "Average",
                                 sd_airterminal(SysNum).SysName);
-            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
-                                sd_airterminal(SysNum).OutdoorAirFlowRate,
-                                "System",
-                                "Average",
-                                sd_airterminal(SysNum).SysName);
 
         } // end Number of Sys Loop
 
@@ -1751,8 +1725,8 @@ namespace SingleDuct {
                 ErrorsFound = true;
             }
             if (sd_airterminal(SysNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs.emplace_back(
-                    new HVACFan::FanSystem(sd_airterminal(SysNum).FanName)); // call constructor, safe here because get input is not using DataIPShortCuts.
+                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(
+                    state, sd_airterminal(SysNum).FanName)); // call constructor, safe here because get input is not using DataIPShortCuts.
                 sd_airterminal(SysNum).Fan_Index = HVACFan::getFanObjectVectorIndex(sd_airterminal(SysNum).FanName);
                 sd_airterminal(SysNum).OutletNodeNum = HVACFan::fanObjs[sd_airterminal(SysNum).Fan_Index]->outletNodeNum;
                 sd_airterminal(SysNum).InletNodeNum = HVACFan::fanObjs[sd_airterminal(SysNum).Fan_Index]->inletNodeNum;
@@ -1760,14 +1734,14 @@ namespace SingleDuct {
             } else if (sd_airterminal(SysNum).Fan_Num == DataHVACGlobals::FanType_SimpleVAV) {
                 IsNotOK = false;
 
-                sd_airterminal(SysNum).OutletNodeNum = GetFanOutletNode(state.fans, sd_airterminal(SysNum).FanType, sd_airterminal(SysNum).FanName, IsNotOK);
+                sd_airterminal(SysNum).OutletNodeNum = GetFanOutletNode(state, sd_airterminal(SysNum).FanType, sd_airterminal(SysNum).FanName, IsNotOK);
                 if (IsNotOK) {
                     ShowContinueError("..Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                     ErrorsFound = true;
                 }
 
                 IsNotOK = false;
-                sd_airterminal(SysNum).InletNodeNum = GetFanInletNode(state.fans, sd_airterminal(SysNum).FanType, sd_airterminal(SysNum).FanName, IsNotOK);
+                sd_airterminal(SysNum).InletNodeNum = GetFanInletNode(state, sd_airterminal(SysNum).FanType, sd_airterminal(SysNum).FanName, IsNotOK);
                 if (IsNotOK) {
                     ShowContinueError("..Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                     ErrorsFound = true;
@@ -1971,6 +1945,16 @@ namespace SingleDuct {
                                 sd_airterminal(SysNum).SysName);
         }
 
+        // common report variable for all single duct air terminals
+        for ( int sdIndex = 1; sdIndex <= NumSDAirTerminal; ++sdIndex) {
+            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
+                OutputProcessor::Unit::m3_s,
+                sd_airterminal(sdIndex).OutdoorAirFlowRate,
+                "System",
+                "Average",
+                sd_airterminal(sdIndex).SysName );
+        }
+
         // Error check to see if a single duct air terminal is assigned to zone that has zone secondary recirculation
         // specified in the Sizing:Zone object
 
@@ -2048,7 +2032,6 @@ namespace SingleDuct {
         int InletNode;
         int OutletNode;
         int SysIndex;
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         //static Array1D_bool MyEnvrnFlag;
         //static Array1D_bool MySizeFlag;
         //static Array1D_bool GetGasElecHeatCoilCap; // Gets autosized value of coil capacity
@@ -2371,11 +2354,6 @@ namespace SingleDuct {
         this->sd_airterminalInlet.AirTemp = Node(InletNode).Temp;
         this->sd_airterminalInlet.AirHumRat = Node(InletNode).HumRat;
         this->sd_airterminalInlet.AirEnthalpy = Node(InletNode).Enthalpy;
-        // set to zero, now it is used for constant volume with no reheat air terminal
-        this->HeatRate = 0.0;
-        this->CoolRate = 0.0;
-        this->HeatEnergy = 0.0;
-        this->CoolEnergy = 0.0;
 
         // update to the current minimum air flow fraction
         this->ZoneMinAirFrac = this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
@@ -4771,41 +4749,13 @@ namespace SingleDuct {
         }
     }
 
-    void SingleDuctAirTerminal::SimConstVolNoReheat(int const ZoneNodeNum)
+    void SingleDuctAirTerminal::SimConstVolNoReheat()
     {
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine simulates the simple single duct constant volume systems with no reheat.
+        // Sets outlet flow rate and conditions for singleduct constantvolume with no reheat air terminal.
 
-        using DataGlobals::SecInHour;
-        using DataHVACGlobals::TimeStepSys;
-        using Psychrometrics::PsyHFnTdbW;
-
-        Real64 MassFlow;           // [kg/sec]   mass flow rate at the inlet
-        Real64 SensOutputProvided; // heating and cooling provided to the zone [W]
-
-        MassFlow = this->sd_airterminalInlet.AirMassFlowRate; // system air mass flow rate
-
-        if (GetCurrentScheduleValue(this->SchedPtr) > 0.0 && MassFlow > SmallMassFlow) {
-            Real64 CpAir = PsyCpAirFnW(0.5 * (Node(this->OutletNodeNum).HumRat + Node(ZoneNodeNum).HumRat));
-            SensOutputProvided = MassFlow * CpAir * (Node(this->OutletNodeNum).Temp - Node(ZoneNodeNum).Temp);
-        } else {
-            SensOutputProvided = 0.0;
-        }
-
-        // set the outlet node air conditions to that of the inlet
-        this->sd_airterminalOutlet.AirTemp = this->sd_airterminalInlet.AirTemp;
-        this->sd_airterminalOutlet.AirHumRat = this->sd_airterminalInlet.AirHumRat;
-        this->sd_airterminalOutlet.AirEnthalpy = this->sd_airterminalInlet.AirEnthalpy;
-        this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
-        this->sd_airterminalOutlet.AirMassFlowRateMaxAvail = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;
-        this->sd_airterminalOutlet.AirMassFlowRateMinAvail = this->sd_airterminalInlet.AirMassFlowRateMinAvail;
-
-        // air heat transfer rate and energy
-        this->HeatRate = max(SensOutputProvided, 0.0);
-        this->CoolRate = std::abs(min(SensOutputProvided, 0.0));
-        this->HeatEnergy = this->HeatRate * TimeStepSys * SecInHour;
-        this->CoolEnergy = this->CoolRate * TimeStepSys * SecInHour;
+        this->sd_airterminalOutlet = this->sd_airterminalInlet;
 
         // update the air terminal outlet node data
         this->UpdateSys();
@@ -5316,8 +5266,6 @@ namespace SingleDuct {
         if (Contaminant.GenericContamSimulation) {
             Node(OutletNode).GenContam = Node(InletNode).GenContam;
         }
-        // set OA volume flow rate report variable
-        this->CalcOutdoorAirVolumeFlowRate();
     }
 
     //        End of Update subroutines for the Sys Module
@@ -5362,6 +5310,9 @@ namespace SingleDuct {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // Still needs to report the Sys power from this component
+
+        // set zone OA volume flow rate
+        this->CalcOutdoorAirVolumeFlowRate();
     }
 
     void GetHVACSingleDuctSysIndex(EnergyPlusData &state, std::string const &SDSName,
@@ -5445,7 +5396,7 @@ namespace SingleDuct {
         UpdateATMixer(SysNum);
     }
 
-    void GetATMixers()
+    void GetATMixers(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5483,7 +5434,7 @@ namespace SingleDuct {
         int ATMixerNum; // Index of inlet side mixer air terminal unit
         int IOStat;
         static std::string const RoutineName("GetATMixers: "); // include trailing blank space
-        static bool ErrorsFound(false);                        // Error flag
+        bool ErrorsFound(false);                        // Error flag
         int NodeNum;                                           // Index to node number
         int CtrlZone;                                          // Index to control zone
         bool ZoneNodeNotFound;                                 // Flag for error checking
@@ -5499,7 +5450,7 @@ namespace SingleDuct {
         SysATMixer.allocate(NumATMixers);
 
         // Need air distribution units first
-        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(dataZoneAirLoopEquipmentManager);
 
         for (ATMixerNum = 1; ATMixerNum <= NumATMixers; ++ATMixerNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
@@ -5967,7 +5918,7 @@ namespace SingleDuct {
         DataDefineEquip::AirDistUnit(aduNum).MassFlowRateSup = Node(PriInNode).MassFlowRate;
     }
 
-    void GetATMixer(std::string const &ZoneEquipName, // zone unit name name
+    void GetATMixer(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, std::string const &ZoneEquipName, // zone unit name name
                     std::string &ATMixerName,         // air terminal mixer name
                     int &ATMixerNum,                  // air terminal mixer index
                     int &ATMixerType,                 // air teminal mixer type
@@ -5993,7 +5944,7 @@ namespace SingleDuct {
 
         if (GetATMixerFlag) {
             // CALL GetZoneAirLoopEquipment
-            GetATMixers();
+            GetATMixers(dataZoneAirLoopEquipmentManager);
             GetATMixerFlag = false;
         }
 
@@ -6245,11 +6196,11 @@ namespace SingleDuct {
 
     void SingleDuctAirTerminal::CalcOutdoorAirVolumeFlowRate()
     {
-        // calculates the amount of outdoor air volume flow rate using the supply air flow rate and OA fraction
+        // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
             this->OutdoorAirFlowRate = (this->sd_airterminalOutlet.AirMassFlowRate / StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
-            // do nothing for now
+            this->OutdoorAirFlowRate = 0.0;
         }
     }
 

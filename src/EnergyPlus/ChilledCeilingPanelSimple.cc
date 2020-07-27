@@ -184,8 +184,9 @@ namespace CoolingPanelSimple {
 
             {
                 auto const SELECT_CASE_var(ThisCP.EquipType);
+
                 if (SELECT_CASE_var == TypeOf_CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
-                    ThisCP.CalcCoolingPanel(state.dataChilledCeilingPanelSimple, state.dataZoneTempPredictorCorrector, CoolingPanelNum);
+                    ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
                 } else {
                     ShowSevereError("SimCoolingPanelSimple: Errors in CoolingPanel=" + state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
                     ShowContinueError("Invalid or unimplemented equipment type=" + TrimSigDigits(state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipType));
@@ -261,7 +262,7 @@ namespace CoolingPanelSimple {
         int NumNumbers;        // Number of Numbers for each GetobjectItem call
         int SurfNum;           // Surface number Do loop counter
         int IOStat;
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
 
         dataChilledCeilingPanelSimple.NumCoolingPanels = inputProcessor->getNumObjectsFound(cCMO_CoolingPanel_Simple);
 
@@ -722,7 +723,6 @@ namespace CoolingPanelSimple {
         static std::string const RoutineName("ChilledCeilingPanelSimple:InitCoolingPanel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ZoneEquipmentListChecked(false);
         static Array1D_bool MyEnvrnFlag;
         int Loop;
         int ZoneNode;
@@ -762,8 +762,8 @@ namespace CoolingPanelSimple {
         if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
-            ZoneEquipmentListChecked = true;
+        if (!state.dataChilledCeilingPanelSimple.ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+            state.dataChilledCeilingPanelSimple.ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataChilledCeilingPanelSimple.NumCoolingPanels; ++Loop) {
                 if (CheckZoneEquipmentList(cCMO_CoolingPanel_Simple, ThisCP.EquipID)) continue;
                 ShowSevereError("InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + ThisCP.EquipID +
@@ -1153,9 +1153,7 @@ namespace CoolingPanelSimple {
         return SizeCoolingPanelUA;
     }
 
-    void CoolingPanelParams::CalcCoolingPanel(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
-                                              ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
-                                              int const CoolingPanelNum)
+    void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -1398,18 +1396,18 @@ namespace CoolingPanelSimple {
             CoolingPanelCool = (Effectiveness)*waterMassFlowRate * Cp * (waterInletTemp - Tzone);
             waterOutletTemp = this->WaterInletTemp - (CoolingPanelCool / (waterMassFlowRate * Cp));
             RadHeat = CoolingPanelCool * this->FracRadiant;
-            dataChilledCeilingPanelSimple.CoolingPanelSource(CoolingPanelNum) = RadHeat;
+            state.dataChilledCeilingPanelSimple.CoolingPanelSource(CoolingPanelNum) = RadHeat;
 
             if (this->FracRadiant <= MinFrac) {
                 LoadMet = CoolingPanelCool;
             } else {
 
                 // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
-                DistributeCoolingPanelRadGains(dataChilledCeilingPanelSimple);
+                DistributeCoolingPanelRadGains(state.dataChilledCeilingPanelSimple);
                 // Now "simulate" the system by recalculating the heat balances
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
 
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(dataZoneTempPredictorCorrector, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                 // Here an assumption is made regarding radiant heat transfer to people.
                 // While the radiant heat transfer to people array will be used by the thermal comfort
@@ -1419,7 +1417,7 @@ namespace CoolingPanelSimple {
                 // that all energy radiated to people is converted to convective energy is
                 // not very precise, but at least it conserves energy. The system impact to heat balance
                 // should include this.
-                LoadMet = (SumHATsurf(ZoneNum) - dataChilledCeilingPanelSimple.ZeroSourceSumHATsurf(ZoneNum)) + (CoolingPanelCool * this->FracConvect) +
+                LoadMet = (SumHATsurf(ZoneNum) - state.dataChilledCeilingPanelSimple.ZeroSourceSumHATsurf(ZoneNum)) + (CoolingPanelCool * this->FracConvect) +
                           (RadHeat * this->FracDistribPerson);
             }
             this->WaterOutletEnthalpy = this->WaterInletEnthalpy - CoolingPanelCool / waterMassFlowRate;
@@ -1433,7 +1431,7 @@ namespace CoolingPanelSimple {
             LoadMet = 0.0;
             RadHeat = 0.0;
             waterMassFlowRate = 0.0;
-            dataChilledCeilingPanelSimple.CoolingPanelSource(CoolingPanelNum) = 0.0;
+            state.dataChilledCeilingPanelSimple.CoolingPanelSource(CoolingPanelNum) = 0.0;
             this->WaterOutletEnthalpy = this->WaterInletEnthalpy;
         }
 
@@ -1503,16 +1501,6 @@ namespace CoolingPanelSimple {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
         int WaterOutletNode;
-        static int Iter(0);
-        static bool MyEnvrnFlag(true);
-
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
-            Iter = 0;
-            MyEnvrnFlag = false;
-        }
-        if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
-        }
 
         // First, update the running average if necessary...
         if (dataChilledCeilingPanelSimple.LastSysTimeElapsed(CoolingPanelNum) == SysTimeElapsed) {

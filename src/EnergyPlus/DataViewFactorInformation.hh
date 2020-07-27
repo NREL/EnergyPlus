@@ -79,6 +79,7 @@ namespace DataViewFactorInformation {
         Array1D<Real64> FMRT;               // Mean Radiant Temperature "View Factor" used in Carroll method
         Array1D<Real64> Fp;                 // F' (Oppenheim surface resistance used in Carroll method)
         Array1D_int SurfacePtr;             // Surface number for surfaces in this enclosure
+        std::vector<int> SurfaceReportNums; // Enclosure surface numbers for reporting view factors in old order (sub-surfaces follow base surfaces)
         Real64 FloorArea;                   // Floor area of zone(s) in enclosure
         Real64 ExtWindowArea;               // Exterior window area
         Real64 TotalSurfArea;               // Total surface area

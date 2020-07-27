@@ -54,6 +54,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -68,7 +69,6 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -305,7 +305,7 @@ namespace PurchasedAirManager {
         int CtrlZone;                                              // zone index
         int NodeNum;                                               // node index
         static std::string const RoutineName("GetPurchasedAir: "); // include trailing blank space
-        static bool ErrorsFound(false);                            // If errors detected in input
+        bool ErrorsFound(false);                            // If errors detected in input
         bool IsOANodeListed;                                       // Flag for OA node name listed in OutdoorAir:Node or Nodelist
         bool UniqueNodeError;                                      // Flag for non-unique node error(s)
 

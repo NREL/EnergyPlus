@@ -31,48 +31,54 @@ class Runtime:
         self.api.issueText.argtypes = [c_char_p]
         self.api.issueText.restype = c_void_p
         self.py_progress_callback_type = CFUNCTYPE(c_void_p, c_int)
-        self.api.registerProgressCallback.argtypes = [self.py_progress_callback_type]
+        self.api.registerProgressCallback.argtypes = [c_void_p, self.py_progress_callback_type]
         self.api.registerProgressCallback.restype = c_void_p
         self.py_message_callback_type = CFUNCTYPE(c_void_p, c_char_p)
-        self.api.registerStdOutCallback.argtypes = [self.py_message_callback_type]
+        self.api.registerStdOutCallback.argtypes = [c_void_p, self.py_message_callback_type]
         self.api.registerStdOutCallback.restype = c_void_p
-        self.py_empty_callback_type = CFUNCTYPE(c_void_p)
-        self.api.callbackBeginNewEnvironment.argtypes = [self.py_empty_callback_type]
+        self.py_state_callback_type = CFUNCTYPE(c_void_p, c_void_p)
+        self.api.callbackBeginNewEnvironment.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackBeginNewEnvironment.restype = c_void_p
-        self.api.callbackAfterNewEnvironmentWarmupComplete.argtypes = [self.py_empty_callback_type]
+        self.api.callbackAfterNewEnvironmentWarmupComplete.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackAfterNewEnvironmentWarmupComplete.restype = c_void_p
-        self.api.callbackBeginZoneTimeStepBeforeInitHeatBalance.argtypes = [self.py_empty_callback_type]
+        self.api.callbackBeginZoneTimeStepBeforeInitHeatBalance.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackBeginZoneTimeStepBeforeInitHeatBalance.restype = c_void_p
-        self.api.callbackBeginZoneTimeStepAfterInitHeatBalance.argtypes = [self.py_empty_callback_type]
+        self.api.callbackBeginZoneTimeStepAfterInitHeatBalance.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackBeginZoneTimeStepAfterInitHeatBalance.restype = c_void_p
-        self.api.callbackBeginTimeStepBeforePredictor.argtypes = [self.py_empty_callback_type]
+        self.api.callbackBeginTimeStepBeforePredictor.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackBeginTimeStepBeforePredictor.restype = c_void_p
-        self.api.callbackAfterPredictorBeforeHVACManagers.argtypes = [self.py_empty_callback_type]
+        self.api.callbackAfterPredictorBeforeHVACManagers.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackAfterPredictorBeforeHVACManagers.restype = c_void_p
-        self.api.callbackAfterPredictorAfterHVACManagers.argtypes = [self.py_empty_callback_type]
+        self.api.callbackAfterPredictorAfterHVACManagers.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackAfterPredictorAfterHVACManagers.restype = c_void_p
-        self.api.callbackInsideSystemIterationLoop.argtypes = [self.py_empty_callback_type]
+        self.api.callbackInsideSystemIterationLoop.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackInsideSystemIterationLoop.restype = c_void_p
-        self.api.callbackEndOfZoneTimeStepBeforeZoneReporting.argtypes = [self.py_empty_callback_type]
+        self.api.callbackEndOfZoneTimeStepBeforeZoneReporting.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackEndOfZoneTimeStepBeforeZoneReporting.restype = c_void_p
-        self.api.callbackEndOfZoneTimeStepAfterZoneReporting.argtypes = [self.py_empty_callback_type]
+        self.api.callbackEndOfZoneTimeStepAfterZoneReporting.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackEndOfZoneTimeStepAfterZoneReporting.restype = c_void_p
-        self.api.callbackEndOfSystemTimeStepBeforeHVACReporting.argtypes = [self.py_empty_callback_type]
+        self.api.callbackEndOfSystemTimeStepBeforeHVACReporting.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackEndOfSystemTimeStepBeforeHVACReporting.restype = c_void_p
-        self.api.callbackEndOfSystemTimeStepAfterHVACReporting.argtypes = [self.py_empty_callback_type]
+        self.api.callbackEndOfSystemTimeStepAfterHVACReporting.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackEndOfSystemTimeStepAfterHVACReporting.restype = c_void_p
-        self.api.callbackEndOfZoneSizing.argtypes = [self.py_empty_callback_type]
+        self.api.callbackEndOfZoneSizing.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackEndOfZoneSizing.restype = c_void_p
-        self.api.callbackEndOfSystemSizing.argtypes = [self.py_empty_callback_type]
+        self.api.callbackEndOfSystemSizing.argtypes = [self.py_state_callback_type]
         self.api.callbackEndOfSystemSizing.restype = c_void_p
-        self.api.callbackEndOfAfterComponentGetInput.argtypes = [self.py_empty_callback_type]
+        self.api.callbackEndOfAfterComponentGetInput.argtypes = [self.py_state_callback_type]
         self.api.callbackEndOfAfterComponentGetInput.restype = c_void_p
         # self.api.callbackUserDefinedComponentModel.argtypes = [self.py_empty_callback_type]
         # self.api.callbackUserDefinedComponentModel.restype = c_void_p
-        self.api.callbackUnitarySystemSizing.argtypes = [self.py_empty_callback_type]
+        self.api.callbackUnitarySystemSizing.argtypes = [self.py_state_callback_type]
         self.api.callbackUnitarySystemSizing.restype = c_void_p
+        self.api.stateNew.argtypes = []
+        self.api.stateNew.restype = c_void_p
+        self.api.stateReset.argtypes = [c_void_p]
+        self.api.stateReset.restype = c_void_p
+        self.api.stateDelete.argtypes = [c_void_p]
+        self.api.stateDelete.restype = c_void_p
 
-    def run_energyplus(self, command_line_args: List[Union[str, bytes]]) -> int:
+    def run_energyplus(self, state: c_void_p, command_line_args: List[Union[str, bytes]]) -> int:
         """
         This function calls EnergyPlus to run a simulation.  The C API expects to find arguments matching the command
         line string when executing EnergyPlus.  When calling the C API directly, the client must create a list of char
@@ -102,13 +108,13 @@ class Runtime:
         cli_arg_type = (c_char_p * len(args_with_program_name))
         # OK, so now that we have the argument "type" set as a fixed length array of char*, we assign it to the
         # DLL function call.  This must be done here because the arg count may change with each call.
-        self.api.energyplus.argtypes = [c_int, cli_arg_type]
+        self.api.energyplus.argtypes = [c_void_p, c_int, cli_arg_type]
         # Now cast the actual Python list instance into that dynamically created ctype "type".  This is another
         # line where the type checker is complaining because it things cli_arg_type is actually an "int", and as such,
         # it wouldn't be a callable item.  cli_arg_type is actually a callable type, so I'm muting this warning.
         # noinspection PyCallingNonCallable
         cli_args = cli_arg_type(*args_with_program_name)
-        return self.api.energyplus(len(args_with_program_name), cli_args)
+        return self.api.energyplus(state, len(args_with_program_name), cli_args)
 
     def issue_warning(self, message: Union[str, bytes]) -> None:
         """
@@ -169,7 +175,7 @@ class Runtime:
             message = message.encode('utf-8')
         self.api.issueText(message)
 
-    def callback_progress(self, f: FunctionType) -> None:
+    def callback_progress(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the end of each
         day with a progress (percentage) indicator
@@ -179,9 +185,9 @@ class Runtime:
         """
         cb_ptr = self.py_progress_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.registerProgressCallback(cb_ptr)
+        self.api.registerProgressCallback(state, cb_ptr)
 
-    def callback_message(self, f: FunctionType) -> None:
+    def callback_message(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus when printing anything
         to standard output.  This can allow a GUI to easily show the output of EnergyPlus streaming by.  When used in
@@ -193,9 +199,9 @@ class Runtime:
         """
         cb_ptr = self.py_message_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.registerStdOutCallback(cb_ptr)
+        self.api.registerStdOutCallback(state, cb_ptr)
 
-    def callback_begin_new_environment(self, f: FunctionType) -> None:
+    def callback_begin_new_environment(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the beginning of
         each environment.
@@ -203,11 +209,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackBeginNewEnvironment(cb_ptr)
+        self.api.callbackBeginNewEnvironment(state, cb_ptr)
 
-    def callback_after_new_environment_warmup_complete(self, f: FunctionType) -> None:
+    def callback_after_new_environment_warmup_complete(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the warmup of
         each environment.
@@ -215,11 +221,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackAfterNewEnvironmentWarmupComplete(cb_ptr)
+        self.api.callbackAfterNewEnvironmentWarmupComplete(state, cb_ptr)
 
-    def callback_begin_zone_timestep_before_init_heat_balance(self, f: FunctionType) -> None:
+    def callback_begin_zone_timestep_before_init_heat_balance(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the beginning of the
         zone time step before init heat balance.
@@ -227,11 +233,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackBeginZoneTimeStepBeforeInitHeatBalance(cb_ptr)
+        self.api.callbackBeginZoneTimeStepBeforeInitHeatBalance(state, cb_ptr)
 
-    def callback_begin_zone_timestep_after_init_heat_balance(self, f: FunctionType) -> None:
+    def callback_begin_zone_timestep_after_init_heat_balance(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the beginning of the
         zone time step after init heat balance.
@@ -239,11 +245,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackBeginZoneTimeStepAfterInitHeatBalance(cb_ptr)
+        self.api.callbackBeginZoneTimeStepAfterInitHeatBalance(state, cb_ptr)
 
-    def callback_begin_system_timestep_before_predictor(self, f: FunctionType) -> None:
+    def callback_begin_system_timestep_before_predictor(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the beginning of
         system time step .
@@ -251,11 +257,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackBeginTimeStepBeforePredictor(cb_ptr)
+        self.api.callbackBeginTimeStepBeforePredictor(state, cb_ptr)
 
-    def callback_after_predictor_before_hvac_managers(self, f: FunctionType) -> None:
+    def callback_after_predictor_before_hvac_managers(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the end of the
         predictor step but before HVAC managers.
@@ -263,11 +269,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackAfterPredictorBeforeHVACManagers(cb_ptr)
+        self.api.callbackAfterPredictorBeforeHVACManagers(state, cb_ptr)
 
-    def callback_after_predictor_after_hvac_managers(self, f: FunctionType) -> None:
+    def callback_after_predictor_after_hvac_managers(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the end of the
         predictor step after HVAC managers.
@@ -275,11 +281,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackAfterPredictorAfterHVACManagers(cb_ptr)
+        self.api.callbackAfterPredictorAfterHVACManagers(state, cb_ptr)
 
-    def callback_inside_system_iteration_loop(self, f: FunctionType) -> None:
+    def callback_inside_system_iteration_loop(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus inside the system
         iteration loop.
@@ -287,11 +293,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackInsideSystemIterationLoop(cb_ptr)
+        self.api.callbackInsideSystemIterationLoop(state, cb_ptr)
 
-    def callback_end_zone_timestep_before_zone_reporting(self, f: FunctionType) -> None:
+    def callback_end_zone_timestep_before_zone_reporting(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the end of a zone
         time step but before zone reporting has been completed.
@@ -299,11 +305,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfZoneTimeStepBeforeZoneReporting(cb_ptr)
+        self.api.callbackEndOfZoneTimeStepBeforeZoneReporting(state, cb_ptr)
 
-    def callback_end_zone_timestep_after_zone_reporting(self, f: FunctionType) -> None:
+    def callback_end_zone_timestep_after_zone_reporting(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the end of a zone
         time step and after zone reporting.
@@ -311,11 +317,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfZoneTimeStepAfterZoneReporting(cb_ptr)
+        self.api.callbackEndOfZoneTimeStepAfterZoneReporting(state, cb_ptr)
 
-    def callback_end_system_timestep_before_hvac_reporting(self, f: FunctionType) -> None:
+    def callback_end_system_timestep_before_hvac_reporting(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the end of a system
         time step, but before HVAC reporting.
@@ -323,11 +329,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfSystemTimeStepBeforeHVACReporting(cb_ptr)
+        self.api.callbackEndOfSystemTimeStepBeforeHVACReporting(state, cb_ptr)
 
-    def callback_end_system_timestep_after_hvac_reporting(self, f: FunctionType) -> None:
+    def callback_end_system_timestep_after_hvac_reporting(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the end of a system
         time step and after HVAC reporting.
@@ -335,11 +341,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfSystemTimeStepAfterHVACReporting(cb_ptr)
+        self.api.callbackEndOfSystemTimeStepAfterHVACReporting(state, cb_ptr)
 
-    def callback_end_zone_sizing(self, f: FunctionType) -> None:
+    def callback_end_zone_sizing(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the end of the zone
         sizing process.
@@ -347,11 +353,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfZoneSizing(cb_ptr)
+        self.api.callbackEndOfZoneSizing(state, cb_ptr)
 
-    def callback_end_system_sizing(self, f: FunctionType) -> None:
+    def callback_end_system_sizing(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the end of the system
         sizing process.
@@ -359,11 +365,11 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfSystemSizing(cb_ptr)
+        self.api.callbackEndOfSystemSizing(state, cb_ptr)
 
-    def callback_after_component_get_input(self, f: FunctionType) -> None:
+    def callback_after_component_get_input(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the end of
         component get input processes.
@@ -371,23 +377,47 @@ class Runtime:
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackEndOfAfterComponentGetInput(cb_ptr)
+        self.api.callbackEndOfAfterComponentGetInput(state, cb_ptr)
 
     # user defined component callbacks are not allowed, they are coupled directly to a specific EMS manager/PythonPlugin
     # def callback_user_defined_component_model(self, f: FunctionType) -> None:
 
-    def callback_unitary_system_sizing(self, f: FunctionType) -> None:
+    def callback_unitary_system_sizing(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus in unitary system sizing.
 
         :param f: A python function which takes no arguments and returns nothing
         :return: Nothing
         """
-        cb_ptr = self.py_empty_callback_type(f)
+        cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackUnitarySystemSizing(cb_ptr)
+        self.api.callbackUnitarySystemSizing(state, cb_ptr)
+
+    def new_state(self) -> c_void_p:
+        """
+        This function creates a new state object that is required to pass into EnergyPlus Runtime API function calls
+
+        :return: A pointer to a new state object in memory
+        """
+        return self.api.stateNew()
+
+    def reset_state(self, state: c_void_p) -> None:
+        """
+        This function resets an existing state instance
+
+        :return: Nothing
+        """
+        self.api.stateReset(state)
+
+    def delete_state(self, state: c_void_p) -> None:
+        """
+        This function deletes an existing state instance
+
+        :return: Nothing
+        """
+        self.api.stateDelete(state)
 
     @staticmethod
     def clear_callbacks() -> None:

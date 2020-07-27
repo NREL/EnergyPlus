@@ -665,14 +665,20 @@ namespace FanCoilUnits {
                 ErrorsFound = true;
             } else {
                 if (!UtilityRoutines::SameString(FanCoil(FanCoilNum).FanType, "Fan:SystemModel")) {
-                    GetFanType(state.fans, FanCoil(FanCoilNum).FanName, FanCoil(FanCoilNum).FanType_Num, errFlag, CurrentModuleObject, FanCoil(FanCoilNum).Name);
+                    GetFanType(state, FanCoil(FanCoilNum).FanName, FanCoil(FanCoilNum).FanType_Num, errFlag, CurrentModuleObject, FanCoil(FanCoilNum).Name);
+                    FanCoil(FanCoilNum).fanAvailSchIndex = Fans::GetFanAvailSchPtr(state, FanCoil(FanCoilNum).FanType, FanCoil(FanCoilNum).FanName, errFlag);
+                    if (errFlag) {
+                        ShowContinueError("Occurs in " + CurrentModuleObject + " = " + FanCoil(FanCoilNum).Name);
+                        ErrorsFound = true;
+                        errFlag = false;
+                    }
                     {
                         auto const SELECT_CASE_var(FanCoil(FanCoilNum).FanType_Num);
                         if ((SELECT_CASE_var == FanType_SimpleConstVolume) || (SELECT_CASE_var == FanType_SimpleVAV) ||
                             (SELECT_CASE_var == FanType_SimpleOnOff)) {
                             // Get fan air volume flow rate
                             FanCoil(FanCoilNum).FanAirVolFlow =
-                                GetFanDesignVolumeFlowRate(state.fans, FanCoil(FanCoilNum).FanType, FanCoil(FanCoilNum).FanName, IsNotOK);
+                                GetFanDesignVolumeFlowRate(state, FanCoil(FanCoilNum).FanType, FanCoil(FanCoilNum).FanName, IsNotOK);
                             // Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
                             if (FanCoil(FanCoilNum).MaxAirVolFlow > FanCoil(FanCoilNum).FanAirVolFlow &&
                                 FanCoil(FanCoilNum).FanAirVolFlow != AutoSize) {
@@ -709,8 +715,9 @@ namespace FanCoilUnits {
                     }
                 } else if (UtilityRoutines::SameString(FanCoil(FanCoilNum).FanType, "Fan:SystemModel")) {
                     FanCoil(FanCoilNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(FanCoil(FanCoilNum).FanName));           // call constructor
+                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, FanCoil(FanCoilNum).FanName));           // call constructor
                     FanCoil(FanCoilNum).FanIndex = HVACFan::getFanObjectVectorIndex(FanCoil(FanCoilNum).FanName); // zero-based
+                    FanCoil(FanCoilNum).fanAvailSchIndex = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->availSchedIndex;
                     FanCoil(FanCoilNum).FanAirVolFlow = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->designAirVolFlowRate;
                     // Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
                     if (FanCoil(FanCoilNum).MaxAirVolFlow > FanCoil(FanCoilNum).FanAirVolFlow && FanCoil(FanCoilNum).FanAirVolFlow != AutoSize) {
@@ -764,7 +771,7 @@ namespace FanCoilUnits {
             }
 
             // check for inlet side air mixer
-            GetATMixer(FanCoil(FanCoilNum).Name,
+            GetATMixer(state.dataZoneAirLoopEquipmentManager, FanCoil(FanCoilNum).Name,
                        ATMixerName,
                        ATMixerNum,
                        ATMixerType,
@@ -1308,7 +1315,8 @@ namespace FanCoilUnits {
             }
         }
         // Set the inlet node mass flow rate
-        if ((GetCurrentScheduleValue(FanCoil(FanCoilNum).SchedPtr) > 0.0 || DataHVACGlobals::ZoneCompTurnFansOn) &&
+        if (((GetCurrentScheduleValue(FanCoil(FanCoilNum).SchedPtr) > 0.0 && GetCurrentScheduleValue(FanCoil(FanCoilNum).fanAvailSchIndex) > 0.0) ||
+             DataHVACGlobals::ZoneCompTurnFansOn) &&
             !DataHVACGlobals::ZoneCompTurnFansOff) {
             Node(InletNode).MassFlowRate = FanCoil(FanCoilNum).MaxAirMassFlow;
             Node(InletNode).MassFlowRateMaxAvail = Node(InletNode).MassFlowRate;
@@ -1618,7 +1626,7 @@ namespace FanCoilUnits {
                     if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                         Fans::SimulateFanComponents(state, FanCoil(FanCoilNum).FanName, true, FanCoil(FanCoilNum).FanIndex);
                         FanCoil(FanCoilNum).FanAirVolFlow =
-                            GetFanDesignVolumeFlowRate(state.fans, cFanTypes(FanCoil(FanCoilNum).FanType_Num), FanCoil(FanCoilNum).FanName, ErrorsFound);
+                            GetFanDesignVolumeFlowRate(state, cFanTypes(FanCoil(FanCoilNum).FanType_Num), FanCoil(FanCoilNum).FanName, ErrorsFound);
                     } else {
                         HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, _, _, _, _);
                         FanCoil(FanCoilNum).FanAirVolFlow = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->designAirVolFlowRate;
@@ -1659,7 +1667,7 @@ namespace FanCoilUnits {
             if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(state, FanCoil(FanCoilNum).FanName, true, FanCoil(FanCoilNum).FanIndex);
                 FanCoil(FanCoilNum).FanAirVolFlow =
-                    GetFanDesignVolumeFlowRate(state.fans, cFanTypes(FanCoil(FanCoilNum).FanType_Num), FanCoil(FanCoilNum).FanName, ErrorsFound);
+                    GetFanDesignVolumeFlowRate(state, cFanTypes(FanCoil(FanCoilNum).FanType_Num), FanCoil(FanCoilNum).FanName, ErrorsFound);
             } else {
                 HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, _, _, _, _);
                 FanCoil(FanCoilNum).FanAirVolFlow = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->designAirVolFlowRate;
@@ -3096,8 +3104,11 @@ namespace FanCoilUnits {
                                                    PLR,
                                                    CompressorOnFlag);
                     }
-                }
-                Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
+                } else if ((CoolingLoad && QUnitOutMax > QZnReq && QZnReq < 0.0) || (HeatingLoad && QUnitOutMax < QZnReq && QZnReq > 0.0)) {
+                    // load is larger than capacity, thus run the fancoil unit at full capacity
+                    PLR = 1.0;
+                } 
+                Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
                 PowerMet = QUnitOut;
                 AirMassFlow = Node(InletNode).MassFlowRate;
                 // CR9155 Remove specific humidity calculations
@@ -3105,6 +3116,7 @@ namespace FanCoilUnits {
                 SpecHumIn = Node(InletNode).HumRat;
                 // Latent rate (kg/s), dehumid = negative
                 LatOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn);
+                FanCoil(FanCoilNum).PLR = PLR;
 
                 // cycling fan constant water flow AND VarFanVarFlow
             } else if (SELECT_CASE_var == CCM_VarFanConsFlow) {
@@ -3538,7 +3550,8 @@ namespace FanCoilUnits {
 
         // Assume the unit is able to vary the flow. A cycling unit is treated as
         // if it were variable flow, with the flow being the averaqe flow over the time step
-        if ((GetCurrentScheduleValue(FanCoil(FanCoilNum).SchedPtr) > 0.0 || DataHVACGlobals::ZoneCompTurnFansOn) &&
+        if (((GetCurrentScheduleValue(FanCoil(FanCoilNum).SchedPtr) > 0.0 && GetCurrentScheduleValue(FanCoil(FanCoilNum).fanAvailSchIndex) > 0.0) ||
+             DataHVACGlobals::ZoneCompTurnFansOn) &&
             !DataHVACGlobals::ZoneCompTurnFansOff) {
             if (FanCoil(FanCoilNum).CapCtrlMeth_Num != CCM_ConsFanVarFlow) {
                 if (FanCoil(FanCoilNum).CapCtrlMeth_Num != CCM_ASHRAE) Node(InletNode).MassFlowRate = PartLoad * Node(InletNode).MassFlowRateMax;
