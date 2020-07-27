@@ -3526,7 +3526,7 @@ namespace LowTempRadiantSystem {
                             QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                     }
                     // Redo the heat balances since we have changed the heat source (set it to zero)
-                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Now check all of the surface temperatures.  If any potentially have condensation, leave the system off.
                     for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
@@ -3585,7 +3585,7 @@ namespace LowTempRadiantSystem {
                         }
 
                         // Redo the heat balances since we have changed the heat source
-                        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+                        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
                         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                         // Check for condensation one more time.  If no condensation, we are done.  If there is
@@ -3650,7 +3650,7 @@ namespace LowTempRadiantSystem {
         // the new SumHATsurf value for the zone.  Note that the difference between the new
         // SumHATsurf and the value originally calculated by the heat balance with a zero
         // source for all radiant systems in the zone is the load met by the system (approximately).
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
         LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
@@ -4698,7 +4698,7 @@ namespace LowTempRadiantSystem {
         // the new SumHATsurf value for the zone.  Note that the difference between the new
         // SumHATsurf and the value originally calculated by the heat balance with a zero
         // source for all radiant systems in the zone is the load met by the system (approximately).
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
         LoadMet = SumHATsurf(this->ZonePtr) - ZeroSourceSumHATsurf(this->ZonePtr);
@@ -4790,7 +4790,7 @@ namespace LowTempRadiantSystem {
                 }
 
                 // Now "simulate" the system by recalculating the heat balances
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                 LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);

@@ -54,7 +54,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include "IOFiles.hh"
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -126,7 +126,7 @@ namespace GeneratorFuelSupply {
         MyOneTimeFlag = true;
     }
 
-    void GetGeneratorFuelSupplyInput()
+    void GetGeneratorFuelSupplyInput(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -255,7 +255,7 @@ namespace GeneratorFuelSupply {
             // now make calls to Setup
 
             for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
-                SetupFuelConstituentData(OutputFiles::getSingleton(), FuelSupNum, ErrorsFound);
+                SetupFuelConstituentData(ioFiles, FuelSupNum, ErrorsFound);
             }
 
             if (ErrorsFound) {
@@ -268,7 +268,7 @@ namespace GeneratorFuelSupply {
 
     //******************************************************************************
 
-    void SetupFuelConstituentData(OutputFiles &outputFiles, int const FuelSupplyNum, bool &ErrorsFound)
+    void SetupFuelConstituentData(IOFiles &ioFiles, int const FuelSupplyNum, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -702,10 +702,10 @@ namespace GeneratorFuelSupply {
         }
 
         // report Heating Values in EIO.
-        print(outputFiles.eio, "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
+        print(ioFiles.eio, "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
                                              "Heating Value [KJ/kg],  Molecular Weight [g/mol] \n");
         static constexpr auto Format_501(" Fuel Supply, {},{:13.6N},{:13.6N},{:13.6N},{:13.6N}\n");
-        print(outputFiles.eio,
+        print(ioFiles.eio,
               Format_501,
               FuelSupply(FuelSupplyNum).Name,
               FuelSupply(FuelSupplyNum).LHV * 1000000.0,

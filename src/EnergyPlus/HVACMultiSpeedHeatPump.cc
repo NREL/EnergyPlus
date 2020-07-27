@@ -781,17 +781,17 @@ namespace HVACMultiSpeedHeatPump {
                 if (UtilityRoutines::SameString(Alphas(6), "Fan:OnOff")) {
                     MSHeatPump(MSHPNum).FanType = FanType_SimpleOnOff;
                     SetUpCompSets(CurrentModuleObject, MSHeatPump(MSHPNum).Name, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, "UNDEFINED", "UNDEFINED");
-                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode(state, state.fans, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
-                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode(state, state.fans, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode(state, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode(state, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
                 } else {
                     MSHeatPump(MSHPNum).FanType = FanType_SimpleConstVolume;
                     SetUpCompSets(
                         CurrentModuleObject, MSHeatPump(MSHPNum).Name, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, "UNDEFINED", "UNDEFINED");
-                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode(state, state.fans, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
-                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode(state, state.fans, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode(state, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode(state, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
                 }
-                GetFanIndex(state, state.fans, Alphas(7), MSHeatPump(MSHPNum).FanNum, ErrorsFound, CurrentModuleObject);
-                GetFanType(state, state.fans, Alphas(7), FanType, ErrorsFound);
+                GetFanIndex(state, Alphas(7), MSHeatPump(MSHPNum).FanNum, ErrorsFound, CurrentModuleObject);
+                GetFanType(state, Alphas(7), FanType, ErrorsFound);
                 if (FanType != MSHeatPump(MSHPNum).FanType) {
                     ShowSevereError(CurrentModuleObject + ", \"" + MSHeatPump(MSHPNum).Name + "\", " + cAlphaFields(6) + " and " + cAlphaFields(7) +
                                     " do not match in Fan objects.");
@@ -850,7 +850,12 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                 }
                 LocalError = false;
-                GetDXCoilIndex(state, MSHeatPump(MSHPNum).DXHeatCoilName, MSHeatPump(MSHPNum).DXHeatCoilIndex, LocalError, "Coil:Heating:DX:MultiSpeed");
+                GetDXCoilIndex(state,
+                               MSHeatPump(MSHPNum).DXHeatCoilName,
+                               MSHeatPump(MSHPNum).DXHeatCoilIndex,
+                               LocalError,
+                               "Coil:Heating:DX:MultiSpeed",
+                               ObjexxFCL::Optional_bool_const());
                 if (LocalError) {
                     ShowSevereError("The index of " + cAlphaFields(11) + " is not found \"" + Alphas(11) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1077,7 +1082,12 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                 }
                 LocalError = false;
-                GetDXCoilIndex(state, MSHeatPump(MSHPNum).DXCoolCoilName, MSHeatPump(MSHPNum).DXCoolCoilIndex, LocalError, "Coil:Cooling:DX:MultiSpeed");
+                GetDXCoilIndex(state,
+                               MSHeatPump(MSHPNum).DXCoolCoilName,
+                               MSHeatPump(MSHPNum).DXCoolCoilIndex,
+                               LocalError,
+                               "Coil:Cooling:DX:MultiSpeed",
+                               ObjexxFCL::Optional_bool_const());
                 if (LocalError) {
                     ShowSevereError("The index of " + cAlphaFields(13) + " is not found \"" + Alphas(13) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");

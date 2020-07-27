@@ -58,9 +58,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
+    class IOFiles;
     struct EnergyPlusData;
-    class OutputFiles;
 
 namespace MixedAir {
 

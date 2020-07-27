@@ -351,7 +351,7 @@ namespace ExternalInterface {
 
     void CalcExternalInterfaceFMUImport(EnergyPlusData &state);
 
-    void InitExternalInterfaceFMUImport();
+    void InitExternalInterfaceFMUImport(IOFiles &ioFiles);
 
     void InstantiateInitializeFMUImport();
 

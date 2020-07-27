@@ -267,7 +267,7 @@ namespace ChillerReformulatedEIR {
 
         void setupOutputVars();
 
-        void size();
+        void size(IOFiles &ioFiles);
 
         void control(Real64 &MyLoad, bool RunFlag, bool FirstIteration);
 
