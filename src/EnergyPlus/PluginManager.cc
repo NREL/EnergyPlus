@@ -53,6 +53,7 @@
 
 #include <map>
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -65,7 +66,7 @@ namespace EnergyPlus {
 namespace PluginManagement {
     std::unique_ptr<PluginManager> pluginManager;
 
-    std::map<int, std::vector<std::function<void()>>> callbacks;
+    std::map<int, std::vector<std::function<void(void *)>>> callbacks;
     std::vector<PluginInstance> plugins;
     std::vector<PluginTrendVariable> trends;
     std::vector<std::string> globalVariableNames;
@@ -402,7 +403,7 @@ namespace PluginManagement {
 #endif
     }
 
-    void registerNewCallback(int iCalledFrom, const std::function<void()> &f)
+    void registerNewCallback(EnergyPlusData &EP_UNUSED(state), int iCalledFrom, const std::function<void(void *)> &f)
     {
         callbacks[iCalledFrom].push_back(f);
     }
@@ -423,11 +424,11 @@ namespace PluginManagement {
         return (int)callbacks.size();
     }
 
-    void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan)
+    void runAnyRegisteredCallbacks(EnergyPlusData &state, int iCalledFrom, bool &anyRan)
     {
         if (DataGlobals::KickOffSimulation) return;
         for (auto const &cb : callbacks[iCalledFrom]) {
-            cb();
+            cb((void *) &state);
             anyRan = true;
         }
 #if LINK_WITH_PYTHON == 1

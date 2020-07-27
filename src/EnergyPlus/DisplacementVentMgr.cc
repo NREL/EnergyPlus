@@ -54,7 +54,6 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
-//#include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -128,10 +127,13 @@ namespace DisplacementVentMgr {
     Real64 ThickOccupiedSubzoneMin(0.2); // Minimum thickness of occupied subzone
     Real64 HeightIntMass(0.0);           // Height of internal mass surfaces, assumed vertical, cannot exceed ceiling height
     Real64 HeightIntMassDefault(2.0);    // Default height of internal mass surfaces
+    bool InitUCSDDVMyOneTimeFlag(true);
 
     // SUBROUTINE SPECIFICATIONS:
 
-    // Functions
+    void clear_state() {
+        InitUCSDDVMyOneTimeFlag = true;
+    }
 
     void ManageUCSDDVModel(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum) // index number for the specified zone
     {
@@ -222,16 +224,15 @@ namespace DisplacementVentMgr {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
         static Array1D_bool MyEnvrnFlag;
 
         // Do the one time initializations
-        if (MyOneTimeFlag) {
+        if (InitUCSDDVMyOneTimeFlag) {
             MyEnvrnFlag.dimension(NumOfZones, true);
             HeightFloorSubzoneTop = 0.2;
             ThickOccupiedSubzoneMin = 0.2;
             HeightIntMassDefault = 2.0;
-            MyOneTimeFlag = false;
+            InitUCSDDVMyOneTimeFlag = false;
         }
 
         // Do the begin environment initializations

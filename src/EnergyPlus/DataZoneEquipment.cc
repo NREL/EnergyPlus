@@ -191,6 +191,7 @@ namespace DataZoneEquipment {
     Array1D<ControlList> CoolingControlList;
     Array1D<SupplyAir> SupplyAirPath;
     Array1D<ReturnAir> ReturnAirPath;
+    bool CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
 
     // Functions
     // Clears the global data in DataZoneEquipment.
@@ -217,6 +218,7 @@ namespace DataZoneEquipment {
         SupplyAirPath.deallocate();
         ReturnAirPath.deallocate();
         UniqueZoneEquipListNames.clear();
+        CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
     }
 
     void GetZoneEquipmentData(EnergyPlusData &state)
@@ -1515,15 +1517,14 @@ namespace DataZoneEquipment {
         Real64 CO2PeopleGeneration;       // CO2 generation from people at design level
         int PeopleNum;
         static Array1D_bool MyEnvrnFlag;
-        static bool OneTimeFlag(true);
 
         OAVolumeFlowRate = 0.0;
         if (DSOAPtr == 0) return OAVolumeFlowRate;
 
-        if (OneTimeFlag) {
+        if (CalcDesignSpecificationOutdoorAirOneTimeFlag) {
             MyEnvrnFlag.allocate(DataSizing::NumOARequirements);
             MyEnvrnFlag = true;
-            OneTimeFlag = false;
+            CalcDesignSpecificationOutdoorAirOneTimeFlag = false;
         }
 
         if (present(PerPersonNotSet)) {

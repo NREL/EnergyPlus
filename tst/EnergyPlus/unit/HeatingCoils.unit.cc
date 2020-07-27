@@ -103,6 +103,20 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInputError)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
+TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeCoal)
+{
+    std::string const idf_objects = delimited_string(
+        {"Coil:Heating:Fuel,", "  Furnace Coil,            !- Name", "  ,    !- Availability Schedule Name", "  Coal,                 !- FuelType",
+         "  0.8,                     !- Gas Burner Efficiency", "  20000,                   !- Nominal Capacity {W}",
+         "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name", "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(state));
+
+    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::iRT_Coal);
+}
+
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
 {
     std::string const idf_objects = delimited_string(

@@ -59,9 +59,8 @@
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
+    class IOFiles;
     struct EnergyPlusData;
-    class OutputFiles;
 
 namespace WaterThermalTanks {
 
@@ -653,13 +652,13 @@ namespace WaterThermalTanks {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void setupOutputVars();
+        void setupOutputVars(IOFiles &ioFiles);
 
         void setupZoneInternalGains();
 
-        void setupChilledWaterTankOutputVars(OutputFiles &outputFiles);
+        void setupChilledWaterTankOutputVars(IOFiles &ioFiles);
 
-        void setupWaterHeaterOutputVars(OutputFiles &outputFiles);
+        void setupWaterHeaterOutputVars(IOFiles &ioFiles);
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -697,7 +696,7 @@ namespace WaterThermalTanks {
 
         void CalcStandardRatings(EnergyPlusData &state);
 
-        void ReportCWTankInits(OutputFiles &outputFiles);
+        void ReportCWTankInits(IOFiles &ioFiles);
 
         Real64 GetHPWHSensedTankTemp();
 
@@ -891,7 +890,7 @@ namespace WaterThermalTanks {
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
                                 int &CompIndex);
 
-    bool getDesuperHtrInput();
+    bool getDesuperHtrInput(EnergyPlusData &state);
 
     bool getHPWaterHeaterInput(EnergyPlusData &state);
 

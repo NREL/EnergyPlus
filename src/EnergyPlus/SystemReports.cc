@@ -60,6 +60,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataConvergParams.hh>
@@ -75,12 +76,11 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -251,7 +251,7 @@ namespace SystemReports {
 
     // Functions
 
-    void InitEnergyReports(OutputFiles &outputFiles)
+    void InitEnergyReports(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -957,7 +957,7 @@ namespace SystemReports {
                 LoopCount = 1;
 
                 if (LoopType > 0 && LoopNum > 0) {
-                    FindFirstLastPtr(outputFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
+                    FindFirstLastPtr(ioFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
                 } else {
                     ConnectionFlag = false;
                 }
@@ -977,7 +977,7 @@ namespace SystemReports {
                 LoopCount = 1;
 
                 if (LoopType > 0 && LoopNum > 0) {
-                    FindFirstLastPtr(outputFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
+                    FindFirstLastPtr(ioFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
                 } else {
                     ConnectionFlag = false;
                 }
@@ -997,7 +997,7 @@ namespace SystemReports {
                 LoopCount = 1;
 
                 if (LoopType > 0 && LoopNum > 0) {
-                    FindFirstLastPtr(outputFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
+                    FindFirstLastPtr(ioFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
                 } else {
                     ConnectionFlag = false;
                 }
@@ -1016,7 +1016,7 @@ namespace SystemReports {
                 LoopCount = 1;
 
                 if (LoopType > 0 && LoopNum > 0) {
-                    FindFirstLastPtr(outputFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
+                    FindFirstLastPtr(ioFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
                 } else {
                     ConnectionFlag = false;
                 }
@@ -1036,7 +1036,7 @@ namespace SystemReports {
                 LoopCount = 1;
 
                 if (LoopType > 0 && LoopNum > 0) {
-                    FindFirstLastPtr(outputFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
+                    FindFirstLastPtr(ioFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
                 } else {
                     ConnectionFlag = false;
                 }
@@ -1056,7 +1056,7 @@ namespace SystemReports {
                 LoopCount = 1;
 
                 if (LoopType > 0 && LoopNum > 0) {
-                    FindFirstLastPtr(outputFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
+                    FindFirstLastPtr(ioFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
                 } else {
                     ConnectionFlag = false;
                 }
@@ -1203,7 +1203,7 @@ namespace SystemReports {
         // initialize energy report variables
     }
 
-    void FindFirstLastPtr(OutputFiles &outputFiles, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag)
+    void FindFirstLastPtr(IOFiles &ioFiles, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -1308,7 +1308,7 @@ namespace SystemReports {
                             DemandSideConnect(ArrayCount).CompNum = DemandSideCompNum;
 
                             found = false;
-                            print(outputFiles.debug, "1271=lstacksize {}\n", size(LoopStack));
+                            print(ioFiles.debug, "1271=lstacksize {}\n", size(LoopStack));
                             for (Idx = 1; Idx <= isize(LoopStack); ++Idx) {
                                 if (DemandSideLoopNum == LoopStack(Idx).LoopNum && DemandSideLoopType == LoopStack(Idx).LoopType) {
                                     found = true;
@@ -1374,7 +1374,7 @@ namespace SystemReports {
                     }
                 }
             } else {
-                print(outputFiles.debug, "{}\n", "1361=error");
+                print(ioFiles.debug, "{}\n", "1361=error");
                 // error
             }
 
@@ -5093,7 +5093,7 @@ namespace SystemReports {
         }
     }
 
-    void ReportAirLoopConnections(OutputFiles &outputFiles)
+    void ReportAirLoopConnections(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5143,23 +5143,23 @@ namespace SystemReports {
         static constexpr auto Format_714("! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,<OA Outlet Node #>,<OA Mixed "
                                          "Air Outlet Node Name>,<AirLoopHVAC Name>");
 
-        print(outputFiles.bnd, "{}\n", "! ===============================================================");
-        print(outputFiles.bnd, "{}\n", Format_706);
-        print(outputFiles.bnd, " #AirLoopHVACs,{}\n", NumPrimaryAirSys);
-        print(outputFiles.bnd, "{}\n", Format_708);
-        print(outputFiles.bnd, "{}\n", Format_709);
-        print(outputFiles.bnd, "{}\n", Format_710);
-        print(outputFiles.bnd, "{}\n", Format_711);
-        print(outputFiles.bnd, "{}\n", Format_712);
-        print(outputFiles.bnd, "{}\n", Format_714);
-        print(outputFiles.bnd,
+        print(ioFiles.bnd, "{}\n", "! ===============================================================");
+        print(ioFiles.bnd, "{}\n", Format_706);
+        print(ioFiles.bnd, " #AirLoopHVACs,{}\n", NumPrimaryAirSys);
+        print(ioFiles.bnd, "{}\n", Format_708);
+        print(ioFiles.bnd, "{}\n", Format_709);
+        print(ioFiles.bnd, "{}\n", Format_710);
+        print(ioFiles.bnd, "{}\n", Format_711);
+        print(ioFiles.bnd, "{}\n", Format_712);
+        print(ioFiles.bnd, "{}\n", Format_714);
+        print(ioFiles.bnd,
               "{}\n",
               "! <AirLoopHVAC Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>");
-        print(outputFiles.bnd,
+        print(ioFiles.bnd,
               "{}\n",
               "! <AirLoopHVAC Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop "
               "Name>,<Loop Type>");
-        print(outputFiles.bnd,
+        print(ioFiles.bnd,
               "{}\n",
               "! <AirLoopHVAC Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop "
               "Type>");
@@ -5172,7 +5172,7 @@ namespace SystemReports {
                 }
             }();
 
-            print(outputFiles.bnd,
+            print(ioFiles.bnd,
                   " AirLoopHVAC,{},{},{},{},{},{}\n",
                   AirToZoneNodeInfo(Count).AirLoopName,
                   AirToZoneNodeInfo(Count).NumReturnNodes,
@@ -5181,70 +5181,70 @@ namespace SystemReports {
                   AirToZoneNodeInfo(Count).NumZonesHeated,
                   oaSysExists);
             for (int Count1 = 1; Count1 <= AirToZoneNodeInfo(Count).NumReturnNodes; ++Count1) {
-                print(outputFiles.bnd, "   AirLoop Return Connections,{},{},", Count1, AirToZoneNodeInfo(Count).AirLoopName);
+                print(ioFiles.bnd, "   AirLoop Return Connections,{},{},", Count1, AirToZoneNodeInfo(Count).AirLoopName);
                 if (AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1) > 0) {
-                    print(outputFiles.bnd,
+                    print(ioFiles.bnd,
                           "{},{},",
                           AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1),
                           NodeID(AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1)));
                 } else {
-                    print(outputFiles.bnd, "{},{},", errstring, errstring);
+                    print(ioFiles.bnd, "{},{},", errstring, errstring);
                 }
                 if (AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1) > 0) {
-                    print(outputFiles.bnd,
+                    print(ioFiles.bnd,
                           "{},{}\n",
                           AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1),
                           NodeID(AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1)));
                 } else {
-                    print(outputFiles.bnd, "{},{}\n", errstring, errstring);
+                    print(ioFiles.bnd, "{},{}\n", errstring, errstring);
                 }
             }
             for (int Count1 = 1; Count1 <= AirToZoneNodeInfo(Count).NumSupplyNodes; ++Count1) {
-                print(outputFiles.bnd, "   AirLoop Supply Connections,{},{},", Count1, AirToZoneNodeInfo(Count).AirLoopName);
+                print(ioFiles.bnd, "   AirLoop Supply Connections,{},{},", Count1, AirToZoneNodeInfo(Count).AirLoopName);
                 if (AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNum(Count1) > 0) {
-                    print(outputFiles.bnd,
+                    print(ioFiles.bnd,
                           "{},{},",
                           AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNum(Count1),
                           NodeID(AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNum(Count1)));
                 } else {
-                    print(outputFiles.bnd, "{},{},", errstring, errstring);
+                    print(ioFiles.bnd, "{},{},", errstring, errstring);
                 }
                 if (AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1) > 0) {
-                    print(outputFiles.bnd,
+                    print(ioFiles.bnd,
                           "{},{}\n",
                           AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1),
                           NodeID(AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1)));
                 } else {
-                    print(outputFiles.bnd, "{},{}\n", errstring, errstring);
+                    print(ioFiles.bnd, "{},{}\n", errstring, errstring);
                 }
             }
 
             for (int Count1 = 1; Count1 <= AirToZoneNodeInfo(Count).NumZonesCooled; ++Count1) {
                 const auto CtrldZoneNum = AirToZoneNodeInfo(Count).CoolCtrlZoneNums(Count1);
                 const auto ZoneNum = ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
-                print(outputFiles.bnd, "   Cooled Zone Info,{},{},", Count1, Zone(ZoneNum).Name);
+                print(ioFiles.bnd, "   Cooled Zone Info,{},{},", Count1, Zone(ZoneNum).Name);
                 if (AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1) > 0) {
-                    print(outputFiles.bnd,
+                    print(ioFiles.bnd,
                           "{},{},{}\n",
                           AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1),
                           NodeID(AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1)),
                           AirToZoneNodeInfo(Count).AirLoopName);
                 } else {
-                    print(outputFiles.bnd, "{},{},{}\n", errstring, errstring, AirToZoneNodeInfo(Count).AirLoopName);
+                    print(ioFiles.bnd, "{},{},{}\n", errstring, errstring, AirToZoneNodeInfo(Count).AirLoopName);
                 }
             }
             for (int Count1 = 1; Count1 <= AirToZoneNodeInfo(Count).NumZonesHeated; ++Count1) {
                 const auto CtrldZoneNum = AirToZoneNodeInfo(Count).HeatCtrlZoneNums(Count1);
                 const auto ZoneNum = ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
-                print(outputFiles.bnd, "   Heated Zone Info,{},{},", Count1, Zone(ZoneNum).Name);
+                print(ioFiles.bnd, "   Heated Zone Info,{},{},", Count1, Zone(ZoneNum).Name);
                 if (AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1) > 0) {
-                    print(outputFiles.bnd,
+                    print(ioFiles.bnd,
                           "{},{},{}\n",
                           AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1),
                           NodeID(AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1)),
                           AirToZoneNodeInfo(Count).AirLoopName);
                 } else {
-                    print(outputFiles.bnd, "{},{},{}\n", errstring, errstring, AirToZoneNodeInfo(Count).AirLoopName);
+                    print(ioFiles.bnd, "{},{},{}\n", errstring, errstring, AirToZoneNodeInfo(Count).AirLoopName);
                 }
             }
             if (AirToOANodeInfo(Count).OASysExists) {
@@ -5261,48 +5261,48 @@ namespace SystemReports {
                     ChrOut2 = errstring;
                 }
 
-                print(outputFiles.bnd, "   Outdoor Air Connections,{},", ChrOut);
+                print(ioFiles.bnd, "   Outdoor Air Connections,{},", ChrOut);
                 if (ChrOut != errstring) {
-                    print(outputFiles.bnd, "{},", NodeID(AirToOANodeInfo(Count).OASysInletNodeNum));
+                    print(ioFiles.bnd, "{},", NodeID(AirToOANodeInfo(Count).OASysInletNodeNum));
                 } else {
-                    print(outputFiles.bnd, "{},", errstring);
+                    print(ioFiles.bnd, "{},", errstring);
                 }
                 if (ChrOut2 != errstring) {
-                    print(outputFiles.bnd,
+                    print(ioFiles.bnd,
                           "{},{},{}\n",
                           ChrOut2,
                           NodeID(AirToOANodeInfo(Count).OASysOutletNodeNum),
                           AirToZoneNodeInfo(Count).AirLoopName);
                 } else {
-                    print(outputFiles.bnd, "{},{},{}\n", errstring, errstring, AirToZoneNodeInfo(Count).AirLoopName);
+                    print(ioFiles.bnd, "{},{},{}\n", errstring, errstring, AirToZoneNodeInfo(Count).AirLoopName);
                 }
             }
             //  Report HVAC Air Loop Splitter to BND file
             if (PrimaryAirSystem(Count).Splitter.Exists) {
-                print(outputFiles.bnd,
+                print(ioFiles.bnd,
                       "   AirLoopHVAC Connector,Splitter,{},{},Air,{}\n",
                       PrimaryAirSystem(Count).Splitter.Name,
                       PrimaryAirSystem(Count).Name,
                       PrimaryAirSystem(Count).Splitter.TotalOutletNodes);
                 for (int Count1 = 1; Count1 <= PrimaryAirSystem(Count).Splitter.TotalOutletNodes; ++Count1) {
-                    print(outputFiles.bnd, "     AirLoopHVAC Connector Branches,{},Splitter,{},", Count1, PrimaryAirSystem(Count).Splitter.Name);
+                    print(ioFiles.bnd, "     AirLoopHVAC Connector Branches,{},Splitter,{},", Count1, PrimaryAirSystem(Count).Splitter.Name);
 
                     if (PrimaryAirSystem(Count).Splitter.BranchNumIn <= 0) {
-                        print(outputFiles.bnd, "{},", errstring);
+                        print(ioFiles.bnd, "{},", errstring);
                     } else {
-                        print(outputFiles.bnd, "{},", PrimaryAirSystem(Count).Branch(PrimaryAirSystem(Count).Splitter.BranchNumIn).Name);
+                        print(ioFiles.bnd, "{},", PrimaryAirSystem(Count).Branch(PrimaryAirSystem(Count).Splitter.BranchNumIn).Name);
                     }
 
                     if (PrimaryAirSystem(Count).Splitter.BranchNumOut(Count1) <= 0) {
-                        print(outputFiles.bnd, "{},{},Air\n", errstring, PrimaryAirSystem(Count).Name);
+                        print(ioFiles.bnd, "{},{},Air\n", errstring, PrimaryAirSystem(Count).Name);
                     } else {
-                        print(outputFiles.bnd,
+                        print(ioFiles.bnd,
                               "{},{},Air\n",
                               PrimaryAirSystem(Count).Branch(PrimaryAirSystem(Count).Splitter.BranchNumOut(Count1)).Name,
                               PrimaryAirSystem(Count).Name);
                     }
 
-                    print(outputFiles.bnd,
+                    print(ioFiles.bnd,
                           "     AirLoopHVAC Connector Nodes,   {},Splitter,{},{},{},{},Air\n",
                           Count1,
                           PrimaryAirSystem(Count).Splitter.Name,
