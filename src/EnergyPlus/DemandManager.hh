@@ -56,6 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace DemandManager {
 
@@ -181,7 +183,7 @@ namespace DemandManager {
 
     // Functions
 
-    void ManageDemand();
+    void ManageDemand(EnergyPlusData &state);
 
     void SimulateDemandManagerList(int const ListNum,
                                    bool &ResimExt, // Flag to resimulate the exterior energy use simulation
@@ -191,19 +193,19 @@ namespace DemandManager {
 
     void GetDemandManagerListInput();
 
-    void GetDemandManagerInput();
+    void GetDemandManagerInput(EnergyPlusData &state);
 
-    void SurveyDemandManagers();
+    void SurveyDemandManagers(EnergyPlusData &state);
 
-    void ActivateDemandManagers();
+    void ActivateDemandManagers(EnergyPlusData &state);
 
-    void UpdateDemandManagers();
+    void UpdateDemandManagers(EnergyPlusData &state);
 
     void ReportDemandManagerList(int const ListNum);
 
-    void LoadInterface(int const Action, int const MgrNum, int const LoadPtr, bool &CanReduceDemand);
+    void LoadInterface(EnergyPlusData &state, int const Action, int const MgrNum, int const LoadPtr, bool &CanReduceDemand);
 
-    void InitDemandManagers();
+    void InitDemandManagers(EnergyPlusData &state);
 
 } // namespace DemandManager
 

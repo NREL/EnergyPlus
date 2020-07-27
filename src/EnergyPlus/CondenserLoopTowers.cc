@@ -52,7 +52,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -73,6 +72,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -168,12 +168,12 @@ namespace CondenserLoopTowers {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void CoolingTower::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void CoolingTower::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                 bool const EP_UNUSED(FirstHVACIteration),
                                 Real64 &CurLoad,
                                 bool const RunFlag)
     {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
             this->calculateSingleSpeedTower();
         } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
@@ -200,9 +200,9 @@ namespace CondenserLoopTowers {
         SizFactor = this->SizFac;
     }
 
-    void CoolingTower::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void CoolingTower::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
             this->SizeVSMerkelTower();
         } else {
@@ -233,7 +233,7 @@ namespace CondenserLoopTowers {
         using namespace DataIPShortCuts; // Data for field names, blank numerics
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt OutputFormat("(F5.2)");
+        static constexpr auto OutputFormat("{:5.2F}");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TowerNum;                      // Tower number, reference counter for towers data array
@@ -1328,51 +1328,42 @@ namespace CondenserLoopTowers {
             towers(TowerNum).DesignInletWB = NumArray(1);
             if (NumArray(1) < towers(towers(TowerNum).VSTower).MinInletAirWBTemp ||
                 NumArray(1) > towers(towers(TowerNum).VSTower).MaxInletAirWBTemp) {
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << towers(TowerNum).DesignInletWB;
-                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << towers(towers(TowerNum).VSTower).MinInletAirWBTemp;
-                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << towers(towers(TowerNum).VSTower).MaxInletAirWBTemp;
                 ShowSevereError(cCurrentModuleObject.append(", \"")
                                     .append(towers(TowerNum).Name)
                                     .append("\" the design inlet air wet-bulb temperature of ")
-                                    .append(OutputChar)
+                                    .append(format(OutputFormat, towers(TowerNum).DesignInletWB))
                                     .append(" must be within the model limits of ")
-                                    .append(OutputCharLo)
+                                    .append(format(OutputFormat, towers(towers(TowerNum).VSTower).MinInletAirWBTemp))
                                     .append(" and ")
-                                    .append(OutputCharHi)
+                                    .append(format(OutputFormat, towers(towers(TowerNum).VSTower).MaxInletAirWBTemp))
                                     .append(" degrees C"));
                 ErrorsFound = true;
             }
 
             towers(TowerNum).DesignApproach = NumArray(2);
             if (NumArray(2) < towers(towers(TowerNum).VSTower).MinApproachTemp || NumArray(2) > towers(towers(TowerNum).VSTower).MaxApproachTemp) {
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << towers(TowerNum).DesignApproach;
-                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << towers(towers(TowerNum).VSTower).MinApproachTemp;
-                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << towers(towers(TowerNum).VSTower).MaxApproachTemp;
                 ShowSevereError(cCurrentModuleObject.append(", \"")
                                     .append(towers(TowerNum).Name)
                                     .append("\" the design approach temperature of ")
-                                    .append(OutputChar)
+                                    .append(format(OutputFormat, towers(TowerNum).DesignApproach))
                                     .append(" must be within the model limits of ")
-                                    .append(OutputCharLo)
+                                    .append(format(OutputFormat, towers(towers(TowerNum).VSTower).MinApproachTemp))
                                     .append(" and ")
-                                    .append(OutputCharHi)
+                                    .append(format(OutputFormat, towers(towers(TowerNum).VSTower).MaxApproachTemp))
                                     .append(" degrees C"));
                 ErrorsFound = true;
             }
 
             towers(TowerNum).DesignRange = NumArray(3);
             if (NumArray(3) < towers(towers(TowerNum).VSTower).MinRangeTemp || NumArray(3) > towers(towers(TowerNum).VSTower).MaxRangeTemp) {
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << towers(TowerNum).DesignRange;
-                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << towers(towers(TowerNum).VSTower).MinRangeTemp;
-                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << towers(towers(TowerNum).VSTower).MaxRangeTemp;
                 ShowSevereError(cCurrentModuleObject.append(", \"")
                                     .append(towers(TowerNum).Name)
                                     .append("\" the design range temperature of ")
-                                    .append(OutputChar)
+                                    .append(format(OutputFormat, towers(TowerNum).DesignRange))
                                     .append(" must be within the model limits of ")
-                                    .append(OutputCharLo)
+                                    .append(format(OutputFormat, towers(towers(TowerNum).VSTower).MinRangeTemp))
                                     .append(" and ")
-                                    .append(OutputCharHi)
+                                    .append(format(OutputFormat, towers(towers(TowerNum).VSTower).MaxRangeTemp))
                                     .append(" degrees C"));
                 ErrorsFound = true;
             }
@@ -1867,7 +1858,7 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void CoolingTower::initialize()
+    void CoolingTower::initialize(BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1895,7 +1886,7 @@ namespace CondenserLoopTowers {
 
             // Locate the tower on the plant loops for later usage
             bool ErrorsFound = false;
-            PlantUtilities::ScanPlantLoopsForObject(
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                 this->Name, this->TowerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
             if (ErrorsFound) {
                 ShowFatalError("initialize: Program terminated due to previous condition(s).");
@@ -2226,8 +2217,7 @@ namespace CondenserLoopTowers {
         // via the "Nominal Capacity" method, the water flow rate is directly proportional to capacity.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
-        static ObjexxFCL::gio::Fmt OutputFormat2("(F9.6)");
+
         int const MaxIte(500);    // Maximum number of iterations
         Real64 const Acc(0.0001); // Accuracy of result
         static std::string const RoutineName("SizeTower");
@@ -2977,6 +2967,7 @@ namespace CondenserLoopTowers {
             }
 
             Real64 WaterFlowRatio(0.0); // tower water flow rate ratio found during model calibration
+
             if (ModelCalibrated) {
                 auto f = std::bind(&CoolingTower::residualTa, this, std::placeholders::_1, std::placeholders::_2);
                 General::SolveRoot(Acc, MaxIte, SolFla, WaterFlowRatio, f, DataPrecisionGlobals::constant_pointfive, MaxWaterFlowRateRatio, Par);
@@ -2992,23 +2983,21 @@ namespace CondenserLoopTowers {
                     ShowFatalError("Cooling tower calibration failed for tower " + this->Name + '.');
                 }
             } else {
-                ObjexxFCL::gio::write(OutputChar2, OutputFormat2) << WaterFlowRateRatio;
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Tapproach;
                 ShowSevereError("Bad starting values for cooling tower water flow rate ratio calibration.");
                 ShowContinueError("Design inlet air wet-bulb or range temperature must be modified to achieve the design approach");
-                ShowContinueError("A water flow rate ratio of " + OutputChar2 + " was calculated to yield an approach temperature of " + OutputChar +
-                                  '.');
+                ShowContinueError(format("A water flow rate ratio of {:.6F} was calculated to yield an approach temperature of {:.2F}.", WaterFlowRateRatio, Tapproach));
                 ShowFatalError("Cooling tower calibration failed for tower " + this->Name + '.');
             }
 
             this->CalibratedWaterFlowRate = this->DesignWaterFlowRate / WaterFlowRatio;
 
             if (WaterFlowRatio < towers(this->VSTower).MinWaterFlowRatio || WaterFlowRatio > towers(this->VSTower).MaxWaterFlowRatio) {
-                ObjexxFCL::gio::write(OutputChar2, OutputFormat2) << WaterFlowRatio;
-                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << towers(this->VSTower).MinWaterFlowRatio;
-                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << towers(this->VSTower).MaxWaterFlowRatio;
-                ShowWarningError("CoolingTower:VariableSpeed, \"" + this->Name + "\" the calibrated water flow rate ratio is determined to be " +
-                                 OutputChar2 + ". This is outside the valid range of " + OutputCharLo + " to " + OutputCharHi + '.');
+                ShowWarningError(format("CoolingTower:VariableSpeed, \"{}\" the calibrated water flow rate ratio is determined to be {:9.6F}. This "
+                                        "is outside the valid range of {:.2F} to {:.2F}.",
+                                        this->Name,
+                                        WaterFlowRatio,
+                                        towers(this->VSTower).MinWaterFlowRatio,
+                                        towers(this->VSTower).MaxWaterFlowRatio));
             }
 
             Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
@@ -4560,8 +4549,7 @@ namespace CondenserLoopTowers {
         // Form 160.00-SG2 (0502). 2002.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt OutputFormat("(F5.2)");
-        static ObjexxFCL::gio::Fmt OutputFormat2("(F8.5)");
+
         int const MaxIte(500);    // Maximum number of iterations
         Real64 const Acc(0.0001); // Accuracy of result
         static std::string const RoutineName("calculateVariableSpeedTower");
@@ -4754,19 +4742,14 @@ namespace CondenserLoopTowers {
                         //           IF RegulaFalsi cannot find a solution then provide detailed output for debugging
                     } else if (SolFla == -2) {
                         if (!DataGlobals::WarmupFlag) {
-                            ObjexxFCL::gio::write(OutputChar, OutputFormat) << TwbCapped;
-                            ObjexxFCL::gio::write(OutputChar2, OutputFormat) << Tr;
-                            ObjexxFCL::gio::write(OutputChar3, OutputFormat) << Ta;
-                            ObjexxFCL::gio::write(OutputChar4, OutputFormat) << WaterFlowRateRatioCapped;
-                            ObjexxFCL::gio::write(OutputChar5, OutputFormat) << this->MinimumVSAirFlowFrac;
+
                             if (this->CoolingTowerAFRRFailedCount < 1) {
                                 ++this->CoolingTowerAFRRFailedCount;
-                                ShowWarningError("CoolingTower:VariableSpeed \"" + this->Name +
-                                                 "\" - Cooling tower air flow rate ratio calculation failed ");
-                                ShowContinueError("...with conditions as Twb = " + OutputChar + ", Trange = " + OutputChar2 +
-                                                  ", Tapproach = " + OutputChar3 + ", and water flow rate ratio = " + OutputChar4);
+                                ShowWarningError(format("CoolingTower:VariableSpeed \"{}\" - Cooling tower air flow rate ratio calculation failed ", this->Name));
+                                ShowContinueError(format("...with conditions as Twb = {:5.2F}, Trange = {:5.2F}, Tapproach = {:5.2F}, and water flow rate ratio = {:5.2F}"
+                                                         , TwbCapped, Tr, Ta, WaterFlowRateRatioCapped));
                                 ShowContinueError("...a solution could not be found within the valid range of air flow rate ratios");
-                                ShowContinueErrorTimeStamp(" ...Valid air flow rate ratio range = " + OutputChar5 + " to 1.0.");
+                                ShowContinueErrorTimeStamp(format(" ...Valid air flow rate ratio range = {:5.2F} to 1.0.", this->MinimumVSAirFlowFrac));
                                 ShowContinueError("...Consider modifying the design approach or design range temperature for this tower.");
                             } else {
                                 ShowRecurringWarningErrorAtEnd("CoolingTower:VariableSpeed \"" + this->Name +
@@ -4835,13 +4818,13 @@ namespace CondenserLoopTowers {
                     //          Report warnings only during actual simulation
                     if (!DataGlobals::WarmupFlag) {
                         towers(this->VSTower).PrintLGMessage = true;
-                        ObjexxFCL::gio::write(OutputChar, OutputFormat) << FlowFraction;
-                        ObjexxFCL::gio::write(OutputChar2, OutputFormat) << towers(this->VSTower).MaxLiquidToGasRatio;
                         towers(this->VSTower).LGBuffer1 =
-                            this->TowerType + " \"" + this->Name + "\" - Liquid to gas ratio (L/G) is out of range at " + OutputChar + '.';
-                        towers(this->VSTower).LGBuffer2 = " ...Valid maximum ratio = " + OutputChar2 +
-                                                          ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " +
-                                                          DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString();
+                            format("{} \"{}\" - Liquid to gas ratio (L/G) is out of range at {:5.2F}.", this->TowerType, this->Name, FlowFraction);
+                        towers(this->VSTower).LGBuffer2 = format(" ...Valid maximum ratio = {:5.2F}. Occurrence info = {}, {} {}",
+                                                                 DataEnvironment::EnvironmentName,
+                                                                 DataEnvironment::CurMnDy,
+                                                                 General::CreateSysTimeIntervalString());
+
                         towers(this->VSTower).LGLast = FlowFraction;
                     }
                 }
@@ -5291,7 +5274,7 @@ namespace CondenserLoopTowers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla;             // Flag of solver
         Array1D<Real64> Par(4); // Parameter array for regula falsi solver
-        Real64 const VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver 
+        Real64 const VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver
 
         //   determine tower outlet water temperature
         Par(1) = this->thisTowerNum; // Index to cooling tower
@@ -5890,7 +5873,7 @@ namespace CondenserLoopTowers {
         // This subroutine is for passing results to the outlet water node.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt LowTempFmt("(' ',F6.2)");
+
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CharErrOut;
@@ -5925,13 +5908,10 @@ namespace CondenserLoopTowers {
         Real64 const LoopMinTemp = DataPlant::PlantLoop(this->LoopNum).MinTemp;
         if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
             ++this->OutletWaterTempErrorCount;
-            ObjexxFCL::gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
-            ObjexxFCL::gio::write(CharErrOut, LowTempFmt) << this->OutletWaterTemp;
             strip(CharErrOut);
             if (this->OutletWaterTempErrorCount < 2) {
                 ShowWarningError(this->TowerType + " \"" + this->Name + "\"");
-                ShowContinueError("Cooling tower water outlet temperature (" + CharErrOut +
-                                  " C) is below the specified minimum condenser loop temp of " + stripped(CharLowOutletTemp) + " C");
+                ShowContinueError(format("Cooling tower water outlet temperature ({:.2F} C) is below the specified minimum condenser loop temp of {:.2F} C", this->OutletWaterTemp, LoopMinTemp));
                 ShowContinueErrorTimeStamp("");
             } else {
                 ShowRecurringWarningErrorAtEnd(
@@ -5950,7 +5930,7 @@ namespace CondenserLoopTowers {
                 ShowWarningError(this->TowerType + " \"" + this->Name + "\"");
                 ShowContinueError("Cooling tower water mass flow rate near zero.");
                 ShowContinueErrorTimeStamp("");
-                ShowContinueError("Actual Mass flow = " + General::TrimSigDigits(this->WaterMassFlowRate, 2));
+                ShowContinueError(format("Actual Mass flow = {:.2T}", this->WaterMassFlowRate));
             } else {
                 ShowRecurringWarningErrorAtEnd(this->TowerType + " \"" + this->Name +
                                                    "\"  Cooling tower water mass flow rate near zero error continues...",

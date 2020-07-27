@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
@@ -3559,6 +3559,8 @@
   Output:Variable,*,Boiler Heating Rate,hourly;
 
   Output:Variable,*,Boiler Gas Rate,hourly;
+
+  Output:Variable,*,Boiler Efficiency,Hourly;
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,hourly;
 

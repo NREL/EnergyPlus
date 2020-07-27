@@ -56,6 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace HighTempRadiantSystem {
 
@@ -167,26 +169,26 @@ namespace HighTempRadiantSystem {
     // Functions
     void clear_state();
 
-    void SimHighTempRadiantSystem(std::string const &CompName,   // name of the low temperature radiant system
+    void SimHighTempRadiantSystem(EnergyPlusData &state, std::string const &CompName,   // name of the low temperature radiant system
                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   Real64 &LoadMet,               // load met by the radiant system, in Watts
                                   int &CompIndex);
 
     void GetHighTempRadiantSystem(bool &ErrorsFound); // Error flag if problems encountered on reading user input
 
-    void InitHighTempRadiantSystem(bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+    void InitHighTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                    int const RadSysNum // Index for the low temperature radiant system under consideration within the derived types
     );
 
-    void SizeHighTempRadiantSystem(int const RadSysNum);
+    void SizeHighTempRadiantSystem(EnergyPlusData &state, int const RadSysNum);
 
     void CalcHighTempRadiantSystem(int const RadSysNum); // name of the low temperature radiant system
 
-    void CalcHighTempRadiantSystemSP(bool const FirstHVACIteration, // true if this is the first HVAC iteration at this system time step !unused1208
+    void CalcHighTempRadiantSystemSP(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, bool const FirstHVACIteration, // true if this is the first HVAC iteration at this system time step !unused1208
                                      int const RadSysNum            // name of the low temperature radiant system
     );
 
-    void UpdateHighTempRadiantSystem(int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
+    void UpdateHighTempRadiantSystem(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
                                      Real64 &LoadMet      // load met by the radiant system, in Watts
     );
 

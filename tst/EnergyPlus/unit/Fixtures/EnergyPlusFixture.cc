@@ -55,6 +55,7 @@
 #include "EnergyPlusFixture.hh"
 
 // A to Z order
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -66,10 +67,10 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <nlohmann/json.hpp>
 #include <EnergyPlus/StateManagement.hh>
 #include <algorithm>
 #include <fstream>
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
@@ -80,17 +81,26 @@ void EnergyPlusFixture::SetUpTestCase()
     EnergyPlus::inputProcessor = InputProcessor::factory();
 }
 
+void EnergyPlusFixture::openOutputFiles(OutputFiles &outputFiles)
+{
+    outputFiles.eio.open_as_stringstream();
+    outputFiles.mtr.open_as_stringstream();
+    outputFiles.eso.open_as_stringstream();
+    outputFiles.audit.open_as_stringstream();
+    outputFiles.bnd.open_as_stringstream();
+    outputFiles.debug.open_as_stringstream();
+    outputFiles.mtd.open_as_stringstream();
+    outputFiles.edd.open_as_stringstream();
+}
+
 void EnergyPlusFixture::SetUp()
 {
-    EnergyPlus::clearAllStates();
+    EnergyPlus::clearThisState(state);
+    EnergyPlus::clearAllStates(state.outputFiles);
 
     show_message();
 
-    OutputFiles::getSingleton().eio.open_as_stringstream();
-    OutputFiles::getSingleton().mtr.open_as_stringstream();
-    OutputFiles::getSingleton().eso.open_as_stringstream();
-    OutputFiles::getSingleton().audit.open_as_stringstream();
-    OutputFiles::getSingleton().bnd.open_as_stringstream();
+    openOutputFiles(state.outputFiles);
 
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
@@ -117,23 +127,22 @@ void EnergyPlusFixture::TearDown()
     {
         IOFlags flags;
         flags.DISPOSE("DELETE");
-        ObjexxFCL::gio::close(OutputProcessor::OutputFileMeterDetails, flags);
-        OutputFiles::getSingleton().eso.del();
+        state.outputFiles.mtd.del();
+        state.outputFiles.eso.del();
         ObjexxFCL::gio::close(DataGlobals::jsonOutputStreams.OutputFileJson, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputStandardError, flags);
-        OutputFiles::getSingleton().eio.del();
-        ObjexxFCL::gio::close(DataGlobals::OutputFileDebug, flags);
-        OutputFiles::getSingleton().zsz.del();
-        OutputFiles::getSingleton().ssz.del();
-        OutputFiles::getSingleton().mtr.del();
-        OutputFiles::getSingleton().bnd.del();
+        state.outputFiles.eio.del();
+        state.outputFiles.debug.del();
+        state.outputFiles.zsz.del();
+        state.outputFiles.ssz.del();
+        state.outputFiles.mtr.del();
+        state.outputFiles.bnd.del();
         ObjexxFCL::gio::close(DataGlobals::OutputFileZonePulse, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputDElightIn, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileShadingFrac, flags);
+        state.outputFiles.shade.del();
     }
 
-    clearAllStates();
-
+    clearThisState(this->state);
+    clearAllStates(state.outputFiles);
 }
 
 std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)
@@ -167,28 +176,28 @@ bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, 
 
 bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = OutputFiles::getSingleton().eso.get_output();
+    auto const stream_str = state.outputFiles.eso.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) OutputFiles::getSingleton().eso.open_as_stringstream();
+    if (reset_stream) state.outputFiles.eso.open_as_stringstream();
     return are_equal;
 }
 
 bool EnergyPlusFixture::compare_eio_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = OutputFiles::getSingleton().eio.get_output();
+    auto const stream_str = state.outputFiles.eio.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) OutputFiles::getSingleton().eio.open_as_stringstream();
+    if (reset_stream) state.outputFiles.eio.open_as_stringstream();
     return are_equal;
 }
 
 bool EnergyPlusFixture::compare_mtr_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = OutputFiles::getSingleton().mtr.get_output();
+    auto const stream_str = state.outputFiles.mtr.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) OutputFiles::getSingleton().mtr.open_as_stringstream();
+    if (reset_stream) state.outputFiles.mtr.open_as_stringstream();
     return are_equal;
 }
 
@@ -219,6 +228,15 @@ bool EnergyPlusFixture::compare_cerr_stream(std::string const &expected_string, 
     return are_equal;
 }
 
+bool EnergyPlusFixture::compare_dfs_stream(std::string const &expected_string, bool reset_stream)
+{
+    auto const stream_str = state.outputFiles.dfs.get_output();
+    EXPECT_EQ(expected_string, stream_str);
+    bool are_equal = (expected_string == stream_str);
+    if (reset_stream) state.outputFiles.dfs.open_as_stringstream();
+    return are_equal;
+}
+
 bool EnergyPlusFixture::has_json_output(bool reset_stream)
 {
     auto const has_output = this->json_stream->str().size() > 0;
@@ -228,22 +246,22 @@ bool EnergyPlusFixture::has_json_output(bool reset_stream)
 
 bool EnergyPlusFixture::has_eso_output(bool reset_stream)
 {
-    auto const has_output = !OutputFiles::getSingleton().eso.get_output().empty();
-    if (reset_stream) OutputFiles::getSingleton().eso.open_as_stringstream();
+    auto const has_output = !state.outputFiles.eso.get_output().empty();
+    if (reset_stream) state.outputFiles.eso.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_eio_output(bool reset_stream)
 {
-    auto const has_output = !OutputFiles::getSingleton().eio.get_output().empty();
-    if (reset_stream) OutputFiles::getSingleton().eio.open_as_stringstream();
+    auto const has_output = !state.outputFiles.eio.get_output().empty();
+    if (reset_stream) state.outputFiles.eio.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_mtr_output(bool reset_stream)
 {
-    auto const has_output = !OutputFiles::getSingleton().mtr.get_output().empty();
-    if (reset_stream) OutputFiles::getSingleton().mtr.open_as_stringstream();
+    auto const has_output = !state.outputFiles.mtr.get_output().empty();
+    if (reset_stream) state.outputFiles.mtr.open_as_stringstream();
     return has_output;
 }
 
@@ -268,11 +286,22 @@ bool EnergyPlusFixture::has_cerr_output(bool reset_stream)
     return has_output;
 }
 
+bool EnergyPlusFixture::has_dfs_output(bool reset_stream)
+{
+    auto const has_output = !state.outputFiles.dfs.get_output().empty();
+    if (reset_stream) state.outputFiles.dfs.open_as_stringstream();
+    return has_output;
+}
+
 bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_assertions)
 {
     bool success = true;
     inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
+    // Add common objects that will trigger a warning if not present
+    if (inputProcessor->epJSON.find("Version") == inputProcessor->epJSON.end()) {
+        inputProcessor->epJSON["Version"] = {{"", {{"idf_order", 0}, {"version_identifier", DataStringGlobals::MatchVersion}}}};
+    }
     if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
         inputProcessor->epJSON["Building"] = {{"Bldg",
                                                {{"idf_order", 0},

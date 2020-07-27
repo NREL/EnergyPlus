@@ -55,6 +55,9 @@
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    struct BranchInputManagerData;
 
 namespace PhotovoltaicThermalCollectors {
 
@@ -159,13 +162,13 @@ namespace PhotovoltaicThermalCollectors {
 
         static PlantComponent *factory(std::string const &objectName);
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupReportVars();
 
-        void initialize(bool FirstHVACIteration);
+        void initialize(BranchInputManagerData &dataBranchInputManager, bool FirstHVACIteration);
 
         void size();
 
@@ -182,7 +185,7 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetPVTcollectorsInput();
 
-    void simPVTfromOASys(int index, bool FirstHVACIteration);
+    void simPVTfromOASys(EnergyPlusData &state, int index, bool FirstHVACIteration);
 
     int getPVTindexFromName(std::string const &name);
 

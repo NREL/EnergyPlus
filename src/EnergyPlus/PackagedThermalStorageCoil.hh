@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -418,16 +419,16 @@ namespace PackagedThermalStorageCoil {
 
     // Functions
 
-    void SimTESCoil(std::string const &CompName, // name of the fan coil unit
+    void SimTESCoil(EnergyPlusData &state, std::string const &CompName, // name of the fan coil unit
                     int &CompIndex,
                     int const FanOpMode, // allows parent object to control fan mode
                     int &TESOpMode,
                     Optional<Real64 const> PartLoadRatio = _ // part load ratio (for single speed cycling unit)
     );
 
-    void GetTESCoilInput();
+    void GetTESCoilInput(EnergyPlusData &state);
 
-    void InitTESCoil(int &TESCoilNum);
+    void InitTESCoil(BranchInputManagerData &dataBranchInputManager, int &TESCoilNum);
 
     void SizeTESCoil(int &TESCoilNum);
 
@@ -449,7 +450,7 @@ namespace PackagedThermalStorageCoil {
 
     void CalcTESIceStorageTank(int const TESCoilNum);
 
-    void ControlTESIceStorageTankCoil(std::string const &CoilName,
+    void ControlTESIceStorageTankCoil(EnergyPlusData &state, std::string const &CoilName,
                                       int CoilIndex,
                                       std::string SystemType,
                                       int const FanOpMode,
@@ -481,16 +482,16 @@ namespace PackagedThermalStorageCoil {
 
     void UpdateEvaporativeCondenserWaterUse(int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum);
 
-    void GetTESCoilIndex(std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = _);
+    void GetTESCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = _);
 
-    void GetTESCoilAirInletNode(std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetTESCoilAirInletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
-    void GetTESCoilAirOutletNode(std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetTESCoilAirOutletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
-    void GetTESCoilCoolingCapacity(std::string const &CoilName, Real64 &CoilCoolCapacity, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetTESCoilCoolingCapacity(EnergyPlusData &state, std::string const &CoilName, Real64 &CoilCoolCapacity, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
     void
-    GetTESCoilCoolingAirFlowRate(std::string const &CoilName, Real64 &CoilCoolAirFlow, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    GetTESCoilCoolingAirFlowRate(EnergyPlusData &state, std::string const &CoilName, Real64 &CoilCoolAirFlow, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
 } // namespace PackagedThermalStorageCoil
 

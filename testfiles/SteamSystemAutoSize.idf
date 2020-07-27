@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
@@ -3406,6 +3406,10 @@
   Output:Variable,*,Heating Coil Steam Mass Flow Rate,Hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,Hourly;
+
+  Output:Variable,*,Boiler Heating Rate,Hourly;
+
+  Output:Variable,*,Boiler Steam Efficiency,Hourly;
 
 ! Reporting NODES Values
 

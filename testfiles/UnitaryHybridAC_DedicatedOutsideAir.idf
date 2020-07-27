@@ -28,7 +28,7 @@
 ! Floor Area:              232.25 m2
 ! Number of Stories:       1
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -608,8 +608,10 @@
     Main Relief Node,        !- Relief Node Name
     2.51,                    !- System Maximum Supply Air Flow Rate {m3/s}
     ,                        !- External Static Pressure at System Maximum Supply Air Flow Rate {Pa}
+    Yes,                     !- Fan Heat Included in Lookup Tables
+    ,                        !- Fan Heat Gain Location
+    ,                        !- Fan Heat Gain in Airstream Fraction
     1,                       !- Scaling Factor
-    6,                       !- Number of Operating Modes
     10,                      !- Minimum Time Between Mode Change {minutes}
     Electricity,             !- First Fuel Type
     NaturalGas,              !- Second Fuel Type

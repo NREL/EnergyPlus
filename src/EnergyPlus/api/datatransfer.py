@@ -36,6 +36,10 @@ class DataExchange:
         self.api.listAllAPIDataCSV.restype = c_char_p
         self.api.apiDataFullyReady.argtypes = []
         self.api.apiDataFullyReady.restype = c_int
+        self.api.apiErrorFlag.argtypes = []
+        self.api.apiErrorFlag.restype = c_int
+        self.api.resetErrorFlag.argtypes = []
+        self.api.resetErrorFlag.restype = c_void_p
         self.api.requestVariable.argtypes = [c_char_p, c_char_p]
         self.api.requestVariable.restype = c_void_p
         self.api.getVariableHandle.argtypes = [c_char_p, c_char_p]
@@ -74,7 +78,7 @@ class DataExchange:
         self.api.hour.argtypes = []
         self.api.hour.restype = c_int
         self.api.currentTime.argtypes = []
-        self.api.currentTime.restype = c_int
+        self.api.currentTime.restype = RealEP
         self.api.minutes.argtypes = []
         self.api.minutes.restype = c_int
         self.api.holidayIndex.argtypes = []
@@ -83,6 +87,8 @@ class DataExchange:
         self.api.sunIsUp.restype = c_int
         self.api.isRaining.argtypes = []
         self.api.isRaining.restype = c_int
+        self.api.zoneTimeStep.argtypes = []
+        self.api.zoneTimeStep.restype = RealEP
         self.api.systemTimeStep.argtypes = []
         self.api.systemTimeStep.restype = RealEP
         self.api.currentEnvironmentNum.argtypes = []
@@ -109,6 +115,14 @@ class DataExchange:
         self.api.getPluginTrendVariableSum.restype = RealEP
         self.api.getPluginTrendVariableDirection.argtypes = [c_int, c_int]
         self.api.getPluginTrendVariableDirection.restype = RealEP
+        self.api.getConstructionHandle.argtypes = [c_char_p]
+        self.api.getConstructionHandle.restype = c_int
+        self.api.actualTime.argtypes = []
+        self.api.actualTime.restype = c_int
+        self.api.actualDateTime.argtypes = []
+        self.api.actualDateTime.restype = c_int
+        self.api.kindOfSim.argtypes = []
+        self.api.kindOfSim.restype = c_int
 
     def list_available_api_data_csv(self) -> bytes:
         """
@@ -123,12 +137,32 @@ class DataExchange:
         Check whether the data exchange API is ready.
         Handles to variables, actuators, and other data are not reliably defined prior to this being true.
 
-        :return:
+        :return: Returns a boolean value to indicate whether variables, actuators, and other data are ready for access.
         """
         success = self.api.apiDataFullyReady()
         if success == 0:
             return True
         return False
+
+    def api_error_flag(self) -> bool:
+        """
+        Check whether the error flag has been activated.
+        A number of functions will return 0 in erroneous situations, and this function allows for disambiguation
+        between valid zero return values and the error condition.
+
+        :return: Returns true if the error flag was activated during prior calculations.
+        """
+        if self.api.apiErrorFlag() == 1:
+            return True
+        return False
+
+    def reset_api_error_flag(self) -> None:
+        """
+        Resets the error flag for API calls.
+        A number of functions will return 0 in erroneous situations, but activate an error flag.  In certain work flows,
+        it may be useful to reset this error flag (unit testing, etc.).  This function allows resetting it to false.
+        """
+        self.api.resetErrorFlag()
 
     def request_variable(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> None:
         """
@@ -220,18 +254,19 @@ class DataExchange:
             actuator_key = actuator_key.encode('utf-8')
         return self.api.getActuatorHandle(component_type, control_type, actuator_key)
 
-    def get_variable_value(self, variable_handle: int) -> float:
+    def get_variable_value(self, variable_handle: int) -> RealEP:
         """
         Get the current value of a variable in a running simulation.  The `get_variable_handle` function is first used
         to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this function to
         then get the value of the variable.
 
         :param variable_handle: An integer returned from the `get_variable_handle` function.
-        :return: Floating point representation of the current variable value
+        :return: Floating point representation of the current variable value.  Returns zero if the handle is invalid.
+                 Use the api_error_flag function to disambiguate between valid zero returns and error states.
         """
         return self.api.getVariableValue(variable_handle)
 
-    def get_meter_value(self, meter_handle: int) -> float:
+    def get_meter_value(self, meter_handle: int) -> RealEP:
         """
         Get the current value of a meter in a running simulation.  The `get_meter_handle` function is first used
         to get a handle to the meter by name.  Then once the handle is retrieved, it is passed into this function to
@@ -241,7 +276,8 @@ class DataExchange:
         This will change in a future version of the API.
 
         :param meter_handle: An integer returned from the `get_meter_handle` function.
-        :return: Floating point representation of the current meter value
+        :return: Floating point representation of the current meter value.  Returns zero if the handle is invalid.
+                 Use the api_error_flag function to disambiguate between valid zero returns and error states.
         """
         return self.api.getMeterValue(meter_handle)
 
@@ -280,6 +316,8 @@ class DataExchange:
 
         :param actuator_handle: An integer returned from the `get_actuator_handle` function.
         :return: A floating point of the actuator value.  For boolean actuators returns 1.0 for true and 0.0 for false.
+                 Returns zero if the handle is invalid.  Use the api_error_flag function to disambiguate between valid
+                 zero returns and error states.
         """
         return self.api.getActuatorValue(actuator_handle)
 
@@ -303,16 +341,38 @@ class DataExchange:
             variable_key = variable_key.encode('utf-8')
         return self.api.getInternalVariableHandle(variable_type, variable_key)
 
-    def get_internal_variable_value(self, variable_handle: int) -> float:
+    def get_internal_variable_value(self, variable_handle: int) -> RealEP:
         """
         Get the value of an internal variable in a running simulation.  The `get_internal_variable_handle` function is
         first used to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this
         function to then get the value of the variable.
 
         :param variable_handle: An integer returned from the `get_internal_variable_handle` function.
-        :return: Floating point representation of the internal variable value
+        :return: Floating point representation of the internal variable value.  Returns zero if the handle is invalid.
+                 Use the api_error_flag function to disambiguate between valid zero returns and error states.
         """
         return self.api.getInternalVariableValue(variable_handle)
+
+    def get_construction_handle(self, var_name: Union[str, bytes]) -> int:
+        """
+        Get a handle to a constructions in a running simulation.  This is only used for Python Plugin applications!
+
+        Some actuators allow specifying different constructions to allow switchable construction control.
+        This function returns an index that can be used in those functions.  The construction is specified by name.
+
+        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
+        automatically converts values to upper-case when finding matches to internal variables in the simulation.
+
+        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
+        as needed.
+
+        :return: An integer ID for this construction, or -1 if one could not be found.
+        """
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_construction_handle is only available as part of a Python Plugin workflow")
+        if isinstance(var_name, str):
+            var_name = var_name.encode('utf-8')
+        return self.api.getConstructionHandle(var_name)
 
     def get_global_handle(self, var_name: Union[str, bytes]) -> int:
         """
@@ -340,7 +400,7 @@ class DataExchange:
             var_name = var_name.encode('utf-8')
         return self.api.getPluginGlobalVariableHandle(var_name)
 
-    def get_global_value(self, handle: int) -> float:
+    def get_global_value(self, handle: int) -> RealEP:
         """
         Get the current value of a plugin global variable in a running simulation.  This is only used for Python Plugin
         applications!
@@ -574,7 +634,7 @@ class DataExchange:
         """
         return self.api.hour()
 
-    def current_time(self) -> float:
+    def current_time(self) -> RealEP:
         """
         Get the current time of day in hours, where current time represents the end time of the current time step.
 
@@ -602,7 +662,7 @@ class DataExchange:
         """
         Get the current day of the year (1-366)
 
-        :return: AN integer day of the year (1-366)
+        :return: An integer day of the year (1-366)
         """
         return self.api.dayOfYear()
 
@@ -651,7 +711,16 @@ class DataExchange:
         """
         return self.api.warmupFlag() == 1
 
-    def system_time_step(self) -> float:
+    def zone_time_step(self) -> RealEP:
+        """
+        Gets the current zone time step value in EnergyPlus.  The zone time step is variable and fluctuates
+        during the simulation.
+
+        :return: The current zone time step in fractional hours.
+        """
+        return self.api.systemTimeStep()
+
+    def system_time_step(self) -> RealEP:
         """
         Gets the current system time step value in EnergyPlus.  The system time step is variable and fluctuates
         during the simulation.
@@ -669,3 +738,27 @@ class DataExchange:
         :return: The current environment number.
         """
         return self.api.currentEnvironmentNum()
+
+    def actual_time(self) -> int:
+        """
+        Gets a simple sum of the values of the time part of the date/time function. Could be used in random seeding.
+
+        :return: Integer value of time portion of the date/time function.
+        """
+        return self.api.actualTime()
+
+    def actual_date_time(self) -> int:
+        """
+        Gets a simple sum of the values of the date/time function. Could be used in random seeding.
+
+        :return: Integer value of the date/time function.
+        """
+        return self.api.actualDateTime()
+
+    def kind_of_sim(self) -> int:
+        """
+        Gets the current environment number.
+
+        :return: Integer value of current environment.
+        """
+        return self.api.kindOfSim()

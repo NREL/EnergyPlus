@@ -56,6 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace WindowAC {
 
@@ -179,7 +181,7 @@ namespace WindowAC {
 
     void clear_state();
 
-    void SimWindowAC(std::string const &CompName,   // name of the window AC unit
+    void SimWindowAC(EnergyPlusData &state, std::string const &CompName,   // name of the window AC unit
                      int const ZoneNum,             // number of zone being served
                      bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                      Real64 &PowerMet,              // Sensible power supplied by window AC (W)
@@ -187,17 +189,17 @@ namespace WindowAC {
                      int &CompIndex                 // component index
     );
 
-    void GetWindowAC();
+    void GetWindowAC(EnergyPlusData &state);
 
-    void InitWindowAC(int const WindACNum,          // number of the current window AC unit being simulated
+    void InitWindowAC(EnergyPlusData &state, int const WindACNum,          // number of the current window AC unit being simulated
                       Real64 &QZnReq,               // zone load (modified as needed) (W)
                       int const ZoneNum,            // index to zone
                       bool const FirstHVACIteration // TRUE when first HVAC iteration
     );
 
-    void SizeWindowAC(int const WindACNum);
+    void SizeWindowAC(EnergyPlusData &state, int const WindACNum);
 
-    void SimCyclingWindowAC(int const WindACNum,           // number of the current window AC unit being simulated
+    void SimCyclingWindowAC(EnergyPlusData &state, int const WindACNum,           // number of the current window AC unit being simulated
                             int const ZoneNum,             // number of zone being served !unused1208
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // Sensible power supplied (W)
@@ -207,7 +209,7 @@ namespace WindowAC {
 
     void ReportWindowAC(int const WindACNum); // number of the current AC unit being simulated
 
-    void CalcWindowACOutput(int const WindACNum,           // Unit index in fan coil array
+    void CalcWindowACOutput(EnergyPlusData &state, int const WindACNum,           // Unit index in fan coil array
                             bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                             int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                             Real64 const PartLoadFrac,     // unit part load fraction
@@ -215,7 +217,7 @@ namespace WindowAC {
                             Real64 &LoadMet                // load met by unit (watts)
     );
 
-    void ControlCycWindACOutput(int const WindACNum,           // Unit index in fan coil array
+    void ControlCycWindACOutput(EnergyPlusData &state, int const WindACNum,           // Unit index in fan coil array
                                 bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                                 int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                                 Real64 const QZnReq,           // cooling output needed by zone [W]
@@ -223,13 +225,13 @@ namespace WindowAC {
                                 bool &HXUnitOn                 // Used to control HX heat recovery as needed
     );
 
-    int GetWindowACZoneInletAirNode(int const WindACNum);
+    int GetWindowACZoneInletAirNode(EnergyPlusData &state, int const WindACNum);
 
-    int GetWindowACOutAirNode(int const WindACNum);
+    int GetWindowACOutAirNode(EnergyPlusData &state, int const WindACNum);
 
-    int GetWindowACReturnAirNode(int const WindACNum);
+    int GetWindowACReturnAirNode(EnergyPlusData &state, int const WindACNum);
 
-    int GetWindowACMixedAirNode(int const WindACNum);
+    int GetWindowACMixedAirNode(EnergyPlusData &state, int const WindACNum);
 
 } // namespace WindowAC
 

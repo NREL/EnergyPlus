@@ -52,12 +52,11 @@
 
 // EnergyPlus Headers
 #include "OutputFiles.hh"
-#include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -85,7 +84,6 @@ namespace DataSystemVariables {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataStringGlobals::altpathChar;
     using DataStringGlobals::CurrentWorkingFolder;
     using DataStringGlobals::pathChar;
@@ -101,7 +99,6 @@ namespace DataSystemVariables {
     int const iUnicode_end(0); // endline value when Unicode file
     char const tabchar('\t');
     int const GoodIOStatValue(0);         // good value for IOStat during reads/writes
-    int const MaxTimingStringLength(250); // string length for timing string array
 
     std::string const DDOnlyEnvVar("DDONLY");       // Only run design days
     std::string const ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
@@ -203,7 +200,8 @@ namespace DataSystemVariables {
 
     // Functions
 
-    void CheckForActualFileName(std::string const &originalInputFileName, // name as input for object
+    void CheckForActualFileName(OutputFiles &outputFiles,
+                                std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
                                 std::string &CheckedFileName              // Blank if not found.
     )
@@ -248,10 +246,8 @@ namespace DataSystemVariables {
         std::string InputFileName; // save for changing out path characters
         std::string::size_type pos;
 
-        OutputFiles &outputFiles = OutputFiles::getSingleton();
-
         if (firstTime) {
-            outputFiles.audit.ensure_open();
+            outputFiles.audit.ensure_open("CheckForActualFileName");
             get_environment_variable(cInputPath1, envinputpath1);
             if (envinputpath1 != blank) {
                 pos = index(envinputpath1, pathChar, true); // look backwards for pathChar
@@ -418,7 +414,7 @@ namespace DataSystemVariables {
         Threading = false;
     }
 
-    void processEnvironmentVariables() {
+    void processEnvironmentVariables(DataGlobal const &dataGlobals) {
 
         static std::string cEnvValue;
 
@@ -434,7 +430,7 @@ namespace DataSystemVariables {
 
         get_environment_variable(FullAnnualSimulation, cEnvValue);
         FullAnnualRun = env_var_on(cEnvValue); // Yes or True
-        if (DataGlobals::AnnualSimulation) FullAnnualRun = true;
+        if (dataGlobals.AnnualSimulation) FullAnnualRun = true;
 
         get_environment_variable(cDisplayAllWarnings, cEnvValue);
         DataGlobals::DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True

@@ -58,6 +58,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace WaterUse {
 
     enum struct HeatRecoveryHXEnum
@@ -209,6 +213,7 @@ namespace WaterUse {
         int PlantLoopCompNum;
         bool MyEnvrnFlag;
         bool setupMyOutputVars;
+        bool plantScanFlag;
 
         WaterConnectionsType()
             : Init(true), InitSizing(true), StandAlone(false), InletNode(0), OutletNode(0), SupplyTankNum(0), RecoveryTankNum(0), TankDemandID(0),
@@ -220,15 +225,15 @@ namespace WaterUse {
               ColdSupplyTemp(0.0), ColdTemp(0.0), HotTemp(0.0), DrainTemp(0.0), RecoveryTemp(0.0), ReturnTemp(0.0), WasteTemp(0.0), TempError(0.0),
               MainsVolume(0.0), TankVolume(0.0), ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0), Energy(0.0), NumWaterEquipment(0),
               MaxIterationsErrorIndex(0), PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0), MyEnvrnFlag(true),
-              setupMyOutputVars(true)
+              setupMyOutputVars(true), plantScanFlag(true)
         {
         }
 
         static PlantComponent *factory(std::string const &objectName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitConnections();
+        void InitConnections(BranchInputManagerData &state);
 
         void CalcConnectionsFlowRates(bool FirstHVACIteration);
 
@@ -245,7 +250,7 @@ namespace WaterUse {
 
     void clear_state();
 
-    void SimulateWaterUse(bool FirstHVACIteration);
+    void SimulateWaterUse(BranchInputManagerData &dataBranchInputManager, bool FirstHVACIteration);
 
     void GetWaterUseInput();
 

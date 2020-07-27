@@ -56,6 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
     class OutputFiles;
 
 namespace HeatBalanceManager {
@@ -141,12 +143,12 @@ namespace HeatBalanceManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ManageHeatBalance(OutputFiles &outputFiles);
+    void ManageHeatBalance(EnergyPlusData &state);
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetHeatBalanceInput();
+    void GetHeatBalanceInput(EnergyPlusData &state);
 
     void CheckUsedConstructions(bool &ErrorsFound);
 
@@ -169,7 +171,7 @@ namespace HeatBalanceManager {
 
     void GetConstructData(bool &ErrorsFound); // If errors found in input
 
-    void GetBuildingData(bool &ErrorsFound); // If errors found in input
+    void GetBuildingData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void GetZoneData(bool &ErrorsFound); // If errors found in input
 
@@ -194,7 +196,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance();
+    void InitHeatBalance(OutputFiles &outputFiles);
 
     void AllocateHeatBalArrays();
 
@@ -218,11 +220,11 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance(OutputFiles &outputFiles);
+    void ReportHeatBalance(EnergyPlusData &state, OutputFiles &outputFiles);
 
     //        End of Reporting subroutines for the HB Module
 
-    void OpenShadingFile();
+    void OpenShadingFile(OutputFiles &outputFiles);
 
     void GetFrameAndDividerData(bool &ErrorsFound); // set to true if errors found in input
 

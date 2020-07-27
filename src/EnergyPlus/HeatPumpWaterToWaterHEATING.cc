@@ -49,7 +49,6 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -62,6 +61,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -141,7 +141,7 @@ namespace HeatPumpWaterToWaterHEATING {
     }
 
 
-    void GshpPeHeatingSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+    void GshpPeHeatingSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                                       bool EP_UNUSED(RunFlag)) {
 
         // Simulate the model for the Demand "MyLoad"
@@ -174,11 +174,12 @@ namespace HeatPumpWaterToWaterHEATING {
         OptLoad = this->NomCap * this->OptPartLoadRat;
     }
 
-    void GshpPeHeatingSpecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) {
+    void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) {
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_HPWaterPEHeating,
                                                     this->SourceLoopNum,
                                                     this->SourceLoopSideNum,
@@ -190,7 +191,8 @@ namespace HeatPumpWaterToWaterHEATING {
                                                     _,
                                                     this->SourceSideInletNodeNum,
                                                     _);
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_HPWaterPEHeating,
                                                     this->LoadLoopNum,
                                                     this->LoadLoopSideNum,
@@ -577,7 +579,6 @@ namespace HeatPumpWaterToWaterHEATING {
         static std::string const RoutineNameCompressInletTemp("CalcGSHPModel:CompressInletTemp");
         static std::string const RoutineNameSuctionPr("CalcGSHPModel:SuctionPr");
         static std::string const RoutineNameCompSuctionTemp("CalcGSHPModel:CompSuctionTemp");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CompSuctionTemp;
@@ -827,20 +828,13 @@ namespace HeatPumpWaterToWaterHEATING {
                     ShowWarningError(ModuleCompName + " did not converge");
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Heatpump Name = " + this->Name);
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << std::abs(100.0 * (this->QLoad - initialQLoad) / (initialQLoad + SmallNum));
-                    ShowContinueError("Heat Inbalance (%)             = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->QLoad;
-                    ShowContinueError("Load-side heat transfer rate   = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->QSource;
-                    ShowContinueError("Source-side heat transfer rate = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->SourceSideWaterMassFlowRate;
-                    ShowContinueError("Source-side mass flow rate     = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->LoadSideWaterMassFlowRate;
-                    ShowContinueError("Load-side mass flow rate       = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->SourceSideWaterInletTemp;
-                    ShowContinueError("Source-side inlet temperature  = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->LoadSideWaterInletTemp;
-                    ShowContinueError("Load-side inlet temperature    = " + stripped(ErrString));
+                    ShowContinueError(format("Heat Inbalance (%)             = {:S}", std::abs(100.0 * (this->QLoad - initialQLoad) / (initialQLoad + SmallNum))));
+                    ShowContinueError(format("Load-side heat transfer rate   = {:S}", this->QLoad));
+                    ShowContinueError(format("Source-side heat transfer rate = {:S}", this->QSource));
+                    ShowContinueError(format("Source-side mass flow rate     = {:S}", this->SourceSideWaterMassFlowRate));
+                    ShowContinueError(format("Load-side mass flow rate       = {:S}", this->LoadSideWaterMassFlowRate));
+                    ShowContinueError(format("Source-side inlet temperature  = {:S}", this->SourceSideWaterInletTemp));
+                    ShowContinueError(format("Load-side inlet temperature    = {:S}", this->LoadSideWaterInletTemp));
                 }
                 goto LOOPLoadEnth_exit;
 

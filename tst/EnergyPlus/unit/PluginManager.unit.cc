@@ -56,20 +56,20 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, TestTrendVariable)
 {
 
-#ifdef LINK_WITH_PYTHON
-#if LINK_WITH_PYTHON == 1
+// this file isn't included in the gtest source unless LINK_WITH_PYTHON is ON
+
     // create a plugin manager instance
     EnergyPlus::PluginManagement::PluginManager pluginManager;
 
     // first create a plugin variable
-    EnergyPlus::PluginManagement::PluginManager::addGlobalVariable("my_var");
+    pluginManager.addGlobalVariable("my_var");
     int globalVarIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle("my_var", true);
     EXPECT_EQ(0, globalVarIndex);
 
     // now create a trend variable to track it
     size_t const numValues = 4;
     PluginManagement::trends.emplace_back("TREND_VAR", numValues, globalVarIndex);
-    int trendVarIndex = pluginManager.getTrendVariableHandle("trend_var");
+    int trendVarIndex = EnergyPlus::PluginManagement::PluginManager::getTrendVariableHandle("trend_var");
     EXPECT_EQ(0, trendVarIndex);
 
     // initially it should be filled with zeroes
@@ -82,7 +82,7 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     std::vector<Real64> fakeValues = {3.14, 2.78, 12.0};
     for (int i = 0; i < 3; i++) {
         EnergyPlus::PluginManagement::PluginManager::setGlobalVariableValue(globalVarIndex, fakeValues[i]);
-        pluginManager.updatePluginValues();
+        EnergyPlus::PluginManagement::PluginManager::updatePluginValues();
     }
 
     // now check the values at the end, it should still be zero at the oldest (fourth) item, and 12.0 at the recent
@@ -90,8 +90,6 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EXPECT_NEAR(fakeValues[1], pluginManager.getTrendVariableValue(trendVarIndex, 1), 0.001);
     EXPECT_NEAR(fakeValues[0], pluginManager.getTrendVariableValue(trendVarIndex, 2), 0.001);
     EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(trendVarIndex, 3));
-#endif
-#endif
 
 }
 } // namespace EnergyPlus

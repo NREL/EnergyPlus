@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NonZoneEquipmentManager.hh>
@@ -80,7 +81,7 @@ namespace NonZoneEquipmentManager {
 
     // Functions
 
-    void ManageNonZoneEquipment(bool const FirstHVACIteration,
+    void ManageNonZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration,
                                 bool &SimNonZoneEquipment // Simulation convergence flag
     )
     {
@@ -121,11 +122,11 @@ namespace NonZoneEquipmentManager {
             CountNonZoneEquip = false;
         }
 
-        SimulateWaterUse(FirstHVACIteration); // simulate non-plant loop water use.
+        SimulateWaterUse(state.dataBranchInputManager, FirstHVACIteration); // simulate non-plant loop water use.
 
         if (!ZoneSizingCalc) {
             for (WaterHeaterNum = 1; WaterHeaterNum <= NumOfWaterHeater; ++WaterHeaterNum) {
-                SimulateWaterHeaterStandAlone(WaterHeaterNum, FirstHVACIteration);
+                SimulateWaterHeaterStandAlone(state, WaterHeaterNum, FirstHVACIteration);
             }
         }
 

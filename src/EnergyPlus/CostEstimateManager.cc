@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataCostEstimate.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -89,32 +90,12 @@ namespace CostEstimateManager {
     // Uses a Line Item methaphor where each Cost Estimate object is a line
     // Create report using utility subroutines taken from OutputReportTabular (by J.Glazer)
 
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::KickOffSimulation;
     using namespace DataCostEstimate;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Functions
-
-    void SimCostEstimate()
+    void SimCostEstimate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -126,33 +107,10 @@ namespace CostEstimateManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Entry point; manage calls to other subroutines
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool GetCostInput(true);
 
         if (GetCostInput) {
-            GetCostEstimateInput();
+            GetCostEstimateInput(state);
             GetCostInput = false;
         }
 
@@ -162,11 +120,11 @@ namespace CostEstimateManager {
 
         if (DoCostEstimate) {
 
-            CalcCostEstimate();
+            CalcCostEstimate(state);
         }
     }
 
-    void GetCostEstimateInput()
+    void GetCostEstimateInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -271,14 +229,14 @@ namespace CostEstimateManager {
             ShowFatalError("Errors found in processing cost estimate input");
         }
 
-        CheckCostEstimateInput(ErrorsFound);
+        CheckCostEstimateInput(state, ErrorsFound);
 
         if (ErrorsFound) {
             ShowFatalError("Errors found in processing cost estimate input");
         }
     }
 
-    void CheckCostEstimateInput(bool &ErrorsFound) // Set to true if errors in input, fatal at end of routine
+    void CheckCostEstimateInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true if errors in input, fatal at end of routine
     {
 
         // SUBROUTINE INFORMATION:
@@ -298,8 +256,6 @@ namespace CostEstimateManager {
         using DataPhotovoltaics::PVarray;
         using DataSurfaces::Surface;
         using DXCoils::DXCoil;
-        using PlantChillers::ElectricChiller;
-        using PlantChillers::ElectricChillerSpecs;
         using namespace DataDaylighting;
         using HeatingCoils::HeatingCoil;
 
@@ -435,7 +391,7 @@ namespace CostEstimateManager {
                     }
                     thisChil = 0;
                     int chillNum = 0;
-                    for (auto &ch : ElectricChiller) {
+                    for (auto &ch : state.dataPlantChillers.ElectricChiller) {
                         chillNum++;
                         if (CostLineItem(Item).ParentObjName == ch.Name) {
                             thisChil = chillNum;
@@ -559,7 +515,7 @@ namespace CostEstimateManager {
         }
     }
 
-    void CalcCostEstimate()
+    void CalcCostEstimate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -582,8 +538,6 @@ namespace CostEstimateManager {
         using DataSurfaces::TotSurfaces;
         using DXCoils::DXCoil;
         using DXCoils::NumDXCoils;
-        using PlantChillers::ElectricChiller;
-        using PlantChillers::ElectricChillerSpecs;
         using namespace DataDaylighting;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
@@ -764,20 +718,20 @@ namespace CostEstimateManager {
                 } else if (SELECT_CASE_var == "CHILLER:ELECTRIC") {
                     thisChil = 0;
                     int chillNum = 0;
-                    for (auto &ch : ElectricChiller) {
+                    for (auto &ch : state.dataPlantChillers.ElectricChiller) {
                         chillNum++;
                         if (CostLineItem(Item).ParentObjName == ch.Name) {
                             thisChil = chillNum;
                         }
                     }
                     if ((thisChil > 0) && (CostLineItem(Item).PerKiloWattCap > 0.0)) {
-                        CostLineItem(Item).Qty = ElectricChiller(thisChil).NomCap / 1000.0;
+                        CostLineItem(Item).Qty = state.dataPlantChillers.ElectricChiller(thisChil).NomCap / 1000.0;
                         CostLineItem(Item).Units = "kW (tot cool cap.)";
                         CostLineItem(Item).ValuePer = CostLineItem(Item).PerKiloWattCap;
                         CostLineItem(Item).LineSubTotal = CostLineItem(Item).Qty * CostLineItem(Item).ValuePer;
                     }
                     if ((thisChil > 0) && (CostLineItem(Item).PerKWCapPerCOP > 0.0)) {
-                        CostLineItem(Item).Qty = ElectricChiller(thisChil).COP * ElectricChiller(thisChil).NomCap / 1000.0;
+                        CostLineItem(Item).Qty = state.dataPlantChillers.ElectricChiller(thisChil).COP * state.dataPlantChillers.ElectricChiller(thisChil).NomCap / 1000.0;
                         CostLineItem(Item).Units = "kW*COP (total, rated) ";
                         CostLineItem(Item).ValuePer = CostLineItem(Item).PerKWCapPerCOP;
                         CostLineItem(Item).LineSubTotal = CostLineItem(Item).Qty * CostLineItem(Item).ValuePer;

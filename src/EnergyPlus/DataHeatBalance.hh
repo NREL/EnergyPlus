@@ -64,6 +64,7 @@
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
@@ -342,7 +343,7 @@ namespace DataHeatBalance {
     extern int SolarDistribution;               // Solar Distribution Algorithm
     extern int InsideSurfIterations;            // Counts inside surface iterations
     extern int OverallHeatTransferSolutionAlgo; // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
- 
+
    // Flags for HeatTransfer Algorithms Used
     extern bool AnyCTF;                     // CTF used
     extern bool AnyEMPD;                    // EMPD used
@@ -923,9 +924,15 @@ namespace DataHeatBalance {
         // 1 or 2 for constructions with sources or sinks)-->may allow 3-D later?
         int SourceAfterLayer;    // Source/sink is present after this layer in the construction
         int TempAfterLayer;      // User is requesting a temperature calculation after this layer in the construction
+                                 // This location is also the position of a temperature on the interior of a slab
+                                 // that could be used to control a low temperature radiant system
         Real64 ThicknessPerpend; // Thickness between planes of symmetry in the direction
-        // perpendicular to the main direction of heat transfer
-        // (same as half the distance between tubes)
+                                 // perpendicular to the main direction of heat transfer
+                                 // (same as half the distance between tubes)
+        Real64 userTemperatureLocationPerpendicular;    // Location of the source perpendicular to the main direction
+                                                        // of heat transfer.  Used in conjunction with the TempAfterLayer
+                                                        // term to provide specific location of user defined temperature.
+                                                        // This value is only used when SolutionDimension = 2.
         // Moisture Transfer Functions term belong here as well
         // BLAST detailed solar model parameters
         Real64 AbsDiffIn;  // Inner absorptance coefficient for diffuse radiation
@@ -1051,9 +1058,9 @@ namespace DataHeatBalance {
               CTFSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, MaxCTFTerms - 1}, 0.0), CTFTSourceOut({0, MaxCTFTerms - 1}, 0.0),
               CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0), CTFTUserOut({0, MaxCTFTerms - 1}, 0.0),
               CTFTUserIn({0, MaxCTFTerms - 1}, 0.0), CTFTUserSource({0, MaxCTFTerms - 1}, 0.0), NumHistories(0), NumCTFTerms(0), UValue(0.0),
-              SolutionDimensions(0), SourceAfterLayer(0), TempAfterLayer(0), ThicknessPerpend(0.0), AbsDiffIn(0.0), AbsDiffOut(0.0),
-              AbsDiff(MaxSolidWinLayers, 0.0), BlAbsDiff(MaxSlatAngs, MaxSolidWinLayers, 0.0), BlAbsDiffGnd(MaxSlatAngs, MaxSolidWinLayers, 0.0),
-              BlAbsDiffSky(MaxSlatAngs, MaxSolidWinLayers, 0.0), AbsDiffBack(MaxSolidWinLayers, 0.0),
+              SolutionDimensions(0), SourceAfterLayer(0), TempAfterLayer(0), ThicknessPerpend(0.0), userTemperatureLocationPerpendicular(0.0),
+              AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiff(MaxSolidWinLayers, 0.0), BlAbsDiff(MaxSlatAngs, MaxSolidWinLayers, 0.0),
+              BlAbsDiffGnd(MaxSlatAngs, MaxSolidWinLayers, 0.0), BlAbsDiffSky(MaxSlatAngs, MaxSolidWinLayers, 0.0), AbsDiffBack(MaxSolidWinLayers, 0.0),
               BlAbsDiffBack(MaxSlatAngs, MaxSolidWinLayers, 0.0), AbsDiffShade(0.0), AbsDiffBlind(MaxSlatAngs, 0.0),
               AbsDiffBlindGnd(MaxSlatAngs, 0.0), AbsDiffBlindSky(MaxSlatAngs, 0.0), AbsDiffBackShade(0.0), AbsDiffBackBlind(MaxSlatAngs, 0.0),
               ShadeAbsorpThermal(0.0), AbsBeamCoef(6, MaxSolidWinLayers, 0.0), AbsBeamBackCoef(6, MaxSolidWinLayers, 0.0), AbsBeamShadeCoef(6, 0.0),
@@ -1079,6 +1086,13 @@ namespace DataHeatBalance {
         bool isGlazingConstruction() const;
 
         void SetFlagForWindowConstructionWithShadeOrBlindLayer();
+        
+        Real64 setUserTemperatureLocationPerpendicular(Real64 userValue);
+        
+        void setNodeSourceAndUserTemp(int &sourceNodeLocation,
+                                      int &userTempNodeLocation,
+                                      Array1D_int & Nodes,
+                                      int NumOfPerpendNodes);
     };
 
     struct SpectralDataProperties
@@ -1470,7 +1484,7 @@ namespace DataHeatBalance {
         Real64 LostEnergy;             // Lost energy (converted to work) [J]
         Real64 TotGainEnergy;          // Total heat gain [J]
         std::string EndUseSubcategory; // user defined name for the end use category
-        int OtherEquipFuelType;        // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
+        ExteriorEnergyUse::ExteriorFuelUsage OtherEquipFuelType;        // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
 
         // Default Constructor
         ZoneEquipData()
@@ -1478,7 +1492,7 @@ namespace DataHeatBalance {
               FractionLost(0.0), FractionConvected(0.0), CO2DesignRate(0.0), CO2RateFactor(0.0), NomMinDesignLevel(0.0), NomMaxDesignLevel(0.0),
               ManageDemand(false), DemandLimit(0.0), Power(0.0), RadGainRate(0.0), ConGainRate(0.0), LatGainRate(0.0), LostRate(0.0),
               TotGainRate(0.0), CO2GainRate(0.0), Consumption(0.0), RadGainEnergy(0.0), ConGainEnergy(0.0), LatGainEnergy(0.0), LostEnergy(0.0),
-              TotGainEnergy(0.0), EndUseSubcategory(""), OtherEquipFuelType(0)
+              TotGainEnergy(0.0), EndUseSubcategory(""), OtherEquipFuelType(ExteriorEnergyUse::ExteriorFuelUsage::Unknown)
         {
         }
     };
@@ -2564,6 +2578,9 @@ namespace DataHeatBalance {
         Real64 CO2Rate;
         Real64 GCRate;
 
+        Real64 SumTinMinusTSup;  // Numerator for zone-level sensible heat index (SHI)
+        Real64 SumToutMinusTSup; // Denominator for zone-level sensible heat index (SHI)
+
         // Default Constructor
         ZoneReportVars()
             : PeopleRadGain(0.0), PeopleConGain(0.0), PeopleSenGain(0.0), PeopleNumOcc(0.0), PeopleLatGain(0.0), PeopleTotGain(0.0),
@@ -2587,7 +2604,7 @@ namespace DataHeatBalance {
               ITEqTimeBelowDryBulbT(0.0), ITEqTimeAboveDewpointT(0.0), ITEqTimeBelowDewpointT(0.0), ITEqTimeAboveRH(0.0), ITEqTimeBelowRH(0.0),
               ITEAdjReturnTemp(0.0), TotRadiantGain(0.0), TotVisHeatGain(0.0), TotConvectiveGain(0.0), TotLatentGain(0.0), TotTotalHeatGain(0.0),
               TotRadiantGainRate(0.0), TotVisHeatGainRate(0.0), TotConvectiveGainRate(0.0), TotLatentGainRate(0.0), TotTotalHeatGainRate(0.0),
-              CO2Rate(0.0), GCRate(0.0)
+              CO2Rate(0.0), GCRate(0.0), SumTinMinusTSup(0.0), SumToutMinusTSup(0.0)
         {
         }
     };

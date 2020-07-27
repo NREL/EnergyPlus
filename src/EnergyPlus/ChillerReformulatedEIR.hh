@@ -52,23 +52,20 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+struct ChillerReformulatedEIRData;
+
 namespace ChillerReformulatedEIR {
-
-    // Chiller type parameters
-    extern int const WaterCooled; // Only water-cooled condensers are currently allowed
-    extern int const EvapCooled;  // Evap-cooled condenser currently not allowed
-
-    // chiller flow modes
-    extern int const FlowModeNotSet;
-    extern int NumElecReformEIRChillers; // Number of electric reformulated EIR chillers specified in input
-
-    extern bool GetInputREIR; // When TRUE, calls subroutine to read input file
 
     struct ReformulatedEIRChillerSpecs : PlantComponent
     {
@@ -78,12 +75,12 @@ namespace ChillerReformulatedEIR {
         std::string CAPFTName;            // CAPFT curve name
         std::string EIRFTName;            // EIRFT curve name
         std::string EIRFPLRName;          // EIRPLR curve name
-        int CondenserType;                // Type of Condenser. Water Cooled is the only available option for now
+        DataPlant::CondenserType CondenserType;   // Type of Condenser. Water Cooled is the only available option for now
         int PartLoadCurveType;            // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift //zrp
         Real64 RefCap;                    // Reference capacity of the chiller [W]
         bool RefCapWasAutoSized;          // reference capacity was autosized on input
         Real64 RefCOP;                    // Reference coefficient of performance [W/W]
-        int FlowMode;                     // one of 3 modes for component flow during operation
+        DataPlant::FlowMode FlowMode;                     // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;      // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;        // true if setpoint warning issued
         Real64 EvapVolFlowRate;           // Reference water volumetric flow rate through the evaporator [m3/s]
@@ -220,7 +217,8 @@ namespace ChillerReformulatedEIR {
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
-            : TypeNum(0), CondenserType(0), PartLoadCurveType(0), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(FlowModeNotSet),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::NOTSET), PartLoadCurveType(0), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0),
+              FlowMode(DataPlant::FlowMode::NOTSET),
               ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false),
               EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0),
               CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
@@ -247,9 +245,9 @@ namespace ChillerReformulatedEIR {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(ChillerReformulatedEIRData &chillers, std::string const &objectName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
@@ -257,9 +255,9 @@ namespace ChillerReformulatedEIR {
 
         void getSizingFactor(Real64 &sizFac) override;
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void initialize(bool RunFlag, Real64 MyLoad);
+        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad);
 
         void setupOutputVars();
 
@@ -278,14 +276,21 @@ namespace ChillerReformulatedEIR {
         Real64 condOutTempResidual(Real64 FalsiCondOutTemp, Array1D<Real64> const &Par);
     };
 
-    // Object Data
-    extern Array1D<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
-
-    void clear_state();
-
-    void GetElecReformEIRChillerInput();
+    void GetElecReformEIRChillerInput(ChillerReformulatedEIRData &chillers);
 
 } // namespace ChillerReformulatedEIR
+
+    struct ChillerReformulatedEIRData : BaseGlobalStruct {
+        int NumElecReformEIRChillers = 0;
+        bool GetInputREIR = true;
+        Array1D<ChillerReformulatedEIR::ReformulatedEIRChillerSpecs> ElecReformEIRChiller;
+        void clear_state() override
+        {
+            NumElecReformEIRChillers = 0;
+            GetInputREIR = true;
+            ElecReformEIRChiller.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

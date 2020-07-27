@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "EnergyPlus/DataIPShortCuts.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh"
 #include "EnergyPlus/GroundTemperatureModeling/SiteShallowGroundTemperatures.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -81,7 +82,7 @@ TEST_F(EnergyPlusFixture, SiteShallowGroundTempTest)
 
     std::string const CurrentModuleObject = CurrentModuleObjects(objectType_SiteShallowGroundTemp);
 
-    auto thisModel = GetGroundTempModelAndInit(CurrentModuleObject, "TEST");
+    auto thisModel = GetGroundTempModelAndInit(state, CurrentModuleObject, "TEST");
 
     EXPECT_NEAR(21.0, thisModel->getGroundTempAtTimeInMonths(0.0, 1), 0.1);  // January
     EXPECT_NEAR(32.0, thisModel->getGroundTempAtTimeInMonths(0.0, 12), 0.1); // December

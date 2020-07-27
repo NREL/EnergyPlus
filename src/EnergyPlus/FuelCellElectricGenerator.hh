@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct BranchInputManagerData;
+
 namespace FuelCellElectricGenerator {
 
     struct FCPowerModuleStruct
@@ -542,13 +545,13 @@ namespace FuelCellElectricGenerator {
 
         static PlantComponent *factory_exhaust(std::string const &objectName);
 
-        void initialize();
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void setupOutputVars();
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void FigureAirHeatCap(Real64 FluidTemp, Real64 &Cp);
 
@@ -596,7 +599,8 @@ namespace FuelCellElectricGenerator {
                                          Real64 &PgridOverage // electricity that can't be stored and needs to go out
         );
 
-        void SimFuelCellGenerator(bool RunFlag,  // simulate Generator when TRUE
+        void SimFuelCellGenerator(BranchInputManagerData &dataBranchInputManager,
+                                  bool RunFlag,  // simulate Generator when TRUE
                                   Real64 MyLoad, // demand on electric generator
                                   bool FirstHVACIteration);
 

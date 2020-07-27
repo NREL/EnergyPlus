@@ -97,9 +97,9 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     NumCurves = 1;
     PerfCurve.allocate(NumCurves);
 
-    NumFans = 2;
-    Fan.allocate(NumFans);
-    FaultsFouledAirFilters.allocate(NumFans);
+    state.fans.NumFans = 2;
+    Fan.allocate(state.fans.NumFans);
+    FaultsFouledAirFilters.allocate(state.fans.NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
@@ -135,11 +135,11 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // Run and Check
     // (1)The rated operational point of Fan_1 falls on the fan curve
     FanNum = 1;
-    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve();
+    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(state);
     EXPECT_TRUE(TestRestult);
     // (2)The rated operational point of Fan_2 does not fall on the fan curve
     FanNum = 2;
-    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve();
+    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(state);
     EXPECT_FALSE(TestRestult);
 
     // Clean up
@@ -162,8 +162,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     NumCurves = 1;
     PerfCurve.allocate(NumCurves);
 
-    NumFans = 1;
-    Fan.allocate(NumFans);
+    state.fans.NumFans = 1;
+    Fan.allocate(state.fans.NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
@@ -271,11 +271,11 @@ TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Readin inputs
-    SetPointManager::GetSetPointManagerInputs();
-    HVACControllers::GetControllerInput();
+    SetPointManager::GetSetPointManagerInputs(state);
+    HVACControllers::GetControllerInput(state);
 
     // Run
-    CheckAndReadFaults();
+    CheckAndReadFaults(state);
 
     // Check
     EXPECT_EQ(2.0, FaultsCoilSATSensor(1).Offset);
@@ -459,9 +459,9 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
-    MixedAir::GetOAControllerInputs(outputFiles());
+    MixedAir::GetOAControllerInputs(state);
 
     // there are two OA controller objects
     EXPECT_EQ(MixedAir::NumOAControllers, 2);
@@ -506,7 +506,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_CoilNotFound)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ASSERT_THROW(FaultsManager::CheckAndReadFaults(), std::runtime_error);
+    ASSERT_THROW(FaultsManager::CheckAndReadFaults(state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\". Referenced Coil named \"NON EXISTENT COOLING COIL\" was not found.",
@@ -570,7 +570,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_BadCoilType)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ASSERT_THROW(FaultsManager::CheckAndReadFaults(), std::runtime_error);
+    ASSERT_THROW(FaultsManager::CheckAndReadFaults(state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\" invalid Coil Name = \"DETAILED PRE COOLING COIL\".",
@@ -689,7 +689,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
 
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());  // read schedule data
+    ScheduleManager::ProcessScheduleInput(state.outputFiles);  // read schedule data
     int avaiSchedIndex = ScheduleManager::GetScheduleIndex("AVAILSCHED");
     EXPECT_EQ(1, avaiSchedIndex);
     int severitySchedIndex = ScheduleManager::GetScheduleIndex("SEVERITYSCHED");
@@ -701,7 +701,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     //HVACControllers::GetControllerInput();
 
     // Run
-    ASSERT_NO_THROW(FaultsManager::CheckAndReadFaults());
+    ASSERT_NO_THROW(FaultsManager::CheckAndReadFaults(state));
 
     // Read schedule values
     DataGlobals::TimeStep = 1;

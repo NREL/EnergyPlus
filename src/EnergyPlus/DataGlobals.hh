@@ -53,7 +53,9 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include "OutputFiles.hh"
 
 namespace EnergyPlus {
 
@@ -65,7 +67,6 @@ namespace DataGlobals {
 
     extern bool runReadVars;
     extern bool DDOnlySimulation;
-    extern bool AnnualSimulation;
     extern bool outputEpJSONConversion;
     extern bool outputEpJSONConversionOnly;
     extern bool isEpJSON;
@@ -79,7 +80,6 @@ namespace DataGlobals {
     extern int const BeginDay;
     extern int const DuringDay;
     extern int const EndDay;
-    extern int const EndZoneSizingCalc;
     extern int const EndSysSizingCalc;
 
     // Parameters for KindOfSim
@@ -216,7 +216,6 @@ namespace DataGlobals {
     extern bool BeginFullSimFlag;       // True until full simulation has begun, False after first time step
     extern bool BeginTimeStepFlag;      // True at the start of each time step, False after first subtime step of time step
     extern int DayOfSim;                // Counter for days (during the simulation)
-    extern std::string DayOfSimChr;     // Counter for days (during the simulation) (character -- for reporting)
     extern int CalendarYear;            // Calendar year of the current day of simulation
     extern std::string CalendarYearChr; // Calendar year of the current day of simulation (character -- for reporting)
     extern bool EndEnvrnFlag;           // True at the end of each environment (last time step of last hour of last day of environ)
@@ -238,12 +237,8 @@ namespace DataGlobals {
     extern int OutputStandardError;                  // Unit number for the standard error output file
     extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records
-    extern int OutputFileDebug;                      // Unit number for debug outputs
     extern int OutputFilePerfLog;                    // Unit number for performance log outputs
-    extern int OutputFileShadingFrac;                // Unit number for shading output
     extern int StdMeterRecordCount;                  // Count of Meter output records
-    extern int OutputDElightIn;                      // Unit number for the DElight In file
-    extern std::ostream *delightin_stream;           // Internal stream used for DElight In file
     extern bool ZoneSizingCalc;                      // TRUE if zone sizing calculation
     extern bool SysSizingCalc;                       // TRUE if system sizing calculation
     extern bool DoZoneSizing;                        // User input in SimulationControl object
@@ -279,7 +274,6 @@ namespace DataGlobals {
     extern bool AnyEnergyManagementSystemInModel;  // true if there is any EMS or Erl in model.  otherwise false
     extern bool AnyLocalEnvironmentsInModel;       // true if there is any local environmental data objected defined in model, otherwise false
     extern bool AnyPlantInModel;                   // true if there are any plant or condenser loops in model, otherwise false
-    extern int CacheIPErrorFile;                   // Cache IP errors until IDF processing done.
     extern bool AnyIdealCondEntSetPointInModel;    // true if there is any ideal condenser entering set point manager in model.
     extern bool RunOptCondEntTemp;                 // true if the ideal condenser entering set point optimization is running
     extern bool CompLoadReportIsReq;               // true if the extra sizing calcs are performed to create a "pulse" for the load component report
@@ -303,9 +297,25 @@ namespace DataGlobals {
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state();
+    void clear_state(EnergyPlus::OutputFiles &outputFiles);
 
 } // namespace DataGlobals
+
+    struct DataGlobal : BaseGlobalStruct {
+        // Data
+        bool AnnualSimulation = false;
+
+        // MODULE VARIABLE DECLARATIONS:
+        std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
+
+        // MODULE PARAMETER DEFINITIONS
+        static constexpr int EndZoneSizingCalc = 4;
+
+        void clear_state() override {
+            AnnualSimulation = false;
+            DayOfSimChr = "0";
+        }
+    };
 
 } // namespace EnergyPlus
 

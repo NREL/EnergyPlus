@@ -57,6 +57,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace SingleDuct {
 
@@ -259,31 +261,33 @@ namespace SingleDuct {
         {
         }
 
-        void InitSys(bool const FirstHVACIteration);
+        void InitSys(EnergyPlusData &state, bool const FirstHVACIteration);
 
         void SizeSys();
 
-        void SimVAV(bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
+        void SimVAV(EnergyPlusData &state, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
 
         void CalcOAMassFlow(Real64 &SAMassFlow, Real64 &AirLoopOAFrac);
 
-        void SimCBVAV(bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
+        void SimCBVAV(EnergyPlusData &state, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
 
-        void SimVAVVS(bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
+        void SimVAVVS(EnergyPlusData &state, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
 
-        void SimConstVol(bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
+        void SimConstVol(EnergyPlusData &state, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
 
-        void CalcVAVVS(bool const FirstHVACIteration, int const ZoneNode, int const HCoilType, Real64 const HWFlow, Real64 const HCoilReq, int const FanType, Real64 const AirFlow, int const FanOn, Real64 &LoadMet);
+        void CalcVAVVS(EnergyPlusData &state, bool const FirstHVACIteration, int const ZoneNode, int const HCoilType, Real64 const HWFlow, Real64 const HCoilReq, int const FanType, Real64 const AirFlow, int const FanOn, Real64 &LoadMet);
 
-        static Real64 VAVVSCoolingResidual(Real64 const SupplyAirMassFlow, Array1D<Real64> const &Par);
+        static Real64 VAVVSCoolingResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlow, Array1D<Real64> const &Par);
 
-        static Real64 VAVVSHWNoFanResidual(Real64 const HWMassFlow, Array1D<Real64> const &Par);
+        static Real64 VAVVSHWNoFanResidual(EnergyPlusData &state, Real64 const HWMassFlow, Array1D<Real64> const &Par);
 
-        static Real64 VAVVSHWFanOnResidual(Real64 const SupplyAirMassFlow, Array1D<Real64> const &Par);
+        static Real64 VAVVSHWFanOnResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlow, Array1D<Real64> const &Par);
 
-        static Real64 VAVVSHCFanOnResidual(Real64 const HeatingFrac, Array1D<Real64> const &Par);
+        static Real64 VAVVSHCFanOnResidual(EnergyPlusData &state, Real64 const HeatingFrac, Array1D<Real64> const &Par);
 
         void SimConstVolNoReheat(int const ZoneNodeNum);
+
+        void CalcOutdoorAirVolumeFlowRate();
 
         void UpdateSys();
 
@@ -353,17 +357,17 @@ namespace SingleDuct {
     // Functions
     void clear_state();
 
-    void SimulateSingleDuct(std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex);
+    void SimulateSingleDuct(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex);
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetSysInput();
+    void GetSysInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
 
-    void GetHVACSingleDuctSysIndex(std::string const &SDSName,
+    void GetHVACSingleDuctSysIndex(EnergyPlusData &state, std::string const &SDSName,
                                    int &SDSIndex,
                                    bool &ErrorsFound,
                                    Optional_string_const ThisObjectType = _,

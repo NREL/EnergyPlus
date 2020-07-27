@@ -57,6 +57,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace SystemAvailabilityManager {
 
@@ -553,17 +555,18 @@ namespace SystemAvailabilityManager {
 
     int ValidateAndSetSysAvailabilityManagerType(std::string const &AvailMgrName); // name to validate
 
-    void ManageHybridVentilation();
+    void ManageHybridVentilation(EnergyPlusData &state);
 
     void GetHybridVentilationInputs();
 
     void InitHybridVentSysAvailMgr();
 
-    void CalcHybridVentSysAvailMgr(int const SysAvailNum,              // number of the current scheduled system availability manager
+    void CalcHybridVentSysAvailMgr(EnergyPlusData &state,
+                                   int const SysAvailNum,              // number of the current scheduled system availability manager
                                    Optional_int_const PriAirSysNum = _ // number of the primary air system affected by this Avail. Manager
     );
 
-    bool GetHybridVentilationControlStatus(int const ZoneNum); // Index of zone
+    bool GetHybridVentilationControlStatus(EnergyPlusData &EP_UNUSED(state), int const ZoneNum); // Index of zone
 
 } // namespace SystemAvailabilityManager
 

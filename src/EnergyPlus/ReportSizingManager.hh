@@ -55,6 +55,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
     class OutputFiles;
 
 namespace ReportSizingManager {
@@ -69,7 +71,7 @@ namespace ReportSizingManager {
                             Optional<Real64 const> UsrValue = _ // the value from the user for the desc item
     );
 
-    void RequestSizing(std::string const &CompType,      // type of component
+    void RequestSizing(EnergyPlusData &state, std::string const &CompType,      // type of component
                        std::string const &CompName,      // name of component
                        int const SizingType,             // integerized type of sizing requested (see DataHVACGlobals, e.g. CoolingCapacitySizing)
                        std::string const &SizingString,  // string containing info for eio report

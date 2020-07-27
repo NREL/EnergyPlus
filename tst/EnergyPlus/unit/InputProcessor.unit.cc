@@ -181,47 +181,53 @@ namespace EnergyPlus {
 
 TEST_F(InputProcessorFixture, decode_encode_1)
 {
-    auto const idf = delimited_string({"Building,",
-                                       "  Ref Bldg Medium Office New2004_v1.3_5.0,",
-                                       "  0.0,",
-                                       "  City,",
-                                       "  0.04,",
-                                       "  0.2,",
-                                       "  FullInteriorAndExterior,",
-                                       "  25.0,",
-                                       "  6.0;",
-                                       "",
-                                       "BuildingSurface:Detailed,",
-                                       "  Zn009:Flr001,",
-                                       "  Floor,",
-                                       "  FLOOR38,",
-                                       "  SCWINDOW,",
-                                       "  Surface,",
-                                       "  Zn009:Flr001,",
-                                       "  NoSun,",
-                                       "  NoWind,",
-                                       "  1.0,",
-                                       "  4.0,",
-                                       "  10.0,",
-                                       "  0.0,",
-                                       "  0.0,",
-                                       "  0.0,",
-                                       "  0.0,",
-                                       "  0.0,",
-                                       "  0.0,",
-                                       "  10.0,",
-                                       "  0.0,",
-                                       "  10.0,",
-                                       "  10.0,",
-                                       "  0.0;",
-                                       "",
-                                       "GlobalGeometryRules,",
-                                       "  UpperLeftCorner,",
-                                       "  Counterclockwise,",
-                                       "  Relative,",
-                                       "  Relative,",
-                                       "  Relative;",
-                                       ""});
+    auto const idf = delimited_string({
+        "Building,",
+        "  Ref Bldg Medium Office New2004_v1.3_5.0,",
+        "  0.0,",
+        "  City,",
+        "  0.04,",
+        "  0.2,",
+        "  FullInteriorAndExterior,",
+        "  25.0,",
+        "  6.0;",
+        "",
+        "BuildingSurface:Detailed,",
+        "  Zn009:Flr001,",
+        "  Floor,",
+        "  FLOOR38,",
+        "  SCWINDOW,",
+        "  Surface,",
+        "  Zn009:Flr001,",
+        "  NoSun,",
+        "  NoWind,",
+        "  1.0,",
+        "  4.0,",
+        "  10.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  10.0,",
+        "  0.0,",
+        "  10.0,",
+        "  10.0,",
+        "  0.0;",
+        "",
+        "GlobalGeometryRules,",
+        "  UpperLeftCorner,",
+        "  Counterclockwise,",
+        "  Relative,",
+        "  Relative,",
+        "  Relative;",
+        "",
+        "Version,",
+        "  " + DataStringGlobals::MatchVersion + ";",
+        ""
+    });
+
     ASSERT_TRUE(process_idf(idf));
     std::string encoded = encodeIDF();
     EXPECT_EQ(idf, encoded);
@@ -246,38 +252,43 @@ TEST_F(InputProcessorFixture, decode_encode_2)
         "  Yes;",
     }));
 
-    auto const expected(delimited_string({"Building,",
-                                          "  Bldg,",
-                                          "  0.0,",
-                                          "  Suburbs,",
-                                          "  0.04,",
-                                          "  0.4,",
-                                          "  FullExterior,",
-                                          "  25.0,",
-                                          "  6.0;",
-                                          "",
-                                          "GlobalGeometryRules,",
-                                          "  UpperLeftCorner,",
-                                          "  Counterclockwise,",
-                                          "  Relative,",
-                                          "  Relative,",
-                                          "  Relative;",
-                                          "",
-                                          "Zone,",
-                                          "  Core_mid,",
-                                          "  0.0,",
-                                          "  0.0,",
-                                          "  0.0,",
-                                          "  0.0,",
-                                          "  1.0,",
-                                          "  1.0,",
-                                          "  ,",
-                                          "  ,",
-                                          "  Autocalculate,",
-                                          "  ,",
-                                          "  ,",
-                                          "  Yes;",
-                                          ""}));
+    auto const expected(delimited_string({
+        "Building,",
+        "  Bldg,",
+        "  0.0,",
+        "  Suburbs,",
+        "  0.04,",
+        "  0.4,",
+        "  FullExterior,",
+        "  25.0,",
+        "  6.0;",
+        "",
+        "GlobalGeometryRules,",
+        "  UpperLeftCorner,",
+        "  Counterclockwise,",
+        "  Relative,",
+        "  Relative,",
+        "  Relative;",
+        "",
+        "Version,",
+        "  " + DataStringGlobals::MatchVersion + ";",
+        "",
+        "Zone,",
+        "  Core_mid,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  1.0,",
+        "  1.0,",
+        "  ,",
+        "  ,",
+        "  Autocalculate,",
+        "  ,",
+        "  ,",
+        "  Yes;",
+        ""
+    }));
 
     ASSERT_TRUE(process_idf(idf));
     std::string encoded = encodeIDF();
@@ -327,6 +338,9 @@ TEST_F(InputProcessorFixture, decode_encode_3)
       "  Comma,",
       "  ,",
       "  10.0;",
+      "",
+      "Version,",
+      "  " + DataStringGlobals::MatchVersion + ";",
       ""
     }));
 
@@ -340,29 +354,32 @@ TEST_F(InputProcessorFixture, byte_order_mark)
     auto const idf(delimited_string(
             {
                     "\xEF\xBB\xBF Building,Bldg,0,Suburbs,0.04,0.4,FullExterior,25,6;",
-                    "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative,Relative,Relative;"
+                    "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative,Relative,Relative;",
+                    "Version," + DataStringGlobals::MatchVersion + ";"
             }));
 
-    auto const expected(delimited_string(
-            {
-                    "Building,",
-                    "  Bldg,",
-                    "  0.0,",
-                    "  Suburbs,",
-                    "  0.04,",
-                    "  0.4,",
-                    "  FullExterior,",
-                    "  25.0,",
-                    "  6.0;",
-                    "",
-                    "GlobalGeometryRules,",
-                    "  UpperLeftCorner,",
-                    "  Counterclockwise,",
-                    "  Relative,",
-                    "  Relative,",
-                    "  Relative;",
-                    ""
-            }));
+    auto const expected(delimited_string({
+        "Building,",
+        "  Bldg,",
+        "  0.0,",
+        "  Suburbs,",
+        "  0.04,",
+        "  0.4,",
+        "  FullExterior,",
+        "  25.0,",
+        "  6.0;",
+        "",
+        "GlobalGeometryRules,",
+        "  UpperLeftCorner,",
+        "  Counterclockwise,",
+        "  Relative,",
+        "  Relative,",
+        "  Relative;",
+        "",
+        "Version,",
+        "  " + DataStringGlobals::MatchVersion + ";",
+        ""
+    }));
 
     ASSERT_TRUE(process_idf(idf));
     std::string encoded = encodeIDF();
@@ -495,6 +512,12 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_1)
           "\"starting_vertex_position\":\"UpperLeftCorner\","
           "\"vertex_entry_direction\":\"Counterclockwise\""
         "}"
+      "},"
+      "\"Version\":{"
+        "\"\":{"
+          "\"idf_order\":0,"
+          "\"version_identifier\":\"" + DataStringGlobals::MatchVersion + "\""
+        "}"
       "}}"
     );
 
@@ -534,6 +557,12 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_2)
           "\"rectangular_surface_coordinate_system\":\"Relative\","
           "\"starting_vertex_position\":\"UpperLeftCorner\","
           "\"vertex_entry_direction\":\"Counterclockwise\""
+        "}"
+      "},"
+      "\"Version\":{"
+        "\"\":{"
+          "\"idf_order\":0,"
+          "\"version_identifier\":\"" + DataStringGlobals::MatchVersion + "\""
         "}"
       "}}"
     );
@@ -577,6 +606,12 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
           "\"starting_vertex_position\":\"UpperLeftCorner\","
           "\"vertex_entry_direction\":\"Counterclockwise\""
         "}"
+      "},"
+      "\"Version\":{"
+        "\"\":{"
+          "\"idf_order\":0,"
+          "\"version_identifier\":\"" + DataStringGlobals::MatchVersion + "\""
+        "}"
       "}}"
     );
 
@@ -587,6 +622,39 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
 
     EXPECT_EQ( expected, input_file );
 }
+
+TEST_F(InputProcessorFixture, parse_latin1_json)
+{
+
+    // Test for #7388 -  Non UTF-8 characters throwing false blank name error
+
+    std::string const idf(delimited_string({
+        "  Construction,",
+        "    \x31\xB0\x70\x69\x61\x6E\x6F,  !- Name",
+        "    intonaco int calce;      !- Outside Layer"
+    }));
+
+    EXPECT_FALSE(process_idf(idf, false)); // No assertions
+    const std::string error_string = delimited_string({
+        "   ** Severe  ** <root>[Construction] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: '1\xB0piano'.",
+        "   ** Severe  ** <root>[Construction] - Object name is required and cannot be blank or whitespace, and must be UTF-8 encoded"
+    });
+    compare_err_stream(error_string, true);
+
+    auto const &errors = validationErrors();
+    EXPECT_EQ(errors.size(), 2ul);
+    EXPECT_EQ("<root>[Construction] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: '1\xB0piano'.", errors[0]);
+    EXPECT_EQ("<root>[Construction] - Object name is required and cannot be blank or whitespace, and must be UTF-8 encoded", errors[1]);
+
+
+    json &epJSON = getEpJSON();
+
+    auto it = epJSON.find("Construction");
+    ASSERT_NE(it, epJSON.end());
+    auto iit = it->begin();
+    EXPECT_EQ("1\xB0piano", iit.key());
+}
+
 
 TEST_F(InputProcessorFixture, parse_malformed_idf)
 {
@@ -833,7 +901,10 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
                          {"temperature_convergence_tolerance_value", 0.4000},
                          {"solar_distribution", "FullExterior"},
                          {"maximum_number_of_warmup_days", 25},
-                         {"minimum_number_of_warmup_days", 6}}}}}};
+                         {"minimum_number_of_warmup_days", 6}}}}},
+                     {"Version",
+                      {{"",
+                        {{"version_identifier", DataStringGlobals::MatchVersion}}}}}};
 
     auto const expected_idf(delimited_string({"Building,",
                                               "  Bldg,",
@@ -872,6 +943,9 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
                                               "  Relative,",
                                               "  Relative,",
                                               "  Relative;",
+                                              "",
+                                              "Version,",
+                                              "  " + DataStringGlobals::MatchVersion + ";",
                                               ""}));
 
     EXPECT_TRUE(process_idf(idf));

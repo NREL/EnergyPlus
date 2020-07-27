@@ -76,6 +76,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -86,6 +87,7 @@
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
@@ -218,7 +220,7 @@ namespace HVACMultiSpeedHeatPump {
 
     // Functions
 
-    void SimMSHeatPump(std::string const &CompName,   // Name of the unitary engine driven heat pump system
+    void SimMSHeatPump(EnergyPlusData &state, std::string const &CompName,   // Name of the unitary engine driven heat pump system
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
                        int const AirLoopNum,          // air loop index
                        int &CompIndex                 // Index to changeover-bypass VAV system
@@ -247,7 +249,7 @@ namespace HVACMultiSpeedHeatPump {
 
         // First time SimMSHeatPump is called, get the input
         if (GetInputFlag) {
-            GetMSHeatPumpInput();
+            GetMSHeatPumpInput(state);
             GetInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
         }
 
@@ -275,9 +277,9 @@ namespace HVACMultiSpeedHeatPump {
         OnOffAirFlowRatio = 0.0;
 
         // Initialize the engine driven heat pump
-        InitMSHeatPump(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QZnLoad, OnOffAirFlowRatio);
+        InitMSHeatPump(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QZnLoad, OnOffAirFlowRatio);
 
-        SimMSHP(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnLoad, OnOffAirFlowRatio);
+        SimMSHP(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnLoad, OnOffAirFlowRatio);
 
         // Update the unit outlet nodes
         UpdateMSHeatPump(MSHeatPumpNum);
@@ -288,7 +290,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void SimMSHP(int const MSHeatPumpNum,       // number of the current engine driven Heat Pump being simulated
+    void SimMSHP(EnergyPlusData &state, int const MSHeatPumpNum,       // number of the current engine driven Heat Pump being simulated
                  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                  int const AirLoopNum,          // air loop index
                  Real64 &QSensUnitOut,          // cooling/heating deliveded to zones [W]
@@ -381,7 +383,7 @@ namespace HVACMultiSpeedHeatPump {
         if (!FirstHVACIteration && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil && QZnReq < 0.0 && AirLoopControlInfo(AirLoopNum).EconoActive) {
             // for cycling fan, cooling load, check whether furnace can meet load with compressor off
             CompOp = Off;
-            ControlMSHPOutput(MSHeatPumpNum,
+            ControlMSHPOutput(state, MSHeatPumpNum,
                               FirstHVACIteration,
                               CompOp,
                               OpMode,
@@ -396,7 +398,7 @@ namespace HVACMultiSpeedHeatPump {
                 // compressor on (reset inlet air mass flow rate to starting value)
                 Node(InletNode).MassFlowRate = SaveMassFlowRate;
                 CompOp = On;
-                ControlMSHPOutput(MSHeatPumpNum,
+                ControlMSHPOutput(state, MSHeatPumpNum,
                                   FirstHVACIteration,
                                   CompOp,
                                   OpMode,
@@ -410,7 +412,7 @@ namespace HVACMultiSpeedHeatPump {
             }
         } else {
             // compressor on
-            ControlMSHPOutput(MSHeatPumpNum,
+            ControlMSHPOutput(state, MSHeatPumpNum,
                               FirstHVACIteration,
                               CompOp,
                               OpMode,
@@ -435,7 +437,7 @@ namespace HVACMultiSpeedHeatPump {
             }
         }
 
-        CalcMSHeatPump(
+        CalcMSHeatPump(state,
             MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
 
         // calculate delivered capacity
@@ -506,7 +508,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void GetMSHeatPumpInput()
+    void GetMSHeatPumpInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
@@ -567,7 +569,7 @@ namespace HVACMultiSpeedHeatPump {
         using DXCoils::SetMSHPDXCoilHeatRecoveryFlag;
         using FluidProperties::GetSatDensityRefrig;
         using SteamCoils::GetTypeOfCoil;
-        using ZoneTempPredictorCorrector::NumStageCtrZone;
+        //using ZoneTempPredictorCorrector::NumStageCtrZone;
 
         // Locals
         // PARAMETERS
@@ -730,7 +732,7 @@ namespace HVACMultiSpeedHeatPump {
                                 if (ComfortControlledZone(TstatZoneNum).ActualZoneNum != MSHeatPump(MSHPNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumStageCtrZone; ++TstatZoneNum) {
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneTempPredictorCorrector.NumStageCtrZone; ++TstatZoneNum) {
                                 if (StageControlledZone(TstatZoneNum).ActualZoneNum != MSHeatPump(MSHPNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
@@ -757,17 +759,17 @@ namespace HVACMultiSpeedHeatPump {
                 if (UtilityRoutines::SameString(Alphas(6), "Fan:OnOff")) {
                     MSHeatPump(MSHPNum).FanType = FanType_SimpleOnOff;
                     SetUpCompSets(CurrentModuleObject, MSHeatPump(MSHPNum).Name, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, "UNDEFINED", "UNDEFINED");
-                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode("Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
-                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode("Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode(state.fans, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode(state.fans, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
                 } else {
                     MSHeatPump(MSHPNum).FanType = FanType_SimpleConstVolume;
                     SetUpCompSets(
                         CurrentModuleObject, MSHeatPump(MSHPNum).Name, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, "UNDEFINED", "UNDEFINED");
-                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode("Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
-                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode("Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode(state.fans, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode(state.fans, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
                 }
-                GetFanIndex(Alphas(7), MSHeatPump(MSHPNum).FanNum, ErrorsFound, CurrentModuleObject);
-                GetFanType(Alphas(7), FanType, ErrorsFound);
+                GetFanIndex(state.fans, Alphas(7), MSHeatPump(MSHPNum).FanNum, ErrorsFound, CurrentModuleObject);
+                GetFanType(state.fans, Alphas(7), FanType, ErrorsFound);
                 if (FanType != MSHeatPump(MSHPNum).FanType) {
                     ShowSevereError(CurrentModuleObject + ", \"" + MSHeatPump(MSHPNum).Name + "\", " + cAlphaFields(6) + " and " + cAlphaFields(7) +
                                     " do not match in Fan objects.");
@@ -833,14 +835,14 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                HeatingCoilInletNode = GetDXCoilInletNode(Alphas(10), Alphas(11), LocalError);
+                HeatingCoilInletNode = GetDXCoilInletNode(state, Alphas(10), Alphas(11), LocalError);
                 if (LocalError) {
                     ShowSevereError("The inlet node number of " + cAlphaFields(11) + " is not found \"" + Alphas(11) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                HeatingCoilOutletNode = GetDXCoilOutletNode(Alphas(10), Alphas(11), LocalError);
+                HeatingCoilOutletNode = GetDXCoilOutletNode(state, Alphas(10), Alphas(11), LocalError);
                 if (LocalError) {
                     ShowSevereError("The outlet node number of " + cAlphaFields(11) + " is not found \"" + Alphas(11) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -887,9 +889,9 @@ namespace HVACMultiSpeedHeatPump {
                 MSHeatPump(MSHPNum).HeatCoilName = Alphas(11);
                 LocalError = false;
                 if (UtilityRoutines::SameString(Alphas(10), "Coil:Heating:Electric:MultiStage")) {
-                    GetCoilIndex(MSHeatPump(MSHPNum).HeatCoilName, MSHeatPump(MSHPNum).HeatCoilIndex, LocalError);
+                    GetCoilIndex(state, MSHeatPump(MSHPNum).HeatCoilName, MSHeatPump(MSHPNum).HeatCoilIndex, LocalError);
                 } else {
-                    GetCoilIndex(MSHeatPump(MSHPNum).HeatCoilName, MSHeatPump(MSHPNum).HeatCoilIndex, LocalError);
+                    GetCoilIndex(state, MSHeatPump(MSHPNum).HeatCoilName, MSHeatPump(MSHPNum).HeatCoilIndex, LocalError);
                 }
                 if (LocalError) {
                     ShowSevereError("The index of " + cAlphaFields(11) + " is not found \"" + Alphas(11) + "\"");
@@ -897,14 +899,14 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                HeatingCoilInletNode = GetCoilInletNode(Alphas(10), Alphas(11), LocalError);
+                HeatingCoilInletNode = GetCoilInletNode(state, Alphas(10), Alphas(11), LocalError);
                 if (LocalError) {
                     ShowSevereError("The inlet node number of " + cAlphaFields(11) + " is not found \"" + Alphas(11) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                HeatingCoilOutletNode = GetCoilOutletNode(Alphas(10), Alphas(11), LocalError);
+                HeatingCoilOutletNode = GetCoilOutletNode(state, Alphas(10), Alphas(11), LocalError);
                 if (LocalError) {
                     ShowSevereError("The outlet node number of " + cAlphaFields(11) + " is not found \"" + Alphas(11) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -953,7 +955,7 @@ namespace HVACMultiSpeedHeatPump {
 
                     // Get the lemental Heating Coil Inlet Node
                     errFlag = false;
-                    HeatingCoilInletNode = GetWaterCoilInletNode("Coil:Heating:Water", MSHeatPump(MSHPNum).HeatCoilName, errFlag);
+                    HeatingCoilInletNode = GetWaterCoilInletNode(state, "Coil:Heating:Water", MSHeatPump(MSHPNum).HeatCoilName, errFlag);
                     MSHeatPump(MSHPNum).CoilAirInletNode = HeatingCoilInletNode;
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHPNum).Name);
@@ -962,7 +964,7 @@ namespace HVACMultiSpeedHeatPump {
 
                     // Get the lemental Heating Coil Outlet Node
                     errFlag = false;
-                    HeatingCoilOutletNode = GetWaterCoilOutletNode("Coil:Heating:Water", MSHeatPump(MSHPNum).HeatCoilName, errFlag);
+                    HeatingCoilOutletNode = GetWaterCoilOutletNode(state, "Coil:Heating:Water", MSHeatPump(MSHPNum).HeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHPNum).Name);
                         ErrorsFound = true;
@@ -1060,14 +1062,14 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                CoolingCoilInletNode = GetDXCoilInletNode(Alphas(12), Alphas(13), LocalError);
+                CoolingCoilInletNode = GetDXCoilInletNode(state, Alphas(12), Alphas(13), LocalError);
                 if (LocalError) {
                     ShowSevereError("The inlet node number of " + cAlphaFields(13) + " is not found \"" + Alphas(13) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                CoolingCoilOutletNode = GetDXCoilOutletNode(Alphas(12), Alphas(13), LocalError);
+                CoolingCoilOutletNode = GetDXCoilOutletNode(state, Alphas(12), Alphas(13), LocalError);
                 if (LocalError) {
                     ShowSevereError("The outlet node number of " + cAlphaFields(13) + " is not found \"" + Alphas(13) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1097,7 +1099,7 @@ namespace HVACMultiSpeedHeatPump {
             if (UtilityRoutines::SameString(Alphas(14), "Coil:Heating:Fuel")) {
                 MSHeatPump(MSHPNum).SuppHeatCoilType = SuppHeatingCoilGas;
                 errFlag = false;
-                MSHeatPump(MSHPNum).SuppHeatCoilNum = GetHeatingCoilIndex("Coil:Heating:Fuel", Alphas(15), errFlag);
+                MSHeatPump(MSHPNum).SuppHeatCoilNum = GetHeatingCoilIndex(state, "Coil:Heating:Fuel", Alphas(15), errFlag);
                 if (MSHeatPump(MSHPNum).SuppHeatCoilNum <= 0 || errFlag) {
                     ShowContinueError("Configuration error in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ShowContinueError(cAlphaFields(15) + " of type Coil:Heating:Fuel \"" + Alphas(15) + "\" not found.");
@@ -1106,14 +1108,14 @@ namespace HVACMultiSpeedHeatPump {
 
                 // Get the Supplemental Heating Coil Node Numbers
                 LocalError = false;
-                SuppHeatCoilInletNode = GetHeatingCoilInletNode(Alphas(14), Alphas(15), LocalError);
+                SuppHeatCoilInletNode = GetHeatingCoilInletNode(state, Alphas(14), Alphas(15), LocalError);
                 if (LocalError) {
                     ShowSevereError("The inlet node number of " + cAlphaFields(15) + " is not found \"" + Alphas(15) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                SuppHeatCoilOutletNode = GetHeatingCoilOutletNode(Alphas(14), Alphas(15), LocalError);
+                SuppHeatCoilOutletNode = GetHeatingCoilOutletNode(state, Alphas(14), Alphas(15), LocalError);
                 if (LocalError) {
                     ShowSevereError("The outlet node number of " + cAlphaFields(15) + " is not found \"" + Alphas(15) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1122,7 +1124,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
 
                 // Get supplemental heating coil capacity to see if it is autosize
-                MSHeatPump(MSHPNum).DesignSuppHeatingCapacity = GetHeatingCoilCapacity(Alphas(14), Alphas(15), LocalError);
+                MSHeatPump(MSHPNum).DesignSuppHeatingCapacity = GetHeatingCoilCapacity(state, Alphas(14), Alphas(15), LocalError);
                 if (LocalError) {
                     ShowSevereError("The capacity " + cAlphaFields(15) + " is not found \"" + Alphas(15) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1139,7 +1141,7 @@ namespace HVACMultiSpeedHeatPump {
             if (UtilityRoutines::SameString(Alphas(14), "Coil:Heating:Electric")) {
                 MSHeatPump(MSHPNum).SuppHeatCoilType = SuppHeatingCoilElec;
                 errFlag = false;
-                MSHeatPump(MSHPNum).SuppHeatCoilNum = GetHeatingCoilIndex("Coil:Heating:Electric", Alphas(15), errFlag);
+                MSHeatPump(MSHPNum).SuppHeatCoilNum = GetHeatingCoilIndex(state, "Coil:Heating:Electric", Alphas(15), errFlag);
                 if (MSHeatPump(MSHPNum).SuppHeatCoilNum <= 0 || errFlag) {
                     ShowContinueError("Configuration error in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ShowContinueError(cAlphaFields(15) + " of type Coil:Heating:Electric \"" + Alphas(15) + "\" not found.");
@@ -1148,14 +1150,14 @@ namespace HVACMultiSpeedHeatPump {
 
                 // Get the Supplemental Heating Coil Node Numbers
                 LocalError = false;
-                SuppHeatCoilInletNode = GetHeatingCoilInletNode(Alphas(14), Alphas(15), LocalError);
+                SuppHeatCoilInletNode = GetHeatingCoilInletNode(state, Alphas(14), Alphas(15), LocalError);
                 if (LocalError) {
                     ShowSevereError("The inlet node number of " + cAlphaFields(15) + " is not found \"" + Alphas(15) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                SuppHeatCoilOutletNode = GetHeatingCoilOutletNode(Alphas(14), Alphas(15), LocalError);
+                SuppHeatCoilOutletNode = GetHeatingCoilOutletNode(state, Alphas(14), Alphas(15), LocalError);
                 if (LocalError) {
                     ShowSevereError("The outlet node number of " + cAlphaFields(15) + " is not found \"" + Alphas(15) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1164,7 +1166,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
 
                 // Get supplemental heating coil capacity to see if it is autosize
-                MSHeatPump(MSHPNum).DesignSuppHeatingCapacity = GetHeatingCoilCapacity(Alphas(14), Alphas(15), LocalError);
+                MSHeatPump(MSHPNum).DesignSuppHeatingCapacity = GetHeatingCoilCapacity(state, Alphas(14), Alphas(15), LocalError);
                 if (LocalError) {
                     ShowSevereError("The capacity " + cAlphaFields(15) + " is not found \"" + Alphas(15) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1208,7 +1210,7 @@ namespace HVACMultiSpeedHeatPump {
 
                     // Get the Supplemental Heating Coil Inlet Node
                     errFlag = false;
-                    SuppHeatCoilInletNode = GetWaterCoilInletNode("Coil:Heating:Water", MSHeatPump(MSHPNum).SuppHeatCoilName, errFlag);
+                    SuppHeatCoilInletNode = GetWaterCoilInletNode(state, "Coil:Heating:Water", MSHeatPump(MSHPNum).SuppHeatCoilName, errFlag);
                     MSHeatPump(MSHPNum).SuppCoilAirInletNode = SuppHeatCoilInletNode;
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHPNum).Name);
@@ -1217,7 +1219,7 @@ namespace HVACMultiSpeedHeatPump {
 
                     // Get the Supplemental Heating Coil Outlet Node
                     errFlag = false;
-                    SuppHeatCoilOutletNode = GetWaterCoilOutletNode("Coil:Heating:Water", MSHeatPump(MSHPNum).SuppHeatCoilName, errFlag);
+                    SuppHeatCoilOutletNode = GetWaterCoilOutletNode(state, "Coil:Heating:Water", MSHeatPump(MSHPNum).SuppHeatCoilName, errFlag);
                     MSHeatPump(MSHPNum).SuppCoilAirOutletNode = SuppHeatCoilOutletNode;
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHPNum).Name);
@@ -1560,7 +1562,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
             } else if (MSHeatPump(MSHPNum).HeatCoilType == Coil_HeatingElectric_MultiStage ||
                        MSHeatPump(MSHPNum).HeatCoilType == Coil_HeatingGas_MultiStage) {
-                i = GetHeatingCoilNumberOfStages(Alphas(10), Alphas(11), ErrorsFound);
+                i = GetHeatingCoilNumberOfStages(state, Alphas(10), Alphas(11), ErrorsFound);
                 if (MSHeatPump(MSHPNum).NumOfSpeedHeating != i) {
                     ShowSevereError("For " + CurrentModuleObject + " \"" + MSHeatPump(MSHPNum).Name + "\"");
                     ShowContinueError("The " + cNumericFields(9) + " is not equal to the number defined in " + cAlphaFields(11) + " = " + Alphas(11));
@@ -1725,7 +1727,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void InitMSHeatPump(int const MSHeatPumpNum,       // Engine driven heat pump number
+    void InitMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum,       // Engine driven heat pump number
                         bool const FirstHVACIteration, // TRUE if first HVAC iteration
                         int const AirLoopNum,          // air loop index
                         Real64 &QZnReq,                // Heating/Cooling load for all served zones
@@ -1856,7 +1858,8 @@ namespace HVACMultiSpeedHeatPump {
         if (MyPlantScantFlag(MSHeatPumpNum) && allocated(PlantLoop)) {
             if (MSHeatPump(MSHeatPumpNum).HeatRecActive) {
                 errFlag = false;
-                ScanPlantLoopsForObject(MSHeatPump(MSHeatPumpNum).Name,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        MSHeatPump(MSHeatPumpNum).Name,
                                         TypeOf_MultiSpeedHeatPumpRecovery,
                                         MSHeatPump(MSHeatPumpNum).HRLoopNum,
                                         MSHeatPump(MSHeatPumpNum).HRLoopSideNum,
@@ -1878,7 +1881,8 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingWater) {
                 errFlag = false;
-                ScanPlantLoopsForObject(MSHeatPump(MSHeatPumpNum).HeatCoilName,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                         TypeOf_CoilWaterSimpleHeating,
                                         MSHeatPump(MSHeatPumpNum).LoopNum,
                                         MSHeatPump(MSHeatPumpNum).LoopSide,
@@ -1914,7 +1918,8 @@ namespace HVACMultiSpeedHeatPump {
 
             } else if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingSteam) {
                 errFlag = false;
-                ScanPlantLoopsForObject(MSHeatPump(MSHeatPumpNum).HeatCoilName,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                         TypeOf_CoilSteamAirHeating,
                                         MSHeatPump(MSHeatPumpNum).LoopNum,
                                         MSHeatPump(MSHeatPumpNum).LoopSide,
@@ -1946,7 +1951,8 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == Coil_HeatingWater) {
                 errFlag = false;
-                ScanPlantLoopsForObject(MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
                                         TypeOf_CoilWaterSimpleHeating,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopNum,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopSide,
@@ -1982,7 +1988,8 @@ namespace HVACMultiSpeedHeatPump {
 
             } else if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == Coil_HeatingSteam) {
                 errFlag = false;
-                ScanPlantLoopsForObject(MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
                                         TypeOf_CoilSteamAirHeating,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopNum,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopSide,
@@ -2137,7 +2144,7 @@ namespace HVACMultiSpeedHeatPump {
             if (MSHeatPump(MSHeatPumpNum).CoilControlNode > 0) {
                 if (MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow == AutoSize) {
                     if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingWater) {
-                        SimulateWaterCoilComponents(
+                        SimulateWaterCoilComponents(state,
                             MSHeatPump(MSHeatPumpNum).HeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).HeatCoilNum);
 
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound);
@@ -2159,7 +2166,7 @@ namespace HVACMultiSpeedHeatPump {
                     }
                     if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingSteam) {
 
-                        SimulateSteamCoilComponents(MSHeatPump(MSHeatPumpNum).HeatCoilName,
+                        SimulateSteamCoilComponents(state, MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                                     FirstHVACIteration,
                                                     MSHeatPump(MSHeatPumpNum).HeatCoilNum,
                                                     1.0,
@@ -2185,7 +2192,7 @@ namespace HVACMultiSpeedHeatPump {
             if (MSHeatPump(MSHeatPumpNum).SuppCoilControlNode > 0) {
                 if (MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow == AutoSize) {
                     if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == Coil_HeatingWater) {
-                        SimulateWaterCoilComponents(
+                        SimulateWaterCoilComponents(state,
                             MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum);
 
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound);
@@ -2207,7 +2214,7 @@ namespace HVACMultiSpeedHeatPump {
                     }
                     if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == Coil_HeatingSteam) {
 
-                        SimulateSteamCoilComponents(MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
+                        SimulateSteamCoilComponents(state, MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
                                                     FirstHVACIteration,
                                                     MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum,
                                                     1.0,
@@ -2498,7 +2505,7 @@ namespace HVACMultiSpeedHeatPump {
         MSHeatPumpReport(MSHeatPumpNum).SpeedRatio = 0.0;
         MSHeatPumpReport(MSHeatPumpNum).SpeedNum = 0;
 
-        CalcMSHeatPump(MSHeatPumpNum, FirstHVACIteration, On, 1, 0.0, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+        CalcMSHeatPump(state, MSHeatPumpNum, FirstHVACIteration, On, 1, 0.0, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
 
         auto &e = MSHeatPump(MSHeatPumpNum);
         {
@@ -2564,7 +2571,7 @@ namespace HVACMultiSpeedHeatPump {
                                      MSHeatPump(MSHeatPumpNum).BranchNum,
                                      MSHeatPump(MSHeatPumpNum).CompNum);
                 //     simulate water coil to find operating capacity
-                SimulateWaterCoilComponents(
+                SimulateWaterCoilComponents(state,
                     MSHeatPump(MSHeatPumpNum).HeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).HeatCoilNum, QActual);
             } // from IF(MSHeatPump(MSHeatPumpNum)%HeatCoilType == Coil_HeatingWater) THEN
 
@@ -2582,7 +2589,7 @@ namespace HVACMultiSpeedHeatPump {
                                      MSHeatPump(MSHeatPumpNum).CompNum);
 
                 //     simulate steam coil to find operating capacity
-                SimulateSteamCoilComponents(MSHeatPump(MSHeatPumpNum).HeatCoilName,
+                SimulateSteamCoilComponents(state, MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                             FirstHVACIteration,
                                             MSHeatPump(MSHeatPumpNum).HeatCoilNum,
                                             1.0,
@@ -2601,7 +2608,7 @@ namespace HVACMultiSpeedHeatPump {
                                      MSHeatPump(MSHeatPumpNum).SuppBranchNum,
                                      MSHeatPump(MSHeatPumpNum).SuppCompNum);
                 //     simulate water coil to find operating capacity
-                SimulateWaterCoilComponents(
+                SimulateWaterCoilComponents(state,
                     MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum, QActual);
                 MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity = QActual;
 
@@ -2621,13 +2628,13 @@ namespace HVACMultiSpeedHeatPump {
                                      MSHeatPump(MSHeatPumpNum).SuppCompNum);
 
                 //     simulate steam coil to find operating capacity
-                SimulateSteamCoilComponents(MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
+                SimulateSteamCoilComponents(state, MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
                                             FirstHVACIteration,
                                             MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum,
                                             1.0,
                                             QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
                 MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity =
-                    GetSteamCoilCapacity("Coil:Heating:Steam", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound);
+                    GetSteamCoilCapacity(state, "Coil:Heating:Steam", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound);
 
             } // from IF(MSHeatPump(MSHeatPumpNum)%SuppHeatCoilType == Coil_HeatingSteam) THEN
         }     // from IF( FirstHVACIteration ) THEN
@@ -2815,7 +2822,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void ControlMSHPOutput(int const MSHeatPumpNum,       // Unit index of engine driven heat pump
+    void ControlMSHPOutput(EnergyPlusData &state, int const MSHeatPumpNum,       // Unit index of engine driven heat pump
                            bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                            int const CompOp,              // compressor operation; 1=on, 0=off
                            int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
@@ -2848,6 +2855,7 @@ namespace HVACMultiSpeedHeatPump {
         using DataGlobals::WarmupFlag;
         using General::RoundSigDigits;
         using General::SolveRoot;
+        using TempSolveRoot::SolveRoot;
         using General::TrimSigDigits;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using Psychrometrics::PsyCpAirFnW;
@@ -2891,7 +2899,7 @@ namespace HVACMultiSpeedHeatPump {
         if (GetCurrentScheduleValue(MSHeatPump(MSHeatPumpNum).AvaiSchedPtr) == 0.0) return;
 
         // Get result when DX coil is off
-        CalcMSHeatPump(
+        CalcMSHeatPump(state,
             MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, PartLoadFrac, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
 
         // If cooling and NoCompOutput < QZnReq, the coil needs to be off
@@ -2919,7 +2927,7 @@ namespace HVACMultiSpeedHeatPump {
             }
         }
 
-        CalcMSHeatPump(
+        CalcMSHeatPump(state,
             MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, PartLoadFrac, FullOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
 
         if (QZnReq < (-1.0 * SmallLoad)) {
@@ -2965,11 +2973,11 @@ namespace HVACMultiSpeedHeatPump {
 
             // heating
             if (QZnReq > SmallLoad && QZnReq < FullOutput) {
-                CalcMSHeatPump(MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 0.0, TempOutput0, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+                CalcMSHeatPump(state, MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 0.0, TempOutput0, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
 
                 for (int i = 1; i <= MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating; ++i) {
                     if (i == 1) {
-                        CalcMSHeatPump(MSHeatPumpNum,
+                        CalcMSHeatPump(state, MSHeatPumpNum,
                                        FirstHVACIteration,
                                        CompOp,
                                        i,
@@ -2982,7 +2990,7 @@ namespace HVACMultiSpeedHeatPump {
                         if (QZnReq <= MSHeatPump(MSHeatPumpNum).FullOutput(i)) {
                             SpeedNum = i;
                             PartLoadFrac = (QZnReq - TempOutput0) / (MSHeatPump(MSHeatPumpNum).FullOutput(i) - TempOutput0);
-                            CalcMSHeatPump(MSHeatPumpNum,
+                            CalcMSHeatPump(state, MSHeatPumpNum,
                                            FirstHVACIteration,
                                            CompOp,
                                            i,
@@ -2995,7 +3003,7 @@ namespace HVACMultiSpeedHeatPump {
                             break;
                         }
                     } else {
-                        CalcMSHeatPump(MSHeatPumpNum,
+                        CalcMSHeatPump(state, MSHeatPumpNum,
                                        FirstHVACIteration,
                                        CompOp,
                                        i,
@@ -3010,7 +3018,7 @@ namespace HVACMultiSpeedHeatPump {
                             PartLoadFrac = 1.0;
                             SpeedRatio = (QZnReq - MSHeatPump(MSHeatPumpNum).FullOutput(i - 1)) /
                                          (MSHeatPump(MSHeatPumpNum).FullOutput(i) - MSHeatPump(MSHeatPumpNum).FullOutput(i - 1));
-                            CalcMSHeatPump(
+                            CalcMSHeatPump(state,
                                 MSHeatPumpNum, FirstHVACIteration, CompOp, i, SpeedRatio, 1.0, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
                             break;
                         }
@@ -3020,10 +3028,10 @@ namespace HVACMultiSpeedHeatPump {
 
             // Coolling
             if (QZnReq < (-1.0 * SmallLoad) && QZnReq > FullOutput) {
-                CalcMSHeatPump(MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 0.0, TempOutput0, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+                CalcMSHeatPump(state, MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 0.0, TempOutput0, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
                 for (int i = 1; i <= MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling; ++i) {
                     if (i == 1) {
-                        CalcMSHeatPump(MSHeatPumpNum,
+                        CalcMSHeatPump(state, MSHeatPumpNum,
                                        FirstHVACIteration,
                                        CompOp,
                                        i,
@@ -3036,7 +3044,7 @@ namespace HVACMultiSpeedHeatPump {
                         if (QZnReq >= MSHeatPump(MSHeatPumpNum).FullOutput(i)) {
                             SpeedNum = i;
                             PartLoadFrac = (QZnReq - TempOutput0) / (MSHeatPump(MSHeatPumpNum).FullOutput(i) - TempOutput0);
-                            CalcMSHeatPump(MSHeatPumpNum,
+                            CalcMSHeatPump(state, MSHeatPumpNum,
                                            FirstHVACIteration,
                                            CompOp,
                                            i,
@@ -3049,7 +3057,7 @@ namespace HVACMultiSpeedHeatPump {
                             break;
                         }
                     } else {
-                        CalcMSHeatPump(MSHeatPumpNum,
+                        CalcMSHeatPump(state, MSHeatPumpNum,
                                        FirstHVACIteration,
                                        CompOp,
                                        i,
@@ -3064,7 +3072,7 @@ namespace HVACMultiSpeedHeatPump {
                             PartLoadFrac = 1.0;
                             SpeedRatio = (QZnReq - MSHeatPump(MSHeatPumpNum).FullOutput(i - 1)) /
                                          (MSHeatPump(MSHeatPumpNum).FullOutput(i) - MSHeatPump(MSHeatPumpNum).FullOutput(i - 1));
-                            CalcMSHeatPump(
+                            CalcMSHeatPump(state,
                                 MSHeatPumpNum, FirstHVACIteration, CompOp, i, SpeedRatio, 1.0, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
                             break;
                         }
@@ -3089,11 +3097,11 @@ namespace HVACMultiSpeedHeatPump {
                 Par(7) = SupHeaterLoad;
                 Par(9) = CompOp;
                 // Check whether the low speed coil can meet the load or not
-                CalcMSHeatPump(MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+                CalcMSHeatPump(state, MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
                 if ((QZnReq > 0.0 && QZnReq <= LowOutput) || (QZnReq < 0.0 && QZnReq >= LowOutput)) {
                     SpeedRatio = 0.0;
                     SpeedNum = 1;
-                    SolveRoot(ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
+                    SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
                     if (SolFla == -1) {
                         if (!WarmupFlag) {
                             if (ErrCountCyc == 0) {
@@ -3121,7 +3129,7 @@ namespace HVACMultiSpeedHeatPump {
                     SpeedRatio = 1.0;
                     if (QZnReq < (-1.0 * SmallLoad)) { // Cooling
                         for (i = 2; i <= MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling; ++i) {
-                            CalcMSHeatPump(MSHeatPumpNum,
+                            CalcMSHeatPump(state, MSHeatPumpNum,
                                            FirstHVACIteration,
                                            CompOp,
                                            i,
@@ -3138,7 +3146,7 @@ namespace HVACMultiSpeedHeatPump {
                         }
                     } else {
                         for (i = 2; i <= MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating; ++i) {
-                            CalcMSHeatPump(MSHeatPumpNum,
+                            CalcMSHeatPump(state, MSHeatPumpNum,
                                            FirstHVACIteration,
                                            CompOp,
                                            i,
@@ -3155,7 +3163,7 @@ namespace HVACMultiSpeedHeatPump {
                         }
                     }
                     Par(8) = SpeedNum;
-                    SolveRoot(ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par);
+                    SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par);
                     if (SolFla == -1) {
                         if (!WarmupFlag) {
                             if (ErrCountVar == 0) {
@@ -3197,10 +3205,10 @@ namespace HVACMultiSpeedHeatPump {
                     SpeedNum = std::abs(MSHeatPump(MSHeatPumpNum).StageNum);
                     Par(8) = SpeedNum;
                     if (SpeedNum == 1) {
-                        CalcMSHeatPump(MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+                        CalcMSHeatPump(state, MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
                         SpeedRatio = 0.0;
                         if ((QZnReq > 0.0 && QZnReq <= LowOutput) || (QZnReq < 0.0 && QZnReq >= LowOutput)) {
-                            SolveRoot(ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
+                            SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
                             if (SolFla == -1) {
                                 if (!WarmupFlag) {
                                     if (ErrCountCyc == 0) {
@@ -3232,14 +3240,14 @@ namespace HVACMultiSpeedHeatPump {
                         } else {
                             SpeedNum = min(MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating, std::abs(MSHeatPump(MSHeatPumpNum).StageNum));
                         }
-                        CalcMSHeatPump(
+                        CalcMSHeatPump(state,
                             MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
                         if ((QZnReq > 0.0 && QZnReq >= LowOutput) || (QZnReq < 0.0 && QZnReq <= LowOutput)) {
-                            CalcMSHeatPump(
+                            CalcMSHeatPump(state,
                                 MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, 1.0, 1.0, FullOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
                             if ((QZnReq > 0.0 && QZnReq <= FullOutput) || (QZnReq < 0.0 && QZnReq >= FullOutput)) {
                                 Par(8) = SpeedNum;
-                                SolveRoot(ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par);
+                                SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
                                     if (!WarmupFlag) {
                                         if (ErrCountVar == 0) {
@@ -3285,7 +3293,7 @@ namespace HVACMultiSpeedHeatPump {
             } else {
                 SupHeaterLoad = 0.0;
             }
-            CalcMSHeatPump(
+            CalcMSHeatPump(state,
                 MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
         }
 
@@ -3294,7 +3302,7 @@ namespace HVACMultiSpeedHeatPump {
 
             //   If the supply air temperature is to high, turn off the supplemental heater to recalculate the outlet temperature
             SupHeaterLoad = 0.0;
-            CalcNonDXHeatingCoils(MSHeatPumpNum, FirstHVACIteration, SupHeaterLoad, OpMode, QCoilActual);
+            CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, SupHeaterLoad, OpMode, QCoilActual);
 
             //   If the outlet temperature is below the maximum supplemental heater supply air temperature, reduce the load passed to
             //   the supplemental heater, otherwise leave the supplemental heater off. If the supplemental heater is to be turned on,
@@ -3317,7 +3325,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void CalcMSHeatPump(int const MSHeatPumpNum,       // Engine driven heat pump number
+    void CalcMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum,       // Engine driven heat pump number
                         bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                         int const CompOp,              // Compressor on/off; 1=on, 0=off
                         int const SpeedNum,            // Speed number
@@ -3410,10 +3418,10 @@ namespace HVACMultiSpeedHeatPump {
         AirMassFlow = Node(InletNode).MassFlowRate;
         // if blow through, simulate fan then coils
         if (MSHeatPump(MSHeatPumpNum).FanPlaceType == BlowThru) {
-            SimulateFanComponents(MSHeatPump(MSHeatPumpNum).FanName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).FanNum, FanSpeedRatio);
+            SimulateFanComponents(state, MSHeatPump(MSHeatPumpNum).FanName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).FanNum, FanSpeedRatio);
             if (QZnReq < (-1.0 * SmallLoad)) {
                 if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorCooling) {
-                    SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
+                    SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                         SpeedRatio,
                                         PartLoadFrac,
                                         MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex,
@@ -3423,7 +3431,7 @@ namespace HVACMultiSpeedHeatPump {
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
                 } else {
-                    SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
+                    SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                         0.0,
                                         0.0,
                                         MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex,
@@ -3433,7 +3441,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
                 SaveCompressorPLR = DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex);
             } else {
-                SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
+                SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                     0.0,
                                     0.0,
                                     MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex,
@@ -3444,7 +3452,7 @@ namespace HVACMultiSpeedHeatPump {
             if (MSHeatPump(MSHeatPumpNum).HeatCoilType == MultiSpeedHeatingCoil) {
                 if (QZnReq > SmallLoad) {
                     if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorHeating) {
-                        SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
+                        SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                             SpeedRatio,
                                             PartLoadFrac,
                                             MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex,
@@ -3454,7 +3462,7 @@ namespace HVACMultiSpeedHeatPump {
                         SavePartloadRatio = PartLoadFrac;
                         SaveSpeedRatio = SpeedRatio;
                     } else {
-                        SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
+                        SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                             0.0,
                                             0.0,
                                             MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex,
@@ -3464,7 +3472,7 @@ namespace HVACMultiSpeedHeatPump {
                     }
                     SaveCompressorPLR = DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex);
                 } else {
-                    SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
+                    SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                         0.0,
                                         0.0,
                                         MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex,
@@ -3475,7 +3483,7 @@ namespace HVACMultiSpeedHeatPump {
             } else if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingElectric_MultiStage ||
                        MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingGas_MultiStage) {
                 if (QZnReq > SmallLoad) {
-                    SimulateHeatingCoilComponents(MSHeatPump(MSHeatPumpNum).HeatCoilName,
+                    SimulateHeatingCoilComponents(state, MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                                   FirstHVACIteration,
                                                   _,
                                                   0,
@@ -3486,17 +3494,17 @@ namespace HVACMultiSpeedHeatPump {
                                                   SpeedNum,
                                                   SpeedRatio);
                 } else {
-                    SimulateHeatingCoilComponents(
+                    SimulateHeatingCoilComponents(state,
                         MSHeatPump(MSHeatPumpNum).HeatCoilName, FirstHVACIteration, _, 0, _, _, MSHeatPump(MSHeatPumpNum).OpMode, 0.0, SpeedNum, 0.0);
                 }
             } else {
-                CalcNonDXHeatingCoils(MSHeatPumpNum, FirstHVACIteration, QZnReq, MSHeatPump(MSHeatPumpNum).OpMode, QCoilActual, PartLoadFrac);
+                CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, QZnReq, MSHeatPump(MSHeatPumpNum).OpMode, QCoilActual, PartLoadFrac);
             }
             // Call twice to ensure the fan outlet conditions are updated
-            SimulateFanComponents(MSHeatPump(MSHeatPumpNum).FanName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).FanNum, FanSpeedRatio);
+            SimulateFanComponents(state, MSHeatPump(MSHeatPumpNum).FanName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).FanNum, FanSpeedRatio);
             if (QZnReq < (-1.0 * SmallLoad)) {
                 if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorCooling) {
-                    SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
+                    SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                         SpeedRatio,
                                         PartLoadFrac,
                                         MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex,
@@ -3506,7 +3514,7 @@ namespace HVACMultiSpeedHeatPump {
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
                 } else {
-                    SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
+                    SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                         0.0,
                                         0.0,
                                         MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex,
@@ -3516,7 +3524,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
                 SaveCompressorPLR = DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex);
             } else {
-                SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
+                SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                     0.0,
                                     0.0,
                                     MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex,
@@ -3527,7 +3535,7 @@ namespace HVACMultiSpeedHeatPump {
             if (MSHeatPump(MSHeatPumpNum).HeatCoilType == MultiSpeedHeatingCoil) {
                 if (QZnReq > SmallLoad) {
                     if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorHeating) {
-                        SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
+                        SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                             SpeedRatio,
                                             PartLoadFrac,
                                             MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex,
@@ -3537,7 +3545,7 @@ namespace HVACMultiSpeedHeatPump {
                         SavePartloadRatio = PartLoadFrac;
                         SaveSpeedRatio = SpeedRatio;
                     } else {
-                        SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
+                        SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                             0.0,
                                             0.0,
                                             MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex,
@@ -3547,7 +3555,7 @@ namespace HVACMultiSpeedHeatPump {
                     }
                     SaveCompressorPLR = DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex);
                 } else {
-                    SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
+                    SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                         0.0,
                                         0.0,
                                         MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex,
@@ -3558,7 +3566,7 @@ namespace HVACMultiSpeedHeatPump {
             } else if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingElectric_MultiStage ||
                        MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingGas_MultiStage) {
                 if (QZnReq > SmallLoad) {
-                    SimulateHeatingCoilComponents(MSHeatPump(MSHeatPumpNum).HeatCoilName,
+                    SimulateHeatingCoilComponents(state, MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                                   FirstHVACIteration,
                                                   _,
                                                   0,
@@ -3569,20 +3577,20 @@ namespace HVACMultiSpeedHeatPump {
                                                   SpeedNum,
                                                   SpeedRatio);
                 } else {
-                    SimulateHeatingCoilComponents(
+                    SimulateHeatingCoilComponents(state,
                         MSHeatPump(MSHeatPumpNum).HeatCoilName, FirstHVACIteration, _, 0, _, _, MSHeatPump(MSHeatPumpNum).OpMode, 0.0, SpeedNum, 0.0);
                 }
             } else {
-                CalcNonDXHeatingCoils(MSHeatPumpNum, FirstHVACIteration, QZnReq, MSHeatPump(MSHeatPumpNum).OpMode, QCoilActual, PartLoadFrac);
+                CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, QZnReq, MSHeatPump(MSHeatPumpNum).OpMode, QCoilActual, PartLoadFrac);
             }
             //  Simulate supplemental heating coil for blow through fan
             if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum > 0) {
-                CalcNonDXHeatingCoils(MSHeatPumpNum, FirstHVACIteration, SupHeaterLoad, MSHeatPump(MSHeatPumpNum).OpMode, QCoilActual);
+                CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, SupHeaterLoad, MSHeatPump(MSHeatPumpNum).OpMode, QCoilActual);
             }
         } else { // otherwise simulate DX coils then fan then supplemental heater
             if (QZnReq < (-1.0 * SmallLoad)) {
                 if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorCooling) {
-                    SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
+                    SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                         SpeedRatio,
                                         PartLoadFrac,
                                         MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex,
@@ -3592,7 +3600,7 @@ namespace HVACMultiSpeedHeatPump {
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
                 } else {
-                    SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
+                    SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                         0.0,
                                         0.0,
                                         MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex,
@@ -3602,7 +3610,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
                 SaveCompressorPLR = DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex);
             } else {
-                SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
+                SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                     0.0,
                                     0.0,
                                     MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex,
@@ -3613,7 +3621,7 @@ namespace HVACMultiSpeedHeatPump {
             if (MSHeatPump(MSHeatPumpNum).HeatCoilType == MultiSpeedHeatingCoil) {
                 if (QZnReq > SmallLoad) {
                     if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorHeating) {
-                        SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
+                        SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                             SpeedRatio,
                                             PartLoadFrac,
                                             MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex,
@@ -3623,7 +3631,7 @@ namespace HVACMultiSpeedHeatPump {
                         SavePartloadRatio = PartLoadFrac;
                         SaveSpeedRatio = SpeedRatio;
                     } else {
-                        SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
+                        SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                             0.0,
                                             0.0,
                                             MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex,
@@ -3633,7 +3641,7 @@ namespace HVACMultiSpeedHeatPump {
                     }
                     SaveCompressorPLR = DXCoilPartLoadRatio(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex);
                 } else {
-                    SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
+                    SimDXCoilMultiSpeed(state, MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                         0.0,
                                         0.0,
                                         MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex,
@@ -3644,7 +3652,7 @@ namespace HVACMultiSpeedHeatPump {
             } else if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingElectric_MultiStage ||
                        MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingGas_MultiStage) {
                 if (QZnReq > SmallLoad) {
-                    SimulateHeatingCoilComponents(MSHeatPump(MSHeatPumpNum).HeatCoilName,
+                    SimulateHeatingCoilComponents(state, MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                                   FirstHVACIteration,
                                                   _,
                                                   0,
@@ -3655,16 +3663,16 @@ namespace HVACMultiSpeedHeatPump {
                                                   SpeedNum,
                                                   SpeedRatio);
                 } else {
-                    SimulateHeatingCoilComponents(
+                    SimulateHeatingCoilComponents(state,
                         MSHeatPump(MSHeatPumpNum).HeatCoilName, FirstHVACIteration, _, 0, _, _, MSHeatPump(MSHeatPumpNum).OpMode, 0.0, SpeedNum, 0.0);
                 }
             } else {
-                CalcNonDXHeatingCoils(MSHeatPumpNum, FirstHVACIteration, QZnReq, MSHeatPump(MSHeatPumpNum).OpMode, QCoilActual, PartLoadFrac);
+                CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, QZnReq, MSHeatPump(MSHeatPumpNum).OpMode, QCoilActual, PartLoadFrac);
             }
-            SimulateFanComponents(MSHeatPump(MSHeatPumpNum).FanName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).FanNum, FanSpeedRatio);
+            SimulateFanComponents(state, MSHeatPump(MSHeatPumpNum).FanName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).FanNum, FanSpeedRatio);
             //  Simulate supplemental heating coil for draw through fan
             if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum > 0) {
-                CalcNonDXHeatingCoils(MSHeatPumpNum, FirstHVACIteration, SupHeaterLoad, MSHeatPump(MSHeatPumpNum).OpMode, QCoilActual);
+                CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, SupHeaterLoad, MSHeatPump(MSHeatPumpNum).OpMode, QCoilActual);
             }
         }
 
@@ -3680,7 +3688,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    Real64 MSHPCyclingResidual(Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MSHPCyclingResidual(EnergyPlusData &state, Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
@@ -3749,7 +3757,7 @@ namespace HVACMultiSpeedHeatPump {
         SupHeaterLoad = Par(7);
         CompOp = int(Par(9));
 
-        CalcMSHeatPump(MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, PartLoadFrac, ActualOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+        CalcMSHeatPump(state, MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, PartLoadFrac, ActualOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
 
         MSHPCyclingResidual = (ActualOutput - QZnReq) / QZnReq;
         return MSHPCyclingResidual;
@@ -3757,7 +3765,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    Real64 MSHPVarSpeedResidual(Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MSHPVarSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                 Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
@@ -3829,7 +3837,7 @@ namespace HVACMultiSpeedHeatPump {
         SpeedNum = int(Par(8));
         CompOp = int(Par(9));
 
-        CalcMSHeatPump(MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, 1.0, ActualOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+        CalcMSHeatPump(state, MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, 1.0, ActualOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
 
         MSHPVarSpeedResidual = (ActualOutput - QZnReq) / QZnReq;
         return MSHPVarSpeedResidual;
@@ -4153,7 +4161,7 @@ namespace HVACMultiSpeedHeatPump {
         }
     }
 
-    void CalcNonDXHeatingCoils(int const MSHeatPumpNum,       // multispeed heatpump index
+    void CalcNonDXHeatingCoils(EnergyPlusData &state, int const MSHeatPumpNum,       // multispeed heatpump index
                                bool const FirstHVACIteration, // flag for first HVAC iteration in the time step
                                Real64 const HeatingLoad,      // supplemental coil load to be met by unit (watts)
                                int const FanMode,             // fan operation mode
@@ -4183,6 +4191,7 @@ namespace HVACMultiSpeedHeatPump {
         using DataHVACGlobals::SmallLoad;
         using General::RoundSigDigits;
         using General::SolveRoot;
+        using TempSolveRoot::SolveRoot;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -4264,16 +4273,16 @@ namespace HVACMultiSpeedHeatPump {
             {
                 auto const SELECT_CASE_var(HeatCoilType);
                 if ((SELECT_CASE_var == SuppHeatingCoilGas) || (SELECT_CASE_var == SuppHeatingCoilElec)) {
-                    SimulateHeatingCoilComponents(HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
+                    SimulateHeatingCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
                 } else if (SELECT_CASE_var == Coil_HeatingWater) {
                     if (present(PartLoadFrac)) {
                         MaxHotWaterFlow = MaxCoilFluidFlow * PartLoadFrac;
                         SetComponentFlowRate(MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
-                        SimulateWaterCoilComponents(HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+                        SimulateWaterCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                     } else {
                         MaxHotWaterFlow = MaxCoilFluidFlow;
                         SetComponentFlowRate(MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
-                        SimulateWaterCoilComponents(HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+                        SimulateWaterCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                         if (QCoilActual > (HeatingLoad + SmallLoad)) {
                             // control water flow to obtain output matching HeatingLoad
                             SolFlag = 0;
@@ -4285,7 +4294,7 @@ namespace HVACMultiSpeedHeatPump {
                                 Par(2) = 0.0;
                             }
                             Par(3) = HeatingLoad;
-                            SolveRoot(ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
+                            SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
                             if (SolFlag == -1) {
                                 if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex == 0) {
                                     ShowWarningMessage("CalcNonDXHeatingCoils: Hot water coil control failed for " + CurrentModuleObject + "=\"" +
@@ -4317,7 +4326,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                "[kg/s]");
                             }
                             // simulate hot water supplemental heating coil
-                            SimulateWaterCoilComponents(HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+                            SimulateWaterCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                         }
                     }
                 } else if (SELECT_CASE_var == Coil_HeatingSteam) {
@@ -4330,7 +4339,7 @@ namespace HVACMultiSpeedHeatPump {
                     }
                     SetComponentFlowRate(mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
                     // simulate steam supplemental heating coil
-                    SimulateSteamCoilComponents(HeatCoilName, FirstHVACIteration, HeatCoilNum, SteamCoilHeatingLoad, QCoilActual, FanMode);
+                    SimulateSteamCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, SteamCoilHeatingLoad, QCoilActual, FanMode);
                 }
             }
 
@@ -4339,23 +4348,23 @@ namespace HVACMultiSpeedHeatPump {
             {
                 auto const SELECT_CASE_var(HeatCoilType);
                 if ((SELECT_CASE_var == SuppHeatingCoilGas) || (SELECT_CASE_var == SuppHeatingCoilElec)) {
-                    SimulateHeatingCoilComponents(HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
+                    SimulateHeatingCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
                 } else if (SELECT_CASE_var == Coil_HeatingWater) {
                     mdot = 0.0;
                     SetComponentFlowRate(mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
-                    SimulateWaterCoilComponents(HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+                    SimulateWaterCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                 } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                     mdot = 0.0;
                     SetComponentFlowRate(mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
                     // simulate the steam supplemental heating coil
-                    SimulateSteamCoilComponents(HeatCoilName, FirstHVACIteration, HeatCoilNum, HeatingLoad, QCoilActual, FanMode);
+                    SimulateSteamCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, HeatingLoad, QCoilActual, FanMode);
                 }
             }
         }
         HeatCoilLoadmet = QCoilActual;
     }
 
-    Real64 HotWaterCoilResidual(Real64 const HWFlow,       // hot water flow rate in kg/s
+    Real64 HotWaterCoilResidual(EnergyPlusData &state, Real64 const HWFlow,       // hot water flow rate in kg/s
                                 Array1D<Real64> const &Par // Par(5) is the requested coil load
     )
     {
@@ -4417,7 +4426,7 @@ namespace HVACMultiSpeedHeatPump {
                              MSHeatPump(MSHeatPumpNum).HotWaterBranchNum,
                              MSHeatPump(MSHeatPumpNum).HotWaterCompNum);
         // simulate the hot water supplemental heating coil
-        SimulateWaterCoilComponents(MSHeatPump(MSHeatPumpNum).HotWaterCoilName,
+        SimulateWaterCoilComponents(state, MSHeatPump(MSHeatPumpNum).HotWaterCoilName,
                                     FirstHVACSoln,
                                     MSHeatPump(MSHeatPumpNum).HotWaterCoilNum,
                                     QCoilActual,

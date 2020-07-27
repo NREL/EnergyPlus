@@ -66,6 +66,7 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -107,7 +108,7 @@ void initializeElectricPowerServiceZoneGains() // namespace routine for handling
     }
 }
 
-void ElectricPowerServiceManager::manageElectricPowerService(
+void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &state,
     bool const firstHVACIteration,
     bool &SimElecCircuits,      // simulation convergence flag
     bool const UpdateMetersOnly // if true then don't resimulate generators, just update meters.
@@ -152,7 +153,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(
     }
 
     for (auto &e : elecLoadCenterObjs) {
-        e->manageElecLoadCenter(firstHVACIteration, wholeBldgRemainingLoad_);
+        e->manageElecLoadCenter(state, firstHVACIteration, wholeBldgRemainingLoad_);
     }
 
     updateWholeBuildingRecords();
@@ -1007,13 +1008,13 @@ ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
     }
 }
 
-void ElectPowerLoadCenter::manageElecLoadCenter(bool const firstHVACIteration, Real64 &remainingWholePowerDemand)
+void ElectPowerLoadCenter::manageElecLoadCenter(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingWholePowerDemand)
 {
     //
     subpanelFeedInRequest = remainingWholePowerDemand;
 
     if (generatorsPresent_) {
-        dispatchGenerators(firstHVACIteration, remainingWholePowerDemand);
+        dispatchGenerators(state, firstHVACIteration, remainingWholePowerDemand);
 
     } // if generators present
     updateLoadCenterGeneratorRecords();
@@ -1046,7 +1047,7 @@ void ElectPowerLoadCenter::manageElecLoadCenter(bool const firstHVACIteration, R
     updateLoadCenterGeneratorRecords();
 }
 
-void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
+void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const firstHVACIteration,
                                               Real64 &remainingWholePowerDemand // power request in, remaining unmet request out
 )
 {
@@ -1093,7 +1094,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
             }
 
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             totalPowerRequest_ += g->powerRequestThisTimestep;
             remainingWholePowerDemand -= g->electProdRate; // Update whole building remaining load
@@ -1140,7 +1141,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
             }
 
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             if (g->eMSRequestOn) {
                 totalPowerRequest_ += max(g->eMSPowerRequest, 0.0);
@@ -1193,7 +1194,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
             }
 
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             if (g->eMSRequestOn) {
                 totalPowerRequest_ += max(g->eMSPowerRequest, 0.0);
@@ -1249,7 +1250,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
             }
 
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             if (g->eMSRequestOn) {
                 totalPowerRequest_ += max(g->eMSPowerRequest, 0.0);
@@ -1306,7 +1307,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
             }
 
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             if (g->eMSRequestOn) {
                 totalPowerRequest_ += max(g->eMSPowerRequest, 0.0);
@@ -1323,7 +1324,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
     }
     case GeneratorOpScheme::thermalFollow: {
         // Turn thermal load into an electrical load for cogenerators controlled to follow heat loads
-        Real64 remainingThermalLoad = calcLoadCenterThermalLoad();
+        Real64 remainingThermalLoad = calcLoadCenterThermalLoad(state.dataBranchInputManager);
         Real64 loadCenterThermalLoad = remainingThermalLoad;
         for (auto &g : elecGenCntrlObj) {
 
@@ -1358,7 +1359,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
             }
 
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             if (g->eMSRequestOn) {
                 totalThermalPowerRequest_ += (max(g->eMSPowerRequest, 0.0)) * g->nominalThermElectRatio;
@@ -1386,7 +1387,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
     case GeneratorOpScheme::thermalFollowLimitElectrical: {
         //  Turn a thermal load into an electrical load for cogenerators controlled to follow heat loads.
         //  Add intitialization of RemainingThermalLoad as in the ThermalFollow operating scheme above.
-        Real64 remainingThermalLoad = calcLoadCenterThermalLoad();
+        Real64 remainingThermalLoad = calcLoadCenterThermalLoad(state.dataBranchInputManager);
         // Total current electrical demand for the building is a secondary limit.
         remainingLoad = remainingWholePowerDemand;
         loadCenterElectricLoad = remainingWholePowerDemand;
@@ -1421,7 +1422,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
                 }
             }
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             if (g->eMSRequestOn) {
                 totalThermalPowerRequest_ += (max(g->eMSPowerRequest, 0.0)) * g->nominalThermElectRatio;
@@ -1928,13 +1929,14 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords()
     }
 }
 
-Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad()
+Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(BranchInputManagerData &dataBranchInputManager)
 {
     if (myCoGenSetupFlag_) {
         bool plantNotFound = false;
         for (auto &g : elecGenCntrlObj) {
             plantNotFound = false;
-            PlantUtilities::ScanPlantLoopsForObject(g->compPlantName,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    g->compPlantName,
                                                     g->compPlantTypeOf_Num,
                                                     g->cogenLocation.loopNum,
                                                     g->cogenLocation.loopSideNum,
@@ -2086,7 +2088,7 @@ void GeneratorController::reinitAtBeginEnvironment()
     thermProdRate = 0.0;
 }
 
-void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
+void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool const runFlag,
                                                      Real64 const myElecLoadRequest,
                                                      bool const FirstHVACIteration, // Unused 2010 JANUARY
                                                      Real64 &electricPowerOutput,   // Actual generator electric power output
@@ -2104,7 +2106,7 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
         Real64 tempLoad = myElecLoadRequest;
 
         // simulate
-        dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->InitICEngineGenerators(runFlag, FirstHVACIteration);
+        dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->InitICEngineGenerators(state.dataBranchInputManager, runFlag, FirstHVACIteration);
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->CalcICEngineGeneratorModel(runFlag, tempLoad);
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->update();
         electProdRate = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecPowerGenerated;
@@ -2123,8 +2125,8 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
         Real64 tempLoad = myElecLoadRequest;
 
         // simulate
-        thisCTE->simulate(L, FirstHVACIteration, tempLoad, runFlag);
-        dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->InitCTGenerators(runFlag, FirstHVACIteration);
+        thisCTE->simulate(state, L, FirstHVACIteration, tempLoad, runFlag);
+        dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->InitCTGenerators(state.dataBranchInputManager, runFlag, FirstHVACIteration);
         dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->CalcCTGeneratorModel(runFlag, tempLoad, FirstHVACIteration);
         electProdRate = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->ElecPowerGenerated;
         electricityProd = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->ElecEnergyGenerated;
@@ -2152,7 +2154,7 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
     }
     case GeneratorType::fuelCell: {
         auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(name);
-        dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->SimFuelCellGenerator(runFlag, myElecLoadRequest, FirstHVACIteration);
+        dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->SimFuelCellGenerator(state.dataBranchInputManager, runFlag, myElecLoadRequest, FirstHVACIteration);
         electProdRate = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.ACPowerGen;
         electricityProd = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.ACEnergyGen;
         thermProdRate = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.qHX;
@@ -2165,7 +2167,7 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
         auto thisMCHP = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(name);
 
         // simulate
-        dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->InitMicroCHPNoNormalizeGenerators();
+        dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->InitMicroCHPNoNormalizeGenerators(state.dataBranchInputManager);
 
         if (!DataPlant::PlantFirstSizeCompleted) break;
 
@@ -2193,7 +2195,7 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
         Real64 tempLoad = myElecLoadRequest;
 
         // simulate
-        dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->InitMTGenerators(runFlag, tempLoad, FirstHVACIteration);
+        dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->InitMTGenerators(state.dataBranchInputManager, runFlag, tempLoad, FirstHVACIteration);
         dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->CalcMTGeneratorModel(runFlag, tempLoad);
         dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->UpdateMTGeneratorRecords();
         electProdRate = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->ElecPowerGenerated;

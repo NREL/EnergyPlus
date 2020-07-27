@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2711,6 +2711,8 @@
   Output:Variable,AbsorberSteamOutletNode,System Node Temperature,timestep;
 
   Output:Variable,*,Boiler Heating Rate,timestep;
+
+  Output:Variable,*,Boiler Steam Efficiency,timestep;
 
   Output:Variable,Steam Boiler Plant Boiler Inlet Node,System Node Mass Flow Rate,timestep;
 

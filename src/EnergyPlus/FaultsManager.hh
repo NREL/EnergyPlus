@@ -56,6 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace FaultsManager {
 
@@ -278,7 +280,7 @@ namespace FaultsManager {
         virtual ~FaultPropertiesAirFilter() = default;
 
     public:
-        bool CheckFaultyAirFilterFanCurve();
+        bool CheckFaultyAirFilterFanCurve(EnergyPlusData &state);
     };
 
     struct FaultPropertiesCoilSAT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CoilSupplyAir
@@ -413,7 +415,7 @@ namespace FaultsManager {
 
     // Functions
 
-    void CheckAndReadFaults();
+    void CheckAndReadFaults(EnergyPlusData &state);
 
     void clear_state();
 

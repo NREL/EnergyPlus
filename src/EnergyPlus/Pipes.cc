@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -107,9 +108,6 @@ namespace Pipes {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    int NumLocalPipes(0);
-    bool GetPipeInputFlag(true);
-
     // SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
 
     // Object Data
@@ -119,18 +117,16 @@ namespace Pipes {
     // Functions
     void clear_state()
     {
-        NumLocalPipes = 0;
-        GetPipeInputFlag = true;
         LocalPipe.deallocate();
         LocalPipeUniqueNames.clear();
     }
 
-    PlantComponent *LocalPipeData::factory(int objectType, std::string objectName)
+    PlantComponent *LocalPipeData::factory(PipesData &pipes, int objectType, std::string objectName)
     {
         // Process the input data for pipes if it hasn't been done already
-        if (GetPipeInputFlag) {
-            GetPipeInput();
-            GetPipeInputFlag = false;
+        if (pipes.GetPipeInputFlag) {
+            GetPipeInput(pipes);
+            pipes.GetPipeInputFlag = false;
         }
         // Now look for this particular pipe in the list
         for (auto &pipe : LocalPipe) {
@@ -144,7 +140,7 @@ namespace Pipes {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void LocalPipeData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void LocalPipeData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                  bool const EP_UNUSED(FirstHVACIteration),
                                  Real64 &EP_UNUSED(CurLoad),
                                  bool const EP_UNUSED(RunFlag))
@@ -152,7 +148,7 @@ namespace Pipes {
         if (this->OneTimeInit) {
             int FoundOnLoop = 0;
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(
+            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
                 this->Name, this->TypeOf, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, errFlag, _, _, FoundOnLoop, _, _);
             if (FoundOnLoop == 0) {
                 ShowFatalError("SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop."); // LCOV_EXCL_LINE
@@ -180,7 +176,7 @@ namespace Pipes {
         PlantUtilities::SafeCopyPlantNode(this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
     }
 
-    void GetPipeInput()
+    void GetPipeInput(PipesData &pipes)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -213,9 +209,9 @@ namespace Pipes {
         // GET NUMBER OF ALL EQUIPMENT TYPES
         NumWaterPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic");
         NumSteamPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic:Steam");
-        NumLocalPipes = NumWaterPipes + NumSteamPipes;
-        LocalPipe.allocate(NumLocalPipes);
-        LocalPipeUniqueNames.reserve(static_cast<unsigned>(NumLocalPipes));
+        pipes.NumLocalPipes = NumWaterPipes + NumSteamPipes;
+        LocalPipe.allocate(pipes.NumLocalPipes);
+        LocalPipeUniqueNames.reserve(static_cast<unsigned>(pipes.NumLocalPipes));
 
         cCurrentModuleObject = "Pipe:Adiabatic";
         for (PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum) {

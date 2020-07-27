@@ -56,6 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace PurchasedAirManager {
 
@@ -305,7 +307,7 @@ namespace PurchasedAirManager {
 
     // Functions
 
-    void SimPurchasedAir(std::string const &PurchAirName,
+    void SimPurchasedAir(EnergyPlusData &state, std::string const &PurchAirName,
                          Real64 &SysOutputProvided,
                          Real64 &MoistOutputProvided, // Moisture output provided (kg/s), dehumidification = negative
                          bool const FirstHVACIteration,
@@ -315,12 +317,12 @@ namespace PurchasedAirManager {
 
     void GetPurchasedAir();
 
-    void InitPurchasedAir(int const PurchAirNum,
+    void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum,
                           bool const FirstHVACIteration, // unused1208
                           int const ControlledZoneNum,
                           int const ActualZoneNum);
 
-    void SizePurchasedAir(int const PurchAirNum);
+    void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum);
 
     void CalcPurchAirLoads(int const PurchAirNum,
                            Real64 &SysOutputProvided,   // Sensible output provided [W] cooling = negative
@@ -342,7 +344,7 @@ namespace PurchasedAirManager {
                               int const OperatingMode          // current operating mode, Off, Heating, Cooling, or DeadBand
     );
 
-    void UpdatePurchasedAir(int const PurchAirNum, bool const FirstHVACIteration);
+    void UpdatePurchasedAir(EnergyPlusData &state, int const PurchAirNum, bool const FirstHVACIteration);
 
     void ReportPurchasedAir(int const PurchAirNum);
 

@@ -58,6 +58,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace PlantValves {
 
     // MODULE VARIABLE DECLARATIONS:
@@ -93,7 +97,7 @@ namespace PlantValves {
 
         static PlantComponent *factory(std::string objectName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                       bool RunFlag) override;
 
         void getDesignCapacities(const PlantLocation &calledFromLocation,
@@ -101,7 +105,7 @@ namespace PlantValves {
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
-        void initialize();
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void calculate();
 

@@ -217,6 +217,12 @@ Outputs available from controlled zones. The ``key'' in the below is the Zone Na
 \item
   HVAC,Average,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}
 \item
+  HVAC,Average,Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}  
+\item
   Zone,Average,Zone Thermostat Control Type {[]}
 \item
   Zone,Average,Zone Thermostat Heating Setpoint Temperature {[}C{]}
@@ -252,17 +258,29 @@ Outputs available from controlled zones. The ``key'' in the below is the Zone Na
   Zone,Sum,Facility Cooling Setpoint Not Met While Occupied Time {[}hr{]}
 \end{itemize}
 
-\paragraph{Zone Predicted Sensible Load to Setpoint Heat Transfer Rate {[}W{]}}\label{zone-predicted-sensible-load-to-setpoint-heat-transfer-rate-w}
+\paragraph{Zone Predicted Sensible Load to Setpoint Heat Transfer Rate {[}W{]}}
 
-This is the predicted sensible load in W required to meet the current zone thermostat setpoint. A positive value indicates a heating load, a negative value indicates a cooling load. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active heating and/or cooling setpoints, determines if the zone requires heating or cooling or is in the deadband, and then passes this single load to the equipment. This value is not multiplied by zone or group multipliers.
+This is the predicted sensible load in W required to meet the current zone thermostat setpoint. A positive value indicates a heating load, a negative value indicates a cooling load. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active heating and/or cooling setpoints, determines if the zone requires heating or cooling or is in the deadband, and then passes this single load to the equipment. This value is NOT multiplied by zone or group multipliers.
 
-\paragraph{Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate {[}W{]}}\label{zone-predicted-sensible-load-to-heating-setpoint-heat-transfer-rate-w}
+\paragraph{Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate {[}W{]}}
 
-This is the predicted sensible load in W required to meet the current zone thermostat heating setpoint. A positive value indicates a heating load, a negative value indicates a cooling load. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. This value is not multiplied by zone or group multipliers.
+This is the predicted sensible load in W required to meet the current zone thermostat heating setpoint. A positive value indicates a heating load, a negative value indicates a cooling load. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. This value is NOT multiplied by zone or group multipliers.
 
-\paragraph{Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}}\label{zone-predicted-sensible-load-to-cooling-setpoint-heat-transfer-rate-w}
+\paragraph{Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}}
 
-This is the predicted sensible load in W required to meet the current zone thermostat cooling setpoint. A positive value indicates a heating load, a negative value indicates a cooling load. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. This value is not multiplied by zone or group multipliers.
+This is the predicted sensible load in W required to meet the current zone thermostat cooling setpoint. A positive value indicates a heating load, a negative value indicates a cooling load. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. This value is NOT multiplied by zone or group multipliers.
+
+\paragraph{Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate {[}W{]}}\label{zone-predicted-sensible-load-to-setpoint-heat-transfer-rate-w}
+
+This is the predicted sensible load in W required to meet the current zone thermostat setpoint at the system level. A positive value indicates a heating load, a negative value indicates a cooling load. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active heating and/or cooling setpoints, determines if the zone requires heating or cooling or is in the deadband, and then passes this single load to the equipment. This value is the Zone Predicted Sensible Load to Setpoint Heat Transfer Rate multiplied by zone or group multipliers.
+
+\paragraph{Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate {[}W{]}}\label{zone-predicted-sensible-load-to-heating-setpoint-heat-transfer-rate-w}
+
+This is the predicted sensible load in W required to meet the current zone thermostat heating setpoint at the system level. A positive value indicates a heating load, a negative value indicates a cooling load. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. This value is the Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate multiplied by zone or group multipliers.
+
+\paragraph{Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}}\label{zone-predicted-sensible-load-to-cooling-setpoint-heat-transfer-rate-w}
+
+This is the predicted sensible load in W required to meet the current zone thermostat cooling setpoint at the system level. A positive value indicates a heating load, a negative value indicates a cooling load. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. This value is the Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate multiplied by zone or group multipliers.
 
 \paragraph{Zone Thermostat Control Type {[]}}\label{zone-thermostat-control-type}
 
@@ -834,19 +852,37 @@ Outputs available from the ZoneControl:Humidistat:
   HVAC,Average,Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}
 \item
   HVAC,Average,Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}
+\item
+  HVAC,Average,Zone System Predicted Moisture Load Moisture Transfer Rate {[}kgWater/s{]}
+\item
+  HVAC,Average,Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}
+\item
+  HVAC,Average,Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}
 \end{itemize}
 
-\paragraph{Zone Predicted Moisture Load Moisture Transfer Rate {[}kgWater/s{]}}\label{zone-predicted-moisture-load-moisture-transfer-rate-kgwaters}
+\paragraph{Zone Predicted Moisture Load Moisture Transfer Rate {[}kgWater/s{]}}
 
-This is the predicted latent (moisture) load in kg\(_{r}\)/s required to meet the current zone humidistat setpoint. A positive value indicates a humidification load, a negative value indicates a dehumidification load. For a dual setpoint humidistat, the value is zero when the controlled zone's relative humidity is between the defined humidifying and dehumidifying setpoints. This moisture load rate is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active humidistat setpoints, determines if the zone requires humidification or dehumidification, and then passes this single load to the equipment for the single setpoint humidistat case. This value is not multiplied by zone or group multipliers.
+This is the predicted latent (moisture) load in kg\(_{r}\)/s required to meet the current zone humidistat setpoint. A positive value indicates a humidification load, a negative value indicates a dehumidification load. For a dual setpoint humidistat, the value is zero when the controlled zone's relative humidity is between the defined humidifying and dehumidifying setpoints. This moisture load rate is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active humidistat setpoints, determines if the zone requires humidification or dehumidification, and then passes this single load to the equipment for the single setpoint humidistat case. This value is NOT multiplied by zone or group multipliers.
 
-\paragraph{Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}}\label{zone-predicted-moisture-load-to-humidifying-setpoint-moisture-transfer-rate-kgwaters}
+\paragraph{Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}}
 
-This is the predicted latent (moisture) load in kg\(_{r}\)/s required to meet the current zone humidistat \textbf{humidifying} setpoint. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active humidistat humidifying setpoints, determines if the zone requires humidification or not, and then passes this load to the equipment for the case of a dual setpoint humidistat (see Zone Predicted Moisture Load Moisture Transfer Rate, above, for single setpoint humidistat case). This value is not multiplied by zone or group multipliers.
+This is the predicted latent (moisture) load in kg\(_{r}\)/s required to meet the current zone humidistat \textbf{humidifying} setpoint. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active humidistat humidifying setpoints, determines if the zone requires humidification or not, and then passes this load to the equipment for the case of a dual setpoint humidistat (see Zone Predicted Moisture Load Moisture Transfer Rate, above, for single setpoint humidistat case). This value is NOT multiplied by zone or group multipliers.
 
-\paragraph{Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}}\label{zone-predicted-moisture-load-to-dehumidifying-setpoint-moisture-transfer-rate-kgwaters}
+\paragraph{Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}}
 
-This is the predicted latent (moisture) load in kg\(_{r}\)/s required to meet the current zone humidistat \textbf{dehumidifying} setpoint. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active humidistat humidifying setpoints, determines if the zone requires dehumidification or not, and then passes this load to the equipment for a dual setpoint humidistat (see Zone Predicted Moisture Load Moisture Transfer Rate, above, for single setpoint humidistat case). This value is not multiplied by zone or group multipliers.
+This is the predicted latent (moisture) load in kg\(_{r}\)/s required to meet the current zone humidistat \textbf{dehumidifying} setpoint. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active humidistat humidifying setpoints, determines if the zone requires dehumidification or not, and then passes this load to the equipment for a dual setpoint humidistat (see Zone Predicted Moisture Load Moisture Transfer Rate, above, for single setpoint humidistat case). This value is NOT multiplied by zone or group multipliers.
+
+\paragraph{Zone System Predicted Moisture Load Moisture Transfer Rate {[}kgWater/s{]}}\label{zone-predicted-moisture-load-moisture-transfer-rate-kgwaters}
+
+This is the predicted latent (moisture) load in kg\(_{r}\)/s required to meet the current zone humidistat setpoint at the system level. A positive value indicates a humidification load, a negative value indicates a dehumidification load. For a dual setpoint humidistat, the value is zero when the controlled zone's relative humidity is between the defined humidifying and dehumidifying setpoints. This moisture load rate is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active humidistat setpoints, determines if the zone requires humidification or dehumidification, and then passes this single load to the equipment for the single setpoint humidistat case. This value is the Zone Predicted Moisture Load Moisture Transfer Rate multiplied by zone or group multipliers.
+
+\paragraph{Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}}\label{zone-predicted-moisture-load-to-humidifying-setpoint-moisture-transfer-rate-kgwaters}
+
+This is the predicted latent (moisture) load in kg\(_{r}\)/s required to meet the current zone humidistat \textbf{humidifying} setpoint. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active humidistat humidifying setpoints, determines if the zone requires humidification or not, and then passes this load to the equipment for the case of a dual setpoint humidistat (see Zone Predicted Moisture Load Moisture Transfer Rate, above, for single setpoint humidistat case). This value is the Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate multiplied by zone or group multipliers.
+
+\paragraph{Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}}\label{zone-predicted-moisture-load-to-dehumidifying-setpoint-moisture-transfer-rate-kgwaters}
+
+This is the predicted latent (moisture) load in kg\(_{r}\)/s required to meet the current zone humidistat \textbf{dehumidifying} setpoint. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. For nearly all equipment types, the Predictor-Corrector evaluates the active humidistat humidifying setpoints, determines if the zone requires dehumidification or not, and then passes this load to the equipment for a dual setpoint humidistat (see Zone Predicted Moisture Load Moisture Transfer Rate, above, for single setpoint humidistat case). This value is the Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate multiplied by zone or group multipliers.
 
 \subsection{ZoneControl:Thermostat:ThermalComfort}\label{zonecontrolthermostatthermalcomfort}
 

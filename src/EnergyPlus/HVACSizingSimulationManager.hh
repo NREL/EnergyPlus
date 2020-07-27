@@ -77,6 +77,8 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 class HVACSizingSimulationManager
 {
@@ -89,7 +91,7 @@ public:
     void DetermineSizingAnalysesNeeded();
     void SetupSizingAnalyses();
 
-    void RedoKickOffAndResize();
+    void RedoKickOffAndResize(EnergyPlusData &state);
     void PostProcessLogs();
     void ProcessCoincidentPlantSizeAdjustments(int const HVACSizingIterCount);
 
@@ -102,7 +104,7 @@ private:
 
 extern std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
-void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound);
+void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound);
 
 } // namespace EnergyPlus
 

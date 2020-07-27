@@ -66,6 +66,9 @@
 #include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZoneTempPredictorCorrectorData;
 
 namespace OutputReportTabular {
 
@@ -696,7 +699,7 @@ namespace OutputReportTabular {
     // Functions
     void clear_state();
 
-    void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     //======================================================================================================================
     //======================================================================================================================
@@ -770,7 +773,9 @@ namespace OutputReportTabular {
 
     void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType);
+    void GatherHeatEmissionReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType);
+
+    void CalcHeatEmissionReport(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -780,7 +785,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports(OutputFiles &outputFiles);
+    void WriteTabularReports(EnergyPlusData &state);
 
     void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
 
@@ -790,13 +795,13 @@ namespace OutputReportTabular {
                                    int const colNum             // Column number
     );
 
-    void FillRemainingPredefinedEntries();
+    void FillRemainingPredefinedEntries(EnergyPlus::EnergyPlusData &state);
 
     void WriteMonthlyTables();
 
     void WriteTimeBinTables();
 
-    void WriteBEPSTable();
+    void WriteBEPSTable(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
 
     std::string ResourceWarningMessage(std::string resource);
 
@@ -808,7 +813,7 @@ namespace OutputReportTabular {
 
     void WriteCompCostTable();
 
-    void WriteVeriSumTable();
+    void WriteVeriSumTable(OutputFiles &outputFiles);
 
     void WriteAdaptiveComfortTable();
 

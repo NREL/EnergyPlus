@@ -55,6 +55,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 struct CoilCoolingDXInputSpecification
 {
@@ -91,7 +93,7 @@ struct CoilCoolingDX
                             std::vector<Real64> &normalModeFlowRates,
                             std::vector<Real64> &normalModeRatedCapacities);
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
-    void size();
+    void size(EnergyPlusData &state);
 
     CoilCoolingDXInputSpecification original_input_specs;
     std::string name;

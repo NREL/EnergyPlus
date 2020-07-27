@@ -104,7 +104,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
@@ -3847,6 +3847,8 @@
   Output:Variable,*,Boiler Heating Rate,Hourly;
 
   Output:Variable,*,Boiler Gas Rate,Hourly;
+
+  Output:Variable,*,Boiler Efficiency,Hourly;
 
   Output:Variable,*,Pump Electric Power,Hourly;
 
