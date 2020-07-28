@@ -64,6 +64,7 @@
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletTempSizing.hh>
+#include <EnergyPlus/Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.hh>
 #include <EnergyPlus/Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh>
 #include <EnergyPlus/Autosizing/HeatingWaterflowSizing.hh>
 #include <EnergyPlus/Autosizing/WaterHeatingCapacitySizing.hh>
@@ -2666,10 +2667,11 @@ namespace WaterCoils {
                 DataFlowUsedForSizing = DataAirFlowUsedForSizing * StdRhoAir;        // used in error mesages
                 WaterCoil(CoilNum).MaxWaterVolFlowRate = DataWaterFlowUsedForSizing; // why is this here?
                 if (!(WaterCoil(CoilNum).CoilPerfInpMeth == NomCap && NomCapUserInp)) {
-                    TempSize = AutoSize;
-                    RequestSizing(state, CompType, CompName, HeatingWaterDesCoilLoadUsedForUASizing, SizingString, TempSize, bPRINT, RoutineName);
-                    DataCapacityUsedForSizing = TempSize;
-                    TempSize = AutoSize; // get the water volume flow rate used to size UA
+                    // get the design coil load used to size UA
+                    HeatingWaterDesCoilLoadUsedForUASizer sizerHWDesCoilLoadForUA;
+                    sizerHWDesCoilLoadForUA.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    DataCapacityUsedForSizing = sizerHWDesCoilLoadForUA.size(DataSizing::AutoSize, ErrorsFound);
+                    // get the water volume flow rate used to size UA
                     HeatingWaterDesCoilWaterVolFlowUsedForUASizer sizerHWWaterVolFlowUA;
                     sizerHWWaterVolFlowUA.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                     DataWaterFlowUsedForSizing = sizerHWWaterVolFlowUA.size(DataSizing::AutoSize, ErrorsFound);
