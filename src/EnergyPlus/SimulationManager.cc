@@ -750,7 +750,7 @@ namespace SimulationManager {
         static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string Alphas(8);
+        Array1D_string Alphas(10);
         Array1D<Real64> Number(4);
         int NumAlpha;
         int NumNumber;
@@ -1234,6 +1234,10 @@ namespace SimulationManager {
                 bool overrideMinNumWarmupDays(false);
                 bool overrideBeginEnvResetSuppress(false);
                 bool overrideMaxZoneTempDiff(false);
+                bool overrideSystemTimestep(false);
+                bool overrideMaxAllowedDelTemp(false);
+                // ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
+                // dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
                 state.dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
@@ -1258,18 +1262,41 @@ namespace SimulationManager {
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
                     } else if (overrideModeValue == "MODE05") {
-                        // Mode04 plus internal variable MaxZoneTempDiff will be set to 1.00
+                        // Mode04 plus Minimun System Timestep will be set to 1hr
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
+                        overrideSystemTimestep = true;
+                    } else if (overrideModeValue == "MODE06") {
+                        // Mode05 plus internal variable MaxZoneTempDiff will be set to 1.00
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                        overrideMinNumWarmupDays = true;
+                        overrideBeginEnvResetSuppress = true;
+                        overrideSystemTimestep = true;
                         overrideMaxZoneTempDiff = true;
+                    } else if (overrideModeValue == "MODE07") {
+                        // Mode06 plus internal variable MaxAllowedDelTemp will be set to 0.1
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                        overrideMinNumWarmupDays = true;
+                        overrideBeginEnvResetSuppress = true;
+                        overrideSystemTimestep = true;
+                        overrideMaxZoneTempDiff = true;
+                        overrideMaxAllowedDelTemp = true; 
                     } else if (overrideModeValue == "ADVANCED") {
                         bool advancedModeUsed = false;
                         if (fields.find("maxzonetempdiff") != fields.end()) { // not required field, has default value
                             DataConvergParams::MaxZoneTempDiff = fields.at("maxzonetempdiff");
                             ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxZoneTempDiff set to: " +
                                              RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 4));
+                            advancedModeUsed = true;
+                        }
+                        if (fields.find("maxalloweddeltemp") != fields.end()) { // not required field, has default value
+                            DataHeatBalance::MaxAllowedDelTemp = fields.at("maxalloweddeltemp");
+                            ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxAllowedDelTemp set to: " +
+                                             RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4));
                             advancedModeUsed = true;
                         }
                         if (advancedModeUsed) {
@@ -1305,10 +1332,25 @@ namespace SimulationManager {
                                          "SuppressAllBeginEnvironmentResets.");
                         DataEnvironment::forceBeginEnvResetSuppress = true;
                     }
+                    if (overrideSystemTimestep) {
+                        ShowWarningError(
+                            "Due to PerformancePrecisionTradeoffs Override Mode, the minimum System TimeSteps has been changed to 1 hr.");
+                        int MinTimeStepSysOverrideValue = 60.0; 
+                        if (MinTimeStepSysOverrideValue > MinutesPerTimeStep) {
+                            MinTimeStepSysOverrideValue = MinutesPerTimeStep;
+                        }
+                        MinTimeStepSys = MinTimeStepSysOverrideValue / 60.0;
+                        LimitNumSysSteps = int(TimeStepZone / MinTimeStepSys);
+                    }
                     if (overrideMaxZoneTempDiff) {
                         ShowWarningError(
                             "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxZoneTempDiff will be set to 1.0 .");
                         DataConvergParams::MaxZoneTempDiff = 1.0;
+                    }
+                    if (overrideMaxAllowedDelTemp) {
+                        ShowWarningError(
+                            "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxAllowedDelTemp will be set to 0.1 .");
+                        DataHeatBalance::MaxAllowedDelTemp = 0.1;
                     }
                 }
             }
@@ -1409,14 +1451,16 @@ namespace SimulationManager {
         } else {
             Alphas(7) = "No";
         }
-        Alphas(8) = General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 3);
+        Alphas(8) = General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1); 
+        Alphas(9) = General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 3);
+        Alphas(10) = General::RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4);
         std::string pptHeader = "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, "
                                 "Zone Radiant Exchange Algorithm, Override Mode, Number of Timestep In Hour, "
                                 "Force Euler Method, Minimum Number of Warmup Days, Force Suppress All Begin Environment Resets, "
-                                "MaxZoneTempDiff";
+                                "Minimum System Timestep, MaxZoneTempDiff, MaxAllowedDelTemp";
         print(state.files.eio, "{}\n", pptHeader);
         print(state.files.eio, " Performance Precision Tradeoffs");
-        for (Num = 1; Num <= 8; ++Num) {
+        for (Num = 1; Num <= 10; ++Num) {
             print(state.files.eio, ", {}", Alphas(Num));
         }
         print(state.files.eio, "\n");
@@ -1466,7 +1510,9 @@ namespace SimulationManager {
         UtilityRoutines::appendPerfLog("Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
         UtilityRoutines::appendPerfLog("Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
         UtilityRoutines::appendPerfLog("SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
+        UtilityRoutines::appendPerfLog("Minimum System Timestep", General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1));
         UtilityRoutines::appendPerfLog("MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 2));
+        UtilityRoutines::appendPerfLog("MaxAllowedDelTemp", General::RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4));
     }
 
     std::string bool_to_string(bool logical)
