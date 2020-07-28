@@ -56,6 +56,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -74,6 +75,7 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 
 using namespace EnergyPlus;
+using namespace EnergyPlus::Construction;
 using namespace EnergyPlus::DaylightingDevices;
 using namespace EnergyPlus::DaylightingManager;
 using namespace EnergyPlus::DataDaylighting;
@@ -2825,13 +2827,13 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     ASSERT_TRUE(process_idf(idf_objects));
     bool foundErrors = false;
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state.outputFiles, foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(foundErrors); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
@@ -2848,20 +2850,20 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.outputFiles, foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                       // expect no errors
-    HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
+    HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
 
-    DataHeatBalance::Construct(Surface(7).Construction).TransDiff = 0.001;  // required for GetTDDInput function to work.
+    dataConstruction.Construct(Surface(7).Construction).TransDiff = 0.001;  // required for GetTDDInput function to work.
     DaylightingDevices::GetTDDInput();
-    CalcDayltgCoefficients(state.outputFiles);
+    CalcDayltgCoefficients(state.files);
 
     std::string const error_string = delimited_string({
-      "   ** Warning ** DaylightingDevice:Tubular = PIPE1:  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.  ",
-      "   ** Warning ** DaylightingDevice:Tubular = PIPE2:  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.  ",
+      "   ** Warning ** DaylightingDevice:Tubular = PIPE1:  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.",
+      "   ** Warning ** DaylightingDevice:Tubular = PIPE2:  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
