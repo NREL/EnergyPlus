@@ -53,7 +53,6 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -66,6 +65,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -170,7 +170,7 @@ namespace MoistureBalanceEMPDManager {
         return PenetrationDepth;
     }
 
-    void GetMoistureBalanceEMPDInput()
+    void GetMoistureBalanceEMPDInput(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -340,14 +340,14 @@ namespace MoistureBalanceEMPDManager {
 
         EMPDzone.deallocate();
 
-        ReportMoistureBalanceEMPD(OutputFiles::getSingleton());
+        ReportMoistureBalanceEMPD(ioFiles);
 
         if (ErrorsFound) {
             ShowFatalError("GetMoistureBalanceEMPDInput: Errors found getting EMPD material properties, program terminated.");
         }
     }
 
-    void InitMoistureBalanceEMPD()
+    void InitMoistureBalanceEMPD(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -411,7 +411,7 @@ namespace MoistureBalanceEMPDManager {
         if (!InitEnvrnFlag) return;
         // Initialize the report variable
 
-        GetMoistureBalanceEMPDInput();
+        GetMoistureBalanceEMPDInput(ioFiles);
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
@@ -441,7 +441,8 @@ namespace MoistureBalanceEMPDManager {
         if (InitEnvrnFlag) InitEnvrnFlag = false;
     }
 
-    void CalcMoistureBalanceEMPD(int const SurfNum,
+    void CalcMoistureBalanceEMPD(IOFiles &ioFiles,
+                                 int const SurfNum,
                                  Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
                                  Real64 const TempZone,   // Zone temperature at current time step.
                                  Real64 &TempSat          // Saturated surface temperature.
@@ -512,7 +513,7 @@ namespace MoistureBalanceEMPDManager {
         Real64 RH_deep_layer;
 
         if (BeginEnvrnFlag && OneTimeFlag) {
-            InitMoistureBalanceEMPD();
+            InitMoistureBalanceEMPD(ioFiles);
             OneTimeFlag = false;
         }
 
@@ -746,7 +747,7 @@ namespace MoistureBalanceEMPDManager {
         RVSurfLayerOld(SurfNum) = RVSurfLayer(SurfNum);
     }
 
-    void ReportMoistureBalanceEMPD(OutputFiles &outputFiles)
+    void ReportMoistureBalanceEMPD(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -790,7 +791,7 @@ namespace MoistureBalanceEMPDManager {
 
         if (!DoReport) return;
         //   Write Descriptions
-        print(outputFiles.eio,
+        print(ioFiles.eio,
               "{}",
               "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Vapor Resistance Factor, a, b, "
               "c, d, Surface Penetration Depth {m}, Deep Penetration Depth {m}, Coating Vapor Resistance Factor, "
@@ -802,7 +803,7 @@ namespace MoistureBalanceEMPDManager {
             if (dataMaterial.Material(MatNum).EMPDMaterialProps) {
                 static constexpr auto Format_700(
                     " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_700,
                       dataConstruction.Construct(ConstrNum).Name,
                       dataMaterial.Material(MatNum).Name,

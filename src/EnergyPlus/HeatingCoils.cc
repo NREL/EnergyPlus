@@ -1060,7 +1060,12 @@ namespace HeatingCoils {
                 }
             } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX:SingleSpeed")) {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = COIL_DX_COOLING;
-                GetDXCoilIndex(Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
+                GetDXCoilIndex(state,
+                               Alphas(6),
+                               HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum,
+                               DXCoilErrFlag,
+                               Alphas(5),
+                               ObjexxFCL::Optional_bool_const());
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(HeatReclaimDXCoil)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim = HeatReclaimDXCoil(HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum);
@@ -1103,7 +1108,12 @@ namespace HeatingCoils {
                 }
             } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX:TwoSpeed")) {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = COIL_DX_MULTISPEED;
-                GetDXCoilIndex(Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
+                GetDXCoilIndex(state,
+                               Alphas(6),
+                               HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum,
+                               DXCoilErrFlag,
+                               Alphas(5),
+                               ObjexxFCL::Optional_bool_const());
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(HeatReclaimDXCoil)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim = HeatReclaimDXCoil(HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum);
@@ -1123,7 +1133,12 @@ namespace HeatingCoils {
                 }
             } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = COIL_DX_MULTIMODE;
-                GetDXCoilIndex(Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
+                GetDXCoilIndex(state,
+                               Alphas(6),
+                               HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum,
+                               DXCoilErrFlag,
+                               Alphas(5),
+                               ObjexxFCL::Optional_bool_const());
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(HeatReclaimDXCoil)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim = HeatReclaimDXCoil(HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum);
@@ -3262,7 +3277,7 @@ namespace HeatingCoils {
         if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:SINGLESPEED") ||
             UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSPEED") ||
             UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
-            GetDXCoilIndex(CoilName, CoilNum, GetCoilErrFlag, CoilType, SuppressWarning);
+            GetDXCoilIndex(state, CoilName, CoilNum, GetCoilErrFlag, CoilType, SuppressWarning);
             for (NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil) {
                 if (HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_COOLING && HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_MULTISPEED &&
                     HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_MULTIMODE && HeatingCoil(NumCoil).ReclaimHeatingCoilName != CoilName)

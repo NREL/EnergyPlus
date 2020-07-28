@@ -316,7 +316,7 @@ namespace Psychrometrics {
 #ifdef EP_psych_stats
     void ShowPsychrometricSummary(OutputFile &auditFile)
 #else
-    void ShowPsychrometricSummary(OutputFile &)
+    void ShowPsychrometricSummary(InputOutputFile &)
 #endif
     {
 
@@ -748,7 +748,7 @@ namespace Psychrometrics {
         }
 
 #ifdef generatetestdata
-        print(OutputFiles::getSingleton().debug, "{}{}{}{}", TDB, dW, Patm, Twb);
+        print(IOFiles::getSingleton().debug, "{}{}{}{}", TDB, dW, Patm, Twb);
 #endif
 
         return TWB;

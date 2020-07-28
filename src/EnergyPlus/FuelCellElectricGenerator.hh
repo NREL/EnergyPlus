@@ -541,9 +541,9 @@ namespace FuelCellElectricGenerator {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(IOFiles &ioFiles, std::string const &objectName);
 
-        static PlantComponent *factory_exhaust(std::string const &objectName);
+        static PlantComponent *factory_exhaust(IOFiles &ioFiles, std::string const &objectName);
 
         void initialize(BranchInputManagerData &dataBranchInputManager);
 
@@ -609,7 +609,7 @@ namespace FuelCellElectricGenerator {
 
     void clear_state();
 
-    void getFuelCellInput();
+    void getFuelCellInput(IOFiles &ioFiles);
 
     void FigureFuelCellZoneGains();
 

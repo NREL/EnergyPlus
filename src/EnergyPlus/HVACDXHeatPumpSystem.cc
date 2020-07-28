@@ -141,6 +141,7 @@ namespace HVACDXHeatPumpSystem {
 
     void clear_state()
     {
+        GetInputFlag = true;
         NumDXHeatPumpSystems = 0;
         EconomizerFlag = false;
         CheckEquipName.deallocate();
@@ -435,7 +436,7 @@ namespace HVACDXHeatPumpSystem {
             DXHeatPumpSystem(DXHeatSysNum).FanOpMode = ContFanCycCoil;
 
             if (DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num != Coil_HeatingAirToAirVariableSpeed) {
-                SetCoilSystemHeatingDXFlag(DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName);
+                SetCoilSystemHeatingDXFlag(state, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName);
             }
 
         } // End of the DX System Loop
