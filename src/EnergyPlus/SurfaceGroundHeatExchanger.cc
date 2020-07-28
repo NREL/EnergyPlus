@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -66,6 +67,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -167,11 +169,39 @@ namespace SurfaceGroundHeatExchanger {
     Array1D<Real64> QRadSysSrcAvg;      // Average source over the time step
     Array1D<Real64> LastSysTimeElapsed; // record of system time
     Array1D<Real64> LastTimeStepSys;    // previous time step size
+    bool InitializeTempTop(false);
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE PlantSurfaceGroundHeatExchangers
 
     // Object Data
     Array1D<SurfaceGroundHeatExchangerData> SurfaceGHE;
+
+    void clear_state() {
+        NoSurfaceGroundTempObjWarning = true;
+        FlowRate = 0.0;
+        TopSurfTemp = 0.0;
+        BtmSurfTemp = 0.0;
+        TopSurfFlux = 0.0;
+        BtmSurfFlux = 0.0;
+        SourceFlux = 0.0;
+        CheckEquipName.clear();
+        PastBeamSolarRad = 0.0;
+        PastSolarDirCosVert = 0.0;
+        PastDifSolarRad = 0.0;
+        PastGroundTemp = 0.0;
+        PastIsRain = false;
+        PastIsSnow = false;
+        PastOutDryBulbTemp = 0.0;
+        PastOutWetBulbTemp = 0.0;
+        PastSkyTemp = 0.0;
+        PastWindSpeed = 0.0;
+        GetInputFlag = true;
+        QRadSysSrcAvg.clear();
+        LastSysTimeElapsed.clear();
+        LastTimeStepSys.clear();
+        InitializeTempTop = false;
+        SurfaceGHE.clear();
+    }
 
     PlantComponent *SurfaceGroundHeatExchangerData::factory(int const EP_UNUSED(objectType), std::string const objectName)
     {
@@ -191,12 +221,12 @@ namespace SurfaceGroundHeatExchanger {
         return nullptr;
     }
 
-    void SurfaceGroundHeatExchangerData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+    void SurfaceGroundHeatExchangerData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                                   bool const FirstHVACIteration,
                                                   Real64 &EP_UNUSED(CurLoad),
                                                   bool const EP_UNUSED(RunFlag))
     {
-        this->InitSurfaceGroundHeatExchanger();
+        this->InitSurfaceGroundHeatExchanger(state.dataBranchInputManager);
         this->CalcSurfaceGroundHeatExchanger(FirstHVACIteration);
         this->UpdateSurfaceGroundHeatExchngr();
         this->ReportSurfaceGroundHeatExchngr();
@@ -220,7 +250,6 @@ namespace SurfaceGroundHeatExchanger {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataHeatBalance::Construct;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using DataEnvironment::GroundTemp_Surface;
@@ -233,7 +262,7 @@ namespace SurfaceGroundHeatExchanger {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        static bool ErrorsFound(false); // Set to true if errors in input,
+        bool ErrorsFound(false); // Set to true if errors in input,
         // fatal at end of routine
         int IOStatus;   // Used in GetObjectItem
         int Item;       // Item to be "gotten"
@@ -261,7 +290,7 @@ namespace SurfaceGroundHeatExchanger {
             // General user input data
             SurfaceGHE(Item).Name = cAlphaArgs(1);
             SurfaceGHE(Item).ConstructionName = cAlphaArgs(2);
-            SurfaceGHE(Item).ConstructionNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Construct);
+            SurfaceGHE(Item).ConstructionNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), dataConstruction.Construct);
 
             if (SurfaceGHE(Item).ConstructionNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
@@ -270,7 +299,7 @@ namespace SurfaceGroundHeatExchanger {
             }
 
             // Error checking for surfaces, zones, and construction information
-            if (!Construct(SurfaceGHE(Item).ConstructionNum).SourceSinkPresent) {
+            if (!dataConstruction.Construct(SurfaceGHE(Item).ConstructionNum).SourceSinkPresent) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError("Construction must have internal source/sink and use Construction:InternalSource object");
@@ -437,7 +466,7 @@ namespace SurfaceGroundHeatExchanger {
         }
     }
 
-    void SurfaceGroundHeatExchangerData::InitSurfaceGroundHeatExchanger()
+    void SurfaceGroundHeatExchangerData::InitSurfaceGroundHeatExchanger(BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -458,8 +487,6 @@ namespace SurfaceGroundHeatExchanger {
         using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::Pi;
         using namespace DataEnvironment;
-        using DataHeatBalance::Construct;
-        using DataHeatBalance::Material;
         using DataHeatBalance::TotConstructs;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
@@ -488,7 +515,7 @@ namespace SurfaceGroundHeatExchanger {
         if (this->MyFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(
+            ScanPlantLoopsForObject(dataBranchInputManager,
                 this->Name, TypeOf_GrndHtExchgSurface, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
 
             if (errFlag) {
@@ -512,28 +539,28 @@ namespace SurfaceGroundHeatExchanger {
         // get QTF data - only once
         if (this->InitQTF) {
             for (Cons = 1; Cons <= TotConstructs; ++Cons) {
-                if (UtilityRoutines::SameString(Construct(Cons).Name, this->ConstructionName)) {
+                if (UtilityRoutines::SameString(dataConstruction.Construct(Cons).Name, this->ConstructionName)) {
                     // some error checking ??
                     // CTF stuff
-                    LayerNum = Construct(Cons).TotLayers;
-                    this->NumCTFTerms = Construct(Cons).NumCTFTerms;
-                    this->CTFin = Construct(Cons).CTFInside;         // Z coefficents
-                    this->CTFout = Construct(Cons).CTFOutside;       // X coefficents
-                    this->CTFcross = Construct(Cons).CTFCross;       // Y coefficents
-                    this->CTFflux({1, _}) = Construct(Cons).CTFFlux; // F & f coefficents
+                    LayerNum = dataConstruction.Construct(Cons).TotLayers;
+                    this->NumCTFTerms = dataConstruction.Construct(Cons).NumCTFTerms;
+                    this->CTFin = dataConstruction.Construct(Cons).CTFInside;         // Z coefficents
+                    this->CTFout = dataConstruction.Construct(Cons).CTFOutside;       // X coefficents
+                    this->CTFcross = dataConstruction.Construct(Cons).CTFCross;       // Y coefficents
+                    this->CTFflux({1, _}) = dataConstruction.Construct(Cons).CTFFlux; // F & f coefficents
                     // QTF stuff
-                    this->CTFSourceIn = Construct(Cons).CTFSourceIn;     // Wi coefficents
-                    this->CTFSourceOut = Construct(Cons).CTFSourceOut;   // Wo coefficents
-                    this->CTFTSourceOut = Construct(Cons).CTFTSourceOut; // y coefficents
-                    this->CTFTSourceIn = Construct(Cons).CTFTSourceIn;   // x coefficents
-                    this->CTFTSourceQ = Construct(Cons).CTFTSourceQ;     // w coefficents
+                    this->CTFSourceIn = dataConstruction.Construct(Cons).CTFSourceIn;     // Wi coefficents
+                    this->CTFSourceOut = dataConstruction.Construct(Cons).CTFSourceOut;   // Wo coefficents
+                    this->CTFTSourceOut = dataConstruction.Construct(Cons).CTFTSourceOut; // y coefficents
+                    this->CTFTSourceIn = dataConstruction.Construct(Cons).CTFTSourceIn;   // x coefficents
+                    this->CTFTSourceQ = dataConstruction.Construct(Cons).CTFTSourceQ;     // w coefficents
                     this->ConstructionNum = Cons;
                     // surface properties
-                    this->BtmRoughness = Material(Construct(Cons).LayerPoint(LayerNum)).Roughness;
-                    this->TopThermAbs = Material(Construct(Cons).LayerPoint(LayerNum)).AbsorpThermal;
-                    this->TopRoughness = Material(Construct(Cons).LayerPoint(1)).Roughness;
-                    this->TopThermAbs = Material(Construct(Cons).LayerPoint(1)).AbsorpThermal;
-                    this->TopSolarAbs = Material(Construct(Cons).LayerPoint(1)).AbsorpSolar;
+                    this->BtmRoughness = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(LayerNum)).Roughness;
+                    this->TopThermAbs = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(LayerNum)).AbsorpThermal;
+                    this->TopRoughness = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(1)).Roughness;
+                    this->TopThermAbs = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(1)).AbsorpThermal;
+                    this->TopSolarAbs = dataMaterial.Material(dataConstruction.Construct(Cons).LayerPoint(1)).AbsorpSolar;
                 }
             }
             // set one-time flag
@@ -661,7 +688,6 @@ namespace SurfaceGroundHeatExchanger {
         Real64 OldSourceFlux;  // previous value of source flux - used during iteration
         int iter;
         int iter1;
-        static bool InitializeTempTop(false);
 
         // check if we are in very first call for this zone time step
         if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && this->firstTimeThrough) {

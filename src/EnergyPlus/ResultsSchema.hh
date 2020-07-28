@@ -203,7 +203,7 @@ namespace ResultsFramework {
         json getVariablesJSON();
         json getJSON() const;
 
-        void writeReport(bool outputJSON, bool outputCBOR, bool outputMsgPack);
+        void writeReport(JsonOutputStreams &jsonOutputStreams, bool outputJSON, bool outputCBOR, bool outputMsgPack);
 
     protected:
         bool IDataFrameEnabled = false;
@@ -313,8 +313,8 @@ namespace ResultsFramework {
         DataFrame SMMeters = DataFrame("RunPeriod");
         DataFrame YRMeters = DataFrame("Yearly");
 
-        void writeTimeSeriesReports();
-        void WriteReport();
+        void writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams);
+        void WriteReport(JsonOutputStreams &jsonOutputStreams);
 
         SimInfo SimulationInformation;
 

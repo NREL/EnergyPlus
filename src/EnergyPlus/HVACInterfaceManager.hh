@@ -77,8 +77,6 @@ namespace HVACInterfaceManager {
     // MODULE VARIABLE DECLARATIONS:
     extern bool CommonPipeSetupFinished;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
-
     // Types
 
     struct CommonPipeData

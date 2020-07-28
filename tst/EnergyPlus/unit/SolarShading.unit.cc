@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -59,9 +60,8 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
@@ -118,7 +118,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     }
 
     DetailedSolarTimestepIntegration = false;
-    CalcPerSolarBeam(AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
+    CalcPerSolarBeam(state.dataWindowComplexManager, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
     for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
@@ -138,7 +138,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 
     DetailedSolarTimestepIntegration = true;
     HourOfDay = 23;
-    CalcPerSolarBeam(AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
+    CalcPerSolarBeam(state.dataWindowComplexManager, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
     for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
@@ -613,28 +613,28 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state);
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state.outputFiles, FoundError);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(FoundError);
+    HeatBalanceManager::GetConstructData(state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
@@ -645,7 +645,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.outputFiles, FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
     //	compare_err_stream( "" ); // just for debugging
@@ -667,14 +667,15 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SolarDistribution = FullExterior;
 
     CalcSkyDifShading = true;
-    SolarShading::InitSolarCalculations();
+    SolarShading::InitSolarCalculations(state.files);
     SolarShading::SkyDifSolarShading();
     CalcSkyDifShading = false;
 
     FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
 
-    EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, 6), 0.0001);
-    EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, 6), 0.0001);
+    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
+    EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, windowSurfNum), 0.0001);
+    EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, windowSurfNum), 0.0001);
 
 
 }
@@ -1012,28 +1013,28 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     SolarShading::clear_state();
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state);
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state.outputFiles, FoundError);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(FoundError);
+    HeatBalanceManager::GetConstructData(state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
@@ -1065,7 +1066,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     SolarDistribution = FullExterior;
 
     CalcSkyDifShading = true;
-    SolarShading::InitSolarCalculations();
+    SolarShading::InitSolarCalculations(state.files);
     SolarShading::SkyDifSolarShading();
     CalcSkyDifShading = false;
 
@@ -1082,9 +1083,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     ;
     EXPECT_FALSE(SolarShading::SUNCOS(3) < DataEnvironment::SunIsUpValue);
 
-    EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, 3));
-    EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, 6));
-    EXPECT_DOUBLE_EQ(0.5432, SunlitFrac(4, 9, 9));
+    int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", DataSurfaces::Surface);
+    EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, surfNum));
+    surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
+    EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, surfNum));
+    surfNum = UtilityRoutines::FindItemInList("ZN001:ROOF", DataSurfaces::Surface);
+    EXPECT_DOUBLE_EQ(0.5432, SunlitFrac(4, 9, surfNum));
     SolarShading::clear_state();
 }
 
@@ -1420,28 +1424,28 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     SolarShading::clear_state();
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state);
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state.outputFiles, FoundError);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(FoundError);
+    HeatBalanceManager::GetConstructData(state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     SizingManager::GetZoneSizingInput();
@@ -1460,7 +1464,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     compare_err_stream(""); // just for debugging
 
-    SolarShading::GetShadowingInput(state.outputFiles);
+    SolarShading::GetShadowingInput(state.files);
 
     for (int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
         if (Surface(SurfNum).ExtBoundCond == 0 && Surface(SurfNum).Zone != 0) {
@@ -1790,28 +1794,28 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.outputFiles);
+    SimulationManager::GetProjectData(state);
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                                                           // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state.outputFiles, FoundError);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(FoundError);
+    HeatBalanceManager::GetConstructData(state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
@@ -1822,7 +1826,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.outputFiles, FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                                                 // expect no errors
 
     //	compare_err_stream( "" ); // just for debugging
@@ -1846,14 +1850,14 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     DataSystemVariables::SlaterBarsky = true;
 
     CalcSkyDifShading = true;
-    SolarShading::InitSolarCalculations();
+    SolarShading::InitSolarCalculations(state.files);
     SolarShading::SkyDifSolarShading();
     CalcSkyDifShading = false;
 
     FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
-
-    EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, 6), 0.0001);
-    EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, 6), 0.0001);
+    int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
+    EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, surfNum), 0.0001);
+    EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, surfNum), 0.0001);
 
     DataSystemVariables::SlaterBarsky = false;
 }

@@ -53,10 +53,13 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
 
 namespace MicroCHPElectricGenerator {
 
@@ -206,7 +209,7 @@ namespace MicroCHPElectricGenerator {
 
         void setupOutputVars();
 
-        void InitMicroCHPNoNormalizeGenerators();
+        void InitMicroCHPNoNormalizeGenerators(BranchInputManagerData &dataBranchInputManager);
 
         void CalcUpdateHeatRecovery();
 
@@ -218,10 +221,10 @@ namespace MicroCHPElectricGenerator {
 
         void UpdateMicroCHPGeneratorRecords();
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(IOFiles &ioFiles, std::string const &objectName);
     };
 
-    void GetMicroCHPGeneratorInput();
+    void GetMicroCHPGeneratorInput(IOFiles &ioFiles);
 
     Real64 FuncDetermineEngineTemp(Real64 TcwOut,   // hot water leaving temp
                                    Real64 MCeng,    // Fictitious mass and heat capacity of engine

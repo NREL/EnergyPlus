@@ -59,7 +59,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/Vectors.hh>
 
@@ -159,15 +159,15 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     ErrorsFound = false;
-    GetProjectControlData(state.outputFiles, ErrorsFound); // read project control data
+    GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
-    GetConstructData(ErrorsFound); // read construction data
+    GetConstructData(state.files, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
     ErrorsFound = false;
@@ -183,7 +183,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     SinBldgRelNorth = 0.0;
 
     ErrorsFound = false;
-    GetSurfaceData(state.outputFiles, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     SetSurfaceOutBulbTempAt();

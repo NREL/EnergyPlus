@@ -117,14 +117,14 @@ namespace VariableSpeedCoils {
     // MODULE PARAMETER DEFINITIONS
 
     Real64 const RatedInletAirTemp(26.6667);     // 26.6667C or 80F
-    Real64 const RatedInletWetBulbTemp(19.44);   // 19.44 or 67F, cooling mode
-    Real64 const RatedInletAirHumRat(0.01125);   // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    Real64 const RatedInletWaterTemp(29.4);      // 85 F cooling mode
+    Real64 const RatedInletWetBulbTemp(19.4444);   // 19.44 or 67F, cooling mode
+    Real64 const RatedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    Real64 const RatedInletWaterTemp(29.4444);      // 85 F cooling mode
     Real64 const RatedAmbAirTemp(35.0);          // 95 F cooling mode
-    Real64 const RatedInletAirTempHeat(21.11);   // 21.11C or 70F, heating mode
-    Real64 const RatedInletWaterTempHeat(21.11); // 21.11C or 70F, heating mode
-    Real64 const RatedAmbAirTempHeat(8.33);      // 8.33 or 47F, heating mode
-    Real64 const RatedAmbAirWBHeat(6.11);        // 8.33 or 43F, heating mode, rated wet bulb temperature
+    Real64 const RatedInletAirTempHeat(21.1111);   // 21.11C or 70F, heating mode
+    Real64 const RatedInletWaterTempHeat(21.1111); // 21.11C or 70F, heating mode
+    Real64 const RatedAmbAirTempHeat(8.3333);      // 8.33 or 47F, heating mode
+    Real64 const RatedAmbAirWBHeat(6.1111);        // 8.33 or 43F, heating mode, rated wet bulb temperature
 
     // Water Systems
     int const CondensateDiscarded(1001); // default mode where water is "lost"
@@ -200,6 +200,7 @@ namespace VariableSpeedCoils {
 
     // Object Data
     Array1D<VariableSpeedCoilData> VarSpeedCoil;
+    bool firstTime(true);
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -231,6 +232,7 @@ namespace VariableSpeedCoils {
         VSHPWHHeatingCapacity = 0.0;
         VSHPWHHeatingCOP = 0.0;
         VarSpeedCoil.deallocate();
+        firstTime = true;
     }
 
     // Default Constructor
@@ -466,7 +468,7 @@ namespace VariableSpeedCoils {
         static int MaxAlphas(0); // Maximum number of alpha input fields
         int IOStat;
         int AlfaFieldIncre;              // increment number of Alfa field
-        static bool ErrorsFound(false);  // If errors detected in input
+        bool ErrorsFound(false);  // If errors detected in input
         Real64 CurveVal;                 // Used to verify modifier curves equal 1 at rated conditions
         Real64 WHInletAirTemp;           // Used to pass proper inlet air temp to HPWH DX coil performance curves
         Real64 WHInletWaterTemp;         // Used to pass proper inlet water temp to HPWH DX coil performance curves
@@ -3238,7 +3240,7 @@ namespace VariableSpeedCoils {
         Real64 Cp;    // local fluid specific heat
         int SpeedCal; // calculated speed level
         bool errFlag;
-        static bool ErrorsFound(false);    // TRUE when errors found, air loop initialization error
+        bool ErrorsFound(false);    // TRUE when errors found, air loop initialization error
         Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
         int Mode;                          // Performance mode for MultiMode DX coil; Always 1 for other coil types
         Real64 RatedHeatPumpIndoorAirTemp; // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
@@ -3285,7 +3287,8 @@ namespace VariableSpeedCoils {
                     plantTypeOfNum = DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
                 }
                 errFlag = false;
-                ScanPlantLoopsForObject(VarSpeedCoil(DXCoilNum).Name,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        VarSpeedCoil(DXCoilNum).Name,
                                         plantTypeOfNum,
                                         VarSpeedCoil(DXCoilNum).LoopNum,
                                         VarSpeedCoil(DXCoilNum).LoopSide,
@@ -5087,7 +5090,6 @@ namespace VariableSpeedCoils {
         bool LatDegradModelSimFlag; // Latent degradation model simulation flag
         int NumIteration;           // Iteration Counter
         static int Count(0);        // No idea what this is for.
-        static bool firstTime(true);
         static Real64 LoadSideInletDBTemp_Init; // rated conditions
         static Real64 LoadSideInletWBTemp_Init; // rated conditions
         static Real64 LoadSideInletHumRat_Init; // rated conditions

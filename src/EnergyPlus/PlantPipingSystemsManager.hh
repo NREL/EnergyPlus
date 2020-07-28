@@ -61,11 +61,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
     namespace PlantPipingSystemsManager {
 
@@ -912,7 +913,7 @@ namespace EnergyPlus {
 
             void PerformIterationLoop(Circuit * thisCircuit);
 
-            void InitPipingSystems(Circuit * thisCircuit);
+            void InitPipingSystems(BranchInputManagerData &dataBranchInputManager, Circuit * thisCircuit);
 
             void UpdatePipingSystems(Circuit * thisCircuit);
 
@@ -940,10 +941,10 @@ namespace EnergyPlus {
         void ReadZoneCoupledDomainInputs(EnergyPlusData &state, const int StartingDomainNumForZone, const int NumZoneCoupledDomains, bool &ErrorsFound);
 
         void ReadBasementInputs(EnergyPlusData &state, const int StartingDomainNumForBasement, const int NumBasements, bool &ErrorsFound);
-        
+
         bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
                                             int const MaterialNum);
-        
+
         void SiteGroundDomainNoMassMatError(std::string const &FieldName,
                                             std::string const &UserInputField,
                                             std::string const &ObjectName);

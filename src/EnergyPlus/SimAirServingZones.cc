@@ -60,6 +60,7 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -75,16 +76,12 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
-#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
@@ -94,15 +91,16 @@
 #include <EnergyPlus/HVACInterfaceManager.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -112,6 +110,7 @@
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -218,6 +217,8 @@ namespace SimAirServingZones {
         int TestUniqueNodesNum(0);
         bool SizeAirLoopsOneTimeFlag(true);
         bool InitAirLoopsBranchSizingFlag(true);
+        bool OutputSetupFlag(false);
+        bool MyEnvrnFlag(true);
     } // namespace
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
@@ -242,6 +243,8 @@ namespace SimAirServingZones {
         InitAirLoopsBranchSizingFlag = true;
         NumOfTimeStepInDay = 0;
         TestUniqueNodesNum = 0;
+        OutputSetupFlag = false;
+        MyEnvrnFlag = true;
     }
 
     void ManageAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
@@ -368,7 +371,6 @@ namespace SimAirServingZones {
         //        \required-field
 
         // Using/Aliasing
-        using AirLoopHVACDOAS::numAirLoopDOAS;
         using BranchInputManager::GetBranchData;
         using BranchInputManager::GetBranchList;
         using BranchInputManager::GetLoopMixer;
@@ -766,7 +768,7 @@ namespace SimAirServingZones {
             BranchListName = Alphas(4);
             AvailManagerListName = Alphas(3);
             ConnectorListName = Alphas(5);
-            PrimaryAirSystem(AirSysNum).NumBranches = NumBranchesInBranchList(BranchListName);
+            PrimaryAirSystem(AirSysNum).NumBranches = NumBranchesInBranchList(state.dataBranchInputManager, BranchListName);
             if (PrimaryAirSystem(AirSysNum).NumBranches == 0) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", insufficient information.");
                 ShowContinueError("...there must be at least 1 branch specified.");
@@ -775,12 +777,12 @@ namespace SimAirServingZones {
             BranchNames.allocate(PrimaryAirSystem(AirSysNum).NumBranches);
             BranchNames = "";
             // get the branch lists
-            GetBranchList(PrimaryAirSystem(AirSysNum).Name, BranchListName, PrimaryAirSystem(AirSysNum).NumBranches, BranchNames, "Air");
+            GetBranchList(state.dataBranchInputManager, PrimaryAirSystem(AirSysNum).Name, BranchListName, PrimaryAirSystem(AirSysNum).NumBranches, BranchNames, "Air");
             PrimaryAirSystem(AirSysNum).Branch.allocate(PrimaryAirSystem(AirSysNum).NumBranches);
             // Cycle through all of the branches and set up the branch data
             for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirSysNum).NumBranches; ++BranchNum) {
                 PrimaryAirSystem(AirSysNum).Branch(BranchNum).Name = BranchNames(BranchNum);
-                NumCompsOnBranch = NumCompsInBranch(BranchNames(BranchNum));
+                NumCompsOnBranch = NumCompsInBranch(state.dataBranchInputManager, BranchNames(BranchNum));
                 if (NumCompsOnBranch <= 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", insufficient information.");
                     ShowContinueError("...Branch=\"" + BranchNames(BranchNum) + "\", no components on branch.");
@@ -794,7 +796,8 @@ namespace SimAirServingZones {
                 OutletNodeNames.allocate(NumCompsOnBranch);
                 OutletNodeNumbers.dimension(NumCompsOnBranch, 0);
 
-                GetBranchData(PrimaryAirSystem(AirSysNum).Name,
+                GetBranchData(state.dataBranchInputManager,
+                              PrimaryAirSystem(AirSysNum).Name,
                               BranchNames(BranchNum),
                               DummyInteger(1),
                               DummyInteger(2),
@@ -978,7 +981,7 @@ namespace SimAirServingZones {
                     ShowContinueError("ConnectorList object=\"" + ConnectorListName + "\" not found in input.");
                 }
                 errFlag = false;
-                GetNumSplitterMixerInConntrList("AirLoop", ConnectorListName, NumofSplitters, NumofMixers, errFlag);
+                GetNumSplitterMixerInConntrList(state.dataBranchInputManager, "AirLoop", ConnectorListName, NumofSplitters, NumofMixers, errFlag);
                 if (errFlag) {
                 }
             }
@@ -988,7 +991,8 @@ namespace SimAirServingZones {
                 inputProcessor->getObjectDefMaxArgs("Connector:Splitter", NumParams, NumAlphas, NumNodes);
                 NodeNames.allocate(NumAlphas);
                 NodeNumbers.allocate(NumAlphas);
-                GetLoopSplitter(PrimaryAirSystem(AirSysNum).Name,
+                GetLoopSplitter(state.dataBranchInputManager,
+                                PrimaryAirSystem(AirSysNum).Name,
                                 ConnectorListName,
                                 PrimaryAirSystem(AirSysNum).Splitter.Name,
                                 PrimaryAirSystem(AirSysNum).Splitter.Exists,
@@ -1048,7 +1052,8 @@ namespace SimAirServingZones {
                 inputProcessor->getObjectDefMaxArgs("Connector:Mixer", NumParams, NumAlphas, NumNodes);
                 NodeNames.allocate(NumAlphas);
                 NodeNumbers.allocate(NumAlphas);
-                GetLoopMixer(PrimaryAirSystem(AirSysNum).Name,
+                GetLoopMixer(state.dataBranchInputManager,
+                             PrimaryAirSystem(AirSysNum).Name,
                              ConnectorListName,
                              PrimaryAirSystem(AirSysNum).Mixer.Name,
                              PrimaryAirSystem(AirSysNum).Mixer.Exists,
@@ -1262,7 +1267,7 @@ namespace SimAirServingZones {
                             // Construct fan object
                             if (HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false) < 0) {
                                 HVACFan::fanObjs.emplace_back(
-                                    new HVACFan::FanSystem(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
+                                    new HVACFan::FanSystem(state, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
                             }
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex =
                                 HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) +
@@ -1305,7 +1310,7 @@ namespace SimAirServingZones {
                         } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = UnitarySystemModel;
                             UnitarySystems::UnitarySys thisSys;
-                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer = thisSys.factory(state, 
+                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer = thisSys.factory(state,
                                 DataHVACGlobals::UnitarySys_AnyCoilType, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false, 0);
                         } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys_HeatOnly;
@@ -1450,11 +1455,11 @@ namespace SimAirServingZones {
                                 PrimaryAirSystem(AirSysNum).Name);
         }
 
-        numAirLoopDOAS = inputProcessor->getNumObjectsFound("AirLoopHVAC:DedicatedOutdoorAirSystem");
-        if (numAirLoopDOAS > 0) {
-            if (AirLoopHVACDOAS::GetInputOnceFlag) {
+        state.dataAirLoopHVACDOAS.numAirLoopDOAS = inputProcessor->getNumObjectsFound("AirLoopHVAC:DedicatedOutdoorAirSystem");
+        if (state.dataAirLoopHVACDOAS.numAirLoopDOAS > 0) {
+            if (state.dataAirLoopHVACDOAS.GetInputOnceFlag) {
                 AirLoopHVACDOAS::getAirLoopHVACDOASInput(state);
-                AirLoopHVACDOAS::GetInputOnceFlag = false;
+                state.dataAirLoopHVACDOAS.GetInputOnceFlag = false;
             }
         }
     }
@@ -1501,7 +1506,7 @@ namespace SimAirServingZones {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using SplitterComponent::SplitterCond;
         using SplitterComponent::SplitterConditions;
-        using ZonePlenum::ZoneSupPlenCond;
+        //using ZonePlenum::ZoneSupPlenCond;
         using ZonePlenum::ZoneSupplyPlenumConditions;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1561,13 +1566,6 @@ namespace SimAirServingZones {
 
         // Dimension the local subcomponent arrays
 
-        // Simulation Flags
-        static bool MyEnvrnFlag(true);
-        /////////// hoisted into namespace InitAirLoopsOneTimeFlag////////////
-        // static bool MyOneTimeFlag( true );
-        // static bool MyBranchSizingFlag( true ); //InitAirLoopsBranchSizingFlag
-        ///////////////////////////
-
         bool ErrorsFound;
         static Real64 OAReliefDiff(0.0); // local for massflow change across OA system, kg/s
 
@@ -1620,14 +1618,14 @@ namespace SimAirServingZones {
                         NumAllSupAirPathNodes += SplitterCond(SplitterNum).NumOutletNodes + 1;
                     } else if (UtilityRoutines::SameString(SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:SupplyPlenum")) {
                         PlenumNum = UtilityRoutines::FindItemInList(
-                            SupplyAirPath(SupAirPath).ComponentName(CompNum), ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName);
+                            SupplyAirPath(SupAirPath).ComponentName(CompNum), state.dataZonePlenum.ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName);
                         if (PlenumNum == 0) {
                             ShowSevereError("AirLoopHVAC:SupplyPlenum not found=" + SupplyAirPath(SupAirPath).ComponentName(CompNum));
                             ShowContinueError("Occurs in AirLoopHVAC:SupplyPath=" + SupplyAirPath(SupAirPath).Name);
                             ErrorsFound = true;
                         }
                         SupplyAirPath(SupAirPath).PlenumIndex(CompNum) = PlenumNum;
-                        NumAllSupAirPathNodes += ZoneSupPlenCond(PlenumNum).NumOutletNodes + 1;
+                        NumAllSupAirPathNodes += state.dataZonePlenum.ZoneSupPlenCond(PlenumNum).NumOutletNodes + 1;
                     }
                 }
                 SupNode.allocate(NumAllSupAirPathNodes);
@@ -1653,15 +1651,15 @@ namespace SimAirServingZones {
                         }
                     } else if (PlenumNum > 0) {
                         ++SupAirPathNodeNum;
-                        SupNode(SupAirPathNodeNum) = ZoneSupPlenCond(PlenumNum).InletNode;
+                        SupNode(SupAirPathNodeNum) = state.dataZonePlenum.ZoneSupPlenCond(PlenumNum).InletNode;
                         if (CompNum == 1) {
                             SupNodeType(SupAirPathNodeNum) = PathInlet;
                         } else {
                             SupNodeType(SupAirPathNodeNum) = CompInlet;
                         }
-                        for (PlenumOutNum = 1; PlenumOutNum <= ZoneSupPlenCond(PlenumNum).NumOutletNodes; ++PlenumOutNum) {
+                        for (PlenumOutNum = 1; PlenumOutNum <= state.dataZonePlenum.ZoneSupPlenCond(PlenumNum).NumOutletNodes; ++PlenumOutNum) {
                             ++SupAirPathNodeNum;
-                            SupNode(SupAirPathNodeNum) = ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
+                            SupNode(SupAirPathNodeNum) = state.dataZonePlenum.ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
                             SupNodeType(SupAirPathNodeNum) = 0;
                         }
                     }
@@ -2023,7 +2021,7 @@ namespace SimAirServingZones {
             }
 
             // now connect return nodes with airloops and corresponding inlet nodes
-            ConnectReturnNodes();
+            ConnectReturnNodes(state.dataZonePlenum);
 
             InitAirLoopsOneTimeFlag = false;
 
@@ -2065,16 +2063,28 @@ namespace SimAirServingZones {
                             if (PrimaryAirSystem(AirLoopNum).OASysExists && !PrimaryAirSystem(AirLoopNum).isAllOA) {
                                 if (FoundOASys) {
                                     if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3) {
-                                        GetFanIndex(state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
+                                        GetFanIndex(state,
+                                                    PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                                    SupFanIndex,
+                                                    ErrorsFound,
+                                                    ObjexxFCL::Optional_string_const());
                                         supFanModelType = structArrayLegacyFanModels;
                                         goto EndOfAirLoop;
                                     }
                                 } else {
-                                    GetFanIndex(state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, RetFanIndex, ErrorsFound);
+                                    GetFanIndex(state,
+                                                PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                                RetFanIndex,
+                                                ErrorsFound,
+                                                ObjexxFCL::Optional_string_const());
                                     retFanModelType = structArrayLegacyFanModels;
                                 }
                             } else {
-                                GetFanIndex(state.fans, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
+                                GetFanIndex(state,
+                                            PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                            SupFanIndex,
+                                            ErrorsFound,
+                                            ObjexxFCL::Optional_string_const());
                                 supFanModelType = structArrayLegacyFanModels;
                                 goto EndOfAirLoop;
                             }
@@ -2364,7 +2374,7 @@ namespace SimAirServingZones {
         } // end loop over primary air systems
     }
 
-    void ConnectReturnNodes()
+    void ConnectReturnNodes(ZonePlenumData &dataZonePlenum)
     {
         // This initializes ZoneEquipConfig.ReturnNodeInletNum and ReturnNodeAirLoopNum
         // Search all return paths to match return nodes with the airloop they are connected to and find the corresponding zone inlet node (same zone,
@@ -2407,7 +2417,7 @@ namespace SimAirServingZones {
                                 }
                             }
                         } else if (compType == ZoneReturnPlenum_Type) {
-                            auto const &thisPlenum(ZonePlenum::ZoneRetPlenCond(thisRetPath.ComponentIndex(compNum)));
+                            auto const &thisPlenum(dataZonePlenum.ZoneRetPlenCond(thisRetPath.ComponentIndex(compNum)));
                             for (int inNode = 1; inNode <= thisPlenum.NumInletNodes; ++inNode) {
                                 if (thisReturnNode == thisPlenum.InletNode(inNode)) {
                                     thisZoneEquip.ReturnNodeAirLoopNum(zoneOutNum) = airLoopNum; // set the return node airloop num
@@ -2495,8 +2505,6 @@ namespace SimAirServingZones {
         // REFERENCES: None
 
         // Using/Aliasing
-        using AirLoopHVACDOAS::airloopDOAS;
-        using AirLoopHVACDOAS::numAirLoopDOAS;
         using DataConvergParams::CalledFromAirSystemSupplySideDeck1;
         using DataConvergParams::CalledFromAirSystemSupplySideDeck2;
         using General::GetPreviousHVACTime;
@@ -2536,8 +2544,6 @@ namespace SimAirServingZones {
         int AirSysOutNum;
         // DO loop index; there are 2 passes - the 2nd is done only if mass balance fails
         int AirLoopPass;
-        // Output variable setup flag
-        static bool OutputSetupFlag(false);
         // Flag set by ResolveSysFlow; if TRUE, mass balance failed and there must be a second pass
         bool SysReSim;
         int CalledFrom;
@@ -2633,11 +2639,11 @@ namespace SimAirServingZones {
 
         } // End of Air Loop iteration
 
-        if (numAirLoopDOAS > 0) {
+        if (state.dataAirLoopHVACDOAS.numAirLoopDOAS > 0) {
             int index;
             Real64 OAMassFLowrate = 0.0;
-            for (std::size_t loop = 0; loop < airloopDOAS.size(); ++loop) {
-                auto &thisAirLoopDOASObjec = airloopDOAS[loop]; // <- regular reference variable, not a pointer
+            for (std::size_t loop = 0; loop < state.dataAirLoopHVACDOAS.airloopDOAS.size(); ++loop) {
+                auto &thisAirLoopDOASObjec = state.dataAirLoopHVACDOAS.airloopDOAS[loop]; // <- regular reference variable, not a pointer
                 if (thisAirLoopDOASObjec.m_AirLoopDOASNum > -1) {
                     index = thisAirLoopDOASObjec.m_AirLoopDOASNum;
                 } else {
@@ -2706,14 +2712,14 @@ namespace SimAirServingZones {
 
                 } // End of Air Loop iteration
                 // check convergence at the mixer outlet or at the AirLoopDOAS outlet
-                AirLoopHVACDOAS::CheckConvergence();
+                AirLoopHVACDOAS::CheckConvergence(state);
             }
         }
         // Reset current system number for sizing routines
         CurSysNum = 0;
     }
 
-    void SimAirLoop(EnergyPlusData &state, 
+    void SimAirLoop(EnergyPlusData &state,
         bool const FirstHVACIteration, int const AirLoopNum, int const AirLoopPass, int &AirLoopIterMax, int &AirLoopIterTot, int &AirLoopNumCalls)
     {
 
@@ -2857,7 +2863,7 @@ namespace SimAirServingZones {
         AirLoopControlInfo(AirLoopNum).ConvergedFlag = AirLoopConvergedFlag;
     }
 
-    void SolveAirLoopControllers(EnergyPlusData &state, 
+    void SolveAirLoopControllers(EnergyPlusData &state,
         bool const FirstHVACIteration, int const AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls)
     {
 
@@ -3299,7 +3305,7 @@ namespace SimAirServingZones {
         }
     }
 
-    void ReSolveAirLoopControllers(EnergyPlusData &state, 
+    void ReSolveAirLoopControllers(EnergyPlusData &state,
         bool const FirstHVACIteration, int const AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls)
     {
 
@@ -3624,7 +3630,7 @@ namespace SimAirServingZones {
                 if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
             } else if (SELECT_CASE_var == CoilUserDefined) { // Coil:UserDefined
-                SimCoilUserDefined(CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
+                SimCoilUserDefined(state, CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
 
             } else if (SELECT_CASE_var == UnitarySystemModel) { // 'AirLoopHVAC:UnitarySystem'
                 Real64 sensOut = 0.0;
@@ -5246,7 +5252,7 @@ namespace SimAirServingZones {
         // have moved std 62.1 table report writing to ManageSystemVentilationAdjustments in SizingManager
     }
 
-    void UpdateSysSizing(OutputFiles &outputFiles, int const CallIndicator)
+    void UpdateSysSizing(EnergyPlusData &state, int const CallIndicator)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7080,7 +7086,7 @@ namespace SimAirServingZones {
 
                 // EMS calling point to customize system sizing results
                 bool anyEMSRan;
-                ManageEMS(emsCallFromSystemSizing, anyEMSRan);
+                ManageEMS(state, emsCallFromSystemSizing, anyEMSRan, ObjexxFCL::Optional_int_const());
 
                 // EMS override point
                 if (AnyEnergyManagementSystemInModel) {
@@ -7115,7 +7121,7 @@ namespace SimAirServingZones {
                 // write out the sys design calc results
 
 
-                print(outputFiles.ssz, "Time");
+                print(state.files.ssz, "Time");
                 // static ObjexxFCL::gio::Fmt SSizeFmt11("(A1,A,A,A1,A,A,A1,A,A,A1,A,A)");
                 // for ( I = 1; I <= NumPrimaryAirSys; ++I ) {
                 // 	{ IOFlags flags; flags.ADVANCE( "No" ); ObjexxFCL::gio::write( OutputFileSysSizing, SSizeFmt11, flags ) << SizingFileColSep <<
@@ -7126,7 +7132,7 @@ namespace SimAirServingZones {
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
                     for (J = 1; J <= TotDesDays + TotRunDesPersDays; ++J) {
                         static constexpr auto SSizeFmt12("{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}");
-                        print(outputFiles.ssz,
+                        print(state.files.ssz,
                               SSizeFmt12,
                               SizingFileColSep,
                               CalcSysSizing(I).AirPriLoopName,
@@ -7155,7 +7161,7 @@ namespace SimAirServingZones {
                               ":Des Tot Cool Cap [W]");
                     }
                 }
-                print(outputFiles.ssz, "\n");
+                print(state.files.ssz, "\n");
                 //      HourFrac = 0.0
                 Minutes = 0;
                 TimeStepIndex = 0;
@@ -7170,12 +7176,12 @@ namespace SimAirServingZones {
                             HourPrint = HourCounter - 1;
                         }
                         static constexpr auto SSizeFmt20("{:02}:{:02}:00");
-                        print(outputFiles.ssz, SSizeFmt20, HourPrint, Minutes);
+                        print(state.files.ssz, SSizeFmt20, HourPrint, Minutes);
                         for (I = 1; I <= NumPrimaryAirSys; ++I) {
                             for (J = 1; J <= TotDesDays + TotRunDesPersDays; ++J) {
                                 static constexpr auto SSizeFmt22("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
 
-                                print(outputFiles.ssz,
+                                print(state.files.ssz,
                                       SSizeFmt22,
                                       SizingFileColSep,
                                       SysSizing(J, I).HeatFlowSeq(TimeStepIndex),
@@ -7189,14 +7195,14 @@ namespace SimAirServingZones {
                                       SysSizing(J, I).TotCoolCapSeq(TimeStepIndex));
                             }
                         }
-                        print(outputFiles.ssz, "\n");
+                        print(state.files.ssz, "\n");
                     }
                 }
 
                 static constexpr auto SSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
-                print(outputFiles.ssz, "Coinc Peak   ");
+                print(state.files.ssz, "Coinc Peak   ");
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
-                    print(outputFiles.ssz,
+                    print(state.files.ssz,
                           SSizeFmt31,
                           SizingFileColSep,
                           CalcSysSizing(I).CoinHeatMassFlow,
@@ -7207,11 +7213,11 @@ namespace SimAirServingZones {
                           SizingFileColSep,
                           CalcSysSizing(I).SensCoolCap);
                 }
-                print(outputFiles.ssz, "\n");
+                print(state.files.ssz, "\n");
 
-                print(outputFiles.ssz, "NonCoinc Peak");
+                print(state.files.ssz, "NonCoinc Peak");
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
-                    print(outputFiles.ssz,
+                    print(state.files.ssz,
                           SSizeFmt31,
                           SizingFileColSep,
                           CalcSysSizing(I).NonCoinHeatMassFlow,
@@ -7222,7 +7228,7 @@ namespace SimAirServingZones {
                           SizingFileColSep,
                           CalcSysSizing(I).SensCoolCap);
                 }
-                print(outputFiles.ssz, "\n");
+                print(state.files.ssz, "\n");
 
                 // have moved a big section to later in calling order, write predefined standard 62.1 report data
             }
