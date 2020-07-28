@@ -833,200 +833,220 @@ The PerformancePrecisionTradeoffs object can be used to control tradeoffs betwee
 
 Every time a simulation includes the PerformancePrecisionTradeoffs object, a file is generated with the same name as the input but ending with \_perflog.csv file (the performance log file). This file can be opened using a spreadsheet program and may be helpful in adjusting the input field values for the PerformancePrecisionTradeoffs object. Unlike most EnergyPlus output files, a new line of results is appended (added to the end of the file) every time the input file is simulated. The \_perflog.csv file contains a log of results from each run and allows the examination of the impacts of the changes to the PerformancePrecisionTradeoffs object and any other simulation inputs. You are encouraged to not make changes to any other portions of your input file other than the PerformancePrecisionTradeoffs object when you are tuning that object. Also, if you are looking at the \_perflog.csv in a spreadsheet program, make sure you close the file before each simulation. A spreadsheet program will often lock a CSV file and prevent it from being modified by another program like EnergyPlus.
 
-To illustrate how to use the PerformancePrecisionTradeoffs object and the \_perflog.csv file together, here is an example using an IDF file with 100 zones, one window per zone, and is served by fan coil units and a central boiler and chiller. Thirteen simulations were made, and the results in the <filename>\_perflog.csv for various options in the PerformancePrecisionTradeoffs object are shown below in the following tables.
+To illustrate how to use the PerformancePrecisionTradeoffs object and the \_perflog.csv file together, here is an example using an IDF file with 100 zones, one window per zone, and is served by fan coil units and a central boiler and chiller. Seventeen simulations were made, and the results in the <filename>\_perflog.csv for various options in the PerformancePrecisionTradeoffs object are shown below in the following tables.
 
 
 % table X
 {\scriptsize
-\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.6in}p{0.5in}p{0.5in}p{0.6in}p{0.6in}p{0.65in}}
+\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.55in}p{0.5in}p{0.52in}p{0.4in}p{0.5in}p{0.5in}p{0.5in}p{0.6in}p{0.5in}}
+% \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.6in}p{0.5in}p{0.5in}p{0.6in}p{0.6in}p{0.65in}}
 % \begin{longtable}[c]{cccccccrr}
-\caption{PerfLog Mode Columns} \tabularnewline
+\caption{PerfLog Mode Columns\label{table:perflog_mode_columns}} \tabularnewline
 \toprule
-Run &
-Direct Coil &
-Radiant Algorithm &
-Override Mode &
-Timesteps&
-Min Warmup&
-Suppress Resets &
-MaxZone TempDiff &
-Runtime {[}seconds{]} \tabularnewline
+Run & 
+Direct Coil & 
+Radiant Algorithm & 
+Override Mode & 
+Num of Timesteps {[}\#/hour{]}& 
+Min Warmup& 
+Suppress Resets & 
+System Timestep {[}minute{]} &
+MaxZone TempDiff & 
+MaxAllowed DelTemp &
+Runtime {[}second{]} \tabularnewline
 \midrule
 \endfirsthead
 
-1  & FALSE & ScriptF    & NORMAL & 6 & 1 & FALSE & 0.30 & 158.05 \tabularnewline
-2  & FALSE & ScriptF    & MODE01 & 1 & 1 & FALSE & 0.30 & 55.07  \tabularnewline
-3  & FALSE & ScriptF    & MODE02 & 1 & 1 & FALSE & 0.30 & 52.39  \tabularnewline
-4  & FALSE & ScriptF    & MODE03 & 1 & 1 & FALSE & 0.30 & 52.42  \tabularnewline
-5  & FALSE & ScriptF    & MODE04 & 1 & 1 & TRUE  & 0.30 & 51.74  \tabularnewline
-6  & FALSE & ScriptF    & MODE05 & 1 & 1 & TRUE  & 1.00 & 32.74  \tabularnewline
-7  & TRUE  & ScriptF    & NORMAL & 6 & 1 & FALSE & 0.30 & 161.89 \tabularnewline
-8  & FALSE & CarrollMRT & NORMAL & 6 & 1 & FALSE & 0.30 & 171.00    \tabularnewline
-9  & FALSE & CarrollMRT & MODE01 & 1 & 1 & FALSE & 0.30 & 54.19  \tabularnewline
-10 & FALSE & CarrollMRT & MODE02 & 1 & 1 & FALSE & 0.30 & 53.85  \tabularnewline
-11 & FALSE & CarrollMRT & MODE03 & 1 & 1 & FALSE & 0.30 & 51.21  \tabularnewline
-12 & FALSE & CarrollMRT & MODE04 & 1 & 1 & TRUE  & 0.30 & 51.14  \tabularnewline
-13 & FALSE & CarrollMRT & MODE05 & 1 & 1 & TRUE  & 1.00 & 32.76  \tabularnewline
+1  & FALSE & ScriptF    & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 185.12 \tabularnewline
+2  & FALSE & ScriptF    & MODE01 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 75.73  \tabularnewline
+3  & FALSE & ScriptF    & MODE02 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 71.37  \tabularnewline
+4  & FALSE & ScriptF    & MODE03 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 66.17  \tabularnewline
+5  & FALSE & ScriptF    & MODE04 & 1 & 1 & TRUE  & 1  & 0.30 & 0.002 & 61.31  \tabularnewline
+6  & FALSE & ScriptF    & MODE05 & 1 & 1 & TRUE  & 60 & 0.30 & 0.002 & 33.30  \tabularnewline
+7  & FALSE & ScriptF    & MODE06 & 1 & 1 & TRUE  & 60 & 1.00 & 0.002 & 32.20  \tabularnewline
+8  & FALSE & ScriptF    & MODE07 & 1 & 1 & TRUE  & 60 & 1.00 & 0.1   & 26.38  \tabularnewline
+9  & TRUE  & ScriptF    & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 178.86 \tabularnewline
+10 & FALSE & CarrollMRT & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 185.07 \tabularnewline
+11 & FALSE & CarrollMRT & MODE01 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 70.30  \tabularnewline
+12 & FALSE & CarrollMRT & MODE02 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 66.85  \tabularnewline
+13 & FALSE & CarrollMRT & MODE03 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 65.76  \tabularnewline
+14 & FALSE & CarrollMRT & MODE04 & 1 & 1 & TRUE  & 1  & 0.30 & 0.002 & 54.46  \tabularnewline
+15 & FALSE & CarrollMRT & MODE05 & 1 & 1 & TRUE  & 60 & 0.30 & 0.002 & 28.09  \tabularnewline
+16 & FALSE & CarrollMRT & MODE06 & 1 & 1 & TRUE  & 60 & 1.00 & 0.002 & 27.87  \tabularnewline
+17 & FALSE & CarrollMRT & MODE07 & 1 & 1 & TRUE  & 60 & 1.00 & 0.1   & 27.39  \tabularnewline
+
 \bottomrule
 \end{longtable}
 }
 
-This example uses 13 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffsobject, but fewer trials could have been made to reach a similar conclusion. The first run shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 6 are just stepping through the Override Modes. Run 7 employs the Use Coil Direct Solution option, but the time for the simulation went up, so it was not used anymore.  Runs 8 through 13 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. Mode02, Moded03, and Mode04 only save a few seconds compared to Mode01, which takes about one-third of the time of the baseline Run 1 time. Mode05 saves the most time with both ScriptF and CarrollMRT taking about one-fifth of the original time. Mode05 seems like the natural choice, but we need to look at other results in the \_perflog.csv file first before we come to that conclusion.
+This example uses 17 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffs object, but fewer trials could have been made to reach a similar conclusion. The first run (Run 1, Normal mode) shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 8 are just stepping through the Override Modes (Mode01 to Mode07). Run 9 employs the ``Use Coil Direct Solution'' option, but the time gain for the simulation is not so significant. Therefore it is not used anymore in later runs. Runs 10 through 17 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. The biggest savings of the computation time are from Mode01 (Run 2) application. Compared to the Normal mode (Run 1) baseline, applying Mode01 (Run 2) immediately reduces the simulation time by nearly 60\%, to about only 40.9\% of that for the Normal baseline. Then again, by applying Mode02 (Run 3), the simulation time is reduced by 5.8\% compared to Mode02 (Run 1); Mode03 (Run 4) saves about 7.3\% compared to Mode02 (Run 3); and Mode04 (Run 5) saves about 7.3\% on top of Mode03 (Run 4). Compared to the normal baseline (Run 1), Mode04 (Run 5) only consumes about one third (33.1\%) of the computation time of Run 1 Normal baseline. 
 
-These example simulations each took three minutes or less to try. If your building takes much longer than a few minutes, you might want to temporarily change your run period to just a  month or even a week to tune the PerformancePrecisionTradeoffs object inputs. If temporarily shortening the run period is necessary, it is best to pick a month or week that has some cooling and some heating. Just remember to set your run period back to a full year before coming to any conclusions about the building or energy efficiency options being considered for the building.
+Next, when Mode05 (Run 6) is applied, the simulation time is significantly reduced again---Mode05 reduces the simulation time by nearly a half compared to Mode04 (Run 5). The run time for Mode05 (Run 6) is only 54.3\% of that for Mode04 (Run 5); and it is only 18.0\% of the Normal baseline (Run 1). Mode06 (Run 7) cuts the simulation time by about a second, or about 3.3\% compared to Mode 05 (Run 6); the overall simulation time of Mode06 (Run 7) is about 17.4\% of the Normal baseline. The final Mode07 (Run 8) cuts the simulation time by another 18.0\% compared to Mode06 (Run 7); and the overall run time for Mode07 is only 14.25\% (or about one-seventh) of that for the Run 1 Normal baseline.
 
+In general, the higher models---Mode05 to Mode07---significantly save the simulation time with both ScriptF and CarrollMRT, taking about one-fifth to one-seventh of the original Normal simulation time. These modes seem to be good choices for faster simulations. However, we still need to look at other results in the \_perflog.csv file first before coming to that conclusion.
+
+These example simulations each takes about three minutes or less to try. If your building takes much longer than a few minutes, you might want to temporarily change the run period to just a month or even a week to tune the PerformancePrecisionTradeoffs object inputs. If temporarily shortening the run period is necessary, it is best to pick a month or week that has some cooling and some heating. Just remember to set your run period back to a full year before coming to any conclusions about the building or energy efficiency options being considered for the building.
 
 % table X
 {\scriptsize
-\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.7in}p{0.65in}}
-\caption{PerfLog Energy Columns} \tabularnewline
+\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.55in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.6in}}
+% \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.7in}p{0.65in}}
+\caption{PerfLog Energy Columns\label{table:perflog_energy_columns}} \tabularnewline
 \toprule
-Run &
-Direct Coil &
-Radiant Algorithm &
-Override Mode &
+Run & 
+Direct Coil & 
+Radiant Algorithm & 
+Override Mode & 
   Electricity {[}MJ{]} &
   Natural Gas {[}MJ{]} &
-  Water {[}m3{]} &
-  Runtime {[}seconds{]} \tabularnewline
+  Water {[}m$^3${]} &
+  Runtime {[}second{]} \tabularnewline
 \midrule
 \endfirsthead
 
-1  & False & ScriptF  & NORMAL & 3,103,200 & 756,352 & 213,489 & 158.05 \tabularnewline
-2  & False & ScriptF  & MODE01 & 3,093,683 & 738,559 & 211,747 & 55.07  \tabularnewline
-3  & False & ScriptF  & MODE02 & 3,097,292 & 746,356 & 212,704 & 52.39  \tabularnewline
-4  & False & ScriptF  & MODE03 & 3,097,292 & 746,356 & 212,704 & 52.42  \tabularnewline
-5  & False & ScriptF  & MODE04 & 3,097,292 & 746,356 & 212,704 & 51.74  \tabularnewline
-6  & False & ScriptF  & MODE05 & 3,098,474 & 743,652 & 213,207 & 32.74  \tabularnewline
-7  & True  & ScriptF  & NORMAL & 3,103,200 & 756,352 & 213,489 & 161.89 \tabularnewline
-8  & False & CarrollMRT & NORMAL & 3,256,436 & 498,372 & 267,030 & 171.00 \tabularnewline
-9  & False & CarrollMRT & MODE01 & 3,245,912 & 486,067 & 265,166 & 54.19  \tabularnewline
-10 & False & CarrollMRT & MODE02 & 3,243,835 & 492,423 & 265,212 & 53.85  \tabularnewline
-11 & False & CarrollMRT & MODE03 & 3,243,835 & 492,423 & 265,212 & 51.21  \tabularnewline
-12 & False & CarrollMRT & MODE04 & 3,243,835 & 492,423 & 265,212 & 51.14  \tabularnewline
-13 & False & CarrollMRT & MODE05 & 3,244,804 & 490,038 & 265,528 & 32.76  \tabularnewline
+1  & FALSE & ScriptF  & NORMAL &  3,103,447 &	 755,635 &	 213,488 &	185.12 \tabularnewline
+2  & FALSE & ScriptF  & MODE01 &  3,095,147 &	 741,358 &	 212,016 &	75.73  \tabularnewline
+3  & FALSE & ScriptF  & MODE02 &  3,097,345 &	 744,583 &	 212,730 &	71.37  \tabularnewline
+4  & FALSE & ScriptF  & MODE03 &  3,097,345 &	 744,583 &	 212,730 &	66.17  \tabularnewline
+5  & FALSE & ScriptF  & MODE04 &  3,097,345 &	 744,583 &	 212,730 &	61.31  \tabularnewline
+6  & FALSE & ScriptF  & MODE05 &  3,096,331 &	 766,580 &	 211,613 &	33.30  \tabularnewline
+7  & FALSE & ScriptF  & MODE06 &  3,096,331 &	 766,580 &	 211,613 &	32.20  \tabularnewline
+8  & FALSE & ScriptF  & MODE07 &  3,097,280 &	 751,021 &	 212,386 &	26.38  \tabularnewline
+9  & TRUE  & ScriptF  & NORMAL &  3,103,447 &	 755,635 &	 213,488 &	178.86 \tabularnewline
+10 & FALSE & CarrollMRT & NORMAL & 3,256,682& 	 497,760 &	 267,097 &	185.07 \tabularnewline
+11 & FALSE & CarrollMRT & MODE01 & 3,246,880& 	 488,583 &	 265,309 &	70.30  \tabularnewline
+12 & FALSE & CarrollMRT & MODE02 & 3,244,172& 	 491,383 &	 265,347 &	66.85  \tabularnewline
+13 & FALSE & CarrollMRT & MODE03 & 3,244,172& 	 491,383 &	 265,347 &	65.76  \tabularnewline
+14 & FALSE & CarrollMRT & MODE04 & 3,244,172& 	 491,383 &	 265,347 &	56.46  \tabularnewline
+15 & FALSE & CarrollMRT & MODE05 & 3,250,818& 	 505,725 &	 265,180 &	28.09  \tabularnewline
+16 & FALSE & CarrollMRT & MODE06 & 3,250,818& 	 505,725 &	 265,180 &	27.87  \tabularnewline
+17 & FALSE & CarrollMRT & MODE07 & 3,250,420& 	 493,351 &	 265,828 &	27.39  \tabularnewline
+
 \bottomrule
 \end{longtable}
 }
 
-
-The CarrollMRT options seemed to have a much more significant impact on the natural gas usage, and the total water and the times were similar to the runtimes using ScriptF, so for this example, CarrollMRT doesn’t seem to be a right choice. In this case, times are not very different than the ScriptF instances, but the energy usage is further from the Normal baseline. The electricity usage differences for Runs 2 through 6 are small compared to Run 1, the normal case, and are less than 0.4\% different. Natural gas usage has a more significant impact of 1.3 to 2.4\%, and the water usage changes from 0.1 to 0.8\%. From an energy perspective, these impacts for the ScriptF runs 2 through 6 are probably tolerable.
-
+The CarrollMRT options seem to have a much more significant impact on the natural gas usage; and the total water and the times are similar to the runtimes using ScriptF. So for this example, CarrollMRT does not seem to be a right choice. In these cases, the computation times are not very different from the ScriptF instances; however, the energy usage is further away from the Normal baseline. The electricity usage differences for Runs 2 through 8 are small compared to Run 1 (the Normal baseline case), and are less than 0.27\% different. The natural gas usage has more significant differences of 1.4\% to 1.9\%, and the water usage differs from 0.36\% to 0.88\%. From an energy perspective, these impacts for the ScriptF Runs 2 through 8 are probably tolerable. 
 
 % table X
 {\scriptsize
-\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.6in}p{0.65in}}
-\caption{PerfLog Oscillation Columns} \tabularnewline
+\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.55in}p{0.7in}p{0.5in}p{0.6in}p{0.7in}p{0.6in}p{0.6in}}
+% \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.6in}p{0.65in}}
+\caption{PerfLog Oscillation Columns\label{table:perflog_oscillation_columns}} \tabularnewline
 \toprule
-Run &
-Direct Coil &
-Radiant Algorithm &
-Override Mode &
-  Oscillating {[}hours{]} &
-  Oscillating Occupancy {[}hours{]} &
-  Oscillating Deadband {[}hours{]} &
+Run & 
+Direct Coil & 
+Radiant Algorithm & 
+Override Mode & 
+  Oscillating {[}hour{]} &
+  Oscillating Occupancy {[}hour{]} &
+  Oscillating Deadband {[}hour{]} &
   Warnings &
-  Runtime {[}seconds{]} \tabularnewline
+  Runtime {[}second{]} \tabularnewline
 \midrule
 \endfirsthead
-1  & FALSE & ScriptF    & NORMAL & 3.48  & 3.28  & 0.2   & 44 & 158.05 \tabularnewline
-2  & FALSE & ScriptF    & MODE01 & 8.02  & 2.62  & 6.57  & 45 & 55.07  \tabularnewline
-3  & FALSE & ScriptF    & MODE02 & 9.85  & 4.45  & 8.4   & 46 & 52.39  \tabularnewline
-4  & FALSE & ScriptF    & MODE03 & 9.85  & 4.45  & 8.4   & 47 & 52.42  \tabularnewline
-5  & FALSE & ScriptF    & MODE04 & 9.85  & 4.45  & 8.4   & 48 & 51.74  \tabularnewline
-6  & FALSE & ScriptF    & MODE05 & 86.57 & 59.33 & 71.57 & 50 & 32.74  \tabularnewline
-7  & TRUE  & ScriptF    & NORMAL & 3.48  & 3.28  & 0.2   & 45 & 161.89 \tabularnewline
-8  & FALSE & CarrollMRT & NORMAL & 2.92  & 2.72  & 0.2   & 45 & 171.00    \tabularnewline
-9  & FALSE & CarrollMRT & MODE01 & 7.88  & 0.95  & 6.48  & 46 & 54.19  \tabularnewline
-10 & FALSE & CarrollMRT & MODE02 & 10.47 & 3.53  & 7.73  & 47 & 53.85  \tabularnewline
-11 & FALSE & CarrollMRT & MODE03 & 10.47 & 3.53  & 7.73  & 48 & 51.21  \tabularnewline
-12 & FALSE & CarrollMRT & MODE04 & 10.47 & 3.53  & 7.73  & 49 & 51.14  \tabularnewline
-13 & FALSE & CarrollMRT & MODE05 & 88.15 & 62.33 & 74.9  & 50 & 32.76  \tabularnewline
+
+1  & FALSE & ScriptF    & NORMAL & 2.92	 & 2.75	 & 0.17	 & 46 &	185.12 \tabularnewline
+2  & FALSE & ScriptF    & MODE01 & 7.5	 & 2.17	 & 6.17	 & 47 &	75.73  \tabularnewline
+3  & FALSE & ScriptF    & MODE02 & 9.25	 & 4	 & 8.25	 & 48 &	71.37  \tabularnewline
+4  & FALSE & ScriptF    & MODE03 & 9.25	 & 4	 & 8.25	 & 49 & 66.17  \tabularnewline
+5  & FALSE & ScriptF    & MODE04 & 9.25	 & 4	 & 8.25	 & 50 &	61.31  \tabularnewline
+6  & FALSE & ScriptF    & MODE05 & 158	 & 87	 & 122	 & 52 &	33.30  \tabularnewline
+7  & FALSE & ScriptF    & MODE06 & 158	 & 87	 & 122	 & 53 &	32.20  \tabularnewline
+8  & FALSE & ScriptF    & MODE07 & 155	 & 91	 & 122	 & 54 &	26.38  \tabularnewline
+9  & TRUE  & ScriptF    & NORMAL & 2.92	 & 2.75	 & 0.17	 & 47 & 178.86 \tabularnewline
+10 & FALSE & CarrollMRT & NORMAL & 2.14	 & 1.97	 & 0.17	 & 47 &	185.07 \tabularnewline
+11 & FALSE & CarrollMRT & MODE01 & 7.74	 & 0.95	 & 6.08	 & 48 &	70.30  \tabularnewline
+12 & FALSE & CarrollMRT & MODE02 & 9.99	 & 3.33	 & 7.53	 & 49 &	66.85  \tabularnewline
+13 & FALSE & CarrollMRT & MODE03 & 9.99	 & 3.33	 & 7.53	 & 50 &	65.76  \tabularnewline
+14 & FALSE & CarrollMRT & MODE04 & 9.99	 & 3.33	 & 7.53	 & 51 &	56.46  \tabularnewline
+15 & FALSE & CarrollMRT & MODE05 & 150	 & 74	 & 108	 & 52 &	28.09  \tabularnewline
+16 & FALSE & CarrollMRT & MODE06 & 150	 & 74	 & 108	 & 53 &	27.87  \tabularnewline
+17 & FALSE & CarrollMRT & MODE07 & 151	 & 76	 & 113	 & 54 &	27.39  \tabularnewline
+
 \bottomrule
 \end{longtable}
 }
 
+The number of hours any zone is oscillating for Run 1 (the Normal baseline case) using Script F is only 2.92 hours, with almost none of the hours in the dead band and nearly all during occupancy. This changes when considering the other ScriptF cases using Mode01 to Mode07 (Run 2 to Run 8). For Mode01 (Run 2), the oscillating hours increase but are still less than 8 hours per year. While more than doubling, it is still considered a small change on an absolute basis. The change is even more minor when considering the oscillating hours during occupancy, which for Mode01 (Run 2) the hours even decrease by a small amount. The oscillation hours in the dead band for Mode01 (Run 2) increase about 6 hours. For Mode02 to Mode04, there is an increase of about 2 hours for each oscillating hour categories (the total, the occupancy, and the dead band ones), though they are considered to be a relatively minor change from the Normal baselines especially when comparing further with those for the succeeding Mode05 and Mode07. For Mode05 to Mode07 (Runs 6 to 8), the oscillating hours increase significantly, by more than one order of magnitude to about 155--158 hours per year. The numbers are also reflected in similar fashions for the the oscillating hours during occupancy and for the oscillating hours during dead band. For the CarrollMRT cases, similar trends can be observed when applying Mode01 to Mode07. The most significant change starts from Mode05, which for both ScriptF and CarrollMRT raise the oscillating hours to about 155--158. This is a substantial change that does indicate a significant shift in the way the simulation program is behaving. On the other hand, the number of warnings for all the seventeen cases are not too much different from each other, all ranging from 46 to 54, showing a slow increasing trend from Normal to Mode07. No severe errors are reported for any of these simulations, so no column is shown for them. After investigating the changes, it is reasonable to conclude that the change in the count of warning messages is not considered important.
 
-The number of hours any zone is oscillating for Run 1 the Normal baseline case using Script F is only 3.48 hours, with almost none of the hours in the dead band and nearly all during occupancy. This changes when considering the other ScriptF cases using Mode01 to Mode05 (Run 2 to Run 5).  For these cases, the oscillating hours increase but are still less than 10 per year, while more than doubling, on an absolute basis, a small change. The change is even more minor when considering the hours with the dead band, which for Run 2 to 6 only increases about an hour. Similar numbers are shown for the CarrollMRT cases for Mode01 to Mode04. The most significant change is Mode05, which for both ScriptF and CarrollMRT raise the oscillating hours to nearly 90. This is a substantial change that does indicate a significant shift in the way the simulation is behaving. It would be easy to eliminate using Mode05 if it wasn’t for the fact that it is also substantially faster than the other modes. No severe errors were reported for any of these simulations, so no column is shown for them, and the column for warnings shows a small increase. After investigating the changes, the change in the count warning messages was not considered important.
+The decision on which mode to use is up to the individual modelers. These simulations runs can be clearly classified into three tiers based on the simulation speed (computation time) and the numerical stability (oscillation hours): the first tier is the normal run, which incurs the least oscillations (the best), but also takes the longest computation time; the second tier includes Mode02 to Mode04, where the simulation time can be cut to roughly one-third of that for the Normal baseline, but with a minor penalty for increased oscillation hours; and the third tier includes Mode05 to Mode07, which can achieve an superior simulation time advantage, reaching around one-fifth to one-seventh of that for the Normal baseline, but also with significant oscillation hours penalties of about one order of magnitude higher. For simulations conducted in these test modes, Runs 5 (Mode04) is recommended as a balanced option for speed and numerical stability (oscillations). It does not use direct coil solution, uses ScriptF, and Mode04. This simulation time also shows an advantages over the other lower modes cases--it saves time compared to Mode01--Mode03---and still has tamed the oscillating hours. Further, it does not add too much additional overrides compared to the higher modes (Mode05--Mode07), which should be avoided if not adding value. For extreme speed benefit, higher modes such as Mode05 to Mode07 definitely show an advantage in the computation time, as they cost only about only one-seventh to one-fifth of the normal base, and only about half of those for the lower modes (such as Mode02--Mode04). However, substantially higher oscillating hours will be incurred as a downside with these higher modes.
 
-The decision on which mode to use is up to the individual modelers, but for these simulations, Run 3 is recommended. Run 3 does not use direct coil solution, uses ScriptF, and Mode02. This simulation saves some time (a few seconds) compared to Mode01 but doesn’t add any additional overrides, which should be avoided if not adding value. Mode03 and Mode04 for this model were just about the same time as Mode02.  Mode05 was avoided because of the substantially larger oscillating hours.
-
-Additional guidance on how to make EnergyPlus faster appears in the "Tips And Tricks for Using EnergyPlus" document that is distributed with EnergyPlus within the section titled "Platforms and Run-Time."
-
+Additional guidance on how to make EnergyPlus faster appears in the ``Tips And Tricks for Using EnergyPlus'' document that is distributed with EnergyPlus within the section titled ``Platforms and Run-Time.''
 
 \paragraph{Field: Use Coil Direct Solutions}\label{use-coil-direct-solutions}
 
-If Yes, an analytical or empirical solution will be used instead of iteration based method in calculations that determine how to control the coil model.  The tradeoff is between an iterative solution algorithm, see \hyperref[hvacystemrootfindingalgorithm]{HVACSystemRootFindingAlgorithm}, or a direct solution algorithm as described below.  These calculations are at the level of how the coil component model is to be controlled by the parent system object as it tries to find a part load ratio that just meets a coil load or coil leaving temperature condition.  Once the control calculations have been completed to determine the part load ratio (or speed ratio for variable speed) the full coil model is still used for the final calculation,
+If Yes, an analytical or empirical solution will be used instead of iteration based method in calculations that determine how to control the coil model.  The tradeoff is between an iterative solution algorithm, see \hyperref[hvacystemrootfindingalgorithm]{HVACSystemRootFindingAlgorithm}, or a direct solution algorithm as described below.  These calculations are at the level of how the coil component model is to be controlled by the parent system object as it tries to find a part load ratio that just meets a coil load or coil leaving temperature condition.  Once the control calculations have been completed to determine the part load ratio (or speed ratio for variable speed) the full coil model is still used for the final calculation.
 
 Although this input field may eventually affect all coils, the current implementation is available for only the limited number of systems and coil configurations listed in the following table. Since a linear relationship between system output and part load ratio, or speed ratio, is expected, an analytical direct solution is applied to all coils in the listed in the table when Yes is selected. More coils will be allowed when time allows. Note that this simulation parameter is global and when used every such coil model included in the entire building model will be changed to use the direct method.
 
-The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below
+The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below: 
 
 \begin{equation}
-PLR = \frac{SystemLoad-OutputOff}{OutputFull - OutputOff}
+\textnormal{PLR} = \frac{\textnormal{SystemLoad} - \textnormal{OutputOff}}{\textnormal{OutputFull} - \textnormal{OutputOff}}
 \end{equation}
 
 where
 
-PLR = Part load ratio for a single speed coil or for a multiple speed coil at speed 1
+PLR = Part load ratio for a single speed coil or for a multiple speed coil at speed 1;
 
-SystemLoad = Load requested to meet thermostat setpoint
+SystemLoad = Load requested to meet thermostat setpoint;
 
-OutputOff = System output at PLR = 0 as coil off
+OutputOff = System output at PLR = 0 as coil off;
 
-OutputFull = System output at PLR =1 as full output
+OutputFull = System output at PLR = 1 as full output.
 
-The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below
+The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below: 
 
 \begin{equation}
-SpeedRatio = \frac{SystemLoad-OutputFull_{i-1}}{OutputFull_{i} - OutputFull_{i-1}}
+\textnormal{SpeedRatio} = \frac{\textnormal{SystemLoad} - \textnormal{OutputFull}_{i-1}}{\textnormal{OutputFull}_{i} - \textnormal{OutputFull}_{i-1}}
 \end{equation}
 
 where
 
-SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep
+SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep;
 
-SystemLoad = Load requested to meet thermostat setpoint
+SystemLoad = Load requested to meet thermostat setpoint;
 
-OutputFull\(_{i}\) = System full output at the higher speed
+OutputFull$_{i}$ = System full output at the higher speed;
 
-OutputFull\(_{i-1}\) = System full output at the lower speed
+OutputFull$_{i-1}$ = System full output at the lower speed.
 
 Note: When a DX cooling coil with a constant volume fan is used, latent degradation is disabled.
 
-When coils of Coil:Cooling:DX:VariableSpeed, Coil:Heating:DX:SingleSpeed, and Coil:Heating:DX:VariableSpeed are applied, the desired outlet temperature are used to determine part load ratio or speed ratio.
+When coils of Coil:Cooling:DX:VariableSpeed, Coil:Heating:DX:SingleSpeed, and Coil:Heating:DX:VariableSpeed are applied, the desired outlet temperature is used to determine part load ratio or speed ratio.
 
-The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below
+The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below:
 
 \begin{equation}
-PLR = \frac{DesOutTemp - InletTemp}{OutTempFull - InletTemp}
+\textnormal{PLR} = \frac{\textnormal{DesOutTemp} - \textnormal{InletTemp}}{\textnormal{OutTempFull} - \textnormal{InletTemp}}
 \end{equation}
 
 where
 
-PLR = Part load ratio for a single speed coil or for a multiple speed coil at speed 1
+PLR = Part load ratio for a single speed coil or for a multiple speed coil at speed 1;
 
-DesOutTemp = Desired outlet temperature to meet setpoint
+DesOutTemp = Desired outlet temperature to meet setpoint;
 
-InletTemp = Inlet temperature
+InletTemp = Inlet temperature;
 
-OutTemptFull = Outlet temperature at PLR =1 as full output
+OutTemptFull = Outlet temperature at PLR = 1 as full output.
 
-The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below
+The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below:
 
 \begin{equation}
-SpeedRatio = \frac{DesOutTemp - OutTempFull_{i-1}}{OutTempFull_{i} - OutTempFull_{i-1}}
+\textnormal{SpeedRatio} = \frac{\textnormal{DesOutTemp} - \textnormal{OutTempFull}_{i-1}}{\textnormal{OutTempFull}_{i} - \textnormal{OutTempFull}_{i-1}}
 \end{equation}
 
 where
 
-SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep
+SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep;
 
-DesOutTemp = Desired outlet temperature to meet setpoint
+DesOutTemp = Desired outlet temperature to meet setpoint;
 
-OutTempFull\(_{i}\) = Outlet temperature of full output at the higher speed
+OutTempFull$_{i}$ = Outlet temperature of full output at the higher speed;
 
-OutTempFull\(_{i-1}\) = Outlet temperature of full output at the lower speed
+OutTempFull$_{i-1}$ = Outlet temperature of full output at the lower speed.
 
 % table 2
 \begin{longtable}[c]{p{4in}p{2.5in}}
@@ -1054,7 +1074,7 @@ Although, defined view factors cannot be used with CarrollMRT, the algorithm app
 
 \paragraph{Field: Override Mode}\label{override-mode}
 
-The Override Mode field provides a single field that will override other inputs located in the IDF/epJSON file as well as convergence related values that appear in the remaining fields of the PerformancePrecisionTradeoffs object. The Normal option (default) provides no overrides while the Mode options provide overrides based on the following tables. The Advanced option, allows the remaining fields of the PerformancePrecisionTradeoffs to be used.
+The Override Mode field provides a single field that will override other inputs located in the IDF/epJSON file as well as convergence related values that appear in the remaining fields of the PerformancePrecisionTradeoffs object. The Normal option (default) provides no overrides while the Mode options provide overrides based on the following tables. The Advanced option, allows the remaining fields of the PerformancePrecisionTradeoffs to be used. 
 
 % table 2
 \begin{longtable}[c]{p{1.5in}p{5.0in}}
@@ -1064,33 +1084,41 @@ Mode & Description \tabularnewline
 \midrule
 \endfirsthead
 
-Normal & no overrides\tabularnewline
-Mode01 & Zone Time step (TimeStep object) will be set to one timestep per hour\tabularnewline
+Normal & No overrides\tabularnewline
+Mode01 & Zone time step (TimeStep object) will be set to one timestep per hour\tabularnewline
 Mode02 & Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler\tabularnewline
 Mode03 & Mode02 plus Minimum Number of Warmup Days will be set to 1\tabularnewline
 Mode04 & Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets\tabularnewline
-Mode05 & Mode04 MaxZoneTempDiff will be set to 1.00\tabularnewline
+Mode05 & Mode04 plus minimum system timestep length will be 1 hour\tabularnewline
+Mode06 & Mode05 MaxZoneTempDiff will be set to 1.00\tabularnewline
+Mode07 & Mode06 MaxAllowedDelTemp will be set to 0.1\tabularnewline
 Advanced& Allow direct input of convergence field values\tabularnewline
 
 \bottomrule
 \end{longtable}
 
-The increasing mode number roughly corresponds with increased speed. Mode01 to Mode04 are overriding inputs in other parts of the IDF/epJSON file and is equivalent to changing those input directly. Mode05 is changing a convergence parameter previously not available to modified by the user.
+The increasing mode number roughly corresponds with increased speed. Mode01 to Mode05 are overriding inputs in other parts of the IDF/epJSON file and is equivalent to changing those input directly. Mode06 and Mode07 are changing convergence parameters previously not available to be modified by the user.
 
 \paragraph{Field: MaxZoneTempDiff}\label{max-zone-temp-diff}
 
-This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxZoneTempDiff variable within EnergyPlus. This variable sets the maximum zone temperature change before the HVAC timestep is shortened. Larger values result in fewer iterations. To understand this input completely, please review the use of the MaxZoneTempDiff variable in the ManageHVAC() routine located in the HVACManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.3, which is also the default value. Testing has been done with a value of 1.0, which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 1.0 have not been tested.
+This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxZoneTempDiff variable within EnergyPlus. This variable sets the maximum zone temperature change before the HVAC timestep is shortened. Larger values result in fewer iterations. To understand this input completely, please review the use of the MaxZoneTempDiff variable in the ManageHVAC() routine located in the HVACManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.3 ($^\circ$C), which is also the default value. Testing has been done with a value of 1.0 ($^\circ$C), which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 1.0 have not been tested.
+
+\paragraph{Field: MaxAllowedDelTemp}\label{max-allowed-del-temp}
+
+This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxAllowedDelTemp variable within EnergyPlus. This variable sets the maximum surface temperature change before the HVAC timestep is shortened. Similar to the MaxZoneTempDiff parameter, larger MaxAllowedDelTemp values result in fewer iterations. To understand this input completely, please review the use of the MaxAllowedDetTemp variable in the CalcHeatBalanceInsideSurf2() routine located in the HeatBalanceSurfaceManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.002 ($^\circ$C), which is also the default value. Testing has been done with a value of 0.1 ($^\circ$C), which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 0.1 have not been tested.
 
 
 An IDF example:
 
 \begin{lstlisting}
 PerformancePrecisionTradeoffs,
-  Yes,                      !- Use Coil Direct Solutions
-  CarrollMRT;               !- Zone Radiant Exchange Algorithm
-  Mode05,                   !- Override Mode
-  0.3;                      !- MaxZoneTempDiff
+Yes,                      !- Use Coil Direct Solutions
+CarrollMRT;               !- Zone Radiant Exchange Algorithm
+Mode06,                   !- Override Mode
+0.3,                      !- MaxZoneTempDiff
+0.002;                    !- MaxAllowedDelTemp
 \end{lstlisting}
+
 
 \subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}
 
