@@ -3651,46 +3651,7 @@ namespace WeatherManager {
         static std::string const WeatherManager("WeatherManager");
         static std::string const RoutineNameLong("WeatherManager.cc subroutine SetUpDesignDay");
 
-        int Hour;
-        int TS;
-        Real64 A;                  // Apparent solar irradiation at air mass = 0
-        Real64 AVSC;               // Annual variation in the solar constant
-        Real64 B;                  // Atmospheric extinction coefficient
-        Real64 C;                  // ASHRAE diffuse radiation factor
-        Real64 ETR;                // radiation of an extraterrestrial normal surface, W/m2
-        Real64 HO;                 // Radiation on an extraterrestial horizontal surface
-        Real64 KT;                 // Radiation ratio
-        Array1D<Real64> SUNCOS(3); // Sun direction cosines
-        int CurrentYear;
-        int OSky;             // Opaque Sky Cover (tenths)
-        Real64 HumidityRatio; // Humidity Ratio -- when constant for day
-        Real64 ESky;          // Emissivitity of Sky
-        Real64 CosZenith;     // Cosine of Zenith Angle of Sun
-        Real64 TotHoriz;      // Total Radiation on Horizontal Surface
-        Real64 GndReflet;     // Ground Reflectivity
-        Real64 CurTime;       // For Solar Calcs
-        Real64 WetBulb;       // For calculating
-        Real64 DBRange;       // working copy of dry-bulb daily range, C (or 1 if input is difference)
-        Real64 WBRange;       // working copy of wet-bulb daily range. C (or 1 if input is difference)
-
-        Array1D_int Date0(8);
-        std::string AlpUseRain;
-        std::string AlpUseSnow;
-        bool ConstantHumidityRatio;
-        Real64 OutHumRat;
         std::string StringOut;
-        bool SaveWarmupFlag;
-        Real64 GloHorzRad;
-        Real64 ClearnessIndex_kt;
-        Real64 ClearnessIndex_ktc;
-        Real64 ClearnessIndex_kds;
-        Real64 SinSolarAltitude;
-        Real64 TotSkyCover;
-        int Hour1Ago;
-        int Hour3Ago;
-        Real64 BeamRad; // working calculated beam and diffuse rad, W/m2
-        Real64 DiffRad;
-        Real64 testval;
         //     For reporting purposes, set year to current system year
 
         struct HourlyWeatherData
@@ -3708,11 +3669,12 @@ namespace WeatherManager {
         // Object Data
         HourlyWeatherData Wthr;
 
-        SaveWarmupFlag = DataGlobals::WarmupFlag;
+        bool SaveWarmupFlag = DataGlobals::WarmupFlag;
         DataGlobals::WarmupFlag = true;
 
+        Array1D_int Date0(8);
         date_and_time(_, _, _, Date0);
-        CurrentYear = Date0(1);
+        int CurrentYear = Date0(1);
 
         if (DataGlobals::BeginSimFlag) {
             PrintDDHeader = true;
@@ -3744,7 +3706,7 @@ namespace WeatherManager {
         // verify that design WB or DP <= design DB
         if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::DewPoint && DesDayInput(EnvrnNum).DewPointNeedsSet) {
             // dew-point
-            testval = Psychrometrics::PsyWFnTdbRhPb(DesDayInput(EnvrnNum).MaxDryBulb, 1.0, DesDayInput(EnvrnNum).PressBarom);
+            Real64 testval = Psychrometrics::PsyWFnTdbRhPb(DesDayInput(EnvrnNum).MaxDryBulb, 1.0, DesDayInput(EnvrnNum).PressBarom);
             DesDayInput(EnvrnNum).HumIndValue = Psychrometrics::PsyTdpFnWPb(testval, DesDayInput(EnvrnNum).PressBarom);
         }
 
@@ -3759,6 +3721,10 @@ namespace WeatherManager {
         DesignDay(EnvrnNum).DaylightSavingIndex = DesDayInput(EnvrnNum).DSTIndicator;
 
         //  Set up Solar parameters for day
+        Real64 A;                  // Apparent solar irradiation at air mass = 0
+        Real64 B;                  // Atmospheric extinction coefficient
+        Real64 C;                  // ASHRAE diffuse radiation factor
+        Real64 AVSC;               // Annual variation in the solar constant
         CalculateDailySolarCoeffs(DesignDay(EnvrnNum).DayOfYear,
                                   A,
                                   B,
@@ -3781,16 +3747,8 @@ namespace WeatherManager {
             PrintDDHeader = false;
         }
         if (DataReportingFlags::DoWeatherInitReporting) {
-            if (DesDayInput(EnvrnNum).RainInd == 1) {
-                AlpUseRain = "Yes";
-            } else {
-                AlpUseRain = "No";
-            }
-            if (DesDayInput(EnvrnNum).SnowInd == 1) {
-                AlpUseSnow = "Yes";
-            } else {
-                AlpUseSnow = "No";
-            }
+            std::string const AlpUseRain = (DesDayInput(EnvrnNum).RainInd == 1) ? "Yes" : "No";
+            std::string const AlpUseSnow = (DesDayInput(EnvrnNum).SnowInd == 1) ? "Yes" : "No";
             print(outputFiles.eio, "Environment:Design Day Data,");
             print(outputFiles.eio, "{:.2R},", DesDayInput(EnvrnNum).MaxDryBulb);
             print(outputFiles.eio, "{:.2R},", DesDayInput(EnvrnNum).DailyDBRange);
@@ -3865,43 +3823,45 @@ namespace WeatherManager {
         // set the values.  For the scheduled values, these are already set in the DDxxx array.
 
         DataGlobals::CurrentTime = 25.0;
+        Real64 HumidityRatio; // Humidity Ratio -- when constant for day
+        bool ConstantHumidityRatio;
 
+        switch (DesDayInput(EnvrnNum).HumIndType)
         {
-            auto const SELECT_CASE_var(DesDayInput(EnvrnNum).HumIndType);
-
-            if (SELECT_CASE_var == DDHumIndType::WetBulb) {
-                HumidityRatio = Psychrometrics::PsyWFnTdbTwbPb(
-                    DesDayInput(EnvrnNum).MaxDryBulb, DesDayInput(EnvrnNum).HumIndValue, DesDayInput(EnvrnNum).PressBarom, RoutineNamePsyWFnTdbTwbPb);
+            case DDHumIndType::WetBulb:
+                HumidityRatio = Psychrometrics::PsyWFnTdbTwbPb(DesDayInput(EnvrnNum).MaxDryBulb, DesDayInput(EnvrnNum).HumIndValue, DesDayInput(EnvrnNum).PressBarom, RoutineNamePsyWFnTdbTwbPb);
                 ConstantHumidityRatio = true;
-
-            } else if (SELECT_CASE_var == DDHumIndType::DewPoint) {
+                break;
+            case DDHumIndType::DewPoint:
                 HumidityRatio = Psychrometrics::PsyWFnTdpPb(DesDayInput(EnvrnNum).HumIndValue, DesDayInput(EnvrnNum).PressBarom, RoutineNamePsyWFnTdpPb);
                 ConstantHumidityRatio = true;
-
-            } else if (SELECT_CASE_var == DDHumIndType::HumRatio) {
+                break;
+            case DDHumIndType::HumRatio:
                 HumidityRatio = DesDayInput(EnvrnNum).HumIndValue;
                 ConstantHumidityRatio = true;
-
-            } else if (SELECT_CASE_var == DDHumIndType::Enthalpy) {
+                break;
+            case DDHumIndType::Enthalpy:
                 // HumIndValue is already in J/kg, so no conversions needed
                 HumidityRatio = Psychrometrics::PsyWFnTdbH(DesDayInput(EnvrnNum).MaxDryBulb, DesDayInput(EnvrnNum).HumIndValue, RoutineNamePsyWFnTdbH);
                 ConstantHumidityRatio = true;
-
-            } else if (SELECT_CASE_var == DDHumIndType::RelHumSch) {
+                break;
+            case DDHumIndType::RelHumSch:
                 // nothing to do -- DDHumIndModifier already contains the scheduled Relative Humidity
                 ConstantHumidityRatio = false;
                 TomorrowOutRelHum = DDHumIndModifier(_, _, EnvrnNum);
-
-            } else if ((SELECT_CASE_var == DDHumIndType::WBProfDef) || (SELECT_CASE_var == DDHumIndType::WBProfDif) ||
-                       (SELECT_CASE_var == DDHumIndType::WBProfMul)) {
+                break;
+            case DDHumIndType::WBProfDef:
+            case DDHumIndType::WBProfDif:
+            case DDHumIndType::WBProfMul:
                 ConstantHumidityRatio = false;
-
-            } else {
+                break;
+            default:
                 ShowSevereError("SetUpDesignDay: Invalid Humidity Indicator type");
                 ShowContinueError("Occurred in Design Day=" + DesDayInput(EnvrnNum).Title);
-            }
+                break;
         }
 
+        int OSky;             // Opaque Sky Cover (tenths)
         if (DesDayInput(EnvrnNum).RainInd != 0) {
             TomorrowIsRain(_, _) = true;
             OSky = 10;
@@ -3912,6 +3872,7 @@ namespace WeatherManager {
             TomorrowLiquidPrecip = 0.0;
         }
 
+        Real64 GndReflet;     // Ground Reflectivity
         if (DesDayInput(EnvrnNum).SnowInd == 0) {
             TomorrowIsSnow(_, _) = false;
             GndReflet = 0.2;
@@ -3928,6 +3889,7 @@ namespace WeatherManager {
         TomorrowAlbedo = 0.0;
 
         // resolve daily ranges
+        Real64 DBRange;       // working copy of dry-bulb daily range, C (or 1 if input is difference)
         if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType::Difference) {
             DBRange = 1.0; // use unscaled multiplier values if difference
         } else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType::Profile) {
@@ -3935,103 +3897,110 @@ namespace WeatherManager {
         } else {
             DBRange = DesDayInput(EnvrnNum).DailyDBRange;
         }
+        Real64 WBRange;       // working copy of wet-bulb daily range. C (or 1 if input is difference)
         if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDif) {
             WBRange = 1.0; // use unscaled multiplier values if difference
         } else {
             WBRange = DesDayInput(EnvrnNum).DailyWBRange;
         }
 
-        for (Hour = 1; Hour <= 24; ++Hour) {
-            for (TS = 1; TS <= DataGlobals::NumOfTimeStepInHour; ++TS) {
+        for (int hour = 1; hour <= 24; ++hour) {
+            for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
 
                 if (DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType::Profile) {
                     // dry-bulb profile
-                    TomorrowOutDryBulbTemp(TS, Hour) = DesDayInput(EnvrnNum).MaxDryBulb - DDDBRngModifier(TS, Hour, EnvrnNum) * DBRange;
+                    TomorrowOutDryBulbTemp(ts, hour) = DesDayInput(EnvrnNum).MaxDryBulb - DDDBRngModifier(ts, hour, EnvrnNum) * DBRange;
                 } else { // DesDayInput(EnvrnNum)%DBTempRangeType == DDDBRangeType::Profile
-                    TomorrowOutDryBulbTemp(TS, Hour) = DDDBRngModifier(TS, Hour, EnvrnNum);
+                    TomorrowOutDryBulbTemp(ts, hour) = DDDBRngModifier(ts, hour, EnvrnNum);
                 }
 
                 // wet-bulb - generate from profile, humidity ratio, or dew point
                 if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDef || DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDif ||
                     DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfMul) {
-                    WetBulb = DesDayInput(EnvrnNum).HumIndValue - DDHumIndModifier(TS, Hour, EnvrnNum) * WBRange;
-                    WetBulb = min(WetBulb, TomorrowOutDryBulbTemp(TS, Hour)); // WB must be <= DB
-                    OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(TomorrowOutDryBulbTemp(TS, Hour), WetBulb, DesDayInput(EnvrnNum).PressBarom);
-                    TomorrowOutDewPointTemp(TS, Hour) = Psychrometrics::PsyTdpFnWPb(OutHumRat, DesDayInput(EnvrnNum).PressBarom);
-                    TomorrowOutRelHum(TS, Hour) =
-                        Psychrometrics::PsyRhFnTdbWPb(TomorrowOutDryBulbTemp(TS, Hour), OutHumRat, DesDayInput(EnvrnNum).PressBarom, WeatherManager) * 100.0;
+                    Real64 WetBulb = DesDayInput(EnvrnNum).HumIndValue - DDHumIndModifier(ts, hour, EnvrnNum) * WBRange;
+                    WetBulb = min(WetBulb, TomorrowOutDryBulbTemp(ts, hour)); // WB must be <= DB
+                    Real64 OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(TomorrowOutDryBulbTemp(ts, hour), WetBulb, DesDayInput(EnvrnNum).PressBarom);
+                    TomorrowOutDewPointTemp(ts, hour) = Psychrometrics::PsyTdpFnWPb(OutHumRat, DesDayInput(EnvrnNum).PressBarom);
+                    TomorrowOutRelHum(ts, hour) =
+                            Psychrometrics::PsyRhFnTdbWPb(TomorrowOutDryBulbTemp(ts, hour), OutHumRat, DesDayInput(EnvrnNum).PressBarom, WeatherManager) * 100.0;
                 } else if (ConstantHumidityRatio) {
                     //  Need Dew Point Temperature.  Use Relative Humidity to get Humidity Ratio, unless Humidity Ratio is constant
                     // BG 9-26-07  moved following inside this IF statment; when HumIndType is 'Schedule' HumidityRatio wasn't being initialized
-                    WetBulb = Psychrometrics::PsyTwbFnTdbWPb(TomorrowOutDryBulbTemp(TS, Hour), HumidityRatio, DesDayInput(EnvrnNum).PressBarom, RoutineNameLong);
+                    Real64 WetBulb = Psychrometrics::PsyTwbFnTdbWPb(TomorrowOutDryBulbTemp(ts, hour), HumidityRatio, DesDayInput(EnvrnNum).PressBarom, RoutineNameLong);
 
-                    OutHumRat = Psychrometrics::PsyWFnTdpPb(TomorrowOutDryBulbTemp(TS, Hour), DesDayInput(EnvrnNum).PressBarom);
+                    Real64 OutHumRat = Psychrometrics::PsyWFnTdpPb(TomorrowOutDryBulbTemp(ts, hour), DesDayInput(EnvrnNum).PressBarom);
                     if (HumidityRatio > OutHumRat) {
-                        WetBulb = TomorrowOutDryBulbTemp(TS, Hour);
+                        WetBulb = TomorrowOutDryBulbTemp(ts, hour);
                     } else {
-                        OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(TomorrowOutDryBulbTemp(TS, Hour), WetBulb, DesDayInput(EnvrnNum).PressBarom);
+                        OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(TomorrowOutDryBulbTemp(ts, hour), WetBulb, DesDayInput(EnvrnNum).PressBarom);
                     }
-                    TomorrowOutDewPointTemp(TS, Hour) = Psychrometrics::PsyTdpFnWPb(OutHumRat, DesDayInput(EnvrnNum).PressBarom);
-                    TomorrowOutRelHum(TS, Hour) =
-                        Psychrometrics::PsyRhFnTdbWPb(TomorrowOutDryBulbTemp(TS, Hour), OutHumRat, DesDayInput(EnvrnNum).PressBarom, WeatherManager) * 100.0;
+                    TomorrowOutDewPointTemp(ts, hour) = Psychrometrics::PsyTdpFnWPb(OutHumRat, DesDayInput(EnvrnNum).PressBarom);
+                    TomorrowOutRelHum(ts, hour) =
+                            Psychrometrics::PsyRhFnTdbWPb(TomorrowOutDryBulbTemp(ts, hour), OutHumRat, DesDayInput(EnvrnNum).PressBarom, WeatherManager) * 100.0;
                 } else {
                     HumidityRatio = Psychrometrics::PsyWFnTdbRhPb(
-                        TomorrowOutDryBulbTemp(TS, Hour), DDHumIndModifier(TS, Hour, EnvrnNum) / 100.0, DesDayInput(EnvrnNum).PressBarom);
-                    TomorrowOutRelHum(TS, Hour) =
-                            Psychrometrics::PsyRhFnTdbWPb(TomorrowOutDryBulbTemp(TS, Hour), HumidityRatio, DesDayInput(EnvrnNum).PressBarom, WeatherManager) * 100.0;
+                            TomorrowOutDryBulbTemp(ts, hour), DDHumIndModifier(ts, hour, EnvrnNum) / 100.0, DesDayInput(EnvrnNum).PressBarom);
+                    TomorrowOutRelHum(ts, hour) =
+                            Psychrometrics::PsyRhFnTdbWPb(TomorrowOutDryBulbTemp(ts, hour), HumidityRatio, DesDayInput(EnvrnNum).PressBarom, WeatherManager) * 100.0;
                     // TomorrowOutRelHum values set earlier
-                    TomorrowOutDewPointTemp(TS, Hour) = Psychrometrics::PsyTdpFnWPb(HumidityRatio, DesDayInput(EnvrnNum).PressBarom);
+                    TomorrowOutDewPointTemp(ts, hour) = Psychrometrics::PsyTdpFnWPb(HumidityRatio, DesDayInput(EnvrnNum).PressBarom);
                 }
 
-                double DryBulb = TomorrowOutDryBulbTemp(TS, Hour);
-                double RelHum = TomorrowOutRelHum(TS, Hour) * 0.01;
-                ESky = CalcSkyEmissivity(Environment(EnvrnNum).SkyTempModel, OSky, DryBulb, TomorrowOutDewPointTemp(TS, Hour), RelHum);
-                TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(DryBulb + DataGlobals::KelvinConv);
+                double DryBulb = TomorrowOutDryBulbTemp(ts, hour);
+                double RelHum = TomorrowOutRelHum(ts, hour) * 0.01;
+                Real64 ESky = CalcSkyEmissivity(Environment(EnvrnNum).SkyTempModel, OSky, DryBulb, TomorrowOutDewPointTemp(ts, hour), RelHum); // Emissivitity of Sky
+                TomorrowHorizIRSky(ts, hour) = ESky * Sigma * pow_4(DryBulb + DataGlobals::KelvinConv);
 
                 if (Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::BruntModel || Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::IdsoModel || Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::BerdahlMartinModel || Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA || Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
                     // Design day not scheduled
-                    TomorrowSkyTemp(TS, Hour) = (DryBulb + DataGlobals::KelvinConv) * root_4(ESky) - DataGlobals::KelvinConv;
+                    TomorrowSkyTemp(ts, hour) = (DryBulb + DataGlobals::KelvinConv) * root_4(ESky) - DataGlobals::KelvinConv;
                 }
                 // Generate solar values for timestep
                 //    working results = BeamRad and DiffRad
                 //    stored to program globals at end of loop
+                Real64 BeamRad;
+                Real64 DiffRad;
                 if (DesDayInput(EnvrnNum).SolarModel == DesignDaySolarModel::SolarModel_Schedule) {
                     // scheduled: set value unconditionally (whether sun up or not)
-                    BeamRad = DDBeamSolarValues(TS, Hour, EnvrnNum);
-                    DiffRad = DDDiffuseSolarValues(TS, Hour, EnvrnNum);
+                    BeamRad = DDBeamSolarValues(ts, hour, EnvrnNum);
+                    DiffRad = DDDiffuseSolarValues(ts, hour, EnvrnNum);
                 } else {
 
                     // calc time = fractional hour of day
+                    Real64 CurTime;
                     if (DataGlobals::NumOfTimeStepInHour != 1) {
-                        CurTime = double(Hour - 1) + double(TS) * TimeStepFraction;
+                        CurTime = double(hour - 1) + double(ts) * TimeStepFraction;
                     } else {
-                        CurTime = double(Hour) + DataEnvironment::TS1TimeOffset;
+                        CurTime = double(hour) + DataEnvironment::TS1TimeOffset;
                     }
 
+                    Array1D<Real64> SUNCOS(3); // Sun direction cosines
                     CalculateSunDirectionCosines(CurTime,
                                                  DesignDay(EnvrnNum).EquationOfTime,
                                                  DesignDay(EnvrnNum).SinSolarDeclinAngle,
                                                  DesignDay(EnvrnNum).CosSolarDeclinAngle,
                                                  SUNCOS);
-                    CosZenith = SUNCOS(3);
+                    Real64 CosZenith = SUNCOS(3); // Cosine of Zenith Angle of Sun
                     if (CosZenith < DataEnvironment::SunIsUpValue) {
                         BeamRad = 0.0;
                         DiffRad = 0.0;
                     } else {
-                        SinSolarAltitude = SUNCOS(3);
+                        Real64 SinSolarAltitude = SUNCOS(3);
 
                         {
                             auto const SELECT_CASE_var(DesDayInput(EnvrnNum).SolarModel);
 
                             if (SELECT_CASE_var == DesignDaySolarModel::ASHRAE_ClearSky) {
                                 Real64 Exponent = B / CosZenith;
+                                Real64 TotHoriz;      // Total Radiation on Horizontal Surface
                                 if (Exponent > 700.0) {
                                     TotHoriz = 0.0;
                                 } else {
                                     TotHoriz = DesDayInput(EnvrnNum).SkyClear * A * (C + CosZenith) * std::exp(-B / CosZenith);
                                 }
-                                HO = GlobalSolarConstant * AVSC * CosZenith;
-                                KT = TotHoriz / HO;
+                                // Radiation on an extraterrestial horizontal surface
+                                Real64 HO = GlobalSolarConstant * AVSC * CosZenith;
+                                Real64 KT = TotHoriz / HO; // Radiation ratio
                                 KT = min(KT, 0.75);
                                 DiffRad = TotHoriz * (1.0045 + KT * (0.04349 + KT * (-3.5227 + 2.6313 * KT)));
                                 if (DesDayInput(EnvrnNum).SkyClear > 0.70) DiffRad = TotHoriz * C / (C + CosZenith);
@@ -4040,7 +4009,8 @@ namespace WeatherManager {
                                 BeamRad = max(0.0, BeamRad);
 
                             } else if (SELECT_CASE_var == DesignDaySolarModel::ASHRAE_Tau || SELECT_CASE_var == DesignDaySolarModel::ASHRAE_Tau2017) {
-                                ETR = GlobalSolarConstant * AVSC; // extraterrestrial normal irrad, W/m2
+                                Real64 ETR = GlobalSolarConstant * AVSC; // radiation of an extraterrestrial normal surface, W/m2
+                                Real64 GloHorzRad;
                                 ASHRAETauModel(DesDayInput(EnvrnNum).SolarModel,
                                                ETR,
                                                CosZenith,
@@ -4051,19 +4021,20 @@ namespace WeatherManager {
                                                GloHorzRad);
 
                             } else if (SELECT_CASE_var == DesignDaySolarModel::Zhang_Huang) {
-                                Hour3Ago = mod(Hour + 20, 24) + 1; // hour 3 hours before
-                                TotSkyCover = max(1.0 - DesDayInput(EnvrnNum).SkyClear, 0.0);
-                                GloHorzRad =
+                                int Hour3Ago = mod(hour + 20, 24) + 1; // hour 3 hours before
+                                Real64 const TotSkyCover = max(1.0 - DesDayInput(EnvrnNum).SkyClear, 0.0);
+                                Real64 GloHorzRad =
                                     (ZHGlobalSolarConstant * SinSolarAltitude *
                                          (ZhangHuangModCoeff_C0 + ZhangHuangModCoeff_C1 * TotSkyCover + ZhangHuangModCoeff_C2 * pow_2(TotSkyCover) +
-                                          ZhangHuangModCoeff_C3 * (TomorrowOutDryBulbTemp(TS, Hour) - TomorrowOutDryBulbTemp(TS, Hour3Ago)) +
-                                          ZhangHuangModCoeff_C4 * TomorrowOutRelHum(TS, Hour) + ZhangHuangModCoeff_C5 * TomorrowWindSpeed(TS, Hour)) +
+                                          ZhangHuangModCoeff_C3 * (TomorrowOutDryBulbTemp(ts, hour) - TomorrowOutDryBulbTemp(ts, Hour3Ago)) +
+                                          ZhangHuangModCoeff_C4 * TomorrowOutRelHum(ts, hour) + ZhangHuangModCoeff_C5 * TomorrowWindSpeed(ts, hour)) +
                                      ZhangHuangModCoeff_D) /
                                     ZhangHuangModCoeff_K;
                                 GloHorzRad = max(GloHorzRad, 0.0);
-                                ClearnessIndex_kt = GloHorzRad / (GlobalSolarConstant * SinSolarAltitude);
+                                Real64 ClearnessIndex_kt = GloHorzRad / (GlobalSolarConstant * SinSolarAltitude);
                                 //          ClearnessIndex_kt=DesDayInput(EnvrnNum)%SkyClear
-                                ClearnessIndex_ktc = 0.4268 + 0.1934 * SinSolarAltitude;
+                                Real64 ClearnessIndex_ktc = 0.4268 + 0.1934 * SinSolarAltitude;
+                                Real64 ClearnessIndex_kds;
                                 if (ClearnessIndex_kt < ClearnessIndex_ktc) {
                                     ClearnessIndex_kds =
                                         (3.996 - 3.862 * SinSolarAltitude + 1.54 * pow_2(SinSolarAltitude)) * pow_3(ClearnessIndex_kt);
@@ -4088,8 +4059,8 @@ namespace WeatherManager {
                 if (DataEnvironment::IgnoreSolarRadiation || DataEnvironment::IgnoreBeamRadiation) BeamRad = 0.0;
                 if (DataEnvironment::IgnoreSolarRadiation || DataEnvironment::IgnoreDiffuseRadiation) DiffRad = 0.0;
 
-                TomorrowBeamSolarRad(TS, Hour) = BeamRad;
-                TomorrowDifSolarRad(TS, Hour) = DiffRad;
+                TomorrowBeamSolarRad(ts, hour) = BeamRad;
+                TomorrowDifSolarRad(ts, hour) = DiffRad;
 
             } // Timestep (TS) Loop
         }     // Hour Loop
@@ -4097,16 +4068,16 @@ namespace WeatherManager {
         // back-fill hour values from timesteps
         // hour values = integrated over hour ending at time of hour
         // insurance: hourly values not known to be needed
-        for (Hour = 1; Hour <= 24; ++Hour) {
-            Hour1Ago = mod(Hour + 22, 24) + 1;
-            BeamRad = (TomorrowBeamSolarRad(DataGlobals::NumOfTimeStepInHour, Hour1Ago) + TomorrowBeamSolarRad(DataGlobals::NumOfTimeStepInHour, Hour)) / 2.0;
-            DiffRad = (TomorrowDifSolarRad(DataGlobals::NumOfTimeStepInHour, Hour1Ago) + TomorrowDifSolarRad(DataGlobals::NumOfTimeStepInHour, Hour)) / 2.0;
+        for (int hour = 1; hour <= 24; ++hour) {
+            int Hour1Ago = mod(hour + 22, 24) + 1;
+            Real64 BeamRad = (TomorrowBeamSolarRad(DataGlobals::NumOfTimeStepInHour, Hour1Ago) + TomorrowBeamSolarRad(DataGlobals::NumOfTimeStepInHour, hour)) / 2.0;
+            Real64 DiffRad = (TomorrowDifSolarRad(DataGlobals::NumOfTimeStepInHour, Hour1Ago) + TomorrowDifSolarRad(DataGlobals::NumOfTimeStepInHour, hour)) / 2.0;
             if (DataGlobals::NumOfTimeStepInHour > 1) {
-                BeamRad += sum(TomorrowBeamSolarRad({1, DataGlobals::NumOfTimeStepInHour - 1}, Hour));
-                DiffRad += sum(TomorrowDifSolarRad({1, DataGlobals::NumOfTimeStepInHour - 1}, Hour));
+                BeamRad += sum(TomorrowBeamSolarRad({1, DataGlobals::NumOfTimeStepInHour - 1}, hour));
+                DiffRad += sum(TomorrowDifSolarRad({1, DataGlobals::NumOfTimeStepInHour - 1}, hour));
             }
-            Wthr.BeamSolarRad(Hour) = BeamRad / DataGlobals::NumOfTimeStepInHour;
-            Wthr.DifSolarRad(Hour) = DiffRad / DataGlobals::NumOfTimeStepInHour;
+            Wthr.BeamSolarRad(hour) = BeamRad / DataGlobals::NumOfTimeStepInHour;
+            Wthr.DifSolarRad(hour) = DiffRad / DataGlobals::NumOfTimeStepInHour;
         }
 
         if (Environment(EnvrnNum).WP_Type1 != 0) {
@@ -4120,18 +4091,18 @@ namespace WeatherManager {
                 } else if (SELECT_CASE_var == EmissivityCalcType::DryBulbDelta) {
                     ScheduleManager::GetSingleDayScheduleValues(WPSkyTemperature(Environment(EnvrnNum).WP_Type1).SchedulePtr, TomorrowSkyTemp);
                     DDSkyTempScheduleValues(_, _, EnvrnNum) = TomorrowSkyTemp;
-                    for (Hour = 1; Hour <= 24; ++Hour) {
-                        for (TS = 1; TS <= DataGlobals::NumOfTimeStepInHour; ++TS) {
-                            TomorrowSkyTemp(TS, Hour) = TomorrowOutDryBulbTemp(TS, Hour) - TomorrowSkyTemp(TS, Hour);
+                    for (int hour = 1; hour <= 24; ++hour) {
+                        for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
+                            TomorrowSkyTemp(ts, hour) = TomorrowOutDryBulbTemp(ts, hour) - TomorrowSkyTemp(ts, hour);
                         }
                     }
 
                 } else if (SELECT_CASE_var == EmissivityCalcType::DewPointDelta) {
                     ScheduleManager::GetSingleDayScheduleValues(WPSkyTemperature(Environment(EnvrnNum).WP_Type1).SchedulePtr, TomorrowSkyTemp);
                     DDSkyTempScheduleValues(_, _, EnvrnNum) = TomorrowSkyTemp;
-                    for (Hour = 1; Hour <= 24; ++Hour) {
-                        for (TS = 1; TS <= DataGlobals::NumOfTimeStepInHour; ++TS) {
-                            TomorrowSkyTemp(TS, Hour) = TomorrowOutDewPointTemp(TS, Hour) - TomorrowSkyTemp(TS, Hour);
+                    for (int hour = 1; hour <= 24; ++hour) {
+                        for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
+                            TomorrowSkyTemp(ts, hour) = TomorrowOutDewPointTemp(ts, hour) - TomorrowSkyTemp(ts, hour);
                         }
                     }
 
