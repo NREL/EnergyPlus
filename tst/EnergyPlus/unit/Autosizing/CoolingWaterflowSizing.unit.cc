@@ -267,6 +267,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
 
     DataSizing::CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
+    DataAirSystems::PrimaryAirSystem.allocate(1);
     DataSizing::NumSysSizInput = 1;
     DataSizing::SysSizingRunDone = false;
     DataSizing::DataCapacityUsedForSizing = 5000.0;

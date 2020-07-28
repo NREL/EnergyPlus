@@ -50,7 +50,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 
 namespace EnergyPlus {
 
@@ -83,8 +82,8 @@ Real64 HeatingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
                     }
-                    Real64 CoilInTemp = ReportSizingManager::setHeatCoilInletTempForZoneEqSizing(
-                        ReportSizingManager::setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                    Real64 CoilInTemp = this->setHeatCoilInletTempForZoneEqSizing(
+                        this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                         this->zoneEqSizing(this->curZoneEqNum),
                         this->finalZoneSizing(this->curZoneEqNum));
                     Real64 CoilOutTemp = this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp;

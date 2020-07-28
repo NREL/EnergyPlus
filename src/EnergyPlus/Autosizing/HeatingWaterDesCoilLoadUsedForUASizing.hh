@@ -45,67 +45,25 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/Autosizing/CoolingWaterDesAirInletHumRatSizing.hh>
+#ifndef HeatingWaterDesCoilLoadUsedForUASizing_hh_INCLUDED
+#define HeatingWaterDesCoilLoadUsedForUASizing_hh_INCLUDED
+
+#include <EnergyPlus/Autosizing/Base.hh>
 
 namespace EnergyPlus {
 
-Real64 CoolingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &errorsFound)
+struct HeatingWaterDesCoilLoadUsedForUASizer : BaseSizer
 {
-    if (!this->checkInitialized(errorsFound)) {
-        return 0.0;
+    HeatingWaterDesCoilLoadUsedForUASizer()
+    {
+        this->sizingType = AutoSizingType::HeatingWaterDesCoilLoadUsedForUASizing;
+        this->sizingString = "Water Heating Design Coil Load for UA Sizing";
     }
-    this->preSize(_originalValue);
+    ~HeatingWaterDesCoilLoadUsedForUASizer() = default;
 
-    if (this->curZoneEqNum > 0) {
-        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
-            this->autoSizedValue = _originalValue;
-        } else {
-            if (this->termUnitIU) {
-                this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).ZoneHumRatAtCoolPeak;
-            } else if (this->zoneEqFanCoil) {
-                Real64 desMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow;
-                this->autoSizedValue = this->setCoolCoilInletHumRatForZoneEqSizing(
-                    this->setOAFracForZoneEqSizing(desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
-                    this->zoneEqSizing(this->curZoneEqNum),
-                    this->finalZoneSizing(this->curZoneEqNum));
-            } else {
-                this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesCoolCoilInHumRat;
-            }
-        }
-    } else if (this->curSysNum > 0) {
-        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
-            this->autoSizedValue = _originalValue;
-        } else {
-            Real64 OutAirFrac = 1.0;
-            if (this->curOASysNum > 0) { // coil is in OA stream
-                if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                    this->autoSizedValue =
-                        this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
-                } else {
-                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).OutHumRatAtCoolPeak;
-                }
-            } else if (this->dataDesInletAirHumRat > 0.0) {
-                this->autoSizedValue = this->dataDesInletAirHumRat;
-            } else {                                                                         // coil is in main air loop
-                if ( this->primaryAirSystem(this->curSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
-                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).MixHumRatAtCoolPeak;
-                } else { // there is precooling of the OA stream
-                    if (this->dataFlowUsedForSizing > 0.0) {
-                        OutAirFrac = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow / this->dataFlowUsedForSizing;
-                    } else {
-                        OutAirFrac = 1.0;
-                    }
-                    OutAirFrac = min(1.0, max(0.0, OutAirFrac));
-                    this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).PrecoolHumRat +
-                                           (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).RetHumRatAtCoolPeak;
-                }
-            }
-        }
-    }
-    if (this->isEpJSON) this->sizingString = "design_inlet_air_humidity_ratio [kgWater/kgDryAir]";
-    this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
-    return this->autoSizedValue;
-}
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
+};
 
 } // namespace EnergyPlus
+
+#endif

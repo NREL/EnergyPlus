@@ -48,7 +48,6 @@
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletTempSizing.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 
 namespace EnergyPlus {
 
@@ -66,8 +65,8 @@ Real64 CoolingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
                 this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).ZoneTempAtCoolPeak;
             } else if (this->zoneEqFanCoil) {
                 Real64 DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow;
-                this->autoSizedValue = ReportSizingManager::setCoolCoilInletTempForZoneEqSizing(
-                    ReportSizingManager::setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                this->autoSizedValue = this->setCoolCoilInletTempForZoneEqSizing(
+                    this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                     this->zoneEqSizing(this->curZoneEqNum),
                     this->finalZoneSizing(this->curZoneEqNum));
             } else {
@@ -89,8 +88,8 @@ Real64 CoolingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
             this->autoSizedValue = _originalValue;
         } else {
             if (this->curOASysNum > 0) { // coil is in OA stream
-                if (DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                    this->autoSizedValue = this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOATemp;
+                if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
+                    this->autoSizedValue = this->airloopDOAS[ this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOATemp;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).OutTempAtCoolPeak;
                 }

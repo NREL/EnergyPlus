@@ -59,7 +59,7 @@ namespace EnergyPlus {
                                                         const std::string &_callingRoutine) {
         BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
         // water coils on main branch have no parent object to set DataFan* variables
-        if (this->dataFanIndex == -1 && this->curSysNum > 0 && this->curOASysNum == 0) {
+        if (this->curSysNum > 0 && this->curOASysNum == 0) {
             if (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
                 this->dataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
                 this->dataFanIndex = this->primaryAirSystem(this->curSysNum).SupFanNum;

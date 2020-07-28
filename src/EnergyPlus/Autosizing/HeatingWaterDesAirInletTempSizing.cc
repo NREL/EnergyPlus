@@ -47,7 +47,6 @@
 
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletTempSizing.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 
 namespace EnergyPlus {
 
@@ -84,8 +83,8 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
                 } else {
                     DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                 }
-                this->autoSizedValue = ReportSizingManager::setHeatCoilInletTempForZoneEqSizing(
-                    ReportSizingManager::setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                this->autoSizedValue = this->setHeatCoilInletTempForZoneEqSizing(
+                    this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                     this->zoneEqSizing(this->curZoneEqNum),
                     this->finalZoneSizing(this->curZoneEqNum));
             }

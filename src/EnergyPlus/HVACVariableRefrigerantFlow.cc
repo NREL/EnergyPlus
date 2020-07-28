@@ -56,6 +56,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
+#include <EnergyPlus/Autosizing/WaterHeatingCapacitySizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -7670,18 +7671,27 @@ namespace HVACVariableRefrigerantFlow {
         if (VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
             CompType = VRFTU(VRFTUNum).SuppHeatCoilType;
             CompName = VRFTU(VRFTUNum).SuppHeatCoilName;
+            PrintFlag = false; // why isn't this being reported?
+            TempSize = VRFTU(VRFTUNum).DesignSuppHeatingCapacity;
             if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
-                SizingMethod = DataHVACGlobals::WaterHeatingCapacitySizing;
+                // sizing result should always be reported
+                if (TempSize == DataSizing::AutoSize) {
+                    WaterHeatingCapacitySizer sizerWaterHeatingCapacity;
+                    bool ErrorsFound = false;
+                    std::string stringOverride = "Supplemental Heating Coil Nominal Capacity [W]";
+                    if (DataGlobals::isEpJSON) stringOverride = "supplemental_heating_coil_nominal_capacity [W]";
+                    sizerWaterHeatingCapacity.overrideSizingString(stringOverride);
+                    sizerWaterHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    VRFTU(VRFTUNum).DesignSuppHeatingCapacity = sizerWaterHeatingCapacity.size(TempSize, ErrorsFound);
+                }
             } else {
                 SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
-            }
-            PrintFlag = false;
-            TempSize = VRFTU(VRFTUNum).DesignSuppHeatingCapacity;
-            SizingString = "Supplemental Heating Coil Nominal Capacity [W]";
-            if (TempSize == DataSizing::AutoSize) {
-                IsAutoSize = true;
-                ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                VRFTU(VRFTUNum).DesignSuppHeatingCapacity = TempSize;
+                SizingString = "Supplemental Heating Coil Nominal Capacity [W]";
+                if (TempSize == DataSizing::AutoSize) {
+                    IsAutoSize = true;
+                    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    VRFTU(VRFTUNum).DesignSuppHeatingCapacity = TempSize;
+                }
             }
         }
 

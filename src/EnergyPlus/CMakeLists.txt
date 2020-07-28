@@ -49,6 +49,8 @@ SET( SRC
   Autosizing/CoolingWaterNumofTubesPerRowSizing.hh
   Autosizing/HeatingAirflowUASizing.cc
   Autosizing/HeatingAirflowUASizing.hh
+  Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.cc
+  Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.hh
   Autosizing/HeatingWaterDesAirInletHumRatSizing.cc
   Autosizing/HeatingWaterDesAirInletHumRatSizing.hh
   Autosizing/HeatingWaterDesAirInletTempSizing.cc
@@ -57,6 +59,8 @@ SET( SRC
   Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh
   Autosizing/HeatingWaterflowSizing.cc
   Autosizing/HeatingWaterflowSizing.hh
+  Autosizing/WaterHeatingCapacitySizing.cc
+  Autosizing/WaterHeatingCapacitySizing.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc

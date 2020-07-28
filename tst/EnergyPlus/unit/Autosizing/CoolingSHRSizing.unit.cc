@@ -94,7 +94,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     EXPECT_NEAR(0.85, sizedValue, 0.01); // default value on error
     EXPECT_FALSE(sizer.sizingDesRunThisZone);
     EXPECT_EQ(sizer.sizingString, "Gross Rated Sensible Heat Ratio");
-        sizer.autoSizedValue = 0.0;         // reset for next test
+    sizer.autoSizedValue = 0.0;         // reset for next test
 
     // reset eio stream
     has_eio_output(true);
