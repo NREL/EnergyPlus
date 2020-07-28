@@ -52,9 +52,9 @@
 #include <ObjexxFCL/numeric.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
@@ -196,11 +196,7 @@ namespace DataGlobals {
     int TimeStep(0);                   // Counter for time steps (fractional hours)
     Real64 TimeStepZone(0.0);          // Zone time step in fractional hours
     bool WarmupFlag(false);            // True during the warmup portion of a simulation
-    JsonOutputStreams jsonOutputStreams;
-    int OutputStandardError(0);                      // Unit number for the standard error output file
-    std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
-    int OutputFilePerfLog(0);                        // Unit number for performance log outputs
     int StdMeterRecordCount(0);                      // Count of Meter output records
     bool ZoneSizingCalc(false);                      // TRUE if zone sizing calculation
     bool SysSizingCalc(false);                       // TRUE if system sizing calculation
@@ -241,7 +237,6 @@ namespace DataGlobals {
     bool RunOptCondEntTemp(false);                 // true if the ideal condenser entering set point optimization is running
     bool CompLoadReportIsReq(false);               // true if the extra sizing calcs are performed to create a "pulse" for the load component report
     bool isPulseZoneSizing(false);                 // true during the set of zone sizing calcs that include the "pulse" for the load component report
-    int OutputFileZonePulse(0); // file handle for special zone sizing report that contains the result of the "pulse" for the load component report
     bool doLoadComponentPulseNow(false); // true for the time step that is the "pulse" for the load component report
     bool ShowDecayCurvesInEIO(false);    // true if the Radiant to Convective Decay Curves should appear in the EIO file
     bool AnySlabsInModel(false);         // true if there are any zone-coupled ground domains in the input file
@@ -261,7 +256,7 @@ namespace DataGlobals {
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state(OutputFiles &outputFiles)
+    void clear_state(IOFiles &ioFiles)
     {
         runReadVars = false;
         DDOnlySimulation = false;
@@ -294,15 +289,14 @@ namespace DataGlobals {
         TimeStep = 0;
         TimeStepZone = 0.0;
         WarmupFlag = false;
-        outputFiles.eso.close();
-        OutputStandardError = 0;
+        ioFiles.eso.close();
+        ioFiles.err_stream.reset();
         StdOutputRecordCount = 0;
-        outputFiles.debug.close();
-        outputFiles.zsz.close();
-        outputFiles.ssz.close();
-        outputFiles.mtr.close();
-        OutputFilePerfLog = 0;
-        outputFiles.shade.close();
+        ioFiles.debug.close();
+        ioFiles.zsz.close();
+        ioFiles.ssz.close();
+        ioFiles.mtr.close();
+        ioFiles.shade.close();
         StdMeterRecordCount = 0;
         ZoneSizingCalc = false;
         SysSizingCalc = false;
@@ -343,7 +337,6 @@ namespace DataGlobals {
         RunOptCondEntTemp = false;
         CompLoadReportIsReq = false;
         isPulseZoneSizing = false;
-        OutputFileZonePulse = 0;
         doLoadComponentPulseNow = false;
         ShowDecayCurvesInEIO = false;
         AnySlabsInModel = false;
@@ -355,8 +348,8 @@ namespace DataGlobals {
         progressCallback = nullptr;
         messageCallback = nullptr;
         errorCallback = nullptr;
-        outputFiles.mtr.close();
-        err_stream = nullptr;
+        ioFiles.mtr.close();
+        ioFiles.err_stream.reset();
         eplusRunningViaAPI = false;
     }
 

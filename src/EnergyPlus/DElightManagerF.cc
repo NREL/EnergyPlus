@@ -114,7 +114,7 @@ namespace DElightManagerF {
     // USE STATEMENTS:
     using namespace DataDElight;
 
-    void DElightInputGenerator(OutputFiles &outputFiles)
+    void DElightInputGenerator(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -216,7 +216,7 @@ namespace DElightManagerF {
         int iNumWndoConsts = 0;
 
         // Open a file for writing DElight input from EnergyPlus data
-        auto delightInFile = outputFiles.delightIn.open("DElightInputGenerator");
+        auto delightInFile = ioFiles.delightIn.open("DElightInputGenerator");
 
         // Start of DElight input file
         print(delightInFile, Format_901, CurrentDateTime);

@@ -215,7 +215,12 @@ namespace LowTempRadiantSystem {
     Array1D<ElecRadSysNumericFieldData> ElecRadSysNumericFields;
     Array1D<HydronicRadiantSysNumericFieldData> HydronicRadiantSysNumericFields;
 
-    // Functions
+    bool FirstTimeFlag = true; // for setting size of Ckj, Cmj, WaterTempOut arrays
+    bool MyEnvrnFlagGeneral = true;
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+    bool MyOneTimeFlag = true; // Initialization flag
+    bool warnTooLow = false;
+    bool warnTooHigh = false;
 
     void clear_state()
     {
@@ -248,6 +253,12 @@ namespace LowTempRadiantSystem {
         HydronicRadiantSysNumericFields.deallocate();
         LowTempRadUniqueNames.clear();
         GetInputFlag = true;
+        FirstTimeFlag = true;
+        MyEnvrnFlagGeneral = true;
+        ZoneEquipmentListChecked = false;
+        MyOneTimeFlag = true;
+        warnTooLow = false;
+        warnTooHigh = false;
     }
 
     void SimLowTempRadiantSystem(EnergyPlusData &state, std::string const &CompName,   // name of the low temperature radiant system
@@ -386,7 +397,7 @@ namespace LowTempRadiantSystem {
         Array1D_string cNumericFields;         // Numeric field names
         Array1D_bool AssignedAsRadiantSurface; // Set to true when a surface is part of a radiant system
         int CheckSurfNum;                      // Surface number to check to see if it has already been used by a radiant system
-        static bool ErrorsFound(false);        // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);        // Set to true if errors in input, fatal at end of routine
         int GlycolIndex;                       // Index of 'Water' in glycol data structure
         int IOStatus;                          // Used in GetObjectItem
         int Item;                              // Item to be "gotten"
@@ -1679,10 +1690,7 @@ namespace LowTempRadiantSystem {
         static Array1D_bool MyEnvrnFlagHydr;
         static Array1D_bool MyEnvrnFlagCFlo;
         static Array1D_bool MyEnvrnFlagElec;
-        static bool MyEnvrnFlagGeneral(true);
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
-        static bool MyOneTimeFlag(true); // Initialization flag
         static Array1D_bool MyPlantScanFlagHydr;
         static Array1D_bool MyPlantScanFlagCFlo;
         Real64 mdot; // local fluid mass flow rate
@@ -3518,7 +3526,7 @@ namespace LowTempRadiantSystem {
                             QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                     }
                     // Redo the heat balances since we have changed the heat source (set it to zero)
-                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Now check all of the surface temperatures.  If any potentially have condensation, leave the system off.
                     for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
@@ -3577,7 +3585,7 @@ namespace LowTempRadiantSystem {
                         }
 
                         // Redo the heat balances since we have changed the heat source
-                        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+                        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
                         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                         // Check for condensation one more time.  If no condensation, we are done.  If there is
@@ -3642,7 +3650,7 @@ namespace LowTempRadiantSystem {
         // the new SumHATsurf value for the zone.  Note that the difference between the new
         // SumHATsurf and the value originally calculated by the heat balance with a zero
         // source for all radiant systems in the zone is the load met by the system (approximately).
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
         LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
@@ -4283,8 +4291,6 @@ namespace LowTempRadiantSystem {
         static Array1D<Real64> WaterTempOut; // Array of outlet water temperatures for
                                              // each surface in the radiant system
 
-        static bool FirstTimeFlag(true); // for setting size of Ckj, Cmj, WaterTempOut arrays
-
         // First, apply heat exchanger logic to find the heat source/sink to the system.
         // This involves finding out the heat transfer characteristics of the hydronic
         // loop and then applying the equations derived on pp. 113-118 of the dissertation.
@@ -4692,7 +4698,7 @@ namespace LowTempRadiantSystem {
         // the new SumHATsurf value for the zone.  Note that the difference between the new
         // SumHATsurf and the value originally calculated by the heat balance with a zero
         // source for all radiant systems in the zone is the load met by the system (approximately).
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
         LoadMet = SumHATsurf(this->ZonePtr) - ZeroSourceSumHATsurf(this->ZonePtr);
@@ -4784,7 +4790,7 @@ namespace LowTempRadiantSystem {
                 }
 
                 // Now "simulate" the system by recalculating the heat balances
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                 LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
@@ -5012,11 +5018,7 @@ namespace LowTempRadiantSystem {
 
         Real64 const upperRangeLimit(500.0);  // high error trigger limit for when model is not working
         Real64 const lowerRangeLimit(-300.0); // Low error trigger limit for when model is not working
-        static bool warnTooLow(false);
-        static bool warnTooHigh(false);
 
-        warnTooLow = false;
-        warnTooHigh = false;
         if (outletTemp < lowerRangeLimit) {
             warnTooLow = true;
         }

@@ -725,7 +725,7 @@ namespace OutputReportTabular {
 
     bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName);
 
-    void GetInputTabularStyle(OutputFiles &outputFiles);
+    void GetInputTabularStyle(IOFiles &ioFiles);
 
     int SetUnitsStyleFromString(std::string const &unitStringIn);
 
@@ -791,7 +791,7 @@ namespace OutputReportTabular {
 
     void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
 
-    void FillWeatherPredefinedEntries();
+    void FillWeatherPredefinedEntries(IOFiles &ioFiles);
 
     std::string GetColumnUsingTabs(std::string const &inString, // Input String
                                    int const colNum             // Column number
@@ -816,7 +816,7 @@ namespace OutputReportTabular {
 
     void WriteCompCostTable(CostEstimateManagerData &dataCostEstimateManager);
 
-    void WriteVeriSumTable(CostEstimateManagerData &dataCostEstimateManager, OutputFiles &outputFiles);
+    void WriteVeriSumTable(CostEstimateManagerData &dataCostEstimateManager, IOFiles &ioFiles);
 
     void WriteAdaptiveComfortTable(CostEstimateManagerData &dataCostEstimateManager);
 
@@ -828,7 +828,7 @@ namespace OutputReportTabular {
 
     void WriteSurfaceShadowing(CostEstimateManagerData &dataCostEstimateManager);
 
-    void WriteEioTables(CostEstimateManagerData &dataCostEstimateManager, OutputFiles &outputFiles);
+    void WriteEioTables(CostEstimateManagerData &dataCostEstimateManager, IOFiles &ioFiles);
 
     int unitsFromHeading(std::string &heading);
 
@@ -840,7 +840,7 @@ namespace OutputReportTabular {
 
     void DeallocateLoadComponentArrays();
 
-    void ComputeLoadComponentDecayCurve(OutputFiles &outputFiles);
+    void ComputeLoadComponentDecayCurve(IOFiles &ioFiles);
 
     void GatherComponentLoadsSurface();
 

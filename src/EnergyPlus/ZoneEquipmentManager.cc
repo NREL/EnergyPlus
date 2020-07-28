@@ -94,10 +94,10 @@
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
@@ -190,7 +190,7 @@ namespace ZoneEquipmentManager {
         InitZoneEquipment(state.dataZoneEquipmentManager, FirstHVACIteration);
 
         if (ZoneSizingCalc) {
-            SizeZoneEquipment(state, state.outputFiles);
+            SizeZoneEquipment(state);
         } else {
             SimZoneEquipment(state, FirstHVACIteration, SimAir);
             ZoneEquipSimulatedOnce = true;
@@ -427,7 +427,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void SizeZoneEquipment(EnergyPlusData &state, OutputFiles &outputFiles)
+    void SizeZoneEquipment(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -489,7 +489,7 @@ namespace ZoneEquipmentManager {
         Real64 HR90L;                         // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 
         if (state.dataZoneEquipmentManager.SizeZoneEquipmentOneTimeFlag) {
-            SetUpZoneSizingArrays(state, outputFiles);
+            SetUpZoneSizingArrays(state);
             state.dataZoneEquipmentManager.SizeZoneEquipmentOneTimeFlag = false;
         }
 
@@ -770,7 +770,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void SetUpZoneSizingArrays(EnergyPlusData &state, OutputFiles &outputFiles)
+    void SetUpZoneSizingArrays(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -810,7 +810,7 @@ namespace ZoneEquipmentManager {
         static Real64 OAFromArea(0.0);   // min OA calculated from zone area and OA flow per area [m3/s]
         int ZoneIndex;                   // index of Zone Sizing zone name in zone array
         int ZoneSizIndex;                // zone sizing do loop index
-        static bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
         static Real64 SchMax(0.0);       // maximum people multiplier value
         Real64 OAVolumeFlowRate;         // outside air flow rate (m3/s)
         bool UseOccSchFlag;              // flag to use occupancy schedule when calculating OA
@@ -835,7 +835,7 @@ namespace ZoneEquipmentManager {
                     ZoneSizingInput(ZoneSizIndex).ZoneNum = ZoneIndex;
                 }
                 if (ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod == FromDDCalc || ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod == FromDDCalc) {
-                    if (!VerifyThermostatInZone(state.dataZoneTempPredictorCorrector, ZoneSizingInput(ZoneSizIndex).ZoneName)) {
+                    if (!VerifyThermostatInZone(state.dataZoneTempPredictorCorrector, state.files, ZoneSizingInput(ZoneSizIndex).ZoneName)) {
                         if (!isPulseZoneSizing) {
                             ShowWarningError("SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput(ZoneSizIndex).ZoneName +
                                              "\", Zone has no thermostat (ref: ZoneControl:Thermostat, et al)");
@@ -852,7 +852,7 @@ namespace ZoneEquipmentManager {
         }
 
         // Put Auto Sizing of Sizing:Zone inputs here!
-        AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, outputFiles);
+        AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
 
         ZoneSizing.allocate(TotDesDays + TotRunDesPersDays, NumOfZones);
         FinalZoneSizing.allocate(NumOfZones);
@@ -1368,27 +1368,27 @@ namespace ZoneEquipmentManager {
             }
         }
         // Formats
-        print(outputFiles.eio, "! <Load Timesteps in Zone Design Calculation Averaging Window>, Value\n");
+        print(state.files.eio, "! <Load Timesteps in Zone Design Calculation Averaging Window>, Value\n");
         static constexpr auto Format_891(" Load Timesteps in Zone Design Calculation Averaging Window, {:4}\n");
-        print(outputFiles.eio, Format_891, NumTimeStepsInAvg);
-        print(outputFiles.eio, "! <Heating Sizing Factor Information>, Sizing Factor ID, Value\n");
+        print(state.files.eio, Format_891, NumTimeStepsInAvg);
+        print(state.files.eio, "! <Heating Sizing Factor Information>, Sizing Factor ID, Value\n");
         static constexpr auto Format_991(" Heating Sizing Factor Information, Global, {:12.5N}\n");
-        print(outputFiles.eio, Format_991, GlobalHeatSizingFactor);
+        print(state.files.eio, Format_991, GlobalHeatSizingFactor);
         for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             if (FinalZoneSizing(CtrlZoneNum).HeatSizingFactor != 1.0) {
                 static constexpr auto Format_992(" Heating Sizing Factor Information, Zone {}, {:12.5N}\n");
-                print(outputFiles.eio, Format_992, FinalZoneSizing(CtrlZoneNum).ZoneName, FinalZoneSizing(CtrlZoneNum).HeatSizingFactor);
+                print(state.files.eio, Format_992, FinalZoneSizing(CtrlZoneNum).ZoneName, FinalZoneSizing(CtrlZoneNum).HeatSizingFactor);
             }
         }
-        print(outputFiles.eio, "! <Cooling Sizing Factor Information>, Sizing Factor ID, Value\n");
+        print(state.files.eio, "! <Cooling Sizing Factor Information>, Sizing Factor ID, Value\n");
         static constexpr auto Format_994(" Cooling Sizing Factor Information, Global, {:12.5N}\n");
-        print(outputFiles.eio, Format_994, GlobalCoolSizingFactor);
+        print(state.files.eio, Format_994, GlobalCoolSizingFactor);
         for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             if (FinalZoneSizing(CtrlZoneNum).CoolSizingFactor != 1.0) {
                 static constexpr auto Format_995(" Cooling Sizing Factor Information, Zone {}, {:12.5N}\n");
-                print(outputFiles.eio, Format_995, FinalZoneSizing(CtrlZoneNum).ZoneName, FinalZoneSizing(CtrlZoneNum).CoolSizingFactor);
+                print(state.files.eio, Format_995, FinalZoneSizing(CtrlZoneNum).ZoneName, FinalZoneSizing(CtrlZoneNum).CoolSizingFactor);
             }
         }
     }
@@ -1794,7 +1794,7 @@ namespace ZoneEquipmentManager {
 
                 // candidate EMS calling point to customize CalcFinalZoneSizing
                 bool anyEMSRan;
-                ManageEMS(emsCallFromZoneSizing, anyEMSRan);
+                ManageEMS(state, emsCallFromZoneSizing, anyEMSRan, ObjexxFCL::Optional_int_const());
 
                 // now apply EMS overrides (if any)
 
@@ -1841,12 +1841,12 @@ namespace ZoneEquipmentManager {
                         }
                     }
 
-                    print(state.outputFiles.zsz, "Time");
+                    print(state.files.zsz, "Time");
                     for (I = 1; I <= NumOfZones; ++I) {
                         if (!ZoneEquipConfig(I).IsControlled) continue;
 
                         static constexpr auto ZSizeFmt11("{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}");
-                        print(state.outputFiles.zsz,
+                        print(state.files.zsz,
                               ZSizeFmt11,
                               SizingFileColSep,
                               CalcFinalZoneSizing(I).ZoneName,
@@ -1970,7 +1970,7 @@ namespace ZoneEquipmentManager {
                         }
                     }
 
-                    print(state.outputFiles.zsz, "\n");
+                    print(state.files.zsz, "\n");
                     //      HourFrac = 0.0
                     Minutes = 0;
                     TimeStepIndex = 0;
@@ -1995,11 +1995,11 @@ namespace ZoneEquipmentManager {
                             }
 
                             static constexpr auto ZSizeFmt20("{:02}:{:02}:00");
-                            print(state.outputFiles.zsz, ZSizeFmt20, HourPrint, Minutes);
+                            print(state.files.zsz, ZSizeFmt20, HourPrint, Minutes);
                             for (I = 1; I <= NumOfZones; ++I) {
                                 if (!ZoneEquipConfig(I).IsControlled) continue;
                                 static constexpr auto ZSizeFmt21("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
-                                print(state.outputFiles.zsz,
+                                print(state.files.zsz,
                                       ZSizeFmt21,
                                       SizingFileColSep,
                                       CalcFinalZoneSizing(I).HeatLoadSeq(TimeStepIndex),
@@ -2010,16 +2010,16 @@ namespace ZoneEquipmentManager {
                                       SizingFileColSep,
                                       CalcFinalZoneSizing(I).CoolFlowSeq(TimeStepIndex));
                             }
-                            print(state.outputFiles.zsz, "\n");
+                            print(state.files.zsz, "\n");
                         }
                     }
-                    print(state.outputFiles.zsz, "Peak");
+                    print(state.files.zsz, "Peak");
 
                     for (I = 1; I <= NumOfZones; ++I) {
                         if (!ZoneEquipConfig(I).IsControlled) continue;
 
                         static constexpr auto ZSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
-                        print(state.outputFiles.zsz,
+                        print(state.files.zsz,
                               ZSizeFmt31,
                               SizingFileColSep,
                               CalcFinalZoneSizing(I).DesHeatLoad,
@@ -2030,13 +2030,13 @@ namespace ZoneEquipmentManager {
                               SizingFileColSep,
                               CalcFinalZoneSizing(I).DesCoolMassFlow);
                     }
-                    print(state.outputFiles.zsz, "\n");
+                    print(state.files.zsz, "\n");
 
-                    print(state.outputFiles.zsz, "\nPeak Vol Flow (m3/s)");
+                    print(state.files.zsz, "\nPeak Vol Flow (m3/s)");
                     for (I = 1; I <= NumOfZones; ++I) {
                         if (!ZoneEquipConfig(I).IsControlled) continue;
                         static constexpr auto ZSizeFmt41("{}{}{}{:12.6E}{}{:12.6E}");
-                        print(state.outputFiles.zsz,
+                        print(state.files.zsz,
                               ZSizeFmt41,
                               SizingFileColSep,
                               SizingFileColSep,
@@ -2045,8 +2045,8 @@ namespace ZoneEquipmentManager {
                               SizingFileColSep,
                               CalcFinalZoneSizing(I).DesCoolVolFlow);
                     }
-                    print(state.outputFiles.zsz, "\n");
-                    state.outputFiles.zsz.close();
+                    print(state.files.zsz, "\n");
+                    state.files.zsz.close();
                 }
 
                 // Move data from Calc arrays to user modified arrays
@@ -2659,10 +2659,9 @@ namespace ZoneEquipmentManager {
         int ZoneEquipTypeNum;
         int ZoneCompNum;
 
-        static bool SupPathInletChanged(false);
-        static bool FirstCall; // indicates first call to supply air path components
+        bool SupPathInletChanged(false);
+        bool FirstCall; // indicates first call to supply air path components
         bool ErrorFlag;
-        static bool ValidSAMComp(false);
 
         Real64 SysOutputProvided; // sensible output delivered by zone equipment (W)
         Real64 LatOutputProvided; // latent output delivered by zone equipment (kg/s)
@@ -2779,7 +2778,7 @@ namespace ZoneEquipmentManager {
 
                 ZoneCompNum = ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr);
 
-                ValidSAMComp = false;
+                bool ValidSAMComp = false;
 
                 if (ZoneEquipTypeNum <= NumValidSysAvailZoneComponents) ValidSAMComp = true;
 
@@ -3103,7 +3102,7 @@ namespace ZoneEquipmentManager {
                         NonAirSystemResponse(ActualZoneNum) += SysOutputProvided;
 
                     } else if (SELECT_CASE_var == UserDefinedZoneHVACForcedAir_Num) {
-                        SimZoneAirUserDefined(state.dataBranchInputManager,
+                        SimZoneAirUserDefined(state,
                                               state.dataZoneEquipmentManager.PrioritySimOrder(EquipTypeNum).EquipName,
                                               ActualZoneNum,
                                               SysOutputProvided,
@@ -5709,7 +5708,7 @@ namespace ZoneEquipmentManager {
         MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
     }
 
-    void AutoCalcDOASControlStrategy(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles)
+    void AutoCalcDOASControlStrategy(ZoneEquipmentManagerData &dataZoneEquipmentManager, IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -5739,7 +5738,8 @@ namespace ZoneEquipmentManager {
                     } else if (ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint > 0.0 && ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint == AutoSize) {
                         ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint + 2.8;
                     }
-                    ReportZoneSizingDOASInputs(dataZoneEquipmentManager, outputFiles,
+                    ReportZoneSizingDOASInputs(dataZoneEquipmentManager,
+                                               ioFiles,
                                                ZoneSizingInput(ZoneSizIndex).ZoneName,
                                                "NeutralSupplyAir",
                                                ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
@@ -5753,7 +5753,8 @@ namespace ZoneEquipmentManager {
                     } else if (ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint > 0.0 && ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint == AutoSize) {
                         ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = 22.2;
                     }
-                    ReportZoneSizingDOASInputs(dataZoneEquipmentManager, outputFiles,
+                    ReportZoneSizingDOASInputs(dataZoneEquipmentManager,
+                                               ioFiles,
                                                ZoneSizingInput(ZoneSizIndex).ZoneName,
                                                "NeutralDehumidifiedSupplyAir",
                                                ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
@@ -5767,7 +5768,8 @@ namespace ZoneEquipmentManager {
                     } else if (ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint > 0.0 && ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint == AutoSize) {
                         ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint + 2.2;
                     }
-                    ReportZoneSizingDOASInputs(dataZoneEquipmentManager, outputFiles,
+                    ReportZoneSizingDOASInputs(dataZoneEquipmentManager,
+                                               ioFiles,
                                                ZoneSizingInput(ZoneSizIndex).ZoneName,
                                                "ColdSupplyAir",
                                                ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
@@ -5785,7 +5787,8 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void ReportZoneSizingDOASInputs(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles,
+    void ReportZoneSizingDOASInputs(ZoneEquipmentManagerData &dataZoneEquipmentManager,
+                                    IOFiles &ioFiles,
                                     std::string const &ZoneName,         // the name of the zone
                                     std::string const &DOASCtrlStrategy, // DOAS control strategy
                                     Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]
@@ -5814,12 +5817,12 @@ namespace ZoneEquipmentManager {
 
 
         if (dataZoneEquipmentManager.reportDOASZoneSizingHeader) {
-            print(outputFiles.eio, "{}\n", Format_990);
+            print(ioFiles.eio, "{}\n", Format_990);
             dataZoneEquipmentManager.reportDOASZoneSizingHeader = false;
         }
 
         static constexpr auto Format_991(" Zone Sizing DOAS Inputs, {}, {}, {:.3R}, {:.3R}\n");
-        print(outputFiles.eio, Format_991, ZoneName, DOASCtrlStrategy, DOASLowTemp, DOASHighTemp);
+        print(ioFiles.eio, Format_991, ZoneName, DOASCtrlStrategy, DOASLowTemp, DOASHighTemp);
 
         // BSLLC Start
         // if ( sqlite ) {
