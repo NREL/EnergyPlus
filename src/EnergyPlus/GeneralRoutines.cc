@@ -2141,9 +2141,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
 
 void CalcComponentSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
                                    Real64 const TDB2,      // dry-bulb temperature at state 2 {C}
-                                   Real64 const dW2,       // humidity ratio at  at state 2
+                                   Real64 const dW2,       // humidity ratio at state 2
                                    Real64 const TDB1,      // dry-bulb temperature at  at state 1 {C}
-                                   Real64 const dW1,       // humidity ratio  at state 1
+                                   Real64 const dW1,       // humidity ratio at state 1
                                    Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
                                    Real64 &LatentOutput,   // latent output rate (state 2 -> State 1), {W}
                                    Real64 &TotalOutput     // total = sensible + latent putput rate (state 2 -> State 1), {W}
@@ -2182,4 +2182,70 @@ void CalcComponentSensibleLatentOutput(Real64 const MassFlow,  // air mass flow 
     }
 }
 
+void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
+    Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
+    Real64 const dWEquip,  // humidity ratio at equipment outlet
+    Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
+    Real64 const dWZone,   // humidity ratio at zone air node
+    Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
+    Real64 &LatentOutput,   // latent output rate (state 2 -> State 1), {W}
+    Real64 &TotalOutput     // total = sensible + latent putput rate (state 2 -> State 1), {W}
+)
+{
+
+    // Purpose:
+    // returns total, sensible and latent heat rate of transfer between equipment outlet 
+    // and zone air node. The mosit energy transfer can be cooling and heating depending 
+    // on the zone equipment outlet and zone air node conditions.
+
+    // Methodology:
+    // Q_total = m_dot * (hEquip - hZone)
+    // Q_sensible = m_dot * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(TDBEquip, dWEquip, TDBZone, dWZone);
+    // or Q_sensible = m_dot * cp_moistair_minHumRat * (TDBEquip - TDBZone)
+    // Q_latent = Q_total - Q_latent;
+
+    // reference:
+    // na
+
+    using Psychrometrics::PsyDeltaHSenFnTdbEquipTdbWZone;
+    using Psychrometrics::PsyHFnTdbW;
+
+    TotalOutput = 0.0;
+    LatentOutput = 0.0;
+    SensibleOutput = 0.0;
+    if (MassFlow > 0.0) {
+        TotalOutput = MassFlow * (Psychrometrics::PsyHFnTdbW(TDBEquip, dWEquip) - Psychrometrics::PsyHFnTdbW(TDBZone, dWZone)); // total addition/removal rate, {W};
+        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(TDBEquip, dWEquip, TDBZone, dWZone); // sensible addition/removal rate, {W};
+        LatentOutput = TotalOutput - SensibleOutput;                                            // latent addition/removal rate, {W}
+    }
+}
+
+void CalcZoneSensibleOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
+    Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
+    Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
+    Real64 const dWZone,   // humidity ratio at zone air node
+    Real64 &SensibleOutput // sensible output rate (state 2 -> State 1), {W}
+)
+{
+
+    // Purpose:
+    // returns sensible heat rate of transfer between equipment outlet and zone 
+    // air node. The mosit energy transfer can be cooling and heating depending
+    // on the zone equipment outlet and zone air node conditions.
+
+    // Methodology:
+    // Q_sensible = m_dot * Psychrometrics::PsyDeltaHSenFnTdbEquipTdbWZone(TDBEquip, dWEquip, TDBZone, dWZone);
+    // or Q_sensible = m_dot * cp_moistair_dWZone * (TDBEquip - TDBZone)
+    // Q_latent = Q_total - Q_latent;
+
+    // reference:
+    // na
+
+    using Psychrometrics::PsyDeltaHSenFnTdbEquipTdbWZone;
+
+    SensibleOutput = 0.0;
+    if (MassFlow > 0.0) {
+        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdbEquipTdbWZone(TDBEquip, TDBZone, dWZone); // sensible addition/removal rate, {W};
+    }
+}
 } // namespace EnergyPlus

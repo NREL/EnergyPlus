@@ -2359,8 +2359,8 @@ namespace HVACMultiSpeedHeatPump {
             MassFlowRate = Node(ZoneInNode).MassFlowRate / MSHeatPump(MSHeatPumpNum).FlowFraction;
             Real64 MinHumRat = Node(ZoneInNode).HumRat;
             if (Node(OutNode).Temp < Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp) MinHumRat = Node(OutNode).HumRat;
-            CalcComponentSensibleLatentOutput(MassFlowRate, Node(OutNode).Temp, MinHumRat, Node(ZoneInNode).Temp, MinHumRat, MSHeatPump(MSHeatPumpNum).LoadLoss, LatentOutput, TotalOutput);
-            CalcComponentSensibleLatentOutput(DeltaMassRate, Node(OutNode).Temp, MinHumRat, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp, MinHumRat, SensibleOutputDelta, LatentOutputDelta, TotalOutputDelta);
+            CalcZoneSensibleLatentOutput(MassFlowRate, Node(OutNode).Temp, MinHumRat, Node(ZoneInNode).Temp, MinHumRat, MSHeatPump(MSHeatPumpNum).LoadLoss, LatentOutput, TotalOutput);
+            CalcZoneSensibleLatentOutput(DeltaMassRate, Node(OutNode).Temp, MinHumRat, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp, MinHumRat, SensibleOutputDelta, LatentOutputDelta, TotalOutputDelta);
             MSHeatPump(MSHeatPumpNum).LoadLoss = MSHeatPump(MSHeatPumpNum).LoadLoss + SensibleOutputDelta;
             if (std::abs(MSHeatPump(MSHeatPumpNum).LoadLoss) < 1.0e-6) MSHeatPump(MSHeatPumpNum).LoadLoss = 0.0;
         }

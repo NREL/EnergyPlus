@@ -10334,7 +10334,7 @@ namespace UnitarySystems {
             if (this->ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 // Air terminal supply side mixer
                 int ATMixOutNode = this->ATMixerOutNode;
-                CalcComponentSensibleLatentOutput(DataLoopNode::Node(ATMixOutNode).MassFlowRate, DataLoopNode::Node(ATMixOutNode).Temp, DataLoopNode::Node(ATMixOutNode).HumRat, RefTemp, RefHumRat, SensibleOutput, LatentOutput, TotalOutput);
+                CalcZoneSensibleLatentOutput(DataLoopNode::Node(ATMixOutNode).MassFlowRate, DataLoopNode::Node(ATMixOutNode).Temp, DataLoopNode::Node(ATMixOutNode).HumRat, RefTemp, RefHumRat, SensibleOutput, LatentOutput, TotalOutput);
                 SensOutput = SensibleOutput - this->m_SenLoadLoss;
                 if (this->m_Humidistat) {
                     LatOutput = LatentOutput - this->m_LatLoadLoss;
@@ -10343,7 +10343,7 @@ namespace UnitarySystems {
                 }
             } else {
                 // Air terminal inlet side mixer
-                CalcComponentSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, RefTemp, RefHumRat, SensibleOutput, LatentOutput, TotalOutput);
+                CalcZoneSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, RefTemp, RefHumRat, SensibleOutput, LatentOutput, TotalOutput);
                 SensOutput = SensibleOutput - this->m_SenLoadLoss;
                 if (this->m_Humidistat) {
                     LatOutput = LatentOutput - this->m_LatLoadLoss;
@@ -10353,7 +10353,7 @@ namespace UnitarySystems {
             }
         } else {
             // Calculate sensible load met 
-            CalcComponentSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, RefTemp, RefHumRat, SensibleOutput, LatentOutput, TotalOutput);
+            CalcZoneSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, RefTemp, RefHumRat, SensibleOutput, LatentOutput, TotalOutput);
             SensOutput = SensibleOutput - this->m_SenLoadLoss;
             if (this->m_Humidistat) {
                 LatOutput = LatentOutput - this->m_LatLoadLoss;
@@ -13465,7 +13465,7 @@ namespace UnitarySystems {
             }
         } else {
             if (OutletNode > 0 && this->NodeNumOfControlledZone > 0) {
-                CalcComponentSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, DataLoopNode::Node(this->NodeNumOfControlledZone).Temp, DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat, SensibleOutput, LatentOutput, TotalOutput);
+                CalcZoneSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, DataLoopNode::Node(this->NodeNumOfControlledZone).Temp, DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat, SensibleOutput, LatentOutput, TotalOutput);
                 QSensUnitOut = SensibleOutput - this->m_SenLoadLoss;
                 QTotUnitOut = TotalOutput;
             }
