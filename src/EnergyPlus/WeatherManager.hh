@@ -640,6 +640,8 @@ namespace WeatherManager {
                                    int &currentDayOfWeek          // Current Day of Week
     );
 
+    void ErrorInterpretWeatherDataLine(int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string SaveLine, std::string Line);
+
     void InterpretWeatherDataLine(std::string &Line,
                                   bool &ErrorFound,       // True if an error is found, false otherwise
                                   int &WYear,
@@ -647,34 +649,34 @@ namespace WeatherManager {
                                   int &WDay,
                                   int &WHour,
                                   int &WMinute,
-                                  Real64 &RField1,        // DryBulb
-                                  Real64 &RField2,        // DewPoint
-                                  Real64 &RField3,        // RelHum
-                                  Real64 &RField4,        // AtmPress
-                                  Real64 &RField5,        // ETHoriz
-                                  Real64 &RField6,        // ETDirect
-                                  Real64 &RField7,        // IRHoriz
-                                  Real64 &RField8,        // GLBHoriz
-                                  Real64 &RField9,        // DirectRad
-                                  Real64 &RField10,       // DiffuseRad
-                                  Real64 &RField11,       // GLBHorizIllum
-                                  Real64 &RField12,       // DirectNrmIllum
-                                  Real64 &RField13,       // DiffuseHorizIllum
-                                  Real64 &RField14,       // ZenLum
-                                  Real64 &RField15,       // WindDir
-                                  Real64 &RField16,       // WindSpeed
-                                  Real64 &RField17,       // TotalSkyCover
-                                  Real64 &RField18,       // OpaqueSkyCover
-                                  Real64 &RField19,       // Visibility
-                                  Real64 &RField20,       // CeilHeight
+                                  Real64 &DryBulb,        // DryBulb
+                                  Real64 &DewPoint,        // DewPoint
+                                  Real64 &RelHum,        // RelHum
+                                  Real64 &AtmPress,        // AtmPress
+                                  Real64 &ETHoriz,        // ETHoriz
+                                  Real64 &ETDirect,        // ETDirect
+                                  Real64 &IRHoriz,        // IRHoriz
+                                  Real64 &GLBHoriz,        // GLBHoriz
+                                  Real64 &DirectRad,        // DirectRad
+                                  Real64 &DiffuseRad,       // DiffuseRad
+                                  Real64 &GLBHorizIllum,       // GLBHorizIllum
+                                  Real64 &DirectNrmIllum,       // DirectNrmIllum
+                                  Real64 &DiffuseHorizIllum,       // DiffuseHorizIllum
+                                  Real64 &ZenLum,       // ZenLum
+                                  Real64 &WindDir,       // WindDir
+                                  Real64 &WindSpeed,       // WindSpeed
+                                  Real64 &TotalSkyCover,       // TotalSkyCover
+                                  Real64 &OpaqueSkyCover,       // OpaqueSkyCover
+                                  Real64 &Visibility,       // Visibility
+                                  Real64 &CeilHeight,       // CeilHeight
                                   int &WObs,              // PresWeathObs
                                   Array1D_int &WCodesArr, // PresWeathConds
-                                  Real64 &RField22,       // PrecipWater
-                                  Real64 &RField23,       // AerosolOptDepth
-                                  Real64 &RField24,       // SnowDepth
-                                  Real64 &RField25,       // DaysSinceLastSnow
-                                  Real64 &RField26,       // Albedo
-                                  Real64 &RField27        // LiquidPrecip
+                                  Real64 &PrecipWater,       // PrecipWater
+                                  Real64 &AerosolOptDepth,       // AerosolOptDepth
+                                  Real64 &SnowDepth,       // SnowDepth
+                                  Real64 &DaysSinceLastSnow,       // DaysSinceLastSnow
+                                  Real64 &Albedo,       // Albedo
+                                  Real64 &LiquidPrecip        // LiquidPrecip
     );
 
     void SetUpDesignDay(OutputFiles &outputFiles, int EnvrnNum); // Environment number passed into the routine
