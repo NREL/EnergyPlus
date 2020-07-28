@@ -2632,6 +2632,7 @@ namespace ThermalComfort {
         int j;
         bool weathersimulation;
         Real64 inavgdrybulb;
+        int const numHeaderRowsInEpw = 8;
 
         if (initiate) { // not optional on initiate=true.  would otherwise check for presence
             weathersimulation = wthrsim;
@@ -2677,7 +2678,7 @@ namespace ThermalComfort {
                 DailyAveOutTemp = 0.0;
 
                 auto epwFile = ioFiles.inputWeatherFileName.open("CalcThermalComfortAdaptiveASH55");
-                for (i = 1; i <= 8; ++i) { // Headers
+                for (i = 1; i <= numHeaderRowsInEpw; ++i) {
                     epwLine = epwFile.readLine().data;
                 }
                 jStartDay = DayOfYear - 1;
@@ -2873,6 +2874,7 @@ namespace ThermalComfort {
         int j;
         bool weathersimulation;
         Real64 inavgdrybulb;
+        int const numHeaderRowsInEpw = 8;
 
         if (initiate) { // not optional on initiate=true.  would otherwise check for presence
             weathersimulation = wthrsim;
@@ -2896,7 +2898,7 @@ namespace ThermalComfort {
                     DaysInYear = 365;
                 }
                 auto epwFile = ioFiles.inputWeatherFileName.open("CalcThermalComfortAdaptiveCEN15251");
-                for (i = 1; i <= 8; ++i) { // Headers
+                for (i = 1; i <= numHeaderRowsInEpw; ++i) {
                     epwFile.readLine();
                 }
                 jStartDay = DayOfYear - 1;
