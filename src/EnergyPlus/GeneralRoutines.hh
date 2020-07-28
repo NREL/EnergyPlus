@@ -163,7 +163,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
 
 void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound, Array2S_int ValRetAPaths);
 
-void CalcTotalSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
+void CalcComponentSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
                                    Real64 const TDB2,      // dry-bulb temperature at state 2 {C}
                                    Real64 const dW2,       // humidity ratio at  at state 2
                                    Real64 const TDB1,      // dry-bulb temperature at  at state 1 {C}

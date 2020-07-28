@@ -8413,7 +8413,7 @@ namespace UnitarySystems {
                             Real64 totalRate;
                             Real64 sensRate;
                             Real64 latRate;
-                            CalcTotalSensibleLatentOutput(DataLoopNode::Node(this->AirOutNode).MassFlowRate, DataLoopNode::Node(CoilInletNode).Temp, DataLoopNode::Node(CoilInletNode).HumRat, DataLoopNode::Node(this->AirOutNode).Temp, DataLoopNode::Node(this->AirOutNode).HumRat, totalRate, sensRate, latRate);
+                            CalcComponentSensibleLatentOutput(DataLoopNode::Node(this->AirOutNode).MassFlowRate, DataLoopNode::Node(CoilInletNode).Temp, DataLoopNode::Node(CoilInletNode).HumRat, DataLoopNode::Node(this->AirOutNode).Temp, DataLoopNode::Node(this->AirOutNode).HumRat, totalRate, sensRate, latRate);
                             if (LatPLR > 1.0 || LatPLR < 0.0) {
                                 this->CoilSHR = this->LoadSHR;
                             } else {
@@ -8455,7 +8455,7 @@ namespace UnitarySystems {
                                                                   HeatCoilLoad,
                                                                   SupHeaterLoad,
                                                                   CompressorONFlag);
-                                    CalcTotalSensibleLatentOutput(DataLoopNode::Node(this->AirOutNode).MassFlowRate, DataLoopNode::Node(CoilInletNode).Temp, DataLoopNode::Node(CoilInletNode).HumRat, DataLoopNode::Node(this->AirOutNode).Temp, DataLoopNode::Node(this->AirOutNode).HumRat, totalRate, sensRate, latRate);
+                                    CalcComponentSensibleLatentOutput(DataLoopNode::Node(this->AirOutNode).MassFlowRate, DataLoopNode::Node(CoilInletNode).Temp, DataLoopNode::Node(CoilInletNode).HumRat, DataLoopNode::Node(this->AirOutNode).Temp, DataLoopNode::Node(this->AirOutNode).HumRat, totalRate, sensRate, latRate);
                                     SenSPR =
                                         (ZoneLoad - this->FullOutput[SpeedNum - 1]) / (this->FullOutput[SpeedNum] - this->FullOutput[SpeedNum - 1]);
                                     LatSPR = (ZoneLatLoad - this->FullLatOutput[SpeedNum - 1]) /
@@ -9369,8 +9369,8 @@ namespace UnitarySystems {
                 MassFlowRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate;
                 DeltaMassRate = 0.0;
             }
-            CalcTotalSensibleLatentOutput(MassFlowRate, DataLoopNode::Node(this->AirOutNode).Temp, DataLoopNode::Node(this->AirOutNode).HumRat, DataLoopNode::Node(ZoneInNode).Temp, DataLoopNode::Node(ZoneInNode).HumRat, TotalOutput, this->m_SenLoadLoss, this->m_LatLoadLoss);
-            CalcTotalSensibleLatentOutput(DeltaMassRate, DataLoopNode::Node(this->AirOutNode).Temp, DataLoopNode::Node(this->AirOutNode).HumRat, DataLoopNode::Node(this->NodeNumOfControlledZone).Temp, DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat, TotalOutputDelta, SensibleOutputDelta, LatentOutputDelta);
+            CalcComponentSensibleLatentOutput(MassFlowRate, DataLoopNode::Node(this->AirOutNode).Temp, DataLoopNode::Node(this->AirOutNode).HumRat, DataLoopNode::Node(ZoneInNode).Temp, DataLoopNode::Node(ZoneInNode).HumRat, TotalOutput, this->m_SenLoadLoss, this->m_LatLoadLoss);
+            CalcComponentSensibleLatentOutput(DeltaMassRate, DataLoopNode::Node(this->AirOutNode).Temp, DataLoopNode::Node(this->AirOutNode).HumRat, DataLoopNode::Node(this->NodeNumOfControlledZone).Temp, DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat, TotalOutputDelta, SensibleOutputDelta, LatentOutputDelta);
             this->m_SenLoadLoss = this->m_SenLoadLoss + SensibleOutputDelta;
             if (std::abs(this->m_SensibleLoadMet) > 0.0) {
                 if (std::abs(this->m_SenLoadLoss / this->m_SensibleLoadMet) < 0.001) this->m_SenLoadLoss = 0.0;
@@ -10334,7 +10334,7 @@ namespace UnitarySystems {
             if (this->ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 // Air terminal supply side mixer
                 int ATMixOutNode = this->ATMixerOutNode;
-                CalcTotalSensibleLatentOutput(DataLoopNode::Node(ATMixOutNode).MassFlowRate, DataLoopNode::Node(ATMixOutNode).Temp, DataLoopNode::Node(ATMixOutNode).HumRat, RefTemp, RefHumRat, TotalOutput, SensibleOutput, LatentOutput);
+                CalcComponentSensibleLatentOutput(DataLoopNode::Node(ATMixOutNode).MassFlowRate, DataLoopNode::Node(ATMixOutNode).Temp, DataLoopNode::Node(ATMixOutNode).HumRat, RefTemp, RefHumRat, TotalOutput, SensibleOutput, LatentOutput);
                 SensOutput = SensibleOutput - this->m_SenLoadLoss;
                 if (this->m_Humidistat) {
                     LatOutput = LatentOutput - this->m_LatLoadLoss;
@@ -10343,7 +10343,7 @@ namespace UnitarySystems {
                 }
             } else {
                 // Air terminal inlet side mixer
-                CalcTotalSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, RefTemp, RefHumRat, TotalOutput, SensibleOutput, LatentOutput);
+                CalcComponentSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, RefTemp, RefHumRat, TotalOutput, SensibleOutput, LatentOutput);
                 SensOutput = SensibleOutput - this->m_SenLoadLoss;
                 if (this->m_Humidistat) {
                     LatOutput = LatentOutput - this->m_LatLoadLoss;
@@ -10353,7 +10353,7 @@ namespace UnitarySystems {
             }
         } else {
             // Calculate sensible load met 
-            CalcTotalSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, RefTemp, RefHumRat, TotalOutput, SensibleOutput, LatentOutput);
+            CalcComponentSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, RefTemp, RefHumRat, TotalOutput, SensibleOutput, LatentOutput);
             SensOutput = SensibleOutput - this->m_SenLoadLoss;
             if (this->m_Humidistat) {
                 LatOutput = LatentOutput - this->m_LatLoadLoss;
@@ -13459,13 +13459,13 @@ namespace UnitarySystems {
         if (SELECT_CASE_var == ControlType::Setpoint) {
             if (OutletNode > 0) {
                 int InletNode = this->AirInNode;
-                CalcTotalSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat, TotalOutput, SensibleOutput, LatentOutput);
+                CalcComponentSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat, TotalOutput, SensibleOutput, LatentOutput);
                 QSensUnitOut = SensibleOutput - this->m_SenLoadLoss;
                 QTotUnitOut = TotalOutput;
             }
         } else {
             if (OutletNode > 0 && this->NodeNumOfControlledZone > 0) {
-                CalcTotalSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, DataLoopNode::Node(this->NodeNumOfControlledZone).Temp, DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat, TotalOutput, SensibleOutput, LatentOutput);
+                CalcComponentSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, DataLoopNode::Node(this->NodeNumOfControlledZone).Temp, DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat, TotalOutput, SensibleOutput, LatentOutput);
                 QSensUnitOut = SensibleOutput - this->m_SenLoadLoss;
                 QTotUnitOut = TotalOutput;
             }
