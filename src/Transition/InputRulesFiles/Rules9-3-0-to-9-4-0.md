@@ -42,6 +42,26 @@ This object was made unique, and with an extensible "Key" field to add specific 
 
 cf #7742.
 
+# Object Change: ‘ZoneHVAC:LowTemperatureRadiant:VariableFlow’
+
+Summary: A new field was added into the middle of the object, everything else states the same (or shifted back if occurring after the new field).
+
+Fields 1-7 remain the same.
+
+NEW Field F8 (A6): Setpoint Control Type.  Leave blank or assign a value of “HalfFlowPower” (default).
+
+Old Fields 8-29 remain the same, just shifted back one field to Fields 9-30.
+
+# Object Change: ‘ZoneHVAC:LowTemperatureRadiant:Electric’
+
+Summary: A new field was added into the middle of the object, everything else states the same (or shifted back if occurring after the new field).
+
+Fields 1-9 remain the same.
+
+NEW Field F10 (A7): Setpoint Control Type.  Leave blank or assign a value of “HalfFlowPower” (default).
+
+Old Fields 10-11 remain the same, just shifted back one field to Fields 11-12.
+
 # Minor Changes:
 
 ## ZoneProperty:UserViewFactors:BySurfaceName,
@@ -68,3 +88,13 @@ Two typos were corrected in field names.
   N4 , \field Coefficient4 C4
   N5 , \field Coefficient5 C5
 ```
+
+# Object Change: `PerformancePrecisionTradeoffs'
+
+Fields 1-2 (A1, A2) remain the same.
+
+Change in Field 3 (A3): two more key values---Mode06 and Mode07---are added.
+
+Field 4 (N1) remains the same; however it is no longer the last field. See the newly added Field 5 (N2) below.
+
+Newly added Field 5 (N2): MaxAllowedDelTemp, supplied with minimu, maximum, and default values.

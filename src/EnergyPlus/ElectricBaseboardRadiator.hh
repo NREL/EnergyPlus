@@ -58,7 +58,11 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
+    struct ConvectionCoefficientsData;
     struct ZoneTempPredictorCorrectorData;
+
+    // Forward Declarations
+    struct EnergyPlusData;
 
 namespace ElectricBaseboardRadiator {
 
@@ -145,6 +149,7 @@ namespace ElectricBaseboardRadiator {
     extern Array1D<ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
 
     // Functions
+    void clear_state();
 
     void SimElecBaseboard(EnergyPlusData &state, std::string const &EquipName,
                           int const ActualZoneNum,
@@ -159,7 +164,7 @@ namespace ElectricBaseboardRadiator {
 
     void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    void CalcElectricBaseboard(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const BaseboardNum, int const ControlledZoneNum);
+    void CalcElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum);
 
     void UpdateElectricBaseboardOff(Real64 &LoadMet,
                                     Real64 &QBBCap,

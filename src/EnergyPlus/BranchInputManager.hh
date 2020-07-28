@@ -57,7 +57,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
@@ -335,7 +335,7 @@ namespace BranchInputManager {
                        Optional_string_const CompName = _  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     );
 
-    void TestBranchIntegrity(BranchInputManagerData &dataBranchInputManager, EnergyPlus::OutputFiles &outputFiles, bool &ErrFound);              // ErrFound is a return value, true or false
+    void TestBranchIntegrity(BranchInputManagerData &dataBranchInputManager, EnergyPlus::IOFiles &ioFiles, bool &ErrFound);              // ErrFound is a return value, true or false
 
 } // namespace BranchInputManager
 

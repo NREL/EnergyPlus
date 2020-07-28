@@ -51,8 +51,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
 #include "EnergyPlus/DataAirLoop.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -60,10 +61,9 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatRecovery.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
@@ -4046,7 +4046,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state.files);
     // get OA Controller
     MixedAir::GetOAControllerInputs(state);
     int OAContrllerNum = 1;

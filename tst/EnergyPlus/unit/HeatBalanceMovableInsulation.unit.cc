@@ -58,8 +58,8 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Material.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
@@ -234,18 +234,18 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).Name = "ZONE ONE";
     // get schedule data
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state.files);
     // get materials data
-    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(4, DataHeatBalance::TotMaterials);
     EXPECT_EQ(dataMaterial.Material(4).Group, DataHeatBalance::WindowSimpleGlazing);
     // get construction data
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotConstructs);
     EXPECT_FALSE(ErrorsFound);
     // set relative coordinate
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
     SurfaceGeometry::CosZoneRelNorth.allocate(2);
     SurfaceGeometry::SinZoneRelNorth.allocate(2);
     SurfaceGeometry::CosZoneRelNorth = 1.0;
@@ -261,7 +261,7 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     Array1D_int const BaseSurfIDs(1, {1});
     int NeedToAddSurfaces;
     // get heat tranfer surface data
-    SurfaceGeometry::GetHTSurfaceData(state.outputFiles, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    SurfaceGeometry::GetHTSurfaceData(state.files, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
     // get movable insulation object data
     SurfaceGeometry::GetMovableInsulationData(ErrorsFound);
     // check movable insulation material
