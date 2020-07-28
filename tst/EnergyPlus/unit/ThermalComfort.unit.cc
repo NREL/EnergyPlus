@@ -1018,6 +1018,6 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveCEN15251)
     DayOfYear += 1;
     avgDryBulbCEN = -6.4875;
     CalcThermalComfortAdaptiveCEN15251(state.files, false);
-    EXPECT_NEAR(ThermalComfort::runningAverageCEN, -2.39121263999999, 0.01);
+    EXPECT_NEAR(ThermalComfort::runningAverageCEN, -2.3912126, 0.01);
     BeginDayFlag = false;
 }
