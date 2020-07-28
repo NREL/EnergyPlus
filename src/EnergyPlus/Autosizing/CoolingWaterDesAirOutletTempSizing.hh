@@ -45,27 +45,25 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef CoolingSHRSizing_hh_INCLUDED
-#define CoolingSHRSizing_hh_INCLUDED
+#ifndef CoolingWaterDesAirOutletTempSizing_hh_INCLUDED
+#define CoolingWaterDesAirOutletTempSizing_hh_INCLUDED
 
-#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
 
 namespace EnergyPlus {
 
-struct CoolingSHRSizer : BaseSizer
+struct CoolingWaterDesAirOutletTempSizer : BaseSizerWithFanHeatInputs
 {
-    CoolingSHRSizer()
+    CoolingWaterDesAirOutletTempSizer()
     {
-        this->sizingType = AutoSizingType::CoolingSHRSizing;
-        this->sizingString = "Gross Rated Sensible Heat Ratio";
-
+        this->sizingType = AutoSizingType::CoolingWaterDesAirOutletTempSizing;
+        this->sizingString = "Design Outlet Air Temperature [C]";
     }
-    ~CoolingSHRSizer() = default;
+    ~CoolingWaterDesAirOutletTempSizer() = default;
 
     Real64 size(Real64 originalValue, bool &errorsFound) override;
 
-    void updateSizingString();
-
+    void clearState();
 };
 
 } // namespace EnergyPlus

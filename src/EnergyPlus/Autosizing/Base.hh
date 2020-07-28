@@ -62,7 +62,9 @@ enum class AutoSizingType
     AutoCalculateSizing,
     CoolingSHRSizing,
     CoolingWaterDesAirInletHumRatSizing,
+    CoolingWaterDesAirInletTempSizing,
     CoolingWaterDesAirOutletHumRatSizing,
+    CoolingWaterDesAirOutletTempSizing,
     CoolingWaterDesWaterInletTempSizing,
     CoolingWaterNumofTubesPerRowSizing,
     HeatingAirflowUASizing,
@@ -149,9 +151,10 @@ struct BaseSizer
     int dataPltSizHeatNum = 0;
     // HeatingWaterDesCoilWaterVolFlowUsedForUASizer, HeaterWaterflowSizing
     int dataWaterLoopNum = 0;
-    // CoolingWaterflowSizing
+    // CoolingWaterflowSizing, CoolingWaterDesAirInletTempSizer
     int dataFanIndex = -1;
     int dataFanEnumType = -1;
+    // CoolingWaterflowSizing
     Real64 dataWaterCoilSizCoolDeltaT = 0.0;
     // HeaterWaterflowSizing
     Real64 dataWaterCoilSizHeatDeltaT = 0.0;
@@ -162,6 +165,11 @@ struct BaseSizer
 
     // CoolingWaterDesAirInletHumRatSizer, CoolingWaterDesAirOutletHumRatSizer
     Real64 dataDesInletAirHumRat = 0.0;
+    // CoolingWaterDesAirInletTempSizer
+    Real64 dataAirFlowUsedForSizing = 0.0;
+    Real64 dataDesInletAirTemp = 0.0;
+    bool dataDesAccountForFanHeat = false;
+    DataSizing::zoneFanPlacement dataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
 
     // CoolingWaterDesAirInletHumRatSizer, HeatingWaterDesAirInletHumRatSizer,
     // HeatingWaterDesAirInletTempSizer

@@ -137,6 +137,10 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->dataWaterCoilSizCoolDeltaT = DataSizing::DataWaterCoilSizCoolDeltaT;
     this->dataCapacityUsedForSizing = DataSizing::DataCapacityUsedForSizing;
 
+    this->dataAirFlowUsedForSizing = DataSizing::DataAirFlowUsedForSizing;
+    this->dataDesInletAirTemp = DataSizing::DataDesInletAirTemp;
+    this->dataDesAccountForFanHeat = DataSizing::DataDesAccountForFanHeat;
+    this->dataFanPlacement = DataSizing::DataFanPlacement;
     this->dataDesInletAirHumRat = DataSizing::DataDesInletAirHumRat;
     this->dataDesOutletAirHumRat = DataSizing::DataDesOutletAirHumRat;
     this->dataDesOutletAirTemp = DataSizing::DataDesOutletAirTemp;
@@ -464,6 +468,9 @@ void BaseSizer::overrideSizingString(std::string &string)
         dataWaterFlowUsedForSizing = 0.0;
         dataSizingFraction = 1.0;
         dataDXSpeedNum = 0.0;
+        dataAirFlowUsedForSizing = 0.0;
+        dataDesInletAirTemp = 0.0;
+        dataDesAccountForFanHeat = false;
 
         printWarningFlag = false;
         callingRoutine = "";

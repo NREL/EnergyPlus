@@ -55,7 +55,9 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletHumRatSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingWaterDesAirInletTempSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletTempSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterflowSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterNumofTubesPerRowSizing.hh>
@@ -2241,9 +2243,10 @@ namespace WaterCoils {
                     SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [C]";
                 }
 
-                RequestSizing(state, CompType, CompName, CoolingWaterDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
-                WaterCoil(CoilNum).DesInletAirTemp = TempSize;
-                DataDesInletAirTemp = TempSize;
+                CoolingWaterDesAirInletTempSizer sizerCWDesInletAirTemp;
+                sizerCWDesInletAirTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                WaterCoil(CoilNum).DesInletAirTemp = sizerCWDesInletAirTemp.size(TempSize, ErrorsFound);
+                DataDesInletAirTemp = WaterCoil(CoilNum).DesInletAirTemp;
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;                                            // no field for detailed water coil, should print to eio anyway
@@ -2283,9 +2286,10 @@ namespace WaterCoils {
                 }
 
                 DataDesInletWaterTemp = WaterCoil(CoilNum).DesInletWaterTemp; // used for warning messages
-                RequestSizing(state, CompType, CompName, CoolingWaterDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
-                WaterCoil(CoilNum).DesOutletAirTemp = TempSize;
-                DataDesOutletAirTemp = TempSize;
+                CoolingWaterDesAirOutletTempSizer sizerCWDesAirOutTemp;
+                sizerCWDesAirOutTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                WaterCoil(CoilNum).DesOutletAirTemp = sizerCWDesAirOutTemp.size(TempSize, ErrorsFound);
+                DataDesOutletAirTemp = WaterCoil(CoilNum).DesOutletAirTemp;
 
                 if (CurSysNum > 0) { // This call can be deleted at a future time and remove the if ( CurZoneEqNum > 0 ) check above. This will
                                      // change the order of the eio file.

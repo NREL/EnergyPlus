@@ -123,12 +123,12 @@ Real64 CoolingSHRSizer::size(Real64 _originalValue, bool &errorsFound)
             }
         }
     }
-    this->setSizingString();
+    this->updateSizingString();
     this->selectSizerOutput(errorsFound);
     return this->autoSizedValue;
 }
 
-void CoolingSHRSizer::setSizingString()
+void CoolingSHRSizer::updateSizingString()
 {
     // bandaid - override sizingString to match existing text
     if (this->coilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {

@@ -667,6 +667,8 @@ namespace FanCoilUnits {
             } else {
                 if (!UtilityRoutines::SameString(FanCoil(FanCoilNum).FanType, "Fan:SystemModel")) {
                     GetFanType(state, FanCoil(FanCoilNum).FanName, FanCoil(FanCoilNum).FanType_Num, errFlag, CurrentModuleObject, FanCoil(FanCoilNum).Name);
+                    // need to grab fan index here
+                    //Fans::GetFanIndex(state, FanCoil(FanCoilNum).FanName, FanCoil(FanCoilNum).FanIndex, errFlag, FanCoil(FanCoilNum).FanType);
                     FanCoil(FanCoilNum).fanAvailSchIndex = Fans::GetFanAvailSchPtr(state, FanCoil(FanCoilNum).FanType, FanCoil(FanCoilNum).FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + FanCoil(FanCoilNum).Name);

@@ -20,7 +20,9 @@ set( test_src
   Autosizing/All_Simple_Sizing.unit.cc
   Autosizing/CoolingSHRSizing.unit.cc
   Autosizing/CoolingWaterDesAirInletHumRatSizing.unit.cc
+  Autosizing/CoolingWaterDesAirInletTempSizing.unit.cc
   Autosizing/CoolingWaterDesAirOutletHumRatSizing.unit.cc
+  Autosizing/CoolingWaterDesAirOutletTempSizing.unit.cc
   Autosizing/CoolingWaterDesWaterInletTempSizing.unit.cc
   Autosizing/CoolingWaterflowSizing.unit.cc
   Autosizing/CoolingWaterNumofTubesPerRowSizing.unit.cc
