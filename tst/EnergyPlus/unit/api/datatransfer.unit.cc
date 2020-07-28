@@ -658,11 +658,11 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_EMS_Override)
 
     ASSERT_TRUE(process_idf(idf_objects));
     OutAirNodeManager::SetOutAirNodes();
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(state.files);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan);
     EXPECT_EQ(1, DataRuntimeLanguage::numActuatorsUsed);
 
     // no error message until now
