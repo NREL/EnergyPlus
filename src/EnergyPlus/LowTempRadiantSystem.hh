@@ -90,7 +90,7 @@ namespace LowTempRadiantSystem {
       OWBControl,           // Controls system using outside air wet-bulb temperature
       SurfFaceTempControl,  // Controls system using the surface inside face temperature
       SurfIntTempControl,   // Controls system using a temperature inside the radiant system construction as defined by the Construction:InternalSource input
-      RunningMeanODBControl // Controls system using the running mean outdoor dry bulb temperature
+      RunningMeanODBControl // Controls system using the running mean outdoor dry-bulb temperature
     };
     // Setpoint Types:
     enum class LowTempRadiantSetpointTypes {
@@ -160,10 +160,10 @@ namespace LowTempRadiantSystem {
         Real64 HeatPower;             // heating sent to panel in Watts
         Real64 HeatEnergy;            // heating sent to panel in Joules
         Real64 runningMeanOutdoorAirTemperatureWeightingFactor; // Weighting factor for running mean outdoor air temperature equation (user input)
-        Real64 todayRunningMeanOutdoorDryBulbTemperature;        // Current running mean outdoor air dry bulb temperature
-        Real64 yesterdayRunningMeanOutdoorDryBulbTemperature;    // Running mean outdoor air dry bulb temperature from yesterday
-        Real64 todayAverageOutdoorDryBulbTemperature;            // Average outdoor dry bulb temperature for today
-        Real64 yesterdayAverageOutdoorDryBulbTemperature;        // Average outdoor dry bulb temperature for yesterday
+        Real64 todayRunningMeanOutdoorDryBulbTemperature;        // Current running mean outdoor air dry-bulb temperature
+        Real64 yesterdayRunningMeanOutdoorDryBulbTemperature;    // Running mean outdoor air dry-bulb temperature from yesterday
+        Real64 todayAverageOutdoorDryBulbTemperature;            // Average outdoor dry-bulb temperature for today
+        Real64 yesterdayAverageOutdoorDryBulbTemperature;        // Average outdoor dry-bulb temperature for yesterday
  
         // Default Constructor
         RadiantSystemBaseData()

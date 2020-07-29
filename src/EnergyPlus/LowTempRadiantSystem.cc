@@ -1565,19 +1565,19 @@ namespace LowTempRadiantSystem {
                                 "Sum",
                                 thisCFloSys.Name);
             if (anyRadiantSystemUsingRunningMeanAverage) {
-                SetupOutputVariable("Zone Radiant HVAC Running Mean Outdoor Dry Bulb Temperature",
+                SetupOutputVariable("Zone Radiant HVAC Running Mean Outdoor Dry-Bulb Temperature",
                                     OutputProcessor::Unit::C,
                                     thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature,
                                     "System",
                                     "Average",
                                     thisCFloSys.Name);
-                SetupOutputVariable("Zone Radiant HVAC Previous Day Running Mean Outdoor Dry Bulb Temperature",
+                SetupOutputVariable("Zone Radiant HVAC Previous Day Running Mean Outdoor Dry-Bulb Temperature",
                                     OutputProcessor::Unit::C,
                                     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature,
                                     "System",
                                     "Average",
                                     thisCFloSys.Name);
-                SetupOutputVariable("Zone Radiant HVAC Previous Day Average Outdoor Dry Bulb Temperature",
+                SetupOutputVariable("Zone Radiant HVAC Previous Day Average Outdoor Dry-Bulb Temperature",
                                     OutputProcessor::Unit::C,
                                     thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature,
                                     "System",
@@ -4746,7 +4746,7 @@ namespace LowTempRadiantSystem {
     void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature()
     {
         // This routine grabs the current weather data since it is currently available at this point in the simulation.  Note, however,
-        // that the formula that calculates the running mean average (dry bulb) temperature uses the values from "yesterday".  So, today's
+        // that the formula that calculates the running mean average (dry-bulb) temperature uses the values from "yesterday".  So, today's
         // values are calculated and then shifted at the beginning of the next day to the tomorrow variables.  It is these tomorrow variables
         // that are then used in the formula.  So, that is why some of the assignments are done in the order that they are in below.
         if (DataGlobals::DayOfSim == 1 && DataGlobals::WarmupFlag) {
