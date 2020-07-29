@@ -251,7 +251,7 @@ namespace DataGlobals {
     void (*progressCallback)(int const);
     void (*messageCallback)(const char * message);
     void (*errorCallback)(const char * errorMessage);
-//    double solar_timer(0.0);
+    double solar_timer(0.0);
     bool eplusRunningViaAPI;
 
     // Clears the global data in DataGlobals.
@@ -351,7 +351,7 @@ namespace DataGlobals {
         ioFiles.mtr.close();
         ioFiles.err_stream.reset();
         eplusRunningViaAPI = false;
-//        solar_timer = 0;
+        solar_timer = 0;
     }
 
 } // namespace DataGlobals

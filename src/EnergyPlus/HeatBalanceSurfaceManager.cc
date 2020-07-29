@@ -3738,25 +3738,35 @@ namespace HeatBalanceSurfaceManager {
             TMULT.dimension(NumOfZones, 0.0);
         }
 
-        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue;
-            ConstrNum = Surface(SurfNum).Construction;
-            ShadeFlag = SurfWinShadingFlag(SurfNum);
-            ITABSF(SurfNum) = dataConstruction.Construct(ConstrNum).InsideAbsorpThermal;
-            HMovInsul = 0.0;
-            if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
-                if (Surface(SurfNum).MaterialMovInsulInt > 0) EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
-                if (HMovInsul > 0.0)
-                    ITABSF(SurfNum) = dataMaterial.Material(Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal; // Movable inside insulation present
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+            int const firstSurf = Zone(zoneNum).SurfaceFirst;
+            int const lastSurf = Zone(zoneNum).SurfaceLast;
+            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+
+                if (!Surface(SurfNum).HeatTransSurf) continue;
+                ConstrNum = Surface(SurfNum).Construction;
+                ShadeFlag = SurfWinShadingFlag(SurfNum);
+                ITABSF(SurfNum) = dataConstruction.Construct(ConstrNum).InsideAbsorpThermal;
+                HMovInsul = 0.0;
+                if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
+                    if (Surface(SurfNum).MaterialMovInsulInt > 0)
+                        EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
+                    if (HMovInsul > 0.0)
+                        ITABSF(SurfNum) = dataMaterial.Material(
+                                Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal; // Movable inside insulation present
+                }
             }
-            // For window with an interior shade or blind, emissivity is a combination of glass and shade/blind emissivity
-            if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn)
-                ITABSF(SurfNum) =
-                    InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), SurfaceWindow(SurfNum).EffShBlindEmiss) +
-                    InterpSlatAng(
-                        SurfWinSlatAngThisTS(SurfNum),
-                        SurfWinMovableSlats(SurfNum),
-                        SurfaceWindow(SurfNum).EffGlassEmiss); // For shades, following interpolation just returns value of first element in array
+            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                // For window with an interior shade or blind, emissivity is a combination of glass and shade/blind emissivity
+                if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn)
+                    ITABSF(SurfNum) = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum),
+                                                    SurfaceWindow(SurfNum).EffShBlindEmiss) +
+                                      InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum),
+                                                    SurfaceWindow(
+                                                            SurfNum).EffGlassEmiss); // For shades, following interpolation just returns value of first element in array
+            }
         }
 
         for (int radEnclosureNum = 1; radEnclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++radEnclosureNum) {
@@ -3775,8 +3785,13 @@ namespace HeatBalanceSurfaceManager {
                 } else { // Switchable glazing
                     SUM1 += Surface(SurfNum).Area * InterpSw(SurfWinSwitchingFactor(SurfNum),
                                                              dataConstruction.Construct(ConstrNum).InsideAbsorpThermal,
-                                                             dataConstruction.Construct(SurfWinShadedConstruction(SurfNum)).InsideAbsorpThermal);
+                                                             dataConstruction.Construct(SurfWinShadedConstruction(
+                                                                     SurfNum)).InsideAbsorpThermal);
                 }
+            }
+            int const firstSurfWin = Zone(radEnclosureNum).WindowSurfaceFirst;
+            int const lastSurfWin = Zone(radEnclosureNum).WindowSurfaceLast;
+            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
 
                 // Window frame and divider effects
                 if (SurfWinFrameArea(SurfNum) > 0.0)

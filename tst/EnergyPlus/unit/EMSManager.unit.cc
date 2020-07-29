@@ -1616,6 +1616,10 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     EXPECT_FALSE(DataSurfaces::SurfWinShadingFlagEMSOn(2));
     EXPECT_EQ(DataSurfaces::SurfWinShadingFlagEMSValue(2), 0);
 
+    DataHeatBalance::Zone.allocate(1);
+    DataHeatBalance::Zone(1).WindowSurfaceFirst = 1;
+    DataHeatBalance::Zone(1).WindowSurfaceLast = 2;
+    DataGlobals::NumOfZones = 1;
     DataSurfaces::SurfWinShadingFlagEMSOn(2) = true;
     DataSurfaces::SurfWinShadingFlagEMSValue(2) = 1.0;
     SolarShading::WindowShadingManager(state.dataWindowEquivalentLayer);
