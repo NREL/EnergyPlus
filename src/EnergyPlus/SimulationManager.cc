@@ -683,6 +683,7 @@ namespace SimulationManager {
         ComputeTariff(); //     Compute the utility bills
 
         EMSManager::checkForUnusedActuatorsAtEnd();
+        EMSManager::checkSetpointNodesAtEnd();
 
         ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
