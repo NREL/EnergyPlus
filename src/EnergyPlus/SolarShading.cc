@@ -11870,13 +11870,12 @@ namespace SolarShading {
             ZoneDifSolarDistAbsorbedTotl = 0.0;
             ZoneDifSolarDistReflectedTotl = 0.0;
             ZoneDifSolarDistTransmittedTotl = 0.0;
-
+            auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             // Loop over all diffuse solar transmitting surfaces (i.e., exterior windows and TDDs) in the current zone
-            int const firstSurfWin = Zone(enclosureNum).WindowSurfaceFirst;
-            int const lastSurfWin = Zone(enclosureNum).WindowSurfaceLast;
-            for (int DifTransSurfNum = firstSurfWin; DifTransSurfNum <= lastSurfWin; ++DifTransSurfNum) { // Window
-
-//                for (int const DifTransSurfNum : thisEnclosure.SurfacePtr) {
+//            int const firstSurfWin = Zone(enclosureNum).WindowSurfaceFirst;
+//            int const lastSurfWin = Zone(enclosureNum).WindowSurfaceLast;
+//            for (int DifTransSurfNum = firstSurfWin; DifTransSurfNum <= lastSurfWin; ++DifTransSurfNum) { // Window
+            for (int const DifTransSurfNum : thisEnclosure.SurfacePtr) {
                 // Skip surfaces that are not exterior, except for TDD_Diffusers
                 if (((Surface(DifTransSurfNum).ExtBoundCond != ExternalEnvironment) &&
                      (Surface(DifTransSurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
@@ -11888,9 +11887,9 @@ namespace SolarShading {
                 //				}
 
                 // Skip surfaces that are not exterior windows or TDD diffusers
-//                if (Surface(DifTransSurfNum).Class != SurfaceClass_Window &&
-//                    SurfWinOriginalClass(DifTransSurfNum) != SurfaceClass_TDD_Diffuser)
-//                    continue;
+                if (Surface(DifTransSurfNum).Class != SurfaceClass_Window &&
+                    SurfWinOriginalClass(DifTransSurfNum) != SurfaceClass_TDD_Diffuser)
+                    continue;
 
                 //----------------------------------------------------------------------------------------------------------
                 // DISTRIBUTE TRANSMITTED DIFFUSE SOLAR THROUGH EXTERIOR WINDOWS AND TDDS TO INTERIOR HEAT TRANSFER SURFACES
@@ -11907,10 +11906,10 @@ namespace SolarShading {
                 WinDifSolarDistTransmittedTotl = 0.0;
 
                 // Loop over all heat transfer surfaces in the current zone that might receive diffuse solar
-                int const firstSurfOpague = Zone(enclosureNum).SurfaceFirst;
-                int const lastSurfOpague = Zone(enclosureNum).SurfaceLast;
-                for (int HeatTransSurfNum = firstSurfOpague; HeatTransSurfNum <= lastSurfOpague; ++HeatTransSurfNum) {
-//                for (int const HeatTransSurfNum : thisEnclosure.SurfacePtr) {
+//                int const firstSurfOpague = Zone(enclosureNum).SurfaceFirst;
+//                int const lastSurfOpague = Zone(enclosureNum).SurfaceLast;
+//                for (int HeatTransSurfNum = firstSurfOpague; HeatTransSurfNum <= lastSurfOpague; ++HeatTransSurfNum) {
+                for (int const HeatTransSurfNum : thisEnclosure.SurfacePtr) {
                     // Skip surfaces that are not heat transfer surfaces
                     // Skip tubular daylighting device domes
                     if (Surface(HeatTransSurfNum).Class == SurfaceClass_TDD_Dome) continue;
