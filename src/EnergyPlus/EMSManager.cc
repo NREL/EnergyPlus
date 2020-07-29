@@ -1822,36 +1822,36 @@ namespace EMSManager {
                 nodeSetpointCheck.needsSetpointChecking = false;
 
                 if (nodeSetpointCheck.checkTemperatureSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= CheckIfNodeSetPointManaged(NodeNum, EMSManager::iTemperatureSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iTemperatureSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkTemperatureMinSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= CheckIfNodeSetPointManaged(NodeNum, EMSManager::iTemperatureMinSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iTemperatureMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkTemperatureMaxSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= CheckIfNodeSetPointManaged(NodeNum, EMSManager::iTemperatureMaxSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iTemperatureMaxSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= CheckIfNodeSetPointManaged(NodeNum, EMSManager::iHumidityRatioSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iHumidityRatioSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioMinSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= CheckIfNodeSetPointManaged(NodeNum, EMSManager::iHumidityRatioMinSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iHumidityRatioMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioMaxSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= CheckIfNodeSetPointManaged(NodeNum, EMSManager::iHumidityRatioMaxSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iHumidityRatioMaxSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= CheckIfNodeSetPointManaged(NodeNum, EMSManager::iMassFlowRateSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iMassFlowRateSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateMinSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= CheckIfNodeSetPointManaged(NodeNum, EMSManager::iMassFlowRateMinSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iMassFlowRateMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateMaxSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= CheckIfNodeSetPointManaged(NodeNum, EMSManager::iMassFlowRateMaxSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iMassFlowRateMaxSetPoint, true);
                 }
-            }
 
-            if (nodeSetpointCheck.needsSetpointChecking) {
-                FatalErrorFlag = true;
+                if (nodeSetpointCheck.needsSetpointChecking) {
+                    FatalErrorFlag = true;
+                }
             }
         }
 
