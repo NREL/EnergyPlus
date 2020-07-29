@@ -295,15 +295,16 @@ namespace DataRuntimeLanguage {
         std::string UniqueIDName;      // unique id for actuator, All uppercase
         std::string ControlTypeName;   // control type id for actuator, All uppercase
         std::string Units;             // control value units, used for reporting and checks.
-        int PntrVarTypeUsed;           // data type used: integer (PntrInteger), real (PntrReal)
-        // or logical (PntrLogical)
+        int handleCount;               // Number of times you tried to get a handle on this actuator,
+                                       // whether from EMS:Actuator or getActuatorHandle (API)
+        int PntrVarTypeUsed;           // data type used: integer (PntrInteger), real (PntrReal) or logical (PntrLogical)
         bool * Actuated;     // POINTER to the logical value that signals EMS is actuating
         Real64 * RealValue; // POINTER to the REAL value that is being actuated
         int * IntValue;      // POINTER to the Integer value that is being actuated
         bool * LogValue;     // POINTER to the Logical value that is being actuated
 
         // Default Constructor
-        EMSActuatorAvailableType() : PntrVarTypeUsed(0), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
+        EMSActuatorAvailableType() : handleCount(0), PntrVarTypeUsed(0), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
         {
         }
     };

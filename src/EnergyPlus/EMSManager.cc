@@ -870,6 +870,15 @@ namespace EMSManager {
 
                 if (FoundActuatorName) {
                     EMSActuatorUsed(ActuatorNum).ActuatorVariableNum = ActuatorVariableNum;
+                    int nHandle = EMSActuatorAvailable(ActuatorVariableNum).handleCount;
+                    if (nHandle > 0) {
+                        EnergyPlus::ShowWarningError("Seems like you already tried to get a Handle on this Actuator " + std::to_string(nHandle) + "times.");
+                        EnergyPlus::ShowContinueError("Occurred for componentType='" +  EMSActuatorUsed(ActuatorNum).ComponentTypeName
+                                + "', controlType='" + EMSActuatorUsed(ActuatorNum).ControlTypeName
+                                + "', uniqueKey='" + EMSActuatorUsed(ActuatorNum).UniqueIDName + "'.");
+                        EnergyPlus::ShowContinueError("You should take note that there is a risk of overwritting.");
+                    }
+                    ++EMSActuatorAvailable(ActuatorVariableNum).handleCount;
                     EMSActuatorUsed(ActuatorNum).CheckedOkay = true;
                 }
             } // ActuatorNum
