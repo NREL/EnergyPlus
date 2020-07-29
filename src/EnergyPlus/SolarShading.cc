@@ -9878,7 +9878,6 @@ namespace SolarShading {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int ISurf;                // Surface counter
         int IZone;                // Zone counter
         int IShadingCtrl;         // Pointer to a window's shading control
         Real64 BeamSolarOnWindow; // Direct solar intensity on window (W/m2)
@@ -9917,430 +9916,464 @@ namespace SolarShading {
 
         int IConst; // Construction
 
-        for (ISurf = 1; ISurf <= TotSurfaces; ++ISurf) {
-            SurfWinExtIntShadePrevTS(ISurf) = SurfWinShadingFlag(ISurf);
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            for (int ISurf = firstSurfWin; ISurf <= lastSurfWin; ++ISurf) {
+                SurfWinExtIntShadePrevTS(ISurf) = SurfWinShadingFlag(ISurf);
 
-            SurfWinShadingFlag(ISurf) = NoShade;
-            SurfWinFracTimeShadingDeviceOn(ISurf) = 0.0;
-            if (SurfWinWindowModelType(ISurf) == WindowEQLModel) {
-                int EQLNum = dataConstruction.Construct(Surface(ISurf).Construction).EQLConsPtr;
-                if (CFS(EQLNum).VBLayerPtr > 0) {
-                    if (CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL == dataWindowEquivalentLayer.lscNONE) {
-                        SurfWinSlatAngThisTSDeg(ISurf) = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
-                    } else {
-                        SurfWinSlatAngThisTSDeg(ISurf) = 0.0;
+                SurfWinShadingFlag(ISurf) = NoShade;
+                SurfWinFracTimeShadingDeviceOn(ISurf) = 0.0;
+                if (SurfWinWindowModelType(ISurf) == WindowEQLModel) {
+                    int EQLNum = dataConstruction.Construct(Surface(ISurf).Construction).EQLConsPtr;
+                    if (CFS(EQLNum).VBLayerPtr > 0) {
+                        if (CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL == dataWindowEquivalentLayer.lscNONE) {
+                            SurfWinSlatAngThisTSDeg(ISurf) = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
+                        } else {
+                            SurfWinSlatAngThisTSDeg(ISurf) = 0.0;
+                        }
                     }
                 }
-            }
 
-            // Initialization of complex fenestration shading device
-            if (SurfWinWindowModelType(ISurf) == WindowBSDFModel) {
-                auto &construction(dataConstruction.Construct(Surface(ISurf).Construction));
-                auto &surface_window(SurfaceWindow(ISurf));
-                int TotLayers = construction.TotLayers;
-                for (auto Lay = 1; Lay <= TotLayers; ++Lay) {
-                    const int LayPtr = construction.LayerPoint(Lay);
-                    auto &material(dataMaterial.Material(LayPtr));
-                    const bool isShading = material.Group == ComplexWindowShade;
-                    if (isShading && Lay == 1) SurfWinShadingFlag(ISurf) = ExtShadeOn;
-                    if (isShading && Lay == TotLayers) SurfWinShadingFlag(ISurf) = IntShadeOn;
-                }
-                if (SurfWinShadingFlag(ISurf) == IntShadeOn) {
+                // Initialization of complex fenestration shading device
+                if (SurfWinWindowModelType(ISurf) == WindowBSDFModel) {
                     auto &construction(dataConstruction.Construct(Surface(ISurf).Construction));
-                    const int TotLay = construction.TotLayers;
-                    int ShadingLayerPtr = construction.LayerPoint(TotLay);
-                    ShadingLayerPtr = dataMaterial.Material(ShadingLayerPtr).ComplexShadePtr;
-                    auto &complexShade = ComplexShade(ShadingLayerPtr);
-                    auto TauShadeIR = complexShade.IRTransmittance;
-                    auto EpsShadeIR = complexShade.BackEmissivity;
-                    auto RhoShadeIR = max(0.0, 1.0 - TauShadeIR - EpsShadeIR);
-                    // Get properties of glass next to inside shading layer
-                    int GlassLayPtr = construction.LayerPoint(TotLay - 2);
-                    auto EpsGlassIR = dataMaterial.Material(GlassLayPtr).AbsorpThermalBack;
-                    auto RhoGlassIR = 1 - EpsGlassIR;
+                    auto &surface_window(SurfaceWindow(ISurf));
+                    int TotLayers = construction.TotLayers;
+                    for (auto Lay = 1; Lay <= TotLayers; ++Lay) {
+                        const int LayPtr = construction.LayerPoint(Lay);
+                        auto &material(dataMaterial.Material(LayPtr));
+                        const bool isShading = material.Group == ComplexWindowShade;
+                        if (isShading && Lay == 1) SurfWinShadingFlag(ISurf) = ExtShadeOn;
+                        if (isShading && Lay == TotLayers) SurfWinShadingFlag(ISurf) = IntShadeOn;
+                    }
+                    if (SurfWinShadingFlag(ISurf) == IntShadeOn) {
+                        auto &construction(dataConstruction.Construct(Surface(ISurf).Construction));
+                        const int TotLay = construction.TotLayers;
+                        int ShadingLayerPtr = construction.LayerPoint(TotLay);
+                        ShadingLayerPtr = dataMaterial.Material(ShadingLayerPtr).ComplexShadePtr;
+                        auto &complexShade = ComplexShade(ShadingLayerPtr);
+                        auto TauShadeIR = complexShade.IRTransmittance;
+                        auto EpsShadeIR = complexShade.BackEmissivity;
+                        auto RhoShadeIR = max(0.0, 1.0 - TauShadeIR - EpsShadeIR);
+                        // Get properties of glass next to inside shading layer
+                        int GlassLayPtr = construction.LayerPoint(TotLay - 2);
+                        auto EpsGlassIR = dataMaterial.Material(GlassLayPtr).AbsorpThermalBack;
+                        auto RhoGlassIR = 1 - EpsGlassIR;
 
-                    auto EffShBlEmiss = EpsShadeIR * (1.0 + RhoGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR));
-                    surface_window.EffShBlindEmiss[0] = EffShBlEmiss;
-                    auto EffGlEmiss = EpsGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR);
-                    surface_window.EffGlassEmiss[0] = EffGlEmiss;
+                        auto EffShBlEmiss =
+                                EpsShadeIR * (1.0 + RhoGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR));
+                        surface_window.EffShBlindEmiss[0] = EffShBlEmiss;
+                        auto EffGlEmiss = EpsGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR);
+                        surface_window.EffGlassEmiss[0] = EffGlEmiss;
+                    }
                 }
-            }
 
-            if (Surface(ISurf).Class != SurfaceClass_Window) continue;
-            if (Surface(ISurf).ExtBoundCond != ExternalEnvironment) continue;
-            if (!Surface(ISurf).HasShadeControl) continue;
+                if (Surface(ISurf).Class != SurfaceClass_Window) continue;
+                if (Surface(ISurf).ExtBoundCond != ExternalEnvironment) continue;
+                if (!Surface(ISurf).HasShadeControl) continue;
 
-            // Initialize switching factor (applicable only to switchable glazing) to unswitched
-            SurfWinSwitchingFactor(ISurf) = 0.0;
+                // Initialize switching factor (applicable only to switchable glazing) to unswitched
+                SurfWinSwitchingFactor(ISurf) = 0.0;
 
-            IConst = Surface(ISurf).Construction;
-            // Vis trans at normal incidence of unswitched glass. Counting the GlazedFrac
-            if (IConst > 0) SurfWinVisTransSelected(ISurf) = POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef) * SurfWinGlazedFrac(ISurf);
+                IConst = Surface(ISurf).Construction;
+                // Vis trans at normal incidence of unswitched glass. Counting the GlazedFrac
+                if (IConst > 0)
+                    SurfWinVisTransSelected(ISurf) = POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef) *
+                                                     SurfWinGlazedFrac(ISurf);
 
-            // Window has shading control
-            IShadingCtrl = Surface(ISurf).WindowShadingControlPtr;
-            ShadingType = WindowShadingControl(IShadingCtrl).ShadingType;
-            SurfWinShadingFlag(ISurf) = ShadeOff; // Initialize shading flag to off
-            IZone = Surface(ISurf).Zone;
-            // Setpoint for shading
-            SetPoint = WindowShadingControl(IShadingCtrl).SetPoint;
-            SetPoint2 = WindowShadingControl(IShadingCtrl).SetPoint2;
+                // Window has shading control
+                IShadingCtrl = Surface(ISurf).WindowShadingControlPtr;
+                ShadingType = WindowShadingControl(IShadingCtrl).ShadingType;
+                SurfWinShadingFlag(ISurf) = ShadeOff; // Initialize shading flag to off
+                IZone = Surface(ISurf).Zone;
+                // Setpoint for shading
+                SetPoint = WindowShadingControl(IShadingCtrl).SetPoint;
+                SetPoint2 = WindowShadingControl(IShadingCtrl).SetPoint2;
 
-            //                                           ShType = NoShade           ! =-1 (see DataHeatBalance)
-            //                                           ShType = ShadeOff          ! =0
-            if (ShadingType == WSC_ST_InteriorShade) ShType = IntShadeOn;            // =1
-            if (ShadingType == WSC_ST_SwitchableGlazing) ShType = SwitchableGlazing; // =2
-            if (ShadingType == WSC_ST_ExteriorShade) ShType = ExtShadeOn;            // =3
-            if (ShadingType == WSC_ST_ExteriorScreen) ShType = ExtScreenOn;          // =4
-            if (ShadingType == WSC_ST_InteriorBlind) ShType = IntBlindOn;            // =6
-            if (ShadingType == WSC_ST_ExteriorBlind) ShType = ExtBlindOn;            // =7
-            if (ShadingType == WSC_ST_BetweenGlassShade) ShType = BGShadeOn;         // =8
-            if (ShadingType == WSC_ST_BetweenGlassBlind) ShType = BGBlindOn;         // =9
+                //                                           ShType = NoShade           ! =-1 (see DataHeatBalance)
+                //                                           ShType = ShadeOff          ! =0
+                if (ShadingType == WSC_ST_InteriorShade) ShType = IntShadeOn;            // =1
+                if (ShadingType == WSC_ST_SwitchableGlazing) ShType = SwitchableGlazing; // =2
+                if (ShadingType == WSC_ST_ExteriorShade) ShType = ExtShadeOn;            // =3
+                if (ShadingType == WSC_ST_ExteriorScreen) ShType = ExtScreenOn;          // =4
+                if (ShadingType == WSC_ST_InteriorBlind) ShType = IntBlindOn;            // =6
+                if (ShadingType == WSC_ST_ExteriorBlind) ShType = ExtBlindOn;            // =7
+                if (ShadingType == WSC_ST_BetweenGlassShade) ShType = BGShadeOn;         // =8
+                if (ShadingType == WSC_ST_BetweenGlassBlind) ShType = BGBlindOn;         // =9
 
-            SchedAllowsControl = true;
-            SchedulePtr = WindowShadingControl(IShadingCtrl).Schedule;
-            if (SchedulePtr != 0) {
-                if (WindowShadingControl(IShadingCtrl).ShadingControlIsScheduled && GetCurrentScheduleValue(SchedulePtr) <= 0.0)
-                    SchedAllowsControl = false;
-            }
+                SchedAllowsControl = true;
+                SchedulePtr = WindowShadingControl(IShadingCtrl).Schedule;
+                if (SchedulePtr != 0) {
+                    if (WindowShadingControl(IShadingCtrl).ShadingControlIsScheduled &&
+                        GetCurrentScheduleValue(SchedulePtr) <= 0.0)
+                        SchedAllowsControl = false;
+                }
 
-            GlareControlIsActive = (ZoneDaylight(IZone).TotalDaylRefPoints > 0 && SunIsUp && WindowShadingControl(IShadingCtrl).GlareControlIsActive);
+                GlareControlIsActive = (ZoneDaylight(IZone).TotalDaylRefPoints > 0 && SunIsUp &&
+                                        WindowShadingControl(IShadingCtrl).GlareControlIsActive);
 
-            SolarOnWindow = 0.0;
-            BeamSolarOnWindow = 0.0;
-            HorizSolar = 0.0;
-            if (SunIsUp) {
-                SkySolarOnWindow = AnisoSkyMult(ISurf) * DifSolarRad;
-                BeamSolarOnWindow = BeamSolarRad * CosIncAng(TimeStep, HourOfDay, ISurf) * SunlitFrac(TimeStep, HourOfDay, ISurf);
-                SolarOnWindow = BeamSolarOnWindow + SkySolarOnWindow + GndSolarRad * Surface(ISurf).ViewFactorGround;
-                HorizSolar = BeamSolarRad * SOLCOS(3) + DifSolarRad;
-            }
+                SolarOnWindow = 0.0;
+                BeamSolarOnWindow = 0.0;
+                HorizSolar = 0.0;
+                if (SunIsUp) {
+                    SkySolarOnWindow = AnisoSkyMult(ISurf) * DifSolarRad;
+                    BeamSolarOnWindow = BeamSolarRad * CosIncAng(TimeStep, HourOfDay, ISurf) *
+                                        SunlitFrac(TimeStep, HourOfDay, ISurf);
+                    SolarOnWindow =
+                            BeamSolarOnWindow + SkySolarOnWindow + GndSolarRad * Surface(ISurf).ViewFactorGround;
+                    HorizSolar = BeamSolarRad * SOLCOS(3) + DifSolarRad;
+                }
 
-            // Determine whether to deploy shading depending on type of control
+                // Determine whether to deploy shading depending on type of control
 
-            {
-                auto const SELECT_CASE_var(WindowShadingControl(IShadingCtrl).ShadingControlType);
+                {
+                    auto const SELECT_CASE_var(WindowShadingControl(IShadingCtrl).ShadingControlType);
 
-                if (SELECT_CASE_var == WSCT_AlwaysOn) { // 'ALWAYSON'
-                    SurfWinShadingFlag(ISurf) = ShType;
-
-                } else if (SELECT_CASE_var == WSCT_AlwaysOff) { // 'ALWAYSOFF'
-                    SurfWinShadingFlag(ISurf) = ShadeOff;
-
-                } else if (SELECT_CASE_var == WSCT_OnIfScheduled) { // 'ONIFSCHEDULEALLOWS'
-                    if (SchedAllowsControl) SurfWinShadingFlag(ISurf) = ShType;
-
-                } else if (SELECT_CASE_var == WSCT_HiSolar) { // 'ONIFHIGHSOLARONWINDOW'  ! Direct plus diffuse solar intensity on window
-                    if (SunIsUp) {
-                        if (SolarOnWindow > SetPoint && SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
-                        }
-                    }
-
-                } else if (SELECT_CASE_var ==
-                           WSCT_HiHorzSolar) { // 'ONIFHIGHHORIZONTALSOLAR'  ! Direct plus diffuse exterior horizontal solar intensity
-                    if (SunIsUp) {
-                        if (HorizSolar > SetPoint && SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
-                        }
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_HiOutAirTemp) { // 'OnIfHighOutdoorAirTemperature'
-                    if (Surface(ISurf).OutDryBulbTemp > SetPoint && SchedAllowsControl) {
+                    if (SELECT_CASE_var == WSCT_AlwaysOn) { // 'ALWAYSON'
                         SurfWinShadingFlag(ISurf) = ShType;
-                    } else if (GlareControlIsActive) {
-                        SurfWinShadingFlag(ISurf) = 10 * ShType;
-                    }
 
-                } else if (SELECT_CASE_var == WSCT_HiZoneAirTemp) { // 'OnIfHighZoneAirTemperature'  ! Previous time step zone air temperature
-                    if (MAT(IZone) > SetPoint && SchedAllowsControl) {
-                        SurfWinShadingFlag(ISurf) = ShType;
-                    } else if (GlareControlIsActive) {
-                        SurfWinShadingFlag(ISurf) = 10 * ShType;
-                    }
+                    } else if (SELECT_CASE_var == WSCT_AlwaysOff) { // 'ALWAYSOFF'
+                        SurfWinShadingFlag(ISurf) = ShadeOff;
 
-                } else if (SELECT_CASE_var ==
-                           WSCT_OnHiOutTemp_HiSolarWindow) { // 'OnIfHighOutdoorAirTempAndHighSolarOnWindow'  ! Outside air temp and solar on window
-                    if (SunIsUp) {
-                        if (Surface(ISurf).OutDryBulbTemp > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
+                    } else if (SELECT_CASE_var == WSCT_OnIfScheduled) { // 'ONIFSCHEDULEALLOWS'
+                        if (SchedAllowsControl) SurfWinShadingFlag(ISurf) = ShType;
+
+                    } else if (SELECT_CASE_var ==
+                               WSCT_HiSolar) { // 'ONIFHIGHSOLARONWINDOW'  ! Direct plus diffuse solar intensity on window
+                        if (SunIsUp) {
+                            if (SolarOnWindow > SetPoint && SchedAllowsControl) {
+                                SurfWinShadingFlag(ISurf) = ShType;
+                            } else if (GlareControlIsActive) {
+                                SurfWinShadingFlag(ISurf) = 10 * ShType;
+                            }
+                        }
+
+                    } else if (SELECT_CASE_var ==
+                               WSCT_HiHorzSolar) { // 'ONIFHIGHHORIZONTALSOLAR'  ! Direct plus diffuse exterior horizontal solar intensity
+                        if (SunIsUp) {
+                            if (HorizSolar > SetPoint && SchedAllowsControl) {
+                                SurfWinShadingFlag(ISurf) = ShType;
+                            } else if (GlareControlIsActive) {
+                                SurfWinShadingFlag(ISurf) = 10 * ShType;
+                            }
+                        }
+
+                    } else if (SELECT_CASE_var == WSCT_HiOutAirTemp) { // 'OnIfHighOutdoorAirTemperature'
+                        if (Surface(ISurf).OutDryBulbTemp > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
                             SurfWinShadingFlag(ISurf) = 10 * ShType;
                         }
-                    }
 
-                } else if (SELECT_CASE_var ==
-                           WSCT_OnHiOutTemp_HiHorzSolar) { // 'OnIfHighOutdoorAirTempAndHighHorizontalSolar'  ! Outside air temp and horizontal solar
-                    if (SunIsUp) {
-                        if (Surface(ISurf).OutDryBulbTemp > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
+                    } else if (SELECT_CASE_var ==
+                               WSCT_HiZoneAirTemp) { // 'OnIfHighZoneAirTemperature'  ! Previous time step zone air temperature
+                        if (MAT(IZone) > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
                             SurfWinShadingFlag(ISurf) = 10 * ShType;
                         }
-                    }
 
-                } else if (SELECT_CASE_var ==
-                           WSCT_OnHiZoneTemp_HiSolarWindow) { // 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW'  ! Zone air temp and solar on window
-                    if (SunIsUp) {
-                        if (MAT(IZone) > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
+                    } else if (SELECT_CASE_var ==
+                               WSCT_OnHiOutTemp_HiSolarWindow) { // 'OnIfHighOutdoorAirTempAndHighSolarOnWindow'  ! Outside air temp and solar on window
+                        if (SunIsUp) {
+                            if (Surface(ISurf).OutDryBulbTemp > SetPoint && SolarOnWindow > SetPoint2 &&
+                                SchedAllowsControl) {
+                                SurfWinShadingFlag(ISurf) = ShType;
+                            } else if (GlareControlIsActive) {
+                                SurfWinShadingFlag(ISurf) = 10 * ShType;
+                            }
+                        }
+
+                    } else if (SELECT_CASE_var ==
+                               WSCT_OnHiOutTemp_HiHorzSolar) { // 'OnIfHighOutdoorAirTempAndHighHorizontalSolar'  ! Outside air temp and horizontal solar
+                        if (SunIsUp) {
+                            if (Surface(ISurf).OutDryBulbTemp > SetPoint && HorizSolar > SetPoint2 &&
+                                SchedAllowsControl) {
+                                SurfWinShadingFlag(ISurf) = ShType;
+                            } else if (GlareControlIsActive) {
+                                SurfWinShadingFlag(ISurf) = 10 * ShType;
+                            }
+                        }
+
+                    } else if (SELECT_CASE_var ==
+                               WSCT_OnHiZoneTemp_HiSolarWindow) { // 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW'  ! Zone air temp and solar on window
+                        if (SunIsUp) {
+                            if (MAT(IZone) > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
+                                SurfWinShadingFlag(ISurf) = ShType;
+                            } else if (GlareControlIsActive) {
+                                SurfWinShadingFlag(ISurf) = 10 * ShType;
+                            }
+                        }
+
+                    } else if (SELECT_CASE_var ==
+                               WSCT_OnHiZoneTemp_HiHorzSolar) { // 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR'  ! Zone air temp and horizontal solar
+                        if (SunIsUp) {
+                            if (MAT(IZone) > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
+                                SurfWinShadingFlag(ISurf) = ShType;
+                            } else if (GlareControlIsActive) {
+                                SurfWinShadingFlag(ISurf) = 10 * ShType;
+                            }
+                        }
+
+                    } else if (SELECT_CASE_var ==
+                               WSCT_HiZoneCooling) { // 'ONIFHIGHZONECOOLING'  ! Previous time step zone sensible cooling rate [W]
+                        // In the following, the check on BeginSimFlag is needed since SNLoadCoolRate (and SNLoadHeatRate,
+                        // used in other CASEs) are not allocated at this point for the first time step of the simulation.
+                        if (!BeginSimFlag) {
+                            if (SNLoadCoolRate(IZone) > SetPoint && SchedAllowsControl) {
+                                SurfWinShadingFlag(ISurf) = ShType;
+                            } else if (GlareControlIsActive) {
+                                SurfWinShadingFlag(ISurf) = 10 * ShType;
+                            }
+                        }
+
+                    } else if (SELECT_CASE_var ==
+                               WSCT_HiGlare) { // 'ONIFHIGHGLARE'  ! Daylight glare index at first reference point in the zone.
+                        // This type of shading control is done in DayltgInteriorIllum. Glare control is not affected
+                        // by control schedule.
+                        if (SunIsUp) SurfWinShadingFlag(ISurf) = 10 * ShType;
+
+                    } else if (SELECT_CASE_var ==
+                               WSCT_MeetDaylIlumSetp) { // 'MEETDAYLIGHTILLUMINANCESETPOINT')  !  Daylight illuminance test is done in DayltgInteriorIllum
+                        // Only switchable glazing does daylight illuminance control
+                        if (SunIsUp && SchedAllowsControl) SurfWinShadingFlag(ISurf) = GlassConditionallyLightened;
+
+                    } else if (SELECT_CASE_var == WSCT_OnNightLoOutTemp_OffDay) { // 'OnNightIfLowOutdoorTempAndOffDay'
+                        if (!SunIsUp && Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
                             SurfWinShadingFlag(ISurf) = 10 * ShType;
                         }
-                    }
 
-                } else if (SELECT_CASE_var ==
-                           WSCT_OnHiZoneTemp_HiHorzSolar) { // 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR'  ! Zone air temp and horizontal solar
-                    if (SunIsUp) {
-                        if (MAT(IZone) > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
+                    } else if (SELECT_CASE_var == WSCT_OnNightLoInTemp_OffDay) { // 'OnNightIfLowInsideTempAndOffDay')
+                        if (!SunIsUp && MAT(IZone) < SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
                             SurfWinShadingFlag(ISurf) = 10 * ShType;
                         }
-                    }
 
-                } else if (SELECT_CASE_var == WSCT_HiZoneCooling) { // 'ONIFHIGHZONECOOLING'  ! Previous time step zone sensible cooling rate [W]
-                    // In the following, the check on BeginSimFlag is needed since SNLoadCoolRate (and SNLoadHeatRate,
-                    // used in other CASEs) are not allocated at this point for the first time step of the simulation.
-                    if (!BeginSimFlag) {
-                        if (SNLoadCoolRate(IZone) > SetPoint && SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
+                    } else if (SELECT_CASE_var == WSCT_OnNightIfHeating_OffDay) { // 'OnNightIfHeatingAndOffDay'
+                        if (!BeginSimFlag) {
+                            if (!SunIsUp && SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) {
+                                SurfWinShadingFlag(ISurf) = ShType;
+                            } else if (GlareControlIsActive) {
+                                SurfWinShadingFlag(ISurf) = 10 * ShType;
+                            }
                         }
-                    }
 
-                } else if (SELECT_CASE_var == WSCT_HiGlare) { // 'ONIFHIGHGLARE'  ! Daylight glare index at first reference point in the zone.
-                    // This type of shading control is done in DayltgInteriorIllum. Glare control is not affected
-                    // by control schedule.
-                    if (SunIsUp) SurfWinShadingFlag(ISurf) = 10 * ShType;
-
-                } else if (SELECT_CASE_var ==
-                           WSCT_MeetDaylIlumSetp) { // 'MEETDAYLIGHTILLUMINANCESETPOINT')  !  Daylight illuminance test is done in DayltgInteriorIllum
-                    // Only switchable glazing does daylight illuminance control
-                    if (SunIsUp && SchedAllowsControl) SurfWinShadingFlag(ISurf) = GlassConditionallyLightened;
-
-                } else if (SELECT_CASE_var == WSCT_OnNightLoOutTemp_OffDay) { // 'OnNightIfLowOutdoorTempAndOffDay'
-                    if (!SunIsUp && Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl) {
-                        SurfWinShadingFlag(ISurf) = ShType;
-                    } else if (GlareControlIsActive) {
-                        SurfWinShadingFlag(ISurf) = 10 * ShType;
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_OnNightLoInTemp_OffDay) { // 'OnNightIfLowInsideTempAndOffDay')
-                    if (!SunIsUp && MAT(IZone) < SetPoint && SchedAllowsControl) {
-                        SurfWinShadingFlag(ISurf) = ShType;
-                    } else if (GlareControlIsActive) {
-                        SurfWinShadingFlag(ISurf) = 10 * ShType;
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_OnNightIfHeating_OffDay) { // 'OnNightIfHeatingAndOffDay'
-                    if (!BeginSimFlag) {
-                        if (!SunIsUp && SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
+                    } else if (SELECT_CASE_var ==
+                               WSCT_OnNightLoOutTemp_OnDayCooling) { // 'OnNightIfLowOutdoorTempAndOnDayIfCooling'
+                        if (!BeginSimFlag) {
+                            if (!SunIsUp) { // Night
+                                if (Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl)
+                                    SurfWinShadingFlag(ISurf) = ShType;
+                            } else { // Day
+                                if (SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                                    SurfWinShadingFlag(ISurf) = ShType;
+                                } else if (GlareControlIsActive) {
+                                    SurfWinShadingFlag(ISurf) = 10 * ShType;
+                                }
+                            }
                         }
-                    }
 
-                } else if (SELECT_CASE_var == WSCT_OnNightLoOutTemp_OnDayCooling) { // 'OnNightIfLowOutdoorTempAndOnDayIfCooling'
-                    if (!BeginSimFlag) {
-                        if (!SunIsUp) { // Night
-                            if (Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl) SurfWinShadingFlag(ISurf) = ShType;
-                        } else { // Day
-                            if (SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                    } else if (SELECT_CASE_var ==
+                               WSCT_OnNightIfHeating_OnDayCooling) { // 'OnNightIfHeatingAndOnDayIfCooling'
+                        if (!BeginSimFlag) {
+                            if (!SunIsUp) { // Night
+                                if (SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl)
+                                    SurfWinShadingFlag(ISurf) = ShType;
+                            } else { // Day
+                                if (SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                                    SurfWinShadingFlag(ISurf) = ShType;
+                                } else if (GlareControlIsActive) {
+                                    SurfWinShadingFlag(ISurf) = 10 * ShType;
+                                }
+                            }
+                        }
+
+                    } else if (SELECT_CASE_var ==
+                               WSCT_OffNight_OnDay_HiSolarWindow) { // 'OffNightAndOnDayIfCoolingAndHighSolarOnWindow'
+                        if (!BeginSimFlag) {
+                            if (SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                                if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
+                            } else if (GlareControlIsActive) {
+                                SurfWinShadingFlag(ISurf) = 10 * ShType;
+                            }
+                        }
+
+                    } else if (SELECT_CASE_var ==
+                               WSCT_OnNight_OnDay_HiSolarWindow) { // 'OnNightAndOnDayIfCoolingAndHighSolarOnWindow'
+                        if (!BeginSimFlag) {
+                            if (SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                                if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
+                            } else if (!SunIsUp && SchedAllowsControl) {
                                 SurfWinShadingFlag(ISurf) = ShType;
                             } else if (GlareControlIsActive) {
                                 SurfWinShadingFlag(ISurf) = 10 * ShType;
                             }
                         }
                     }
-
-                } else if (SELECT_CASE_var == WSCT_OnNightIfHeating_OnDayCooling) { // 'OnNightIfHeatingAndOnDayIfCooling'
-                    if (!BeginSimFlag) {
-                        if (!SunIsUp) { // Night
-                            if (SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) SurfWinShadingFlag(ISurf) = ShType;
-                        } else { // Day
-                            if (SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
-                                SurfWinShadingFlag(ISurf) = ShType;
-                            } else if (GlareControlIsActive) {
-                                SurfWinShadingFlag(ISurf) = 10 * ShType;
-                            }
-                        }
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_OffNight_OnDay_HiSolarWindow) { // 'OffNightAndOnDayIfCoolingAndHighSolarOnWindow'
-                    if (!BeginSimFlag) {
-                        if (SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
-                            if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
-                        }
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_OnNight_OnDay_HiSolarWindow) { // 'OnNightAndOnDayIfCoolingAndHighSolarOnWindow'
-                    if (!BeginSimFlag) {
-                        if (SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
-                            if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (!SunIsUp && SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
-                        }
-                    }
                 }
-            }
 
-            // Set switching factor to fully switched if ShadingFlag = 2
-            if (SurfWinShadingFlag(ISurf) == SwitchableGlazing) {
-                SurfWinSwitchingFactor(ISurf) = 1.0;
+                // Set switching factor to fully switched if ShadingFlag = 2
+                if (SurfWinShadingFlag(ISurf) == SwitchableGlazing) {
+                    SurfWinSwitchingFactor(ISurf) = 1.0;
 
-                // Added TH 1/20/2010
-                // Vis trans at normal incidence of fully switched glass
-                IConst = Surface(ISurf).ShadedConstruction;
-                SurfWinVisTransSelected(ISurf) = POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef) * SurfWinGlazedFrac(ISurf);
-            }
+                    // Added TH 1/20/2010
+                    // Vis trans at normal incidence of fully switched glass
+                    IConst = Surface(ISurf).ShadedConstruction;
+                    SurfWinVisTransSelected(ISurf) =
+                            POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef) * SurfWinGlazedFrac(ISurf);
+                }
 
-            // Slat angle control for blinds
+                // Slat angle control for blinds
 
-            SurfWinSlatAngThisTS(ISurf) = 0.0;
-            SurfWinSlatAngThisTSDeg(ISurf) = 0.0;
-            SurfWinSlatsBlockBeam(ISurf) = false;
-            if (SurfWinShadingFlag(ISurf) == IntBlindOn || SurfWinShadingFlag(ISurf) == 10 * IntBlindOn ||
-                SurfWinShadingFlag(ISurf) == ExtBlindOn || SurfWinShadingFlag(ISurf) == 10 * ExtBlindOn ||
-                SurfWinShadingFlag(ISurf) == BGBlindOn || SurfWinShadingFlag(ISurf) == 10 * BGBlindOn) {
-                // Blind in place or may be in place due to glare control
-                BlNum = SurfWinBlindNumber(ISurf);
-                if (BlNum > 0) {
-                    InputSlatAngle = Blind(BlNum).SlatAngle * DegToRadians;
+                SurfWinSlatAngThisTS(ISurf) = 0.0;
+                SurfWinSlatAngThisTSDeg(ISurf) = 0.0;
+                SurfWinSlatsBlockBeam(ISurf) = false;
+                if (SurfWinShadingFlag(ISurf) == IntBlindOn || SurfWinShadingFlag(ISurf) == 10 * IntBlindOn ||
+                    SurfWinShadingFlag(ISurf) == ExtBlindOn || SurfWinShadingFlag(ISurf) == 10 * ExtBlindOn ||
+                    SurfWinShadingFlag(ISurf) == BGBlindOn || SurfWinShadingFlag(ISurf) == 10 * BGBlindOn) {
+                    // Blind in place or may be in place due to glare control
+                    BlNum = SurfWinBlindNumber(ISurf);
+                    if (BlNum > 0) {
+                        InputSlatAngle = Blind(BlNum).SlatAngle * DegToRadians;
 
-                    if (Blind(BlNum).SlatWidth > Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
-                        ProfileAngle(ISurf, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
-                        ThetaBase = std::acos(std::cos(ProfAng) * Blind(BlNum).SlatSeparation / Blind(BlNum).SlatWidth);
-                        // There are two solutions for the slat angle that just blocks beam radiation
-                        ThetaBlock1 = ProfAng + ThetaBase;
-                        ThetaBlock2 = ProfAng + Pi - ThetaBase;
-                        ThetaSmall = min(ThetaBlock1, ThetaBlock2);
-                        ThetaBig = max(ThetaBlock1, ThetaBlock2);
-                        ThetaMin = Blind(BlNum).MinSlatAngle * DegToRadians;
-                        ThetaMax = Blind(BlNum).MaxSlatAngle * DegToRadians;
-                    }
-
-                    // TH 5/20/2010, CR 8064: Slat Width <= Slat Separation
-                    if (Blind(BlNum).SlatWidth <= Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
-                        if (WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds == WSC_SAC_BlockBeamSolar) {
-
+                        if (Blind(BlNum).SlatWidth > Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
                             ProfileAngle(ISurf, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
-
-                            if (std::abs(std::cos(ProfAng) * Blind(BlNum).SlatSeparation / Blind(BlNum).SlatWidth) <= 1.0) {
-                                // set to block 100% of beam solar, not necessarily to block maximum solar (beam + diffuse)
-                                ThetaBase = std::acos(std::cos(ProfAng) * Blind(BlNum).SlatSeparation / Blind(BlNum).SlatWidth);
-                                SurfWinSlatsBlockBeam(ISurf) = true;
-                            } else {
-                                // cannot block 100% of beam solar, turn slats to be perpendicular to sun beam to block maximal beam solar
-                                ThetaBase = 0.0;
-                            }
-
+                            ThetaBase = std::acos(
+                                    std::cos(ProfAng) * Blind(BlNum).SlatSeparation / Blind(BlNum).SlatWidth);
                             // There are two solutions for the slat angle that just blocks beam radiation
                             ThetaBlock1 = ProfAng + ThetaBase;
-                            ThetaBlock2 = ProfAng - ThetaBase + Pi;
-
+                            ThetaBlock2 = ProfAng + Pi - ThetaBase;
                             ThetaSmall = min(ThetaBlock1, ThetaBlock2);
                             ThetaBig = max(ThetaBlock1, ThetaBlock2);
                             ThetaMin = Blind(BlNum).MinSlatAngle * DegToRadians;
                             ThetaMax = Blind(BlNum).MaxSlatAngle * DegToRadians;
                         }
-                    }
 
-                    {
-                        auto const SELECT_CASE_var(WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds);
+                        // TH 5/20/2010, CR 8064: Slat Width <= Slat Separation
+                        if (Blind(BlNum).SlatWidth <= Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
+                            if (WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds ==
+                                WSC_SAC_BlockBeamSolar) {
 
-                        if (SELECT_CASE_var == WSC_SAC_FixedSlatAngle) { // 'FIXEDSLATANGLE'
-                            SurfWinSlatAngThisTS(ISurf) = InputSlatAngle;
-                            if ((SurfWinSlatAngThisTS(ISurf) <= ThetaSmall || SurfWinSlatAngThisTS(ISurf) >= ThetaBig) &&
-                                (Blind(BlNum).SlatWidth > Blind(BlNum).SlatSeparation) && (BeamSolarOnWindow > 0.0))
-                                SurfWinSlatsBlockBeam(ISurf) = true;
+                                ProfileAngle(ISurf, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
 
-                        } else if (SELECT_CASE_var == WSC_SAC_ScheduledSlatAngle) { // 'SCHEDULEDSLATANGLE'
-                            SurfWinSlatAngThisTS(ISurf) = GetCurrentScheduleValue(WindowShadingControl(IShadingCtrl).SlatAngleSchedule);
-                            SurfWinSlatAngThisTS(ISurf) =
-                                max(Blind(BlNum).MinSlatAngle, min(SurfWinSlatAngThisTS(ISurf), Blind(BlNum).MaxSlatAngle)) * DegToRadians;
-                            if ((SurfWinSlatAngThisTS(ISurf) <= ThetaSmall || SurfWinSlatAngThisTS(ISurf) >= ThetaBig) &&
-                                (Blind(BlNum).SlatWidth > Blind(BlNum).SlatSeparation) && (BeamSolarOnWindow > 0.0))
-                                SurfWinSlatsBlockBeam(ISurf) = true;
-
-                        } else if (SELECT_CASE_var == WSC_SAC_BlockBeamSolar) { // 'BLOCKBEAMSOLAR'
-                            if (BeamSolarOnWindow > 0.0) {
-                                if (Blind(BlNum).SlatSeparation >= Blind(BlNum).SlatWidth) {
-                                    // TH 5/20/2010. CR 8064.
-                                    // The following line of code assumes slats are always vertical/closed to minimize solar penetration
-                                    // The slat angle can however change if the only goal is to block maximum amount of direct beam solar
-                                    // SurfaceWindow(ISurf)%SlatAngThisTS = 0.0  ! Allows beam penetration but minimizes it
-
-                                    if (ThetaSmall >= ThetaMin && ThetaSmall <= ThetaMax) {
-                                        SurfWinSlatAngThisTS(ISurf) = ThetaSmall;
-                                    } else if (ThetaBig >= ThetaMin && ThetaBig <= ThetaMax) {
-                                        SurfWinSlatAngThisTS(ISurf) = ThetaBig;
-                                    } else if (ThetaSmall < ThetaMin && ThetaBig < ThetaMin) {
-                                        SurfWinSlatAngThisTS(ISurf) = ThetaMin;
-                                    } else if (ThetaSmall > ThetaMax && ThetaBig > ThetaMax) {
-                                        SurfWinSlatAngThisTS(ISurf) = ThetaMax;
-                                    } else { // ThetaBig > ThetaMax and ThetaSmall < ThetaMin (no-block condition)
-                                        SurfWinSlatAngThisTS(ISurf) = ThetaMin;
-                                    }
-
-                                } else { // Usual case -- slat width greater than slat separation
-                                    if (ThetaSmall >= ThetaMin && ThetaSmall <= ThetaMax) {
-                                        SurfWinSlatAngThisTS(ISurf) = ThetaSmall;
-                                        SurfWinSlatsBlockBeam(ISurf) = true;
-                                    } else if (ThetaBig >= ThetaMin && ThetaBig <= ThetaMax) {
-                                        SurfWinSlatAngThisTS(ISurf) = ThetaBig;
-                                        SurfWinSlatsBlockBeam(ISurf) = true;
-                                    } else if (ThetaSmall < ThetaMin && ThetaBig < ThetaMin) {
-                                        SurfWinSlatAngThisTS(ISurf) = ThetaMin;
-                                        SurfWinSlatsBlockBeam(ISurf) = true;
-                                    } else if (ThetaSmall > ThetaMax && ThetaBig > ThetaMax) {
-                                        SurfWinSlatAngThisTS(ISurf) = ThetaMax;
-                                        SurfWinSlatsBlockBeam(ISurf) = true;
-                                    } else { // ThetaBig > ThetaMax and ThetaSmall < ThetaMin (no-block condition)
-                                        SurfWinSlatAngThisTS(ISurf) = ThetaMin;
-                                    }
+                                if (std::abs(
+                                        std::cos(ProfAng) * Blind(BlNum).SlatSeparation / Blind(BlNum).SlatWidth) <=
+                                    1.0) {
+                                    // set to block 100% of beam solar, not necessarily to block maximum solar (beam + diffuse)
+                                    ThetaBase = std::acos(
+                                            std::cos(ProfAng) * Blind(BlNum).SlatSeparation / Blind(BlNum).SlatWidth);
+                                    SurfWinSlatsBlockBeam(ISurf) = true;
+                                } else {
+                                    // cannot block 100% of beam solar, turn slats to be perpendicular to sun beam to block maximal beam solar
+                                    ThetaBase = 0.0;
                                 }
-                            } else {
-                                SurfWinSlatAngThisTS(ISurf) = InputSlatAngle;
+
+                                // There are two solutions for the slat angle that just blocks beam radiation
+                                ThetaBlock1 = ProfAng + ThetaBase;
+                                ThetaBlock2 = ProfAng - ThetaBase + Pi;
+
+                                ThetaSmall = min(ThetaBlock1, ThetaBlock2);
+                                ThetaBig = max(ThetaBlock1, ThetaBlock2);
+                                ThetaMin = Blind(BlNum).MinSlatAngle * DegToRadians;
+                                ThetaMax = Blind(BlNum).MaxSlatAngle * DegToRadians;
                             }
                         }
-                    }
 
-                    SurfWinSlatAngThisTSDeg(ISurf) = SurfWinSlatAngThisTS(ISurf) / DegToRadians;
-                    if (SurfWinSlatAngThisTSDegEMSon(ISurf)) {
-                        SurfWinSlatAngThisTSDeg(ISurf) = SurfWinSlatAngThisTSDegEMSValue(ISurf);
-                        SurfWinSlatAngThisTS(ISurf) = DegToRadians * SurfWinSlatAngThisTSDeg(ISurf);
-                    }
-                    // Air flow permeability for calculation of convective air flow between blind and glass
-                    SlatAng = SurfWinSlatAngThisTS(ISurf);
-                    PermeabilityA = std::sin(SlatAng) - Blind(BlNum).SlatThickness / Blind(BlNum).SlatSeparation;
-                    PermeabilityB = 1.0 - (std::abs(Blind(BlNum).SlatWidth * std::cos(SlatAng)) + Blind(BlNum).SlatThickness * std::sin(SlatAng)) /
+                        {
+                            auto const SELECT_CASE_var(WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds);
+
+                            if (SELECT_CASE_var == WSC_SAC_FixedSlatAngle) { // 'FIXEDSLATANGLE'
+                                SurfWinSlatAngThisTS(ISurf) = InputSlatAngle;
+                                if ((SurfWinSlatAngThisTS(ISurf) <= ThetaSmall ||
+                                     SurfWinSlatAngThisTS(ISurf) >= ThetaBig) &&
+                                    (Blind(BlNum).SlatWidth > Blind(BlNum).SlatSeparation) && (BeamSolarOnWindow > 0.0))
+                                    SurfWinSlatsBlockBeam(ISurf) = true;
+
+                            } else if (SELECT_CASE_var == WSC_SAC_ScheduledSlatAngle) { // 'SCHEDULEDSLATANGLE'
+                                SurfWinSlatAngThisTS(ISurf) = GetCurrentScheduleValue(
+                                        WindowShadingControl(IShadingCtrl).SlatAngleSchedule);
+                                SurfWinSlatAngThisTS(ISurf) = max(Blind(BlNum).MinSlatAngle,
+                                                                  min(SurfWinSlatAngThisTS(ISurf),
+                                                                      Blind(BlNum).MaxSlatAngle)) * DegToRadians;
+                                if ((SurfWinSlatAngThisTS(ISurf) <= ThetaSmall ||
+                                     SurfWinSlatAngThisTS(ISurf) >= ThetaBig) &&
+                                    (Blind(BlNum).SlatWidth > Blind(BlNum).SlatSeparation) && (BeamSolarOnWindow > 0.0))
+                                    SurfWinSlatsBlockBeam(ISurf) = true;
+
+                            } else if (SELECT_CASE_var == WSC_SAC_BlockBeamSolar) { // 'BLOCKBEAMSOLAR'
+                                if (BeamSolarOnWindow > 0.0) {
+                                    if (Blind(BlNum).SlatSeparation >= Blind(BlNum).SlatWidth) {
+                                        // TH 5/20/2010. CR 8064.
+                                        // The following line of code assumes slats are always vertical/closed to minimize solar penetration
+                                        // The slat angle can however change if the only goal is to block maximum amount of direct beam solar
+                                        // SurfaceWindow(ISurf)%SlatAngThisTS = 0.0  ! Allows beam penetration but minimizes it
+
+                                        if (ThetaSmall >= ThetaMin && ThetaSmall <= ThetaMax) {
+                                            SurfWinSlatAngThisTS(ISurf) = ThetaSmall;
+                                        } else if (ThetaBig >= ThetaMin && ThetaBig <= ThetaMax) {
+                                            SurfWinSlatAngThisTS(ISurf) = ThetaBig;
+                                        } else if (ThetaSmall < ThetaMin && ThetaBig < ThetaMin) {
+                                            SurfWinSlatAngThisTS(ISurf) = ThetaMin;
+                                        } else if (ThetaSmall > ThetaMax && ThetaBig > ThetaMax) {
+                                            SurfWinSlatAngThisTS(ISurf) = ThetaMax;
+                                        } else { // ThetaBig > ThetaMax and ThetaSmall < ThetaMin (no-block condition)
+                                            SurfWinSlatAngThisTS(ISurf) = ThetaMin;
+                                        }
+
+                                    } else { // Usual case -- slat width greater than slat separation
+                                        if (ThetaSmall >= ThetaMin && ThetaSmall <= ThetaMax) {
+                                            SurfWinSlatAngThisTS(ISurf) = ThetaSmall;
+                                            SurfWinSlatsBlockBeam(ISurf) = true;
+                                        } else if (ThetaBig >= ThetaMin && ThetaBig <= ThetaMax) {
+                                            SurfWinSlatAngThisTS(ISurf) = ThetaBig;
+                                            SurfWinSlatsBlockBeam(ISurf) = true;
+                                        } else if (ThetaSmall < ThetaMin && ThetaBig < ThetaMin) {
+                                            SurfWinSlatAngThisTS(ISurf) = ThetaMin;
+                                            SurfWinSlatsBlockBeam(ISurf) = true;
+                                        } else if (ThetaSmall > ThetaMax && ThetaBig > ThetaMax) {
+                                            SurfWinSlatAngThisTS(ISurf) = ThetaMax;
+                                            SurfWinSlatsBlockBeam(ISurf) = true;
+                                        } else { // ThetaBig > ThetaMax and ThetaSmall < ThetaMin (no-block condition)
+                                            SurfWinSlatAngThisTS(ISurf) = ThetaMin;
+                                        }
+                                    }
+                                } else {
+                                    SurfWinSlatAngThisTS(ISurf) = InputSlatAngle;
+                                }
+                            }
+                        }
+
+                        SurfWinSlatAngThisTSDeg(ISurf) = SurfWinSlatAngThisTS(ISurf) / DegToRadians;
+                        if (SurfWinSlatAngThisTSDegEMSon(ISurf)) {
+                            SurfWinSlatAngThisTSDeg(ISurf) = SurfWinSlatAngThisTSDegEMSValue(ISurf);
+                            SurfWinSlatAngThisTS(ISurf) = DegToRadians * SurfWinSlatAngThisTSDeg(ISurf);
+                        }
+                        // Air flow permeability for calculation of convective air flow between blind and glass
+                        SlatAng = SurfWinSlatAngThisTS(ISurf);
+                        PermeabilityA = std::sin(SlatAng) - Blind(BlNum).SlatThickness / Blind(BlNum).SlatSeparation;
+                        PermeabilityB = 1.0 - (std::abs(Blind(BlNum).SlatWidth * std::cos(SlatAng)) +
+                                               Blind(BlNum).SlatThickness * std::sin(SlatAng)) /
                                               Blind(BlNum).SlatSeparation;
-                    SurfWinBlindAirFlowPermeability(ISurf) = min(1.0, max(0.0, PermeabilityA, PermeabilityB));
+                        SurfWinBlindAirFlowPermeability(ISurf) = min(1.0, max(0.0, PermeabilityA, PermeabilityB));
+                    }
+                } // End of check if interior or exterior blind in place
+
+                //   CALL CalcScreenTransmittance to intialized all screens prior to HB calc's
+                if (SurfWinShadingFlag(ISurf) == ExtScreenOn && SunIsUp) {
+                    CalcScreenTransmittance(ISurf);
                 }
-            } // End of check if interior or exterior blind in place
 
-            //   CALL CalcScreenTransmittance to intialized all screens prior to HB calc's
-            if (SurfWinShadingFlag(ISurf) == ExtScreenOn && SunIsUp) {
-                CalcScreenTransmittance(ISurf);
-            }
+                // EMS Actuator Point: override setting if ems flag on
+                if (SurfWinShadingFlagEMSOn(ISurf)) {
+                    SurfWinShadingFlag(ISurf) = SurfWinShadingFlagEMSValue(ISurf);
+                }
 
-            // EMS Actuator Point: override setting if ems flag on
-            if (SurfWinShadingFlagEMSOn(ISurf)) {
-                SurfWinShadingFlag(ISurf) = SurfWinShadingFlagEMSValue(ISurf);
-            }
-
-        } // End of surface loop
+            } // End of surface loop
+        }
     }
 
     void WindowGapAirflowControl()
