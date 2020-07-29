@@ -869,7 +869,10 @@ namespace EMSManager {
                 }
 
                 if (FoundActuatorName) {
+                    // SetupNodeSetPointAsActuators has NOT been called yet at this point
                     EMSActuatorUsed(ActuatorNum).ActuatorVariableNum = ActuatorVariableNum;
+                    EMSActuatorUsed(ActuatorNum).CheckedOkay = true;
+
                     int nHandle = EMSActuatorAvailable(ActuatorVariableNum).handleCount;
                     if (nHandle > 0) {
                         EnergyPlus::ShowWarningError("Seems like you already tried to get a Handle on this Actuator " + std::to_string(nHandle) + "times.");
@@ -879,7 +882,6 @@ namespace EMSManager {
                         EnergyPlus::ShowContinueError("You should take note that there is a risk of overwritting.");
                     }
                     ++EMSActuatorAvailable(ActuatorVariableNum).handleCount;
-                    EMSActuatorUsed(ActuatorNum).CheckedOkay = true;
                 }
             } // ActuatorNum
         }
@@ -1241,6 +1243,15 @@ namespace EMSManager {
             } else {
                 EMSActuatorUsed(ActuatorNum).ActuatorVariableNum = ActuatorVariableNum;
                 EMSActuatorUsed(ActuatorNum).CheckedOkay = true;
+                int nHandle = EMSActuatorAvailable(ActuatorVariableNum).handleCount;
+                if (nHandle > 0) {
+                    EnergyPlus::ShowWarningError("Seems like you already tried to get a Handle on this Actuator " + std::to_string(nHandle) + "times.");
+                    EnergyPlus::ShowContinueError("Occurred for componentType='" +  EMSActuatorUsed(ActuatorNum).ComponentTypeName
+                            + "', controlType='" + EMSActuatorUsed(ActuatorNum).ControlTypeName
+                            + "', uniqueKey='" + EMSActuatorUsed(ActuatorNum).UniqueIDName + "'.");
+                    EnergyPlus::ShowContinueError("You should take note that there is a risk of overwritting.");
+                }
+                ++EMSActuatorAvailable(ActuatorVariableNum).handleCount;
             }
         } // ActuatorNum
 
@@ -1591,7 +1602,8 @@ namespace EMSManager {
                                  Node(NodeNum).EMSOverrideOutAirWindDir,
                                  Node(NodeNum).EMSValueForOutAirWindDir);
                 for (int ActuatorUsedLoop = 1; ActuatorUsedLoop <= numActuatorsUsed; ActuatorUsedLoop++) {
-                    if (UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).ComponentTypeName, "Outdoor Air System Node") && UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).UniqueIDName,NodeID(NodeNum))) {
+                    if (UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).ComponentTypeName, "Outdoor Air System Node") &&
+                        UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).UniqueIDName,NodeID(NodeNum))) {
                         Node(NodeNum).IsLocalNode = true;
                         break;
                     }
