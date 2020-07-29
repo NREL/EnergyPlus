@@ -1810,6 +1810,8 @@ namespace HVACUnitaryBypassVAV {
                         // need call to EMS to check node
                         EMSSetPointCheck = false;
                         EMSManager::CheckIfNodeSetPointManagedByEMS(OutNode, EMSManager::iHumidityRatioMaxSetPoint, EMSSetPointCheck);
+                        // TODO: What should be do here?
+                        DataLoopNode::NodeSetpointCheck(OutNode).needsSetpointChecking = false;
                         if (EMSSetPointCheck) {
                             ShowWarningError("Unitary System:VAV:ChangeOverBypass = " + CBVAV(CBVAVNum).Name);
                             ShowContinueError("Use SetpointManager:SingleZone:Humidity:Maximum to place a humidity setpoint at the air outlet node "
@@ -3401,7 +3403,7 @@ namespace HVACUnitaryBypassVAV {
         LoadMet = DataLoopNode::Node(OutletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRat) -
                                                                  Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, MinHumRat));
 
-        // calculate OA fraction used for zone OA volume flow rate calc 
+        // calculate OA fraction used for zone OA volume flow rate calc
         DataAirLoop::AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac = 0.0;
         if (DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate > 0.0) {
             DataAirLoop::AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac =
