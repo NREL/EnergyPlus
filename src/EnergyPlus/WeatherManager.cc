@@ -2822,7 +2822,6 @@ namespace WeatherManager {
         Real64 B;
         Real64 C;
         Real64 AVSC;
-        Real64 SkyTemp;
         static int CurDayOfWeek;
         static bool UseDayOfWeek;
         bool SkipThisDay; // Used when LeapYear is/is not in effect
@@ -2831,7 +2830,6 @@ namespace WeatherManager {
         bool ErrorsFound;
         static Real64 CurTime;
         Real64 HourRep;
-        Real64 ESky;
         bool ErrorFound;
         static bool LastHourSet; // for Interpolation
         int NxtHour;
