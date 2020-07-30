@@ -10096,7 +10096,8 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    void ControlVSHPOutput(EnergyPlusData &state, int const FurnaceNum,          // Unit index of engine driven heat pump
+    void ControlVSHPOutput(EnergyPlusData &state,
+                           int const FurnaceNum,          // Unit index of engine driven heat pump
                            bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                            int const CompOp,              // compressor operation; 1=on, 0=off
                            int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
@@ -10125,7 +10126,6 @@ namespace Furnaces {
         using DataGlobals::WarmupFlag;
         using General::RoundSigDigits;
         using General::SolveRoot;
-        using TempSolveRoot::SolveRoot;
         using General::TrimSigDigits;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using IntegratedHeatPump::GetCurWorkMode;
@@ -10133,6 +10133,11 @@ namespace Furnaces {
         using IntegratedHeatPump::IHPOperationMode;
         using IntegratedHeatPump::IntegratedHeatPumps;
         using Psychrometrics::PsyCpAirFnW;
+        using TempSolveRoot::SolveRoot;
+        using VariableSpeedCoils::GetGridLoadCtrlMode;
+        using VariableSpeedCoils::GRID_LATENT;
+        using VariableSpeedCoils::GRID_SENLAT;
+        using VariableSpeedCoils::GRID_SENSIBLE;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500); // maximum number of iterations
@@ -10152,6 +10157,7 @@ namespace Furnaces {
         static int ErrCountCyc(0); // Counter used to minimize the occurrence of output warnings
         static int ErrCountVar(0); // Counter used to minimize the occurrence of output warnings
         IHPOperationMode IHPMode(IHPOperationMode::IdleMode);
+        int GridResponseMode(VariableSpeedCoils::GRID_SENLAT);
 
         // FLOW
         SupHeaterLoad = 0.0;
@@ -10166,7 +10172,8 @@ namespace Furnaces {
 
         // Get result when DX coil is off
         SupHeaterLoad = 0.0;
-        CalcVarSpeedHeatPump(state, FurnaceNum,
+        CalcVarSpeedHeatPump(state,
+                             FurnaceNum,
                              FirstHVACIteration,
                              CompOp,
                              SpeedNum,
@@ -10214,7 +10221,8 @@ namespace Furnaces {
 
         if (Furnace(FurnaceNum).bIsIHP) SpeedNum = GetMaxSpeedNumIHP(Furnace(FurnaceNum).CoolingCoilIndex);
 
-        CalcVarSpeedHeatPump(state, FurnaceNum,
+        CalcVarSpeedHeatPump(state,
+                             FurnaceNum,
                              FirstHVACIteration,
                              CompOp,
                              SpeedNum,
@@ -10227,7 +10235,13 @@ namespace Furnaces {
                              OnOffAirFlowRatio,
                              SupHeaterLoad);
 
-        if (QLatReq < (-1.0 * SmallLoad)) { // dehumidification mode
+        if (Furnace(FurnaceNum).bIsIHP) {
+
+        } else {
+            GridResponseMode = GetGridLoadCtrlMode(Furnace(FurnaceNum).CoolingCoilIndex);
+        }
+
+        if ((QLatReq < (-1.0 * SmallLoad)) && (GridResponseMode != VariableSpeedCoils::GRID_SENSIBLE)) { // dehumidification mode
             if (QLatReq <= LatOutput || (QZnReq < -SmallLoad && QZnReq <= FullOutput) || (QZnReq > SmallLoad && QZnReq >= FullOutput)) {
                 PartLoadFrac = 1.0;
                 SpeedRatio = 1.0;
@@ -10256,7 +10270,8 @@ namespace Furnaces {
             ErrorToler = 0.001; // Error tolerance for convergence from input deck
         }
 
-        if ((QZnReq < -SmallLoad && NoCompOutput - QZnReq > SmallLoad) || (QZnReq > SmallLoad && QZnReq - NoCompOutput > SmallLoad)) {
+        if (((QZnReq < -SmallLoad && NoCompOutput - QZnReq > SmallLoad) || (QZnReq > SmallLoad && QZnReq - NoCompOutput > SmallLoad)) &&
+            (GridResponseMode != VariableSpeedCoils::GRID_LATENT)) {
             if ((QZnReq > SmallLoad && QZnReq < FullOutput) || (QZnReq < (-1.0 * SmallLoad) && QZnReq > FullOutput)) {
 
                 Par(1) = FurnaceNum;
@@ -10274,7 +10289,18 @@ namespace Furnaces {
                 Par(10) = 1.0;
                 // Check whether the low speed coil can meet the load or not
                 CalcVarSpeedHeatPump(state,
-                    FurnaceNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, LatOutput, QZnReq, QLatReq, OnOffAirFlowRatio, SupHeaterLoad);
+                                     FurnaceNum,
+                                     FirstHVACIteration,
+                                     CompOp,
+                                     1,
+                                     0.0,
+                                     1.0,
+                                     LowOutput,
+                                     LatOutput,
+                                     QZnReq,
+                                     QLatReq,
+                                     OnOffAirFlowRatio,
+                                     SupHeaterLoad);
                 if ((QZnReq > SmallLoad && QZnReq <= LowOutput) || (QZnReq < (-1.0 * SmallLoad) && QZnReq >= LowOutput)) {
                     // Calculate the part load fraction
                     SpeedRatio = 0.0;
@@ -10301,13 +10327,29 @@ namespace Furnaces {
                         ShowFatalError("VS WSHP unit cycling ratio calculation failed: cycling limits exceeded, for unit=" +
                                        Furnace(FurnaceNum).Name);
                     }
+
+                    // update LatOutput
+                    CalcVarSpeedHeatPump(state,
+                                         FurnaceNum,
+                                         FirstHVACIteration,
+                                         CompOp,
+                                         1,
+                                         0.0,
+                                         PartLoadFrac,
+                                         TempOutput,
+                                         LatOutput,
+                                         QZnReq,
+                                         QLatReq,
+                                         OnOffAirFlowRatio,
+                                         SupHeaterLoad);
                 } else {
                     // Check to see which speed to meet the load
                     PartLoadFrac = 1.0;
                     SpeedRatio = 1.0;
                     if (QZnReq < (-1.0 * SmallLoad)) { // Cooling
                         for (i = 2; i <= Furnace(FurnaceNum).NumOfSpeedCooling; ++i) {
-                            CalcVarSpeedHeatPump(state, FurnaceNum,
+                            CalcVarSpeedHeatPump(state,
+                                                 FurnaceNum,
                                                  FirstHVACIteration,
                                                  CompOp,
                                                  i,
@@ -10327,7 +10369,8 @@ namespace Furnaces {
                         }
                     } else {
                         for (i = 2; i <= Furnace(FurnaceNum).NumOfSpeedHeating; ++i) {
-                            CalcVarSpeedHeatPump(state, FurnaceNum,
+                            CalcVarSpeedHeatPump(state,
+                                                 FurnaceNum,
                                                  FirstHVACIteration,
                                                  CompOp,
                                                  i,
@@ -10368,6 +10411,21 @@ namespace Furnaces {
                         ShowFatalError("VS WSHP unit compressor speed calculation failed: speed limits exceeded, for unit=" +
                                        Furnace(FurnaceNum).Name);
                     }
+
+                    // update LatOutput
+                    CalcVarSpeedHeatPump(state,
+                                         FurnaceNum,
+                                         FirstHVACIteration,
+                                         CompOp,
+                                         SpeedNum,
+                                         SpeedRatio,
+                                         PartLoadFrac,
+                                         TempOutput,
+                                         LatOutput,
+                                         QZnReq,
+                                         QLatReq,
+                                         OnOffAirFlowRatio,
+                                         SupHeaterLoad);
                 }
             } else {
                 LatOutput = noLatOutput; // reset full output if not needed for sensible load
@@ -10377,12 +10435,14 @@ namespace Furnaces {
             LatOutput = noLatOutput; // reset full output if not needed for sensible load
             SpeedNum = 1;            // reset speed from full output test
         }
+
         // meet the latent load
-        if (QLatReq < -SmallLoad && QLatReq < LatOutput) {
+        if ((QLatReq < -SmallLoad && QLatReq < LatOutput) && (GridResponseMode != VariableSpeedCoils::GRID_SENSIBLE)) {
             PartLoadFrac = 1.0;
             SpeedRatio = 1.0;
             for (i = SpeedNum; i <= Furnace(FurnaceNum).NumOfSpeedCooling; ++i) {
-                CalcVarSpeedHeatPump(state, FurnaceNum,
+                CalcVarSpeedHeatPump(state,
+                                     FurnaceNum,
                                      FirstHVACIteration,
                                      CompOp,
                                      i,
@@ -10457,7 +10517,8 @@ namespace Furnaces {
             } else {
                 SupHeaterLoad = 0.0;
             }
-            CalcVarSpeedHeatPump(state, FurnaceNum,
+            CalcVarSpeedHeatPump(state,
+                                 FurnaceNum,
                                  FirstHVACIteration,
                                  CompOp,
                                  SpeedNum,
@@ -10505,7 +10566,8 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    void CalcVarSpeedHeatPump(EnergyPlusData &state, int const FurnaceNum,          // Variable speed heat pump number
+    void CalcVarSpeedHeatPump(EnergyPlusData &state,
+                              int const FurnaceNum,          // Variable speed heat pump number
                               bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                               int const CompOp,              // Compressor on/off; 1=on, 0=off
                               int const SpeedNum,            // Speed number
@@ -10529,6 +10591,7 @@ namespace Furnaces {
         // Using/Aliasing
         using Fans::SimulateFanComponents;
         using IntegratedHeatPump::SimIHP;
+        using VariableSpeedCoils::CompareGridSpeed;
         using VariableSpeedCoils::SimVariableSpeedCoils;
         using VariableSpeedCoils::VarSpeedCoil;
 
@@ -10555,6 +10618,7 @@ namespace Furnaces {
         Real64 ErrorToler;        // supplemental heating coil convergence tollerance
         bool SuppHeatingCoilFlag; // whether to turn on the supplemental heater
         Real64 HeatCoilLoad;      // REQUIRED HEAT COIL LOAD
+        int FanSpeed = SpeedNum;  // speed level to drive fan flow
 
         // FLOW
         InletNode = Furnace(FurnaceNum).FurnaceInletNodeNum;
@@ -10565,8 +10629,17 @@ namespace Furnaces {
         SavePartloadRatio = 0.0;
         ErrorToler = 0.001;
 
+        if (Furnace(FurnaceNum).bIsIHP) {
+
+        } else {
+            FanSpeed = CompareGridSpeed(Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum);
+            if (FanSpeed == 0) FanSpeed = SpeedNum; // compressor off, allow maximum fan flow speed
+            FanSpeed = CompareGridSpeed(Furnace(FurnaceNum).HeatingCoilIndex, FanSpeed);
+            if (FanSpeed == 0) FanSpeed = SpeedNum; // compressor off, allow maximum fan flow speed
+        }
+
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
-        SetVSHPAirFlow(state, FurnaceNum, PartLoadFrac, OnOffAirFlowRatio, SpeedNum, SpeedRatio);
+        SetVSHPAirFlow(state, FurnaceNum, PartLoadFrac, OnOffAirFlowRatio, FanSpeed, SpeedRatio);
 
         if ((SupHeaterLoad > 1.0e-10) && (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool) &&
             (Furnace(FurnaceNum).SuppHeatCoilIndex == 0)) {
@@ -10589,14 +10662,16 @@ namespace Furnaces {
             if ((!Furnace(FurnaceNum).CoolingCoilUpstream) && (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
                 SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
+                CalcNonDXHeatingCoils(
+                    state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
             }
 
             if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad))) &&
                 (OutDryBulbTemp >= Furnace(FurnaceNum).MinOATCompressorCooling)) { // COOLING MODE or dehumidification mode
 
                 if (Furnace(FurnaceNum).bIsIHP) {
-                    SimIHP(state, BlankString,
+                    SimIHP(state,
+                           BlankString,
                            Furnace(FurnaceNum).CoolingCoilIndex,
                            Furnace(FurnaceNum).OpMode,
                            Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10612,7 +10687,8 @@ namespace Furnaces {
                            false,
                            OnOffAirFlowRatio);
                 } else {
-                    SimVariableSpeedCoils(state, BlankString,
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
                                           Furnace(FurnaceNum).CoolingCoilIndex,
                                           Furnace(FurnaceNum).OpMode,
                                           Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10633,7 +10709,8 @@ namespace Furnaces {
                 SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
             } else {
                 if (Furnace(FurnaceNum).bIsIHP) {
-                    SimIHP(state, BlankString,
+                    SimIHP(state,
+                           BlankString,
                            Furnace(FurnaceNum).CoolingCoilIndex,
                            Furnace(FurnaceNum).OpMode,
                            Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10649,7 +10726,8 @@ namespace Furnaces {
                            false,
                            OnOffAirFlowRatio);
                 } else {
-                    SimVariableSpeedCoils(state, BlankString,
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
                                           Furnace(FurnaceNum).CoolingCoilIndex,
                                           Furnace(FurnaceNum).OpMode,
                                           Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10668,7 +10746,8 @@ namespace Furnaces {
             if (Furnace(FurnaceNum).FurnaceType_Num != UnitarySys_HeatCool) {
                 if ((QZnReq > SmallLoad) && HeatingLoad) {
                     if (Furnace(FurnaceNum).bIsIHP) {
-                        SimIHP(state, BlankString,
+                        SimIHP(state,
+                               BlankString,
                                Furnace(FurnaceNum).HeatingCoilIndex,
                                Furnace(FurnaceNum).OpMode,
                                Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10684,7 +10763,8 @@ namespace Furnaces {
                                false,
                                OnOffAirFlowRatio);
                     } else {
-                        SimVariableSpeedCoils(state, BlankString,
+                        SimVariableSpeedCoils(state,
+                                              BlankString,
                                               Furnace(FurnaceNum).HeatingCoilIndex,
                                               Furnace(FurnaceNum).OpMode,
                                               Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10705,7 +10785,8 @@ namespace Furnaces {
                     SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
                 } else {
                     if (Furnace(FurnaceNum).bIsIHP) {
-                        SimIHP(state, BlankString,
+                        SimIHP(state,
+                               BlankString,
                                Furnace(FurnaceNum).CoolingCoilIndex,
                                Furnace(FurnaceNum).OpMode,
                                Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10721,7 +10802,8 @@ namespace Furnaces {
                                false,
                                OnOffAirFlowRatio);
                     } else {
-                        SimVariableSpeedCoils(state, BlankString,
+                        SimVariableSpeedCoils(state,
+                                              BlankString,
                                               Furnace(FurnaceNum).HeatingCoilIndex,
                                               Furnace(FurnaceNum).OpMode,
                                               Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10739,7 +10821,8 @@ namespace Furnaces {
             } else if (Furnace(FurnaceNum).CoolingCoilUpstream && (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
                 SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
+                CalcNonDXHeatingCoils(
+                    state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
             }
 
             // Call twice to ensure the fan outlet conditions are updated
@@ -10748,13 +10831,15 @@ namespace Furnaces {
             if ((!Furnace(FurnaceNum).CoolingCoilUpstream) && (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
                 SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
+                CalcNonDXHeatingCoils(
+                    state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
             }
 
             if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad))) && (OutDryBulbTemp >= Furnace(FurnaceNum).MinOATCompressorCooling)) {
 
                 if (Furnace(FurnaceNum).bIsIHP) {
-                    SimIHP(state, BlankString,
+                    SimIHP(state,
+                           BlankString,
                            Furnace(FurnaceNum).CoolingCoilIndex,
                            Furnace(FurnaceNum).OpMode,
                            Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10770,7 +10855,8 @@ namespace Furnaces {
                            false,
                            OnOffAirFlowRatio);
                 } else {
-                    SimVariableSpeedCoils(state, BlankString,
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
                                           Furnace(FurnaceNum).CoolingCoilIndex,
                                           Furnace(FurnaceNum).OpMode,
                                           Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10791,7 +10877,8 @@ namespace Furnaces {
             } else {
 
                 if (Furnace(FurnaceNum).bIsIHP) {
-                    SimIHP(state, BlankString,
+                    SimIHP(state,
+                           BlankString,
                            Furnace(FurnaceNum).CoolingCoilIndex,
                            Furnace(FurnaceNum).OpMode,
                            Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10807,7 +10894,8 @@ namespace Furnaces {
                            false,
                            OnOffAirFlowRatio);
                 } else {
-                    SimVariableSpeedCoils(state, BlankString,
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
                                           Furnace(FurnaceNum).CoolingCoilIndex,
                                           Furnace(FurnaceNum).OpMode,
                                           Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10826,7 +10914,8 @@ namespace Furnaces {
             if (Furnace(FurnaceNum).FurnaceType_Num != UnitarySys_HeatCool) {
                 if ((QZnReq > SmallLoad) && HeatingLoad) {
                     if (Furnace(FurnaceNum).bIsIHP) {
-                        SimIHP(state, BlankString,
+                        SimIHP(state,
+                               BlankString,
                                Furnace(FurnaceNum).HeatingCoilIndex,
                                Furnace(FurnaceNum).OpMode,
                                Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10842,7 +10931,8 @@ namespace Furnaces {
                                false,
                                OnOffAirFlowRatio);
                     } else {
-                        SimVariableSpeedCoils(state, BlankString,
+                        SimVariableSpeedCoils(state,
+                                              BlankString,
                                               Furnace(FurnaceNum).HeatingCoilIndex,
                                               Furnace(FurnaceNum).OpMode,
                                               Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10862,7 +10952,8 @@ namespace Furnaces {
                     SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
                 } else {
                     if (Furnace(FurnaceNum).bIsIHP) {
-                        SimIHP(state, BlankString,
+                        SimIHP(state,
+                               BlankString,
                                Furnace(FurnaceNum).CoolingCoilIndex,
                                Furnace(FurnaceNum).OpMode,
                                Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10878,7 +10969,8 @@ namespace Furnaces {
                                false,
                                OnOffAirFlowRatio);
                     } else {
-                        SimVariableSpeedCoils(state, BlankString,
+                        SimVariableSpeedCoils(state,
+                                              BlankString,
                                               Furnace(FurnaceNum).HeatingCoilIndex,
                                               Furnace(FurnaceNum).OpMode,
                                               Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10896,26 +10988,30 @@ namespace Furnaces {
             } else if (Furnace(FurnaceNum).CoolingCoilUpstream && (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
                 SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
+                CalcNonDXHeatingCoils(
+                    state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
             }
 
             //  Simulate supplemental heating coil for blow through fan
             if (Furnace(FurnaceNum).SuppHeatCoilIndex > 0) {
                 SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, SupHeaterLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
+                CalcNonDXHeatingCoils(
+                    state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, SupHeaterLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
             }
         } else { // otherwise simulate DX coils then fan then supplemental heater
 
             if ((!Furnace(FurnaceNum).CoolingCoilUpstream) && (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
                 SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
+                CalcNonDXHeatingCoils(
+                    state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
             }
 
             if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad))) && (OutDryBulbTemp >= Furnace(FurnaceNum).MinOATCompressorCooling)) {
 
                 if (Furnace(FurnaceNum).bIsIHP) {
-                    SimIHP(state, BlankString,
+                    SimIHP(state,
+                           BlankString,
                            Furnace(FurnaceNum).CoolingCoilIndex,
                            Furnace(FurnaceNum).OpMode,
                            Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10931,7 +11027,8 @@ namespace Furnaces {
                            false,
                            OnOffAirFlowRatio);
                 } else {
-                    SimVariableSpeedCoils(state, BlankString,
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
                                           Furnace(FurnaceNum).CoolingCoilIndex,
                                           Furnace(FurnaceNum).OpMode,
                                           Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10952,7 +11049,8 @@ namespace Furnaces {
                 SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
             } else {
                 if (Furnace(FurnaceNum).bIsIHP) {
-                    SimIHP(state, BlankString,
+                    SimIHP(state,
+                           BlankString,
                            Furnace(FurnaceNum).CoolingCoilIndex,
                            Furnace(FurnaceNum).OpMode,
                            Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10968,7 +11066,8 @@ namespace Furnaces {
                            false,
                            OnOffAirFlowRatio);
                 } else {
-                    SimVariableSpeedCoils(state, BlankString,
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
                                           Furnace(FurnaceNum).CoolingCoilIndex,
                                           Furnace(FurnaceNum).OpMode,
                                           Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -10988,7 +11087,8 @@ namespace Furnaces {
                 if (QZnReq > SmallLoad && (OutDryBulbTemp >= Furnace(FurnaceNum).MinOATCompressorCooling)) {
 
                     if (Furnace(FurnaceNum).bIsIHP) {
-                        SimIHP(state, BlankString,
+                        SimIHP(state,
+                               BlankString,
                                Furnace(FurnaceNum).HeatingCoilIndex,
                                Furnace(FurnaceNum).OpMode,
                                Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -11004,7 +11104,8 @@ namespace Furnaces {
                                false,
                                OnOffAirFlowRatio);
                     } else {
-                        SimVariableSpeedCoils(state, BlankString,
+                        SimVariableSpeedCoils(state,
+                                              BlankString,
                                               Furnace(FurnaceNum).HeatingCoilIndex,
                                               Furnace(FurnaceNum).OpMode,
                                               Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -11024,7 +11125,8 @@ namespace Furnaces {
                     SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
                 } else {
                     if (Furnace(FurnaceNum).bIsIHP) {
-                        SimIHP(state, BlankString,
+                        SimIHP(state,
+                               BlankString,
                                Furnace(FurnaceNum).CoolingCoilIndex,
                                Furnace(FurnaceNum).OpMode,
                                Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -11040,7 +11142,8 @@ namespace Furnaces {
                                false,
                                OnOffAirFlowRatio);
                     } else {
-                        SimVariableSpeedCoils(state, BlankString,
+                        SimVariableSpeedCoils(state,
+                                              BlankString,
                                               Furnace(FurnaceNum).HeatingCoilIndex,
                                               Furnace(FurnaceNum).OpMode,
                                               Furnace(FurnaceNum).MaxONOFFCyclesperHour,
@@ -11058,14 +11161,16 @@ namespace Furnaces {
             } else if (Furnace(FurnaceNum).CoolingCoilUpstream && (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
                 SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
+                CalcNonDXHeatingCoils(
+                    state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
             }
 
             SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
             //  Simulate supplemental heating coil for draw through fan
             if (Furnace(FurnaceNum).SuppHeatCoilIndex > 0) {
                 SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, SupHeaterLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
+                CalcNonDXHeatingCoils(
+                    state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, SupHeaterLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
             }
         }
 
