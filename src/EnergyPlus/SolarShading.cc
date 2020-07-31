@@ -82,9 +82,9 @@
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -92,12 +92,12 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
-#include <WCEMultiLayerOptics.hpp>
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <EnergyPlus/WindowModel.hh>
+#include <WCEMultiLayerOptics.hpp>
 
 namespace EnergyPlus {
 
@@ -288,7 +288,14 @@ namespace SolarShading {
     Array1D<SurfaceErrorTracking> TrackTooManyVertices;
     Array1D<SurfaceErrorTracking> TrackBaseSubSurround;
 
-    // MODULE SUBROUTINES:
+    bool InitComplexOnce = true;
+    bool ShadowOneTimeFlag = true;
+    bool CHKSBSOneTimeFlag = true;
+    bool ORDERFirstTimeFlag = true;
+    bool TooManyFiguresMessage = false;
+    bool TooManyVerticesMessage = false;
+    bool SHDBKSOneTimeFlag = true;
+    bool SHDGSSOneTimeFlag = true;
 
     // Functions
     void clear_state()
@@ -356,9 +363,17 @@ namespace SolarShading {
         TrackBaseSubSurround.deallocate();
         DBZoneIntWin.deallocate();
         ISABSF.deallocate();
+        InitComplexOnce = true;
+        ShadowOneTimeFlag = true;
+        CHKSBSOneTimeFlag = true;
+        ORDERFirstTimeFlag = true;
+        TooManyFiguresMessage = false;
+        TooManyVerticesMessage = false;
+        SHDBKSOneTimeFlag = true;
+        SHDGSSOneTimeFlag = true;
     }
 
-    void InitSolarCalculations()
+    void InitSolarCalculations(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -404,7 +419,7 @@ namespace SolarShading {
             }
 
             if (GetInputFlag) {
-                GetShadowingInput(OutputFiles::getSingleton());
+                GetShadowingInput(ioFiles);
                 GetInputFlag = false;
                 MaxHCV = (((max(15, MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
                 assert((MaxHCV + 1) % 16 == 0);
@@ -562,7 +577,7 @@ namespace SolarShading {
         firstTime = false;
     }
 
-    void GetShadowingInput(OutputFiles &outputFiles)
+    void GetShadowingInput(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -926,14 +941,14 @@ namespace SolarShading {
             }
         }
 
-        print(outputFiles.eio,
+        print(ioFiles.eio,
               "{}",
               "! <Shadowing/Sun Position Calculations Annual Simulations>, Shading Calculation Method, "
               "Shading Calculation Update Frequency Method, Shading Calculation Update Frequency {days}, "
               "Maximum Figures in Shadow Overlap Calculations {}, Polygon Clipping Algorithm, Pixel Counting Resolution, Sky Diffuse Modeling "
               "Algorithm, Output External Shading Calculation Results, Disable "
               "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones\n");
-        print(outputFiles.eio,
+        print(ioFiles.eio,
               "Shadowing/Sun Position Calculations Annual Simulations,{},{},{},{},{},{},{},{},{},{}\n",
               cAlphaArgs(1),
               cAlphaArgs(2),
@@ -2807,7 +2822,6 @@ namespace SolarShading {
         int NS2; // Number of the figure doing overlapping
         int NS3; // Location to place results of overlap
 
-        static bool OneTimeFlag(true);
         bool inside;
 
         bool Out;
@@ -2823,14 +2837,14 @@ namespace SolarShading {
         Real64 BMAX;
         //  INTEGER M
 
-        if (OneTimeFlag) {
+        if (CHKSBSOneTimeFlag) {
             XVT.allocate(MaxVerticesPerSurface + 1);
             YVT.allocate(MaxVerticesPerSurface + 1);
             ZVT.allocate(MaxVerticesPerSurface + 1);
             XVT = 0.0;
             YVT = 0.0;
             ZVT = 0.0;
-            OneTimeFlag = false;
+            CHKSBSOneTimeFlag = false;
         }
 
         NS1 = 1;
@@ -4604,11 +4618,10 @@ namespace SolarShading {
         int M;   // Number of slopes to be sorted
         int N;   // Vertex number
         int P;   // Location of first slope to be sorted
-        static bool FirstTimeFlag(true);
 
-        if (FirstTimeFlag) {
+        if (ORDERFirstTimeFlag) {
             SLOPE.allocate(max(10, MaxVerticesPerSurface + 1));
-            FirstTimeFlag = false;
+            ORDERFirstTimeFlag = false;
         }
         // Determine left-most vertex.
 
@@ -4745,8 +4758,6 @@ namespace SolarShading {
         int NV3;  // Number of vertices of figure NS3 (the overlap of NS1 and NS2)
         int NIN1; // Number of vertices of NS1 within NS2
         int NIN2; // Number of vertices of NS2 within NS1
-        static bool TooManyFiguresMessage(false);
-        static bool TooManyVerticesMessage(false);
 
         // Check for exceeding array limits.
 #ifdef EP_Count_Calls
@@ -4873,7 +4884,7 @@ namespace SolarShading {
         }
     }
 
-    void CalcPerSolarBeam(Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
+    void CalcPerSolarBeam(WindowComplexManagerData &dataWindowComplexManager, Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
                           Real64 const AvgSinSolarDeclin, // Average value of Sine of Solar Declination for period
                           Real64 const AvgCosSolarDeclin  // Average value of Cosine of Solar Declination for period
     )
@@ -4919,10 +4930,9 @@ namespace SolarShading {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iHour;   // Hour index number
         int TS;      // TimeStep Loop Countergit
-        static bool Once(true);
 
-        if (Once) InitComplexWindows();
-        Once = false;
+        if (InitComplexOnce) InitComplexWindows(dataWindowComplexManager);
+        InitComplexOnce = false;
 
         if (KickOffSizing || KickOffSimulation) return; // Skip solar calcs for these Initialization steps.
 
@@ -4971,7 +4981,7 @@ namespace SolarShading {
             FigureSunCosines(HourOfDay, TimeStep, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
         }
         // Initialize/update the Complex Fenestration geometry and optical properties
-        UpdateComplexWindows();
+        UpdateComplexWindows(dataWindowComplexManager);
         if (!DetailedSolarTimestepIntegration) {
             for (iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
@@ -5717,7 +5727,6 @@ namespace SolarShading {
         static Array1D<Real64> XVT; // X Vertices of Shadows
         static Array1D<Real64> YVT; // Y vertices of Shadows
         static Array1D<Real64> ZVT; // Z vertices of Shadows
-        static bool OneTimeFlag(true);
         int HTS;         // Heat transfer surface number of the general receiving surface
         int GRSNR;       // Surface number of general receiving surface
         int NBKS;        // Number of back surfaces
@@ -5726,14 +5735,14 @@ namespace SolarShading {
         Real64 SurfArea; // Surface area. For walls, includes all window frame areas.
         // For windows, includes divider area
 
-        if (OneTimeFlag) {
+        if (ShadowOneTimeFlag) {
             XVT.allocate(MaxVerticesPerSurface + 1);
             YVT.allocate(MaxVerticesPerSurface + 1);
             ZVT.allocate(MaxVerticesPerSurface + 1);
             XVT = 0.0;
             YVT = 0.0;
             ZVT = 0.0;
-            OneTimeFlag = false;
+            ShadowOneTimeFlag = false;
         }
 
 #ifdef EP_Count_Calls
@@ -5905,7 +5914,6 @@ namespace SolarShading {
         static Array1D<Real64> XVT; // X,Y,Z coordinates of vertices of
         static Array1D<Real64> YVT; // back surfaces projected into system
         static Array1D<Real64> ZVT; // relative to receiving surface
-        static bool OneTimeFlag(true);
         int BackSurfaceNumber;
         int NS1; // Number of the figure being overlapped
         int NS2; // Number of the figure doing overlapping
@@ -5916,14 +5924,14 @@ namespace SolarShading {
         assert(equal_dimensions(HCX, HCY));
         assert(equal_dimensions(HCX, HCA));
 
-        if (OneTimeFlag) {
+        if (SHDBKSOneTimeFlag) {
             XVT.allocate(MaxVerticesPerSurface + 1);
             YVT.allocate(MaxVerticesPerSurface + 1);
             ZVT.allocate(MaxVerticesPerSurface + 1);
             XVT = 0.0;
             YVT = 0.0;
             ZVT = 0.0;
-            OneTimeFlag = false;
+            SHDBKSOneTimeFlag = false;
         }
 
         if ((NBKS <= 0) || (SAREA(HTS) <= 0.0) || (OverlapStatus == TooManyVertices) || (OverlapStatus == TooManyFigures)) return;
@@ -6046,17 +6054,16 @@ namespace SolarShading {
         static Array1D<Real64> XVT;
         static Array1D<Real64> YVT;
         static Array1D<Real64> ZVT;
-        static bool OneTimeFlag(true);
         int NS1;         // Number of the figure being overlapped
         int NS2;         // Number of the figure doing overlapping
         int NS3;         // Location to place results of overlap
         Real64 SchValue; // Value for Schedule of shading transmittence
 
-        if (OneTimeFlag) {
+        if (SHDGSSOneTimeFlag) {
             XVT.dimension(MaxVerticesPerSurface + 1, 0.0);
             YVT.dimension(MaxVerticesPerSurface + 1, 0.0);
             ZVT.dimension(MaxVerticesPerSurface + 1, 0.0);
-            OneTimeFlag = false;
+            SHDGSSOneTimeFlag = false;
         }
 
         FGSSHC = LOCHCA + 1;
@@ -6430,7 +6437,7 @@ namespace SolarShading {
         } // End of check that sunlit area > 0.
     }
 
-    void CalcInteriorSolarDistribution()
+    void CalcInteriorSolarDistribution(WindowEquivalentLayerData &dataWindowEquivalentLayer)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6468,8 +6475,6 @@ namespace SolarShading {
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace DataDaylightingDevices;
         using DaylightingDevices::TransTDD;
-        using WindowEquivalentLayer::CalcEQLOpticalProperty;
-        using WindowEquivalentLayer::CFSDiffAbsTrans;
         using namespace DataWindowEquivalentLayer;
 
         int SurfNum2;                                       // Secondary surface number for tubular daylighting device diffuser (TDD:DIFFUSER)
@@ -6706,9 +6711,6 @@ namespace SolarShading {
         // window with horizontally-slatted blind into zone at current time (m2)
         static Array1D<Real64> WinTransDifSolarSky; // Factor for exterior sky diffuse solar transmitted through
         // window with horizontally-slatted blind into zone at current time (m2)
-        /////////// hoisted into namespace renamed to ////////////
-        // static bool MustAlloc( true ); // True when local arrays must be allocated
-        ////////////////////////
         Real64 TBmDenom; // TBmDenominator
 
         Real64 TBmBmShBlSc;       // Beam-beam transmittance for window with shade, blind, screen, or switchable glazing
@@ -7259,15 +7261,15 @@ namespace SolarShading {
                         // call the ASHWAT fenestration model for optical properties
                         // determine the beam radiation absorptance and tranmittance of the
                         // the equivalent layer window model
-                        CalcEQLOpticalProperty(SurfNum, isBEAM, AbsSolBeamEQL);
+                        WindowEquivalentLayer::CalcEQLOpticalProperty(dataWindowEquivalentLayer, SurfNum, isBEAM, AbsSolBeamEQL);
 
                         // recalcuate the diffuse absorptance and transmittance of the
                         // the equivalent layer window model if there is shade control
                         EQLNum = dataConstruction.Construct(Surface(SurfNum).Construction).EQLConsPtr;
                         if (CFS(EQLNum).ISControlled) {
-                            CalcEQLOpticalProperty(SurfNum, isDIFF, AbsSolDiffEQL);
+                            WindowEquivalentLayer::CalcEQLOpticalProperty(dataWindowEquivalentLayer, SurfNum, isDIFF, AbsSolDiffEQL);
                         } else {
-                            AbsSolDiffEQL(_, {1, CFS(EQLNum).NL + 1}) = CFSDiffAbsTrans(_, {1, CFS(EQLNum).NL + 1}, EQLNum);
+                            AbsSolDiffEQL(_, {1, CFS(EQLNum).NL + 1}) = dataWindowEquivalentLayer.CFSDiffAbsTrans(_, {1, CFS(EQLNum).NL + 1}, EQLNum);
                         }
                         dataConstruction.Construct(ConstrNum).TransDiff = AbsSolDiffEQL(1, CFS(EQLNum).NL + 1);
 
@@ -8498,7 +8500,7 @@ namespace SolarShading {
                                     // or interior window (treates windows with/without shades as defined) for this timestep
 
                                     // call the ASHWAT fenestration model for beam radiation here
-                                    CalcEQLOpticalProperty(BackSurfNum, isBEAM, AbsSolBeamBackEQL);
+                                    WindowEquivalentLayer::CalcEQLOpticalProperty(dataWindowEquivalentLayer, BackSurfNum, isBEAM, AbsSolBeamBackEQL);
 
                                     EQLNum = dataConstruction.Construct(ConstrNumBack).EQLConsPtr;
                                     AbsBeamWinEQL({ 1, CFS(EQLNum).NL }) = AbsSolBeamBackEQL(1, { 1, CFS(EQLNum).NL });
@@ -8790,7 +8792,7 @@ namespace SolarShading {
         // RJH - Calculate initial distribution of diffuse solar transmitted by exterior windows into each zone
         //       to all interior surfaces in the zone
         //       Includes subsequent transmittance of diffuse solar to adjacent zones through interior windows
-        CalcWinTransDifSolInitialDistribution();
+        CalcWinTransDifSolInitialDistribution(dataWindowEquivalentLayer);
     }
 
     void CalcAborbedOnExteriorOpaqueSurfaces()
@@ -8852,7 +8854,7 @@ namespace SolarShading {
         }
     }
 
-    void CalcInteriorSolarDistributionWCE(WindowManagerData &dataWindowManager)
+    void CalcInteriorSolarDistributionWCE(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8873,11 +8875,11 @@ namespace SolarShading {
         CalcAborbedOnExteriorOpaqueSurfaces();
 
         if (dataWindowManager.winOpticalModel->isSimplifiedModel()) {
-            CalcInteriorSolarDistributionWCESimple(dataWindowManager);
+            CalcInteriorSolarDistributionWCESimple(dataWindowComplexManager, dataWindowManager);
         } // else for built in BSDF (possible future implementation)
     }
 
-    void CalcInteriorSolarDistributionWCESimple(WindowManagerData &dataWindowManager)
+    void CalcInteriorSolarDistributionWCESimple(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8927,7 +8929,7 @@ namespace SolarShading {
                 }
                 auto &window = SurfaceWindow(SurfNum2);
                 Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum2);
-                std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(SurfNum2, BSDFHemisphere::Incoming);
+                std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(dataWindowComplexManager, SurfNum2, BSDFHemisphere::Incoming);
                 Real64 Theta = incomingAngle.first;
                 Real64 Phi = incomingAngle.second;
                 Real64 SunLitFract = SunlitFrac(TimeStep, HourOfDay, SurfNum2);
@@ -9150,7 +9152,7 @@ namespace SolarShading {
         return SurfaceScheduledSolarInc;
     }
 
-    void PerformSolarCalculations()
+    void PerformSolarCalculations(WindowComplexManagerData &dataWindowComplexManager, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9263,7 +9265,7 @@ namespace SolarShading {
                 }
             }
 
-            CalcPerSolarBeam(AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
+            CalcPerSolarBeam(dataWindowComplexManager, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
             // Calculate factors for solar reflection
             if (CalcSolRefl) {
@@ -9273,7 +9275,7 @@ namespace SolarShading {
             }
 
             //  Calculate daylighting coefficients
-            CalcDayltgCoefficients(OutputFiles::getSingleton());
+            CalcDayltgCoefficients(ioFiles);
         }
 
         if (!WarmupFlag) {
@@ -9283,7 +9285,7 @@ namespace SolarShading {
         // Recalculate daylighting coefficients if storm window has been added
         // or removed from one or more windows at beginning of day
         if (TotWindowsWithDayl > 0 && !BeginSimFlag && !BeginEnvrnFlag && !WarmupFlag && TotStormWin > 0 && StormWinChangeThisDay) {
-            CalcDayltgCoefficients(OutputFiles::getSingleton());
+            CalcDayltgCoefficients(ioFiles);
         }
     }
 
@@ -9796,7 +9798,7 @@ namespace SolarShading {
         SUNCOS(1) = CosSolarDeclin * std::sin(H);
     }
 
-    void WindowShadingManager()
+    void WindowShadingManager(WindowEquivalentLayerData &dataWindowEquivalentLayer)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9862,7 +9864,6 @@ namespace SolarShading {
         using DataWindowEquivalentLayer::CFS;
         using General::POLYF;
         using ScheduleManager::GetCurrentScheduleValue;
-        using WindowEquivalentLayer::lscNONE;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -9923,7 +9924,7 @@ namespace SolarShading {
             if (SurfaceWindow(ISurf).WindowModelType == WindowEQLModel) {
                 int EQLNum = dataConstruction.Construct(Surface(ISurf).Construction).EQLConsPtr;
                 if (CFS(EQLNum).VBLayerPtr > 0) {
-                    if (CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL == lscNONE) {
+                    if (CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL == dataWindowEquivalentLayer.lscNONE) {
                         SurfaceWindow(ISurf).SlatAngThisTSDeg = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
                     } else {
                         SurfaceWindow(ISurf).SlatAngThisTSDeg = 0.0;
@@ -11765,7 +11766,7 @@ namespace SolarShading {
         }
     }
 
-    void CalcWinTransDifSolInitialDistribution()
+    void CalcWinTransDifSolInitialDistribution(WindowEquivalentLayerData &dataWindowEquivalentLayer)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11800,7 +11801,6 @@ namespace SolarShading {
         using DataHeatBalance::InitialZoneDifSolReflW;
         using DataHeatBalSurface::InitialDifSolInAbs;
         using DataHeatBalSurface::InitialDifSolInTrans;
-        using WindowEquivalentLayer::CalcEQLOpticalProperty;
         using namespace DataWindowEquivalentLayer;
 
         Real64 AbsInt;               // Tmp var for Inside surface short-wave absorptance
@@ -12212,7 +12212,7 @@ namespace SolarShading {
                             // SurfaceWindow(HeatTransSurfNum)%WindowModelType == WindowEQLModel
                             // ConstrNum=Surface(HeatTransSurfNum)%Construction
                             // call the ASHWAT fenestration model for diffuse radiation here
-                            CalcEQLOpticalProperty(HeatTransSurfNum, isDIFF, AbsSolDiffBackEQL);
+                            WindowEquivalentLayer::CalcEQLOpticalProperty(dataWindowEquivalentLayer, HeatTransSurfNum, isDIFF, AbsSolDiffBackEQL);
 
                             EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
                             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
@@ -12957,7 +12957,7 @@ namespace SolarShading {
         LOCHCA = 1;
     }
 
-    void TimestepInitComplexFenestration()
+    void TimestepInitComplexFenestration(WindowComplexManagerData &dataWindowComplexManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -12970,13 +12970,6 @@ namespace SolarShading {
         // complex fenestration have construction changed (by EMS) in which case performs addition of current states
         // into complex fenestration array
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using WindowComplexManager::CheckCFSStates;
 
         // Locals
@@ -12987,7 +12980,7 @@ namespace SolarShading {
         for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
             if (SurfaceWindow(iSurf).WindowModelType == WindowBSDFModel) {
                 // This will check complex fenestrations state and add new one if necessary (EMS case)
-                CheckCFSStates(iSurf);
+                CheckCFSStates(dataWindowComplexManager, iSurf);
 
                 NumOfStates = ComplexWind(iSurf).NumStates;
 

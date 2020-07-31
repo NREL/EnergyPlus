@@ -52,8 +52,8 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -594,7 +594,7 @@ namespace PollutionModule {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void SetupPollutionCalculations()
+    void SetupPollutionCalculations(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -643,9 +643,9 @@ namespace PollutionModule {
             //  necessary to make sure that the Meter file is opened and written to by the OP so that time stamps
             //  and the like are happening as expected.
             if (!lAlphaFieldBlanks(1)) {
-                InitPollutionMeterReporting(OutputFiles::getSingleton(), cAlphaArgs(1));
+                InitPollutionMeterReporting(ioFiles, cAlphaArgs(1));
             } else {
-                InitPollutionMeterReporting(OutputFiles::getSingleton(), "RunPeriod");
+                InitPollutionMeterReporting(ioFiles, "RunPeriod");
             }
         }
     }
@@ -671,7 +671,7 @@ namespace PollutionModule {
         int NumNums;
         int Loop;
         int IOStat;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         if (!GetInputFlagPollution) return; // Input already gotten
 

@@ -71,9 +71,9 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -134,7 +134,7 @@ namespace WindowManager {
     //   Optical Calculation Routines
     //   Heat Balance Routines
 
-    void InitWindowOpticalCalculations(WindowManagerData &dataWindowManager, OutputFiles &outputFiles)
+    void InitWindowOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -148,13 +148,13 @@ namespace WindowManager {
         // check and read custom solar and/or visible spectrum data if any
         CheckAndReadCustomSprectrumData(dataWindowManager);
         if (dataWindowManager.inExtWindowModel->isExternalLibraryModel()) {
-            InitWCE_SimplifiedOpticalData(dataWindowManager, outputFiles);
+            InitWCE_SimplifiedOpticalData(dataWindowManager, ioFiles);
         } else {
-            InitGlassOpticalCalculations(dataWindowManager, outputFiles);
+            InitGlassOpticalCalculations(dataWindowComplexManager, dataWindowManager, ioFiles);
         }
     }
 
-    void InitGlassOpticalCalculations(WindowManagerData &dataWindowManager, OutputFiles &outputFiles)
+    void InitGlassOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -306,10 +306,8 @@ namespace WindowManager {
         Array1D<Real64> W3(3);
         Array1D<Real64> W21(3); // W1-W2, W3-W2, resp. (m)
         Array1D<Real64> W23(3);
-        static bool lSimpleGlazingSystem(false); // true if using simple glazing system block model
         static Real64 SimpleGlazingSHGC(0.0);    // value of SHGC for simple glazing system block model
         static Real64 SimpleGlazingU(0.0);       // value of U-factor for simple glazing system block model
-        static bool BGFlag(false);               // True if between-glass shade or blind
         static Real64 tmpTrans(0.0);             // solar transmittance calculated from spectral data
         static Real64 tmpTransVis(0.0);          // visible transmittance calculated from spectral data
         static Real64 tmpReflectSolBeamFront(0.0);
@@ -335,7 +333,7 @@ namespace WindowManager {
         if (TotBlinds > 0) CalcWindowBlindProperties();
 
         // Initialize SurfaceScreen structure
-        if (NumSurfaceScreens > 0) CalcWindowScreenProperties(outputFiles);
+        if (NumSurfaceScreens > 0) CalcWindowScreenProperties(ioFiles);
 
         // Get glazing system optical properties of constructions with glass or glass plus
         //   shade, screen or blind
@@ -367,11 +365,11 @@ namespace WindowManager {
             BGBlind = false;
             ExtScreen = false;
             StormWinConst = false;
-            lSimpleGlazingSystem = false;
+            dataWindowManager.lSimpleGlazingSystem = false;
 
             if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group == WindowSimpleGlazing) {
                 // what if outside layer is shade, blind, or screen?
-                lSimpleGlazingSystem = true;
+                dataWindowManager.lSimpleGlazingSystem = true;
                 SimpleGlazingSHGC = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SimpleWindowSHGC;
                 SimpleGlazingU = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
             }
@@ -432,7 +430,7 @@ namespace WindowManager {
             ScreenOn = ExtScreen;
             BlindOn = IntBlind || ExtBlind || BGBlind;
             ShadeOn = IntShade || ExtShade || BGShade;
-            BGFlag = BGBlind || BGShade;
+            dataWindowManager.BGFlag = BGBlind || BGShade;
 
             // For construction with interior or exterior shade, get shade thermal absorptance (emissivity)
             // (accounting for inter-reflection with glazing) and correct the inside glass InsideAbsorpThermal
@@ -496,7 +494,7 @@ namespace WindowManager {
                 LayPtr = dataConstruction.Construct(ConstrNum).LayerPoint(LayNum);
                 SpecDataNum = dataMaterial.Material(LayPtr).GlassSpectralDataPtr;
                 if (SpecDataNum != 0) {
-                    if (!BGFlag) AllGlassIsSpectralAverage = false;
+                    if (!dataWindowManager.BGFlag) AllGlassIsSpectralAverage = false;
 
                     // Get the spectral data for the transmittance, front reflectance and
                     // back reflectance (all at normal incidence) for this layer.
@@ -508,14 +506,14 @@ namespace WindowManager {
                     for (ILam = 1; ILam <= numptDAT; ++ILam) {
                         dataWindowManager.wlt(IGlass, ILam) = SpectralData(SpecDataNum).WaveLength(ILam);
                         dataWindowManager.t(IGlass, ILam) = SpectralData(SpecDataNum).Trans(ILam);
-                        if ((IGlass == 1 || (IGlass == 2 && StormWinConst)) && (!BGFlag)) dataWindowManager.t(IGlass, ILam) *= dataMaterial.Material(LayPtr).GlassTransDirtFactor;
+                        if ((IGlass == 1 || (IGlass == 2 && StormWinConst)) && (!dataWindowManager.BGFlag)) dataWindowManager.t(IGlass, ILam) *= dataMaterial.Material(LayPtr).GlassTransDirtFactor;
                         dataWindowManager.rff(IGlass, ILam) = SpectralData(SpecDataNum).ReflFront(ILam);
                         dataWindowManager.rbb(IGlass, ILam) = SpectralData(SpecDataNum).ReflBack(ILam);
                     }
 
                     // TH 8/26/2010, CR 8206
                     // If there is spectral data for between-glass shades or blinds, calc the average spectral properties for use.
-                    if (BGFlag) {
+                    if (dataWindowManager.BGFlag) {
                         // 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
                         ShowWarningError("Window glazing material \"" + dataMaterial.Material(LayPtr).Name +
                                          "\" was defined with full spectral data and has been converted to average spectral data");
@@ -561,10 +559,10 @@ namespace WindowManager {
                     dataWindowManager.rbb(IGlass, 2) = dataMaterial.Material(LayPtr).ReflectVisBeamBack;
                 }
                 if (dataMaterial.Material(LayPtr).GlassSpectralAndAngle) {
-                    if (!BGFlag) AllGlassIsSpectralAverage = false;
+                    if (!dataWindowManager.BGFlag) AllGlassIsSpectralAverage = false;
                     numptDAT = dataWindowManager.wle.size();
                     dataWindowManager.numpt(IGlass) = numptDAT;
-                    if (BGFlag) {
+                    if (dataWindowManager.BGFlag) {
                         // 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
                         ShowWarningError("Window glazing material \"" + dataMaterial.Material(LayPtr).Name +
                                          "\" was defined with full spectral and angular data and has been converted to average spectral data");
@@ -636,7 +634,7 @@ namespace WindowManager {
                                               dataWindowManager.tPhi(IGlass, ILam),
                                               dataWindowManager.rfPhi(IGlass, ILam),
                                               dataWindowManager.rbPhi(IGlass, ILam),
-                                              lSimpleGlazingSystem,
+                                              dataWindowManager.lSimpleGlazingSystem,
                                               SimpleGlazingSHGC,
                                               SimpleGlazingU);
                         }
@@ -829,7 +827,7 @@ namespace WindowManager {
                                               dataWindowManager.tPhi(IGlass, ILam),
                                               dataWindowManager.rfPhi(IGlass, ILam),
                                               dataWindowManager.rbPhi(IGlass, ILam),
-                                              lSimpleGlazingSystem,
+                                              dataWindowManager.lSimpleGlazingSystem,
                                               SimpleGlazingSHGC,
                                               SimpleGlazingU);
                         }
@@ -1514,7 +1512,7 @@ namespace WindowManager {
             }
         } // End of surface loop
 
-        ReportGlass(dataWindowManager, outputFiles);
+        ReportGlass(dataWindowComplexManager, dataWindowManager, ioFiles);
     }
 
     //*****************************************************************************************
@@ -2012,7 +2010,7 @@ namespace WindowManager {
     // Window Thermal Calculation Subroutines
     //***********************************************************************************
 
-    void CalcWindowHeatBalance(WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalance(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
@@ -2031,11 +2029,11 @@ namespace WindowManager {
         if (dataWindowManager.inExtWindowModel->isExternalLibraryModel()) {
             CalcWindowHeatBalanceExternalRoutines(dataWindowManager, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp);
         } else {
-            CalcWindowHeatBalanceInternalRoutines(dataWindowManager, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp);
+            CalcWindowHeatBalanceInternalRoutines(dataWindowComplexManager, dataWindowEquivalentLayer, dataWindowManager, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp);
         }
     }
 
-    void CalcWindowHeatBalanceInternalRoutines(WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalanceInternalRoutines(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
                                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
@@ -2149,7 +2147,6 @@ namespace WindowManager {
         // New variables for thermochromic windows calc
         Real64 locTCSpecTemp;         // The temperature corresponding to the specified optical properties of the TC layer
         Real64 locTCLayerTemp;        // TC layer temperature at each time step. C
-        static bool locTCFlag(false); // True if this surface is a TC window
         static Array1D<Real64> deltaTemp(100, 0.0);
         int i;
         static Array1D_int iMinDT(1, 0);
@@ -2172,7 +2169,7 @@ namespace WindowManager {
             temp = 0;
 
             // Simon: Complex fenestration state works only with tarcog
-            CalcComplexWindowThermal(SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, noCondition);
+            CalcComplexWindowThermal(dataWindowComplexManager, SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, noCondition);
 
             ConstrNum = surface.Construction;
             TotGlassLay = dataConstruction.Construct(ConstrNum).TotGlassLayers;
@@ -2203,7 +2200,7 @@ namespace WindowManager {
 
         } else if (window.WindowModelType == WindowEQLModel) {
 
-            EQLWindowSurfaceHeatBalance(SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, noCondition);
+            EQLWindowSurfaceHeatBalance(dataWindowEquivalentLayer, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, noCondition);
             dataWindowManager.hcout = HextConvCoeff;
             // Required for report variables calculations.
             if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)
@@ -2222,9 +2219,9 @@ namespace WindowManager {
             if (window.StormWinFlag > 0) ConstrNum = surface.StormWinConstruction;
 
             // Added for thermochromic windows
-            locTCFlag = (dataConstruction.Construct(ConstrNum).TCFlag == 1);
+            dataWindowManager.locTCFlag = (dataConstruction.Construct(ConstrNum).TCFlag == 1);
 
-            if (locTCFlag) {
+            if (dataWindowManager.locTCFlag) {
                 locTCSpecTemp = dataMaterial.Material(dataConstruction.Construct(ConstrNum).TCLayer).SpecTemp;
                 window.SpecTemp = locTCSpecTemp;
                 // Check to see whether needs to switch to a new TC window construction
@@ -2642,7 +2639,7 @@ namespace WindowManager {
             }
 
             // Added TH 12/23/2008 for thermochromic windows to save the current TC layer temperature
-            if (locTCFlag) {
+            if (dataWindowManager.locTCFlag) {
                 window.TCLayerTemp =
                     (dataWindowManager.thetas(2 * dataConstruction.Construct(ConstrNum).TCGlassID - 1) + dataWindowManager.thetas(2 * dataConstruction.Construct(ConstrNum).TCGlassID)) / 2 - dataWindowManager.TKelvin; // degree C
             }
@@ -6835,7 +6832,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void ReportGlass(WindowManagerData &dataWindowManager, OutputFiles &outputFiles)
+    void ReportGlass(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6862,10 +6859,6 @@ namespace WindowManager {
         static Array1D_string const Roughness(6, {"VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"});
         static Array1D_string const GasTypeName({0, 4}, {"Custom", "Air", "Argon", "Krypton", "Xenon"});
 
-        static bool DoReport(false);
-        static bool HasWindows(false);
-        static bool HasComplexWindows(false);
-        static bool HasEQLWindows(false); // equivalent layer window defined
         static Real64 TempVar(0.0);       // just temporary usage for complex fenestration
 
         int ThisNum;
@@ -6897,7 +6890,7 @@ namespace WindowManager {
         std::string GapVentType;
 
 
-        ScanForReports("Constructions", DoReport, "Constructions");
+        ScanForReports("Constructions", dataWindowManager.DoReport, "Constructions");
 
         //  DO ThisNum=1,TotConstructs
         //    IF (.not. Construct(ThisNum)%TypeIsWindow) CYCLE
@@ -6905,11 +6898,11 @@ namespace WindowManager {
         //    EXIT
         //  ENDDO
 
-        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.TypeIsWindow; })) HasWindows = true;
+        if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.TypeIsWindow; })) dataWindowManager.HasWindows = true;
         if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.WindowTypeBSDF; }))
-            HasComplexWindows = true; // Yes, this is a bit different than actually using them.
+            dataWindowManager.HasComplexWindows = true; // Yes, this is a bit different than actually using them.
         if (std::any_of(dataConstruction.Construct.begin(), dataConstruction.Construct.end(), [](Construction::ConstructionProps const &e) { return e.WindowTypeEQL; }))
-            HasEQLWindows = true; // for reporting purpose only
+            dataWindowManager.HasEQLWindows = true; // for reporting purpose only
 
         //  DO ThisNum=1,TotSurfaces
         //    SurfConstr = Surface(ThisNum)%Construction
@@ -6921,39 +6914,39 @@ namespace WindowManager {
         //    END IF
         //  ENDDO
 
-        if (DoReport && (HasWindows || HasComplexWindows || HasEQLWindows)) {
+        if (dataWindowManager.DoReport && (dataWindowManager.HasWindows || dataWindowManager.HasComplexWindows || dataWindowManager.HasEQLWindows)) {
             //                                      Write Descriptions
 
-            print(outputFiles.eio, "{}\n", "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},SHGC,Solar "
+            print(ioFiles.eio, "{}\n", "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},SHGC,Solar "
                                                  "Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
             if ((TotSimpleWindow > 0) || (W5GlsMat > 0) || (W5GlsMatAlt > 0))
-                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Glazing>, Material Name, Optical Data Type, Spectral Data Set Name, "
+                print(ioFiles.eio, "{}\n", "! <WindowMaterial:Glazing>, Material Name, Optical Data Type, Spectral Data Set Name, "
                                                      "Thickness {m}, Solar Transmittance,Front Solar Reflectance, Back Solar Reflectance, Visible "
                                                      "Transmittance, Front Visible Reflectance,Back Visible Reflectance,Infrared Transmittance, "
                                                      "Front Thermal Emissivity, Back Thermal Emissivity,Conductivity {W/m-K},Dirt Factor,Solar "
                                                      "Diffusing");
             if ((W5GasMat > 0) || (W5GasMatMixture > 0))
-                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Gas>,Material Name,GasType,Thickness {m}");
+                print(ioFiles.eio, "{}\n", "! <WindowMaterial:Gas>,Material Name,GasType,Thickness {m}");
             if (TotShades > 0)
-                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Shade>,Material Name,Thickness {m},Conductivity {W/m-K},Thermal "
+                print(ioFiles.eio, "{}\n", "! <WindowMaterial:Shade>,Material Name,Thickness {m},Conductivity {W/m-K},Thermal "
                                                      "Absorptance,Transmittance,Visible Transmittance,Shade Reflectance");
             if (TotScreens > 0)
-                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Screen>,Material Name,Thickness {m},Conductivity {W/m-K},Thermal "
+                print(ioFiles.eio, "{}\n", "! <WindowMaterial:Screen>,Material Name,Thickness {m},Conductivity {W/m-K},Thermal "
                                                      "Absorptance,Transmittance,Reflectance,Visible Reflectance,Diffuse Reflectance,Diffuse Visible "
                                                      "Reflectance,Screen Material Diameter To Spacing Ratio,Screen To GlassDistance {m}");
             if (TotBlinds > 0)
-                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Blind>,Material Name,Slat Width {m},Slat Separation {m},Slat Thickness "
+                print(ioFiles.eio, "{}\n", "! <WindowMaterial:Blind>,Material Name,Slat Width {m},Slat Separation {m},Slat Thickness "
                                                      "{m},Slat Angle {deg},Slat Beam Solar Transmittance,Slat Beam Solar Front Reflectance,Blind To "
                                                      "Glass Distance {m}");
 
-            if (HasComplexWindows)
-                print(outputFiles.eio, "{}\n", "! <WindowConstruction:Complex>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC");
+            if (dataWindowManager.HasComplexWindows)
+                print(ioFiles.eio, "{}\n", "! <WindowConstruction:Complex>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC");
 
-            if (HasEQLWindows)
-                print(outputFiles.eio, "{}\n", "! <Construction:WindowEquivalentLayer>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC, "
+            if (dataWindowManager.HasEQLWindows)
+                print(ioFiles.eio, "{}\n", "! <Construction:WindowEquivalentLayer>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC, "
                                                      "Solar Transmittance at Normal Incidence");
             if (W5GlsMatEQL > 0)
-                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Glazing:EquivalentLayer>, Material Name, Optical Data Type, Spectral Data "
+                print(ioFiles.eio, "{}\n", "! <WindowMaterial:Glazing:EquivalentLayer>, Material Name, Optical Data Type, Spectral Data "
                                                      "Set Name, Front Side Beam-Beam Solar Transmittance, Back Side Beam-Beam Solar Transmittance, "
                                                      "Front Side Beam-Beam Solar Reflectance, Back Side Beam-Beam Solar Reflectance, Front Side "
                                                      "Beam-Diffuse Solar Transmittance, Back Side Beam-Diffuse Solar Transmittance, , Front Side "
@@ -6962,14 +6955,14 @@ namespace WindowManager {
                                                      "Solar Reflectance, Infrared Transmittance, Front Side Infrared Emissivity, Back Side Infrared "
                                                      "Emissivity");
             if (TotShadesEQL > 0)
-                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Shade:EquivalentLayer>, Material Name, Front Side Beam-Beam Solar "
+                print(ioFiles.eio, "{}\n", "! <WindowMaterial:Shade:EquivalentLayer>, Material Name, Front Side Beam-Beam Solar "
                                                      "Transmittance, Back Side Beam-Beam Solar Transmittance, Front Side Beam-Diffuse Solar "
                                                      "Transmittance, Back Side Beam-Diffuse Solar Transmittance, , Front Side Beam-Diffuse Solar "
                                                      "Reflectance, Back Side Beam-Diffuse Solar Reflectance, Infrared Transmittance, Front Side "
                                                      "Infrared Emissivity, Back Side Infrared Emissivity");
 
             if (TotDrapesEQL > 0)
-                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Drape:EquivalentLayer>, Material Name, Front Side Beam-Beam Solar "
+                print(ioFiles.eio, "{}\n", "! <WindowMaterial:Drape:EquivalentLayer>, Material Name, Front Side Beam-Beam Solar "
                                                      "Transmittance, Back Side Beam-Beam Solar Transmittance, Front Side Beam-Diffuse Solar "
                                                      "Transmittance, Back Side Beam-Diffuse Solar Transmittance, , Front Side Beam-Diffuse Solar "
                                                      "Reflectance, Back Side Beam-Diffuse Solar Reflectance, Infrared Transmittance, Front Side "
@@ -6977,7 +6970,7 @@ namespace WindowManager {
                                                      "Fabric");
 
             if (TotBlindsEQL > 0)
-                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Blind:EquivalentLayer>, Material Name, Slat Orientation, Slat Width, Slat "
+                print(ioFiles.eio, "{}\n", "! <WindowMaterial:Blind:EquivalentLayer>, Material Name, Slat Orientation, Slat Width, Slat "
                                                      "Separation, Slat Crown, Slat Angle, Front Side Slate Beam-Diffuse Solar Transmittance, Back "
                                                      "Side Slate Beam-Diffuse Solar Transmittance, Front Side Slate Beam-Diffuse Solar Reflectance, "
                                                      "Back Side Slate Beam-Diffuse Solar Reflectance, Slat Diffuse-Diffuse Solar Transmittance, "
@@ -6985,23 +6978,23 @@ namespace WindowManager {
                                                      "Reflectance, Infrared Transmittance, Front Side Infrared Emissivity, Back Side Infrared "
                                                      "Emissivity, Slat Angle Control");
             if (TotScreensEQL > 0)
-                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Screen:EquivalentLayer>, Material Name, Screen Beam-Beam Solar "
+                print(ioFiles.eio, "{}\n", "! <WindowMaterial:Screen:EquivalentLayer>, Material Name, Screen Beam-Beam Solar "
                                                      "Transmittance, Screen Beam-Diffuse Solar Transmittance, Screen Beam-Diffuse Solar Reflectance, "
                                                      "Screen Infrared Transmittance, Screen Infrared Emissivity, Screen Wire Spacing, Screen Wire "
                                                      "Diameter");
             if (W5GapMatEQL > 0)
-                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Gap:EquivalentLayer>, Material Name, GasType, Gap Thickness {m}, Gap Vent Type");
+                print(ioFiles.eio, "{}\n", "! <WindowMaterial:Gap:EquivalentLayer>, Material Name, GasType, Gap Thickness {m}, Gap Vent Type");
 
             for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
 
                 if (dataConstruction.Construct(ThisNum).WindowTypeBSDF) {
 
                     i = ThisNum;
-                    CalcComplexWindowThermal(0, i, TempVar, TempVar, TempVar, TempVar, winterCondition);
-                    CalcComplexWindowThermal(0, i, TempVar, TempVar, TempVar, TempVar, summerCondition);
+                    CalcComplexWindowThermal(dataWindowComplexManager, 0, i, TempVar, TempVar, TempVar, TempVar, winterCondition);
+                    CalcComplexWindowThermal(dataWindowComplexManager, 0, i, TempVar, TempVar, TempVar, TempVar, summerCondition);
 
                     static constexpr auto Format_800(" WindowConstruction:Complex,{},{},{},{:.3R},{:.3R}\n");
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                           Format_800,
                           dataConstruction.Construct(ThisNum).Name,
                           ThisNum,
@@ -7023,7 +7016,7 @@ namespace WindowManager {
                         dataConstruction.Construct(ThisNum).VisTransNorm = 0.0; // TODO list
 
                         static constexpr auto Format_799(" Construction:WindowEquivalentLayer,{},{},{},{:.3R},{:.3R},{:.3R}\n");
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               Format_799,
                               dataConstruction.Construct(ThisNum).Name,
                               ThisNum,
@@ -7061,7 +7054,7 @@ namespace WindowManager {
                         dataConstruction.Construct(ThisNum).VisTransNorm = TransVisNorm;
 
                         static constexpr auto Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R}\n");
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               Format_700,
                               dataConstruction.Construct(ThisNum).Name,
                               ThisNum,
@@ -7080,7 +7073,7 @@ namespace WindowManager {
                             auto const SELECT_CASE_var(dataMaterial.Material(Layer).Group);
                             if (SELECT_CASE_var == WindowGas) {
                                 static constexpr auto Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
-                                print(outputFiles.eio,
+                                print(ioFiles.eio,
                                       Format_702,
                                       dataMaterial.Material(Layer).Name,
                                       GasTypeName(dataMaterial.Material(Layer).GasType(1)),
@@ -7090,7 +7083,7 @@ namespace WindowManager {
 
                             } else if (SELECT_CASE_var == Shade) {
                                 static constexpr auto Format_703(" WindowMaterial:Shade,,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
-                                print(outputFiles.eio,
+                                print(ioFiles.eio,
                                       Format_703,
                                       dataMaterial.Material(Layer).Name,
                                       dataMaterial.Material(Layer).Thickness,
@@ -7103,7 +7096,7 @@ namespace WindowManager {
                             } else if (SELECT_CASE_var == WindowBlind) {
                                 BlNum = dataMaterial.Material(Layer).BlindDataPtr;
                                 static constexpr auto Format_704(" WindowMaterial:Blind,{},{:.4R},{:.4R},{:.4R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
-                                print(outputFiles.eio,
+                                print(ioFiles.eio,
                                       Format_704,
                                       dataMaterial.Material(Layer).Name,
                                       Blind(BlNum).SlatWidth,
@@ -7116,7 +7109,7 @@ namespace WindowManager {
                             } else if (SELECT_CASE_var == Screen) {
                                 if (dataMaterial.Material(Layer).ScreenDataPtr > 0) {
                                     static constexpr auto Format_706(" WindowMaterial:Screen,{},{:.5R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
-                                    print(outputFiles.eio,
+                                    print(ioFiles.eio,
                                           Format_706,
                                           dataMaterial.Material(Layer).Name,
                                           dataMaterial.Material(Layer).Thickness,
@@ -7147,7 +7140,7 @@ namespace WindowManager {
                                 }
                                 static constexpr auto Format_707(" WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{"
                                                                  ":.5R},{:.5R},{:.5R},{:.5R},{:.5R},{}\n");
-                                print(outputFiles.eio,
+                                print(ioFiles.eio,
                                       Format_707,
                                       dataMaterial.Material(Layer).Name,
                                       OpticalDataType,
@@ -7171,7 +7164,7 @@ namespace WindowManager {
                                 SpectralDataName = "";
                                 static constexpr auto Format_708(" WindowMaterial:Glazing:EquivalentLayer,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}"
                                                                  ",{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}\n");
-                                print(outputFiles.eio,
+                                print(ioFiles.eio,
                                       Format_708,
                                       dataMaterial.Material(Layer).Name,
                                       OpticalDataType,
@@ -7193,7 +7186,7 @@ namespace WindowManager {
 
                             } else if (SELECT_CASE_var == ShadeEquivalentLayer) {
                                 static constexpr auto Format_709(" WindowMaterial:Shade:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}\n");
-                                print(outputFiles.eio,
+                                print(ioFiles.eio,
                                       Format_709,
                                       dataMaterial.Material(Layer).Name,
                                       dataMaterial.Material(Layer).TausFrontBeamBeam,
@@ -7208,7 +7201,7 @@ namespace WindowManager {
 
                             } else if (SELECT_CASE_var == DrapeEquivalentLayer) {
                                 static constexpr auto Format_710(" WindowMaterial:Drape:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.5R},{:.5R}\n");
-                                print(outputFiles.eio,
+                                print(ioFiles.eio,
                                       Format_710,
                                       dataMaterial.Material(Layer).Name,
                                       dataMaterial.Material(Layer).TausFrontBeamBeam,
@@ -7224,7 +7217,7 @@ namespace WindowManager {
 
                             } else if (SELECT_CASE_var == ScreenEquivalentLayer) {
                                 static constexpr auto Format_711(" WindowMaterial:Screen:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.5R},{:.5R}\n");
-                                print(outputFiles.eio,
+                                print(ioFiles.eio,
                                       Format_711,
                                       dataMaterial.Material(Layer).Name,
                                       dataMaterial.Material(Layer).TausFrontBeamBeam,
@@ -7245,7 +7238,7 @@ namespace WindowManager {
                                 }
                                 // Formats
                                 static constexpr auto Format_712(" WindowMaterial:Blind:EquivalentLayer,{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}");
-                                print(outputFiles.eio,
+                                print(ioFiles.eio,
                                       Format_712,
                                       dataMaterial.Material(Layer).Name,
                                       SlateOrientation,
@@ -7272,7 +7265,7 @@ namespace WindowManager {
                                     GapVentType = "VentedOutdoor";
                                 }
                                 static constexpr auto Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
-                                print(outputFiles.eio,
+                                print(ioFiles.eio,
                                       Format_713,
                                       dataMaterial.Material(Layer).Name,
                                       GasTypeName(dataMaterial.Material(Layer).GasType(1)),
@@ -7284,7 +7277,7 @@ namespace WindowManager {
                 }
             }
 
-        } else if (HasWindows) {
+        } else if (dataWindowManager.HasWindows) {
 
             for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
 
@@ -7513,7 +7506,7 @@ namespace WindowManager {
 
     //*************************************************************************************
 
-    void CalcWindowScreenProperties(OutputFiles &outputFiles)
+    void CalcWindowScreenProperties(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7680,7 +7673,7 @@ namespace WindowManager {
         if (PrintTransMap) {
             // Fortran version did not have error handling in case of file open failure. This one does.
             // Which is correct?
-            auto screenCsvFile = outputFiles.screenCsv.open("CalcWindowScreenComponents");
+            auto screenCsvFile = ioFiles.screenCsv.open("CalcWindowScreenComponents");
 
             //  WRITE(ScreenTransUnitNo,*)' '
             for (ScreenNum = 1; ScreenNum <= NumSurfaceScreens; ++ScreenNum) {
@@ -8595,7 +8588,7 @@ namespace WindowManager {
         // Overwriting the default values
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         int NumAlphas;                  // Number of Alphas for each GetobjectItem call
         int NumNumbers;                 // Number of Numbers for each GetobjectItem call
         int NumArgs;
@@ -8603,17 +8596,16 @@ namespace WindowManager {
         Array1D_string cAlphaArgs;    // Alpha input items for object
         Array1D<Real64> rNumericArgs; // Numeric input items for object
 
-        static bool RunMeOnceFlag(false); // This subroutine only needs to be run once
         std::string cCurrentModuleObject;
         std::string cSolarSpectrum;
         std::string cVisibleSpectrum;
-        static int iSolarSpectrum(0);
-        static int iVisibleSpectrum(0);
-        static int NumSiteSpectrum(0);
+        int iSolarSpectrum(0);
+        int iVisibleSpectrum(0);
+        int NumSiteSpectrum(0);
         int Loop;
         int iTmp;
 
-        if (RunMeOnceFlag) return;
+        if (dataWindowManager.RunMeOnceFlag) return;
 
         // Step 1 - check whether there is custom solar or visible spectrum
         cCurrentModuleObject = "Site:SolarAndVisibleSpectrum";
@@ -8621,7 +8613,7 @@ namespace WindowManager {
 
         // no custom spectrum data, done!
         if (NumSiteSpectrum == 0) {
-            RunMeOnceFlag = true;
+            dataWindowManager.RunMeOnceFlag = true;
             return;
         }
 
@@ -8640,7 +8632,7 @@ namespace WindowManager {
 
             // use default spectrum data, done!
             if (UtilityRoutines::SameString(cAlphaArgs(2), "Default")) {
-                RunMeOnceFlag = true;
+                dataWindowManager.RunMeOnceFlag = true;
                 return;
             }
 
@@ -8716,7 +8708,7 @@ namespace WindowManager {
             ShowFatalError("Errors found in processing input for user-defined solar/visible spectrum");
         }
 
-        RunMeOnceFlag = true;
+        dataWindowManager.RunMeOnceFlag = true;
     }
 
     //*****************************************************************************************

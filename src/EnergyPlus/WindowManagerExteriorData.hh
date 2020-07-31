@@ -54,6 +54,8 @@
 #include <vector>
 
 // EnergyPlus Headers
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Vectors.hh>
 
@@ -61,6 +63,7 @@ namespace EnergyPlus {
 
     //forward declaration
     struct EnergyPlusData;
+    struct WindowComplexManagerData;
 
 namespace DataHeatBalance {
     struct MaterialProperties;
@@ -114,10 +117,10 @@ namespace WindowManager {
     // Converts world coordinates (E+) into local surface coordinates that suites better for
     // WCE operations. Return values are angles Theta and Phi that are used to define WCE direction
     std::pair<Real64, Real64>
-    getWCECoordinates(const int t_SurfNum, const DataVectorTypes::Vector &t_Ray, const SingleLayerOptics::BSDFHemisphere t_Direction);
+    getWCECoordinates(WindowComplexManagerData &dataWindowComplexManager, const int t_SurfNum, const DataVectorTypes::Vector &t_Ray, const SingleLayerOptics::BSDFHemisphere t_Direction);
 
     // Returns Theta and Phi coordinates of surface BSDF for current Sun position
-    std::pair<Real64, Real64> getSunWCEAngles(const int t_SurfNum, const SingleLayerOptics::BSDFHemisphere t_Direction);
+    std::pair<Real64, Real64> getSunWCEAngles(WindowComplexManagerData &dataWindowComplexManager, const int t_SurfNum, const SingleLayerOptics::BSDFHemisphere t_Direction);
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCESpecturmProperties

@@ -101,9 +101,16 @@ Field: Fuel Type (or similar)
 9.3.0:
 
 "FuelOil#1" 
-"FuelOil#2" 
+"FuelOil#2"
+
+"Fuel Oil #1" 
+"Fuel Oil #2"
+
 
 9.4.0:
 
 "FuelOilNo1" 
 "FuelOilNo2" 
+
+"Fuel Oil No 1" 
+"Fuel Oil No 2" 
