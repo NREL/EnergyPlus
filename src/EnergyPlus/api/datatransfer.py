@@ -1,5 +1,5 @@
 from ctypes import cdll, c_int, c_char_p, c_void_p
-from pyenergyplus.common import RealEP, EnergyPlusException
+from pyenergyplus.common import RealEP, EnergyPlusException, is_number
 from typing import Union
 
 
@@ -264,6 +264,10 @@ class DataExchange:
         :return: Floating point representation of the current variable value.  Returns zero if the handle is invalid.
                  Use the api_error_flag function to disambiguate between valid zero returns and error states.
         """
+        if not is_number(variable_handle):
+            raise EnergyPlusException(
+                "`get_variable_value` expects `variable_handle` as an `int`, not "
+                "'{}'".format(variable_handle))
         return self.api.getVariableValue(variable_handle)
 
     def get_meter_value(self, meter_handle: int) -> float:
@@ -279,6 +283,10 @@ class DataExchange:
         :return: Floating point representation of the current meter value.  Returns zero if the handle is invalid.
                  Use the api_error_flag function to disambiguate between valid zero returns and error states.
         """
+        if not is_number(meter_handle):
+            raise EnergyPlusException(
+                "`get_meter_value` expects `meter_handle` as an `int`, not "
+                "'{}'".format(meter_handle))
         return self.api.getMeterValue(meter_handle)
 
     def set_actuator_value(self, actuator_handle: int, actuator_value: float) -> None:
@@ -297,6 +305,14 @@ class DataExchange:
         :param actuator_value: The floating point value to assign to the actuator
         :return: Nothing
         """
+        if not is_number(actuator_handle):
+            raise EnergyPlusException(
+                "`set_actuator_value` expects `actuator_handle` as an `int`, not "
+                "'{}'".format(actuator_handle))
+        if not is_number(actuator_value):
+            raise EnergyPlusException(
+                "`set_actuator_value` expects `actuator_value` as a `float`, not "
+                "'{}'".format(actuator_value))
         self.api.setActuatorValue(actuator_handle, actuator_value)
 
     def reset_actuator(self, actuator_handle: int) -> None:
@@ -307,6 +323,10 @@ class DataExchange:
         :param actuator_handle: An integer returned from the `get_actuator_handle` function.
         :return: Nothing
         """
+        if not is_number(actuator_handle):
+            raise EnergyPlusException(
+                "`reset_actuator` expects `actuator_handle` as an `int`, not "
+                "'{}'".format(actuator_handle))
         self.api.resetActuator(actuator_handle)
 
     def get_actuator_value(self, actuator_handle: int) -> float:
@@ -319,6 +339,10 @@ class DataExchange:
                  Returns zero if the handle is invalid.  Use the api_error_flag function to disambiguate between valid
                  zero returns and error states.
         """
+        if not is_number(actuator_handle):
+            raise EnergyPlusException(
+                "`get_actuator_value` expects `actuator_handle` as an `int`, not "
+                "'{}'".format(actuator_handle))
         return self.api.getActuatorValue(actuator_handle)
 
     def get_internal_variable_handle(self, variable_type: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
@@ -351,6 +375,10 @@ class DataExchange:
         :return: Floating point representation of the internal variable value.  Returns zero if the handle is invalid.
                  Use the api_error_flag function to disambiguate between valid zero returns and error states.
         """
+        if not is_number(variable_handle):
+            raise EnergyPlusException(
+                "`get_internal_variable_value` expects `variable_handle` as an `int`, not "
+                "'{}'".format(variable_handle))
         return self.api.getInternalVariableValue(variable_handle)
 
     def get_construction_handle(self, var_name: Union[str, bytes]) -> int:
@@ -422,6 +450,10 @@ class DataExchange:
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_global_value is only available as part of a Python Plugin workflow")
+        if not is_number(handle):
+            raise EnergyPlusException(
+                "`get_global_value` expects `handle` as an `int`, not "
+                "'{}'".format(handle))
         return self.api.getPluginGlobalVariableValue(handle)
 
     def set_global_value(self, handle: int, value: float) -> None:
@@ -446,6 +478,14 @@ class DataExchange:
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("set_global_handle is only available as part of a Python Plugin workflow")
+        if not is_number(handle):
+            raise EnergyPlusException(
+                "`set_global_value` expects `variable_handle` as an `int`, not "
+                "'{}'".format(handle))
+        if not is_number(value):
+            raise EnergyPlusException(
+                "`get_global_value` expects `value` as a `float`, not "
+                "'{}'".format(value))
         self.api.setPluginGlobalVariableValue(handle, value)
 
     def get_trend_handle(self, trend_var_name: Union[str, bytes]) -> int:
@@ -492,6 +532,14 @@ class DataExchange:
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_value is only available as part of a Python Plugin workflow")
+        if not is_number(trend_handle):
+            raise EnergyPlusException(
+                "`get_trend_value` expects `trend_handle` as an `int`, not "
+                "'{}'".format(trend_handle))
+        if not is_number(time_index):
+            raise EnergyPlusException(
+                "`get_trend_value` expects `time_index` as an `int`, not "
+                "'{}'".format(time_index))
         return self.api.getPluginTrendVariableValue(trend_handle, time_index)
 
     def get_trend_average(self, trend_handle: int, count: int) -> float:
@@ -513,6 +561,14 @@ class DataExchange:
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_average is only available as part of a Python Plugin workflow")
+        if not is_number(trend_handle):
+            raise EnergyPlusException(
+                "`get_trend_average` expects `trend_handle` as an `int`, not "
+                "'{}'".format(trend_handle))
+        if not is_number(count):
+            raise EnergyPlusException(
+                "`get_trend_average` expects `count` as an `int`, not "
+                "'{}'".format(count))
         return self.api.getPluginTrendVariableAverage(trend_handle, count)
 
     def get_trend_min(self, trend_handle: int, count: int) -> float:
@@ -534,6 +590,14 @@ class DataExchange:
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_min is only available as part of a Python Plugin workflow")
+        if not is_number(trend_handle):
+            raise EnergyPlusException(
+                "`get_trend_min` expects `trend_handle` as an `int`, not "
+                "'{}'".format(trend_handle))
+        if not is_number(count):
+            raise EnergyPlusException(
+                "`get_trend_min` expects `count` as an `int`, not "
+                "'{}'".format(count))
         return self.api.getPluginTrendVariableMin(trend_handle, count)
 
     def get_trend_max(self, trend_handle: int, count: int) -> float:
@@ -555,6 +619,14 @@ class DataExchange:
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_max is only available as part of a Python Plugin workflow")
+        if not is_number(trend_handle):
+            raise EnergyPlusException(
+                "`get_trend_max` expects `trend_handle` as an `int`, not "
+                "'{}'".format(trend_handle))
+        if not is_number(count):
+            raise EnergyPlusException(
+                "`get_trend_max` expects `count` as an `int`, not "
+                "'{}'".format(count))
         return self.api.getPluginTrendVariableMax(trend_handle, count)
 
     def get_trend_sum(self, trend_handle: int, count: int) -> float:
@@ -576,6 +648,14 @@ class DataExchange:
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_sum is only available as part of a Python Plugin workflow")
+        if not is_number(trend_handle):
+            raise EnergyPlusException(
+                "`get_trend_sum` expects `trend_handle` as an `int`, not "
+                "'{}'".format(trend_handle))
+        if not is_number(count):
+            raise EnergyPlusException(
+                "`get_trend_sum` expects `count` as an `int`, not "
+                "'{}'".format(count))
         return self.api.getPluginTrendVariableSum(trend_handle, count)
 
     def get_trend_direction(self, trend_handle: int, count: int) -> float:
@@ -599,6 +679,14 @@ class DataExchange:
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_direction is only available as part of a Python Plugin workflow")
+        if not is_number(trend_handle):
+            raise EnergyPlusException(
+                "`get_trend_direction` expects `trend_handle` as an `int`, not "
+                "'{}'".format(trend_handle))
+        if not is_number(count):
+            raise EnergyPlusException(
+                "`get_trend_direction` expects `count` as an `int`, not "
+                "'{}'".format(count))
         return self.api.getPluginTrendVariableDirection(trend_handle, count)
 
     def year(self) -> int:
