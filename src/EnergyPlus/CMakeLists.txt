@@ -804,6 +804,9 @@ add_custom_command(
         -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}"
         -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}"
         -P "${PROJECT_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake"
+        # TODO: temporary "hack" to depend on a specific file that doesn't exist to force this to run
+        # ideally the whole process would be revamped
+        DEPENDS __ALWAYSRUNME
 )
 
 install( TARGETS energyplus energyplusapi DESTINATION ./ )
