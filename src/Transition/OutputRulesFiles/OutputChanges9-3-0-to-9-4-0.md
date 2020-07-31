@@ -161,8 +161,8 @@ See [8121](https://github.com/NREL/EnergyPlus/pull/8121)
 (b) From "FuelOil#2" in 9.3 to "FuelOilNo2" in 9.4
 
  
-(c) From "Fuel Oil #1" in 9.3 to "Fuel Oil No 1" in 9.4
-(d) From "Fuel Oil #2" in 9.3 to "Fuel Oil No 2" in 9.4
+(c) From "Fuel Oil #1" in 9.3 to "FuelOilNo1" in 9.4
+(d) From "Fuel Oil #2" in 9.3 to "FuelOilNo2" in 9.4
 
 ### table output headings moving from:
  (a) "Fuel Oil #1" in 9.3 to "Fuel Oil No 1" in 9.4
