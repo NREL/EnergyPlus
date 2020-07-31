@@ -254,7 +254,7 @@ class DataExchange:
             actuator_key = actuator_key.encode('utf-8')
         return self.api.getActuatorHandle(component_type, control_type, actuator_key)
 
-    def get_variable_value(self, variable_handle: int) -> RealEP:
+    def get_variable_value(self, variable_handle: int) -> float:
         """
         Get the current value of a variable in a running simulation.  The `get_variable_handle` function is first used
         to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this function to
@@ -266,7 +266,7 @@ class DataExchange:
         """
         return self.api.getVariableValue(variable_handle)
 
-    def get_meter_value(self, meter_handle: int) -> RealEP:
+    def get_meter_value(self, meter_handle: int) -> float:
         """
         Get the current value of a meter in a running simulation.  The `get_meter_handle` function is first used
         to get a handle to the meter by name.  Then once the handle is retrieved, it is passed into this function to
@@ -281,7 +281,7 @@ class DataExchange:
         """
         return self.api.getMeterValue(meter_handle)
 
-    def set_actuator_value(self, actuator_handle: int, actuator_value: RealEP) -> None:
+    def set_actuator_value(self, actuator_handle: int, actuator_value: float) -> None:
         """
         Sets the value of an actuator in a running simulation.  The `get_actuator_handle` function is first used
         to get a handle to the actuator by name.  Then once the handle is retrieved, it is passed into this function,
@@ -309,7 +309,7 @@ class DataExchange:
         """
         self.api.resetActuator(actuator_handle)
 
-    def get_actuator_value(self, actuator_handle: int) -> RealEP:
+    def get_actuator_value(self, actuator_handle: int) -> float:
         """
         Gets the most recent value of an actuator.  In some applications, actuators are altered by multiple scripts, and
         this allows getting the most recent value.
@@ -341,7 +341,7 @@ class DataExchange:
             variable_key = variable_key.encode('utf-8')
         return self.api.getInternalVariableHandle(variable_type, variable_key)
 
-    def get_internal_variable_value(self, variable_handle: int) -> RealEP:
+    def get_internal_variable_value(self, variable_handle: int) -> float:
         """
         Get the value of an internal variable in a running simulation.  The `get_internal_variable_handle` function is
         first used to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this
@@ -400,7 +400,7 @@ class DataExchange:
             var_name = var_name.encode('utf-8')
         return self.api.getPluginGlobalVariableHandle(var_name)
 
-    def get_global_value(self, handle: int) -> RealEP:
+    def get_global_value(self, handle: int) -> float:
         """
         Get the current value of a plugin global variable in a running simulation.  This is only used for Python Plugin
         applications!
@@ -473,7 +473,7 @@ class DataExchange:
             trend_var_name = trend_var_name.encode('utf-8')
         return self.api.getPluginTrendVariableHandle(trend_var_name)
 
-    def get_trend_value(self, trend_handle: int, time_index: int) -> RealEP:
+    def get_trend_value(self, trend_handle: int, time_index: int) -> float:
         """
         Get the value of a plugin trend variable at a specific history point.  The time_index argument specifies how
         many time steps to go back in the trend history.  A value of 1 indicates taking the most recent value.  The
@@ -494,7 +494,7 @@ class DataExchange:
             raise EnergyPlusException("get_trend_value is only available as part of a Python Plugin workflow")
         return self.api.getPluginTrendVariableValue(trend_handle, time_index)
 
-    def get_trend_average(self, trend_handle: int, count: int) -> RealEP:
+    def get_trend_average(self, trend_handle: int, count: int) -> float:
         """
         Get the average of a plugin trend variable over a specific history set.  The count argument specifies how
         many time steps to go back in the trend history.  A value of 1 indicates averaging just the most recent value.
@@ -515,7 +515,7 @@ class DataExchange:
             raise EnergyPlusException("get_trend_average is only available as part of a Python Plugin workflow")
         return self.api.getPluginTrendVariableAverage(trend_handle, count)
 
-    def get_trend_min(self, trend_handle: int, count: int) -> RealEP:
+    def get_trend_min(self, trend_handle: int, count: int) -> float:
         """
         Get the minimum of a plugin trend variable over a specific history set.  The count argument specifies how
         many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.
@@ -536,7 +536,7 @@ class DataExchange:
             raise EnergyPlusException("get_trend_min is only available as part of a Python Plugin workflow")
         return self.api.getPluginTrendVariableMin(trend_handle, count)
 
-    def get_trend_max(self, trend_handle: int, count: int) -> RealEP:
+    def get_trend_max(self, trend_handle: int, count: int) -> float:
         """
         Get the maximum of a plugin trend variable over a specific history set.  The count argument specifies how
         many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.
@@ -557,7 +557,7 @@ class DataExchange:
             raise EnergyPlusException("get_trend_max is only available as part of a Python Plugin workflow")
         return self.api.getPluginTrendVariableMax(trend_handle, count)
 
-    def get_trend_sum(self, trend_handle: int, count: int) -> RealEP:
+    def get_trend_sum(self, trend_handle: int, count: int) -> float:
         """
         Get the summation of a plugin trend variable over a specific history set.  The count argument specifies how
         many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.
@@ -578,7 +578,7 @@ class DataExchange:
             raise EnergyPlusException("get_trend_sum is only available as part of a Python Plugin workflow")
         return self.api.getPluginTrendVariableSum(trend_handle, count)
 
-    def get_trend_direction(self, trend_handle: int, count: int) -> RealEP:
+    def get_trend_direction(self, trend_handle: int, count: int) -> float:
         """
         Get the trajectory of a plugin trend variable over a specific history set.  The count argument specifies how
         many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.
@@ -634,7 +634,7 @@ class DataExchange:
         """
         return self.api.hour()
 
-    def current_time(self) -> RealEP:
+    def current_time(self) -> float:
         """
         Get the current time of day in hours, where current time represents the end time of the current time step.
 
@@ -711,7 +711,7 @@ class DataExchange:
         """
         return self.api.warmupFlag() == 1
 
-    def zone_time_step(self) -> RealEP:
+    def zone_time_step(self) -> float:
         """
         Gets the current zone time step value in EnergyPlus.  The zone time step is variable and fluctuates
         during the simulation.
@@ -720,7 +720,7 @@ class DataExchange:
         """
         return self.api.systemTimeStep()
 
-    def system_time_step(self) -> RealEP:
+    def system_time_step(self) -> float:
         """
         Gets the current system time step value in EnergyPlus.  The system time step is variable and fluctuates
         during the simulation.
