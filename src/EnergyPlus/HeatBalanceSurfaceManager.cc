@@ -514,8 +514,7 @@ namespace HeatBalanceSurfaceManager {
         // Set shading flag for exterior windows (except flags related to daylighting) and
         // window construction (unshaded or shaded) to be used in heat balance calculation
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Window Shading");
-        
-//        high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
         WindowShadingManager(state.dataWindowEquivalentLayer);
 
         // Calculate factors that are used to determine how much long-wave radiation from internal
@@ -523,9 +522,6 @@ namespace HeatBalanceSurfaceManager {
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Absorption Factors");
         if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange(state.files);
         ComputeIntThermalAbsorpFactors();
-//        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-//        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-//        DataGlobals::solar_timer += time_span.count();
 
         // Calculate factors for diffuse solar absorbed by room surfaces and interior shades
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Diffuse Solar Absorption Factors");
@@ -541,11 +537,14 @@ namespace HeatBalanceSurfaceManager {
         // For daylit zones, calculate interior daylight illuminance at reference points and
         // simulate lighting control system to get overhead electric lighting reduction
         // factor due to daylighting.
-
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).ExtSolar) {
-                SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                if (Surface(SurfNum).ExtSolar) {
+                    SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
+                    SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
+                }
             }
         }
 
@@ -689,13 +688,17 @@ namespace HeatBalanceSurfaceManager {
         }
 
         errFlag = false;
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (Surface(SurfNum).Class != SurfaceClass_Window) continue;
-            SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
-            if (SurfWinShadingFlag(SurfNum) > 0) {
-                SurfWinFracTimeShadingDeviceOn(SurfNum) = 1.0;
-            } else {
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+
                 SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
+                if (SurfWinShadingFlag(SurfNum) > 0) {
+                    SurfWinFracTimeShadingDeviceOn(SurfNum) = 1.0;
+                } else {
+                    SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
+                }
             }
         }
 
@@ -707,10 +710,7 @@ namespace HeatBalanceSurfaceManager {
         //  take the appropriate parts of these inits to the other heat balance managers
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Solar Heat Gains");
 
-
         InitSolarHeatGains(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager);
-
-
 
         if (SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0)) {
             for (NZ = 1; NZ <= NumOfZones; ++NZ) {
@@ -755,80 +755,93 @@ namespace HeatBalanceSurfaceManager {
             CTFTsrcConstPart = 0.0;
             CTFTuserConstPart = 0.0;
         }
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces...
-            auto const &surface(Surface(SurfNum));
+//        high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
-            if (!surface.HeatTransSurf) continue; // Skip non-heat transfer surfaces
-            if (surface.HeatTransferAlgorithm != HeatTransferModel_CTF && surface.HeatTransferAlgorithm != HeatTransferModel_EMPD) continue;
-            if (surface.Class == SurfaceClass_Window) continue;
-            // Outside surface temp of "normal" windows not needed in Window5 calculation approach
-            // Window layer temperatures are calculated in CalcHeatBalanceInsideSurf
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {// Loop through all surfaces...
+            int const firstSurfOpaque = Zone(zoneNum).NonWindowSurfaceFirst;
+            int const lastSurfOpaque = Zone(zoneNum).NonWindowSurfaceLast;
+            for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
+                auto const &surface(Surface(SurfNum));
 
-            ConstrNum = surface.Construction;
-            auto const &construct(dataConstruction.Construct(ConstrNum));
-            if (construct.NumCTFTerms > 1) { // COMPUTE CONSTANT PORTION OF CONDUCTIVE FLUXES.
+                if (!surface.HeatTransSurf) continue; // Skip non-heat transfer surfaces
+                if (surface.HeatTransferAlgorithm != HeatTransferModel_CTF &&
+                    surface.HeatTransferAlgorithm != HeatTransferModel_EMPD)
+                    continue;
+                // if (surface.Class == SurfaceClass_Window) continue;
+                // Outside surface temp of "normal" windows not needed in Window5 calculation approach
+                // Window layer temperatures are calculated in CalcHeatBalanceInsideSurf
 
-                QIC = 0.0;
-                QOC = 0.0;
-                if (construct.SourceSinkPresent) {
-                    TSC = 0.0;
-                    TUC = 0.0;
-                }
-                auto l11(TH.index(1, 2, SurfNum));
-                auto l12(TH.index(2, 2, SurfNum));
-                auto const s3(TH.size3());
-                for (Term = 1; Term <= construct.NumCTFTerms;
-                     ++Term, l11 += s3, l12 += s3) { // [ l11 ] == ( 1, Term + 1, SurfNum ), [ l12 ] == ( 1, Term + 1, SurfNum )
+                ConstrNum = surface.Construction;
+                auto const &construct(dataConstruction.Construct(ConstrNum));
+                if (construct.NumCTFTerms > 1) { // COMPUTE CONSTANT PORTION OF CONDUCTIVE FLUXES.
 
-                    // Sign convention for the various terms in the following two equations
-                    // is based on the form of the Conduction Transfer Function equation
-                    // given by:
-                    // Qin,now  = (Sum of)(Y Tout) - (Sum of)(Z Tin) + (Sum of)(F Qin,old)
-                    // Qout,now = (Sum of)(X Tout) - (Sum of)(Y Tin) + (Sum of)(F Qout,old)
-                    // In both equations, flux is positive from outside to inside.
-
-                    // Tuned Aliases and linear indexing
-                    Real64 const ctf_cross(construct.CTFCross(Term));
-                    Real64 const TH11(TH[l11]);
-                    Real64 const TH12(TH[l12]);
-
-                    QIC += ctf_cross * TH11 - construct.CTFInside(Term) * TH12 + construct.CTFFlux(Term) * QH[l12];
-
-                    QOC += construct.CTFOutside(Term) * TH11 - ctf_cross * TH12 + construct.CTFFlux(Term) * QH[l11];
-
+                    QIC = 0.0;
+                    QOC = 0.0;
                     if (construct.SourceSinkPresent) {
-                        Real64 const QsrcHist1(QsrcHist(SurfNum, Term + 1));
-
-                        QIC += construct.CTFSourceIn(Term) * QsrcHist1;
-
-                        QOC += construct.CTFSourceOut(Term) * QsrcHist1;
-
-                        TSC += construct.CTFTSourceOut(Term) * TH11 + construct.CTFTSourceIn(Term) * TH12 + construct.CTFTSourceQ(Term) * QsrcHist1 +
-                               construct.CTFFlux(Term) * TsrcHist(SurfNum, Term + 1);
-
-                        TUC += construct.CTFTUserOut(Term) * TH11 + construct.CTFTUserIn(Term) * TH12 + construct.CTFTUserSource(Term) * QsrcHist1 +
-                               construct.CTFFlux(Term) * TuserHist(SurfNum, Term + 1);
+                        TSC = 0.0;
+                        TUC = 0.0;
                     }
-                }
+                    auto l11(TH.index(1, 2, SurfNum));
+                    auto l12(TH.index(2, 2, SurfNum));
+                    auto const s3(TH.size3());
+                    for (Term = 1; Term <=
+                                   construct.NumCTFTerms; ++Term, l11 += s3, l12 += s3) { // [ l11 ] == ( 1, Term + 1, SurfNum ), [ l12 ] == ( 1, Term + 1, SurfNum )
 
-                CTFConstOutPart(SurfNum) = QOC;
-                CTFConstInPart(SurfNum) = QIC;
-                if (construct.SourceSinkPresent) {
-                    CTFTsrcConstPart(SurfNum) = TSC;
-                    CTFTuserConstPart(SurfNum) = TUC;
-                }
-            } else { // Number of CTF Terms = 1-->Resistance only constructions have no history terms.
+                        // Sign convention for the various terms in the following two equations
+                        // is based on the form of the Conduction Transfer Function equation
+                        // given by:
+                        // Qin,now  = (Sum of)(Y Tout) - (Sum of)(Z Tin) + (Sum of)(F Qin,old)
+                        // Qout,now = (Sum of)(X Tout) - (Sum of)(Y Tin) + (Sum of)(F Qout,old)
+                        // In both equations, flux is positive from outside to inside.
 
-                CTFConstOutPart(SurfNum) = 0.0;
-                CTFConstInPart(SurfNum) = 0.0;
-                if (construct.SourceSinkPresent) {
-                    CTFTsrcConstPart(SurfNum) = 0.0;
-                    CTFTuserConstPart(SurfNum) = 0.0;
+                        // Tuned Aliases and linear indexing
+                        Real64 const ctf_cross(construct.CTFCross(Term));
+                        Real64 const TH11(TH[l11]);
+                        Real64 const TH12(TH[l12]);
+
+                        QIC += ctf_cross * TH11 - construct.CTFInside(Term) * TH12 + construct.CTFFlux(Term) * QH[l12];
+
+                        QOC += construct.CTFOutside(Term) * TH11 - ctf_cross * TH12 + construct.CTFFlux(Term) * QH[l11];
+
+                        if (construct.SourceSinkPresent) {
+                            Real64 const QsrcHist1(QsrcHist(SurfNum, Term + 1));
+
+                            QIC += construct.CTFSourceIn(Term) * QsrcHist1;
+
+                            QOC += construct.CTFSourceOut(Term) * QsrcHist1;
+
+                            TSC += construct.CTFTSourceOut(Term) * TH11 + construct.CTFTSourceIn(Term) * TH12 +
+                                   construct.CTFTSourceQ(Term) * QsrcHist1 +
+                                   construct.CTFFlux(Term) * TsrcHist(SurfNum, Term + 1);
+
+                            TUC += construct.CTFTUserOut(Term) * TH11 + construct.CTFTUserIn(Term) * TH12 +
+                                   construct.CTFTUserSource(Term) * QsrcHist1 +
+                                   construct.CTFFlux(Term) * TuserHist(SurfNum, Term + 1);
+                        }
+                    }
+
+                    CTFConstOutPart(SurfNum) = QOC;
+                    CTFConstInPart(SurfNum) = QIC;
+                    if (construct.SourceSinkPresent) {
+                        CTFTsrcConstPart(SurfNum) = TSC;
+                        CTFTuserConstPart(SurfNum) = TUC;
+                    }
+                } else { // Number of CTF Terms = 1-->Resistance only constructions have no history terms.
+
+                    CTFConstOutPart(SurfNum) = 0.0;
+                    CTFConstInPart(SurfNum) = 0.0;
+                    if (construct.SourceSinkPresent) {
+                        CTFTsrcConstPart(SurfNum) = 0.0;
+                        CTFTuserConstPart(SurfNum) = 0.0;
+                    }
                 }
             }
 
         } // ...end of surfaces DO loop for initializing temperature history terms for the surface heat balances
 
+//        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+//        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+//        DataGlobals::solar_timer += time_span.count();
         // Zero out all of the radiant system heat balance coefficient arrays
         RadSysTiHBConstCoef = 0.0;
         RadSysTiHBToutCoef = 0.0;
@@ -3788,10 +3801,6 @@ namespace HeatBalanceSurfaceManager {
                                                              dataConstruction.Construct(SurfWinShadedConstruction(
                                                                      SurfNum)).InsideAbsorpThermal);
                 }
-//            }
-//            int const firstSurfWin = Zone(radEnclosureNum).WindowSurfaceFirst;
-//            int const lastSurfWin = Zone(radEnclosureNum).WindowSurfaceLast;
-//            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
 
                 // Window frame and divider effects
                 if (SurfWinFrameArea(SurfNum) > 0.0)
