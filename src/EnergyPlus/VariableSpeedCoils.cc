@@ -5529,7 +5529,7 @@ namespace VariableSpeedCoils {
             if (LatDegradModelSimFlag) {
                 // Calculate for SHReff using the Latent Degradation Model
                 if (NumIteration == 1) {
-                    QLatRated = VarSpeedCoil(DXCoilNum).MSRatedTotCap(SpeedCal) * (1.0 - VarSpeedCoil(DXCoilNum).MSRatedSHR(SpeedCal));
+                    QLatRated = QLoadTotal - QSensible;
                 } else if (NumIteration == 2) {
                     QLatActual = QLoadTotal - QSensible;
                     SHRss = QSensible / QLoadTotal;
