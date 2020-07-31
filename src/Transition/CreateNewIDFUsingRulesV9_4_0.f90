@@ -491,6 +491,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with P, insert the rules here
 
+              CASE('PERFORMANCEPRECISIONTRADEOFFS')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:4)=InArgs(1:4)
+                  IF (MakeUPPERCase(OutArgs(3)) == 'MODE05') THEN
+                    OutArgs(3) = 'Mode06'
+                  ENDIF
+
+
               ! If your original object starts with R, insert the rules here
 
               ! If your original object starts with S, insert the rules here
