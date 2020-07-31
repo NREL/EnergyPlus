@@ -11905,9 +11905,6 @@ namespace SolarShading {
             ZoneDifSolarDistTransmittedTotl = 0.0;
             auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             // Loop over all diffuse solar transmitting surfaces (i.e., exterior windows and TDDs) in the current zone
-//            int const firstSurfWin = Zone(enclosureNum).WindowSurfaceFirst;
-//            int const lastSurfWin = Zone(enclosureNum).WindowSurfaceLast;
-//            for (int DifTransSurfNum = firstSurfWin; DifTransSurfNum <= lastSurfWin; ++DifTransSurfNum) { // Window
             for (int const DifTransSurfNum : thisEnclosure.SurfacePtr) {
                 // Skip surfaces that are not exterior, except for TDD_Diffusers
                 if (((Surface(DifTransSurfNum).ExtBoundCond != ExternalEnvironment) &&
