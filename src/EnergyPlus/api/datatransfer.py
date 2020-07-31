@@ -183,8 +183,16 @@ class DataExchange:
         """
         if isinstance(variable_name, str):
             variable_name = variable_name.encode('utf-8')
+        elif not isinstance(variable_name, bytes):
+            raise EnergyPlusException(
+                "`request_variable` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(variable_name))
         if isinstance(variable_key, str):
             variable_key = variable_key.encode('utf-8')
+        elif not isinstance(variable_key, bytes):
+            raise EnergyPlusException(
+                "`request_variable` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(variable_key))
         self.api.requestVariable(variable_name, variable_key)
 
     def get_variable_handle(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
@@ -204,8 +212,16 @@ class DataExchange:
         """
         if isinstance(variable_name, str):
             variable_name = variable_name.encode('utf-8')
+        elif not isinstance(variable_name, bytes):
+            raise EnergyPlusException(
+                "`get_variable_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(variable_name))
         if isinstance(variable_key, str):
             variable_key = variable_key.encode('utf-8')
+        elif not isinstance(variable_key, bytes):
+            raise EnergyPlusException(
+                "`get_variable_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(variable_key))
         return self.api.getVariableHandle(variable_name, variable_key)
 
     def get_meter_handle(self, meter_name: Union[str, bytes]) -> int:
@@ -224,6 +240,10 @@ class DataExchange:
         meter_name = meter_name.upper()
         if isinstance(meter_name, str):
             meter_name = meter_name.encode('utf-8')
+        elif not isinstance(meter_name, bytes):
+            raise EnergyPlusException(
+                "`get_meter_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(meter_name))
         return self.api.getMeterHandle(meter_name)
 
     def get_actuator_handle(
@@ -248,10 +268,22 @@ class DataExchange:
         """
         if isinstance(component_type, str):
             component_type = component_type.encode('utf-8')
+        elif not isinstance(component_type, bytes):
+            raise EnergyPlusException(
+                "`get_actuator_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(component_type))
         if isinstance(control_type, str):
             control_type = control_type.encode('utf-8')
+        elif not isinstance(control_type, bytes):
+            raise EnergyPlusException(
+                "`get_actuator_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(control_type))
         if isinstance(actuator_key, str):
             actuator_key = actuator_key.encode('utf-8')
+        elif not isinstance(actuator_key, bytes):
+            raise EnergyPlusException(
+                "`get_actuator_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(actuator_key))
         return self.api.getActuatorHandle(component_type, control_type, actuator_key)
 
     def get_variable_value(self, variable_handle: int) -> float:
@@ -361,8 +393,16 @@ class DataExchange:
         """
         if isinstance(variable_type, str):
             variable_type = variable_type.encode('utf-8')
+        elif not isinstance(variable_type, bytes):
+            raise EnergyPlusException(
+                "`get_internal_variable_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(variable_type))
         if isinstance(variable_key, str):
             variable_key = variable_key.encode('utf-8')
+        elif not isinstance(variable_key, bytes):
+            raise EnergyPlusException(
+                "`get_internal_variable_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(variable_key))
         return self.api.getInternalVariableHandle(variable_type, variable_key)
 
     def get_internal_variable_value(self, variable_handle: int) -> float:
@@ -400,6 +440,10 @@ class DataExchange:
             raise EnergyPlusException("get_construction_handle is only available as part of a Python Plugin workflow")
         if isinstance(var_name, str):
             var_name = var_name.encode('utf-8')
+        elif not isinstance(var_name, bytes):
+            raise EnergyPlusException(
+                "`get_construction_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(var_name))
         return self.api.getConstructionHandle(var_name)
 
     def get_global_handle(self, var_name: Union[str, bytes]) -> int:
@@ -426,6 +470,10 @@ class DataExchange:
             raise EnergyPlusException("get_global_handle is only available as part of a Python Plugin workflow")
         if isinstance(var_name, str):
             var_name = var_name.encode('utf-8')
+        elif not isinstance(var_name, bytes):
+            raise EnergyPlusException(
+                "`get_global_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(var_name))
         return self.api.getPluginGlobalVariableHandle(var_name)
 
     def get_global_value(self, handle: int) -> float:
@@ -511,6 +559,10 @@ class DataExchange:
             raise EnergyPlusException("get_trend_handle is only available as part of a Python Plugin workflow")
         if isinstance(trend_var_name, str):
             trend_var_name = trend_var_name.encode('utf-8')
+        elif not isinstance(trend_var_name, bytes):
+            raise EnergyPlusException(
+                "`get_trend_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(trend_var_name))
         return self.api.getPluginTrendVariableHandle(trend_var_name)
 
     def get_trend_value(self, trend_handle: int, time_index: int) -> float:
