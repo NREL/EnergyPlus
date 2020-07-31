@@ -3543,7 +3543,7 @@ namespace OutputProcessor {
         std::string const idf_objects = delimited_string({
             "Output:Variable,*,Chiller Electric Energy,runperiod;",
             "Output:Variable,*,Lights Electric Energy,runperiod;",
-            "Output:Variable,*,Environmental Impact Fuel Oil No2 CO2 Emissions Mass,runperiod;",
+            "Output:Variable,*,Environmental Impact Fuel Oil No 2 CO2 Emissions Mass,runperiod;",
         });
 
         ASSERT_TRUE(process_idf(idf_objects));
@@ -3581,7 +3581,7 @@ namespace OutputProcessor {
                             1);
 
         Real64 fuel_oil_co2 = 0.;
-        SetupOutputVariable("Environmental Impact Fuel Oil No2 CO2 Emissions Mass",
+        SetupOutputVariable("Environmental Impact Fuel Oil No 2 CO2 Emissions Mass",
                             OutputProcessor::Unit::kg,
                             fuel_oil_co2,
                             "System",
