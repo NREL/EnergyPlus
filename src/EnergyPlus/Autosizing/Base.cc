@@ -152,6 +152,8 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->dataSizingFraction = DataSizing::DataSizingFraction;
     this->dataDXSpeedNum = DataSizing::DataDXSpeedNum;
     this->dataDesicRegCoil = DataSizing::DataDesicRegCoil;
+    this->dataZoneUsedForSizing = DataSizing::DataZoneUsedForSizing;
+    this->dataDesicDehumNum = DataSizing::DataDesicDehumNum;
 }
 
 void BaseSizer::initializeFromAPI(Real64 const elevation)
@@ -560,6 +562,10 @@ void BaseSizer::clearState()
     dataAirFlowUsedForSizing = 0.0;
     dataDesInletAirTemp = 0.0;
     dataDesAccountForFanHeat = false;
+    dataDesicRegCoil = false;
+    dataHeatSizeRatio = 0.0;
+    dataZoneUsedForSizing = 0;
+    dataDesicDehumNum = 0;
 
     printWarningFlag = false;
     callingRoutine = "";

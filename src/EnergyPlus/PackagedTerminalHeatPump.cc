@@ -56,6 +56,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -5412,7 +5413,6 @@ namespace PackagedTerminalHeatPump {
             DataZoneUsedForSizing = PTUnit(PTUnitNum).ControlZoneNum;
             CheckThisZoneForSizing(DataZoneUsedForSizing, SizingDesRunThisZone);
 
-            SizingMethod = ASHRAEMinSATCoolingSizing;
             Real64 capacityMultiplier = 0.5; // one-half of design zone load
             if (SizingDesRunThisZone) {
                 DataCapacityUsedForSizing = FinalZoneSizing(PTUnit(PTUnitNum).ControlZoneNum).DesCoolLoad * capacityMultiplier;
@@ -5422,21 +5422,10 @@ namespace PackagedTerminalHeatPump {
             DataCapacityUsedForSizing /= PTUnit(PTUnitNum).ControlZoneMassFlowFrac;
             DataFlowUsedForSizing = PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow;
             PrintFlag = true;
-            if (PTUnit(PTUnitNum).ZoneEquipType == PkgTermHPAirToAir_Num) {
-                FieldNum = 11; // Minimum Supply Air Temperature in Cooling Mode
-            } else if (PTUnit(PTUnitNum).ZoneEquipType == PkgTermACAirToAir_Num) {
-                FieldNum = 7; // Minimum Supply Air Temperature in Cooling Mode
-            }
-            SizingString = PTUnitUNumericFields(PTUnitNum).FieldNames(FieldNum) + " [C]";
-            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, PTUnit(PTUnitNum).DesignMinOutletTemp, PrintFlag, RoutineName);
+            ASHRAEMinSATCoolingSizer sizerASHRAEMinSATCooling;
+            sizerASHRAEMinSATCooling.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            PTUnit(PTUnitNum).DesignMinOutletTemp = sizerASHRAEMinSATCooling.size(PTUnit(PTUnitNum).DesignMinOutletTemp, ErrorsFound);
 
-            SizingMethod = ASHRAEMaxSATHeatingSizing;
-            if (PTUnit(PTUnitNum).ZoneEquipType == PkgTermHPAirToAir_Num) {
-                FieldNum = 12; // Maximum Supply Air Temperature in Heating Mode
-            } else if (PTUnit(PTUnitNum).ZoneEquipType == PkgTermACAirToAir_Num) {
-                FieldNum = 8; // Maximum Supply Air Temperature in Heating Mode
-            }
-            SizingString = PTUnitUNumericFields(PTUnitNum).FieldNames(FieldNum) + " [C]";
             if (SizingDesRunThisZone) {
                 DataCapacityUsedForSizing = FinalZoneSizing(PTUnit(PTUnitNum).ControlZoneNum).DesHeatLoad * capacityMultiplier;
             } else {
@@ -5444,7 +5433,9 @@ namespace PackagedTerminalHeatPump {
             }
             DataCapacityUsedForSizing /= PTUnit(PTUnitNum).ControlZoneMassFlowFrac;
             DataFlowUsedForSizing = PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow;
-            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, PTUnit(PTUnitNum).DesignMaxOutletTemp, PrintFlag, RoutineName);
+            ASHRAEMaxSATHeatingSizer sizerASHRAEMaxSATHeating;
+            sizerASHRAEMaxSATHeating.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            PTUnit(PTUnitNum).DesignMaxOutletTemp = sizerASHRAEMaxSATHeating.size(PTUnit(PTUnitNum).DesignMaxOutletTemp, ErrorsFound);
 
             DataCapacityUsedForSizing = 0.0; // reset so other routines don't use this inadvertently
             DataFlowUsedForSizing = 0.0;

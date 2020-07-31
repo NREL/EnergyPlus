@@ -46,6 +46,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DesiccantDehumidifiers.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 namespace EnergyPlus {
 
@@ -64,19 +68,20 @@ Real64 AutoCalculateSizer::size(Real64 _originalValue, bool &errorsFound)
     return this->autoSizedValue;
 }
 
-Real64 MaxHeaterOutletTempSizer::size(Real64 _originalValue, bool& errorsFound) {
-    if ( !this->checkInitialized(errorsFound) ) {
+Real64 MaxHeaterOutletTempSizer::size(Real64 _originalValue, bool &errorsFound)
+{
+    if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
     this->preSize(_originalValue);
-    if ( this->curZoneEqNum > 0 ) {
-        if ( !this->wasAutoSized && !this->sizingDesRunThisZone ) {
+    if (this->curZoneEqNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
         } else {
             this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp;
         }
-    } else if ( this->curSysNum > 0 ) {
-        if ( !this->wasAutoSized && !this->sizingDesRunThisAirSys ) {
+    } else if (this->curSysNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
             this->autoSizedValue = _originalValue;
         } else {
             this->autoSizedValue = this->finalSysSizing(this->curSysNum).HeatSupTemp;
@@ -105,6 +110,9 @@ Real64 ZoneCoolingLoadSizer::size(Real64 _originalValue, bool &errorsFound)
             // not implemented
             this->errorType = AutoSizingResultType::ErrorType1;
             this->autoSizedValue = 0.0;
+            std::string msg = "Developer Error: For autosizing of " + this->compType + ' ' + this->compName +
+                ", Airloop equipment not implemented.";
+            this->addErrorMessage(msg);
         }
     }
     this->selectSizerOutput(errorsFound);
@@ -130,9 +138,256 @@ Real64 ZoneHeatingLoadSizer::size(Real64 _originalValue, bool &errorsFound)
             // not implemented
             this->errorType = AutoSizingResultType::ErrorType1;
             this->autoSizedValue = 0.0;
+            std::string msg = "Developer Error: For autosizing of " + this->compType + ' ' + this->compName +
+                ", Airloop equipment not implemented.";
+            this->addErrorMessage(msg);
         }
     }
     this->selectSizerOutput(errorsFound);
+    return this->autoSizedValue;
+}
+
+Real64 ASHRAEMinSATCoolingSizer::size(Real64 _originalValue, bool &errorsFound)
+{
+    if (!this->checkInitialized(errorsFound)) {
+        return 0.0;
+    }
+    this->preSize(_originalValue);
+    if (this->curZoneEqNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            if (this->dataCapacityUsedForSizing > 0.0 && this->dataFlowUsedForSizing > 0.0) {
+                this->autoSizedValue =
+                    this->finalZoneSizing(this->curZoneEqNum).ZoneTempAtCoolPeak -
+                    (this->dataCapacityUsedForSizing / (this->dataFlowUsedForSizing * DataEnvironment::StdRhoAir *
+                                                        Psychrometrics::PsyCpAirFnW(this->finalZoneSizing(this->curZoneEqNum).ZoneHumRatAtCoolPeak)));
+            } else {
+                std::string msg =
+                    this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
+                this->errorType = AutoSizingResultType::ErrorType1;
+                this->addErrorMessage(msg);
+                ShowSevereError(msg);
+                msg = "SizingString = " + this->sizingString +
+                      ", DataCapacityUsedForSizing = " + General::TrimSigDigits(this->dataCapacityUsedForSizing, 1);
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
+                msg = "SizingString = " + this->sizingString + ", DataFlowUsedForSizing = " + General::TrimSigDigits(this->dataFlowUsedForSizing, 1);
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
+            }
+        }
+    } else if (this->curSysNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            if (this->dataCapacityUsedForSizing > 0.0 && this->dataFlowUsedForSizing > 0.0 && this->dataZoneUsedForSizing > 0) {
+                this->autoSizedValue = this->finalZoneSizing(this->dataZoneUsedForSizing).ZoneTempAtCoolPeak -
+                                       (this->dataCapacityUsedForSizing /
+                                        (this->dataFlowUsedForSizing * DataEnvironment::StdRhoAir *
+                                         Psychrometrics::PsyCpAirFnW(this->finalZoneSizing(this->dataZoneUsedForSizing).ZoneHumRatAtCoolPeak)));
+            } else {
+                std::string msg =
+                    this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
+                this->errorType = AutoSizingResultType::ErrorType1;
+                this->addErrorMessage(msg);
+                ShowSevereError(msg);
+                msg = "SizingString = " + this->sizingString +
+                      ", DataCapacityUsedForSizing = " + General::TrimSigDigits(this->dataCapacityUsedForSizing, 1);
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
+                msg = "SizingString = " + this->sizingString + ", DataFlowUsedForSizing = " + General::TrimSigDigits(this->dataFlowUsedForSizing, 1);
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
+                msg = "SizingString = " + this->sizingString +
+                      ", DataZoneUsedForSizing = " + General::TrimSigDigits(Real64(this->dataZoneUsedForSizing), 0);
+                ShowContinueError(msg);
+            }
+        }
+    }
+    this->selectSizerOutput(errorsFound);
+    return this->autoSizedValue;
+}
+
+Real64 ASHRAEMaxSATHeatingSizer::size(Real64 _originalValue, bool &errorsFound)
+{
+    if (!this->checkInitialized(errorsFound)) {
+        return 0.0;
+    }
+    this->preSize(_originalValue);
+    if (this->curZoneEqNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            if (this->dataCapacityUsedForSizing > 0.0 && this->dataFlowUsedForSizing > 0.0) {
+                this->autoSizedValue =
+                    this->finalZoneSizing(this->curZoneEqNum).ZoneTempAtHeatPeak +
+                    (this->dataCapacityUsedForSizing / (this->dataFlowUsedForSizing * DataEnvironment::StdRhoAir *
+                                                        Psychrometrics::PsyCpAirFnW(this->finalZoneSizing(this->curZoneEqNum).ZoneHumRatAtHeatPeak)));
+            } else {
+                std::string msg =
+                    this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
+                this->errorType = AutoSizingResultType::ErrorType1;
+                this->addErrorMessage(msg);
+                ShowSevereError(msg);
+                msg = "SizingString = " + this->sizingString +
+                      ", DataCapacityUsedForSizing = " + General::TrimSigDigits(this->dataCapacityUsedForSizing, 1);
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
+                msg = "SizingString = " + this->sizingString + ", DataFlowUsedForSizing = " + General::TrimSigDigits(this->dataFlowUsedForSizing, 1);
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
+            }
+        }
+    } else if (this->curSysNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            if (this->dataCapacityUsedForSizing > 0.0 && this->dataFlowUsedForSizing > 0.0 && this->dataZoneUsedForSizing > 0) {
+                this->autoSizedValue = this->finalZoneSizing(this->dataZoneUsedForSizing).ZoneTempAtHeatPeak +
+                                       (this->dataCapacityUsedForSizing /
+                                        (this->dataFlowUsedForSizing * DataEnvironment::StdRhoAir *
+                                         Psychrometrics::PsyCpAirFnW(this->finalZoneSizing(this->dataZoneUsedForSizing).ZoneHumRatAtHeatPeak)));
+            } else {
+                std::string msg =
+                    this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
+                this->errorType = AutoSizingResultType::ErrorType1;
+                this->addErrorMessage(msg);
+                ShowSevereError(msg);
+                msg = "SizingString = " + this->sizingString +
+                      ", DataCapacityUsedForSizing = " + General::TrimSigDigits(this->dataCapacityUsedForSizing, 1);
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
+                msg = "SizingString = " + this->sizingString + ", DataFlowUsedForSizing = " + General::TrimSigDigits(this->dataFlowUsedForSizing, 1);
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
+                msg = "SizingString = " + this->sizingString +
+                      ", DataZoneUsedForSizing = " + General::TrimSigDigits(Real64(this->dataZoneUsedForSizing), 0);
+                ShowContinueError(msg);
+            }
+        }
+    }
+    this->selectSizerOutput(errorsFound);
+    return this->autoSizedValue;
+}
+
+Real64 DesiccantDehumidifierBFPerfDataFaceVelocitySizer::size(Real64 _originalValue, bool &errorsFound)
+{
+    if (!this->checkInitialized(errorsFound)) {
+        return 0.0;
+    }
+    this->preSize(_originalValue);
+    if (this->dataEMSOverrideON) {
+        this->autoSizedValue = this->dataEMSOverride;
+    } else {
+        this->autoSizedValue = 4.30551 + 0.01969 * this->dataAirFlowUsedForSizing;
+        this->autoSizedValue = min(6.0, this->autoSizedValue);
+    }
+    this->selectSizerOutput(errorsFound);
+    return this->autoSizedValue;
+}
+
+Real64 HeatingCoilDesAirInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
+{
+    if (!this->checkInitialized(errorsFound)) {
+        return 0.0;
+    }
+    this->preSize(_originalValue);
+    if (this->curZoneEqNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            // not implemented
+            this->errorType = AutoSizingResultType::ErrorType1;
+            this->autoSizedValue = 0.0;
+            std::string msg = "Developer Error: For autosizing of " + this->compType + ' ' + this->compName +
+                ", Zone equipment not implemented.";
+            this->addErrorMessage(msg);
+        }
+    } else if (this->curSysNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            if (this->dataDesicRegCoil && this->dataDesicDehumNum > 0) {
+                // change to Data* global
+                if (DesiccantDehumidifiers::DesicDehum(this->dataDesicDehumNum).RegenInletIsOutsideAirNode) {
+                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).HeatOutTemp;
+                } else {
+                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).HeatRetTemp;
+                }
+            }
+        }
+    }
+    this->selectSizerOutput(errorsFound);
+    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
+    return this->autoSizedValue;
+}
+
+Real64 HeatingCoilDesAirOutletTempSizer::size(Real64 _originalValue, bool &errorsFound)
+{
+    if (!this->checkInitialized(errorsFound)) {
+        return 0.0;
+    }
+    this->preSize(_originalValue);
+    if (this->curZoneEqNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            // not implemented
+            this->errorType = AutoSizingResultType::ErrorType1;
+            this->autoSizedValue = 0.0;
+            std::string msg = "Developer Error: For autosizing of " + this->compType + ' ' + this->compName +
+                ", Zone equipment not implemented.";
+            this->addErrorMessage(msg);
+        }
+    } else if (this->curSysNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            if (this->dataDesicRegCoil && this->dataDesicDehumNum > 0) {
+                // change to Data* global
+                this->autoSizedValue = DesiccantDehumidifiers::DesicDehum(this->dataDesicDehumNum).RegenSetPointTemp;
+            }
+        }
+    }
+    this->selectSizerOutput(errorsFound);
+    if (this->getCoilReportObject) coilSelectionReportObj->setCoilLvgAirTemp(this->compName, this->compType, this->autoSizedValue);
+    return this->autoSizedValue;
+}
+
+Real64 HeatingCoilDesAirInletHumRatSizer::size(Real64 _originalValue, bool &errorsFound)
+{
+    if (!this->checkInitialized(errorsFound)) {
+        return 0.0;
+    }
+    this->preSize(_originalValue);
+    if (this->curZoneEqNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            // not implemented
+            this->errorType = AutoSizingResultType::ErrorType1;
+            this->autoSizedValue = 0.0;
+            std::string msg = "Developer Error: For autosizing of " + this->compType + ' ' + this->compName +
+                ", Zone equipment not implemented.";
+            this->addErrorMessage(msg);
+        }
+    } else if (this->curSysNum > 0) {
+        if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+            this->autoSizedValue = _originalValue;
+        } else {
+            if (this->dataDesicRegCoil) {
+                // change to Data* global
+                if (DesiccantDehumidifiers::DesicDehum(this->dataDesicDehumNum).RegenInletIsOutsideAirNode) {
+                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).HeatOutHumRat;
+                } else {
+                    this->autoSizedValue = this->finalSysSizing(this->curSysNum).HeatRetHumRat;
+                }
+            }
+        }
+    }
+    this->selectSizerOutput(errorsFound);
+    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 

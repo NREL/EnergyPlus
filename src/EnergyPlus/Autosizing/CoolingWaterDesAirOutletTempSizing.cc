@@ -96,8 +96,11 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(Real64 _originalValue, bool &erro
             this->autoSizedValue -= fanDeltaT;
 
             if (this->autoSizedValue < this->dataDesInletWaterTemp && this->dataWaterFlowUsedForSizing > 0.0) { // flow here is water vol flow rate
-                ShowWarningError(this->callingRoutine + ":" + " Coil=\"" + this->compName +
-                                 "\", Cooling Coil has leaving air temperature < entering water temperature.");
+                std::string msg =
+                    this->callingRoutine + ":" + " Coil=\"" + this->compName +
+                    "\", Cooling Coil has leaving air temperature < entering water temperature.";
+                this->addErrorMessage(msg);
+                ShowWarningError(msg);
                 ShowContinueError("    Tair,out  =  " + General::RoundSigDigits(this->autoSizedValue, 3));
                 ShowContinueError("    Twater,in = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3));
                 this->autoSizedValue = this->dataDesInletWaterTemp + 0.5;
@@ -143,8 +146,11 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(Real64 _originalValue, bool &erro
                 this->autoSizedValue -= fanDeltaT;
             }
             if (this->autoSizedValue < this->dataDesInletWaterTemp && this->dataWaterFlowUsedForSizing > 0.0) {
-                ShowWarningError(this->callingRoutine + ":" + " Coil=\"" + this->compName +
-                                 "\", Cooling Coil has leaving air temperature < entering water temperature.");
+                std::string msg =
+                    this->callingRoutine + ":" + " Coil=\"" + this->compName +
+                    "\", Cooling Coil has leaving air temperature < entering water temperature.";
+                this->addErrorMessage(msg);
+                ShowWarningError(msg);
                 ShowContinueError("    Tair,out  =  " + General::RoundSigDigits(this->autoSizedValue, 3));
                 ShowContinueError("    Twater,in = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3));
                 this->autoSizedValue = this->dataDesInletWaterTemp + 0.5;

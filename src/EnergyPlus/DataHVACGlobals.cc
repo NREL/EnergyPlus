@@ -101,12 +101,6 @@ namespace DataHVACGlobals {
     int const SystemCapacitySizing(21);                              // request sizing for system capacity
     int const HeatingDefrostSizing(23);                              // request sizing for heating defrost capacity
     int const AutoCalculateSizing(25);                               // identifies an autocalulate input
-    int const ASHRAEMinSATCoolingSizing(30);                         // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
-    int const ASHRAEMaxSATHeatingSizing(31);                         // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
-    int const HeatingCoilDesAirInletTempSizing(32);                  // design inlet air temperature for heating coil
-    int const HeatingCoilDesAirOutletTempSizing(33);                 // design outlet air temperature for heating coil
-    int const HeatingCoilDesAirInletHumRatSizing(34);                // design inlet air humidity ratio for heating coil
-    int const DesiccantDehumidifierBFPerfDataFaceVelocitySizing(35); // identifies desiccant performance data face velocity autosisizing input
 
     // Condenser Type (using same numbering scheme as for chillers)
     int const AirCooled(1);   // Air-cooled condenser

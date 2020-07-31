@@ -2538,12 +2538,16 @@ namespace WaterCoils {
                 if (WaterCoil(CoilNum).DesiccantRegenerationCoil) {
                     DataDesicRegCoil = true;
                     DataDesicDehumNum = WaterCoil(CoilNum).DesiccantDehumNum;
-                    TempSize = AutoSize;
-                    RequestSizing(state, CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
-                    DataDesInletAirTemp = TempSize;
-                    TempSize = AutoSize;
-                    RequestSizing(state, CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
-                    DataDesOutletAirTemp = TempSize;
+                    HeatingCoilDesAirInletTempSizer sizerHeatingDesInletTemp;
+                    bool ErrorsFound = false;
+                    sizerHeatingDesInletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    DataDesInletAirTemp = sizerHeatingDesInletTemp.size(DataSizing::AutoSize, ErrorsFound);
+
+                    HeatingCoilDesAirOutletTempSizer sizerHeatingDesOutletTemp;
+                    ErrorsFound = false;
+                    sizerHeatingDesOutletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    DataDesOutletAirTemp = sizerHeatingDesOutletTemp.size(DataSizing::AutoSize, ErrorsFound);
+
                     if (CurOASysNum > 0) {
                         OASysEqSizing(CurOASysNum).AirFlow = true;
                         OASysEqSizing(CurOASysNum).AirVolFlow = FinalSysSizing(CurSysNum).DesOutAirVolFlow;
@@ -2575,9 +2579,6 @@ namespace WaterCoils {
                 } else {
                     WaterHeatingCapacitySizer sizerWaterHeatingCapacity;
                     bool ErrorsFound = false;
-                    std::string stringOverride = "Supplemental Heating Coil Nominal Capacity [W]";
-                    if (DataGlobals::isEpJSON) stringOverride = "supplemental_heating_coil_nominal_capacity [W]";
-                    sizerWaterHeatingCapacity.overrideSizingString(stringOverride);
                     sizerWaterHeatingCapacity.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                     WaterCoil(CoilNum).DesWaterHeatingCoilRate = sizerWaterHeatingCapacity.size(TempSize, ErrorsFound);
                     WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesWaterHeatingCoilRate;
@@ -2634,24 +2635,24 @@ namespace WaterCoils {
                     WaterCoil(CoilNum).MaxWaterMassFlowRate = rho * DataWaterFlowUsedForSizing;
                     WaterCoil(CoilNum).InletWaterTemp = WaterCoil(CoilNum).DesInletWaterTemp;
                 } else if (WaterCoil(CoilNum).DesiccantRegenerationCoil) {
-                    TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-                    RequestSizing(state, CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).InletAirTemp = TempSize;
-                    TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-                    RequestSizing(state, CompType, CompName, HeatingCoilDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).DesInletAirHumRat = TempSize; // coil report
-                    WaterCoil(CoilNum).InletAirHumRat = TempSize;
+                    WaterCoil(CoilNum).InletAirTemp = DataDesInletAirTemp;
+                    HeatingCoilDesAirInletHumRatSizer sizerHeatingDesInletHumRat;
+                    bool ErrorsFound = false;
+                    sizerHeatingDesInletHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    WaterCoil(CoilNum).DesInletAirHumRat = sizerHeatingDesInletHumRat.size(DataSizing::AutoSize, ErrorsFound);
+                    WaterCoil(CoilNum).InletAirHumRat = WaterCoil(CoilNum).DesInletAirHumRat;
+
                     WaterCoil(CoilNum).DesAirVolFlowRate = DataAirFlowUsedForSizing;                // coil report
                     WaterCoil(CoilNum).InletAirMassFlowRate = DataAirFlowUsedForSizing * StdRhoAir; // this is stiil volume flow!
                 } else {
-                    HeatingWaterDesAirInletTempSizer sizerHWDesInTemp;
-                    sizerHWDesInTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).InletAirTemp = sizerHWDesInTemp.size(DataSizing::AutoSize, ErrorsFound);
+                    HeatingWaterDesAirInletTempSizer sizerHWDesInletTemp;
+                    sizerHWDesInletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    WaterCoil(CoilNum).InletAirTemp = sizerHWDesInletTemp.size(DataSizing::AutoSize, ErrorsFound);
 
                     TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-                    HeatingWaterDesAirInletHumRatSizer sizerHWAirInHumRat;
-                    sizerHWAirInHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).DesInletAirHumRat = sizerHWAirInHumRat.size(DataSizing::AutoSize, ErrorsFound);
+                    HeatingWaterDesAirInletHumRatSizer sizerHWAirInletHumRat;
+                    sizerHWAirInletHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    WaterCoil(CoilNum).DesInletAirHumRat = sizerHWAirInletHumRat.size(DataSizing::AutoSize, ErrorsFound);
                     WaterCoil(CoilNum).InletAirHumRat = WaterCoil(CoilNum).DesInletAirHumRat;
 
                     HeatingAirflowUASizer sizerHWAirFlowUA;

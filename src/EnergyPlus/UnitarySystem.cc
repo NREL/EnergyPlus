@@ -2590,11 +2590,10 @@ namespace UnitarySystems {
 
         if ((this->m_HeatCoilExists || this->m_SuppCoilExists) && this->m_ControlType != ControlType::CCMASHRAE) {
 
-            bool ErrorsFound = false;
             TempSize = this->DesignMaxOutletTemp;
             MaxHeaterOutletTempSizer sizerMaxHeaterOutTemp;
             sizerMaxHeaterOutTemp.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            this->DesignMaxOutletTemp = sizerMaxHeaterOutTemp.size(TempSize, ErrorsFound);
+            this->DesignMaxOutletTemp = sizerMaxHeaterOutTemp.size(TempSize, ErrFound);
         }
 
         if (this->m_SuppCoilExists) {
@@ -2703,7 +2702,6 @@ namespace UnitarySystems {
             DataSizing::DataZoneUsedForSizing = this->ControlZoneNum;
             CheckThisZoneForSizing(DataSizing::DataZoneUsedForSizing, SizingDesRunThisSys);
 
-            SizingMethod = DataHVACGlobals::ASHRAEMinSATCoolingSizing;
             capacityMultiplier = 0.5; // one-half of design zone load
             if (SizingDesRunThisSys) {
                 DataSizing::DataCapacityUsedForSizing = DataSizing::FinalZoneSizing(this->ControlZoneNum).DesCoolLoad * capacityMultiplier;
@@ -2712,15 +2710,13 @@ namespace UnitarySystems {
             }
             DataSizing::DataCapacityUsedForSizing /= this->ControlZoneMassFlowFrac;
             DataSizing::DataFlowUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
-            FieldNum = 2; // Minimum Supply Air Temperature in Cooling Mode
-            // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [C]";
-            SizingString = "Minimum Supply Air Temperature [C]";
-            ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, this->DesignMinOutletTemp, PrintFlag, RoutineName);
+            ASHRAEMinSATCoolingSizer sizerASHRAEMinSATCooling;
+            std::string stringOverride = "Minimum Supply Air Temperature [C]";
+            if (DataGlobals::isEpJSON) stringOverride = "minimum_supply_air_temperature [C]";
+            sizerASHRAEMinSATCooling.overrideSizingString(stringOverride);
+            sizerASHRAEMinSATCooling.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            this->DesignMinOutletTemp = sizerASHRAEMinSATCooling.size(this->DesignMinOutletTemp, ErrFound);
 
-            SizingMethod = DataHVACGlobals::ASHRAEMaxSATHeatingSizing;
-            FieldNum = 17; // Maximum Supply Air Temperature in Heating Mode
-            // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [C]";
-            SizingString = "Maximum Supply Air Temperature [C]";
             if (SizingDesRunThisSys) {
                 DataSizing::DataCapacityUsedForSizing = DataSizing::FinalZoneSizing(this->ControlZoneNum).DesHeatLoad * capacityMultiplier;
             } else {
@@ -2728,7 +2724,12 @@ namespace UnitarySystems {
             }
             DataSizing::DataCapacityUsedForSizing /= this->ControlZoneMassFlowFrac;
             DataSizing::DataFlowUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
-            ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, this->DesignMaxOutletTemp, PrintFlag, RoutineName);
+            ASHRAEMaxSATHeatingSizer sizerASHRAEMaxSATHeating;
+            stringOverride = "Maximum Supply Air Temperature [C]";
+            if (DataGlobals::isEpJSON) stringOverride = "maximum_supply_air_temperature [C]";
+            sizerASHRAEMaxSATHeating.overrideSizingString(stringOverride);
+            sizerASHRAEMaxSATHeating.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            this->DesignMaxOutletTemp = sizerASHRAEMaxSATHeating.size(this->DesignMaxOutletTemp, ErrFound);
 
             DataSizing::DataCapacityUsedForSizing = 0.0; // reset so other routines don't use this inadvertently
             DataSizing::DataFlowUsedForSizing = 0.0;

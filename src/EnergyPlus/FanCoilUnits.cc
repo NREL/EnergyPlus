@@ -2061,7 +2061,6 @@ namespace FanCoilUnits {
 
                 CompType = FanCoil(FanCoilNum).UnitType;
                 CompName = FanCoil(FanCoilNum).Name;
-                SizingMethod = DataHVACGlobals::ASHRAEMinSATCoolingSizing;
                 Real64 capacityMultiplier = 0.6; // 60% of design zone load for water coils
                 DataCapacityUsedForSizing = FanCoil(FanCoilNum).DesCoolingLoad * capacityMultiplier;
                 CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
@@ -2072,20 +2071,19 @@ namespace FanCoilUnits {
                 }
                 DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
                 PrintFlag = true;
-                FieldNum = 11; // Minimum Supply Air Temperature in Cooling Mode
-                SizingString = FanCoilNumericFields(FanCoilNum).FieldNames(FieldNum) + " [C]";
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, FanCoil(FanCoilNum).DesignMinOutletTemp, PrintFlag, RoutineName);
+                ASHRAEMinSATCoolingSizer sizerASHRAEMinSATCooling;
+                sizerASHRAEMinSATCooling.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                FanCoil(FanCoilNum).DesignMinOutletTemp = sizerASHRAEMinSATCooling.size(FanCoil(FanCoilNum).DesignMinOutletTemp, ErrorsFound);
 
-                SizingMethod = DataHVACGlobals::ASHRAEMaxSATHeatingSizing;
-                FieldNum = 12; // Maximum Supply Air Temperature in Heating Mode
-                SizingString = FanCoilNumericFields(FanCoilNum).FieldNames(FieldNum) + " [C]";
                 if (SizingDesRunThisZone) {
                     DataCapacityUsedForSizing = FinalZoneSizing(FanCoil(FanCoilNum).ControlZoneNum).DesHeatLoad * capacityMultiplier;
                 } else {
                     DataCapacityUsedForSizing = FanCoil(FanCoilNum).DesHeatingLoad * capacityMultiplier;
                 }
                 DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, FanCoil(FanCoilNum).DesignMaxOutletTemp, PrintFlag, RoutineName);
+                ASHRAEMaxSATHeatingSizer sizerASHRAEMaxSATHeating;
+                sizerASHRAEMaxSATHeating.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                FanCoil(FanCoilNum).DesignMaxOutletTemp = sizerASHRAEMaxSATHeating.size(FanCoil(FanCoilNum).DesignMaxOutletTemp, ErrorsFound);
 
                 DataCapacityUsedForSizing = 0.0; // reset so other routines don't use this inadvertently
                 DataFlowUsedForSizing = 0.0;

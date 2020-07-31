@@ -61,7 +61,6 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(Real64 _originalValue, bool &
 
     Real64 FanCoolLoad = 0.0;
     Real64 DesMassFlow = 0.0;
-    Real64 NominalCapacityDes = 0.0;
     Real64 TotCapTempModFac = 0.0;
     Real64 DXFlowPerCapMinRatio = 0.0;
     Real64 DXFlowPerCapMaxRatio = 0.0;
@@ -118,10 +117,10 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(Real64 _originalValue, bool &
                     this->setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                                                               this->zoneEqSizing(this->curZoneEqNum),
                                                               this->finalZoneSizing(this->curZoneEqNum));
-                Real64 CoilInHumRat =
-                    this->setHeatCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
-                                                                this->zoneEqSizing(this->curZoneEqNum),
-                                                                this->finalZoneSizing(this->curZoneEqNum));
+                //Real64 CoilInHumRat =
+                //    this->setHeatCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                //                                                this->zoneEqSizing(this->curZoneEqNum),
+                //                                                this->finalZoneSizing(this->curZoneEqNum));
                 Real64 CoilOutTemp = this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp;
                 Real64 CoilOutHumRat = this->finalZoneSizing(this->curZoneEqNum).HeatDesHumRat;
                 this->autoSizedValue = Psychrometrics::PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);

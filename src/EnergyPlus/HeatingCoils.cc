@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -1570,12 +1571,16 @@ namespace HeatingCoils {
                 DataDesicRegCoil = true;
                 bPRINT = false;
                 DataDesicDehumNum = HeatingCoil(CoilNum).DesiccantDehumNum;
-                TempSize = AutoSize;
-                RequestSizing(state, CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
-                DataDesInletAirTemp = TempSize;
-                TempSize = AutoSize;
-                RequestSizing(state, CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
-                DataDesOutletAirTemp = TempSize;
+                HeatingCoilDesAirInletTempSizer sizerHeatingDesInletTemp;
+                bool ErrorsFound = false;
+                sizerHeatingDesInletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                DataDesInletAirTemp = sizerHeatingDesInletTemp.size(DataSizing::AutoSize, ErrorsFound);
+
+                HeatingCoilDesAirOutletTempSizer sizerHeatingDesOutletTemp;
+                ErrorsFound = false;
+                sizerHeatingDesOutletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                DataDesOutletAirTemp = sizerHeatingDesOutletTemp.size(DataSizing::AutoSize, ErrorsFound);
+
                 if (CurOASysNum > 0) {
                     OASysEqSizing(CurOASysNum).AirFlow = true;
                     OASysEqSizing(CurOASysNum).AirVolFlow = FinalSysSizing(CurSysNum).DesOutAirVolFlow;

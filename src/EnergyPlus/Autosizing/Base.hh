@@ -59,6 +59,8 @@ namespace EnergyPlus {
 
 enum class AutoSizingType
 {
+    ASHRAEMinSATCoolingSizing,
+    ASHRAEMaxSATHeatingSizing,
     AutoCalculateSizing,
     CoolingSHRSizing,
     CoolingWaterDesAirInletHumRatSizing,
@@ -67,7 +69,11 @@ enum class AutoSizingType
     CoolingWaterDesAirOutletTempSizing,
     CoolingWaterDesWaterInletTempSizing,
     CoolingWaterNumofTubesPerRowSizing,
+    DesiccantDehumidifierBFPerfDataFaceVelocitySizing,
     HeatingAirflowUASizing,
+    HeatingCoilDesAirInletHumRatSizing,
+    HeatingCoilDesAirInletTempSizing,
+    HeatingCoilDesAirOutletTempSizing,
     HeatingWaterDesAirInletHumRatSizing,
     HeatingWaterDesAirInletTempSizing,
     HeatingWaterDesCoilLoadUsedForUASizing,
@@ -190,10 +196,16 @@ struct BaseSizer
     int dataDXSpeedNum = 0;
 
     // WaterHeatingCapacitySizing
-    Real64 dataDesicRegCoil = 0.0;
+    bool dataDesicRegCoil = false;
 
     // WaterHeatingCapacitySizing
     Real64 dataHeatSizeRatio = 0.0;
+
+    // ASHRAEMinSATCoolingSizing, ASHRAEMaxSATHeatingSizing
+    int dataZoneUsedForSizing = 0;
+
+    //HeatingCoilDesAirInletTempSizing,
+    int dataDesicDehumNum = 0;
 
     bool printWarningFlag = false;
     std::string callingRoutine = "";

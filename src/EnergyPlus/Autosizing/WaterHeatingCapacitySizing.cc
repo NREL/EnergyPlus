@@ -104,20 +104,26 @@ Real64 WaterHeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
                     this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                                                               this->zoneEqSizing(this->curZoneEqNum),
                                                               this->finalZoneSizing(this->curZoneEqNum));
-                Real64 CoilInHumRat =
-                    this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
-                                                                this->zoneEqSizing(this->curZoneEqNum),
-                                                                this->finalZoneSizing(this->curZoneEqNum));
+                //Real64 CoilInHumRat =
+                //    this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                //                                                this->zoneEqSizing(this->curZoneEqNum),
+                //                                                this->finalZoneSizing(this->curZoneEqNum));
                 CoilOutTemp = this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp;
                 CoilOutHumRat = this->finalZoneSizing(this->curZoneEqNum).HeatDesHumRat;
                 NominalCapacityDes = Psychrometrics::PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
             }
             this->autoSizedValue = NominalCapacityDes * this->dataHeatSizeRatio;
             if (DataGlobals::DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
-                ShowWarningMessage(this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
-                ShowContinueError("...Rated Total Heating Capacity = " + General::TrimSigDigits(this->autoSizedValue, 2) + " [W]");
-                ShowContinueError("...Air flow rate used for sizing = " + General::TrimSigDigits(DesMassFlow / DataEnvironment::StdRhoAir, 5) +
-                                  " [m3/s]");
+                std::string msg =
+                    this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
+                this->addErrorMessage(msg);
+                ShowWarningMessage(msg);
+                msg = "...Rated Total Heating Capacity = " + General::TrimSigDigits(this->autoSizedValue, 2) + " [W]";
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
+                msg = "...Air flow rate used for sizing = " + General::TrimSigDigits(DesMassFlow / DataEnvironment::StdRhoAir, 5) + " [m3/s]";
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
                 if (this->termUnitSingDuct || this->termUnitPIU || this->termUnitIU || this->zoneEqFanCoil || this->zoneEqUnitHeater) {
                     ShowContinueError("...Air flow rate used for sizing = " + General::TrimSigDigits(DesMassFlow / DataEnvironment::StdRhoAir, 5) +
                                       " [m3/s]");

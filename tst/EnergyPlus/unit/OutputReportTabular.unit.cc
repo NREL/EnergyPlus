@@ -51,6 +51,7 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
+#include <stdio.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include "Fixtures/SQLiteFixture.hh"
@@ -6664,14 +6665,18 @@ TEST(OutputReportTabularTest, GetZoneComponentAreas_test)
 
 TEST(OutputReportTabularTest, CombineLoadCompResults_test)
 {
+    printf("1");
     ShowMessage("Begin Test: OutputReportTabularTest, CombineLoadCompResults_test");
+    printf("2");
 
     CompLoadTablesType compLoadTotal;
+    printf("3");
     compLoadTotal.cells.allocate(10, 30);
     compLoadTotal.cells = 0.;
     compLoadTotal.cellUsed.allocate(10, 30);
     compLoadTotal.cellUsed = false;
 
+    printf("4");
     CompLoadTablesType compLoadPartial;
     compLoadPartial.cells.allocate(10, 30);
     compLoadPartial.cells = 0.;
@@ -6686,7 +6691,9 @@ TEST(OutputReportTabularTest, CombineLoadCompResults_test)
     compLoadPartial.outsideWetBulb = 17.;
     compLoadPartial.diffDesignPeak = 11.;
 
+    printf("5");
     CombineLoadCompResults(compLoadTotal, compLoadPartial, multiplier);
+    printf("6");
 
     EXPECT_EQ(1.1 * 3., compLoadTotal.cells(1, 1));
     EXPECT_EQ(1.2 * 3., compLoadTotal.cells(4, 25));
