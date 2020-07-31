@@ -1156,9 +1156,9 @@ A custom meter allows the user to group variables or meters onto a virtual meter
 
 This is a user defined name for the custom meter. Names for custom meters cannot duplicate internal meter names.
 
-\paragraph{Field: Fuel Type}\label{field-fuel-type-004}
+\paragraph{Field: Resource Type}\label{field-fuel-type-004}
 
-A fuel type should be specified for the meter. All assignments to this meter will be checked to assure that the same fuel type is used. Additionally, this may be used in other objects (such as the Demand Limiting). Valid choices for this field are:
+A resource type should be specified for the meter. All assignments to this meter will be checked to assure that the same resource type is used. Additionally, this may be used in other objects (such as the Demand Limiting). Valid choices for this field are:
 
 \begin{itemize}
 \item
@@ -1172,22 +1172,28 @@ A fuel type should be specified for the meter. All assignments to this meter wil
 \item
   FuelOilNo2
 \item
-  Coal
-\item
   Diesel
 \item
   Gasoline
 \item
-  Water
-\item
-  Generic
+  Coal
 \item
   OtherFuel1
 \item
   OtherFuel2
+\item
+  Steam
+\item
+  DistrictHeating
+\item
+  DistrictCooling
+\item
+  Water
+\item
+  Generic
 \end{itemize}
 
-Fuel types are generally self-explanatory. Generic is included for convenience when a custom meter is defined that doesn't quite fit the ``fuel'' categories. See the examples below.
+Resource types are generally self-explanatory. Generic is included for convenience when a custom meter is defined that doesn't quite fit the ``resource'' categories. See the examples below.
 
 \paragraph{Field: group(s) Key Name-Output Variable/Meter Name}\label{field-groups-key-name-output-variablemeter-name}
 
@@ -1199,7 +1205,12 @@ A key name field is used when the following field specifies an output variable. 
 
 \paragraph{Field: Output Variable or Meter Name \#}\label{field-output-variable-or-meter-name}
 
-This field must be a valid output variable name or a valid meter name. If a Meter:Custom references another Meter:Custom it will generate a warning and not product any output.
+This field must be a valid output variable name or a valid meter name. If a Meter:Custom references another Meter:Custom it will generate a warning and not produce any output.
+For output variables, only summed variables are valid. For example from the rdd output, any "Sum" type variable is valid:
+\begin{lstlisting}
+ Zone,Sum,Exterior Equipment Electric Energy [J]
+\end{lstlisting}
+
 
 \subsection{Meter:CustomDecrement}\label{metercustomdecrement}
 
@@ -1211,9 +1222,9 @@ The decrement custom meter is very similar to the custom meter specification but
 
 This is a user defined name for the custom meter. Names for custom meters cannot duplicate internal meter names.
 
-\paragraph{Field: Fuel Type}\label{field-fuel-type-1-003}
+\paragraph{Field: Resource Type}\label{field-fuel-type-1-003}
 
-A fuel type should be specified for the meter. All assignments to this meter will be checked to assure that the same fuel type is used. Additionally, this may be used in other objects (such as the Demand Limiting). Valid choices for this field are:
+A resource type should be specified for the meter. All assignments to this meter will be checked to assure that the same resource type is used. Additionally, this may be used in other objects (such as the Demand Limiting). Valid choices for this field are:
 
 \begin{itemize}
 \item
@@ -1227,19 +1238,25 @@ A fuel type should be specified for the meter. All assignments to this meter wil
 \item
   FuelOilNo2
 \item
-  Coal
-\item
   Diesel
 \item
   Gasoline
 \item
-  Water
-\item
-  Generic
+  Coal
 \item
   OtherFuel1
 \item
   OtherFuel2
+\item
+  Steam
+\item
+  DistrictHeating
+\item
+  DistrictCooling
+\item
+  Water
+\item
+  Generic
 \end{itemize}
 
 \paragraph{Field: Source Meter Name}\label{field-source-meter-name}
@@ -1256,7 +1273,10 @@ A key name field is used when the following field specifies an output variable. 
 
 \paragraph{Field: Output Variable or Meter Name \#}\label{field-output-variable-or-meter-name-1}
 
-This field must be a valid output variable name or a valid meter name. Additionally, it must be contained on the Source Meter. Note that, if an error occurs, only the Variable in error will show -- confusing things if what was entered was a meter name.
+This field must be a valid output variable name or a valid meter name. Additionally, it must be contained on the Source Meter. Note that, if an error occurs, only the Variable in error will show -- confusing things if what was entered was a meter name. For output variables, only summed variables are valid. For example from the rdd output, any "Sum" type variable is valid:
+\begin{lstlisting}
+ Zone,Sum,Exterior Equipment Electric Energy [J]
+\end{lstlisting}
 
 \subsection{Custom Meter Examples}\label{custom-meter-examples}
 
@@ -1267,7 +1287,7 @@ In the following examples, the custom meters are set up to illustrate the capabi
 \begin{lstlisting}
 Meter:Custom,
   MyGeneralLights,         !- Name
-  Electricity,             !- Fuel Type
+  Electricity,             !- Resource Type
   SPACE1-1,                !- Key Name 1
   Lights Electric Energy,  !- Output Variable or Meter Name 1
   SPACE2-1,                !- Key Name 2
@@ -1281,30 +1301,30 @@ Meter:Custom,
 
 Meter:Custom,
   MyBuildingElectric,      !- Name
-  Electricity,             !- Fuel Type
+  Electricity,             !- Resource Type
   ,                        !- Key Name #1
   Electricity:Building;    !- Output Variable or Meter Name #1
 
 Meter:CustomDecrement,
   MyBuildingOther,         !- Name
-  Electricity,             !- Fuel Type
+  Electricity,             !- Resource Type
   Electricity:Building,    !- Source Meter Name
   ,                        !- Key Name #1
   MyGeneralLights;         !- Output Variable or Meter Name #1
 \end{lstlisting}
 
-For an example of ``generic'' fuel type, one might put the Building Infiltration Heat Loss \& Heat Gain on a set of custom meters:
+For an example of ``generic'' Resource type, one might put the Building Infiltration Heat Loss \& Heat Gain on a set of custom meters:
 
 \begin{lstlisting}
 Meter:Custom,
   Building Infiltration Heat Loss,          !- Name
-  Generic,                                  !- Fuel Type
+  Generic,                                  !- Resource Type
   *,                                        !- Key Name 1
   Zone Infiltration Total Heat Loss Energy; !- Output Variable Name 1
 
 Meter:Custom,
   Building Infiltration Heat Gain,          !- Name
-  Generic,                                  !- Fuel Type
+  Generic,                                  !- Resource Type
   *,                                        !- Key Name 1
   Zone Infiltration Total Heat Gain Energy; !- Output Variable Name 1
 \end{lstlisting}
