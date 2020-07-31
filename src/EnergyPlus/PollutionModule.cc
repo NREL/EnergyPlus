@@ -2040,7 +2040,7 @@ namespace PollutionModule {
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
                     // Pollutants from FuelOilNo2
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 Source Energy",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 Source Energy",
                                         OutputProcessor::Unit::J,
                                         Pollution.FuelOil2Comp.Source,
                                         "System",
@@ -2051,7 +2051,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 CO2 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 CO2 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.CO2Pollution,
                                         "System",
@@ -2062,7 +2062,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 CO Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 CO Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.COPollution,
                                         "System",
@@ -2073,7 +2073,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 CH4 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 CH4 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.CH4Pollution,
                                         "System",
@@ -2084,7 +2084,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 NOx Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 NOx Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.NOxPollution,
                                         "System",
@@ -2095,7 +2095,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 N2O Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 N2O Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.N2OPollution,
                                         "System",
@@ -2106,7 +2106,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 SO2 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 SO2 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.SO2Pollution,
                                         "System",
@@ -2117,7 +2117,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 PM Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 PM Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.PMPollution,
                                         "System",
@@ -2128,7 +2128,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 PM10 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 PM10 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.PM10Pollution,
                                         "System",
@@ -2139,7 +2139,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 PM2.5 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 PM2.5 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.PM25Pollution,
                                         "System",
@@ -2150,7 +2150,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 NH3 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 NH3 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.NH3Pollution,
                                         "System",
@@ -2161,7 +2161,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 NMVOC Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 NMVOC Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.NMVOCPollution,
                                         "System",
@@ -2172,7 +2172,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 Hg Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 Hg Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.HgPollution,
                                         "System",
@@ -2183,7 +2183,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 Pb Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 Pb Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.PbPollution,
                                         "System",
@@ -2194,7 +2194,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 Water Consumption Volume",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 Water Consumption Volume",
                                         OutputProcessor::Unit::L,
                                         Pollution.FuelOil2Comp.WaterPollution,
                                         "System",
@@ -2205,7 +2205,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 Nuclear High Level Waste Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 Nuclear High Level Waste Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil2Comp.NucHiPollution,
                                         "System",
@@ -2216,7 +2216,7 @@ namespace PollutionModule {
                                         "FuelOilNo2Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 2 Nuclear Low Level Waste Volume",
+                    SetupOutputVariable("Environmental Impact FuelOilNo2 Nuclear Low Level Waste Volume",
                                         OutputProcessor::Unit::m3,
                                         Pollution.FuelOil2Comp.NucLoPollution,
                                         "System",
@@ -2230,7 +2230,7 @@ namespace PollutionModule {
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
                     // Pollutants from FuelOilNo1
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 Source Energy",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 Source Energy",
                                         OutputProcessor::Unit::J,
                                         Pollution.FuelOil1Comp.Source,
                                         "System",
@@ -2241,7 +2241,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 CO2 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 CO2 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.CO2Pollution,
                                         "System",
@@ -2252,7 +2252,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 CO Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 CO Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.COPollution,
                                         "System",
@@ -2263,7 +2263,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 CH4 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 CH4 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.CH4Pollution,
                                         "System",
@@ -2274,7 +2274,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 NOx Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 NOx Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.NOxPollution,
                                         "System",
@@ -2285,7 +2285,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 N2O Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 N2O Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.N2OPollution,
                                         "System",
@@ -2296,7 +2296,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 SO2 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 SO2 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.SO2Pollution,
                                         "System",
@@ -2307,7 +2307,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 PM Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 PM Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.PMPollution,
                                         "System",
@@ -2318,7 +2318,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 PM10 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 PM10 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.PM10Pollution,
                                         "System",
@@ -2329,7 +2329,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 PM2.5 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 PM2.5 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.PM25Pollution,
                                         "System",
@@ -2340,7 +2340,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 NH3 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 NH3 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.NH3Pollution,
                                         "System",
@@ -2351,7 +2351,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 NMVOC Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 NMVOC Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.NMVOCPollution,
                                         "System",
@@ -2362,7 +2362,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 Hg Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 Hg Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.HgPollution,
                                         "System",
@@ -2373,7 +2373,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 Pb Emissions Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 Pb Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.PbPollution,
                                         "System",
@@ -2384,7 +2384,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 Water Consumption Volume",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 Water Consumption Volume",
                                         OutputProcessor::Unit::L,
                                         Pollution.FuelOil1Comp.WaterPollution,
                                         "System",
@@ -2395,7 +2395,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 Nuclear High Level Waste Mass",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 Nuclear High Level Waste Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.FuelOil1Comp.NucHiPollution,
                                         "System",
@@ -2406,7 +2406,7 @@ namespace PollutionModule {
                                         "FuelOilNo1Emissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Fuel Oil No 1 Nuclear Low Level Waste Volume",
+                    SetupOutputVariable("Environmental Impact FuelOilNo1 Nuclear Low Level Waste Volume",
                                         OutputProcessor::Unit::m3,
                                         Pollution.FuelOil1Comp.NucLoPollution,
                                         "System",

@@ -76,39 +76,39 @@ FuelOil#1Emissions:Pb,FuelOilNo1Emissions:Pb,Output meters in the standard meter
 FuelOil#1Emissions:WaterEnvironmentalFactors,FuelOilNo1Emissions:WaterEnvironmentalFactors,Output meters in the standard meter output (.mdd) file
 FuelOil#1Emissions:Nuclear High,FuelOilNo1Emissions:Nuclear High,Output meters in the standard meter output (.mdd) file
 FuelOil#1Emissions:Nuclear Low,FuelOilNo1Emissions:Nuclear Low,Output meters in the standard meter output (.mdd) file
-Environmental Impact Fuel Oil #2 CO2 Emissions Mass,Environmental Impact Fuel Oil No 2 CO2 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 Source Energy,Environmental Impact Fuel Oil No 2 Source Energy,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 CO2 Emissions Mass,Environmental Impact Fuel Oil No 2 CO2 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 CO Emissions Mass,Environmental Impact Fuel Oil No 2 CO Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 CH4 Emissions Mass,Environmental Impact Fuel Oil No 2 CH4 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 NOx Emissions Mass,Environmental Impact Fuel Oil No 2 NOx Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 N2O Emissions Mass,Environmental Impact Fuel Oil No 2 N2O Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 SO2 Emissions Mass,Environmental Impact Fuel Oil No 2 SO2 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 PM Emissions Mass,Environmental Impact Fuel Oil No 2 PM Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 PM10 Emissions Mass,Environmental Impact Fuel Oil No 2 PM10 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 PM2.5 Emissions Mass,Environmental Impact Fuel Oil No 2 PM2.5 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 NH3 Emissions Mass,Environmental Impact Fuel Oil No 2 NH3 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 NMVOC Emissions Mass,Environmental Impact Fuel Oil No 2 NMVOC Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 Hg Emissions Mass,Environmental Impact Fuel Oil No 2 Hg Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 Pb Emissions Mass,Environmental Impact Fuel Oil No 2 Pb Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 Water Consumption Volume,Environmental Impact Fuel Oil No 2 Water Consumption Volume,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 Nuclear High Level Waste Mass,Environmental Impact Fuel Oil No 2 Nuclear High Level Waste Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #2 Nuclear Low Level Waste Volume,Environmental Impact Fuel Oil No 2 Nuclear Low Level Waste Volume,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 Source Energy,Environmental Impact Fuel Oil No 1 Source Energy,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 CO2 Emissions Mass,Environmental Impact Fuel Oil No 1 CO2 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 CO Emissions Mass,Environmental Impact Fuel Oil No 1 CO Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 CH4 Emissions Mass,Environmental Impact Fuel Oil No 1 CH4 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 NOx Emissions Mass,Environmental Impact Fuel Oil No 1 NOx Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 N2O Emissions Mass,Environmental Impact Fuel Oil No 1 N2O Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 SO2 Emissions Mass,Environmental Impact Fuel Oil No 1 SO2 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 PM Emissions Mass,Environmental Impact Fuel Oil No 1 PM Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 PM10 Emissions Mass,Environmental Impact Fuel Oil No 1 PM10 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 PM2.5 Emissions Mass,Environmental Impact Fuel Oil No 1 PM2.5 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 NH3 Emissions Mass,Environmental Impact Fuel Oil No 1 NH3 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 NMVOC Emissions Mass,Environmental Impact Fuel Oil No 1 NMVOC Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 Hg Emissions Mass,Environmental Impact Fuel Oil No 1 Hg Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 Pb Emissions Mass,Environmental Impact Fuel Oil No 1 Pb Emissions Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 Water Consumption Volume,Environmental Impact Fuel Oil No 1 Water Consumption Volume,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 Nuclear High Level Waste Mass,Environmental Impact Fuel Oil No 1 Nuclear High Level Waste Mass,Output Variables in the standard report variable output (.rdd) file
-Environmental Impact Fuel Oil #1 Nuclear Low Level Waste Volume,Environmental Impact Fuel Oil No 1 Nuclear Low Level Waste Volume,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 CO2 Emissions Mass,Environmental Impact FuelOilNo2 CO2 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 Source Energy,Environmental Impact FuelOilNo2 Source Energy,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 CO2 Emissions Mass,Environmental Impact FuelOilNo2 CO2 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 CO Emissions Mass,Environmental Impact FuelOilNo2 CO Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 CH4 Emissions Mass,Environmental Impact FuelOilNo2 CH4 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 NOx Emissions Mass,Environmental Impact FuelOilNo2 NOx Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 N2O Emissions Mass,Environmental Impact FuelOilNo2 N2O Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 SO2 Emissions Mass,Environmental Impact FuelOilNo2 SO2 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 PM Emissions Mass,Environmental Impact FuelOilNo2 PM Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 PM10 Emissions Mass,Environmental Impact FuelOilNo2 PM10 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 PM2.5 Emissions Mass,Environmental Impact FuelOilNo2 PM2.5 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 NH3 Emissions Mass,Environmental Impact FuelOilNo2 NH3 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 NMVOC Emissions Mass,Environmental Impact FuelOilNo2 NMVOC Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 Hg Emissions Mass,Environmental Impact FuelOilNo2 Hg Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 Pb Emissions Mass,Environmental Impact FuelOilNo2 Pb Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 Water Consumption Volume,Environmental Impact FuelOilNo2 Water Consumption Volume,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 Nuclear High Level Waste Mass,Environmental Impact FuelOilNo2 Nuclear High Level Waste Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #2 Nuclear Low Level Waste Volume,Environmental Impact FuelOilNo2 Nuclear Low Level Waste Volume,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 Source Energy,Environmental Impact FuelOilNo1 Source Energy,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 CO2 Emissions Mass,Environmental Impact FuelOilNo1 CO2 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 CO Emissions Mass,Environmental Impact FuelOilNo1 CO Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 CH4 Emissions Mass,Environmental Impact FuelOilNo1 CH4 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 NOx Emissions Mass,Environmental Impact FuelOilNo1 NOx Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 N2O Emissions Mass,Environmental Impact FuelOilNo1 N2O Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 SO2 Emissions Mass,Environmental Impact FuelOilNo1 SO2 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 PM Emissions Mass,Environmental Impact FuelOilNo1 PM Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 PM10 Emissions Mass,Environmental Impact FuelOilNo1 PM10 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 PM2.5 Emissions Mass,Environmental Impact FuelOilNo1 PM2.5 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 NH3 Emissions Mass,Environmental Impact FuelOilNo1 NH3 Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 NMVOC Emissions Mass,Environmental Impact FuelOilNo1 NMVOC Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 Hg Emissions Mass,Environmental Impact FuelOilNo1 Hg Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 Pb Emissions Mass,Environmental Impact FuelOilNo1 Pb Emissions Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 Water Consumption Volume,Environmental Impact FuelOilNo1 Water Consumption Volume,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 Nuclear High Level Waste Mass,Environmental Impact FuelOilNo1 Nuclear High Level Waste Mass,Output Variables in the standard report variable output (.rdd) file
+Environmental Impact Fuel Oil #1 Nuclear Low Level Waste Volume,Environmental Impact FuelOilNo1 Nuclear Low Level Waste Volume,Output Variables in the standard report variable output (.rdd) file
 old variable name,new variable name,
