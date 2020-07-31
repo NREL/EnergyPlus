@@ -515,12 +515,6 @@ class DataExchange:
         using the get_global_value and this set_global_value functions as needed.  Note all global variables are
         floating point values.
 
-        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
-        automatically converts values to upper-case when finding matches to internal variables in the simulation.
-
-        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
-        as needed.
-
         :param handle: An integer returned from the `get_global_handle` function.
         :param value: Floating point value to assign to the global variable
         """
