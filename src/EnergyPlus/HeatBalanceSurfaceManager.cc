@@ -3788,10 +3788,10 @@ namespace HeatBalanceSurfaceManager {
                                                              dataConstruction.Construct(SurfWinShadedConstruction(
                                                                      SurfNum)).InsideAbsorpThermal);
                 }
-            }
-            int const firstSurfWin = Zone(radEnclosureNum).WindowSurfaceFirst;
-            int const lastSurfWin = Zone(radEnclosureNum).WindowSurfaceLast;
-            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+//            }
+//            int const firstSurfWin = Zone(radEnclosureNum).WindowSurfaceFirst;
+//            int const lastSurfWin = Zone(radEnclosureNum).WindowSurfaceLast;
+//            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
 
                 // Window frame and divider effects
                 if (SurfWinFrameArea(SurfNum) > 0.0)
