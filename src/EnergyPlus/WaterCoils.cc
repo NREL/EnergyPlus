@@ -68,6 +68,7 @@
 #include <EnergyPlus/Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh>
 #include <EnergyPlus/Autosizing/HeatingWaterflowSizing.hh>
 #include <EnergyPlus/Autosizing/WaterHeatingCapacitySizing.hh>
+#include <EnergyPlus/Autosizing/WaterHeatingCoilUASizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -2704,7 +2705,9 @@ namespace WaterCoils {
                 }
                 // must set DataCapacityUsedForSizing, DataWaterFlowUsedForSizing and DataFlowUsedForSizing to size UA. Any value of 0 will result
                 // in UA = 1.
-                RequestSizing(state, CompType, CompName, WaterHeatingCoilUASizing, SizingString, TempSize, bPRINT, RoutineName);
+                WaterHeatingCoilUASizer sizerHWCoilUA;
+                sizerHWCoilUA.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                WaterCoil(CoilNum).UACoil = sizerHWCoilUA.size(TempSize, ErrorsFound);
                 if (DesCoilWaterInTempSaved < DesCoilHWInletTempMin) {
                     ShowWarningError("Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"");
                     ShowContinueError(" Plant design loop exit temperature = " + TrimSigDigits(PlantSizData(DataPltSizHeatNum).ExitTemp, 2) + " C");
@@ -2713,14 +2716,13 @@ namespace WaterCoils {
                         " Heating coil UA-value is sized using coil water inlet temperature = " + TrimSigDigits(DesCoilInletWaterTempUsed, 2) + " C");
                     WaterCoil(DataCoilNum).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature
                 }
-                WaterCoil(CoilNum).UACoil = TempSize;
                 // if coil UA did not size due to one of these variables being 0, must set UACoilVariable to avoid crash later on
                 if (DataCapacityUsedForSizing == 0.0 || DataWaterFlowUsedForSizing == 0.0 || DataFlowUsedForSizing == 0.0) {
                     if (WaterCoil(CoilNum).UACoilVariable == AutoSize) {
-                        WaterCoil(CoilNum).UACoilVariable = TempSize;
+                        WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
                     }
                 }
-                WaterCoil(CoilNum).UACoilVariable = TempSize;
+                WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
                 WaterCoil(CoilNum).DesWaterHeatingCoilRate = DataCapacityUsedForSizing;
                 WaterCoil(DataCoilNum).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature
 

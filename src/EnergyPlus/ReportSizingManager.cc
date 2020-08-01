@@ -1926,91 +1926,6 @@ namespace ReportSizingManager {
                             }
                         }
                     }
-                } else if (SizingType == WaterHeatingCoilUASizing) {
-                    if (DataCapacityUsedForSizing > 0.0 && DataWaterFlowUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0) {
-                        Par(1) = DataCapacityUsedForSizing;
-                        Par(2) = double(DataCoilNum);
-                        Par(3) = double(DataFanOpMode); // fan operating mode
-                        Par(4) = 1.0;                   // part-load ratio
-                        UA0 = 0.001 * DataCapacityUsedForSizing;
-                        UA1 = DataCapacityUsedForSizing;
-                        // Invert the simple heating coil model: given the design inlet conditions and the design load,
-                        // find the design UA.
-                        SolveRoot(Acc, MaxIte, SolFla, AutosizeDes, SimpleHeatingCoilUAResidual, UA0, UA1, Par);
-                        if (SolFla == -1) {
-                            ShowSevereError("Autosizing of heating coil UA failed for Coil:Heating:Water \"" + CompName + "\"");
-                            ShowContinueError("  Iteration limit exceeded in calculating coil UA");
-                            ShowContinueError("  Lower UA estimate = " + TrimSigDigits(UA0, 6) + " W/m2-K (0.1% of Design Coil Load)");
-                            ShowContinueError("  Upper UA estimate = " + TrimSigDigits(UA1, 6) + " W/m2-K (100% of Design Coil Load)");
-                            ShowContinueError("  Final UA estimate when iterations exceeded limit = " + TrimSigDigits(AutosizeDes, 6) + " W/m2-K");
-                            ShowContinueError("  Zone \"" + FinalZoneSizing(CurZoneEqNum).ZoneName +
-                                              "\" coil sizing conditions (may be different than Sizing inputs):");
-                            ShowContinueError("  Coil inlet air temperature     = " + TrimSigDigits(DataDesInletAirTemp, 3) + " C");
-                            ShowContinueError("  Coil inlet air humidity ratio  = " + TrimSigDigits(DataDesInletAirHumRat, 3) + " kgWater/kgDryAir");
-                            ShowContinueError("  Coil inlet air mass flow rate  = " + TrimSigDigits(DataFlowUsedForSizing, 6) + " kg/s");
-                            // TotWaterHeatingCoilRate is set in CALL to CalcSimpleHeatingCoil
-                            ShowContinueError("  Design Coil Capacity           = " + TrimSigDigits(DataDesignCoilCapacity, 3) + " W");
-                            if (DataNomCapInpMeth) {
-                                ShowContinueError("  Design Coil Load               = " + TrimSigDigits(DataCapacityUsedForSizing, 3) + " W");
-                                ShowContinueError("  Coil outlet air temperature    = " + TrimSigDigits(DataDesOutletAirTemp, 3) + " C");
-                                ShowContinueError("  Coil outlet air humidity ratio = " + TrimSigDigits(DataDesOutletAirHumRat, 3) +
-                                                  " kgWater/kgDryAir");
-                            } else if (TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil) {
-                                ShowContinueError("  Design Coil Load               = " + TrimSigDigits(DataCapacityUsedForSizing, 3) + " W");
-                            } else {
-                                ShowContinueError("  Design Coil Load               = " + TrimSigDigits(DataCapacityUsedForSizing, 3) + " W");
-                                ShowContinueError(
-                                    "  Coil outlet air temperature    = " + TrimSigDigits(FinalZoneSizing(CurZoneEqNum).HeatDesTemp, 3) + " C");
-                                ShowContinueError("  Coil outlet air humidity ratio = " +
-                                                  TrimSigDigits(FinalZoneSizing(CurZoneEqNum).HeatDesHumRat, 3) + " kgWater/kgDryAir");
-                            }
-                            DataErrorsFound = true;
-                        } else if (SolFla == -2) {
-                            ShowSevereError("Autosizing of heating coil UA failed for Coil:Heating:Water \"" + CompName + "\"");
-                            ShowContinueError("  Bad starting values for UA");
-                            ShowContinueError("  Lower UA estimate = " + TrimSigDigits(UA0, 6) + " W/m2-K (0.1% of Design Coil Load)");
-                            ShowContinueError("  Upper UA estimate = " + TrimSigDigits(UA1, 6) + " W/m2-K (100% of Design Coil Load)");
-                            ShowContinueError("  Zone \"" + FinalZoneSizing(CurZoneEqNum).ZoneName +
-                                              "\" coil sizing conditions (may be different than Sizing inputs):");
-                            ShowContinueError("  Coil inlet air temperature     = " + TrimSigDigits(DataDesInletAirTemp, 3) + " C");
-                            ShowContinueError("  Coil inlet air humidity ratio  = " + TrimSigDigits(DataDesInletAirHumRat, 3) + " kgWater/kgDryAir");
-                            ShowContinueError("  Coil inlet air mass flow rate  = " + TrimSigDigits(DataFlowUsedForSizing, 6) + " kg/s");
-                            ShowContinueError("  Design Coil Capacity           = " + TrimSigDigits(DataDesignCoilCapacity, 3) + " W");
-                            if (DataNomCapInpMeth) {
-                                ShowContinueError("  Design Coil Load               = " + TrimSigDigits(DataCapacityUsedForSizing, 3) + " W");
-                                ShowContinueError("  Coil outlet air temperature    = " + TrimSigDigits(DataDesOutletAirTemp, 3) + " C");
-                                ShowContinueError("  Coil outlet air humidity ratio = " + TrimSigDigits(DataDesOutletAirHumRat, 3) +
-                                                  " kgWater/kgDryAir");
-                            } else if (TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil) {
-                                ShowContinueError("  Design Coil Load               = " + TrimSigDigits(DataCapacityUsedForSizing, 3) + " W");
-                            } else {
-                                ShowContinueError("  Design Coil Load               = " + TrimSigDigits(DataCapacityUsedForSizing, 3) + " W");
-                                ShowContinueError(
-                                    "  Coil outlet air temperature    = " + TrimSigDigits(FinalZoneSizing(CurZoneEqNum).HeatDesTemp, 3) + " C");
-                                ShowContinueError("  Coil outlet air humidity ratio = " +
-                                                  TrimSigDigits(FinalZoneSizing(CurZoneEqNum).HeatDesHumRat, 3) + " kgWater/kgDryAir");
-                            }
-                            // TotWaterHeatingCoilRate is set in CALL to CalcSimpleHeatingCoil
-                            if (DataDesignCoilCapacity < DataCapacityUsedForSizing) {
-                                ShowContinueError("  Inadequate water side capacity: in Plant Sizing for this hot water loop");
-                                ShowContinueError("  increase design loop exit temperature and/or decrease design loop delta T");
-                                ShowContinueError("  Plant Sizing object = " + PlantSizData(DataPltSizHeatNum).PlantLoopName);
-                                ShowContinueError(
-                                    "  Plant design loop exit temperature = " + TrimSigDigits(PlantSizData(DataPltSizHeatNum).ExitTemp, 3) + " C");
-                                ShowContinueError("  Plant design loop delta T          = " + TrimSigDigits(DataWaterCoilSizHeatDeltaT, 3) + " C");
-                            }
-                            DataErrorsFound = true;
-                        }
-                    } else {
-                        AutosizeDes = 1.0;
-                        if (DataWaterFlowUsedForSizing > 0.0 && DataCapacityUsedForSizing == 0.0) {
-                            ShowWarningError("The design coil load used for UA sizing is zero for Coil:Heating:Water " + CompName);
-                            ShowContinueError("An autosize value for UA cannot be calculated");
-                            ShowContinueError("Input a value for UA, change the heating design day, or raise");
-                            ShowContinueError("  the zone heating design supply air temperature");
-                            ShowContinueError("Water coil UA is set to 1 and the simulation continues.");
-                        }
-                    }
                 } else {
                     // should never happen
                 }
@@ -2679,73 +2594,6 @@ namespace ReportSizingManager {
                         } // end switch
                     }
 
-                } else if (SizingType == WaterHeatingCoilUASizing) {
-                    if (DataCapacityUsedForSizing >= SmallLoad && DataWaterFlowUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0) {
-                        Par(1) = DataCapacityUsedForSizing;
-                        Par(2) = double(DataCoilNum);
-                        Par(3) = double(DataFanOpMode); // fan operating mode
-                        Par(4) = 1.0;                   // part-load ratio
-                        UA0 = 0.001 * DataCapacityUsedForSizing;
-                        UA1 = DataCapacityUsedForSizing;
-                        // Invert the simple heating coil model: given the design inlet conditions and the design load,
-                        // find the design UA.
-                        SolveRoot(Acc, MaxIte, SolFla, AutosizeDes, SimpleHeatingCoilUAResidual, UA0, UA1, Par);
-                        if (SolFla == -1) {
-                            ShowSevereError("Autosizing of heating coil UA failed for Coil:Heating:Water \"" + CompName + "\"");
-                            ShowContinueError("  Iteration limit exceeded in calculating coil UA");
-                            ShowContinueError("  Lower UA estimate = " + TrimSigDigits(UA0, 6) + " W/m2-K (1% of Design Coil Load)");
-                            ShowContinueError("  Upper UA estimate = " + TrimSigDigits(UA1, 6) + " W/m2-K (100% of Design Coil Load)");
-                            ShowContinueError("  Final UA estimate when iterations exceeded limit = " + TrimSigDigits(AutosizeDes, 6) + " W/m2-K");
-                            ShowContinueError("  AirloopHVAC \"" + FinalSysSizing(CurSysNum).AirPriLoopName +
-                                              "\" coil sizing conditions (may be different than Sizing inputs):");
-                            ShowContinueError("  Coil inlet air temperature     = " + TrimSigDigits(DataDesInletAirTemp, 3) + " C");
-                            ShowContinueError("  Coil inlet air humidity ratio  = " + TrimSigDigits(DataDesInletAirHumRat, 3) + " kgWater/kgDryAir");
-                            ShowContinueError("  Coil inlet air mass flow rate  = " + TrimSigDigits(DataFlowUsedForSizing, 6) + " kg/s");
-                            ShowContinueError("  Design Coil Capacity           = " + TrimSigDigits(DataDesignCoilCapacity, 3) + " W");
-                            ShowContinueError("  Design Coil Load               = " + TrimSigDigits(DataCapacityUsedForSizing, 3) + " W");
-                            if (DataNomCapInpMeth) {
-                                ShowContinueError("  Coil outlet air temperature    = " + TrimSigDigits(DataDesOutletAirTemp, 3) + " C");
-                                ShowContinueError("  Coil outlet air humidity ratio = " + TrimSigDigits(DataDesOutletAirHumRat, 3) +
-                                                  " kgWater/kgDryAir");
-                            }
-                            DataErrorsFound = true;
-                        } else if (SolFla == -2) {
-                            ShowSevereError("Autosizing of heating coil UA failed for Coil:Heating:Water \"" + CompName + "\"");
-                            ShowContinueError("  Bad starting values for UA");
-                            ShowContinueError("  Lower UA estimate = " + TrimSigDigits(UA0, 6) + " W/m2-K (1% of Design Coil Load)");
-                            ShowContinueError("  Upper UA estimate = " + TrimSigDigits(UA1, 6) + " W/m2-K (100% of Design Coil Load)");
-                            ShowContinueError("  AirloopHVAC \"" + FinalSysSizing(CurSysNum).AirPriLoopName +
-                                              "\" coil sizing conditions (may be different than Sizing inputs):");
-                            ShowContinueError("  Coil inlet air temperature     = " + TrimSigDigits(DataDesInletAirTemp, 3) + " C");
-                            ShowContinueError("  Coil inlet air humidity ratio  = " + TrimSigDigits(DataDesInletAirHumRat, 3) + " kgWater/kgDryAir");
-                            ShowContinueError("  Coil inlet air mass flow rate  = " + TrimSigDigits(DataFlowUsedForSizing, 6) + " kg/s");
-                            ShowContinueError("  Design Coil Capacity           = " + TrimSigDigits(DataDesignCoilCapacity, 3) + " W");
-                            ShowContinueError("  Design Coil Load               = " + TrimSigDigits(DataCapacityUsedForSizing, 3) + " W");
-                            if (DataNomCapInpMeth) {
-                                ShowContinueError("  Coil outlet air temperature    = " + TrimSigDigits(DataDesOutletAirTemp, 3) + " C");
-                                ShowContinueError("  Coil outlet air humidity ratio = " + TrimSigDigits(DataDesOutletAirHumRat, 3) +
-                                                  " kgWater/kgDryAir");
-                            }
-                            if (DataDesignCoilCapacity < DataCapacityUsedForSizing && !DataNomCapInpMeth) {
-                                ShowContinueError("  Inadequate water side capacity: in Plant Sizing for this hot water loop");
-                                ShowContinueError("  increase design loop exit temperature and/or decrease design loop delta T");
-                                ShowContinueError("  Plant Sizing object = " + PlantSizData(DataPltSizHeatNum).PlantLoopName);
-                                ShowContinueError(
-                                    "  Plant design loop exit temperature = " + TrimSigDigits(PlantSizData(DataPltSizHeatNum).ExitTemp, 3) + " C");
-                                ShowContinueError("  Plant design loop delta T          = " + TrimSigDigits(DataWaterCoilSizHeatDeltaT, 3) + " C");
-                            }
-                            DataErrorsFound = true;
-                        }
-                    } else {
-                        AutosizeDes = 1.0;
-                        if (DataWaterFlowUsedForSizing > 0.0 && DataCapacityUsedForSizing < SmallLoad) {
-                            ShowWarningError("The design coil load used for UA sizing is too small for Coil:Heating:Water " + CompName);
-                            ShowContinueError("An autosize value for UA cannot be calculated");
-                            ShowContinueError("Input a value for UA, change the heating design day, or raise");
-                            ShowContinueError("  the system heating design supply air temperature");
-                            ShowContinueError("Water coil UA is set to 1 and the simulation continues.");
-                        }
-                    }
                 }
             }
         } else {
@@ -3094,9 +2942,6 @@ namespace ReportSizingManager {
                                                                DXFlowPerCapMinRatio,
                                                                DXFlowPerCapMaxRatio);
             }
-        } else if (CurSysNum <= NumPrimaryAirSys && SizingType == WaterHeatingCoilUASizing) {
-            coilSelectionReportObj->setCoilUA(CompName, CompType, SizingResult, DataCapacityUsedForSizing, IsAutoSize, CurSysNum, CurZoneEqNum);
-
         } else if (SizingType == HeatingDefrostSizing) {
 
         } else if (SizingType == AutoCalculateSizing) {

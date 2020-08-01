@@ -61,6 +61,8 @@ SET( SRC
   Autosizing/HeatingWaterflowSizing.hh
   Autosizing/WaterHeatingCapacitySizing.cc
   Autosizing/WaterHeatingCapacitySizing.hh
+  Autosizing/WaterHeatingCoilUASizing.cc
+  Autosizing/WaterHeatingCoilUASizing.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc

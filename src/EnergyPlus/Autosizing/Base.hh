@@ -81,6 +81,7 @@ enum class AutoSizingType
     HeatingWaterflowSizing,
     MaxHeaterOutletTempSizing,
     WaterHeatingCapacitySizing,
+    WaterHeatingCoilUASizing,
     ZoneCoolingLoadSizing,
     ZoneHeatingLoadSizing,
     Unknown
@@ -206,6 +207,13 @@ struct BaseSizer
 
     //HeatingCoilDesAirInletTempSizing,
     int dataDesicDehumNum = 0;
+
+    // WaterHeatingCoilUASizing
+    bool dataNomCapInpMeth = false;
+    int dataCoilNum = 0;
+    int dataFanOpMode = 0;
+    Real64 dataDesignCoilCapacity = 0.0;
+    bool dataErrorsFound = false;
 
     bool printWarningFlag = false;
     std::string callingRoutine = "";

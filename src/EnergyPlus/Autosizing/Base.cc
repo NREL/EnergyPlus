@@ -123,7 +123,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->minOA = DataSizing::MinOA;
     this->dataConstantUsedForSizing = DataSizing::DataConstantUsedForSizing;
     this->dataFractionUsedForSizing = DataSizing::DataFractionUsedForSizing;
-    DataSizing::DataConstantUsedForSizing = 0.0; // reset here instead of in component model
+    DataSizing::DataConstantUsedForSizing = 0.0; // reset here instead of in component model?
     DataSizing::DataFractionUsedForSizing = 0.0;
 
     this->dataFanIndex = DataSizing::DataFanIndex;
@@ -154,6 +154,12 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->dataDesicRegCoil = DataSizing::DataDesicRegCoil;
     this->dataZoneUsedForSizing = DataSizing::DataZoneUsedForSizing;
     this->dataDesicDehumNum = DataSizing::DataDesicDehumNum;
+
+    this->dataNomCapInpMeth = DataSizing::DataNomCapInpMeth;
+    this->dataCoilNum = DataSizing::DataCoilNum;
+    this->dataFanOpMode = DataSizing::DataFanOpMode;
+    this->dataDesignCoilCapacity = DataSizing::DataDesignCoilCapacity;
+    this->dataErrorsFound = DataSizing::DataErrorsFound;
 }
 
 void BaseSizer::initializeFromAPI(Real64 const elevation)
@@ -562,10 +568,16 @@ void BaseSizer::clearState()
     dataAirFlowUsedForSizing = 0.0;
     dataDesInletAirTemp = 0.0;
     dataDesAccountForFanHeat = false;
+    dataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
     dataDesicRegCoil = false;
     dataHeatSizeRatio = 0.0;
     dataZoneUsedForSizing = 0;
     dataDesicDehumNum = 0;
+    dataNomCapInpMeth = false;
+    dataCoilNum = 0;
+    dataFanOpMode = 0;
+    dataDesignCoilCapacity = 0.0;
+    dataErrorsFound = false;
 
     printWarningFlag = false;
     callingRoutine = "";
