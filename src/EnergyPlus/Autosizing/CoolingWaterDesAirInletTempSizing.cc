@@ -126,7 +126,7 @@ Real64 CoolingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
     this->selectSizerOutput(errorsFound);
     if (this->getCoilReportObject) {
         if (this->curSysNum <= this->numPrimaryAirSys) {
-            coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->wasAutoSized, this->curSysNum, this->curZoneEqNum);
+            coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
         }
     }
     return this->autoSizedValue;

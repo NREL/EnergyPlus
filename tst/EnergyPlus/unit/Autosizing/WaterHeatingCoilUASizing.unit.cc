@@ -53,6 +53,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
 namespace EnergyPlus {
@@ -119,9 +120,10 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     WaterCoils::WaterCoil(1).InletAirMassFlowRate = 0.2;
     WaterCoils::WaterCoil(1).InletWaterMassFlowRate = 0.8;
     WaterCoils::WaterCoil(1).WaterLoopNum = 1;
-    WaterCoils::WaterCoil(1).SchedPtr = 1;
+    WaterCoils::WaterCoil(1).SchedPtr = -1;
     WaterCoils::MyUAAndFlowCalcFlag.allocate(1);
     WaterCoils::MySizeFlag.allocate(1);
+    ScheduleManager::Schedule.allocate(1);
 
     // now allocate sizing arrays for testing autosized field
     EnergyPlus::DataSizing::TermUnitSizing.allocate(1);
