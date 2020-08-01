@@ -2722,7 +2722,7 @@ namespace WaterCoils {
                         WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
                     }
                 }
-                WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
+                //WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
                 WaterCoil(CoilNum).DesWaterHeatingCoilRate = DataCapacityUsedForSizing;
                 WaterCoil(DataCoilNum).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature
 

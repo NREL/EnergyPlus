@@ -354,13 +354,8 @@ namespace ReportSizingManager {
         using Psychrometrics::PsyWFnTdpPb;
         using WaterCoils::SimpleHeatingCoilUAResidual;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const Acc(0.0001); // Accuracy of result
-        int const MaxIte(500);    // Maximum number of iterations
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DDNum;                                 // design day number corresponding to TimeStepNumAtMax
-        int SolFla;                                // Flag of solver
         int TimeStepNumAtMax;                      // time step number at max load
         bool IsAutoSize;                           // Indicator to autosize for reporting
         bool HardSizeNoDesRun;                     // Indicator to hardsize with no sizing runs for reporting
@@ -392,8 +387,6 @@ namespace ReportSizingManager {
         Real64 CpAirStd;                           // specific heat of air at standard conditions [J/kg-K]
         Real64 NominalCapacityDes;                 // Autosized nominal capacity for reporting [W]
         Real64 RatedVolFlowPerRatedTotCap;         // ratio of volume flow rate to capacity [m3/W]
-        Real64 UA0;                                // lower bound of UA for autosizing
-        Real64 UA1;                                // upper bound of UA for autosizing
         int SupFanNum;                             // index to supply fan
         int RetFanNum;                             // index to return fan
         Real64 SupFanDT;                           // supply air fan delta temperature [C]
