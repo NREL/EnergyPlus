@@ -58,7 +58,7 @@ struct WaterHeatingCoilUASizer : BaseSizer
     WaterHeatingCoilUASizer()
     {
         this->sizingType = AutoSizingType::WaterHeatingCoilUASizing;
-        this->sizingString = "Heating Water Coil UA";
+        this->sizingString = "U-Factor Times Area Value [W/K]";
     }
     ~WaterHeatingCoilUASizer() = default;
 
