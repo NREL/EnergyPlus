@@ -61,9 +61,9 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(Real64 _originalValue, bool &
 
     Real64 FanCoolLoad = 0.0;
     Real64 DesMassFlow = 0.0;
-    Real64 TotCapTempModFac = 0.0;
-    Real64 DXFlowPerCapMinRatio = 0.0;
-    Real64 DXFlowPerCapMaxRatio = 0.0;
+    Real64 TotCapTempModFac = 1.0;
+    Real64 DXFlowPerCapMinRatio = 1.0;
+    Real64 DXFlowPerCapMaxRatio = 1.0;
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;

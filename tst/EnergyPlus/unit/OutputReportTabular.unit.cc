@@ -6665,9 +6665,7 @@ TEST(OutputReportTabularTest, GetZoneComponentAreas_test)
 
 TEST(OutputReportTabularTest, CombineLoadCompResults_test)
 {
-    printf("1");
     ShowMessage("Begin Test: OutputReportTabularTest, CombineLoadCompResults_test");
-    printf("2");
 
     CompLoadTablesType compLoadTotal;
     printf("3");
