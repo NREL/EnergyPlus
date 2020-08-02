@@ -539,8 +539,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                                   Changes for report variables, meters, tables -- update names                                   !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! TODO: not sure if need to keep all of this...
-
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -970,6 +968,63 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     EXIT
                   ENDIF
                 ENDDO
+
+    !!!   Changes for other objects that reference meter names -- update names
+              CASE('DEMANDMANAGERASSIGNMENTLIST',  &
+                   'UtilityCost:Tariff')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+
+                CALL ScanOutputVariablesForReplacement(  &
+                   2,  &
+                   DelThis,  &
+                   checkrvi,  &
+                   nodiff,  &
+                   ObjectName,  &
+                   DifLfn,      &
+                   .false.,  & !OutVar
+                   .true., & !MtrVar
+                   .false., & !TimeBinVar
+                   CurArgs, &
+                   Written, &
+                   .false.)
+
+              CASE('ELECTRICLOADCENTER:DISTRIBUTION')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+
+               ! Field 6  A5,  \field Generator Track Meter Scheme Meter Name
+                CALL ScanOutputVariablesForReplacement(  &
+                   6,  &
+                   DelThis,  &
+                   checkrvi,  &
+                   nodiff,  &
+                   ObjectName,  &
+                   DifLfn,      &
+                   .false.,  & !OutVar
+                   .true., & !MtrVar
+                   .false., & !TimeBinVar
+                   CurArgs, &
+                   Written, &
+                   .false.)
+
+               ! Field 12    A11, \field Storage Control Track Meter Name
+                CALL ScanOutputVariablesForReplacement(  &
+                   12,  &
+                   DelThis,  &
+                   checkrvi,  &
+                   nodiff,  &
+                   ObjectName,  &
+                   DifLfn,      &
+                   .false.,  & !OutVar
+                   .true., & !MtrVar
+                   .false., & !TimeBinVar
+                   CurArgs, &
+                   Written, &
+                   .false.)
+
 
               ! ANY OTHER OBJECT
               CASE DEFAULT

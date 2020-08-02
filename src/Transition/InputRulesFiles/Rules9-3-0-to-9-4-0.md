@@ -90,11 +90,9 @@ Two typos were corrected in field names.
 ```
 
 # Object Change: Fuel type synonyms
-For all Boiler:\*, WaterHeater:\* , Generator:\* ,
-OtherEquipment, Exterior:FuelEquipment, HVACTemplate:System:VRF, HVACTemplate:Plant:Boiler, ZoneHVAC:HybridUnitaryHVAC
-Coil:Cooling:DX:MultiSpeed, Coil:Heating:Fuel, Coil:Heating:DX:MultiSpeed, AirConditioner:VariableRefrigerantFlow, Chiller:EngineDriven, Chiller:CombustionTurbine, 
-ChillerHeater:Absorption:DirectFired, EnergyManagementSystem:MeteredOutputVariable, LifeCycleCost:UsePriceEscalation, LifeCycleCost:UseAdjustment, 
-Meter:Custom, Meter:CustomDecrement, FuelFactors and other objects with a fuel type or resource type field
+For Output:Variable, Output:Meter*, Meter:Custom, Meter:CustomDecrement, 
+Output:Table:Monthly, Output:Table:Annual, Output:Table:TimeBins, EnergyManagementSystem:Sensor, DemandManagerAssignmentList, 
+ElectricLoadCenter:Distribution, UtilityCost:Tariff and other objects with a Meter name or Output:Variable name as an input field:
 
 Field: Fuel Type (or similar)
 
