@@ -177,6 +177,8 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(Real64 _originalValue, bool &
             }
         }
     }
+    // heating coil can't have negative capacity
+    this->autoSizedValue = std::max(0.0, this->autoSizedValue);
     if (this->isEpJSON) this->sizingString = "water_heating_design_coil_load_for_ua_sizing";
     this->selectSizerOutput(errorsFound);
     if (this->getCoilReportObject && this->curSysNum <= this->numPrimaryAirSys) {
