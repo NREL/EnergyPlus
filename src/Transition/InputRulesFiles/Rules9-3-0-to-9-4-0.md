@@ -62,6 +62,16 @@ NEW Field F10 (A7): Setpoint Control Type.  Leave blank or assign a value of “
 
 Old Fields 10-11 remain the same, just shifted back one field to Fields 11-12.
 
+# Object Change: ‘ZoneHVAC:LowTemperatureRadiant:ConstantFlow’
+
+Summary: A new field was added into the middle of the object, everything else states the same (or shifted back if occurring after the new field).
+
+Fields 1-7 remain the same.
+
+NEW Field F8 (N3): Running Mean Outdoor Air Temperature Weighting Factor.  Leave blank or assign a value of “0.8” (default).
+
+Old Fields 8-29 remain the same, just shifted back one field to Fields 9-30.
+
 # Minor Changes:
 
 ## ZoneProperty:UserViewFactors:BySurfaceName,

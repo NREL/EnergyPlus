@@ -72,6 +72,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -1893,91 +1894,91 @@ TEST_F(LowTempRadiantSystemTest, processRadiantSystemControlInputTest)
     inputFunction = meanAirTemperature;
     expectedResult = LowTempRadiantControlTypes::MATControl;
     actualFunctionAnswer = LowTempRadiantControlTypes::MRTControl; // reset
-    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, HydronicSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MRTControl; // reset
-    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ConstantFlowSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MRTControl; // reset
-    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ElectricSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
     // Test 2: MRT test (done for all three types of systems)
     inputFunction = meanRadiantTemperature;
     expectedResult = LowTempRadiantControlTypes::MRTControl;
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, HydronicSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ConstantFlowSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ElectricSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
     // Test 3: Operative Temperature test (done for all three types of systems)
     inputFunction = operativeTemperature;
     expectedResult = LowTempRadiantControlTypes::OperativeControl;
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, HydronicSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ConstantFlowSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ElectricSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
     // Test 4: Outside Dry-Bulb Temperature test (done for all three types of systems)
     inputFunction = outsideAirDryBulbTemperature;
     expectedResult = LowTempRadiantControlTypes::ODBControl;
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, HydronicSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ConstantFlowSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ElectricSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
     // Test 5: Outside Wet-Bulb Temperature test (done for all three types of systems)
     inputFunction = outsideAirWetBulbTemperature;
     expectedResult = LowTempRadiantControlTypes::OWBControl;
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, HydronicSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ConstantFlowSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ElectricSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
     // Test 6: Inside Face Surface Temperature test (done for all three types of systems)
     inputFunction = surfaceFaceTemperature;
     expectedResult = LowTempRadiantControlTypes::SurfFaceTempControl;
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, HydronicSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ConstantFlowSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ElectricSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
     // Test 7: Inside Face Surface Temperature test (done for all three types of systems)
     inputFunction = surfaceInteriorTemperature;
     expectedResult = LowTempRadiantControlTypes::SurfIntTempControl;
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, HydronicSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ConstantFlowSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
-    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass, ElectricSystem);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
 }
@@ -2134,6 +2135,14 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     actualResult = ElecRadSys(1).setRadiantSystemControlTemperature();
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
+    // Test 8: Running Mean Outdoor Air Temperature Control (Constant Flow System Only)
+    CFloRadSys(1).ControlType = LowTempRadiantControlTypes::RunningMeanODBControl;
+    CFloRadSys(1).todayRunningMeanOutdoorDryBulbTemperature = 12.345;
+    expectedResult = CFloRadSys(1).todayRunningMeanOutdoorDryBulbTemperature;
+    actualResult = 0.0; // reset
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    
 }
 
 TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
@@ -2263,5 +2272,91 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     expectedResult = 0.75;
     actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(scheduleIndex,throttlingRange);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+
+}
+
+TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
+{
+    // This tests both calculateRunningMeanAverageTemperature and calculateCurrentDailyAverageODB
+    // because calculateCurrentDailyAverageODB is called by calculateRunningMeanAverageTemperature
+    Real64 expectedResult;
+    Real64 acceptibleError = 0.001;
+    
+    CFloRadSys.allocate(1);
+    auto &thisCFloSys (CFloRadSys(1));
+    
+    NumOfTimeStepInHour = 1;
+    WeatherManager::TodayOutDryBulbTemp.allocate(NumOfTimeStepInHour, DataGlobals::HoursInDay);
+    WeatherManager::TodayOutDryBulbTemp = 0.0;
+    for (int hourNumber = 1; hourNumber <= DataGlobals::HoursInDay; ++hourNumber) {
+        WeatherManager::TodayOutDryBulbTemp(NumOfTimeStepInHour,hourNumber) = double(hourNumber);
+    }
+    
+    // Test 1: First day of the simulation and it's in warmup-->everything set to the same temperature
+    DataGlobals::DayOfSim = 1;
+    DataGlobals::WarmupFlag = true;
+    DataGlobals::NumOfDayInEnvrn = 366;
+    thisCFloSys.todayAverageOutdoorDryBulbTemperature = -9999.9;
+    thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature = -9999.9;
+    thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature = -9999.9;
+    thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = -9999.9;
+    thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
+    expectedResult = 12.5;
+    thisCFloSys.calculateRunningMeanAverageTemperature();
+    EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
+    EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature, acceptibleError);
+    EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
+    EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
+
+    // Test 2: Not first dsy of simulation but still in warmup-->should not do anything because in warmup same day repeated over and over
+    DataGlobals::DayOfSim = 2;
+    DataGlobals::WarmupFlag = true;
+    DataGlobals::NumOfDayInEnvrn = 366;
+    thisCFloSys.todayAverageOutdoorDryBulbTemperature = -9999.9;
+    thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature = -9999.9;
+    thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature = -9999.9;
+    thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = -9999.9;
+    thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
+    expectedResult = -9999.9;
+    thisCFloSys.calculateRunningMeanAverageTemperature();
+    EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
+    EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature, acceptibleError);
+    EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
+    EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
+
+    // Test 3: Not in warmup but number of days of simulation only 1-->should not do anything because it's a single day which means no real history
+    DataGlobals::DayOfSim = 1;
+    DataGlobals::WarmupFlag = false;
+    DataGlobals::NumOfDayInEnvrn = 1;
+    thisCFloSys.todayAverageOutdoorDryBulbTemperature = 12.345;
+    thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature = 12.345;
+    thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature = 12.345;
+    thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = 12.345;
+    thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
+    expectedResult = 12.345;
+    thisCFloSys.calculateRunningMeanAverageTemperature();
+    EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
+    EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature, acceptibleError);
+    EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
+    EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
+
+    // Test 4: Not in warmup and number of days of simulation greater than 1-->apply the formula for running mean temperature and shift data
+    DataGlobals::DayOfSim = 1;
+    DataGlobals::WarmupFlag = false;
+    DataGlobals::NumOfDayInEnvrn = 366;
+    thisCFloSys.todayAverageOutdoorDryBulbTemperature = 15.0;
+    thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature = 10.0;
+    thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature = 14.5;
+    thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = 5.0;
+    thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
+    thisCFloSys.calculateRunningMeanAverageTemperature();
+    expectedResult = 12.5;  // Average of TodayOutDryBulbTemp(firstTimeStepIndex,hourNumber)
+    EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
+    expectedResult = 15.0;  // Should transfer what was todayAverageOutdoorDryBulbTemperature (see above)
+    EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature, acceptibleError);
+    expectedResult = 14.5;  // Should transfer what was todayRunningMeanOutdoorDryBulbTemperature (see above)
+    EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
+    expectedResult = 14.75;  // Should be weighted average the "yesterday" values using the weighting factor
+    EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
 
 }
