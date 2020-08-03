@@ -118,6 +118,11 @@ ENERGYPLUSLIB_API void cClearAllStates();
 /// \see cClearAllStates
 /// \see requestVariable
 ENERGYPLUSLIB_API int energyplus(int argc, const char *argv[]);
+
+/// \brief Stop an EnergyPlus simulation early
+/// \details This function can be used by an API client to end a simulation before the end of the scheduled run periods.
+///          The simulation will end gracefully and all output files will be finalized and closed before the
+///          EnergyPlus process is complete.
 ENERGYPLUSLIB_API void stopSimulation();
 
 /// \brief Asks EnergyPlus to issue a warning message to the error file.
