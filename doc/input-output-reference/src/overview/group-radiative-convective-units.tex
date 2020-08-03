@@ -1152,6 +1152,10 @@ This optional input allows the user to choose between modeling each surface in t
 
 The length in meters of each parallel hydronic circuit in a surface. Used when the previous input field is set to \emph{CalculateFromCircuitLength}. The default is 106.7 meters (350 feet), which is the maximum circuit length allowed in Title 24.
 
+\paragraph{Field: Changeover Delay Time Period Schedule}\label{field-changeover-delay-time-period-schedule}
+
+This field defines a schedule which should be populated with values for the amount of time in hours that is required before this low temperature radiant system can switch between either heating or cooling and the opposite conditioning mode.  If this schedule value is set to 1 (hour) at a particular time and the system was previously in heating mode, then it will be locked out from switching into cooling mode until at least one hour of time has passed in the simulation with the system "not operating".  This helps avoid systems bouncing back and forth between the two conditioning modes in successive time steps.  This parameter can be set to any positive value, and a zero or negative value will be assumed to have no delay (equivalent to a delay of zero).  If the user leaves this field blank, EnergyPlus will assume that no changeover delay is requested (also equivalent to a delay of zero).
+
 An example IDF with a hydronic low temperature radiant system is shown below.
 
 \begin{lstlisting}
@@ -1186,7 +1190,8 @@ An example IDF with a hydronic low temperature radiant system is shown below.
       Off,                     !- Condensation Control Type
       1.0,                     !- Condensation Control Dewpoint Offset
       CalculateFromCircuitLength,   !- Number of Circuits
-      106.7;                   !- Circuit Length
+      106.7,                   !- Circuit Length
+      ChangeoverSchedule;      !- Changeover Delay Time Period Schedule
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-5-007}
@@ -1429,6 +1434,10 @@ This optional input allows the user to choose between modeling each surface in t
 
 The length in meters of each parallel hydronic circuit in a surface. Used when the previous input field is set to \emph{CalculateFromCircuitLength}. The default is 106.7 meters (350 feet), which is the maximum circuit length allowed in Title 24.
 
+\paragraph{Field: Changeover Delay Time Period Schedule}\label{field-changeover-delay-time-period-schedule-1}
+
+This field defines a schedule which should be populated with values for the amount of time in hours that is required before this low temperature radiant system can switch between either heating or cooling and the opposite conditioning mode.  If this schedule value is set to 1 (hour) at a particular time and the system was previously in heating mode, then it will be locked out from switching into cooling mode until at least one hour of time has passed in the simulation with the system "not operating".  This helps avoid systems bouncing back and forth between the two conditioning modes in successive time steps.  This parameter can be set to any positive value, and a zero or negative value will be assumed to have no delay (equivalent to a delay of zero).  If the user leaves this field blank, EnergyPlus will assume that no changeover delay is requested (also equivalent to a delay of zero).
+
 An example IDF with a constant flow low temperature radiant system is shown below.
 
 \begin{lstlisting}
@@ -1463,7 +1472,8 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
       SimpleOff,              !- condensation control type
       0.5,                    !- condensation control dewpoint offset
       CalculateFromCircuitLength,   !- Number of Circuits
-      106.7;                  !- Circuit Length
+      106.7,                   !- Circuit Length
+      ChangeoverSchedule;      !- Changeover Delay Time Period Schedule
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-6-007}

@@ -2395,7 +2395,7 @@ namespace LowTempRadiantSystem {
         
         if (this->OperatingMode == this->lastOperatingMode) return; // always let it continue to operating in the same mode
         
-        if (this->schedPtrChangeoverDelay <= 0) return; // user not requesting any delays (no schedule entered) so let it do whatever is requested
+        if (this->schedPtrChangeoverDelay == 0) return; // user not requesting any delays (no schedule entered) so let it do whatever is requested
         
         Real64 currentChangeoverDelay = ScheduleManager::GetCurrentScheduleValue(this->schedPtrChangeoverDelay);
         if (currentChangeoverDelay <= 0.0) return;  // delay is zero so let it do whatever it requested
