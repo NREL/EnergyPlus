@@ -225,9 +225,9 @@ namespace SystemReports {
 
     // Functions
 
-    void InitEnergyReports(OutputFiles &outputFiles);
+    void InitEnergyReports(IOFiles &ioFiles);
 
-    void FindFirstLastPtr(OutputFiles &outputFiles, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
+    void FindFirstLastPtr(IOFiles &ioFiles, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
 
     void UpdateZoneCompPtrArray(int &Idx,
                                 int const ListNum,
@@ -320,7 +320,7 @@ namespace SystemReports {
                              int &MatchComp               // Component number of the match
     );
 
-    void ReportAirLoopConnections(OutputFiles &outputFiles);
+    void ReportAirLoopConnections(IOFiles &ioFiles);
 
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************

@@ -567,7 +567,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     GetZoneData(ErrorsFound);
     EXPECT_EQ("WEST ZONE", Zone(1).Name);
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetFanCoilUnits(state);
     auto &thisFanCoil(FanCoil(1));
