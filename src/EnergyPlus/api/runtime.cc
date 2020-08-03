@@ -95,6 +95,14 @@ void registerStdOutCallback(void (*f)(const char * message)) {
     EnergyPlus::DataGlobals::messageCallback = f;
 }
 
+void registerExternalHVACManager(std::function<void ()> f) {
+  EnergyPlus::DataGlobals::externalHVACManager = f;
+}
+
+void registerExternalHVACManager(void (*f)()) {
+  registerExternalHVACManager(std::function<void ()>(f));
+}
+
 void callbackBeginNewEnvironment(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginNewEvironment, f);
 }

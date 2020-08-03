@@ -71,6 +71,7 @@ ENERGYPLUSLIB_API void callbackEndOfZoneSizing(std::function<void ()> f);
 ENERGYPLUSLIB_API void callbackEndOfSystemSizing(std::function<void ()> f);
 ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(std::function<void ()> f);
 ENERGYPLUSLIB_API void callbackUnitarySystemSizing(std::function<void ()> f);
+ENERGYPLUSLIB_API void registerExternalHVACManager(std::function<void ()> f);
 //ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(std::function<void ()> f);
 
 extern "C" {
@@ -329,6 +330,11 @@ ENERGYPLUSLIB_API void callbackUnitarySystemSizing(void (*f)());
 // The user defined component model won't actually call out to this API endpoint -- it is coupled with a specific
 // plugin instance in the code.
 // ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(void (*f)());
+
+/// \brief Register a callback function to be used in place of the EnergyPlus ManageHVAC function.
+/// \details This is an advanced function, currently used by Spawn. When this callback is defined, the
+///          conventional EnergyPlus HVAC simulation is completely bypassed.
+ENERGYPLUSLIB_API void registerExternalHVACManager(void (*f)());
 
 #ifdef __cplusplus
 }
