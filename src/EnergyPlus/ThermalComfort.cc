@@ -243,7 +243,6 @@ namespace ThermalComfort {
     Array1D<Real64> ZoneOccHrs;
     bool useEpwData(false);
     Array1D<Real64> DailyAveOutTemp(30, 0.0);
-    Real64 avgDryBulbCEN(0.0);
 
     // Subroutine Specifications for the Thermal Comfort module
 
@@ -2857,6 +2856,7 @@ namespace ThermalComfort {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string epwLine;
+        static Real64 avgDryBulbCEN(0.0);
         Real64 dryBulb;
         Real64 tComf;
         Real64 tComfLow;

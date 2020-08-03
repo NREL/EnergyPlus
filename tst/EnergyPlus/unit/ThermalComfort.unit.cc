@@ -1009,14 +1009,24 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveCEN15251)
     CurrentYearIsLeapYear = false;
     CalcThermalComfortAdaptiveCEN15251(state.files, true, true, 0.0);
     EXPECT_NEAR(ThermalComfort::runningAverageCEN, -1.3671408, 0.01);
-    
+
     // skip the first day
+    Array1D<Real64> HourlyDryBulbTemp = {
+        -4.8, -5.4, -5.7, -5.9, -6.1, -6.2, -7.2, -6.7, -6.7, -5.6, -5., -4.4, -5., -3.9, -5., -5., -6.7, -7.8, -9.4, -9.4, -9.4, -9.4, -7.8, -7.2,
+    };
     BeginDayFlag = true;
-    CalcThermalComfortAdaptiveCEN15251(state.files, false);
+    BeginHourFlag = true;
+    for (int i = 1; i <= 24; i++) {
+        OutDryBulbTemp = HourlyDryBulbTemp(i);
+        CalcThermalComfortAdaptiveCEN15251(state.files, false);
+        if (i == 1) {
+            BeginDayFlag = false;
+        }
+    }
 
     // test the second day
     DayOfYear += 1;
-    avgDryBulbCEN = -6.4875;
+    BeginDayFlag = true;
     CalcThermalComfortAdaptiveCEN15251(state.files, false);
     EXPECT_NEAR(ThermalComfort::runningAverageCEN, -2.3912126, 0.01);
     BeginDayFlag = false;
