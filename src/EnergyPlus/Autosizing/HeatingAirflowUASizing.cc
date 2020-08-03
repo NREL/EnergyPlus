@@ -198,6 +198,7 @@ namespace EnergyPlus {
             this->addErrorMessage("Autosized value was zero or less than zero");
             this->autoSizedValue = 0.0;
         }
+        if (this->isEpJSON) this->sizingString = "heating_coil_airflow_for_ua";
         this->selectSizerOutput(errorsFound);
         return this->autoSizedValue;
     }

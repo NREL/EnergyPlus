@@ -50,7 +50,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 
 namespace EnergyPlus {
 
@@ -63,7 +62,6 @@ Real64 HeatingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
     // component used AutoCalculate method to size value
     if (this->dataFractionUsedForSizing > 0.0) {
         this->autoSizedValue = this->dataConstantUsedForSizing * this->dataFractionUsedForSizing;
-        if (this->wasAutoSized) this->originalValue = this->autoSizedValue;
     } else {
         if (this->curZoneEqNum > 0) {
             if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
@@ -84,8 +82,8 @@ Real64 HeatingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
                     }
-                    Real64 CoilInTemp = ReportSizingManager::setHeatCoilInletTempForZoneEqSizing(
-                        ReportSizingManager::setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                    Real64 CoilInTemp = this->setHeatCoilInletTempForZoneEqSizing(
+                        this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                         this->zoneEqSizing(this->curZoneEqNum),
                         this->finalZoneSizing(this->curZoneEqNum));
                     Real64 CoilOutTemp = this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp;
@@ -147,6 +145,7 @@ Real64 HeatingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
             }
         }
     }
+    if (this->isEpJSON) this->sizingString = "maximum_water_flow_rate [m3/s]";
     this->selectSizerOutput(errorsFound);
     if (this->getCoilReportObject) {
         coilSelectionReportObj->setCoilWaterFlowPltSizNum(

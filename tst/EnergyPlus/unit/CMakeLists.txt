@@ -18,16 +18,22 @@ set( test_src
   AirTerminalSingleDuctPIUReheat.unit.cc
   Autosizing/AutosizingFixture.hh
   Autosizing/All_Simple_Sizing.unit.cc
+  Autosizing/CoolingSHRSizing.unit.cc
   Autosizing/CoolingWaterDesAirInletHumRatSizing.unit.cc
+  Autosizing/CoolingWaterDesAirInletTempSizing.unit.cc
   Autosizing/CoolingWaterDesAirOutletHumRatSizing.unit.cc
+  Autosizing/CoolingWaterDesAirOutletTempSizing.unit.cc
   Autosizing/CoolingWaterDesWaterInletTempSizing.unit.cc
   Autosizing/CoolingWaterflowSizing.unit.cc
   Autosizing/CoolingWaterNumofTubesPerRowSizing.unit.cc
   Autosizing/HeatingAirflowUASizing.unit.cc
   Autosizing/HeatingWaterDesAirInletHumRatSizing.unit.cc
   Autosizing/HeatingWaterDesAirInletTempSizing.unit.cc
+  Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.unit.cc
   Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.unit.cc
   Autosizing/HeatingWaterflowSizing.unit.cc
+  Autosizing/WaterHeatingCapacitySizing.unit.cc
+  Autosizing/WaterHeatingCoilUASizing.unit.cc
   BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
   BoilerSteam.unit.cc

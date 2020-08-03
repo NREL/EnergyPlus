@@ -223,6 +223,8 @@ struct ChilledCeilingPanelSimpleData : BaseGlobalStruct {
     Array1D<CoolingPanelSimple::CoolingPanelParams> CoolingPanel;
     Array1D<CoolingPanelSimple::CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
 
+    bool ZoneEquipmentListChecked = false;
+
     void clear_state() override
     {
         GetInputFlag = true;
@@ -239,6 +241,7 @@ struct ChilledCeilingPanelSimpleData : BaseGlobalStruct {
         MySizeFlagCoolPanel.deallocate();
         CoolingPanel.deallocate();
         CoolingPanelSysNumericFields.deallocate();
+        ZoneEquipmentListChecked = false;
     }
 };
 

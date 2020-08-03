@@ -59,16 +59,29 @@ namespace EnergyPlus {
 
 enum class AutoSizingType
 {
+    ASHRAEMinSATCoolingSizing,
+    ASHRAEMaxSATHeatingSizing,
+    AutoCalculateSizing,
+    CoolingSHRSizing,
     CoolingWaterDesAirInletHumRatSizing,
+    CoolingWaterDesAirInletTempSizing,
     CoolingWaterDesAirOutletHumRatSizing,
+    CoolingWaterDesAirOutletTempSizing,
     CoolingWaterDesWaterInletTempSizing,
     CoolingWaterNumofTubesPerRowSizing,
+    DesiccantDehumidifierBFPerfDataFaceVelocitySizing,
     HeatingAirflowUASizing,
+    HeatingCoilDesAirInletHumRatSizing,
+    HeatingCoilDesAirInletTempSizing,
+    HeatingCoilDesAirOutletTempSizing,
     HeatingWaterDesAirInletHumRatSizing,
     HeatingWaterDesAirInletTempSizing,
+    HeatingWaterDesCoilLoadUsedForUASizing,
     HeatingWaterDesCoilWaterVolFlowUsedForUASizing,
     HeatingWaterflowSizing,
     MaxHeaterOutletTempSizing,
+    WaterHeatingCapacitySizing,
+    WaterHeatingCoilUASizing,
     ZoneCoolingLoadSizing,
     ZoneHeatingLoadSizing,
     Unknown
@@ -100,8 +113,10 @@ struct BaseSizer
     bool sizingDesValueFromParent = false;
     bool airLoopSysFlag = false;
     bool oaSysFlag = false;
+    int coilType_Num = 0;
     std::string compType = "";
     std::string compName = "";
+    bool isEpJSON = false;
 
     bool sysSizingRunDone = false;
     bool zoneSizingRunDone = false;
@@ -131,6 +146,8 @@ struct BaseSizer
     Real64 minOA = 0.0;
 
     // global Data* sizing constants
+    bool dataEMSOverrideON = false;
+    Real64 dataEMSOverride = 0.0;
 
     // HeatingWaterflowSizer
     Real64 dataConstantUsedForSizing = 0.0;
@@ -140,9 +157,10 @@ struct BaseSizer
     int dataPltSizHeatNum = 0;
     // HeatingWaterDesCoilWaterVolFlowUsedForUASizer, HeaterWaterflowSizing
     int dataWaterLoopNum = 0;
-    // CoolingWaterflowSizing
+    // CoolingWaterflowSizing, CoolingWaterDesAirInletTempSizer
     int dataFanIndex = -1;
     int dataFanEnumType = -1;
+    // CoolingWaterflowSizing
     Real64 dataWaterCoilSizCoolDeltaT = 0.0;
     // HeaterWaterflowSizing
     Real64 dataWaterCoilSizHeatDeltaT = 0.0;
@@ -153,6 +171,11 @@ struct BaseSizer
 
     // CoolingWaterDesAirInletHumRatSizer, CoolingWaterDesAirOutletHumRatSizer
     Real64 dataDesInletAirHumRat = 0.0;
+    // CoolingWaterDesAirInletTempSizer
+    Real64 dataAirFlowUsedForSizing = 0.0;
+    Real64 dataDesInletAirTemp = 0.0;
+    bool dataDesAccountForFanHeat = false;
+    DataSizing::zoneFanPlacement dataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
 
     // CoolingWaterDesAirInletHumRatSizer, HeatingWaterDesAirInletHumRatSizer,
     // HeatingWaterDesAirInletTempSizer
@@ -165,6 +188,29 @@ struct BaseSizer
 
     // CoolingWaterNumofTubesPerRowSizer, HeatingWaterDesCoilWaterVolFlowUsedForUASizer
     Real64 dataWaterFlowUsedForSizing = 0.0;
+
+    // CoolingSHRSizing
+    Real64 dataSizingFraction = 1.0;
+    int dataDXSpeedNum = 0;
+
+    // WaterHeatingCapacitySizing
+    bool dataDesicRegCoil = false;
+
+    // WaterHeatingCapacitySizing
+    Real64 dataHeatSizeRatio = 0.0;
+
+    // ASHRAEMinSATCoolingSizing, ASHRAEMaxSATHeatingSizing
+    int dataZoneUsedForSizing = 0;
+
+    //HeatingCoilDesAirInletTempSizing,
+    int dataDesicDehumNum = 0;
+
+    // WaterHeatingCoilUASizing
+    bool dataNomCapInpMeth = false;
+    int dataCoilNum = 0;
+    int dataFanOpMode = 0;
+    Real64 dataDesignCoilCapacity = 0.0;
+    bool dataErrorsFound = false;
 
     bool printWarningFlag = false;
     std::string callingRoutine = "";
@@ -194,7 +240,7 @@ struct BaseSizer
 
     std::string getLastErrorMessages();
 
-    void overrideSizingString(std::string const &string);
+    void overrideSizingString(std::string &string);
 
 protected:
 
@@ -215,9 +261,23 @@ protected:
 
     void selectSizerOutput(bool &errorsFound);
 
-    static bool isValidCoilType(std::string const &compType);
+    bool isValidCoilType(std::string const &compType);
 
     bool checkInitialized(bool &errorsFound);
+
+    Real64 setOAFracForZoneEqSizing(Real64 const& desMassFlow, DataSizing::ZoneEqSizingData const& zoneEqSizing);
+    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const& outAirFrac,
+        DataSizing::ZoneEqSizingData const& zoneEqSizing,
+        DataSizing::ZoneSizingData const& finalZoneSizing);
+    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 const& outAirFrac,
+        DataSizing::ZoneEqSizingData const& zoneEqSizing,
+        DataSizing::ZoneSizingData const& finalZoneSizing);
+    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 const& outAirFrac,
+        DataSizing::ZoneEqSizingData const& zoneEqSizing,
+        DataSizing::ZoneSizingData const& finalZoneSizing);
+    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const& outAirFrac,
+        DataSizing::ZoneEqSizingData const& zoneEqSizing,
+        DataSizing::ZoneSizingData const& finalZoneSizing);
 
     void clearState();
 

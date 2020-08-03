@@ -204,6 +204,7 @@ namespace ZonePlenum {
         // Object Data
         Array1D<ZonePlenum::ZoneReturnPlenumConditions> ZoneRetPlenCond;
         Array1D<ZonePlenum::ZoneSupplyPlenumConditions> ZoneSupPlenCond;
+        bool MyEnvrnFlag = true;
 
         void clear_state() override
         {
@@ -215,6 +216,7 @@ namespace ZonePlenum {
             NumZoneSupplyPlenums = 0;
             ZoneRetPlenCond.deallocate();
             ZoneSupPlenCond.deallocate();
+            MyEnvrnFlag = true;
         }
 
         // Default Constructor

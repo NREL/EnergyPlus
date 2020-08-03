@@ -52,13 +52,24 @@
 
 namespace EnergyPlus {
 
+struct AutoCalculateSizer : BaseSizer
+{
+    AutoCalculateSizer()
+    {
+        this->sizingType = AutoSizingType::AutoCalculateSizing;
+        this->sizingString = "Set String in Component Model using overrideSizingString";
+    }
+    ~AutoCalculateSizer() = default;
+
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
+};
+
 struct MaxHeaterOutletTempSizer : BaseSizer
 {
     MaxHeaterOutletTempSizer()
     {
         this->sizingType = AutoSizingType::MaxHeaterOutletTempSizing;
         this->sizingString = "Maximum Supply Air Temperature [C]";
-
     }
     ~MaxHeaterOutletTempSizer() = default;
 
@@ -69,7 +80,6 @@ struct ZoneCoolingLoadSizer: BaseSizer {
     ZoneCoolingLoadSizer() {
         this->sizingType = AutoSizingType::ZoneCoolingLoadSizing;
         this->sizingString = "Zone Cooling Sensible Load [W]";
-
     }
     ~ZoneCoolingLoadSizer() = default;
 
@@ -80,11 +90,80 @@ struct ZoneHeatingLoadSizer: BaseSizer {
     ZoneHeatingLoadSizer() {
         this->sizingType = AutoSizingType::ZoneHeatingLoadSizing;
         this->sizingString = "Zone Heating Sensible Load [W]";
-
     }
     ~ZoneHeatingLoadSizer() = default;
 
     Real64 size(Real64 originalValue, bool& errorsFound) override;
+};
+
+struct ASHRAEMinSATCoolingSizer : BaseSizer
+{
+    ASHRAEMinSATCoolingSizer()
+    {
+        this->sizingType = AutoSizingType::ASHRAEMinSATCoolingSizing;
+        this->sizingString = "Minimum Supply Air Temperature in Cooling Mode [C]";
+    }
+    ~ASHRAEMinSATCoolingSizer() = default;
+
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
+};
+
+struct ASHRAEMaxSATHeatingSizer : BaseSizer
+{
+    ASHRAEMaxSATHeatingSizer()
+    {
+        this->sizingType = AutoSizingType::ASHRAEMaxSATHeatingSizing;
+        this->sizingString = "Maximum Supply Air Temperature in Heating Mode [C]";
+    }
+    ~ASHRAEMaxSATHeatingSizer() = default;
+
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
+};
+
+struct DesiccantDehumidifierBFPerfDataFaceVelocitySizer: BaseSizer {
+    DesiccantDehumidifierBFPerfDataFaceVelocitySizer() {
+        this->sizingType = AutoSizingType::DesiccantDehumidifierBFPerfDataFaceVelocitySizing;
+        this->sizingString = "Nominal Air Face Velocity [m3/s]";
+    }
+    ~DesiccantDehumidifierBFPerfDataFaceVelocitySizer() = default;
+
+    Real64 size(Real64 originalValue, bool& errorsFound) override;
+};
+
+struct HeatingCoilDesAirInletTempSizer : BaseSizer
+{
+    HeatingCoilDesAirInletTempSizer()
+    {
+        this->sizingType = AutoSizingType::HeatingCoilDesAirInletTempSizing;
+        this->sizingString = "Rated Inlet Air Temperature";
+    }
+    ~HeatingCoilDesAirInletTempSizer() = default;
+
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
+};
+
+struct HeatingCoilDesAirOutletTempSizer : BaseSizer
+{
+    HeatingCoilDesAirOutletTempSizer()
+    {
+        this->sizingType = AutoSizingType::HeatingCoilDesAirOutletTempSizing;
+        this->sizingString = "Rated Outlet Air Temperature";
+    }
+    ~HeatingCoilDesAirOutletTempSizer() = default;
+
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
+};
+
+struct HeatingCoilDesAirInletHumRatSizer : BaseSizer
+{
+    HeatingCoilDesAirInletHumRatSizer()
+    {
+        this->sizingType = AutoSizingType::HeatingCoilDesAirInletHumRatSizing;
+        this->sizingString = "Rated Inlet Air Humidity Ratio";
+    }
+    ~HeatingCoilDesAirInletHumRatSizer() = default;
+
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
 };
 
 } // namespace EnergyPlus

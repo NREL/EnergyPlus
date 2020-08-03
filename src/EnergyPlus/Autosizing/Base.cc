@@ -51,7 +51,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -76,6 +75,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->initialized = true;
     this->compType = _compType;
     this->compName = _compName;
+    this->isEpJSON = DataGlobals::isEpJSON;
     this->printWarningFlag = _printWarningFlag;
     this->callingRoutine = _callingRoutine;
     this->stdRhoAir = DataEnvironment::StdRhoAir;
@@ -118,9 +118,14 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     }
 
     // global sizing data
+    dataEMSOverrideON = DataSizing::DataEMSOverrideON;
+    dataEMSOverride = DataSizing::DataEMSOverride;
     this->minOA = DataSizing::MinOA;
     this->dataConstantUsedForSizing = DataSizing::DataConstantUsedForSizing;
     this->dataFractionUsedForSizing = DataSizing::DataFractionUsedForSizing;
+    DataSizing::DataConstantUsedForSizing = 0.0; // reset here instead of in component model?
+    DataSizing::DataFractionUsedForSizing = 0.0;
+
     this->dataFanIndex = DataSizing::DataFanIndex;
     this->dataFanEnumType = DataSizing::DataFanEnumType;
 
@@ -131,16 +136,34 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->dataWaterCoilSizHeatDeltaT = DataSizing::DataWaterCoilSizHeatDeltaT;
     this->dataWaterCoilSizCoolDeltaT = DataSizing::DataWaterCoilSizCoolDeltaT;
     this->dataCapacityUsedForSizing = DataSizing::DataCapacityUsedForSizing;
+    this->dataHeatSizeRatio = DataSizing::DataHeatSizeRatio;
 
+    this->dataAirFlowUsedForSizing = DataSizing::DataAirFlowUsedForSizing;
+    this->dataDesInletAirTemp = DataSizing::DataDesInletAirTemp;
+    this->dataDesAccountForFanHeat = DataSizing::DataDesAccountForFanHeat;
+    this->dataFanPlacement = DataSizing::DataFanPlacement;
     this->dataDesInletAirHumRat = DataSizing::DataDesInletAirHumRat;
     this->dataDesOutletAirHumRat = DataSizing::DataDesOutletAirHumRat;
     this->dataDesOutletAirTemp = DataSizing::DataDesOutletAirTemp;
     this->dataDesInletWaterTemp = DataSizing::DataDesInletWaterTemp;
     this->dataFlowUsedForSizing = DataSizing::DataFlowUsedForSizing;
     this->dataWaterFlowUsedForSizing = DataSizing::DataWaterFlowUsedForSizing;
+
+    this->dataSizingFraction = DataSizing::DataSizingFraction;
+    this->dataDXSpeedNum = DataSizing::DataDXSpeedNum;
+    this->dataDesicRegCoil = DataSizing::DataDesicRegCoil;
+    this->dataZoneUsedForSizing = DataSizing::DataZoneUsedForSizing;
+    this->dataDesicDehumNum = DataSizing::DataDesicDehumNum;
+
+    this->dataNomCapInpMeth = DataSizing::DataNomCapInpMeth;
+    this->dataCoilNum = DataSizing::DataCoilNum;
+    this->dataFanOpMode = DataSizing::DataFanOpMode;
+    this->dataDesignCoilCapacity = DataSizing::DataDesignCoilCapacity;
+    this->dataErrorsFound = DataSizing::DataErrorsFound;
 }
 
-void BaseSizer::initializeFromAPI(Real64 const elevation) {
+void BaseSizer::initializeFromAPI(Real64 const elevation)
+{
     this->clearState();
     this->initialized = true;
     this->compType = "API_component_type";
@@ -152,11 +175,13 @@ void BaseSizer::initializeFromAPI(Real64 const elevation) {
     this->getCoilReportObject = false;
 }
 
-void BaseSizer::addErrorMessage(std::string const &s) {
+void BaseSizer::addErrorMessage(std::string const &s)
+{
     this->lastErrorMessages.append(s).append("\n");
 }
 
-std::string BaseSizer::getLastErrorMessages() {
+std::string BaseSizer::getLastErrorMessages()
+{
     std::string s(this->lastErrorMessages);
     this->lastErrorMessages = "";
     return s;
@@ -185,9 +210,6 @@ void BaseSizer::preSize(Real64 const _originalValue)
                           this->sizingString + " must both be greater than 0.";
         this->addErrorMessage(msg);
         ShowSevereError(msg);
-        // flip data so sizer uses AutoCalculate?
-        // this->dataConstantUsedForSizing = 0.0;
-        // this->dataFractionUsedForSizing = 1.0;
     } else if (this->dataFractionUsedForSizing > 0.0) {
         this->autoCalculate = true;
         this->hardSizeNoDesignRun = false;
@@ -282,7 +304,7 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
 
     // to do, make this a parameter. Unfortunately this function is used in MANY
     // places so it involves touching most of E+
-    auto &outputFiles = EnergyPlus::OutputFiles::getSingleton();
+    auto &outputFiles = EnergyPlus::IOFiles::getSingleton();
     if (oneTimeCompRptHeaderFlag) {
         if (ReportSizingManager::MyOneTimeFlag) print(outputFiles.eio, Format_990);
         ReportSizingManager::MyOneTimeFlag = false;
@@ -316,7 +338,8 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
         } else if (!this->wasAutoSized && this->autoSizedValue >= 0.0 && this->originalValue == 0.0) { // input was blank or zero
             this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->originalValue);
             this->autoSizedValue = this->originalValue;
-        } else if (this->wasAutoSized && this->autoSizedValue >= 0.0 && this->originalValue <= 0.0) { // autosized to 0 or greater and input is 0 or autosize
+        } else if (this->wasAutoSized && this->autoSizedValue >= 0.0 &&
+                   this->originalValue <= 0.0) { // autosized to 0 or greater and input is 0 or autosize
             // might need more logic here to catch everything correctly
             this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
         } else if (this->autoSizedValue >= 0.0 && this->originalValue > 0.0) {
@@ -349,7 +372,7 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
         this->autoSizedValue = this->originalValue;
     }
 
-    if ( this->errorType != AutoSizingResultType::NoError ) {
+    if (this->errorType != AutoSizingResultType::NoError) {
         ShowSevereError("Developer Error: sizing of " + this->sizingString + " failed.");
         ShowContinueError("Occurs in " + this->compType + " " + this->compName);
         errorsFound = true;
@@ -357,15 +380,20 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
 }
 bool BaseSizer::isValidCoilType(std::string const &_compType)
 {
+    int coilNum = 0;
     for (auto const &coilType : DataHVACGlobals::cAllCoilTypes) {
+        coilNum += 1;
         if (UtilityRoutines::SameString(_compType, coilType)) {
+            this->coilType_Num = coilNum;
             return true;
         }
     }
+    this->coilType_Num = 0;
     return false;
 }
 
-bool BaseSizer::checkInitialized(bool &errorsFound) {
+bool BaseSizer::checkInitialized(bool &errorsFound)
+{
     if (!this->initialized) {
         errorsFound = true;
         this->errorType = AutoSizingResultType::ErrorType2;
@@ -377,112 +405,195 @@ bool BaseSizer::checkInitialized(bool &errorsFound) {
     return true;
 }
 
-void BaseSizer::overrideSizingString(std::string const &string)
+void BaseSizer::overrideSizingString(std::string &string)
 {
     this->sizingString = string;
 }
 
+Real64 BaseSizer::setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
+{
+    Real64 outAirFrac = 0.0;
+    if (desMassFlow <= 0.0) return outAirFrac;
 
-    void BaseSizer::clearState() {
-        stdRhoAir = 0.0;
-
-        getCoilReportObject = false; // provides access to coil reporting
-        initialized = false;     // indicates initializeWithinEP was called
-        errorType = AutoSizingResultType::NoError;
-        sizingString = "";
-        originalValue = 0.0;
-        autoSizedValue = 0.0;
-        wasAutoSized = false;
-        hardSizeNoDesignRun = false;
-        sizingDesRunThisAirSys = false;
-        sizingDesRunThisZone = false;
-        sizingDesValueFromParent = false;
-        airLoopSysFlag = false;
-        oaSysFlag = false;
-        compType = "";
-        compName = "";
-
-        sysSizingRunDone = false;
-        zoneSizingRunDone = false;
-        curSysNum = 0;
-        curOASysNum = 0;
-        curZoneEqNum = 0;
-        curDuctType = 0;
-        curTermUnitSizingNum = 0; // index in zone equipment vector - for single duct, IU, and PIU
-        numPrimaryAirSys = 0;
-        numSysSizInput = 0;
-        doSystemSizing = false;
-        numZoneSizingInput = 0;
-        doZoneSizing = false;
-        autoCalculate = false; // indicator that AutoCalculate is used
-
-        // terminal units
-        termUnitSingDuct = false; // single duct terminal unit
-        termUnitPIU = false;      // powered induction unit
-        termUnitIU = false;       // induction terminal unit
-        zoneEqFanCoil = false;    // fan coil zone equipment
-        otherEqType = false;      // this covers the ELSE type switch
-        zoneEqUnitHeater = false; // unit heater zone equipment
-        zoneEqUnitVent = false;   // unit ventilator zone equipment
-        zoneEqVentedSlab = false; // ventilated slab zone equipment
-
-        // error message handling
-        getLastErrorMessages();
-
-        // global sizing data
-        minOA = 0.0;
-
-        // global Data* sizing constants
-
-        // HeatingWaterflowSizer
-        dataConstantUsedForSizing = 0.0;
-        dataFractionUsedForSizing = 0.0;
-
-        // HeatingWaterDesCoilWaterVolFlowUsedForUASizer
-        dataPltSizHeatNum = 0;
-        // HeatingWaterDesCoilWaterVolFlowUsedForUASizer, HeaterWaterflowSizing
-        dataWaterLoopNum = 0;
-        // CoolingWaterflowSizing
-        dataFanIndex = -1;
-        dataFanEnumType = -1;
-        dataWaterCoilSizCoolDeltaT = 0.0;
-        // HeaterWaterflowSizing
-        dataWaterCoilSizHeatDeltaT = 0.0;
-        dataCapacityUsedForSizing = 0.0;
-
-        // CoolingWaterDesWaterInletTempSizer, CoolingWaterNumofTubesPerRowSizer
-        dataPltSizCoolNum = 0;
-
-        // CoolingWaterDesAirInletHumRatSizer, CoolingWaterDesAirOutletHumRatSizer
-        dataDesInletAirHumRat = 0.0;
-
-        // CoolingWaterDesAirInletHumRatSizer, HeatingWaterDesAirInletHumRatSizer,
-        // HeatingWaterDesAirInletTempSizer
-        dataFlowUsedForSizing = 0.0;
-
-        // CoolingWaterDesAirOutletHumRatSizer
-        dataDesOutletAirHumRat = 0.0;
-        dataDesInletWaterTemp = 0.0;
-        dataDesOutletAirTemp = 0.0;
-
-        // CoolingWaterNumofTubesPerRowSizer, HeatingWaterDesCoilWaterVolFlowUsedForUASizer
-        dataWaterFlowUsedForSizing = 0.0;
-
-        printWarningFlag = false;
-        callingRoutine = "";
-        sysSizingInputData.clear();
-        zoneSizingInput.clear();
-        unitarySysEqSizing.clear();
-        oaSysEqSizing.clear();
-        zoneEqSizing.clear();
-        outsideAirSys.clear();
-        termUnitSizing.clear();
-        termUnitFinalZoneSizing.clear();
-        finalZoneSizing.clear();
-        finalSysSizing.clear();
-        plantSizData.clear();
-        primaryAirSystem.clear();
-        airloopDOAS.clear();
+    if (zoneEqSizing.ATMixerVolFlow > 0.0) {
+        // set central DOAS AT mixer OA fraction
+        outAirFrac = min(DataEnvironment::StdRhoAir * zoneEqSizing.ATMixerVolFlow / desMassFlow, 1.0);
+    } else if (zoneEqSizing.OAVolFlow > 0.0) { // set zone equipment OA fraction
+        outAirFrac = min(DataEnvironment::StdRhoAir * zoneEqSizing.OAVolFlow / desMassFlow, 1.0);
     }
+    return outAirFrac;
+}
+
+Real64 BaseSizer::setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+                                                      DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                      DataSizing::ZoneSizingData const &finalZoneSizing)
+{
+    Real64 coilInTemp = 0.0;
+    if (zoneEqSizing.ATMixerVolFlow > 0.0) {
+        // adjust for central DOAS AT mixer mixed inlet temp
+        coilInTemp = (1.0 - outAirFrac) * finalZoneSizing.ZoneRetTempAtHeatPeak + outAirFrac * zoneEqSizing.ATMixerHeatPriDryBulb;
+    } else if (zoneEqSizing.OAVolFlow > 0.0) {
+        // adjust for raw OA mixed inlet temp
+        coilInTemp = (1.0 - outAirFrac) * finalZoneSizing.ZoneTempAtHeatPeak + outAirFrac * finalZoneSizing.OutTempAtHeatPeak;
+    } else {
+        // use zone condition for sizing zone equipment
+        coilInTemp = finalZoneSizing.ZoneTempAtHeatPeak;
+    }
+    return coilInTemp;
+}
+
+Real64 BaseSizer::setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+                                                        DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                        DataSizing::ZoneSizingData const &finalZoneSizing)
+{
+    Real64 coilInHumRat = 0.0;
+    if (zoneEqSizing.ATMixerVolFlow > 0.0) {
+        // adjust for central DOAS AT mixer mixed inlet humrat
+        coilInHumRat = (1.0 - outAirFrac) * finalZoneSizing.ZoneHumRatAtHeatPeak + outAirFrac * zoneEqSizing.ATMixerHeatPriHumRat;
+    } else if (zoneEqSizing.OAVolFlow > 0.0) { // adjust for raw OA mixed inlet humrat
+        coilInHumRat = (1.0 - outAirFrac) * finalZoneSizing.ZoneHumRatAtHeatPeak + outAirFrac * finalZoneSizing.OutHumRatAtHeatPeak;
+    } else {
+        coilInHumRat = finalZoneSizing.ZoneHumRatAtHeatPeak;
+    }
+    return coilInHumRat;
+}
+
+Real64 BaseSizer::setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+                                                      DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                      DataSizing::ZoneSizingData const &finalZoneSizing)
+{
+    Real64 coilInTemp = 0.0;
+    if (zoneEqSizing.ATMixerVolFlow > 0.0) {
+        // adjust for central DOAS AT mixer mixed inlet temp
+        coilInTemp = (1.0 - outAirFrac) * finalZoneSizing.ZoneRetTempAtCoolPeak + outAirFrac * zoneEqSizing.ATMixerCoolPriDryBulb;
+    } else if (zoneEqSizing.OAVolFlow > 0.0) {
+        // adjust for raw OA mixed inlet temp
+        coilInTemp = (1.0 - outAirFrac) * finalZoneSizing.ZoneTempAtCoolPeak + outAirFrac * finalZoneSizing.OutTempAtCoolPeak;
+    } else {
+        // use zone condition for sizing zone equipment
+        coilInTemp = finalZoneSizing.ZoneTempAtCoolPeak;
+    }
+    return coilInTemp;
+}
+
+Real64 BaseSizer::setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+                                                        DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                        DataSizing::ZoneSizingData const &finalZoneSizing)
+{
+    Real64 coilInHumRat = 0.0;
+    if (zoneEqSizing.ATMixerVolFlow > 0.0) {
+        // adjust for central DOAS AT mixer mixed inlet humrat
+        coilInHumRat = (1.0 - outAirFrac) * finalZoneSizing.ZoneHumRatAtCoolPeak + outAirFrac * zoneEqSizing.ATMixerCoolPriHumRat;
+    } else if (zoneEqSizing.OAVolFlow > 0.0) { // adjust for raw OA mixed inlet humrat
+        coilInHumRat = (1.0 - outAirFrac) * finalZoneSizing.ZoneHumRatAtCoolPeak + outAirFrac * finalZoneSizing.OutHumRatAtCoolPeak;
+    } else {
+        coilInHumRat = finalZoneSizing.ZoneHumRatAtCoolPeak;
+    }
+    return coilInHumRat;
+}
+
+void BaseSizer::clearState()
+{
+    stdRhoAir = 0.0;
+
+    getCoilReportObject = false; // provides access to coil reporting
+    initialized = false;         // indicates initializeWithinEP was called
+    errorType = AutoSizingResultType::NoError;
+    sizingString = "";
+    originalValue = 0.0;
+    autoSizedValue = 0.0;
+    wasAutoSized = false;
+    hardSizeNoDesignRun = false;
+    sizingDesRunThisAirSys = false;
+    sizingDesRunThisZone = false;
+    sizingDesValueFromParent = false;
+    airLoopSysFlag = false;
+    oaSysFlag = false;
+    coilType_Num = 0;
+    compType = "";
+    compName = "";
+    isEpJSON = false;
+
+    sysSizingRunDone = false;
+    zoneSizingRunDone = false;
+    curSysNum = 0;
+    curOASysNum = 0;
+    curZoneEqNum = 0;
+    curDuctType = 0;
+    curTermUnitSizingNum = 0; // index in zone equipment vector - for single duct, IU, and PIU
+    numPrimaryAirSys = 0;
+    numSysSizInput = 0;
+    doSystemSizing = false;
+    numZoneSizingInput = 0;
+    doZoneSizing = false;
+    autoCalculate = false; // indicator that AutoCalculate is used
+
+    // terminal units
+    termUnitSingDuct = false; // single duct terminal unit
+    termUnitPIU = false;      // powered induction unit
+    termUnitIU = false;       // induction terminal unit
+    zoneEqFanCoil = false;    // fan coil zone equipment
+    otherEqType = false;      // this covers the ELSE type switch
+    zoneEqUnitHeater = false; // unit heater zone equipment
+    zoneEqUnitVent = false;   // unit ventilator zone equipment
+    zoneEqVentedSlab = false; // ventilated slab zone equipment
+
+    // error message handling
+    getLastErrorMessages();
+
+    // global sizing data
+    minOA = 0.0;
+
+    // global Data* sizing constants
+    dataEMSOverrideON = false;
+    dataEMSOverride = 0.0;
+    dataConstantUsedForSizing = 0.0;
+    dataFractionUsedForSizing = 0.0;
+    dataPltSizHeatNum = 0;
+    dataWaterLoopNum = 0;
+    dataFanIndex = -1;
+    dataFanEnumType = -1;
+    dataWaterCoilSizCoolDeltaT = 0.0;
+    dataWaterCoilSizHeatDeltaT = 0.0;
+    dataCapacityUsedForSizing = 0.0;
+    dataPltSizCoolNum = 0;
+    dataDesInletAirHumRat = 0.0;
+    dataFlowUsedForSizing = 0.0;
+    dataDesOutletAirHumRat = 0.0;
+    dataDesInletWaterTemp = 0.0;
+    dataDesOutletAirTemp = 0.0;
+    dataWaterFlowUsedForSizing = 0.0;
+    dataSizingFraction = 1.0;
+    dataDXSpeedNum = 0.0;
+    dataAirFlowUsedForSizing = 0.0;
+    dataDesInletAirTemp = 0.0;
+    dataDesAccountForFanHeat = false;
+    dataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
+    dataDesicRegCoil = false;
+    dataHeatSizeRatio = 0.0;
+    dataZoneUsedForSizing = 0;
+    dataDesicDehumNum = 0;
+    dataNomCapInpMeth = false;
+    dataCoilNum = 0;
+    dataFanOpMode = 0;
+    dataDesignCoilCapacity = 0.0;
+    dataErrorsFound = false;
+
+    printWarningFlag = false;
+    callingRoutine = "";
+    sysSizingInputData.clear();
+    zoneSizingInput.clear();
+    unitarySysEqSizing.clear();
+    oaSysEqSizing.clear();
+    zoneEqSizing.clear();
+    outsideAirSys.clear();
+    termUnitSizing.clear();
+    termUnitFinalZoneSizing.clear();
+    finalZoneSizing.clear();
+    finalSysSizing.clear();
+    plantSizData.clear();
+    primaryAirSystem.clear();
+    airloopDOAS.clear();
+}
 
 } // namespace EnergyPlus

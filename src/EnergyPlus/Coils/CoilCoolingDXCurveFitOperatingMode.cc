@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
+#include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -174,14 +175,18 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->ratedGrossTotalCap = TempSize;
 
-    SizingMethod = DataHVACGlobals::AutoCalculateSizing;
     // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
     DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
     DataSizing::DataFractionUsedForSizing = 0.000114;
-    SizingString = "Rated Condenser Air Flow Rate";
     TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-    this->ratedCondAirFlowRate = TempSize;
+
+    bool errorsFound = false;
+    AutoCalculateSizer sizerCondAirFlow;
+    std::string stringOverride = "Rated Condenser Air Flow Rate";
+    if(DataGlobals::isEpJSON) stringOverride = "rated_condenser_air_flow_rate";
+    sizerCondAirFlow.overrideSizingString(stringOverride);
+    sizerCondAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    this->ratedCondAirFlowRate = sizerCondAirFlow.size(TempSize, errorsFound);
 
     for (auto &curSpeed : this->speeds) {
         curSpeed.parentModeRatedGrossTotalCap = this->ratedGrossTotalCap;

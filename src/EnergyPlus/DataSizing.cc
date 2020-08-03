@@ -293,6 +293,7 @@ namespace DataSizing {
     Real64 DataConstantUsedForSizing(0.0);          // base value used for sizing inputs that are ratios of other inputs
     Real64 DataFractionUsedForSizing(0.0);          // fractional value of base value used for sizing inputs that are ratios of other inputs
     Real64 DataNonZoneNonAirloopValue(0.0);         // used when equipment is not located in a zone or airloop
+    Real64 DataSizingFraction(1.0);                 // used when ratios of sizing is required
     int DataZoneUsedForSizing(0);                   // pointer to control zone for air loop equipment
     int DataZoneNumber(0);                          // a pointer to a served by zoneHVAC equipment
     int NumZoneHVACSizing(0);                       // Number of design specification zone HVAC sizing objects
@@ -317,6 +318,7 @@ namespace DataSizing {
     int DataFanEnumType(-1);                        // Fan type used during sizing
     int DataFanIndex(-1);                           // Fan index used during sizing
     zoneFanPlacement DataFanPlacement(zoneFanPlacement::zoneFanPlaceNotSet); // identifies location of fan wrt coil
+    int DataDXSpeedNum(0);
 
     // Object Data
     Array1D<OARequirementsData> OARequirements;
@@ -805,6 +807,7 @@ namespace DataSizing {
         DataWaterCoilSizHeatDeltaT = 0.0;
         DataNomCapInpMeth = false;
         DataFanPlacement = zoneFanPlacement::zoneFanPlaceNotSet;
+        DataDXSpeedNum = 0;
         DataCoilSizingAirInTemp = 0.0;
         DataCoilSizingAirInHumRat = 0.0;
         DataCoilSizingAirOutTemp = 0.0;

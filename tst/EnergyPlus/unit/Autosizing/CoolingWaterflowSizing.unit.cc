@@ -161,6 +161,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     Fans::Fan(1).MotEff = 0.9;
     Fans::Fan(1).FanEff = 0.6;
     Fans::Fan(1).MotInAirFrac = 0.5;
+    Fans::Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
     DataSizing::DataFanIndex = 1;
     DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
     sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
@@ -175,6 +176,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     Real64 desFanHeat = sizer.calcFanDesHeatGain(desVolFlow);
     EXPECT_FALSE(sizer.fanCompModel); // fan is not a component model type
     EXPECT_NEAR(237.5, desFanHeat, 0.001);
+    Real64 fanPowerTot = (desVolFlow * 600.0) / 0.6;
+    Real64 designFanHeatGain = 0.9 * fanPowerTot + (fanPowerTot - 0.9 * fanPowerTot) * 0.5;
+    EXPECT_NEAR(designFanHeatGain, desFanHeat, 0.0001);// compare with manual fan heat calculation
 
     // Test 5 - Zone Equipment, Powered Induction TU
     DataSizing::TermUnitSingDuct = false;
@@ -263,6 +267,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
 
     DataSizing::CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
+    DataAirSystems::PrimaryAirSystem.allocate(1);
     DataSizing::NumSysSizInput = 1;
     DataSizing::SysSizingRunDone = false;
     DataSizing::DataCapacityUsedForSizing = 5000.0;

@@ -58,6 +58,16 @@ namespace EnergyPlus {
                                                         const std::string &_compName, const bool &_printWarningFlag,
                                                         const std::string &_callingRoutine) {
         BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
+        // water coils on main branch have no parent object to set DataFan* variables
+        if (this->curSysNum > 0 && this->curOASysNum == 0) {
+            if (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
+                this->dataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                this->dataFanIndex = this->primaryAirSystem(this->curSysNum).SupFanNum;
+            } else if (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum == DataAirSystems::objectVectorOOFanSystemModel) {
+                this->dataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                this->dataFanIndex = this->primaryAirSystem(this->curSysNum).supFanVecIndex;
+            }
+        }
         this->getFanInputsForDesHeatGain(state,
                                          this->dataFanEnumType,
                                          this->dataFanIndex,
@@ -76,6 +86,7 @@ namespace EnergyPlus {
         Real64 designHeatGain = 0.0;
         if (this->dataFanEnumType < 0 || this->dataFanIndex < 0) return designHeatGain;
         if (this->dataFanEnumType == DataAirSystems::fanModelTypeNotYetSet) return designHeatGain;
+        if (this->dataFanEnumType == DataAirSystems::structArrayLegacyFanModels && this->dataFanIndex == 0) return designHeatGain;
         if (this->fanCompModel) {
             designHeatGain = this->fanShaftPow + (this->motInPower - this->fanShaftPow) * this->motInAirFrac;
         } else {
@@ -96,13 +107,6 @@ namespace EnergyPlus {
                                                Real64 &motInPower,
                                                bool &fanCompModel)
     {
-        deltaP = 0.0;
-        motEff = 0.0;
-        totEff = 0.0;
-        motInAirFrac = 0.0;
-        fanShaftPow = 0.0;
-        motInPower = 0.0;
-        fanCompModel = false;
         if (fanEnumType < 0 || fanIndex < 0) return;
 
         switch (fanEnumType) {
@@ -120,6 +124,10 @@ namespace EnergyPlus {
             }
         } // end switch
         return;
+    }
+
+    void BaseSizerWithFanHeatInputs::setDataDesAccountForFanHeat(bool flag)         {
+        DataSizing::DataDesAccountForFanHeat = flag;
     }
 
 }

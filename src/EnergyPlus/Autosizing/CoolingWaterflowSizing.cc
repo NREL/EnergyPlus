@@ -65,7 +65,6 @@ Real64 CoolingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
     // AutoCalculate is not used for cooling coil water flow sizing
     if (this->dataFractionUsedForSizing > 0.0) {
         this->autoSizedValue = this->dataConstantUsedForSizing * this->dataFractionUsedForSizing;
-        if (this->wasAutoSized) this->originalValue = this->autoSizedValue;
     } else {
         if (this->curZoneEqNum > 0) {
             if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
@@ -145,9 +144,14 @@ Real64 CoolingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
         }
     }
     // bandaid - override sizing string for detailed coil model
-    if (this->compType == "Coil:Cooling:Water:DetailedGeometry") {
-        std::string const stringOverride = "Maximum Water Flow Rate [m3/s]";
-        this->overrideSizingString(stringOverride);
+    if (this->coilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed ) {
+        if (this->isEpJSON) {
+            this->sizingString = "maximum_water_flow_rate [m3/s]";
+        } else {
+            this->sizingString = "Maximum Water Flow Rate [m3/s]";
+        }
+    } else {
+        if (this->isEpJSON) this->sizingString = "design_water_flow_rate [m3/s]";
     }
     this->selectSizerOutput(errorsFound);
     if (this->getCoilReportObject) {
@@ -167,7 +171,6 @@ Real64 CoolingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
 
 void CoolingWaterflowSizer::clearState() {
     BaseSizerWithFanHeatInputs::clearState();
-    this->someSpecialFlag = false;
 }
 
 } // namespace EnergyPlus

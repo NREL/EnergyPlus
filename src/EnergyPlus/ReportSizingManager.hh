@@ -55,9 +55,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
+    class IOFiles;
     struct EnergyPlusData;
-    class OutputFiles;
 
 namespace ReportSizingManager {
 
@@ -80,8 +79,7 @@ namespace ReportSizingManager {
                        std::string const &SizingString,  // string containing info for eio report
                        Real64 &SizingResult,             // result of the sizing procedure
                        bool const PrintWarningFlag,      // TRUE when requesting output (eio) reporting
-                       std::string const &CallingRoutine, // name of calling rotuine for warning messages
-                       Real64 const fraction = 1.0
+                       std::string const &CallingRoutine // name of calling rotuine for warning messages
     );
 
     void GetCoilDesFlowT(int SysNum,           // central air system index

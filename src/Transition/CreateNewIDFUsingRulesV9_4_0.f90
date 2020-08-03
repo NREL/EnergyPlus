@@ -438,6 +438,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
                   CurArgs = CurArgs + 1
 
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:7)=InArgs(1:7)
+                  OutArgs(8) = '0.8'
+                  OutArgs(9:CurArgs+1)=InArgs(8:CurArgs)
+                  CurArgs = CurArgs + 1
+
               ! If your original object starts with I, insert the rules here
 
               ! If your original object starts with L, insert the rules here
@@ -490,6 +498,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ENDIF
 
               ! If your original object starts with P, insert the rules here
+
+              CASE('PERFORMANCEPRECISIONTRADEOFFS')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:4)=InArgs(1:4)
+                  IF (MakeUPPERCase(OutArgs(3)) == 'MODE05') THEN
+                    OutArgs(3) = 'Mode06'
+                  ENDIF
+
 
               ! If your original object starts with R, insert the rules here
 
