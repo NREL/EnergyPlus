@@ -912,6 +912,8 @@ namespace HVACManager {
         while ((SimAirLoopsFlag || SimZoneEquipmentFlag || SimNonZoneEquipmentFlag || SimPlantLoopsFlag || SimElecCircuitsFlag) &&
                (HVACManageIteration <= MaxIter)) {
 
+            if (DataGlobals::stopSimulation) break;
+
             ManageEMS(emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
 
             // Manages the various component simulations
