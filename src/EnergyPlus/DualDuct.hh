@@ -248,7 +248,7 @@ namespace DualDuct {
     // End of Get Input subroutines for the Module
     //******************************************************************************
 
-    void ReportDualDuctConnections(OutputFiles &outputFiles);
+    void ReportDualDuctConnections(IOFiles &ioFiles);
 
     void GetDualDuctOutdoorAirRecircUse(std::string const &CompTypeName, std::string const &CompName, bool &RecircIsUsed);
 

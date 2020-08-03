@@ -1902,6 +1902,7 @@
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
     OperativeTemperature,    !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Air Temperature Weighting Factor
     0.00015,                 !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     225000,                  !- Rated Pump Head {Pa}
@@ -1933,6 +1934,7 @@
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
     SurfaceFaceTemperature,  !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Air Temperature Weighting Factor
     0.0001,                  !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     225000,                  !- Rated Pump Head {Pa}
@@ -1964,6 +1966,7 @@
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
     SurfaceInteriorTemperature, !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Air Temperature Weighting Factor
     0.0001,                  !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     225000,                  !- Rated Pump Head {Pa}

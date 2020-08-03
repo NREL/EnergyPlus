@@ -55,6 +55,7 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -69,8 +70,8 @@
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Material.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -683,20 +684,20 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
@@ -1211,17 +1212,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state.files);
 
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -1229,7 +1230,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
+    HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
     EXPECT_FALSE(has_err_output(true));
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
@@ -1343,7 +1344,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
         DataSurfaces::Surface(SurfNum).ExtConvCoeff = -1;
     }
-    CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+    CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
     Real64 HExt_Expect_Surf1 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(5, 1.5);
     Real64 HExt_Expect_Surf2 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(5, 0.0);
     EXPECT_EQ(HExt_Expect_Surf1, DataHeatBalSurface::HcExtSurf(1));
@@ -1786,17 +1787,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state.files);
 
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -1804,7 +1805,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
+    HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
     EXPECT_FALSE(has_err_output(true));
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
@@ -1900,7 +1901,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
         DataSurfaces::Surface(SurfNum).ExtConvCoeff = -6;
         DataSurfaces::AirSkyRadSplit(SurfNum) = 1.0;
     }
-    CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+    CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
 
     // Test if local value correctly overwritten
     // Surface(1-3) - local; Surface(4-6) - global;
@@ -1961,7 +1962,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     dataConstruction.Construct(1).CTFTUserSource(0) = 0.25;
 
     AllocateSurfaceHeatBalArrays(); // allocates a host of variables related to CTF calculations
-    OutputProcessor::GetReportVariableInput(state.outputFiles);
+    OutputProcessor::GetReportVariableInput(state.files);
 
     EXPECT_EQ(OutputProcessor::ReqRepVars(2).VarName, "SURFACE CONSTRUCTION INDEX");
 }
@@ -2348,15 +2349,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -2367,7 +2368,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     // Clear schedule type warnings
     EXPECT_TRUE(has_err_output(true));
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
+    HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
     EXPECT_TRUE(compare_err_stream(""));
     EXPECT_FALSE(has_err_output(true));
 
@@ -2459,7 +2460,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     }
 
     // Test Additional Heat Source Calculation
-    CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+    CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
     EXPECT_EQ(-0.1, DataHeatBalSurface::QAdditionalHeatSourceOutside(1));
 
     CalcHeatBalanceInsideSurf(state);
@@ -3033,15 +3034,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow) {
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -3049,7 +3050,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow) {
     SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
+    HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
     EXPECT_FALSE(has_err_output(true));
 
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
