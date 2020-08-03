@@ -57,7 +57,7 @@ struct AutoCalculateSizer : BaseSizer
     AutoCalculateSizer()
     {
         this->sizingType = AutoSizingType::AutoCalculateSizing;
-        this->sizingString = "Set String in Component Model using overrideSizingString";
+        this->sizingString = "AutoCalculate: Set string in Component Model using overrideSizingString";
     }
     ~AutoCalculateSizer() = default;
 
@@ -123,7 +123,7 @@ struct ASHRAEMaxSATHeatingSizer : BaseSizer
 struct DesiccantDehumidifierBFPerfDataFaceVelocitySizer: BaseSizer {
     DesiccantDehumidifierBFPerfDataFaceVelocitySizer() {
         this->sizingType = AutoSizingType::DesiccantDehumidifierBFPerfDataFaceVelocitySizing;
-        this->sizingString = "Nominal Air Face Velocity [m3/s]";
+        this->sizingString = "Nominal Air Face Velocity [m/s]";
     }
     ~DesiccantDehumidifierBFPerfDataFaceVelocitySizer() = default;
 

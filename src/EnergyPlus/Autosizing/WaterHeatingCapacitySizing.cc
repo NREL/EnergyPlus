@@ -104,7 +104,7 @@ Real64 WaterHeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
                     this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                                                               this->zoneEqSizing(this->curZoneEqNum),
                                                               this->finalZoneSizing(this->curZoneEqNum));
-                //Real64 CoilInHumRat =
+                // Real64 CoilInHumRat =
                 //    this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                 //                                                this->zoneEqSizing(this->curZoneEqNum),
                 //                                                this->finalZoneSizing(this->curZoneEqNum));
@@ -114,8 +114,7 @@ Real64 WaterHeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
             }
             this->autoSizedValue = NominalCapacityDes * this->dataHeatSizeRatio;
             if (DataGlobals::DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
-                std::string msg =
-                    this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
+                std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                 this->addErrorMessage(msg);
                 ShowWarningMessage(msg);
                 msg = "...Rated Total Heating Capacity = " + General::TrimSigDigits(this->autoSizedValue, 2) + " [W]";
@@ -125,15 +124,22 @@ Real64 WaterHeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
                 this->addErrorMessage(msg);
                 ShowContinueError(msg);
                 if (this->termUnitSingDuct || this->termUnitPIU || this->termUnitIU || this->zoneEqFanCoil || this->zoneEqUnitHeater) {
-                    ShowContinueError("...Air flow rate used for sizing = " + General::TrimSigDigits(DesMassFlow / DataEnvironment::StdRhoAir, 5) +
-                                      " [m3/s]");
-                    ShowContinueError("...Plant loop temperature difference = " + General::TrimSigDigits(this->dataWaterCoilSizHeatDeltaT, 2) +
-                                      " [C]");
+                    msg = "...Air flow rate used for sizing = " + General::TrimSigDigits(DesMassFlow / DataEnvironment::StdRhoAir, 5) + " [m3/s]";
+                    this->addErrorMessage(msg);
+                    ShowContinueError(msg);
+                    msg = "...Plant loop temperature difference = " + General::TrimSigDigits(this->dataWaterCoilSizHeatDeltaT, 2) + " [C]";
+                    this->addErrorMessage(msg);
+                    ShowContinueError(msg);
                 } else {
-                    ShowContinueError("...Coil inlet air temperature used for sizing = " + General::TrimSigDigits(CoilInTemp, 2) + " [C]");
-                    ShowContinueError("...Coil outlet air temperature used for sizing = " + General::TrimSigDigits(CoilOutTemp, 2) + " [C]");
-                    ShowContinueError("...Coil outlet air humidity ratio used for sizing = " + General::TrimSigDigits(CoilOutHumRat, 2) +
-                                      " [kgWater/kgDryAir]");
+                    msg = "...Coil inlet air temperature used for sizing = " + General::TrimSigDigits(CoilInTemp, 2) + " [C]";
+                    this->addErrorMessage(msg);
+                    ShowContinueError(msg);
+                    msg = "...Coil outlet air temperature used for sizing = " + General::TrimSigDigits(CoilOutTemp, 2) + " [C]";
+                    this->addErrorMessage(msg);
+                    ShowContinueError(msg);
+                    msg = "...Coil outlet air humidity ratio used for sizing = " + General::TrimSigDigits(CoilOutHumRat, 2) + " [kgWater/kgDryAir]";
+                    this->addErrorMessage(msg);
+                    ShowContinueError(msg);
                 }
             }
         }

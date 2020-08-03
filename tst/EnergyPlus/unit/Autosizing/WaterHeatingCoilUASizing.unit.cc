@@ -165,6 +165,26 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
+    // Test 2 - Zone Equipment, UA sizing fails
+    WaterCoils::WaterCoil(1).InletAirTemp = 61.0;
+    // start with an auto-sized value as the user input
+    inputValue = EnergyPlus::DataSizing::AutoSize;
+    // do sizing
+    DataSizing::ZoneSizingInput.allocate(1);
+    DataSizing::ZoneSizingInput(1).ZoneNum = 1;
+    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(inputValue, errorsFound);
+    EXPECT_TRUE(errorsFound);
+    EXPECT_TRUE(DataSizing::DataErrorsFound);
+    EXPECT_TRUE(sizer.dataErrorsFound);
+    EXPECT_EQ(AutoSizingResultType::ErrorType1, sizer.errorType);
+    EXPECT_TRUE(sizer.wasAutoSized);
+    EXPECT_NEAR(3.0, sizedValue, 0.01); // 0.1% of 3000 W capacity
+    WaterCoils::WaterCoil(1).InletAirTemp = 21.0;
+    DataSizing::DataErrorsFound = false;
+    sizer.dataErrorsFound = false;
+    errorsFound = false;
+
     // reset eio stream
     has_eio_output(true);
     eiooutput = "";
@@ -234,6 +254,28 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(98.35, sizedValue, 0.01);
+    sizer.autoSizedValue = 0.0; // reset for next test
+
+    // Test 5 - Airloop Equipment, failed UA sizing
+    WaterCoils::WaterCoil(1).InletAirTemp = 61.0;
+    // start with an auto-sized value as the user input
+    inputValue = EnergyPlus::DataSizing::AutoSize;
+
+    // do sizing
+    sizer.wasAutoSized = false;
+    printFlag = false;
+    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(inputValue, errorsFound);
+    EXPECT_EQ(AutoSizingResultType::ErrorType1, sizer.errorType);
+    EXPECT_TRUE(sizer.wasAutoSized);
+    EXPECT_TRUE(errorsFound);
+    EXPECT_TRUE(DataSizing::DataErrorsFound);
+    EXPECT_TRUE(sizer.dataErrorsFound);
+    EXPECT_NEAR(3.0, sizedValue, 0.01); // 0.1% of 3000 W capacity
+    WaterCoils::WaterCoil(1).InletAirTemp = 21.0;
+    DataSizing::DataErrorsFound = false;
+    sizer.dataErrorsFound = false;
+    errorsFound = false;
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // OUTDOOR AIR SYSTEM EQUIPMENT TESTING

@@ -385,6 +385,9 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
         std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Outlet Air Temperature [C], 11.44000\n"
                     " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Design Outlet Air Temperature [C], 14.44000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+
+    // call the clearState
+    sizer.clearState();
 }
 
 } // namespace EnergyPlus

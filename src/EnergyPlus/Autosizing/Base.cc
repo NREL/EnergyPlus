@@ -203,16 +203,27 @@ void BaseSizer::preSize(Real64 const _originalValue)
 
     if (this->dataFractionUsedForSizing == 0.0 && this->dataConstantUsedForSizing > 0.0) {
         this->errorType = AutoSizingResultType::ErrorType1;
-        this->autoSizedValue = 0.0;
         this->autoCalculate = true;
         this->hardSizeNoDesignRun = false;
-        std::string msg = "Sizing Library HeatingWaterflowSizer: DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " +
-                          this->sizingString + " must both be greater than 0.";
-        this->addErrorMessage(msg);
-        ShowSevereError(msg);
+        if (this->wasAutoSized) {
+            this->autoSizedValue = 0.0;
+            std::string msg = "Sizing Library: DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " + this->sizingString +
+                " must both be greater than 0.";
+            this->addErrorMessage(msg);
+            ShowSevereError(msg);
+        }
     } else if (this->dataFractionUsedForSizing > 0.0) {
         this->autoCalculate = true;
         this->hardSizeNoDesignRun = false;
+    } else if (this->sizingType == AutoSizingType::AutoCalculateSizing) {
+        this->autoCalculate = true;
+        if (this->originalValue == DataSizing::AutoSize && !this->dataEMSOverrideON) {
+            this->errorType = AutoSizingResultType::ErrorType1;
+            std::string msg = "Sizing Library: DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " + this->sizingString +
+                " must both be greater than 0.";
+            this->addErrorMessage(msg);
+            ShowSevereError(msg);
+        }
     }
 
     if (this->curSysNum > 0 && this->curSysNum <= this->numPrimaryAirSys) {
@@ -338,6 +349,8 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
         } else if (!this->wasAutoSized && this->autoSizedValue >= 0.0 && this->originalValue == 0.0) { // input was blank or zero
             this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->originalValue);
             this->autoSizedValue = this->originalValue;
+        } else if (this->dataEMSOverrideON) { // EMS overrides value
+            this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->autoSizedValue);
         } else if (this->wasAutoSized && this->autoSizedValue >= 0.0 &&
                    this->originalValue <= 0.0) { // autosized to 0 or greater and input is 0 or autosize
             // might need more logic here to catch everything correctly
@@ -355,17 +368,31 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
             }
             if (DataGlobals::DisplayExtraWarnings) {
                 if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
-                    ShowMessage(this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
-                    ShowContinueError("User-Specified " + this->sizingString + " = " + General::RoundSigDigits(this->originalValue, 5));
-                    ShowContinueError("differs from Design Size " + this->sizingString + " = " + General::RoundSigDigits(this->autoSizedValue, 5));
-                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                    std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
+                    this->addErrorMessage(msg);
+                    ShowMessage(msg);
+                    msg = "User-Specified " + this->sizingString + " = " + General::RoundSigDigits(this->originalValue, 5);
+                    this->addErrorMessage(msg);
+                    ShowContinueError(msg);
+                    msg = "differs from Design Size " + this->sizingString + " = " + General::RoundSigDigits(this->autoSizedValue, 5);
+                    this->addErrorMessage(msg);
+                    ShowContinueError(msg);
+                    msg = "This may, or may not, indicate mismatched component sizes.";
+                    this->addErrorMessage(msg);
+                    ShowContinueError(msg);
+                    msg = "Verify that the value entered is intended and is consistent with other components.";
+                    this->addErrorMessage(msg);
+                    ShowContinueError(msg);
                 }
             }
             if (!this->wasAutoSized) this->autoSizedValue = this->originalValue;
         } else {
-            ShowSevereError(this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.");
-            ShowContinueError("SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->originalValue, 1));
+            std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
+            this->addErrorMessage(msg);
+            ShowSevereError(msg);
+            msg = "SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->originalValue, 1);
+            this->addErrorMessage(msg);
+            ShowContinueError(msg);
             this->errorType = AutoSizingResultType::ErrorType1;
         }
     } else if (!this->wasAutoSized && !this->autoCalculate) {
@@ -373,8 +400,12 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
     }
 
     if (this->errorType != AutoSizingResultType::NoError) {
-        ShowSevereError("Developer Error: sizing of " + this->sizingString + " failed.");
-        ShowContinueError("Occurs in " + this->compType + " " + this->compName);
+        std::string msg = "Developer Error: sizing of " + this->sizingString + " failed.";
+        this->addErrorMessage(msg);
+        ShowSevereError(msg);
+        msg = "Occurs in " + this->compType + " " + this->compName;
+        this->addErrorMessage(msg);
+        ShowContinueError(msg);
         errorsFound = true;
     }
 }
@@ -398,8 +429,12 @@ bool BaseSizer::checkInitialized(bool &errorsFound)
         errorsFound = true;
         this->errorType = AutoSizingResultType::ErrorType2;
         this->autoSizedValue = 0.0;
-        ShowSevereError("Developer Error: sizing of " + this->sizingString + " failed.");
-        ShowContinueError("Occurs in " + this->compType + " " + this->compName);
+        std::string msg = "Developer Error: uninitialized sizing of " + this->sizingString + ".";
+        this->addErrorMessage(msg);
+        ShowSevereError(msg);
+        msg = "Occurs in " + this->compType + " " + this->compName;
+        this->addErrorMessage(msg);
+        ShowContinueError(msg);
         return false;
     }
     return true;
