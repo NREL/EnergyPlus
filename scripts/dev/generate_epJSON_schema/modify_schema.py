@@ -236,6 +236,27 @@ def add_explicit_extensible_bounds(schema):
         loc['required'] = ['lines']
     loc['properties']['lines']['minItems'] = 1
 
+def add_implicit_extensible_bounds(schema):
+    for obj_name, obj_schema in schema['properties'].items():
+        if 'max_fields' in obj_schema:
+            if not 'extensible_size' in obj_schema:
+                raise RuntimeError(
+                    "max_fields without extensible_size makes no sense and "
+                    "should not happen. Object name = {}".format(obj_name))
+            n_exts = obj_schema['extensible_size']
+            n_regular_fields = len(obj_schema['legacy_idd']['fields'])
+            max_fields = obj_schema['max_fields']
+            obj_schema['maxItems'] = int((max_fields-n_regular_fields) / n_exts)
+            # obj_schema.pop('max_fields')
+        if 'min_fields' in obj_schema:
+            if not 'extensible_size' in obj_schema:
+                # Thats ok, skip it
+                continue
+            n_exts = obj_schema['extensible_size']
+            n_regular_fields = len(obj_schema['legacy_idd']['fields'])
+            min_fields = obj_schema['min_fields']
+            obj_schema['minItems'] = int((min_fields-n_regular_fields) / n_exts)
+            #obj_schema.pop('min_fields')
 
 def change_special_cased_name_fields(schema):
     original_name = schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['field_info'].pop('zone_terminal_unit_name')
