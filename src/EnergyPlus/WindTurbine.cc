@@ -59,11 +59,8 @@
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGenerators.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -95,8 +92,8 @@ namespace WindTurbine {
     // Mazharul Islam, David S.K. Ting, and Amir Fartaj. 2008. Aerodynamic Models for Darrieus-type sSraight-bladed
     //     Vertical Axis Wind Turbines. Renewable & Sustainable Energy Reviews, Volume 12, pp.1087-1109
 
-    using namespace DataPrecisionGlobals;
-    using namespace DataGenerators;
+  //  using namespace DataPrecisionGlobals;
+  //  using namespace DataGenerators;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DegToRadians;
     using DataGlobals::Pi;
@@ -105,9 +102,8 @@ namespace WindTurbine {
 
     static std::string const BlankString;
 
-    // Functions
-
-    void SimWindTurbine(WindTurbineData &dataWindTurbine, int const EP_UNUSED(GeneratorType), // Type of Generator
+    void SimWindTurbine(EnergyPlusData &state,
+                        int const EP_UNUSED(GeneratorType), // Type of Generator
                         std::string const &GeneratorName,   // User specified name of Generator
                         int &GeneratorIndex,                // Generator index
                         bool const RunFlag,                 // ON or OFF
@@ -129,38 +125,37 @@ namespace WindTurbine {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true);
         int WindTurbineNum;
         // Obtains and allocates heat balance related parameters from input
 
-        if (GetInputFlag) {
-            GetWindTurbineInput(dataWindTurbine);
-            GetInputFlag = false;
+        if (state.dataWindTurbine.GetInputFlag) {
+            GetWindTurbineInput(state.dataWindTurbine);
+            state.dataWindTurbine.GetInputFlag = false;
         }
 
         if (GeneratorIndex == 0) {
-            WindTurbineNum = UtilityRoutines::FindItemInList(GeneratorName, dataWindTurbine.WindTurbineSys);
+            WindTurbineNum = UtilityRoutines::FindItemInList(GeneratorName, state.dataWindTurbine.WindTurbineSys);
             if (WindTurbineNum == 0) {
                 ShowFatalError("SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators " + GeneratorName);
             }
             GeneratorIndex = WindTurbineNum;
         } else {
             WindTurbineNum = GeneratorIndex;
-            if (WindTurbineNum > dataWindTurbine.NumWindTurbines || WindTurbineNum < 1) {
+            if (WindTurbineNum > state.dataWindTurbine.NumWindTurbines || WindTurbineNum < 1) {
                 ShowFatalError("SimWindTurbine: Invalid GeneratorIndex passed=" + TrimSigDigits(WindTurbineNum) +
-                               ", Number of Wind Turbine Generators=" + TrimSigDigits(dataWindTurbine.NumWindTurbines) + ", Generator name=" + GeneratorName);
+                               ", Number of Wind Turbine Generators=" + TrimSigDigits(state.dataWindTurbine.NumWindTurbines) + ", Generator name=" + GeneratorName);
             }
-            if (GeneratorName != dataWindTurbine.WindTurbineSys(WindTurbineNum).Name) {
+            if (GeneratorName != state.dataWindTurbine.WindTurbineSys(WindTurbineNum).Name) {
                 ShowFatalError("SimMWindTurbine: Invalid GeneratorIndex passed=" + TrimSigDigits(WindTurbineNum) +
-                               ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + dataWindTurbine.WindTurbineSys(WindTurbineNum).Name);
+                               ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + state.dataWindTurbine.WindTurbineSys(WindTurbineNum).Name);
             }
         }
 
-        InitWindTurbine(dataWindTurbine, WindTurbineNum);
+        InitWindTurbine(state, WindTurbineNum);
 
-        CalcWindTurbine(dataWindTurbine, WindTurbineNum, RunFlag);
+        CalcWindTurbine(state.dataWindTurbine, WindTurbineNum, RunFlag);
 
-        ReportWindTurbine(dataWindTurbine, WindTurbineNum);
+        ReportWindTurbine(state.dataWindTurbine, WindTurbineNum);
     }
 
     void GetWTGeneratorResults(WindTurbineData &dataWindTurbine, int const EP_UNUSED(GeneratorType), // Type of Generator
@@ -214,7 +209,7 @@ namespace WindTurbine {
         Real64 const DefaultH(50.0);       // Default of height for local wind speed
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         int WindTurbineNum;             // Wind turbine number
         int NumAlphas;                  // Number of Alphas for each GetobjectItem call
         int NumNumbers;                 // Number of Numbers for each GetobjectItem call
@@ -614,7 +609,7 @@ namespace WindTurbine {
         }
     }
 
-    void InitWindTurbine(WindTurbineData &dataWindTurbine, int const WindTurbineNum)
+    void InitWindTurbine(EnergyPlusData &state, int const WindTurbineNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -637,85 +632,56 @@ namespace WindTurbine {
         using DataEnvironment::WeatherFileWindModCoeff;
 
         static char const TabChr('\t'); // Tab character
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
-        static bool MyOneTimeFlag(true);
-        int ReadStatus;               // Reading status of stat file
-        int statFile;                 // Weather Stat File
-        std::string::size_type lnPtr; // scan pointer for Line input
         int mon;                      // loop counter
         bool wsStatFound;             // logical noting that wind stats were found
-        bool fileExists;              // true if Stat file exists
         bool warningShown;            // true if the <365 warning has already been shown
-        std::string lineIn;
         Array1D<Real64> MonthWS(12);
         static Real64 AnnualTMYWS(0.0); // Annual average wind speed in stat file
         Real64 LocalTMYWS;              // Annual average wind speed at the rotor height
 
         // Estimate average annual wind speed once
-        if (MyOneTimeFlag) {
+        if (state.dataWindTurbine.MyOneTimeFlag) {
             wsStatFound = false;
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(DataStringGlobals::inStatFileName, flags);
-                fileExists = flags.exists();
-            }
-            if (fileExists) {
-                statFile = GetNewUnitNumber();
-                ReadStatus = 0;
-                {
-                    IOFlags flags;
-                    flags.ACTION("READ");
-                    ObjexxFCL::gio::open(statFile, DataStringGlobals::inStatFileName, flags);
-                    ReadStatus = flags.ios();
-                }
-                if (ReadStatus != 0) {
-                    ShowFatalError("InitWindTurbine: Could not open file " + DataStringGlobals::inStatFileName + " for input (read).");
-                }
-                while (ReadStatus == 0) { // end of file
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
-                        ReadStatus = flags.ios();
-                    }
+
+            if (FileSystem::fileExists(state.files.inStatFileName.fileName)) {
+                auto statFile = state.files.inStatFileName.open("InitWindTurbine");
+                while (statFile.good()) { // end of file
+                    auto lineIn = statFile.readLine();
                     // reconcile line with different versions of stat file
-                    lnPtr = index(lineIn, "Wind Speed");
+                    auto lnPtr = index(lineIn.data, "Wind Speed");
                     if (lnPtr == std::string::npos) continue;
                     // have hit correct section.
-                    while (ReadStatus == 0) { // find daily avg line
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
-                            ReadStatus = flags.ios();
-                        }
-                        lnPtr = index(lineIn, "Daily Avg");
+                    while (statFile.good()) { // find daily avg line
+                        lineIn = statFile.readLine();
+                        lnPtr = index(lineIn.data, "Daily Avg");
                         if (lnPtr == std::string::npos) continue;
                         // tab delimited file
-                        lineIn.erase(0, lnPtr + 10);
+                        lineIn.data.erase(0, lnPtr + 10);
                         MonthWS = 0.0;
                         wsStatFound = true;
                         warningShown = false;
                         for (mon = 1; mon <= 12; ++mon) {
-                            lnPtr = index(lineIn, TabChr);
+                            lnPtr = index(lineIn.data, TabChr);
                             if (lnPtr != 1) {
-                                if ((lnPtr == std::string::npos) || (!stripped(lineIn.substr(0, lnPtr)).empty())) {
+                                if ((lnPtr == std::string::npos) || (!stripped(lineIn.data.substr(0, lnPtr)).empty())) {
                                     if (lnPtr != std::string::npos) {
-                                        ObjexxFCL::gio::read(lineIn.substr(0, lnPtr), "*") >> MonthWS(mon);
-                                        lineIn.erase(0, lnPtr + 1);
+                                        ObjexxFCL::gio::read(lineIn.data.substr(0, lnPtr), "*") >> MonthWS(mon);
+                                        lineIn.data.erase(0, lnPtr + 1);
                                     }
                                 } else { // blank field
                                     if (!warningShown) {
-                                        ShowWarningError("InitWindTurbine: read from " + DataStringGlobals::inStatFileName +
+                                        ShowWarningError("InitWindTurbine: read from " + state.files.inStatFileName.fileName +
                                                          " file shows <365 days in weather file. Annual average wind speed used will be inaccurate.");
-                                        lineIn.erase(0, lnPtr + 1);
+                                        lineIn.data.erase(0, lnPtr + 1);
                                         warningShown = true;
                                     }
                                 }
                             } else { // two tabs in succession
                                 if (!warningShown) {
-                                    ShowWarningError("InitWindTurbine: read from " + DataStringGlobals::inStatFileName +
+                                    ShowWarningError("InitWindTurbine: read from " + state.files.inStatFileName.fileName +
                                                      " file shows <365 days in weather file. Annual average wind speed used will be inaccurate.");
-                                    lineIn.erase(0, lnPtr + 1);
+                                    lineIn.data.erase(0, lnPtr + 1);
                                     warningShown = true;
                                 }
                             }
@@ -724,7 +690,6 @@ namespace WindTurbine {
                     }
                     if (wsStatFound) break;
                 }
-                ObjexxFCL::gio::close(statFile);
                 if (wsStatFound) {
                     AnnualTMYWS = sum(MonthWS) / 12.0;
                 } else {
@@ -735,33 +700,33 @@ namespace WindTurbine {
                 ShowWarningError("InitWindTurbine: stat file missing. TMY Wind Speed adjusted at the height is used.");
             }
 
-            MyOneTimeFlag = false;
+            state.dataWindTurbine.MyOneTimeFlag = false;
         }
 
-        dataWindTurbine.WindTurbineSys(WindTurbineNum).AnnualTMYWS = AnnualTMYWS;
+        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).AnnualTMYWS = AnnualTMYWS;
 
         // Factor differences between TMY wind data and local wind data once
-        if (AnnualTMYWS > 0.0 && dataWindTurbine.WindTurbineSys(WindTurbineNum).WSFactor == 0.0 && dataWindTurbine.WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS > 0) {
+        if (AnnualTMYWS > 0.0 && state.dataWindTurbine.WindTurbineSys(WindTurbineNum).WSFactor == 0.0 && state.dataWindTurbine.WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS > 0) {
             // Convert the annual wind speed to the local wind speed at the height of the local station, then factor
             LocalTMYWS =
-                AnnualTMYWS * WeatherFileWindModCoeff * std::pow(dataWindTurbine.WindTurbineSys(WindTurbineNum).HeightForLocalWS / SiteWindBLHeight, SiteWindExp);
-            dataWindTurbine.WindTurbineSys(WindTurbineNum).WSFactor = LocalTMYWS / dataWindTurbine.WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS;
+                AnnualTMYWS * WeatherFileWindModCoeff * std::pow(state.dataWindTurbine.WindTurbineSys(WindTurbineNum).HeightForLocalWS / SiteWindBLHeight, SiteWindExp);
+            state.dataWindTurbine.WindTurbineSys(WindTurbineNum).WSFactor = LocalTMYWS / state.dataWindTurbine.WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS;
         }
         // Assign factor of 1.0 if no stat file or no input of local average wind speed
-        if (dataWindTurbine.WindTurbineSys(WindTurbineNum).WSFactor == 0.0) dataWindTurbine.WindTurbineSys(WindTurbineNum).WSFactor = 1.0;
+        if (state.dataWindTurbine.WindTurbineSys(WindTurbineNum).WSFactor == 0.0) state.dataWindTurbine.WindTurbineSys(WindTurbineNum).WSFactor = 1.0;
 
         // Do every time step initialization
-        dataWindTurbine.WindTurbineSys(WindTurbineNum).Power = 0.0;
-        dataWindTurbine.WindTurbineSys(WindTurbineNum).TotPower = 0.0;
-        dataWindTurbine.WindTurbineSys(WindTurbineNum).PowerCoeff = 0.0;
-        dataWindTurbine.WindTurbineSys(WindTurbineNum).TipSpeedRatio = 0.0;
-        dataWindTurbine.WindTurbineSys(WindTurbineNum).ChordalVel = 0.0;
-        dataWindTurbine.WindTurbineSys(WindTurbineNum).NormalVel = 0.0;
-        dataWindTurbine.WindTurbineSys(WindTurbineNum).RelFlowVel = 0.0;
-        dataWindTurbine.WindTurbineSys(WindTurbineNum).AngOfAttack = 0.0;
-        dataWindTurbine.WindTurbineSys(WindTurbineNum).TanForce = 0.0;
-        dataWindTurbine.WindTurbineSys(WindTurbineNum).NorForce = 0.0;
-        dataWindTurbine.WindTurbineSys(WindTurbineNum).TotTorque = 0.0;
+        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).Power = 0.0;
+        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).TotPower = 0.0;
+        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).PowerCoeff = 0.0;
+        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).TipSpeedRatio = 0.0;
+        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).ChordalVel = 0.0;
+        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).NormalVel = 0.0;
+        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).RelFlowVel = 0.0;
+        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).AngOfAttack = 0.0;
+        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).TanForce = 0.0;
+        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).NorForce = 0.0;
+        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).TotTorque = 0.0;
     }
 
     void CalcWindTurbine(WindTurbineData &dataWindTurbine, int const WindTurbineNum,     // System is on

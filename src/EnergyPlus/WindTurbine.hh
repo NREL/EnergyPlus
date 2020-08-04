@@ -138,9 +138,8 @@ namespace WindTurbine {
         }
     };
 
-    // Functions
-
-    void SimWindTurbine(WindTurbineData &dataWindTurbine, int const GeneratorType,          // Type of Generator
+    void SimWindTurbine(EnergyPlusData &state,
+                        int const GeneratorType,          // Type of Generator
                         std::string const &GeneratorName, // User specified name of Generator
                         int &GeneratorIndex,              // Generator index
                         bool const RunFlag,               // ON or OFF
@@ -156,7 +155,7 @@ namespace WindTurbine {
 
     void GetWindTurbineInput(WindTurbineData &dataWindTurbine);
 
-    void InitWindTurbine(WindTurbineData &dataWindTurbine, int const WindTurbineNum);
+    void InitWindTurbine(EnergyPlusData &state, int const WindTurbineNum);
 
     void CalcWindTurbine(WindTurbineData &dataWindTurbine, int const WindTurbineNum, // System is on
                          bool const RunFlag        // System is on
@@ -170,18 +169,21 @@ namespace WindTurbine {
 
     struct WindTurbineData : BaseGlobalStruct {
 
-
         int NumWindTurbines; // Total wind turbine statements in inputs
+        bool GetInputFlag;
+        bool MyOneTimeFlag;
         Array1D<WindTurbine::WindTurbineParams> WindTurbineSys;
 
         void clear_state() override
         {
             NumWindTurbines = 0;
+            GetInputFlag = true;
+            MyOneTimeFlag = true;
             WindTurbineSys.deallocate();
         }
 
         // Default Constructor
-        WindTurbineData() : NumWindTurbines(0) 
+        WindTurbineData() : NumWindTurbines(0), GetInputFlag(true), MyOneTimeFlag(true)
         {
         }
     };

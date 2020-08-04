@@ -15,11 +15,9 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Backspace.hh>
-#include <ObjexxFCL/Inquire.hh>
 #include <ObjexxFCL/Print.hh>
 #include <ObjexxFCL/Read.hh>
 #include <ObjexxFCL/Rewind.hh>
 #include <ObjexxFCL/Stream.hh>
-#include <ObjexxFCL/Write.hh>
 
 #endif // ObjexxFCL_FormattedIO_hh_INCLUDED

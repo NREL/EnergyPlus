@@ -51,12 +51,12 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -65,12 +65,12 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -1108,16 +1108,16 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
 
     NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.outputFiles);  // read schedule data
+    ProcessScheduleInput(state.files);  // read schedule data
 
     ErrorsFound = false;
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, ErrorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData(state, state.outputFiles);
+    GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
 
@@ -1282,7 +1282,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
 
     NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.outputFiles);  // read schedule data
+    ProcessScheduleInput(state.files);  // read schedule data
 
     ErrorsFound = false;
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
@@ -1298,7 +1298,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     GetWaterCoilsInputFlag = false;
 
     ErrorsFound = false;
-    GetFanInput(state.fans);
+    GetFanInput(state);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
