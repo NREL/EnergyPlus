@@ -76,7 +76,7 @@ void registerErrorCallback(void (*f)(int, const char *)) {
 }
 
 Glycol glycolNew(const char* glycolName) {
-    auto glycol = new EnergyPlus::FluidProperties::GlycolAPI(glycolName);
+    auto *glycol = new EnergyPlus::FluidProperties::GlycolAPI(glycolName);
     return reinterpret_cast<Glycol>(glycol);
 }
 void glycolDelete(Glycol glycol) {
@@ -96,7 +96,7 @@ Real64 glycolViscosity(Glycol glycol, Real64 temperature) {
 }
 
 Refrigerant refrigerantNew(const char* refrigerantName) {
-    auto refrigerant = new EnergyPlus::FluidProperties::RefrigerantAPI(refrigerantName);
+    auto *refrigerant = new EnergyPlus::FluidProperties::RefrigerantAPI(refrigerantName);
     return reinterpret_cast<Refrigerant>(refrigerant);
 }
 void refrigerantDelete(Refrigerant refrigerant) {

@@ -2470,7 +2470,7 @@ namespace RootFinder {
         return BrentMethod;
     }
 
-    void WriteRootFinderTraceHeader(int const TraceFileUnit) // Unit for trace file
+    void WriteRootFinderTraceHeader(InputOutputFile &TraceFile) // Unit for trace file
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
@@ -2515,18 +2515,31 @@ namespace RootFinder {
         //'History(1)%DefinedFlag', ',', &
         //'History(2)%DefinedFlag', ',', &
         //'History(3)%DefinedFlag', ',', &
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(TraceFileUnit, "(20(A,A))", flags)
-                << "Status" << ',' << "Method" << ',' << "CurrentPoint%X" << ',' << "CurrentPoint%Y" << ',' << "XCandidate" << ','
-                << "ConvergenceRate" << ',' << "MinPoint%X" << ',' << "MinPoint%Y" << ',' << "LowerPoint%X" << ',' << "LowerPoint%Y" << ','
-                << "UpperPoint%X" << ',' << "UpperPoint%Y" << ',' << "MaxPoint%X" << ',' << "MaxPoint%Y" << ',' << "History(1)%X" << ','
-                << "History(1)%Y" << ',' << "History(2)%X" << ',' << "History(2)%Y" << ',' << "History(3)%X" << ',' << "History(3)%Y" << ',';
-        }
+        print(TraceFile,
+              "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},",
+              "Status",
+              "Method",
+              "CurrentPoint%X",
+              "CurrentPoint%Y",
+              "XCandidate",
+              "ConvergenceRate",
+              "MinPoint%X",
+              "MinPoint%Y",
+              "LowerPoint%X",
+              "LowerPoint%Y",
+              "UpperPoint%X",
+              "UpperPoint%Y",
+              "MaxPoint%X",
+              "MaxPoint%Y",
+              "History(1)%X",
+              "History(1)%Y",
+              "History(2)%X",
+              "History(2)%Y",
+              "History(3)%X",
+              "History(3)%Y");
     }
 
-    void WriteRootFinderTrace(int const TraceFileUnit,                 // Unit for trace file
+    void WriteRootFinderTrace(InputOutputFile &TraceFile,                 // Unit for trace file
                               RootFinderDataType const &RootFinderData // Data used by root finding algorithm
     )
     {
@@ -2566,35 +2579,26 @@ namespace RootFinder {
 
         // FLOW:
 
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(TraceFileUnit, "(2(A,A))", flags)
-                << TrimSigDigits(RootFinderData.StatusFlag) << ',' << TrimSigDigits(RootFinderData.CurrentMethodType) << ',';
-        }
+        print(TraceFile, "{},{},", RootFinderData.StatusFlag,RootFinderData.CurrentMethodType);
 
         // Only show current point if defined.
-        WritePoint(TraceFileUnit, RootFinderData.CurrentPoint, false);
+        WritePoint(TraceFile, RootFinderData.CurrentPoint, false);
 
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(TraceFileUnit, "(2(F20.10,A))", flags) << RootFinderData.XCandidate << ',' << RootFinderData.ConvergenceRate << ',';
-        }
+        print(TraceFile, "{:20.10F},{:20.10F},", RootFinderData.XCandidate, RootFinderData.ConvergenceRate);
 
         // Always show min and max points.
         // Only show lower and upper points if defined.
-        WritePoint(TraceFileUnit, RootFinderData.MinPoint, true);
-        WritePoint(TraceFileUnit, RootFinderData.LowerPoint, false);
-        WritePoint(TraceFileUnit, RootFinderData.UpperPoint, false);
-        WritePoint(TraceFileUnit, RootFinderData.MaxPoint, true);
+        WritePoint(TraceFile, RootFinderData.MinPoint, true);
+        WritePoint(TraceFile, RootFinderData.LowerPoint, false);
+        WritePoint(TraceFile, RootFinderData.UpperPoint, false);
+        WritePoint(TraceFile, RootFinderData.MaxPoint, true);
         // Only show history points if defined.
-        WritePoint(TraceFileUnit, RootFinderData.History(1), false);
-        WritePoint(TraceFileUnit, RootFinderData.History(2), false);
-        WritePoint(TraceFileUnit, RootFinderData.History(3), false);
+        WritePoint(TraceFile, RootFinderData.History(1), false);
+        WritePoint(TraceFile, RootFinderData.History(2), false);
+        WritePoint(TraceFile, RootFinderData.History(3), false);
     }
 
-    void WritePoint(int const TraceFileUnit,    // Unit for trace file
+    void WritePoint(InputOutputFile &TraceFile,    // Unit for trace file
                     PointType const &PointData, // Point data structure
                     bool const ShowXValue)
     {
@@ -2623,8 +2627,6 @@ namespace RootFinder {
         // If set to TRUE, ten always show the X value even if not defined
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string NoValue; // String used whenever the value is not available
-
         // INTERFACE BLOCK SPECIFICATIONS
         // na
 
@@ -2637,29 +2639,17 @@ namespace RootFinder {
         // FLOW:
 
         if (PointData.DefinedFlag) {
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(TraceFileUnit, "(2(F20.10,A))", flags) << PointData.X << ',' << PointData.Y << ',';
-            }
+            print(TraceFile, "{:20.10F},{:20.10F},", PointData.X, PointData.Y);
         } else {
             if (ShowXValue) {
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(TraceFileUnit, "(1(F20.10,A),1(A,A))", flags) << PointData.X << ',' << NoValue << ',';
-                }
+                print(TraceFile, "{:20.10F},,", PointData.X);
             } else {
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(TraceFileUnit, "(2(A,A))", flags) << NoValue << ',' << NoValue << ',';
-                }
+                print(TraceFile, ",,");
             }
         }
     }
 
-    void DebugRootFinder(int const FileUnit,                      // File unit where to write debugging info
+    void DebugRootFinder(InputOutputFile &DebugFile,                   // File unit where to write debugging info
                          RootFinderDataType const &RootFinderData // Data used by root finding algorithm
     )
     {
@@ -2687,8 +2677,6 @@ namespace RootFinder {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2701,49 +2689,28 @@ namespace RootFinder {
 
         // FLOW:
 
-        // UNIT=0 should correspond to the standard output file (screen).
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(FileUnit, fmtA, flags) << "Current = ";
-        }
-        WritePoint(FileUnit, RootFinderData.CurrentPoint, true);
-        ObjexxFCL::gio::write(FileUnit, fmtLD);
+        print(DebugFile, "Current = ");
+        WritePoint(DebugFile, RootFinderData.CurrentPoint, true);
+        print(DebugFile, "\n");
 
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(FileUnit, fmtA, flags) << "Min     = ";
-        }
-        WritePoint(FileUnit, RootFinderData.MinPoint, true);
-        ObjexxFCL::gio::write(FileUnit, fmtLD);
+        print(DebugFile, "Min     = ");
+        WritePoint(DebugFile, RootFinderData.MinPoint, true);
+        print(DebugFile, "\n");
 
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(FileUnit, fmtA, flags) << "Lower   = ";
-        }
-        WritePoint(FileUnit, RootFinderData.LowerPoint, false);
-        ObjexxFCL::gio::write(FileUnit, fmtLD);
+        print(DebugFile, "Lower   = ");
+        WritePoint(DebugFile, RootFinderData.LowerPoint, false);
+        print(DebugFile, "\n");
 
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(FileUnit, fmtA, flags) << "Upper   = ";
-        }
-        WritePoint(FileUnit, RootFinderData.UpperPoint, false);
-        ObjexxFCL::gio::write(FileUnit, fmtLD);
+        print(DebugFile, "Upper   = ");
+        WritePoint(DebugFile, RootFinderData.UpperPoint, false);
+        print(DebugFile, "\n");
 
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(FileUnit, fmtA, flags) << "Max     = ";
-        }
-        WritePoint(FileUnit, RootFinderData.MaxPoint, true);
-        ObjexxFCL::gio::write(FileUnit, fmtLD);
+        print(DebugFile, "Max     = ");
+        WritePoint(DebugFile, RootFinderData.MaxPoint, true);
+        print(DebugFile, "\n");
     }
 
-    void WriteRootFinderStatus(int const FileUnit,                      // File unit where to write the status description
+    void WriteRootFinderStatus(InputOutputFile &File,                      // File unit where to write the status description
                                RootFinderDataType const &RootFinderData // Data used by root finding algorithm
     )
     {
@@ -2768,7 +2735,6 @@ namespace RootFinder {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2781,35 +2747,33 @@ namespace RootFinder {
 
         // FLOW:
 
-        {
             auto const SELECT_CASE_var(RootFinderData.StatusFlag);
             if (SELECT_CASE_var == iStatusOK) {
-                ObjexxFCL::gio::write(FileUnit, fmtA) << "Found unconstrained root";
+                print(File, "Found unconstrained root");
             } else if (SELECT_CASE_var == iStatusOKMin) {
-                ObjexxFCL::gio::write(FileUnit, fmtA) << "Found min constrained root";
+                print(File, "Found min constrained root");
             } else if (SELECT_CASE_var == iStatusOKMax) {
-                ObjexxFCL::gio::write(FileUnit, fmtA) << "Found max constrained root";
+                print(File, "Found max constrained root");
             } else if (SELECT_CASE_var == iStatusOKRoundOff) {
-                ObjexxFCL::gio::write(FileUnit, fmtA) << "Detected round-off convergence in bracket";
+                print(File, "Detected round-off convergence in bracket");
 
             } else if (SELECT_CASE_var == iStatusWarningSingular) {
-                ObjexxFCL::gio::write(FileUnit, fmtA) << "Detected singularity warning";
+                print(File, "Detected singularity warning");
             } else if (SELECT_CASE_var == iStatusWarningNonMonotonic) {
-                ObjexxFCL::gio::write(FileUnit, fmtA) << "Detected non-monotonicity warning";
+                print(File, "Detected non-monotonicity warning");
 
             } else if (SELECT_CASE_var == iStatusErrorRange) {
-                ObjexxFCL::gio::write(FileUnit, fmtA) << "Detected out-of-range error";
+                print(File, "Detected out-of-range error");
             } else if (SELECT_CASE_var == iStatusErrorBracket) {
-                ObjexxFCL::gio::write(FileUnit, fmtA) << "Detected bracket error";
+                print(File, "Detected bracket error");
             } else if (SELECT_CASE_var == iStatusErrorSlope) {
-                ObjexxFCL::gio::write(FileUnit, fmtA) << "Detected slope error";
+                print(File, "Detected slope error");
             } else if (SELECT_CASE_var == iStatusErrorSingular) {
-                ObjexxFCL::gio::write(FileUnit, fmtA) << "Detected singularity error";
+                print(File, "Detected singularity error");
 
             } else {
-                ObjexxFCL::gio::write(FileUnit, fmtA) << "Detected bad root finder status";
+                print(File, "Detected bad root finder status");
             }
-        }
     }
 
 } // namespace RootFinder

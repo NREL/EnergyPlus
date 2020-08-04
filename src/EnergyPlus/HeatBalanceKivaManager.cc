@@ -57,6 +57,7 @@
 #endif
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -71,10 +72,11 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/ThermalComfort.hh> // MRT Weighting
+#include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -130,7 +132,7 @@ namespace HeatBalanceKivaManager {
         }
     }
 
-    void KivaInstanceMap::initGround(const KivaWeatherData &kivaWeather)
+    void KivaInstanceMap::initGround(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather)
     {
 
 #ifdef GROUND_PLOT
@@ -168,7 +170,7 @@ namespace HeatBalanceKivaManager {
 
         // Initialize with steady state before accelerated timestepping
         instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_STEADY_STATE;
-        setInitialBoundaryConditions(kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
+        setInitialBoundaryConditions(dataZoneTempPredictorCorrector, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
         instance.calculate();
         accDate += acceleratedTimestep;
         while (accDate > 365 + WeatherManager::LeapYearAdd) {
@@ -178,7 +180,7 @@ namespace HeatBalanceKivaManager {
         // Accelerated timestepping
         instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_IMPLICIT;
         for (int i = 0; i < numAccelaratedTimesteps; ++i) {
-            setInitialBoundaryConditions(kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
+            setInitialBoundaryConditions(dataZoneTempPredictorCorrector, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
             instance.calculate(acceleratedTimestep * 24 * 60 * 60);
             accDate += acceleratedTimestep;
             while (accDate > 365 + WeatherManager::LeapYearAdd) {
@@ -190,7 +192,7 @@ namespace HeatBalanceKivaManager {
         instance.foundation->numericalScheme = Kiva::Foundation::NS_ADI;
     }
 
-    void KivaInstanceMap::setInitialBoundaryConditions(const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep)
+    void KivaInstanceMap::setInitialBoundaryConditions(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep)
     {
 
         unsigned index, indexPrev;
@@ -256,7 +258,7 @@ namespace HeatBalanceKivaManager {
 
                     int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_SingleHeatSetPoint;
                     int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                    int spSchId = ZoneTempPredictorCorrector::SetPointSingleHeating(schTypeId).TempSchedIndex;
+                    int spSchId = dataZoneTempPredictorCorrector.SetPointSingleHeating(schTypeId).TempSchedIndex;
                     Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
                     Tin = setpoint + DataGlobals::KelvinConv;
 
@@ -264,7 +266,7 @@ namespace HeatBalanceKivaManager {
 
                     int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_SingleCoolSetPoint;
                     int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                    int spSchId = ZoneTempPredictorCorrector::SetPointSingleCooling(schTypeId).TempSchedIndex;
+                    int spSchId = dataZoneTempPredictorCorrector.SetPointSingleCooling(schTypeId).TempSchedIndex;
                     Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
                     Tin = setpoint + DataGlobals::KelvinConv;
 
@@ -272,7 +274,7 @@ namespace HeatBalanceKivaManager {
 
                     int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_SingleHeatCoolSetPoint;
                     int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                    int spSchId = ZoneTempPredictorCorrector::SetPointSingleHeatCool(schTypeId).TempSchedIndex;
+                    int spSchId = dataZoneTempPredictorCorrector.SetPointSingleHeatCool(schTypeId).TempSchedIndex;
                     Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
                     Tin = setpoint + DataGlobals::KelvinConv;
 
@@ -280,8 +282,8 @@ namespace HeatBalanceKivaManager {
 
                     int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_DualSetPointWDeadBand;
                     int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                    int heatSpSchId = ZoneTempPredictorCorrector::SetPointDualHeatCool(schTypeId).HeatTempSchedIndex;
-                    int coolSpSchId = ZoneTempPredictorCorrector::SetPointDualHeatCool(schTypeId).CoolTempSchedIndex;
+                    int heatSpSchId = dataZoneTempPredictorCorrector.SetPointDualHeatCool(schTypeId).HeatTempSchedIndex;
+                    int coolSpSchId = dataZoneTempPredictorCorrector.SetPointDualHeatCool(schTypeId).CoolTempSchedIndex;
                     Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(heatSpSchId, hour, timestep);
                     Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(coolSpSchId, hour, timestep);
                     const Real64 heatBalanceTemp = 10.0; // (assumed) degC
@@ -441,16 +443,10 @@ namespace HeatBalanceKivaManager {
     {
     }
 
-    void KivaManager::readWeatherData()
+    void KivaManager::readWeatherData(IOFiles &ioFiles)
     {
         // Below from OpenEPlusWeatherFile
-        int kivaWeatherFileUnitNumber = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("read");
-            ObjexxFCL::gio::open(kivaWeatherFileUnitNumber, DataStringGlobals::inputWeatherFileName, flags);
-            if (flags.err()) ShowFatalError("Kiva::ReadWeatherFile: Could not OPEN EPW Weather File");
-        }
+        auto kivaWeatherFile = ioFiles.inputWeatherFileName.open("KivaManager::readWeatherFile");
 
         // Read in Header Information
         static Array1D_string const Header(8,
@@ -463,62 +459,60 @@ namespace HeatBalanceKivaManager {
                                             "COMMENTS 2",
                                             "DATA PERIODS"});
 
-        std::string Line;
         int HdLine = 1; // Look for first Header
         bool StillLooking = true;
         while (StillLooking) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(kivaWeatherFileUnitNumber, "(A)", flags) >> Line;
-                if (flags.end())
-                    ShowFatalError(
-                        "Kiva::ReadWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" +
-                        Header(HdLine));
+            auto LineResult = kivaWeatherFile.readLine();
+            if (LineResult.eof) {
+                ShowFatalError(
+                    "Kiva::ReadWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" +
+                    Header(HdLine));
             }
+
             // Use headers to know how to read data to memory (e.g., number of periods, number of intervals)
-            int endcol = len(Line);
+            int endcol = LineResult.data.size();
             if (endcol > 0) {
-                if (int(Line[endcol - 1]) == DataSystemVariables::iUnicode_end) {
+                if (int(LineResult.data[endcol - 1]) == DataSystemVariables::iUnicode_end) {
                     ShowSevereError("OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.");
                     ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
                     ShowFatalError("Program terminates due to previous condition.");
                 }
             }
-            std::string::size_type Pos = FindNonSpace(Line);
-            std::string::size_type const HdPos = index(Line, Header(HdLine));
+            std::string::size_type Pos = FindNonSpace(LineResult.data);
+            std::string::size_type const HdPos = index(LineResult.data, Header(HdLine));
             if (Pos != HdPos) continue;
-            Pos = index(Line, ',');
+            Pos = index(LineResult.data, ',');
 
             // Below borrowed from ProcessEPWHeader
 
             if ((Pos == std::string::npos) && (!has_prefixi(Header(HdLine), "COMMENTS"))) {
                 ShowSevereError("Invalid Header line in in.epw -- no commas");
-                ShowContinueError("Line=" + Line);
+                ShowContinueError("Line=" + LineResult.data);
                 ShowFatalError("Previous conditions cause termination.");
             }
-            if (Pos != std::string::npos) Line.erase(0, Pos + 1);
+            if (Pos != std::string::npos) LineResult.data.erase(0, Pos + 1);
 
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(Header(HdLine)));
 
                 if (SELECT_CASE_var == "DATA PERIODS") {
                     bool IOStatus;
-                    uppercase(Line);
+                    uppercase(LineResult.data);
                     int NumHdArgs = 2;
                     int Count = 1;
                     while (Count <= NumHdArgs) {
-                        strip(Line);
-                        Pos = index(Line, ',');
+                        strip(LineResult.data);
+                        Pos = index(LineResult.data, ',');
                         if (Pos == std::string::npos) {
-                            if (len(Line) == 0) {
+                            if (len(LineResult.data) == 0) {
                                 while (Pos == std::string::npos) {
-                                    ObjexxFCL::gio::read(kivaWeatherFileUnitNumber, "(A)") >> Line;
-                                    strip(Line);
-                                    uppercase(Line);
-                                    Pos = index(Line, ',');
+                                    LineResult.update(kivaWeatherFile.readLine());
+                                    strip(LineResult.data);
+                                    uppercase(LineResult.data);
+                                    Pos = index(LineResult.data, ',');
                                 }
                             } else {
-                                Pos = len(Line);
+                                Pos = len(LineResult.data);
                             }
                         }
 
@@ -526,14 +520,14 @@ namespace HeatBalanceKivaManager {
                             auto const SELECT_CASE_var1(Count);
 
                             if (SELECT_CASE_var1 == 1) {
-                                int NumDataPeriods = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+                                int NumDataPeriods = UtilityRoutines::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
                                 NumHdArgs += 4 * NumDataPeriods;
                                 // TODO: Error if more than one period? Less than full year?
                             } else if (SELECT_CASE_var1 == 2) {
-                                kivaWeather.intervalsPerHour = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+                                kivaWeather.intervalsPerHour = UtilityRoutines::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
                             }
                         }
-                        Line.erase(0, Pos + 1);
+                        LineResult.data.erase(0, Pos + 1);
                         ++Count;
                     }
                 }
@@ -542,7 +536,6 @@ namespace HeatBalanceKivaManager {
             if (HdLine == 9) StillLooking = false;
         }
 
-        int ReadStatus = 0;
         bool ErrorFound = false;
         int WYear;
         int WMonth;
@@ -580,18 +573,13 @@ namespace HeatBalanceKivaManager {
 
         Real64 totalDB = 0.0;
         int count = 0;
-        std::string WeatherDataLine;
 
-        while (!ReadStatus) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(kivaWeatherFileUnitNumber, "(A)", flags) >> WeatherDataLine;
-                ReadStatus = flags.ios();
-            }
-            if (ReadStatus < 0) {
+        while (true) {
+            auto WeatherDataLine = kivaWeatherFile.readLine();
+            if (WeatherDataLine.eof) {
                 break;
             }
-            WeatherManager::InterpretWeatherDataLine(WeatherDataLine,
+            WeatherManager::InterpretWeatherDataLine(WeatherDataLine.data,
                                                      ErrorFound,
                                                      WYear,
                                                      WMonth,
@@ -643,25 +631,23 @@ namespace HeatBalanceKivaManager {
 
         // Annual averages
         kivaWeather.annualAverageDrybulbTemp = totalDB / count;
-
-        ObjexxFCL::gio::close(kivaWeatherFileUnitNumber);
     }
 
-    bool KivaManager::setupKivaInstances(OutputFiles &outputFiles)
+    bool KivaManager::setupKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles)
     {
         Kiva::setMessageCallback(kivaErrorCallback, nullptr);
         bool ErrorsFound = false;
 
         if (DataZoneControls::GetZoneAirStatsInputFlag) {
-            ZoneTempPredictorCorrector::GetZoneAirSetPoints(outputFiles);
+            ZoneTempPredictorCorrector::GetZoneAirSetPoints(dataZoneTempPredictorCorrector, ioFiles);
             DataZoneControls::GetZoneAirStatsInputFlag = false;
         }
 
-        readWeatherData();
+        readWeatherData(ioFiles);
 
         auto &Surfaces = DataSurfaces::Surface;
-        auto &Constructs = DataHeatBalance::Construct;
-        auto &Materials = DataHeatBalance::Material;
+        auto &Constructs = dataConstruction.Construct;
+        auto &Materials = dataMaterial.Material;
 
         int inst = 0;
         int surfNum = 1;
@@ -1064,7 +1050,7 @@ namespace HeatBalanceKivaManager {
             }
         }
 
-        print(outputFiles.eio, "{}", "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Total Exposed "
+        print(ioFiles.eio, "{}", "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Total Exposed "
                                                            "Perimeter, Perimeter Fraction, Wall Height, Wall Construction, Floor Surface, Wall "
                                                            "Surface(s)\n");
 
@@ -1075,7 +1061,7 @@ namespace HeatBalanceKivaManager {
             if (kv.constructionNum == 0) {
                 constructionName = "<Default Footing Wall Construction>";
             } else {
-                constructionName = DataHeatBalance::Construct(kv.constructionNum).Name;
+                constructionName = dataConstruction.Construct(kv.constructionNum).Name;
             }
 
             std::string wallSurfaceString = "";
@@ -1084,7 +1070,7 @@ namespace HeatBalanceKivaManager {
             }
 
             static constexpr auto fmt = "{},{},{},{},{:.2R},{:.2R},{:.2R},{},{}{}\n";
-            print(outputFiles.eio,
+            print(ioFiles.eio,
                   fmt,
                   foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name,
                   grnd->nX,
@@ -1101,12 +1087,12 @@ namespace HeatBalanceKivaManager {
         return ErrorsFound;
     }
 
-    void KivaManager::initKivaInstances()
+    void KivaManager::initKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
     {
         // initialize temperatures at the beginning of run environment
         for (auto &kv : kivaInstances) {
             // Start with steady-state solution
-            kv.initGround(kivaWeather);
+            kv.initGround(dataZoneTempPredictorCorrector, kivaWeather);
         }
         calcKivaSurfaceResults();
     }
