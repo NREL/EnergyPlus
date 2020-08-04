@@ -139,9 +139,9 @@ TEST_F(EnergyPlusFixture, CTElectricGenerator_Fueltype)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetCTGeneratorInput();
+    GetCTGeneratorInput(state.dataCTElectricGenerator);
 
-    EXPECT_EQ(CTGenerator(1).FuelType, "Gas");
+    EXPECT_EQ(state.dataCTElectricGenerator.CTGenerator(1).FuelType, "Gas");
 }
 
 } // namespace EnergyPlus

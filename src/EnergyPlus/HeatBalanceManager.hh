@@ -54,10 +54,14 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    // Forward Declarations
+    struct EnergyPlusData;
+    struct WindowComplexManagerData;
+    struct WindowEquivalentLayerData;
+    struct WindowManagerData;
+    class IOFiles;
 
 namespace HeatBalanceManager {
 
@@ -155,11 +159,11 @@ namespace HeatBalanceManager {
 
     void SetPreConstructionInputParameters();
 
-    void GetProjectControlData(OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if errors detected during getting data
+    void GetProjectControlData(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors detected during getting data
 
-    void GetSiteAtmosphereData(EnergyPlus::OutputFiles &outputFiles, bool &ErrorsFound);
+    void GetSiteAtmosphereData(EnergyPlus::IOFiles &ioFiles, bool &ErrorsFound);
 
-    void GetMaterialData(OutputFiles &outputFiles, bool &ErrorsFound); // set to true if errors found in input
+    void GetMaterialData(WindowEquivalentLayerData &dataWindowEquivalentLayer, IOFiles &ioFiles, bool &ErrorsFound); // set to true if errors found in input
 
     void GetWindowGlassSpectralData(bool &ErrorsFound); // set to true if errors found in input
 
@@ -168,7 +172,7 @@ namespace HeatBalanceManager {
                                    bool &ErrorsFound             // If errors found
     );
 
-    void GetConstructData(bool &ErrorsFound); // If errors found in input
+    void GetConstructData(IOFiles &ioFiles, bool &ErrorsFound); // If errors found in input
 
     void GetBuildingData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
@@ -195,7 +199,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(OutputFiles &outputFiles);
+    void InitHeatBalance(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
 
     void AllocateHeatBalArrays();
 
@@ -205,11 +209,11 @@ namespace HeatBalanceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void RecKeepHeatBalance(OutputFiles &outputFiles);
+    void RecKeepHeatBalance(IOFiles &ioFiles);
 
     void CheckWarmupConvergence();
 
-    void ReportWarmupConvergence(OutputFiles &outputFiles);
+    void ReportWarmupConvergence(IOFiles &ioFiles);
     
     void UpdateWindowFaceTempsNonBSDFWin();
 
@@ -219,15 +223,16 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance(EnergyPlusData &state, OutputFiles &outputFiles);
+    void ReportHeatBalance(EnergyPlusData &state, IOFiles &ioFiles);
 
     //        End of Reporting subroutines for the HB Module
 
-    void OpenShadingFile(OutputFiles &outputFiles);
+    void OpenShadingFile(IOFiles &ioFiles);
 
     void GetFrameAndDividerData(bool &ErrorsFound); // set to true if errors found in input
 
-    void SearchWindow5DataFile(std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
+    void SearchWindow5DataFile(IOFiles &ioFiles,
+                               std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
                                std::string const &DesiredConstructionName, // Name that will be searched for in the Window5 data file
                                bool &ConstructionFound,                    // True if DesiredConstructionName is in the Window5 data file
                                bool &EOFonFile,                            // True if EOF during file read
@@ -257,6 +262,8 @@ namespace HeatBalanceManager {
 
     void SetupComplexFenestrationStateInput(int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound);
+
+    void InitConductionTransferFunctions(IOFiles &ioFiles);
 
 } // namespace HeatBalanceManager
 

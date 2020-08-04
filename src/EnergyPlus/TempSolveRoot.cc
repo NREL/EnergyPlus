@@ -56,21 +56,11 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/DataRuntimeLanguage.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/OutputFiles.hh>
-// TODO: move DetermineMinuteForReporting to avoid bringing this one in
-#include <EnergyPlus/OutputProcessor.hh>
 
 #if defined(_WIN32) && _MSC_VER < 1900
 #define snprintf _snprintf
@@ -100,7 +90,6 @@ namespace TempSolveRoot {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataHVACGlobals::Bisection;
     using DataHVACGlobals::HVACSystemRootFinding;
 
@@ -126,7 +115,8 @@ namespace TempSolveRoot {
 
     // Functions
 
-    void SolveRoot(EnergyPlusData &state, Real64 const Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0
@@ -302,7 +292,8 @@ namespace TempSolveRoot {
         XRes = XTemp;
     }
 
-    void SolveRoot(EnergyPlusData &state, Real64 const Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0
@@ -478,7 +469,8 @@ namespace TempSolveRoot {
         XRes = XTemp;
     }
 
-    void SolveRoot(EnergyPlusData &state, Real64 const Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0

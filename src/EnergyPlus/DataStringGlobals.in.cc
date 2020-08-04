@@ -119,35 +119,7 @@ namespace DataStringGlobals {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    std::string outputEndFileName("eplusout.end");
-    std::string outputErrFileName("eplusout.err");
-    std::string outputJsonFileName("eplusout.json");
-    std::string outputTSHvacJsonFileName("eplusout_detailed_HVAC.json");
-    std::string outputTSZoneJsonFileName("eplusout_detailed_zone.json");
-    std::string outputTSJsonFileName("eplusout_timestep.json");
-    std::string outputYRJsonFileName("eplusout_yearly.json");
-    std::string outputMNJsonFileName("eplusout_monthly.json");
-    std::string outputDYJsonFileName("eplusout_daily.json");
-    std::string outputHRJsonFileName("eplusout_hourly.json");
-    std::string outputSMJsonFileName("eplusout_runperiod.json");
-    std::string outputCborFileName("eplusout.cbor");
-    std::string outputTSHvacCborFileName("eplusout_detailed_HVAC.cbor");
-    std::string outputTSZoneCborFileName("eplusout_detailed_zone.cbor");
-    std::string outputTSCborFileName("eplusout_timestep.cbor");
-    std::string outputYRCborFileName("eplusout_yearly.cbor");
-    std::string outputMNCborFileName("eplusout_monthly.cbor");
-    std::string outputDYCborFileName("eplusout_daily.cbor");
-    std::string outputHRCborFileName("eplusout_hourly.cbor");
-    std::string outputSMCborFileName("eplusout_runperiod.cbor");
-    std::string outputMsgPackFileName("eplusout.msgpack");
-    std::string outputTSHvacMsgPackFileName("eplusout_detailed_HVAC.msgpack");
-    std::string outputTSZoneMsgPackFileName("eplusout_detailed_zone.msgpack");
-    std::string outputTSMsgPackFileName("eplusout_timestep.msgpack");
-    std::string outputYRMsgPackFileName("eplusout_yearly.msgpack");
-    std::string outputMNMsgPackFileName("eplusout_monthly.msgpack");
-    std::string outputDYMsgPackFileName("eplusout_daily.msgpack");
-    std::string outputHRMsgPackFileName("eplusout_hourly.msgpack");
-    std::string outputSMMsgPackFileName("eplusout_runperiod.msgpack");
+
     std::string outputMddFileName("eplusout.mdd");
     std::string outputRddFileName("eplusout.rdd");
     std::string outputShdFileName("eplusout.shd");
@@ -159,19 +131,14 @@ namespace DataStringGlobals {
     std::string outputAdsFileName("eplusADS.out");
     std::string outputGLHEFileName("eplusout.glhe");
     std::string outputDelightOutFileName("eplusout.delightout");
-    std::string outputDelightEldmpFileName("eplusout.delighteldmp");
-    std::string outputDelightDfdmpFileName("eplusout.delightdfdmp");
     std::string outputIperrFileName("eplusout.iperr");
     std::string outputPerfLogFileName("eplusout_perflog.csv");
     std::string outputSqlFileName("eplusout.sql");
     std::string outputSqliteErrFileName("eplussqlite.err");
-    std::string TarcogIterationsFileName("TarcogIterations.dbg");
     std::string outputCsvFileName("eplusout.csv");
     std::string outputMtrCsvFileName("eplusmtr.csv");
     std::string outputRvauditFileName("eplusout.rvaudit");
 
-    std::string EnergyPlusIniFileName;
-    std::string inStatFileName;
     std::string eplusADSFileName;
     std::string idfFileNameOnly;
     std::string idfDirPathName;
@@ -183,7 +150,6 @@ namespace DataStringGlobals {
     std::string inputFileName;
     std::string inputIddFileName;
     std::string inputEpJSONSchemaFileName;
-    std::string inputWeatherFileName;
     std::string FullName;
     std::string weatherFileNameOnly;
     std::string ProgramPath;          // Path for Program from INI file
@@ -202,8 +168,6 @@ namespace DataStringGlobals {
 
     void clear_state()
     {
-        EnergyPlusIniFileName.clear();
-        inStatFileName.clear();
         eplusADSFileName.clear();
         idfFileNameOnly.clear();
         idfDirPathName.clear();
@@ -215,7 +179,6 @@ namespace DataStringGlobals {
         inputFileName.clear();
         inputIddFileName.clear();
         inputEpJSONSchemaFileName.clear();
-        inputWeatherFileName.clear();
         FullName.clear();
         weatherFileNameOnly.clear();
         ProgramPath.clear();

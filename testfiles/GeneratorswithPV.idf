@@ -180,6 +180,7 @@
     1,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.0,                     !- Tube Spacing {m}
+    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request
     PVModule(glass),         !- Outside Layer
     PVModule(glass),         !- Layer 2
     B4 - 3 IN INSULATION,    !- Layer 3

@@ -307,7 +307,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                     }
                 }
 
-                ManageWeather();
+                ManageWeather(state.files);
 
                 outDryBulbTemp_num += OutDryBulbTemp;
                 airDensity_num += OutAirDensity;

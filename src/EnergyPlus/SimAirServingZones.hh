@@ -54,9 +54,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZonePlenumData;
 
 namespace SimAirServingZones {
 
@@ -139,17 +142,17 @@ namespace SimAirServingZones {
 
     void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration); // TRUE if first full HVAC iteration in an HVAC timestep
 
-    void ConnectReturnNodes();
+    void ConnectReturnNodes(ZonePlenumData &dataZonePlenum);
 
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
     void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &SimZoneEquipment);
 
-    void SimAirLoop(EnergyPlusData &state, 
+    void SimAirLoop(EnergyPlusData &state,
         bool const FirstHVACIteration, int const AirLoopNum, int const AirLoopPass, int &AirLoopIterMax, int &AirLoopIterTot, int &AirLoopNumCalls);
 
-    void SolveAirLoopControllers(EnergyPlusData &state, 
+    void SolveAirLoopControllers(EnergyPlusData &state,
         bool const FirstHVACIteration, int const AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls);
 
     void SolveWaterCoilController(EnergyPlusData &state, bool const FirstHVACIteration,
@@ -160,7 +163,7 @@ namespace SimAirServingZones {
                                   int ControllerIndex,
                                   bool const HXAssistedWaterCoil);
 
-    void ReSolveAirLoopControllers(EnergyPlusData &state, 
+    void ReSolveAirLoopControllers(EnergyPlusData &state,
         bool const FirstHVACIteration, int const AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls);
 
     void SimAirLoopComponents(EnergyPlusData &state, int const AirLoopNum,         // Index of the air loop being currently simulated
@@ -191,7 +194,7 @@ namespace SimAirServingZones {
 
     void SizeSysOutdoorAir();
 
-    void UpdateSysSizing(OutputFiles &outputFiles, int const CallIndicator);
+    void UpdateSysSizing(EnergyPlusData &state, int const CallIndicator);
 
     void UpdateSysSizingForScalableInputs(int const AirLoopNum);
 
