@@ -124,7 +124,8 @@ TEST_F(EnergyPlusFixture, CalcComponentSensibleLatentOutputTest)
 
     // test 1: zero flow
     MassFlowRate = 0.0;
-    CalcComponentSensibleLatentOutput(MassFlowRate, CoilOutletTemp, CoilOutletHumRat, CoilInletTemp, CoilInletHumRat, sensibleoutput, latentoutput, totaloutput);
+    CalcComponentSensibleLatentOutput(
+        MassFlowRate, CoilOutletTemp, CoilOutletHumRat, CoilInletTemp, CoilInletHumRat, sensibleoutput, latentoutput, totaloutput);
     EXPECT_DOUBLE_EQ(results_totaloutput, totaloutput);
     EXPECT_DOUBLE_EQ(results_sensibleoutput, sensibleoutput);
     EXPECT_DOUBLE_EQ(results_latentoutput, latentoutput);
@@ -134,10 +135,12 @@ TEST_F(EnergyPlusFixture, CalcComponentSensibleLatentOutputTest)
     CoilOutletTemp = 12.0;
     CoilInletHumRat = 0.00850;
     CoilOutletHumRat = 0.00750;
-    results_totaloutput = MassFlowRate * (Psychrometrics::PsyHFnTdbW(CoilOutletTemp, CoilOutletHumRat) - Psychrometrics::PsyHFnTdbW(CoilInletTemp, CoilInletHumRat));
+    results_totaloutput =
+        MassFlowRate * (Psychrometrics::PsyHFnTdbW(CoilOutletTemp, CoilOutletHumRat) - Psychrometrics::PsyHFnTdbW(CoilInletTemp, CoilInletHumRat));
     results_sensibleoutput = MassFlowRate * (1.00484e3 + min(CoilInletHumRat, CoilOutletHumRat) * 1.85895e3) * (CoilOutletTemp - CoilInletTemp);
     results_latentoutput = results_totaloutput - results_sensibleoutput;
-    CalcComponentSensibleLatentOutput(MassFlowRate, CoilOutletTemp, CoilOutletHumRat, CoilInletTemp, CoilInletHumRat, sensibleoutput, latentoutput, totaloutput);
+    CalcComponentSensibleLatentOutput(
+        MassFlowRate, CoilOutletTemp, CoilOutletHumRat, CoilInletTemp, CoilInletHumRat, sensibleoutput, latentoutput, totaloutput);
     EXPECT_DOUBLE_EQ(results_totaloutput, totaloutput);
     EXPECT_DOUBLE_EQ(results_sensibleoutput, sensibleoutput);
     EXPECT_DOUBLE_EQ(results_latentoutput, latentoutput);
@@ -147,10 +150,12 @@ TEST_F(EnergyPlusFixture, CalcComponentSensibleLatentOutputTest)
     CoilOutletTemp = 32.0;
     CoilInletHumRat = 0.00750;
     CoilOutletHumRat = 0.00750;
-    results_totaloutput = MassFlowRate * (Psychrometrics::PsyHFnTdbW(CoilOutletTemp, CoilOutletHumRat) - Psychrometrics::PsyHFnTdbW(CoilInletTemp, CoilInletHumRat));
+    results_totaloutput =
+        MassFlowRate * (Psychrometrics::PsyHFnTdbW(CoilOutletTemp, CoilOutletHumRat) - Psychrometrics::PsyHFnTdbW(CoilInletTemp, CoilInletHumRat));
     results_sensibleoutput = MassFlowRate * (1.00484e3 + min(CoilInletHumRat, CoilOutletHumRat) * 1.85895e3) * (CoilOutletTemp - CoilInletTemp);
     results_latentoutput = results_totaloutput - results_sensibleoutput;
-    CalcComponentSensibleLatentOutput(MassFlowRate, CoilOutletTemp, CoilOutletHumRat, CoilInletTemp, CoilInletHumRat, sensibleoutput, latentoutput, totaloutput);
+    CalcComponentSensibleLatentOutput(
+        MassFlowRate, CoilOutletTemp, CoilOutletHumRat, CoilInletTemp, CoilInletHumRat, sensibleoutput, latentoutput, totaloutput);
     EXPECT_DOUBLE_EQ(results_totaloutput, totaloutput);
     EXPECT_DOUBLE_EQ(results_sensibleoutput, sensibleoutput);
     EXPECT_NEAR(results_latentoutput, latentoutput, 1.0E-10);

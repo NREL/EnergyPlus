@@ -4381,9 +4381,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
 
     bool ErrorsFound(false);
     bool FirstHVACIteration(false);
-    //Real64 CpAir(0.0);       // specific heat of air
     Real64 Qsens_sys(0.0);   // UnitarySystem delivered sensible capacity wrt zone
-    //Real64 MinHumRatio(0.0); // track minimum of outlet node or zone humidity ratio
     Real64 ZoneTemp(0.0);    // control zone temperature
     int InletNode(0);        // UnitarySystem inlet node number
     int OutletNode(0);       // UnitarySystem outlet node number
@@ -4683,7 +4681,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, thisSys->m_SensibleLoadMet, 0.01);    // Watts
@@ -4725,7 +4725,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, thisSys->m_SensibleLoadMet, 0.025);   // Watts
@@ -5145,9 +5147,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
 
     bool ErrorsFound(false);
     bool FirstHVACIteration(false);
-    //Real64 CpAir(0.0);       // specific heat of air
     Real64 Qsens_sys(0.0);   // UnitarySystem delivered sensible capacity wrt zone
-    //Real64 MinHumRatio(0.0); // track minimum of outlet node or zone humidity ratio
     Real64 ZoneTemp(0.0);    // control zone temperature
     int InletNode(0);        // UnitarySystem inlet node number
     int OutletNode(0);       // UnitarySystem outlet node number
@@ -5552,7 +5552,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 0.01); // Watts
@@ -5589,7 +5591,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
@@ -5602,9 +5606,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
 
     bool ErrorsFound(false);
     bool FirstHVACIteration(false);
-    //Real64 CpAir(0.0);       // specific heat of air
     Real64 Qsens_sys(0.0);   // UnitarySystem delivered sensible capacity wrt zone
-    //Real64 MinHumRatio(0.0); // track minimum of outlet node or zone humidity ratio
     Real64 ZoneTemp(0.0);    // control zone temperature
     int InletNode(0);        // UnitarySystem inlet node number
     int OutletNode(0);       // UnitarySystem outlet node number
@@ -6007,7 +6009,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 0.01);    // Watts
@@ -6051,7 +6055,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
@@ -7491,9 +7497,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
 
     bool ErrorsFound(false);
     bool FirstHVACIteration(false);
-    //Real64 CpAir(0.0);       // specific heat of air
     Real64 Qsens_sys(0.0);   // UnitarySystem delivered sensible capacity wrt zone
-    //Real64 MinHumRatio(0.0); // track minimum of outlet node or zone humidity ratio
     Real64 ZoneTemp(0.0);    // control zone temperature
     int InletNode(0);        // UnitarySystem inlet node number
     int OutletNode(0);       // UnitarySystem outlet node number
@@ -7849,7 +7853,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 0.01);    // Watts
@@ -7887,7 +7893,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
     
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
@@ -7905,9 +7913,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
 
     bool ErrorsFound(false);
     bool FirstHVACIteration(false);
-    //Real64 CpAir(0.0);       // specific heat of air
     Real64 Qsens_sys(0.0);   // UnitarySystem delivered sensible capacity wrt zone
-    //Real64 MinHumRatio(0.0); // track minimum of outlet node or zone humidity ratio
     Real64 ZoneTemp(0.0);    // control zone temperature
     int InletNode(0);        // UnitarySystem inlet node number
     int OutletNode(0);       // UnitarySystem outlet node number
@@ -8204,7 +8210,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 2.0); // Watts (2.0 = 0.001 * load)
@@ -8273,7 +8281,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 6.0); // Watts
@@ -8312,7 +8322,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 10.0); // Watts
@@ -8347,7 +8359,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_GT(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys);   // Watts - system CANNOT meet load
@@ -8397,7 +8411,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 3.0); // Watts
@@ -8433,7 +8449,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 9.0); // Watts
@@ -8496,7 +8514,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 18.0); // Watts
@@ -8531,7 +8551,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // test model performance
     EXPECT_LT(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys);   // Watts - system CANNOT meet load

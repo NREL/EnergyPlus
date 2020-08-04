@@ -803,8 +803,9 @@ namespace ZoneAirLoopEquipmentManager {
             SpecHumIn = Node(ZoneAirNode).HumRat;
             // Sign convention: SysOutputProvided <0 Zone is cooled
             //                  SysOutputProvided >0 Zone is heated
-            SysOutputProvided = Node(OutletNodeNum).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Node(OutletNodeNum).Temp, SpecHumOut, Node(ZoneAirNode).Temp, SpecHumIn); // sensible {W};
-            ;
+            SysOutputProvided =
+                Node(OutletNodeNum).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Node(OutletNodeNum).Temp, SpecHumOut, Node(ZoneAirNode).Temp, SpecHumIn); // sensible {W};
             // Sign convention: LatOutputProvided <0 Zone is dehumidified
             //                  LatOutputProvided >0 Zone is humidified
             // CR9155 Remove specific humidity calculations

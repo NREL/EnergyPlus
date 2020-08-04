@@ -464,7 +464,9 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
         compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, zoneEquipment, sensOut, latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
 
@@ -489,7 +491,9 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
         compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, zoneEquipment, sensOut, latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+    Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // Test 1: HX is off, cooling load is met, dehumidification control mode = None
     EXPECT_NEAR( DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0 ); // Watts

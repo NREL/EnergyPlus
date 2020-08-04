@@ -2350,17 +2350,31 @@ namespace HVACMultiSpeedHeatPump {
             ZoneInNode = MSHeatPump(MSHeatPumpNum).ZoneInletNode;
             DeltaMassRate = Node(OutNode).MassFlowRate - Node(ZoneInNode).MassFlowRate / MSHeatPump(MSHeatPumpNum).FlowFraction;
             if (DeltaMassRate < 0.0) DeltaMassRate = 0.0;
-            Real64 MassFlowRate( 0.0 );  // parent mass flow rate
-            Real64 LatentOutput(0.0);    // latent output rate
-            Real64 TotalOutput(0.0);     // total output rate 
-            Real64 SensibleOutputDelta(0.0);  // delta sensible output rate
-            Real64 LatentOutputDelta(0.0);    // delta latent output rate
-            Real64 TotalOutputDelta(0.0);     // delta total output rate 
+            Real64 MassFlowRate(0.0);        // parent mass flow rate
+            Real64 LatentOutput(0.0);        // latent output rate
+            Real64 TotalOutput(0.0);         // total output rate
+            Real64 SensibleOutputDelta(0.0); // delta sensible output rate
+            Real64 LatentOutputDelta(0.0);   // delta latent output rate
+            Real64 TotalOutputDelta(0.0);    // delta total output rate
             MassFlowRate = Node(ZoneInNode).MassFlowRate / MSHeatPump(MSHeatPumpNum).FlowFraction;
             Real64 MinHumRat = Node(ZoneInNode).HumRat;
             if (Node(OutNode).Temp < Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp) MinHumRat = Node(OutNode).HumRat;
-            CalcZoneSensibleLatentOutput(MassFlowRate, Node(OutNode).Temp, MinHumRat, Node(ZoneInNode).Temp, MinHumRat, MSHeatPump(MSHeatPumpNum).LoadLoss, LatentOutput, TotalOutput);
-            CalcZoneSensibleLatentOutput(DeltaMassRate, Node(OutNode).Temp, MinHumRat, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp, MinHumRat, SensibleOutputDelta, LatentOutputDelta, TotalOutputDelta);
+            CalcZoneSensibleLatentOutput(MassFlowRate,
+                                         Node(OutNode).Temp,
+                                         MinHumRat,
+                                         Node(ZoneInNode).Temp,
+                                         MinHumRat,
+                                         MSHeatPump(MSHeatPumpNum).LoadLoss,
+                                         LatentOutput,
+                                         TotalOutput);
+            CalcZoneSensibleLatentOutput(DeltaMassRate,
+                                         Node(OutNode).Temp,
+                                         MinHumRat,
+                                         Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp,
+                                         MinHumRat,
+                                         SensibleOutputDelta,
+                                         LatentOutputDelta,
+                                         TotalOutputDelta);
             MSHeatPump(MSHeatPumpNum).LoadLoss = MSHeatPump(MSHeatPumpNum).LoadLoss + SensibleOutputDelta;
             if (std::abs(MSHeatPump(MSHeatPumpNum).LoadLoss) < 1.0e-6) MSHeatPump(MSHeatPumpNum).LoadLoss = 0.0;
         }
@@ -3683,12 +3697,13 @@ namespace HVACMultiSpeedHeatPump {
             }
         }
 
-        // calculate sensible load met 
-        Real64 SensibleOutput(0.0);  // sensible output rate
+        // calculate sensible load met
+        Real64 SensibleOutput(0.0); // sensible output rate
         // calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio)
         Real64 MinHumRat = Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).HumRat;
         if (Node(OutletNode).Temp < Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp) MinHumRat = Node(OutletNode).HumRat;
-        SensibleOutput = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Node(OutletNode).Temp, MinHumRat, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp, MinHumRat);
+        SensibleOutput = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                                           Node(OutletNode).Temp, MinHumRat, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp, MinHumRat);
         LoadMet = SensibleOutput - MSHeatPump(MSHeatPumpNum).LoadLoss;
 
         MSHeatPump(MSHeatPumpNum).LoadMet = LoadMet;

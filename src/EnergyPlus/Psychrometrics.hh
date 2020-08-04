@@ -1298,19 +1298,19 @@ namespace Psychrometrics {
     )
     {
         // returns sensible enthalpy difference of moist air going from state 1 to state 2
-        //Real64 dWavg = 0.5 * (max(dW2, 1.0e-5) + max(dW1, 1.0e-5));
+        // Real64 dWavg = 0.5 * (max(dW2, 1.0e-5) + max(dW1, 1.0e-5));
         Real64 dWmin = min(dW1, dW2);
 
-        return (1.00484e3 +  max(1.0e-5, dWmin) * 1.85895e3) * (TDB2 - TDB1);
+        return (1.00484e3 + max(1.0e-5, dWmin) * 1.85895e3) * (TDB2 - TDB1);
     }
 
     inline Real64 PsyDeltaHSenFnTdbEquipTdbWZone(Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
-        Real64 const TDBZone, // dry-bulb temperature at zone air node {C}
-        Real64 const dWZone   // humidity ratio at zone air node
+                                                 Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
+                                                 Real64 const dWZone    // humidity ratio at zone air node
     )
     {
         // returns sensible enthalpy difference between equipment outlet to zone air node
-        return (1.00484e3 +  max(1.0e-5, dWZone) * 1.85895e3) * (TDBEquip - TDBZone);
+        return (1.00484e3 + max(1.0e-5, dWZone) * 1.85895e3) * (TDBEquip - TDBZone);
     }
 
     inline Real64 PsyHfgAvgFnTdb2Tdb1(Real64 const TDB2, // dry-bulb temperature at  at state 2 {C}
