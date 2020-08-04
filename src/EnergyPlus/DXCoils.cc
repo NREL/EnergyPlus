@@ -513,7 +513,8 @@ namespace DXCoils {
         ReportDXCoil(DXCoilNum);
     }
 
-    void SimDXCoilMultiMode(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimDXCoilMultiMode(EnergyPlusData &state,
+                            std::string const &CompName,   // name of the fan coil unit
                             int const EP_UNUSED(CompOp),   // compressor operation; 1=on, 0=off !unused1208
                             bool const FirstHVACIteration, // true if first hvac iteration
                             Real64 const PartLoadRatio,    // part load ratio
