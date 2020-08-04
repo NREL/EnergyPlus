@@ -162,9 +162,6 @@ namespace DataGlobals {
     int const emsCallFromUnitarySystemSizing(17);       // EMS called from unitary system compound component
     int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance(18); // Identity where EMS called from
     int const emsCallFromBeginZoneTimestepAfterInitHeatBalance(19); // Identity where EMS called from
-    // This is for special use cases where no EnergyPlus HVAC is simulated
-    // This is not documented or user supported like the other ems calling points
-    int const emsCallExternalHVACManager(20); // Identity where EMS called from
 
     int const ScheduleAlwaysOn(-1); // Value when passed to schedule routines gives back 1.0 (on)
 
