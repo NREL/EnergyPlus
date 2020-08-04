@@ -119,6 +119,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     EnergyPlus::DataSizing::PlantSizData.allocate(1);
     EnergyPlus::DataSizing::PlantSizData(1).ExitTemp = 7.0;
     EnergyPlus::DataSizing::DataPltSizCoolNum = 1;
+    DataSizing::DataDesInletWaterTemp = 7.0;
 
     // Sizing Type Prerequisites:
     EnergyPlus::DataSizing::FinalZoneSizing(1).CoolDesTemp = 12.88;
@@ -219,11 +220,25 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     EXPECT_NEAR(12.88, sizedValue, 0.0001); // no fan heat since DataFanInext = -1
     sizer.autoSizedValue = 0.0; // reset for next test
 
+    // Test 8 - Zone Equipment, Zone Eq Fan Coil, outlet temp < water temp
+    DataSizing::DataDesInletWaterTemp = 13.0;
+    // start with an auto-sized value as the user input
+    inputValue = EnergyPlus::DataSizing::AutoSize;
+    // do sizing
+    sizer.wasAutoSized = false;
+    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(inputValue, errorsFound);
+    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
+    EXPECT_TRUE(sizer.wasAutoSized);
+    EXPECT_NEAR(DataSizing::DataDesInletWaterTemp + 0.5, sizedValue, 0.0001); // 0.5 C above inlet water temp
+    sizer.autoSizedValue = 0.0; // reset for next test
+    DataSizing::DataDesInletWaterTemp = 7.0;
+
     // reset eio stream
     has_eio_output(true);
 
     // AIRLOOP EQUIPMENT TESTING - CurDuctType not set, no reporting
-    // Test 8 - Airloop Equipment
+    // Test 9 - Airloop Equipment
     // delete zone sizing info
     DataSizing::CurZoneEqNum = 0;
     DataSizing::NumZoneSizingInput = 0;
@@ -249,7 +264,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     eiooutput = std::string("");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    // Test 9 - Airloop Equipment - no OA coils, no fan heat
+    // Test 10 - Airloop Equipment - no OA coils, no fan heat
     DataSizing::SysSizingRunDone = true;
     EnergyPlus::DataSizing::FinalSysSizing.allocate(1);
     EnergyPlus::DataSizing::SysSizInput.allocate(1);
@@ -276,7 +291,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    // Test 10 - Airloop Equipment - no OA coils, with fan heat
+    // Test 11 - Airloop Equipment - no OA coils, with fan heat
     DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
     DataSizing::DataFanIndex = 1;
     // start with an auto-sized value as the user input
@@ -292,7 +307,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     EXPECT_NEAR(12.026, sizedValue, 0.001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 10 - Airloop Equipment - 1 OA coil, use PrecoolHumRat
+    // Test 12 - Airloop Equipment - 1 OA coil, use PrecoolHumRat
     DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).NumOACoolCoils = 1;
     EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).PrecoolTemp = 12.21;
 
@@ -309,7 +324,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     EXPECT_NEAR(12.026, sizedValue, 0.0001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 11 - Airloop Equipment - 1 OA coil, DataDesOutletAirTemp is set
+    // Test 13 - Airloop Equipment - 1 OA coil, DataDesOutletAirTemp is set
     DataSizing::DataDesOutletAirTemp = 10.6;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
@@ -326,7 +341,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // OUTDOOR AIR SYSTEM EQUIPMENT TESTING
-    // Test 12 - Outdoor Air System Equipment, no DOAS air loop
+    // Test 14 - Outdoor Air System Equipment, no DOAS air loop
     EnergyPlus::DataSizing::OASysEqSizing.allocate(1);
     EnergyPlus::DataAirLoop::OutsideAirSys.allocate(1);
     DataSizing::CurOASysNum = 1;
@@ -343,7 +358,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     EXPECT_NEAR(outAirTemp, sizedValue, 0.00001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 13 - Outdoor Air System Equipment with DOAS system
+    // Test 15 - Outdoor Air System Equipment with DOAS system
     EnergyPlus::DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.0;
     EnergyPlus::DataAirLoop::OutsideAirSys(1).AirLoopDOASNum = 0;
     state.dataAirLoopHVACDOAS.airloopDOAS.emplace_back();
@@ -364,8 +379,8 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     // reset eio stream
     has_eio_output(true);
 
-    // Test 14 - Outdoor Air System Equipment with DOAS system, hard-sized humidity ratio
-    // start with an auto-sized value as the user input
+    // Test 16 - Outdoor Air System Equipment with DOAS system, hard-sized outlet temp
+    // start with a hard-sized value as the user input
     inputValue = 14.44; // value not previously used
 
     // do sizing
@@ -373,18 +388,33 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     printFlag = true;
     sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(inputValue, errorsFound);
-    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // cumulative of previous calls
+    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(inputValue, sizedValue, 0.01); // hard-sized value
     sizer.autoSizedValue = 0.0;                // reset for next test
 
-    EXPECT_FALSE(errorsFound);
+    EXPECT_FALSE(errorsFound); // cumulative of previous calls
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
     eiooutput =
         std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Outlet Air Temperature [C], 11.44000\n"
                     " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Design Outlet Air Temperature [C], 14.44000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+
+    // Test 17 - Outdoor Air System Equipment with DOAS system, outlet temp < water temp
+    DataSizing::DataDesInletWaterTemp = 12.0;
+    // start with an auto-sized value as the user input
+    inputValue = DataSizing::AutoSize;
+
+    // do sizing
+    sizer.wasAutoSized = false;
+    printFlag = true;
+    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(inputValue, errorsFound);
+    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
+    EXPECT_TRUE(sizer.wasAutoSized);
+    EXPECT_NEAR(DataSizing::DataDesInletWaterTemp + 0.5, sizedValue, 0.01); // 0.5 C above water temp
+    sizer.autoSizedValue = 0.0;                // reset for next test
 
     // call the clearState
     sizer.clearState();
