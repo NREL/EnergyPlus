@@ -183,11 +183,7 @@ namespace LowTempRadiantSystem {
                                                                       std::string const& controlInputField
         );
 
-        void errorCheckZonesAndConstructions(bool &errorsFound,
-                                             std::string const& cAlphaField3,
-                                             std::string const& alpha3,
-                                             std::string const& currentModuleObject,
-                                             std::string const& alpha1);
+        void errorCheckZonesAndConstructions(bool &errorsFound);
         
         Real64 setRadiantSystemControlTemperature();
 

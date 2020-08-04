@@ -577,7 +577,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Error checking for zones and construction information
-            thisRadSys.errorCheckZonesAndConstructions(ErrorsFound,cAlphaFields(3),Alphas(3),CurrentModuleObject,Alphas(1));
+            thisRadSys.errorCheckZonesAndConstructions(ErrorsFound);
 
             thisRadSys.TubeDiameter = Numbers(1);
             thisRadSys.TubeLength = Numbers(2);
@@ -887,7 +887,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Error checking for zones and construction information
-            thisCFloSys.errorCheckZonesAndConstructions(ErrorsFound,cAlphaFields(3),Alphas(3),CurrentModuleObject,Alphas(1));
+            thisCFloSys.errorCheckZonesAndConstructions(ErrorsFound);
 
             thisCFloSys.TubeDiameter = Numbers(1);
             thisCFloSys.TubeLength = Numbers(2);
@@ -1107,7 +1107,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Error checking for zones and construction information
-            thisElecSys.errorCheckZonesAndConstructions(ErrorsFound,cAlphaFields(3),Alphas(3),CurrentModuleObject,Alphas(1));
+            thisElecSys.errorCheckZonesAndConstructions(ErrorsFound);
 
             // Heating user input data
             // Determine Low Temp Radiant heating design capacity sizing method
@@ -1622,11 +1622,7 @@ namespace LowTempRadiantSystem {
 
     }
 
-    void RadiantSystemBaseData::errorCheckZonesAndConstructions(bool &errorsFound,
-                                                                std::string const& cAlphaField3,
-                                                                std::string const& alpha3,
-                                                                std::string const& currentModuleObject,
-                                                                std::string const& alpha1)
+    void RadiantSystemBaseData::errorCheckZonesAndConstructions(bool &errorsFound)
     {
         Real64 zoneMultipliers = 0.0;
         Real64 zoneMultipliersSurface = 0.0;
@@ -1637,23 +1633,23 @@ namespace LowTempRadiantSystem {
             
             // check zone numbers--ok if they are not the same
             if (Surface(this->SurfacePtr(SurfNum)).Zone != this->ZonePtr) {
-                ShowWarningError("Surface referenced in " + currentModuleObject +
-                                " not in same zone as Radiant System, surface=" + Surface(this->SurfacePtr(SurfNum)).Name);
+                ShowWarningError("A surface referenced in a Low Temperature Radiant System is not in same zone as the radiant system itself");
+                ShowContinueError("Surface = " + Surface(this->SurfacePtr(SurfNum)).Name);
                 ShowContinueError("Surface in Zone=" + DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Name +
-                                  " Radiant System in " + cAlphaField3 + " = " + alpha3);
-                ShowContinueError("Occurs in " + currentModuleObject + " = " + alpha1);
+                                  " Radiant System in Zone = " + this->ZoneName);
+                ShowContinueError("Occurs in Low Temperature Radiant System = " + this->Name);
                 ShowContinueError("If this is intentionally a radiant system with surfaces in more than one thermal zone,");
                 ShowContinueError("then ignore this warning message.  Otherwise, check the surfaces in this radiant system.");
             }
             
             // check zone multipliers--these must be the same
-            if (SurfNum == 1) zoneMultipliers = double(DataHeatBalance::Zone(this->ZonePtr).Multiplier * DataHeatBalance::Zone(this->ZonePtr).ListMultiplier);
-            zoneMultipliersSurface = double(DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Multiplier
-                                            * DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).ListMultiplier);
+            if (SurfNum == 1) zoneMultipliers = double(DataHeatBalance::Zone(this->ZonePtr).Multiplier) *double(DataHeatBalance::Zone(this->ZonePtr).ListMultiplier);
+            zoneMultipliersSurface = double(DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Multiplier)
+                                            * double(DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).ListMultiplier);
             if (std::abs(zoneMultipliers-zoneMultipliersSurface)>zoneMultiplersTolerance) {
-                ShowSevereError("The zone multipliers in " + currentModuleObject + " are not the same for the zones in all of the surfaces");
-                ShowContinueError("contained in this particular radiant system.  This is not allowed and must be fixed for the simulation to run.");
-                ShowContinueError("Occurs in " + currentModuleObject + " = " + alpha1);
+                ShowSevereError("The zone multipliers are not the same for all surfaces contained in this radiant system");
+                ShowContinueError("This is not allowed and must be fixed for the simulation to run.");
+                ShowContinueError("Occurs in Low Temperature Radiant System = " + this->Name);
                 errorsFound = true;
             }
                         

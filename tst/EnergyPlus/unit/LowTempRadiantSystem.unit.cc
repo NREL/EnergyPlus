@@ -2318,7 +2318,7 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     Surface(1).Construction = 1;
     Surface(2).Construction = 1;
     Surface(3).Construction = 1;
-    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound,Alpha1,Alpha2,Alpha3,Alpha4);
+    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound);
     EXPECT_FALSE(actualErrorsFound);
 
     // Test 1b: Surfaces are in different zones, zone multipliers are all the same, and the construct has a source/sink.
@@ -2336,7 +2336,7 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     Surface(1).Construction = 1;
     Surface(2).Construction = 1;
     Surface(3).Construction = 1;
-    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound,Alpha1,Alpha2,Alpha3,Alpha4);
+    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound);
     EXPECT_FALSE(actualErrorsFound);
 
     // Test 2: Surfaces are in different zones, zone multipliers are NOT all the same (one is 7 instead of 2), and the construct has a source/sink.
@@ -2354,7 +2354,7 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     Surface(1).Construction = 1;
     Surface(2).Construction = 1;
     Surface(3).Construction = 1;
-    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound,Alpha1,Alpha2,Alpha3,Alpha4);
+    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound);
     EXPECT_TRUE(actualErrorsFound);
 
     // Test 3: Surfaces are in the same zones, zone multipliers are all the same, and one construct does NOT have a source/sink.
@@ -2372,10 +2372,11 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     Surface(1).Construction = 1;
     Surface(2).Construction = 1;
     Surface(3).Construction = 2;
-    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound,Alpha1,Alpha2,Alpha3,Alpha4);
+    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound);
     EXPECT_TRUE(actualErrorsFound);
+}
 
-    TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
+TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
 {
     // This tests both calculateRunningMeanAverageTemperature and calculateCurrentDailyAverageODB
     // because calculateCurrentDailyAverageODB is called by calculateRunningMeanAverageTemperature
