@@ -197,6 +197,8 @@ namespace HeatBalanceSurfaceManager {
         bool CalculateZoneMRTfirstTime(true); // Flag for first time calculations
         bool calcHeatBalanceInsideSurfFirstTime(true);
         bool reportThermalResilienceFirstTime(true);
+        bool reportVarHeatIndex(false);
+        bool reportVarHumidex(false);
         bool hasPierceSET(true);
         bool reportCO2ResilienceFirstTime(true);
         bool reportVisualResilienceFirstTime(true);
@@ -225,6 +227,8 @@ namespace HeatBalanceSurfaceManager {
         CalculateZoneMRTfirstTime = true;
         calcHeatBalanceInsideSurfFirstTime = true;
         reportThermalResilienceFirstTime = true;
+        reportVarHeatIndex = false;
+        reportVarHumidex = false;
         hasPierceSET = true;
         reportCO2ResilienceFirstTime = true;
         reportVisualResilienceFirstTime = true;
@@ -4921,6 +4925,23 @@ namespace HeatBalanceSurfaceManager {
         // Canada's Atmospheric Environment Service in 1979.
         // Reference: Masterson, J., and F. Richardson, 1979: Humidex, a method of quantifying human
         // discomfort due to excessive heat and humidity CLI 1-79, Environment Canada, Atmosheric Environment Servic
+//        using OutputProcessor::ReqRepVars;
+        if (ManageSurfaceHeatBalancefirstTime) {
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                SetupOutputVariable("Zone Heat Index", OutputProcessor::Unit::C, ZoneHeatIndex(ZoneNum), "Zone",
+                                    "State", Zone(ZoneNum).Name);
+                SetupOutputVariable("Zone Humidity Index", OutputProcessor::Unit::None, ZoneHumidex(ZoneNum), "Zone",
+                                    "State", Zone(ZoneNum).Name);
+            }
+            for (int Loop = 1; Loop <= OutputProcessor::NumOfReqVariables; ++Loop) {
+                if (OutputProcessor::ReqRepVars(Loop).VarName == "Zone Heat Index") {
+                    reportVarHeatIndex = true;
+                }
+                if (OutputProcessor::ReqRepVars(Loop).VarName == "Zone Humidity") {
+                    reportVarHumidex = true;
+                }
+            }
+        }
 
         // Constance for heat index regression equation of Rothfusz.
         Real64 c1 = -42.379;
@@ -4933,54 +4954,43 @@ namespace HeatBalanceSurfaceManager {
         Real64 c8 = .00085282;
         Real64 c9 = -.00000199;
 
-        if (ManageSurfaceHeatBalancefirstTime) {
-            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
-                SetupOutputVariable("Zone Heat Index",
-                                    OutputProcessor::Unit::C,
-                                    ZoneHeatIndex(ZoneNum),
-                                    "Zone",
-                                    "State",
-                                    Zone(ZoneNum).Name);
-                SetupOutputVariable("Zone Humidity Index",
-                                    OutputProcessor::Unit::None,
-                                    ZoneHumidex(ZoneNum),
-                                    "Zone",
-                                    "State",
-                                    Zone(ZoneNum).Name);
-            }
-        }
-
         // Calculate Heat Index and Humidex.
         // The heat index equation set is fit to Fahrenheit units, so the zone air temperature values are first convert to F,
         // then heat index is calculated and converted back to C.
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
-            Real64 ZoneT = ZTAV(ZoneNum);
-            Real64 ZoneW = ZoneAirHumRatAvg(ZoneNum);
-            Real64 ZoneRH = Psychrometrics::PsyRhFnTdbWPb(ZoneT, ZoneW, OutBaroPress) * 100.0;
-            Real64 ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
-            Real64 HI;
+        if (reportVarHeatIndex || OutputReportTabular::displayThermalResilienceSummary) {
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                Real64 ZoneT = ZTAV(ZoneNum);
+                Real64 ZoneW = ZoneAirHumRatAvg(ZoneNum);
+                Real64 ZoneRH = Psychrometrics::PsyRhFnTdbWPb(ZoneT, ZoneW, OutBaroPress) * 100.0;
+                Real64 ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
+                Real64 HI;
 
-            if (ZoneTF < 80) {
-                HI = 0.5 * (ZoneTF + 61.0 + (ZoneTF - 68.0) * 1.2 + (ZoneRH * 0.094));
-            } else {
-                HI = c1 + c2 * ZoneTF + c3 * ZoneRH + c4 * ZoneTF * ZoneRH + c5 * ZoneTF * ZoneTF + c6 * ZoneRH * ZoneRH +
-                     c7 * ZoneTF * ZoneTF * ZoneRH + c8 * ZoneTF * ZoneRH * ZoneRH + c9 * ZoneTF * ZoneTF * ZoneRH * ZoneRH;
-                if (ZoneRH < 13 && ZoneTF < 112) {
-                    HI -= (13 - ZoneRH) / 4 * std::sqrt((17 - abs(ZoneTF - 95)) / 17);
-                } else if (ZoneRH > 85 && ZoneTF < 87) {
-                    HI += (ZoneRH - 85) / 10 * (87 - ZoneTF) / 5;
+                if (ZoneTF < 80) {
+                    HI = 0.5 * (ZoneTF + 61.0 + (ZoneTF - 68.0) * 1.2 + (ZoneRH * 0.094));
+                } else {
+                    HI = c1 + c2 * ZoneTF + c3 * ZoneRH + c4 * ZoneTF * ZoneRH + c5 * ZoneTF * ZoneTF +
+                         c6 * ZoneRH * ZoneRH + c7 * ZoneTF * ZoneTF * ZoneRH + c8 * ZoneTF * ZoneRH * ZoneRH +
+                         c9 * ZoneTF * ZoneTF * ZoneRH * ZoneRH;
+                    if (ZoneRH < 13 && ZoneTF < 112) {
+                        HI -= (13 - ZoneRH) / 4 * std::sqrt((17 - abs(ZoneTF - 95)) / 17);
+                    } else if (ZoneRH > 85 && ZoneTF < 87) {
+                        HI += (ZoneRH - 85) / 10 * (87 - ZoneTF) / 5;
+                    }
                 }
+                HI = (HI - 32.0) * (5.0 / 9.0);
+                ZoneHeatIndex(ZoneNum) = HI;
             }
-
-            HI = (HI - 32.0) * (5.0 / 9.0);
-
-            Real64 TDewPointK = Psychrometrics::PsyTdpFnWPb(ZoneW, OutBaroPress) + KelvinConv;
-            Real64 e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
-            Real64 h = 5.0 / 9.0 * (e - 10.0);
-            Real64 Humidex = ZoneT + h;
-
-            ZoneHeatIndex(ZoneNum) = HI;
-            ZoneHumidex(ZoneNum) = Humidex;
+        }
+        if (reportVarHumidex || OutputReportTabular::displayThermalResilienceSummary) {
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                Real64 ZoneW = ZoneAirHumRatAvg(ZoneNum);
+                Real64 ZoneT = ZTAV(ZoneNum);
+                Real64 TDewPointK = Psychrometrics::PsyTdpFnWPb(ZoneW, OutBaroPress) + KelvinConv;
+                Real64 e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
+                Real64 h = 5.0 / 9.0 * (e - 10.0);
+                Real64 Humidex = ZoneT + h;
+                ZoneHumidex(ZoneNum) = Humidex;
+            }
         }
     }
 
