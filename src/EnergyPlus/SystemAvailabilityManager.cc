@@ -2717,12 +2717,14 @@ namespace SystemAvailabilityManager {
             }
             if (!allocated(OptStartData.ActualZoneNum)) OptStartData.ActualZoneNum.allocate(NumOfZones);
 
+            // OptStartFlag needs to be reset each timestep to not stay set to true post-occupancy
+            OptStartData.OptStartFlag = false;
+
             // reset OptStartData once per beginning of day
             if (BeginDayFlag) {
                 NumHoursBeforeOccupancy = 0.0; // Initialize the hours of optimum start period. This variable is for reporting purpose.
                 if (BeginOfDayResetFlag) {
                     OptStartData.OccStartTime = 22.99; // initialize the zone occupancy start time
-                    OptStartData.OptStartFlag = false;
                     BeginOfDayResetFlag = false;
                 }
             }

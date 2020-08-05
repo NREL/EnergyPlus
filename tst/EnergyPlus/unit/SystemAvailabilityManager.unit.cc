@@ -64,7 +64,6 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
@@ -154,6 +153,43 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
         "   Zone 1,                  !- Zone 1 Name",
         "   Zone 2,                  !- Zone 2 Name",
         "   Zone 3;                  !- Zone 3 Name",
+
+        " ZoneControl:Thermostat,",
+        "   LIST_ZONES Thermostat,  !- Name",
+        "   LIST_ZONES,             !- Zone or ZoneList Name",
+        "   Dual Zone Control Type Sched,  !- Control Type Schedule Name",
+        "   ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
+        "   Zone DualSPSched; !- Control 1 Name",
+
+        " Schedule:Compact,",
+        "   Dual Zone Control Type Sched,  !- Name",
+        "   Control Type,            !- Schedule Type Limits Name",
+        "   Through: 12/31,          !- Field 1",
+        "   For: AllDays,            !- Field 2",
+        "   Until: 24:00,4;          !- Field 3",
+
+        " ThermostatSetpoint:DualSetpoint,",
+        "   Zone DualSPSched, !- Name",
+        "   HTGSETP_SCH,             !- Heating Setpoint Temperature Schedule Name",
+        "   CLGSETP_SCH;             !- Cooling Setpoint Temperature Schedule Name",
+
+        " Schedule:Compact,",
+        "   CLGSETP_SCH,             !- Name",
+        "   Temperature,             !- Schedule Type Limits Name",
+        "   Through: 12/31,          !- Field 1",
+        "   For: AllDays,            !- Field 2",
+        "   Until: 7:00,29.4,       !- Field 3",
+        "   Until: 18:00,24.0,       !- Field 3",
+        "   Until: 24:00,29.4;       !- Field 3",
+
+        " Schedule:Compact,",
+        "   HTGSETP_SCH,             !- Name",
+        "   Temperature,             !- Schedule Type Limits Name",
+        "   Through: 12/31,          !- Field 1",
+        "   For: AllDays,            !- Field 2",
+        "   Until: 7:00,15.0,       !- Field 3",
+        "   Until: 18:00,19.0,       !- Field 3",
+        "   Until: 24:00,15.0;       !- Field 3",
 
     });
 
