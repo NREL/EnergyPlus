@@ -49,7 +49,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -94,7 +94,7 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state);
 
     // no error message from PerformancePrecisionTradeoffs objects
     EXPECT_TRUE(compare_err_stream("", true));
@@ -112,7 +112,7 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Mess
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.",
@@ -154,8 +154,8 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
     std::string perfLogContents = perfLogStrSteam.str();
 
     std::string expectedContents = "Program, Version, TimeStamp,Use Coil Direct Solution,Zone Radiant Exchange Algorithm,"
-        "Override Mode,Number of Timesteps per Hour,Minimum Number of Warmup Days,SuppressAllBeginEnvironmentResets,MaxZoneTempDiff,lastHeader,\n"
-        "EnergyPlus, Version 0.0.0-xxxx, August 14 1945,False,ScriptF,MODE193,0,1,False,0.30,lastValue,\n";
+        "Override Mode,Number of Timesteps per Hour,Minimum Number of Warmup Days,SuppressAllBeginEnvironmentResets,Minimum System Timestep,MaxZoneTempDiff,MaxAllowedDelTemp,lastHeader,\n"
+        "EnergyPlus, Version 0.0.0-xxxx, August 14 1945,False,ScriptF,MODE193,0,1,False,1.0,0.30,2.0000E-003,lastValue,\n";
 
     EXPECT_EQ(perfLogContents, expectedContents);
 
@@ -174,7 +174,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
 
         EXPECT_TRUE(process_idf(idf_objects));
 
-        SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+        SimulationManager::GetProjectData(state);
         EXPECT_FALSE(DataReportingFlags::DebugOutput);
         EXPECT_FALSE(DataReportingFlags::EvenDuringWarmup);
 
@@ -191,7 +191,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
 
         EXPECT_TRUE(process_idf(idf_objects));
 
-        SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+        SimulationManager::GetProjectData(state);
         EXPECT_TRUE(DataReportingFlags::DebugOutput);
         EXPECT_FALSE(DataReportingFlags::EvenDuringWarmup);
 
@@ -208,7 +208,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
 
         EXPECT_TRUE(process_idf(idf_objects));
 
-        SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+        SimulationManager::GetProjectData(state);
         EXPECT_FALSE(DataReportingFlags::DebugOutput);
         EXPECT_TRUE(DataReportingFlags::EvenDuringWarmup);
 
@@ -238,7 +238,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
             EXPECT_TRUE(compare_err_stream(expectedError, true));
         }
 
-        SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+        SimulationManager::GetProjectData(state);
         EXPECT_FALSE(DataReportingFlags::DebugOutput);
         EXPECT_TRUE(DataReportingFlags::EvenDuringWarmup);
 
@@ -260,7 +260,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state);
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
     EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
@@ -296,7 +296,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_SimpleCase)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state);
 
     EXPECT_TRUE(DataGlobals::DisplayAllWarnings);
     EXPECT_TRUE(DataGlobals::DisplayExtraWarnings);
@@ -336,7 +336,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_AllKeys)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state);
 
     EXPECT_TRUE(DataGlobals::DisplayAllWarnings);
     EXPECT_TRUE(DataGlobals::DisplayExtraWarnings);
@@ -374,7 +374,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
         });
         EXPECT_TRUE(compare_err_stream(expectedError, true));
     }
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state);
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
     EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
@@ -419,7 +419,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
     });
     EXPECT_TRUE(compare_err_stream(expected_warning, true));
 
-    SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles);
+    SimulationManager::GetProjectData(state);
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
     EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
@@ -456,7 +456,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    ASSERT_NO_THROW(SimulationManager::GetProjectData(state.dataZoneTempPredictorCorrector, state.outputFiles));
+    ASSERT_NO_THROW(SimulationManager::GetProjectData(state));
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
     EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
@@ -478,4 +478,26 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
         "   ** Warning ** Output:Diagnostics: empty key found, consider removing it to avoid this warning.",
     });
     EXPECT_TRUE(compare_err_stream(expectedError, true));
+}
+
+TEST_F(EnergyPlusFixture, SimulationManager_HVACSizingSimulationChoiceTest)
+{
+    std::string const idf_objects = delimited_string({
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    No,                      !- Run Simulation for Sizing Periods",
+        "    Yes,                     !- Run Simulation for Weather File Run Periods",
+        "    Yes;                     !- Do HVAC Sizing Simulation for Sizing Periods",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(state);
+
+    EXPECT_TRUE(DataGlobals::DoHVACSizingSimulation);
+    // get a default value
+    EXPECT_EQ(DataGlobals::HVACSizingSimMaxIterations, 1);   
+
 }

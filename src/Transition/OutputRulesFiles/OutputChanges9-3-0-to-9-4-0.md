@@ -83,3 +83,72 @@ Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Tur
 24,ZN_1_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000
 24,ZN_1_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000
 ```
+### Surface Order in Output Reports
+
+The internal ordering of surfaces has changed. Previously subsurfaces (doors and windows) immdediately followed their respective base surface. 
+Now subsurfaces are at the end of each group of zone surfaces.Many reports preserve the old order, but some outputs do not.
+Changed outputs include the rdd, edd, eso (and resulting csv), shd, and sci output files.
+
+See [PR#7847](https://github.com/NREL/EnergyPlus/pull/7847)
+
+### Report zero values with zero Zone Cooling and Heating Loads in Report: HVAC Sizing Summary
+
+When Zone Sensible Cooling = 0 or Zone Sensible Heating = 0, empty values are shown in the table:
+
+Zone Sensible Cooling
+
+	Calculated Design Load [W] 	User Design Load [W] 	User Design Load per Area [W/m2] 	Calculated Design Air Flow [m3/s] 	User Design Air Flow [m3/s] 	Design Day Name 	Date/Time Of Peak {TIMESTAMP} 	Thermostat Setpoint Temperature at Peak Load [C] 	Indoor Temperature at Peak Load [C] 	Indoor Humidity Ratio at Peak Load [kgWater/kgDryAir] 	Outdoor Temperature at Peak Load [C] 	Outdoor Humidity Ratio at Peak Load [kgWater/kgDryAir] 	Minimum Outdoor Air Flow Rate [m3/s] 	Heat Gain Rate from DOAS [W]
+None 	  	  	  	  	  	  	  	  	  	  	  	  	  	 
+
+This causes difficulty for SQLite to retrieve data.
+
+The fix reports zero values when loads = 0, so that SQLite is able to process non-empty values, shown as below:
+
+Zone Sensible Cooling
+
+	Calculated Design Load [W] 	User Design Load [W] 	User Design Load per Area [W/m2] 	Calculated Design Air Flow [m3/s] 	User Design Air Flow [m3/s] 	Design Day Name 	Date/Time Of Peak {TIMESTAMP} 	Thermostat Setpoint Temperature at Peak Load [C] 	Indoor Temperature at Peak Load [C] 	Indoor Humidity Ratio at Peak Load [kgWater/kgDryAir] 	Outdoor Temperature at Peak Load [C] 	Outdoor Humidity Ratio at Peak Load [kgWater/kgDryAir] 	Minimum Outdoor Air Flow Rate [m3/s] 	Heat Gain Rate from DOAS [W]
+LIVING SPACE 	0.0 	0.0 	0.0 	0.0 	0.0 	N/A 	N/A 	0.0 	0.0 	0.0 	0.0 	0.0 	0.0 	0.0
+
+The fix is applied both both tables of Zone Sensible Cooling abd Zone Sensible Heating.
+
+See [PR#8145](https://github.com/NREL/EnergyPlus/pull/8145)
+
+### New reporting items added to the _perflog.csv log file for PerformancePrecisionTradeoffs
+
+Two new reporting variables (two columns) related to the new PerformancePrecisionTradeoffs modes are added to the _perflog.csv log file to help with performance tuning of newly added and expanded PerformancePrecisionTradeoffs modes. 
+In the log file with _perflog.csv suffix, each simulation will add a line that contains the following the reporting variables (items) below. The two newly added reporting items (Minimum System Timestep, and MaxAllowedDelTemp) are denoted with (*) marks in the following table:
+
+- Program
+- Version
+- TimeStamp
+- Use Coil Direct Solution
+- Zone Radiant Exchange Algorithm
+- Number of Timesteps per Hour
+- Minimum Number of Warmup Days
+- SuppressAllBeginEnvironmentResets
+- Minimum System Timestep (*)
+- MaxZoneTempDiff
+- MaxAllowedDelTemp (*)
+- Electricity ABUPS Total [J]
+- Natural Gas ABUPS Total [J]
+- Additional Fuel ABUPS Total [J]
+- District Cooling ABUPS Total [J]
+- District Heating ABUPS Total [J]
+- Water ABUPS Total [m3]
+- Values Gathered Over [hours]
+- Run Time [seconds]
+- Run Time [string]
+- Number of Warnings
+- Number of Severe
+
+See [8121](https://github.com/NREL/EnergyPlus/pull/8121)
+
+### EIO reporting items added for PerformancePrecisionTradeoffs
+
+Two new reporting variables (two columns) related to the new PerformancePrecisionTradeoffs modes are added to the .eio file to help with tracing the and tuning of newly added and expanded PerformancePrecisionTradeoffs modes. 
+In the PerformancePrecisionTradeoffs section of .eio file, a line of header of parameter names and a line of corresponding parameter values are reported. Two newly added reporting items (Minimum System Timestep, and MaxAllowedDelTemp) are now added to reporting lines: the parameter names are added to the headline (first line); and the parameter values are added to the data line (secon line). Now the new reporting lines look like the following:
+
+! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, Zone Radiant Exchange Algorithm, Override Mode, Number of Timestep In Hour, Force Euler Method, Minimum Number of Warmup Days, Force Suppress All Begin Environment Resets, Minimum System Timestep, MaxZoneTempDiff, MaxAllowedDelTemp
+ Performance Precision Tradeoffs, No, ScriptF, MODE07, 1, Yes, 1, Yes, 60.0, 1.000, 0.1000
+
+See [8121](https://github.com/NREL/EnergyPlus/pull/8121)

@@ -64,14 +64,14 @@
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
-void ReportSurfaces(OutputFiles &outputFiles)
+void ReportSurfaces(IOFiles &ioFiles)
 {
 
     // SUBROUTINE INFORMATION:
@@ -130,7 +130,7 @@ void ReportSurfaces(OutputFiles &outputFiles)
     Option2 = "";
 
     ScanForReports("Surfaces", DoReport, "Lines", Option1);
-    if (DoReport) LinesOut(Option1);
+    if (DoReport) LinesOut(ioFiles, Option1);
 
     ScanForReports("Surfaces", DoReport, "Vertices");
     if (DoReport) {
@@ -166,7 +166,7 @@ void ReportSurfaces(OutputFiles &outputFiles)
             if (Option2 != "") {
                 SetUpSchemeColors(Option2, "DXF");
             }
-            DXFOut(outputFiles, Option1, Option2);
+            DXFOut(ioFiles, Option1, Option2);
             DXFDone = true;
         } else {
             ShowWarningError("ReportSurfaces: DXF output already generated.  DXF with option=[" + Option1 + "] will not be generated.");
@@ -179,7 +179,7 @@ void ReportSurfaces(OutputFiles &outputFiles)
             if (Option2 != "") {
                 SetUpSchemeColors(Option2, "DXF");
             }
-            DXFOutWireFrame(outputFiles, Option2);
+            DXFOutWireFrame(ioFiles, Option2);
             DXFDone = true;
         } else {
             ShowWarningError("ReportSurfaces: DXF output already generated.  DXF:WireFrame will not be generated.");
@@ -189,7 +189,7 @@ void ReportSurfaces(OutputFiles &outputFiles)
     ScanForReports("Surfaces", DoReport, "VRML", Option1, Option2);
     if (DoReport) {
         if (!VRMLDone) {
-            VRMLOut(outputFiles, Option1, Option2);
+            VRMLOut(ioFiles, Option1, Option2);
             VRMLDone = true;
         } else {
             ShowWarningError("ReportSurfaces: VRML output already generated.  VRML with option=[" + Option1 + "] will not be generated.");
@@ -198,15 +198,15 @@ void ReportSurfaces(OutputFiles &outputFiles)
 
     ScanForReports("Surfaces", DoReport, "CostInfo");
     if (DoReport) {
-        CostInfoOut(outputFiles);
+        CostInfoOut(ioFiles);
     }
 
     if (SurfDet || SurfVert) {
-        DetailsForSurfaces(SurfDetails);
+        DetailsForSurfaces(ioFiles, SurfDetails);
     }
 }
 
-void LinesOut(std::string const &option)
+void LinesOut(IOFiles &ioFiles, std::string const &option)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
@@ -260,10 +260,10 @@ void LinesOut(std::string const &option)
     lastoption = option;
     optiondone = true;
 
-    auto slnfile = OutputFiles::getSingleton().sln.open("LinesOut");
+    auto slnfile = ioFiles.sln.open("LinesOut");
 
     if (option != "IDF") {
-        for (int surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Sides == 0) continue;
             print(slnfile, "{}:{}\n", Surface(surf).ZoneName, Surface(surf).Name);
@@ -294,7 +294,7 @@ void LinesOut(std::string const &option)
     } else {
         print(slnfile, "{}\n", " Building North Axis = 0");
         print(slnfile, "{}\n", "GlobalGeometryRules,UpperLeftCorner,CounterClockwise,WorldCoordinates;");
-        for (int surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Sides == 0) continue;
             // process heat transfer surfaces
@@ -324,7 +324,7 @@ static std::string normalizeName(std::string name)
     return name;
 }
 
-static void WriteDXFCommon(OutputFile &of, const std::string &ColorScheme)
+static void WriteDXFCommon(InputOutputFile &of, const std::string &ColorScheme)
 {
     using DataHeatBalance::BuildingName;
     using DataHeatBalance::Zone;
@@ -373,7 +373,7 @@ static void WriteDXFCommon(OutputFile &of, const std::string &ColorScheme)
 
     Real64 minx = 99999.0;
     Real64 miny = 99999.0;
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         if (Surface(surf).Class == SurfaceClass_IntMass) continue;
         for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
             minx = min(minx, Surface(surf).Vertex(vert).x);
@@ -453,7 +453,7 @@ static void WriteDXFCommon(OutputFile &of, const std::string &ColorScheme)
     }
 }
 
-static void DXFDaylightingReferencePoints(OutputFile &of, bool const DELight)
+static void DXFDaylightingReferencePoints(InputOutputFile &of, bool const DELight)
 {
     using namespace DataSurfaceColors;
     using DataDaylighting::ZoneDaylight;
@@ -481,7 +481,7 @@ static void DXFDaylightingReferencePoints(OutputFile &of, bool const DELight)
     }
 }
 
-void DXFOut(OutputFiles &outputFiles,
+void DXFOut(IOFiles &ioFiles,
             std::string const &PolygonAction,
             std::string const &ColorScheme // Name from user for color scheme or blank
 )
@@ -580,7 +580,7 @@ void DXFOut(OutputFiles &outputFiles,
         return;
     }
 
-    auto dxffile = outputFiles.dxf.open("DXFOut");
+    auto dxffile = ioFiles.dxf.open("DXFOut");
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -598,7 +598,7 @@ void DXFOut(OutputFiles &outputFiles,
 
     auto colorindex = ColorNo_ShdDetFix;
     //  Do all detached shading surfaces first
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         std::string ShadeType;
 
         if (Surface(surf).HeatTransSurf) continue;
@@ -638,7 +638,8 @@ void DXFOut(OutputFiles &outputFiles,
             } else {
                 Array1D<dTriangle> mytriangles;
 
-                const auto ntri = Triangulate(Surface(surf).Sides,
+                const auto ntri = Triangulate(ioFiles,
+                                              Surface(surf).Sides,
                                               Surface(surf).Vertex,
                                               mytriangles,
                                               Surface(surf).Azimuth,
@@ -673,7 +674,8 @@ void DXFOut(OutputFiles &outputFiles,
     for (int zones = 1; zones <= NumOfZones; ++zones) {
         const auto TempZoneName = normalizeName(Zone(zones).Name);
 
-        for (int surf = max(Zone(zones).SurfaceFirst, 1); surf <= Zone(zones).SurfaceLast; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+            if (Surface(surf).Zone != zones) continue;
             if (Surface(surf).Sides == 0) continue;
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Class == SurfaceClass_Wall) colorindex = ColorNo_Wall;
@@ -718,7 +720,8 @@ void DXFOut(OutputFiles &outputFiles,
                 } else {
                     Array1D<dTriangle> mytriangles;
 
-                    const auto ntri = Triangulate(Surface(surf).Sides,
+                    const auto ntri = Triangulate(ioFiles,
+                                                  Surface(surf).Sides,
                                                   Surface(surf).Vertex,
                                                   mytriangles,
                                                   Surface(surf).Azimuth,
@@ -749,7 +752,7 @@ void DXFOut(OutputFiles &outputFiles,
             }
         }
         // still have to do shading surfaces for zone
-        for (int surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass_Shading) continue;
             if (Surface(surf).ZoneName != Zone(zones).Name) continue;
@@ -787,7 +790,8 @@ void DXFOut(OutputFiles &outputFiles,
                     Array1D<dTriangle> mytriangles;
                     int ntri = 0;
                     if (Surface(surf).Shape == SurfaceShape::RectangularOverhang) {
-                        ntri = Triangulate(Surface(surf).Sides,
+                        ntri = Triangulate(ioFiles,
+                                           Surface(surf).Sides,
                                            Surface(surf).Vertex,
                                            mytriangles,
                                            Surface(surf).Azimuth,
@@ -795,7 +799,8 @@ void DXFOut(OutputFiles &outputFiles,
                                            Surface(surf).Name,
                                            SurfaceClass_Overhang);
                     } else {
-                        ntri = Triangulate(Surface(surf).Sides,
+                        ntri = Triangulate(ioFiles,
+                                           Surface(surf).Sides,
                                            Surface(surf).Vertex,
                                            mytriangles,
                                            Surface(surf).Azimuth,
@@ -858,7 +863,7 @@ void DXFOut(OutputFiles &outputFiles,
     print(dxffile, Format_706);
 }
 
-void DXFOutLines(std::string const &ColorScheme)
+void DXFOutLines(IOFiles &ioFiles, std::string const &ColorScheme)
 {
 
     // SUBROUTINE INFORMATION:
@@ -919,7 +924,7 @@ void DXFOutLines(std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = OutputFiles::getSingleton().dxf.open("DXFOutLines");
+    auto dxffile = ioFiles.dxf.open("DXFOutLines");
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -934,7 +939,7 @@ void DXFOutLines(std::string const &ColorScheme)
     //  Do all detached shading surfaces first
     int surfcount = 0;
     int colorindex = 0;
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         std::string ShadeType;
         if (Surface(surf).HeatTransSurf) continue;
         if (Surface(surf).Class == SurfaceClass_Shading) continue;
@@ -979,7 +984,8 @@ void DXFOutLines(std::string const &ColorScheme)
         auto TempZoneName = normalizeName(Zone(zones).Name);
 
         surfcount = 0;
-        for (int surf = max(Zone(zones).SurfaceFirst, 1); surf <= Zone(zones).SurfaceLast; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+            if (Surface(surf).Zone != zones) continue;
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Class == SurfaceClass_Wall) colorindex = ColorNo_Wall;
             if (Surface(surf).Class == SurfaceClass_Roof) colorindex = ColorNo_Roof;
@@ -1029,7 +1035,7 @@ void DXFOutLines(std::string const &ColorScheme)
         }
         // still have to do shading surfaces for zone
         surfcount = 0;
-        for (int surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass_Shading) continue;
             if (Surface(surf).ZoneName != Zone(zones).Name) continue;
@@ -1070,7 +1076,7 @@ void DXFOutLines(std::string const &ColorScheme)
     print(dxffile, Format_706);
 }
 
-void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
+void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1131,7 +1137,7 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = outputFiles.dxf.open("DXFOutWireFrame");
+    auto dxffile = ioFiles.dxf.open("DXFOutWireFrame");
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1145,7 +1151,7 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
     //  Do all detached shading surfaces first
     int surfcount = 0;
     int colorindex = 0;
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         std::string ShadeType;
 
         if (Surface(surf).HeatTransSurf) continue;
@@ -1179,7 +1185,8 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
         const auto SaveZoneName = normalizeName(Zone(zones).Name);
 
         surfcount = 0;
-        for (int surf = max(Zone(zones).SurfaceFirst, 1); surf <= Zone(zones).SurfaceLast; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+            if (Surface(surf).Zone != zones) continue;
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Class == SurfaceClass_Wall) colorindex = ColorNo_Wall;
             if (Surface(surf).Class == SurfaceClass_Roof) colorindex = ColorNo_Roof;
@@ -1209,7 +1216,7 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
         }
         // still have to do shading surfaces for zone
         surfcount = 0;
-        for (int surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass_Shading) continue;
             if (Surface(surf).ZoneName != Zone(zones).Name) continue;
@@ -1242,7 +1249,7 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
     print(dxffile, Format_706);
 }
 
-void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only, 11=Details with vertices)
+void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only, 10=Details only, 11=Details with vertices)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1285,7 +1292,6 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int surf;    // Loop variable for surfaces
     int vert;    // Loop counter
     int ZoneNum; // Loop counter
     std::string BaseSurfName;
@@ -1366,13 +1372,15 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
     }
 
     // Do just "detached" shading first
-    for (surf = 1; surf <= TotSurfaces; ++surf) {
+    int surf2 = 0;
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        surf2 = surf;
         if (Surface(surf).Zone != 0) break;
     }
-    if ((surf - 1) > 0) {
+    if ((surf2 - 1) > 0) {
         *eiostream << "Shading Surfaces,"
-                   << "Number of Shading Surfaces," << surf - 1 << '\n';
-        for (surf = 1; surf <= TotSurfaces; ++surf) {
+                   << "Number of Shading Surfaces," << surf2 - 1 << '\n';
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != 0) break;
             AlgoName = "None";
             *eiostream << "Shading Surface," << Surface(surf).Name << "," << cSurfaceClass(Surface(surf).Class) << "," << Surface(surf).BaseSurfName
@@ -1427,7 +1435,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
 
     for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
         *eiostream << "Zone Surfaces," << Zone(ZoneNum).Name << "," << (Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1) << '\n';
-        for (surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != ZoneNum) continue;
             SolarDiffusing = "";
             if (RptType == 10 || RptType == 11) { // Details and Details with Vertices
@@ -1724,10 +1732,10 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
         } // surfaces
     }     // zones
 
-    print(OutputFiles::getSingleton().eio, "{}", eiostream->str());
+    print(ioFiles.eio, "{}", eiostream->str());
 }
 
-void CostInfoOut(OutputFiles &outputFiles)
+void CostInfoOut(IOFiles &ioFiles)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1775,7 +1783,7 @@ void CostInfoOut(OutputFiles &outputFiles)
     // need to determine unique surfacs... some surfaces are shared by zones and hence doubled
     uniqueSurf.dimension(TotSurfaces, true);
 
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         if (Surface(surf).ExtBoundCond > 0) {
             if (Surface(surf).ExtBoundCond < surf) { // already cycled through
                 uniqueSurf(surf) = false;
@@ -1786,13 +1794,13 @@ void CostInfoOut(OutputFiles &outputFiles)
         }
     }
 
-    auto scifile = outputFiles.sci.open("CostInfoOut");
+    auto scifile = ioFiles.sci.open("CostInfoOut");
 
     print(scifile, "{:12}{:12}\n", TotSurfaces, count(uniqueSurf));
     print(scifile, "{}\n", " data for surfaces useful for cost information");
     print(scifile, "{}\n", " Number, Name, Construction, class, area, grossarea");
 
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         // if (surface(surf)%class .eq. SurfaceClass_IntMass) CYCLE
         if (!uniqueSurf(surf)) continue;
         // why the heck are constructions == 0 ?
@@ -1813,7 +1821,7 @@ void CostInfoOut(OutputFiles &outputFiles)
     uniqueSurf.deallocate();
 }
 
-void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const std::string &ColorScheme)
+void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::string &ColorScheme)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1889,7 +1897,7 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
         return;
     }
 
-    auto wrlfile = outputFiles.wrl.open("VRMLOut");
+    auto wrlfile = ioFiles.wrl.open("VRMLOut");
 
     print(wrlfile, Format_702);
 
@@ -1920,7 +1928,7 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
     int colorindex = 0;
 
     //  Do all detached shading surfaces first
-    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         if (Surface(surf).HeatTransSurf) continue;
         if (Surface(surf).Construction > 0) {
             if (dataConstruction.Construct(Surface(surf).Construction).TypeIsAirBoundary) continue;
@@ -1949,7 +1957,8 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
             print(wrlfile, Format_805);
         } else { // will be >4 sided polygon with triangulate option
             Array1D<dTriangle> mytriangles;
-            const auto ntri = Triangulate(Surface(surf).Sides,
+            const auto ntri = Triangulate(ioFiles,
+                                          Surface(surf).Sides,
                                           Surface(surf).Vertex,
                                           mytriangles,
                                           Surface(surf).Azimuth,
@@ -1967,9 +1976,11 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
         }
     }
     //  ! now do zone surfaces, by zone
-    for (int zones = 1; zones <= NumOfZones; ++zones) {
-
-        for (int surf = max(Zone(zones).SurfaceFirst, 1); surf <= Zone(zones).SurfaceLast; ++surf) {
+    for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+        int oldSurfNum = 0;
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+            ++oldSurfNum;
+            if (Surface(surf).Zone != zoneNum) continue;
             if (Surface(surf).Sides == 0) continue;
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Class == SurfaceClass_Wall) colorindex = 1;
@@ -1980,7 +1991,7 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
             if (Surface(surf).Class == SurfaceClass_Door) colorindex = 2;
 
             print(wrlfile, "# {}:{}\n", Surface(surf).ZoneName, Surface(surf).Name);
-            print(wrlfile, Format_801, colorstring(colorindex), "Surf", surf);
+            print(wrlfile, Format_801, colorstring(colorindex), "Surf", oldSurfNum);
             for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
                 print(wrlfile, Format_802, Surface(surf).Vertex(vert).x, Surface(surf).Vertex(vert).y, Surface(surf).Vertex(vert).z);
             }
@@ -1993,7 +2004,8 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
                 print(wrlfile, Format_805);
             } else { // will be >4 sided polygon with triangulate option
                 Array1D<dTriangle> mytriangles;
-                const auto ntri = Triangulate(Surface(surf).Sides,
+                const auto ntri = Triangulate(ioFiles,
+                                              Surface(surf).Sides,
                                               Surface(surf).Vertex,
                                               mytriangles,
                                               Surface(surf).Azimuth,
@@ -2012,10 +2024,10 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
         }
         // still have to do shading surfaces for zone
         colorindex = 4;
-        for (int surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             //      !if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass_Shading) continue;
-            if (Surface(surf).ZoneName != Zone(zones).Name) continue;
+            if (Surface(surf).ZoneName != Zone(zoneNum).Name) continue;
             if (Surface(surf).Sides == 0) continue;
             print(wrlfile, "# {}:{}\n", Surface(surf).ZoneName, Surface(surf).Name);
             print(wrlfile, Format_801, colorstring(colorindex), "Surf", surf);
@@ -2031,7 +2043,8 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
                 print(wrlfile, Format_805);
             } else { // will be >4 sided polygon with triangulate option
                 Array1D<dTriangle> mytriangles;
-                const auto ntri = Triangulate(Surface(surf).Sides,
+                const auto ntri = Triangulate(ioFiles,
+                                              Surface(surf).Sides,
                                               Surface(surf).Vertex,
                                               mytriangles,
                                               Surface(surf).Azimuth,

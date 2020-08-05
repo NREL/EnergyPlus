@@ -184,6 +184,7 @@ namespace CoolingPanelSimple {
 
             {
                 auto const SELECT_CASE_var(ThisCP.EquipType);
+
                 if (SELECT_CASE_var == TypeOf_CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
                     ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
                 } else {
@@ -261,7 +262,7 @@ namespace CoolingPanelSimple {
         int NumNumbers;        // Number of Numbers for each GetobjectItem call
         int SurfNum;           // Surface number Do loop counter
         int IOStat;
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
 
         dataChilledCeilingPanelSimple.NumCoolingPanels = inputProcessor->getNumObjectsFound(cCMO_CoolingPanel_Simple);
 
@@ -722,7 +723,6 @@ namespace CoolingPanelSimple {
         static std::string const RoutineName("ChilledCeilingPanelSimple:InitCoolingPanel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ZoneEquipmentListChecked(false);
         static Array1D_bool MyEnvrnFlag;
         int Loop;
         int ZoneNode;
@@ -762,8 +762,8 @@ namespace CoolingPanelSimple {
         if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
-            ZoneEquipmentListChecked = true;
+        if (!state.dataChilledCeilingPanelSimple.ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+            state.dataChilledCeilingPanelSimple.ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataChilledCeilingPanelSimple.NumCoolingPanels; ++Loop) {
                 if (CheckZoneEquipmentList(cCMO_CoolingPanel_Simple, ThisCP.EquipID)) continue;
                 ShowSevereError("InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + ThisCP.EquipID +
@@ -1405,9 +1405,9 @@ namespace CoolingPanelSimple {
                 // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
                 DistributeCoolingPanelRadGains(state.dataChilledCeilingPanelSimple);
                 // Now "simulate" the system by recalculating the heat balances
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
 
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state.dataZoneTempPredictorCorrector, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                 // Here an assumption is made regarding radiant heat transfer to people.
                 // While the radiant heat transfer to people array will be used by the thermal comfort
@@ -1501,16 +1501,6 @@ namespace CoolingPanelSimple {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
         int WaterOutletNode;
-        static int Iter(0);
-        static bool MyEnvrnFlag(true);
-
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
-            Iter = 0;
-            MyEnvrnFlag = false;
-        }
-        if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
-        }
 
         // First, update the running average if necessary...
         if (dataChilledCeilingPanelSimple.LastSysTimeElapsed(CoolingPanelNum) == SysTimeElapsed) {

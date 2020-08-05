@@ -54,10 +54,17 @@
 #include <vector>
 
 // EnergyPlus Headers
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Vectors.hh>
 
 namespace EnergyPlus {
+
+    //forward declaration
+    struct EnergyPlusData;
+    struct WindowComplexManagerData;
+
 namespace DataHeatBalance {
     struct MaterialProperties;
 }
@@ -92,6 +99,8 @@ class CMultiLayerScattered;
 } // namespace MultiLayerOptics
 
 namespace EnergyPlus {
+    //forward declaration
+    struct WindowManagerData;
 
 namespace WindowManager {
 
@@ -108,10 +117,10 @@ namespace WindowManager {
     // Converts world coordinates (E+) into local surface coordinates that suites better for
     // WCE operations. Return values are angles Theta and Phi that are used to define WCE direction
     std::pair<Real64, Real64>
-    getWCECoordinates(const int t_SurfNum, const DataVectorTypes::Vector &t_Ray, const SingleLayerOptics::BSDFHemisphere t_Direction);
+    getWCECoordinates(WindowComplexManagerData &dataWindowComplexManager, const int t_SurfNum, const DataVectorTypes::Vector &t_Ray, const SingleLayerOptics::BSDFHemisphere t_Direction);
 
     // Returns Theta and Phi coordinates of surface BSDF for current Sun position
-    std::pair<Real64, Real64> getSunWCEAngles(const int t_SurfNum, const SingleLayerOptics::BSDFHemisphere t_Direction);
+    std::pair<Real64, Real64> getSunWCEAngles(WindowComplexManagerData &dataWindowComplexManager, const int t_SurfNum, const SingleLayerOptics::BSDFHemisphere t_Direction);
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCESpecturmProperties
@@ -122,8 +131,8 @@ namespace WindowManager {
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(int const t_SampleDataPtr);
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData>
         getSpectralSample(Material::MaterialProperties const &t_MaterialProperties);
-        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultSolarRadiationSpectrum();
-        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultVisiblePhotopicResponse();
+        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultSolarRadiationSpectrum(WindowManagerData &dataWindowManager);
+        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultVisiblePhotopicResponse(WindowManagerData &dataWindowManager);
     };
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -139,7 +148,7 @@ namespace WindowManager {
                        int const t_ConstrNum,
                        std::shared_ptr<SingleLayerOptics::CScatteringLayer> const &t_Layer);
 
-        std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> getEquivalentLayer(FenestrationCommon::WavelengthRange const t_Range,
+        std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> getEquivalentLayer(WindowManagerData &dataWindowManager, FenestrationCommon::WavelengthRange const t_Range,
                                                                                    int const t_ConstrNum);
 
         static void clearState();

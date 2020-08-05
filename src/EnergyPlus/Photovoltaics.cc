@@ -131,20 +131,16 @@ namespace Photovoltaics {
     //   see DataPhotovoltaics.cc
 
     Array1D_bool CheckEquipName;
+    bool GetInputFlag(true); // one time get input flag
+    bool MyOneTimeFlag(true);
+    bool firstTime(true);
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Photovoltaics
-
-    // The following subroutines are used for the SIMPLE model
-
-    // The following subroutines and functions are used for only the EQUIVALENT ONE-DIODE model
-
-    // The following subroutines and functions are used for the Sandia model.
-
-    //  OO get set methods for coupling to exterior vented baffle cavity mounting configurations
-
-    // *************
-
-    // Functions
+    void clear_state() {
+        CheckEquipName.clear();
+        GetInputFlag = true;
+        MyOneTimeFlag = true;
+        firstTime = true;
+    }
 
     void SimPVGenerator(int const EP_UNUSED(GeneratorType), // type of Generator !unused1208
                         std::string const &GeneratorName,   // user specified name of Generator
@@ -170,7 +166,6 @@ namespace Photovoltaics {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PVnum;                      // index of unit in PV array for Equivalent one-diode model
-        static bool GetInputFlag(true); // one time get input flag
 
         // Get PV data from input file
         if (GetInputFlag) {
@@ -315,7 +310,7 @@ namespace Photovoltaics {
         int NumAlphas; // Number of PV Array parameter alpha names being passed
         int NumNums;   // Number of PV Array numeric parameters are being passed
         int IOStat;
-        static bool ErrorsFound(false); // if errors detected in input
+        bool ErrorsFound(false); // if errors detected in input
         int ThisParamObj;
         int dupPtr;
 
@@ -1243,7 +1238,6 @@ namespace Photovoltaics {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
         static Array1D_bool MyEnvrnFlag;
         Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 
@@ -1364,7 +1358,6 @@ namespace Photovoltaics {
         int K;
         Real64 CellTemp(0.0); // cell temperature in Kelvin
         Real64 CellTempC;     // cell temperature in degrees C
-        static bool firstTime(true);
         // unused1208  INTEGER :: thisZone
 
         // if the cell temperature mode is 2, convert the timestep to seconds

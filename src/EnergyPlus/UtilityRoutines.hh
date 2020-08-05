@@ -61,20 +61,19 @@
 #include <functional>
 
 namespace EnergyPlus {
+
     // Forward declarations
     struct EnergyPlusData;
-    class OutputFile;
-    class OutputFiles;
+    class InputOutputFile;
+    class IOFiles;
 
 int AbortEnergyPlus(EnergyPlusData &state);
 
-void CloseMiscOpenFiles(OutputFiles &outputFiles);
+void CloseMiscOpenFiles(IOFiles &ioFiles);
 
 void CloseOutOpenFiles();
 
-int EndEnergyPlus(OutputFiles &outputFiles);
-
-int GetNewUnitNumber();
+int EndEnergyPlus(IOFiles &ioFiles);
 
 int FindUnitNumber(std::string const &FileName); // File name to be searched.
 
@@ -136,7 +135,7 @@ public:
     {}
 };
 
-using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::OutputFile>>;
+using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
 void ShowFatalError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 

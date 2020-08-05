@@ -119,17 +119,24 @@ namespace BaseboardElectric {
 
     struct BaseboardElectricData : BaseGlobalStruct {
         int NumBaseboards;
+        bool getInputFlag;
         Array1D<BaseboardElectric::BaseboardParams> Baseboard;
         Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
+        bool MyOneTimeFlag = true;
+        bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+
         void clear_state() override
         {
             NumBaseboards = 0;
+            getInputFlag = true;
             Baseboard.deallocate();
             BaseboardNumericFields.deallocate();
+            MyOneTimeFlag = true;
+            ZoneEquipmentListChecked = false;
         }
         // Default Constructor
         BaseboardElectricData()
-            : NumBaseboards(0) {}
+            : NumBaseboards(0), getInputFlag(true) {}
     };
 
 } // namespace EnergyPlus

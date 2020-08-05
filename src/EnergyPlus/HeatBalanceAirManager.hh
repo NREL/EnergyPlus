@@ -54,8 +54,8 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
-    class OutputFiles;
-    
+    class IOFiles;
+
 namespace HeatBalanceAirManager {
 
     // Data
@@ -91,7 +91,7 @@ namespace HeatBalanceAirManager {
     //*****************************************************************************************
     // This subroutine was moved from 'RoomAirManager' Module
 
-    void GetRoomAirModelParameters(OutputFiles &outputFiles, bool &errFlag); // True if errors found during this input routine
+    void GetRoomAirModelParameters(IOFiles &ioFiles, bool &errFlag); // True if errors found during this input routine
 
     // END of Get Input subroutines for the HBAir Module
     //******************************************************************************

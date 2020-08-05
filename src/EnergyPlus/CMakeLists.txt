@@ -103,8 +103,6 @@ SET( SRC
   DataConvergParams.hh
   DataConversions.cc
   DataConversions.hh
-  DataCostEstimate.cc
-  DataCostEstimate.hh
   DataDElight.cc
   DataDElight.hh
   DataDaylighting.cc
@@ -384,8 +382,8 @@ SET( SRC
   OutAirNodeManager.hh
   OutdoorAirUnit.cc
   OutdoorAirUnit.hh
-  OutputFiles.cc
-  OutputFiles.hh
+        IOFiles.cc
+        IOFiles.hh
   OutputProcessor.cc
   OutputProcessor.hh
   OutputReportPredefined.cc

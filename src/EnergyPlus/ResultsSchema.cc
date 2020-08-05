@@ -448,105 +448,105 @@ namespace ResultsFramework {
         return root;
     }
 
-    void DataFrame::writeReport(bool outputJSON, bool outputCBOR, bool outputMsgPack)
+    void DataFrame::writeReport(JsonOutputStreams &jsonOutputStreams, bool outputJSON, bool outputCBOR, bool outputMsgPack)
     {
 
         json root = getJSON();
         if (ReportFrequency == "Detailed-HVAC") {
-            if (outputJSON && DataGlobals::jsonOutputStreams.json_TSstream_HVAC) {
-                *(DataGlobals::jsonOutputStreams.json_TSstream_HVAC) << std::setw(4) << root << std::endl;
+            if (outputJSON && jsonOutputStreams.json_TSstream_HVAC) {
+                *(jsonOutputStreams.json_TSstream_HVAC) << std::setw(4) << root << std::endl;
             }
-            if (outputCBOR && DataGlobals::jsonOutputStreams.cbor_TSstream_HVAC) {
+            if (outputCBOR && jsonOutputStreams.cbor_TSstream_HVAC) {
                 std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.cbor_TSstream_HVAC));
+                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_TSstream_HVAC));
             }
-            if (outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_TSstream_HVAC) {
+            if (outputMsgPack && jsonOutputStreams.msgpack_TSstream_HVAC) {
                 std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.msgpack_TSstream_HVAC));
+                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_TSstream_HVAC));
             }
         } else if (ReportFrequency == "Detailed-Zone") {
-            if (outputJSON && DataGlobals::jsonOutputStreams.json_TSstream_Zone) {
-                *(DataGlobals::jsonOutputStreams.json_TSstream_Zone) << std::setw(4) << root << std::endl;
+            if (outputJSON && jsonOutputStreams.json_TSstream_Zone) {
+                *(jsonOutputStreams.json_TSstream_Zone) << std::setw(4) << root << std::endl;
             }
-            if (outputCBOR && DataGlobals::jsonOutputStreams.cbor_TSstream_Zone) {
+            if (outputCBOR && jsonOutputStreams.cbor_TSstream_Zone) {
                 std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.cbor_TSstream_Zone));
+                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_TSstream_Zone));
             }
-            if (outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_TSstream_Zone) {
+            if (outputMsgPack && jsonOutputStreams.msgpack_TSstream_Zone) {
                 std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.msgpack_TSstream_Zone));
+                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_TSstream_Zone));
             }
         } else if (ReportFrequency == "Timestep") {
-            if (outputJSON && DataGlobals::jsonOutputStreams.json_TSstream) {
-                *(DataGlobals::jsonOutputStreams.json_TSstream) << std::setw(4) << root << std::endl;
+            if (outputJSON && jsonOutputStreams.json_TSstream) {
+                *(jsonOutputStreams.json_TSstream) << std::setw(4) << root << std::endl;
             }
-            if (outputCBOR && DataGlobals::jsonOutputStreams.cbor_TSstream) {
+            if (outputCBOR && jsonOutputStreams.cbor_TSstream) {
                 std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.cbor_TSstream));
+                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_TSstream));
             }
-            if (outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_TSstream) {
+            if (outputMsgPack && jsonOutputStreams.msgpack_TSstream) {
                 std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.msgpack_TSstream));
+                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_TSstream));
             }
         } else if (ReportFrequency == "Daily") {
-            if (outputJSON && DataGlobals::jsonOutputStreams.json_DYstream) {
-                *(DataGlobals::jsonOutputStreams.json_DYstream) << std::setw(4) << root << std::endl;
+            if (outputJSON && jsonOutputStreams.json_DYstream) {
+                *(jsonOutputStreams.json_DYstream) << std::setw(4) << root << std::endl;
             }
-            if (outputCBOR && DataGlobals::jsonOutputStreams.cbor_DYstream) {
+            if (outputCBOR && jsonOutputStreams.cbor_DYstream) {
                 std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.cbor_DYstream));
+                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_DYstream));
             }
-            if (outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_DYstream) {
+            if (outputMsgPack && jsonOutputStreams.msgpack_DYstream) {
                 std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.msgpack_DYstream));
+                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_DYstream));
             }
         } else if (ReportFrequency == "Hourly") {
-            if (outputJSON && DataGlobals::jsonOutputStreams.json_HRstream) {
-                *(DataGlobals::jsonOutputStreams.json_HRstream) << std::setw(4) << root << std::endl;
+            if (outputJSON && jsonOutputStreams.json_HRstream) {
+                *(jsonOutputStreams.json_HRstream) << std::setw(4) << root << std::endl;
             }
-            if (outputCBOR && DataGlobals::jsonOutputStreams.cbor_HRstream) {
+            if (outputCBOR && jsonOutputStreams.cbor_HRstream) {
                 std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.cbor_HRstream));
+                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_HRstream));
             }
-            if (outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_HRstream) {
+            if (outputMsgPack && jsonOutputStreams.msgpack_HRstream) {
                 std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.msgpack_HRstream));
+                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_HRstream));
             }
         } else if (ReportFrequency == "Monthly") {
-            if (outputJSON && DataGlobals::jsonOutputStreams.json_MNstream) {
-                *(DataGlobals::jsonOutputStreams.json_MNstream) << std::setw(4) << root << std::endl;
+            if (outputJSON && jsonOutputStreams.json_MNstream) {
+                *(jsonOutputStreams.json_MNstream) << std::setw(4) << root << std::endl;
             }
-            if (outputCBOR && DataGlobals::jsonOutputStreams.cbor_MNstream) {
+            if (outputCBOR && jsonOutputStreams.cbor_MNstream) {
                 std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.cbor_MNstream));
+                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_MNstream));
             }
-            if (outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_MNstream) {
+            if (outputMsgPack && jsonOutputStreams.msgpack_MNstream) {
                 std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.msgpack_MNstream));
+                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_MNstream));
             }
         } else if (ReportFrequency == "RunPeriod") {
-            if (outputJSON && DataGlobals::jsonOutputStreams.json_SMstream) {
-                *(DataGlobals::jsonOutputStreams.json_SMstream) << std::setw(4) << root << std::endl;
+            if (outputJSON && jsonOutputStreams.json_SMstream) {
+                *(jsonOutputStreams.json_SMstream) << std::setw(4) << root << std::endl;
             }
-            if (outputCBOR && DataGlobals::jsonOutputStreams.cbor_SMstream) {
+            if (outputCBOR && jsonOutputStreams.cbor_SMstream) {
                 std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.cbor_SMstream));
+                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_SMstream));
             }
-            if (outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_SMstream) {
+            if (outputMsgPack && jsonOutputStreams.msgpack_SMstream) {
                 std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.msgpack_SMstream));
+                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_SMstream));
             }
         } else if (ReportFrequency == "Yearly") {
-            if (outputJSON && DataGlobals::jsonOutputStreams.json_YRstream) {
-                *(DataGlobals::jsonOutputStreams.json_YRstream) << std::setw(4) << root << std::endl;
+            if (outputJSON && jsonOutputStreams.json_YRstream) {
+                *(jsonOutputStreams.json_YRstream) << std::setw(4) << root << std::endl;
             }
-            if (outputCBOR && DataGlobals::jsonOutputStreams.cbor_YRstream) {
+            if (outputCBOR && jsonOutputStreams.cbor_YRstream) {
                 std::vector<uint8_t> v_cbor = json::to_cbor(root);
-                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.cbor_YRstream));
+                std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.cbor_YRstream));
             }
-            if (outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_YRstream) {
+            if (outputMsgPack && jsonOutputStreams.msgpack_YRstream) {
                 std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.msgpack_YRstream));
+                std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_YRstream));
             }
         }
     }
@@ -1060,50 +1060,50 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsSchema::writeTimeSeriesReports()
+    void ResultsSchema::writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams)
     {
         // Output detailed Zone time series data
         if (OutputSchema->RIDetailedZoneTSData.rDataFrameEnabled() || OutputSchema->RIDetailedZoneTSData.iDataFrameEnabled()) {
-            OutputSchema->RIDetailedZoneTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            OutputSchema->RIDetailedZoneTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output detailed HVAC time series data
         if (OutputSchema->RIDetailedHVACTSData.iDataFrameEnabled() || OutputSchema->RIDetailedHVACTSData.rDataFrameEnabled()) {
-            OutputSchema->RIDetailedHVACTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            OutputSchema->RIDetailedHVACTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output timestep time series data
         if (OutputSchema->RITimestepTSData.iDataFrameEnabled() || OutputSchema->RITimestepTSData.rDataFrameEnabled()) {
-            OutputSchema->RITimestepTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            OutputSchema->RITimestepTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output hourly time series data
         if (OutputSchema->RIHourlyTSData.iDataFrameEnabled() || OutputSchema->RIHourlyTSData.rDataFrameEnabled()) {
-            OutputSchema->RIHourlyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            OutputSchema->RIHourlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output daily time series data
         if (OutputSchema->RIDailyTSData.iDataFrameEnabled() || OutputSchema->RIDailyTSData.rDataFrameEnabled()) {
-            OutputSchema->RIDailyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            OutputSchema->RIDailyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output monthly time series data
         if (OutputSchema->RIMonthlyTSData.iDataFrameEnabled() || OutputSchema->RIMonthlyTSData.rDataFrameEnabled()) {
-            OutputSchema->RIMonthlyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            OutputSchema->RIMonthlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output run period time series data
         if (OutputSchema->RIRunPeriodTSData.iDataFrameEnabled() || OutputSchema->RIRunPeriodTSData.rDataFrameEnabled()) {
-            OutputSchema->RIRunPeriodTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            OutputSchema->RIRunPeriodTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output yearly time series data
         if (OutputSchema->RIYearlyTSData.iDataFrameEnabled() || OutputSchema->RIYearlyTSData.rDataFrameEnabled()) {
-            OutputSchema->RIYearlyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            OutputSchema->RIYearlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
     }
 
-    void ResultsSchema::WriteReport()
+    void ResultsSchema::WriteReport(JsonOutputStreams &jsonOutputStreams)
     {
         json root, outputVars, rdd, meterVars, meterData;
         json rddvals = json::array();
@@ -1216,19 +1216,19 @@ namespace ResultsFramework {
         root["MeterData"] = meterData;
         root["TabularReports"] = TabularReportsCollection.getJSON();
 
-        if (outputJSON && DataGlobals::jsonOutputStreams.json_stream) {
+        if (outputJSON && jsonOutputStreams.json_stream) {
             auto const dumped_json = root.dump(4, ' ', false, json::error_handler_t::replace);
-            std::copy(dumped_json.begin(), dumped_json.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.json_stream));
+            std::copy(dumped_json.begin(), dumped_json.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.json_stream));
         }
-        if (outputCBOR && DataGlobals::jsonOutputStreams.cbor_stream) {
-            json::to_cbor(root, *DataGlobals::jsonOutputStreams.cbor_stream);
+        if (outputCBOR && jsonOutputStreams.cbor_stream) {
+            json::to_cbor(root, *jsonOutputStreams.cbor_stream);
 //            std::vector<uint8_t> v_cbor = json::to_cbor(root);
-//            std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.cbor_stream));
+//            std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*json.cbor_stream));
         }
-        if (outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_stream) {
-            json::to_msgpack(root, *DataGlobals::jsonOutputStreams.msgpack_stream);
+        if (outputMsgPack && jsonOutputStreams.msgpack_stream) {
+            json::to_msgpack(root, *jsonOutputStreams.msgpack_stream);
 //            std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-//            std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.msgpack_stream));
+//            std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*json.msgpack_stream));
         }
     }
 

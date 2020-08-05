@@ -139,6 +139,8 @@ namespace TranspiredCollector {
 
     // Object Data
     Array1D<UTSCDataStruct> UTSC;
+    bool MyOneTimeFlag(true);
+    bool MySetPointCheckFlag(true);
 
     // Functions
     void clear_state()
@@ -146,9 +148,13 @@ namespace TranspiredCollector {
         NumUTSC = 0;
         GetInputFlag = true;
         UTSC.deallocate();
+        MyOneTimeFlag = true;
+        MySetPointCheckFlag = true;
     }
 
-    void SimTranspiredCollector(std::string const &CompName, // component name
+    void SimTranspiredCollector(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                IOFiles &ioFiles,
+                                std::string const &CompName, // component name
                                 int &CompIndex               // component index (to reduce string compares during simulation)
     )
     {
@@ -227,9 +233,9 @@ namespace TranspiredCollector {
         }
 
         if (UTSC(UTSCNum).IsOn) {
-            CalcActiveTranspiredCollector(UTSCNum);
+            CalcActiveTranspiredCollector(dataConvectionCoefficients, ioFiles, UTSCNum);
         } else {
-            CalcPassiveTranspiredCollector(UTSCNum);
+            CalcPassiveTranspiredCollector(dataConvectionCoefficients, ioFiles, UTSCNum);
         }
 
         UpdateTranspiredCollector(UTSCNum);
@@ -288,7 +294,7 @@ namespace TranspiredCollector {
         int MaxNumNumbers;              // argumenet for call to GetObjectDefMaxArgs
         int Dummy;                      // argumenet for call to GetObjectDefMaxArgs
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int Found;
         int AlphaOffset; // local temp var
         std::string Roughness;
@@ -769,9 +775,7 @@ namespace TranspiredCollector {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
         int UTSCUnitNum;
-        static bool MySetPointCheckFlag(true);
         static Array1D_bool MyEnvrnFlag;
         int ControlNode;
         // unused  INTEGER             :: InletNode
@@ -870,7 +874,7 @@ namespace TranspiredCollector {
         UTSC(UTSCNum).UTSCCollEff = 0.0;
     }
 
-    void CalcActiveTranspiredCollector(int const UTSCNum)
+    void CalcActiveTranspiredCollector(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1075,7 +1079,7 @@ namespace TranspiredCollector {
             HMovInsul = 0.0;
             HExt = 0.0;
             LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
-            InitExteriorConvectionCoeff(
+            InitExteriorConvectionCoeff(dataConvectionCoefficients, ioFiles,
                 SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = Surface(SurfPtr).Construction;
             AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
@@ -1216,7 +1220,7 @@ namespace TranspiredCollector {
         }
     }
 
-    void CalcPassiveTranspiredCollector(int const UTSCNum)
+    void CalcPassiveTranspiredCollector(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1290,7 +1294,9 @@ namespace TranspiredCollector {
 
         // all the work is done in this routine located in GeneralRoutines.cc
 
-        CalcPassiveExteriorBaffleGap(UTSC(UTSCNum).SurfPtrs,
+        CalcPassiveExteriorBaffleGap(dataConvectionCoefficients,
+                                     ioFiles,
+                                     UTSC(UTSCNum).SurfPtrs,
                                      holeArea,
                                      UTSC(UTSCNum).Cv,
                                      UTSC(UTSCNum).Cd,

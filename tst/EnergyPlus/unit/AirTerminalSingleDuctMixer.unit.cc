@@ -56,27 +56,28 @@
 
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -351,7 +352,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.outputFiles);  // read schedules
+    ProcessScheduleInput(state.files);  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -599,7 +600,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -930,7 +931,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -1344,7 +1345,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -1757,7 +1758,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -2429,7 +2430,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -3108,7 +3109,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -4858,7 +4859,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -6612,7 +6613,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -6859,7 +6860,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -7096,7 +7097,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -7345,7 +7346,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
     SizingManager::GetOARequirements();
     SizingManager::GetZoneSizingInput();
     GetZoneEquipmentData1(state);
-    ZoneEquipmentManager::SetUpZoneSizingArrays(state, state.outputFiles);
+    ZoneEquipmentManager::SetUpZoneSizingArrays(state);
     GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     GetATMixers(state.dataZoneAirLoopEquipmentManager);
 
@@ -7536,14 +7537,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetFanCoilUnits(state);
 
@@ -7964,14 +7965,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.outputFiles); // read schedules
+    ProcessScheduleInput(state.files); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetFanCoilUnits(state);
     SystemAvailabilityManager::GetSysAvailManagerInputs();

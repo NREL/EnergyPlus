@@ -107,7 +107,7 @@ namespace PhotovoltaicThermalCollectors {
 
     Real64 const SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
-    static bool GetInputFlag(true); // First time, input is "gotten"
+    bool GetInputFlag(true); // First time, input is "gotten"
 
     int NumPVT(0); // count of all types of PVT in input file
 
@@ -153,7 +153,7 @@ namespace PhotovoltaicThermalCollectors {
 
         this->initialize(state.dataBranchInputManager, FirstHVACIteration);
         this->control();
-        this->calculate();
+        this->calculate(state.dataConvectionCoefficients, state.files);
         this->update();
     }
 
@@ -844,7 +844,7 @@ namespace PhotovoltaicThermalCollectors {
         }
     }
 
-    void PVTCollectorStruct::calculate()
+    void PVTCollectorStruct::calculate(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -947,7 +947,9 @@ namespace PhotovoltaicThermalCollectors {
                 Real64 HcExt(0.0);
                 Real64 HrSky(0.0);
 
-                ConvectionCoefficients::InitExteriorConvectionCoeff(this->SurfNum,
+                ConvectionCoefficients::InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                                                                    ioFiles,
+                                                                    this->SurfNum,
                                                                     0.0,
                                                                     DataHeatBalance::VerySmooth,
                                                                     this->Simple.SurfEmissivity,
