@@ -108,3 +108,8 @@ Change in Field 3 (A3): two more key values---Mode06 and Mode07---are added.
 Field 4 (N1) remains the same; however it is no longer the last field. See the newly added Field 5 (N2) below.
 
 Newly added Field 5 (N2): MaxAllowedDelTemp, supplied with minimu, maximum, and default values.
+
+# Object Change: `LifeCycleCost:UsePriceEscalation`
+
+The first field was changed from `LCC Price Escalation Name` to `Name` to conform with common conventions.
+Unicity of the Name is now enforced by the InputProcessor as a result.
