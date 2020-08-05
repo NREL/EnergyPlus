@@ -342,7 +342,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     DataLoopNode::Node(EAFanInletNode).MassFlowRateMaxAvail = 0.60215437; // exhaust fan will not turn on unless max avail is set
 
     SetPredefinedTables();
-    SimOutdoorAirUnit(state, 
+    SimOutdoorAirUnit(state,
         "ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
     EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA, OutAirUnit(OAUnitNum).OutAirVolFlow);
@@ -474,8 +474,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
 
         "ZoneHVAC:OutdoorAirUnit:EquipmentList,",
         "    OAUnitZone1EQLIST,       !- Name",
-        "    Coil:Cooling:Water,      !- Component 2 Object Type",
-        "    OAU Water Cooling Coil;  !- Component 2 Name",
+        "    Coil:Cooling:Water,      !- Component 1 Object Type",
+        "    OAU Water Cooling Coil;  !- Component 1 Name",
 
         "Fan:SystemModel,",
         "    Zone 1 OAU ExhFan,       !- Name",
