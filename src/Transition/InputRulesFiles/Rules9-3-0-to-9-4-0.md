@@ -113,3 +113,121 @@ Newly added Field 5 (N2): MaxAllowedDelTemp, supplied with minimu, maximum, and 
 
 The first field was changed from `LCC Price Escalation Name` to `Name` to conform with common conventions.
 Unicity of the Name is now enforced by the InputProcessor as a result.
+
+# epJSON extensible fields expanded
+
+The following objects will now have an `extension` defined, so will expect an array:
+
+```
+    'MaterialProperty:PhaseChange': 'temperature_enthalpies',
+    'MaterialProperty:VariableThermalConductivity': 'temperature_conductivities',
+    'MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm': 'isotherm_coordinates',
+    'MaterialProperty:HeatAndMoistureTransfer:Suction': 'suction_points',
+    'MaterialProperty:HeatAndMoistureTransfer:Redistribution': 'redistribution_points',
+    'MaterialProperty:HeatAndMoistureTransfer:Diffusion': 'data_pairs',
+    'MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity': 'thermal_coordinates',
+    'FenestrationSurface:Detailed': 'vertices',
+    'RoomAir:Node': 'surfaces',
+    'People': 'thermal_comfort_models',
+    'ComfortViewFactorAngles': 'anglefactors',
+    'AirflowNetwork:MultiZone:WindPressureCoefficientArray': 'wind_directions',
+    'AirflowNetwork:MultiZone:WindPressureCoefficientValues': 'wind_pressure_coefficients',
+    'ZoneControl:Thermostat:ThermalComfort': 'thermal_comfort_controls',
+    'ZoneHVAC:OutdoorAirUnit:EquipmentList': 'equipment',
+    'Coil:Cooling:DX:CurveFit:OperatingMode': 'speeds',
+    'Coil:Cooling:DX:MultiSpeed': 'speed_data',
+    'Coil:Heating:Gas:MultiStage': 'stage_data',
+    'Coil:Cooling:DX:VariableSpeed': 'speed_data',
+    'Coil:Heating:DX:VariableSpeed': 'speed_data',
+    'Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit': 'speed_data',
+    'Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit': 'speed_data',
+    'Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed': 'speed_data',
+    'AirLoopHVAC:ControllerList': 'controllers',
+    'AirLoopHVAC:OutdoorAirSystem:EquipmentList': 'equipment',
+    'ConnectorList': 'connectors',
+    'CentralHeatPumpSystem': 'modules',
+    'PlantEquipmentOperation:CoolingLoad': 'ranges',
+    'PlantEquipmentOperation:HeatingLoad': 'ranges',
+    'PlantEquipmentOperation:OutdoorDryBulb': 'ranges',
+    'PlantEquipmentOperation:OutdoorWetBulb': 'ranges',
+    'PlantEquipmentOperation:OutdoorRelativeHumidity': 'ranges',
+    'PlantEquipmentOperation:OutdoorDewpoint': 'ranges',
+    'PlantEquipmentOperation:OutdoorDryBulbDifference': 'ranges',
+    'PlantEquipmentOperation:OutdoorWetBulbDifference': 'ranges',
+    'PlantEquipmentOperation:OutdoorDewpointDifference': 'ranges',
+    'PlantEquipmentOperation:ComponentSetpoint': 'equipment_controls',
+    'CondenserEquipmentOperationSchemes': 'control_schemes',
+    'PlantEquipmentOperationSchemes': 'control_schemes',
+    'PlantEquipmentOperation:UserDefined': 'equipment',
+    'Generator:FuelSupply': 'constituents',
+    'FluidProperties:Temperatures': 'temperatures',
+    'FluidProperties:Saturated': 'properties',
+    'FluidProperties:Superheated': 'properties',
+    'FluidProperties:Concentration': 'properties',
+    'UtilityCost:Charge:Block': 'blocks',
+    'UtilityCost:Computation': 'compute_steps',
+    'OutputControl:SurfaceColorScheme': 'drawing_elements',
+```
+
+A `minItems` / `maxItems` property was added for these objects as appropriate, to put a lower/upper bound on the number of extensible groups accepted.
+
+For example, `FenestrationSurface:Detailed`:
+
+This object is similar to `BuildingSurface:Detailed` (which was already extensible) and other `XXX:Detailed` surface objects, in the sense that it accepts (X,Y,Z) vertex groups.
+But, this object only accepts either 3 or 4 vertices.
+
+Before you would define it in epJSON as:
+
+```
+    "FenestrationSurface:Detailed": {
+        "Perimeter_bot_ZN_1_Wall_South_Window": {
+            "building_surface_name": "Perimeter_bot_ZN_1_Wall_South",
+            "construction_name": "Window Non-res Fixed",
+            "multiplier": 1.0,
+            "number_of_vertices": 4,
+            "surface_type": "Window",
+            "vertex_1_x_coordinate": 0.0,
+            "vertex_1_y_coordinate": 0.0,
+            "vertex_1_z_coordinate": 2.3293,
+            "vertex_2_x_coordinate": 0.0,
+            "vertex_2_y_coordinate": 0.0,
+            "vertex_2_z_coordinate": 1.0213,
+            "vertex_3_x_coordinate": 10.0,
+            "vertex_3_y_coordinate": 0.2738,
+            "vertex_3_z_coordinate": 0.0,
+            "view_factor_to_ground": "Autocalculate"
+        },
+```
+
+Now in 9.4.0 you will define it as:
+
+```
+    "FenestrationSurface:Detailed": {
+        "Perimeter_bot_ZN_1_Wall_South_Window": {
+            "building_surface_name": "Perimeter_bot_ZN_1_Wall_South",
+            "construction_name": "Window Non-res Fixed",
+            "multiplier": 1.0,
+            "number_of_vertices": 4,
+            "surface_type": "Window",
+            "vertices" : [
+               {
+                    "vertex_x_coordinate": 0.0,
+                    "vertex_y_coordinate": 0.0,
+                    "vertex_z_coordinate": 2.3293
+                },
+                {
+                    "vertex_x_coordinate": 0.0,
+                    "vertex_y_coordinate": 0.0,
+                    "vertex_z_coordinate": 1.0213
+                },
+                {
+                    "vertex_x_coordinate": 10.0,
+                    "vertex_y_coordinate": 0.2738,
+                    "vertex_z_coordinate":  0.0
+                },
+             ],
+             "view_factor_to_ground": "Autocalculate"
+        },
+```
+
+
