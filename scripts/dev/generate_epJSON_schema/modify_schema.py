@@ -165,18 +165,18 @@ extension_renaming = {
     'PlantEquipmentOperation:UserDefined': 'equipment',
     'Generator:FuelSupply': 'constituents',
     'FluidProperties:Temperatures': 'temperatures',
-    'FluidProperties:Saturated': 'properties',
-    'FluidProperties:Superheated': 'properties',
-    'FluidProperties:Concentration': 'properties',
+    'FluidProperties:Saturated': 'saturated_properties',
+    'FluidProperties:Superheated': 'superheated_properties',
+    'FluidProperties:Concentration': 'concentration_properties',
     'UtilityCost:Charge:Block': 'blocks',
     'UtilityCost:Computation': 'compute_steps',
     'OutputControl:SurfaceColorScheme': 'drawing_elements',
+    'MaterialProperty:GlazingSpectralData': 'spectral_properties',
 }
 
 remaining_objects = [
     'Site:SpectrumData',
     'Schedule:Day:List',
-    'MaterialProperty:GlazingSpectralData',
     'ZoneThermalChimney',
 ]
 
