@@ -404,7 +404,7 @@ namespace OutdoorAirUnit {
         cNumericFields.allocate(MaxNums);
         lAlphaBlanks.dimension(MaxAlphas, true);
         lNumericBlanks.dimension(MaxNums, true);
-        cAlphaArgs.allocate(NumAlphas);
+        cAlphaArgs.allocate(MaxAlphas);
 
         CurrentModuleObject = CurrentModuleObjects(CO_OAUnit);
         NumOfOAUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject);

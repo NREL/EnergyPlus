@@ -5136,7 +5136,7 @@
     0;                       !- Annual escalation rate
 
   LifeCycleCost:UsePriceEscalation,
-    MidWest  Commercial-Electricity,  !- LCC Price Escalation Name
+    MidWest  Commercial-Electricity-Purchased,  !- LCC Price Escalation Name
     ElectricityPurchased,    !- Resource
     2012,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
@@ -5172,7 +5172,7 @@
     1.0774;                  !- <none>
 
   LifeCycleCost:UsePriceEscalation,
-    MidWest  Commercial-Electricity,  !- LCC Price Escalation Name
+    MidWest  Commercial-Electricity-SurplusSold,  !- LCC Price Escalation Name
     ElectricitySurplusSold,  !- Resource
     2012,                    !- Escalation Start Year
     January,                 !- Escalation Start Month

@@ -123,11 +123,61 @@ extension_renaming = {
     'AirLoopHVAC:DedicatedOutdoorAirSystem': 'airloophvacs',
     'PythonPlugin:Variables': 'global_py_vars',
     'Output:Diagnostics': 'diagnostics',
+    'MaterialProperty:PhaseChange': 'temperature_enthalpies',
+    'MaterialProperty:VariableThermalConductivity': 'temperature_conductivities',
+    'MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm': 'isotherm_coordinates',
+    'MaterialProperty:HeatAndMoistureTransfer:Suction': 'suction_points',
+    'MaterialProperty:HeatAndMoistureTransfer:Redistribution': 'redistribution_points',
+    'MaterialProperty:HeatAndMoistureTransfer:Diffusion': 'data_pairs',
+    'MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity': 'thermal_coordinates',
+    'FenestrationSurface:Detailed': 'vertices',
+    'RoomAir:Node': 'surfaces',
+    'People': 'thermal_comfort_models',
+    'ComfortViewFactorAngles': 'anglefactors',
+    'AirflowNetwork:MultiZone:WindPressureCoefficientArray': 'wind_directions',
+    'AirflowNetwork:MultiZone:WindPressureCoefficientValues': 'wind_pressure_coefficients',
+    'ZoneControl:Thermostat:ThermalComfort': 'thermal_comfort_controls',
+    'ZoneHVAC:OutdoorAirUnit:EquipmentList': 'equipment',
+    'Coil:Cooling:DX:CurveFit:OperatingMode': 'speeds',
+    'Coil:Cooling:DX:MultiSpeed': 'speed_data',
+    'Coil:Heating:Gas:MultiStage': 'stage_data',
+    'Coil:Cooling:DX:VariableSpeed': 'speed_data',
+    'Coil:Heating:DX:VariableSpeed': 'speed_data',
+    'Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit': 'speed_data',
+    'Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit': 'speed_data',
+    'Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed': 'speed_data',
+    'AirLoopHVAC:ControllerList': 'controllers',
+    'AirLoopHVAC:OutdoorAirSystem:EquipmentList': 'equipment',
+    'ConnectorList': 'connectors',
+    'CentralHeatPumpSystem': 'modules',
+    'PlantEquipmentOperation:CoolingLoad': 'ranges',
+    'PlantEquipmentOperation:HeatingLoad': 'ranges',
+    'PlantEquipmentOperation:OutdoorDryBulb': 'ranges',
+    'PlantEquipmentOperation:OutdoorWetBulb': 'ranges',
+    'PlantEquipmentOperation:OutdoorRelativeHumidity': 'ranges',
+    'PlantEquipmentOperation:OutdoorDewpoint': 'ranges',
+    'PlantEquipmentOperation:OutdoorDryBulbDifference': 'ranges',
+    'PlantEquipmentOperation:OutdoorWetBulbDifference': 'ranges',
+    'PlantEquipmentOperation:OutdoorDewpointDifference': 'ranges',
+    'PlantEquipmentOperation:ComponentSetpoint': 'equipment_controls',
+    'CondenserEquipmentOperationSchemes': 'control_schemes',
+    'PlantEquipmentOperationSchemes': 'control_schemes',
+    'PlantEquipmentOperation:UserDefined': 'equipment',
+    'Generator:FuelSupply': 'constituents',
+    'FluidProperties:Temperatures': 'temperatures',
+    'FluidProperties:Saturated': 'saturated_properties',
+    'FluidProperties:Superheated': 'superheated_properties',
+    'FluidProperties:Concentration': 'concentration_properties',
+    'UtilityCost:Charge:Block': 'blocks',
+    'UtilityCost:Computation': 'compute_steps',
+    'OutputControl:SurfaceColorScheme': 'drawing_elements',
+    'MaterialProperty:GlazingSpectralData': 'spectral_properties',
 }
+
 remaining_objects = [
     'Site:SpectrumData',
     'Schedule:Day:List',
-    'MaterialProperty:GlazingSpectralData',
+    'ZoneThermalChimney',
 ]
 
 
@@ -236,6 +286,45 @@ def add_explicit_extensible_bounds(schema):
         loc['required'] = ['lines']
     loc['properties']['lines']['minItems'] = 1
 
+def add_implicit_extensible_bounds(schema):
+    """
+    Parses the \min-fields \max-fields, and determines the bounds for the
+    number of extensible groups allowed and places that at root in
+    minItems/maxItems
+    """
+    for obj_name, obj_schema in schema['properties'].items():
+
+        if 'max_fields' in obj_schema:
+            if 'extensible_size' not in obj_schema:
+                raise RuntimeError(
+                    "max_fields without extensible_size makes no sense and "
+                    "should not happen. Object name = {}".format(obj_name))
+            if 'extension' not in obj_schema['legacy_idd']:
+                raise RuntimeError(
+                    "Cannot find 'extension' under 'legacy_idd' for "
+                    "Object name = {}".format(obj_name))
+            ext_name = obj_schema['legacy_idd']['extension']
+            n_exts = obj_schema['extensible_size']
+            n_regular_fields = len(obj_schema['legacy_idd']['fields'])
+            max_fields = obj_schema['max_fields']
+            get_schema_object(schema, obj_name)['properties'][ext_name]['maxItems'] = int((max_fields-n_regular_fields) / n_exts)
+            # obj_schema.pop('max_fields')
+        if 'min_fields' in obj_schema:
+            if not 'extensible_size' in obj_schema:
+                # Thats ok, skip it
+                continue
+            if 'extension' not in obj_schema['legacy_idd']:
+                # Thats ok, skip it
+                continue
+            ext_name = obj_schema['legacy_idd']['extension']
+            n_exts = obj_schema['extensible_size']
+            n_regular_fields = len(obj_schema['legacy_idd']['fields'])
+            min_fields = obj_schema['min_fields']
+            # minItems only if min-fields is greater than the number of regular
+            # fields
+            if (min_fields > n_regular_fields):
+                get_schema_object(schema, obj_name)['properties'][ext_name]['minItems'] = int((min_fields-n_regular_fields) / n_exts)
+            #obj_schema.pop('min_fields')
 
 def change_special_cased_name_fields(schema):
     original_name = schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['field_info'].pop('zone_terminal_unit_name')

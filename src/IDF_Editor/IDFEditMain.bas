@@ -1768,6 +1768,7 @@ Do While Not EOF(1)
               Case "SIMERGYONLY" '\SimergyOnly
               Case "NO-SEQUENCE" '\no-sequence
               Case "SURROGATE-NAME-FOR-SEQUENCE" '\surrogate-name-for-sequence
+              Case "MAX-FIELDS"  '\max-fields
               Case Else
                 invalidSlashCodesFound = True
                 invalidSlashCodeText = invalidSlashCodeText & vbCrLf & t

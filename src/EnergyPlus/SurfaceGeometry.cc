@@ -1310,7 +1310,7 @@ namespace SurfaceGeometry {
             ++MovedSurfs;
             Surface(MovedSurfs) = SurfaceTmp(SurfNum);
             SurfaceTmp(SurfNum).Class = SurfaceClass_Moved; //'Moved'
-            // Store list of moved surface numbers in reporting order 
+            // Store list of moved surface numbers in reporting order
             DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
         }
 
@@ -3974,11 +3974,6 @@ namespace SurfaceGeometry {
             ErrorsFound = true;
         }
 
-        if (SurfaceNumProp != 15) {
-            ShowSevereError(cCurrentModuleObject +
-                            ": Object Definition indicates > 15 Numeric Objects, Number Indicated=" + TrimSigDigits(SurfaceNumAlpha));
-            ErrorsFound = true;
-        }
         NeedToAddSurfaces = 0;
 
         for (Loop = 1; Loop <= TotHTSubs; ++Loop) {

@@ -173,42 +173,8 @@
     HPHeatingCAPFTemp5,      !- Speed 5 Heating Capacity Function of Temperature Curve Name
     HPACFFF,                 !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name
     HPHeatingEIRFTemp5,      !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
-    HPACFFF,                 !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
-    ,                        !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
-    ,                        !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
-    ,                        !- Speed 6 Heating Capacity Function of Temperature Curve Name
-    ,                        !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
-    ,                        !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
-    ,                        !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
-    ,                        !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
-    ,                        !- Speed 7 Heating Capacity Function of Temperature Curve Name
-    ,                        !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
-    ,                        !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
-    ,                        !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
-    ,                        !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
-    ,                        !- Speed 8 Heating Capacity Function of Temperature Curve Name
-    ,                        !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
-    ,                        !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
-    ,                        !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
-    ,                        !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
-    ,                        !- Speed 9 Heating Capacity Function of Temperature Curve Name
-    ,                        !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
-    ,                        !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
-    ,                        !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
-    ,                        !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
-    ,                        !- Speed 10 Heating Capacity Function of Temperature Curve Name
-    ,                        !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
-    ;                        !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    HPACFFF;                 !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
+
 
   Coil:Cooling:DX:VariableSpeed,
     Heat Pump ACDXCoil 1,    !- Name
@@ -271,67 +237,7 @@
     HPCoolingCAPFTemp4,      !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
     HPACFFF,                 !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPCoolingEIRFTemp4,      !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
-    HPACFFF,                 !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
-    ,                        !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    ,                        !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
-    ,                        !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
-    ,                        !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
-    ,                        !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
-    ,                        !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
-    ,                        !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
-    ,                        !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    ,                        !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
-    ,                        !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
-    ,                        !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
-    ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
-    ,                        !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
-    ,                        !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
-    ,                        !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
-    ,                        !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    ,                        !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
-    ,                        !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
-    ,                        !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
-    ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
-    ,                        !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
-    ,                        !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
-    ,                        !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
-    ,                        !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    ,                        !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
-    ,                        !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
-    ,                        !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
-    ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
-    ,                        !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
-    ,                        !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
-    ,                        !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
-    ,                        !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    ,                        !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
-    ,                        !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
-    ,                        !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
-    ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
-    ,                        !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
-    ,                        !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
-    ,                        !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
-    ,                        !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    ,                        !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
-    ,                        !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
-    ,                        !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
-    ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
-    ,                        !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
-    ,                        !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
-    ;                        !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    HPACFFF;                 !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
 ! 0.9997,  R Squared
 

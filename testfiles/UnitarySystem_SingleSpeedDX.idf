@@ -2448,8 +2448,7 @@
     AirCooled,               !- Condenser Type
     0,                       !- Nominal Evaporative Condenser Pump Power {W}
     1,                       !- Nominal Speed Number
-    Sys 1 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Speed 1 Name
-    ;                        !- Speed 2 Name
+    Sys 1 Furnace DX Cool Cooling Coil Speed 1 Performance;  !- Speed 1 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 1 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Name
@@ -2826,8 +2825,7 @@
     AirCooled,               !- Condenser Type
     0,                       !- Nominal Evaporative Condenser Pump Power {W}
     1,                       !- Nominal Speed Number
-    Sys 2 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Speed 1 Name
-    ;                        !- Speed 2 Name
+    Sys 2 Furnace DX Cool Cooling Coil Speed 1 Performance;  !- Speed 1 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 2 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Name
@@ -3191,8 +3189,7 @@
     AirCooled,               !- Condenser Type
     0,                       !- Nominal Evaporative Condenser Pump Power {W}
     1,                       !- Nominal Speed Number
-    Sys 3 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Speed 1 Name
-    ;                        !- Speed 2 Name
+    Sys 3 Heat Pump Air Source Cooling Coil Speed 1 Performance;  !- Speed 1 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 3 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Name
@@ -3637,8 +3634,7 @@
     AirCooled,               !- Condenser Type
     0,                       !- Nominal Evaporative Condenser Pump Power {W}
     1,                       !- Nominal Speed Number
-    Sys 4 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Speed 1 Name
-    ;                        !- Speed 2 Name
+    Sys 4 Heat Pump Air Source Cooling Coil Speed 1 Performance;  !- Speed 1 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 4 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Name
@@ -4083,8 +4079,7 @@
     AirCooled,               !- Condenser Type
     0,                       !- Nominal Evaporative Condenser Pump Power {W}
     1,                       !- Nominal Speed Number
-    Sys 5 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Speed 1 Name
-    ;                        !- Speed 2 Name
+    Sys 5 Furnace DX Cool Cooling Coil Speed 1 Performance;  !- Speed 1 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 5 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Name
