@@ -293,27 +293,37 @@ def add_implicit_extensible_bounds(schema):
     minItems/maxItems
     """
     for obj_name, obj_schema in schema['properties'].items():
+
         if 'max_fields' in obj_schema:
-            if not 'extensible_size' in obj_schema:
+            if 'extensible_size' not in obj_schema:
                 raise RuntimeError(
                     "max_fields without extensible_size makes no sense and "
                     "should not happen. Object name = {}".format(obj_name))
+            if 'extension' not in obj_schema['legacy_idd']:
+                raise RuntimeError(
+                    "Cannot find 'extension' under 'legacy_idd' for "
+                    "Object name = {}".format(obj_name))
+            ext_name = obj_schema['legacy_idd']['extension']
             n_exts = obj_schema['extensible_size']
             n_regular_fields = len(obj_schema['legacy_idd']['fields'])
             max_fields = obj_schema['max_fields']
-            obj_schema['maxItems'] = int((max_fields-n_regular_fields) / n_exts)
+            get_schema_object(schema, obj_name)['properties'][ext_name]['maxItems'] = int((max_fields-n_regular_fields) / n_exts)
             # obj_schema.pop('max_fields')
         if 'min_fields' in obj_schema:
             if not 'extensible_size' in obj_schema:
                 # Thats ok, skip it
                 continue
+            if 'extension' not in obj_schema['legacy_idd']:
+                # Thats ok, skip it
+                continue
+            ext_name = obj_schema['legacy_idd']['extension']
             n_exts = obj_schema['extensible_size']
             n_regular_fields = len(obj_schema['legacy_idd']['fields'])
             min_fields = obj_schema['min_fields']
             # minItems only if min-fields is greater than the number of regular
             # fields
             if (min_fields > n_regular_fields):
-                obj_schema['minItems'] = int((min_fields-n_regular_fields) / n_exts)
+                get_schema_object(schema, obj_name)['properties'][ext_name]['minItems'] = int((min_fields-n_regular_fields) / n_exts)
             #obj_schema.pop('min_fields')
 
 def change_special_cased_name_fields(schema):
