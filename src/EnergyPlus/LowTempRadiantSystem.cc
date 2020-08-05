@@ -1631,15 +1631,18 @@ namespace LowTempRadiantSystem {
             
             if (this->SurfacePtr(SurfNum) == 0) continue; // invalid surface -- detected earlier
             
-            // check zone numbers--ok if they are not the same
-            if (Surface(this->SurfacePtr(SurfNum)).Zone != this->ZonePtr) {
-                ShowWarningError("A surface referenced in a Low Temperature Radiant System is not in same zone as the radiant system itself");
-                ShowContinueError("Surface = " + Surface(this->SurfacePtr(SurfNum)).Name);
-                ShowContinueError("Surface in Zone=" + DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Name +
-                                  " Radiant System in Zone = " + this->ZoneName);
-                ShowContinueError("Occurs in Low Temperature Radiant System = " + this->Name);
-                ShowContinueError("If this is intentionally a radiant system with surfaces in more than one thermal zone,");
-                ShowContinueError("then ignore this warning message.  Otherwise, check the surfaces in this radiant system.");
+            if (DataGlobals::DisplayExtraWarnings) {
+                // check zone numbers--ok if they are not the same
+                // group warning issued earlier, show detailed warning here
+                if (Surface(this->SurfacePtr(SurfNum)).Zone != this->ZonePtr) {
+                    ShowWarningError("A surface referenced in a Low Temperature Radiant System is not in same zone as the radiant system itself");
+                    ShowContinueError("Surface = " + Surface(this->SurfacePtr(SurfNum)).Name);
+                    ShowContinueError("Surface in Zone = " + DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Name +
+                        ". Radiant System in Zone = " + this->ZoneName);
+                    ShowContinueError("Occurs in Low Temperature Radiant System = " + this->Name);
+                    ShowContinueError("If this is intentionally a radiant system with surfaces in more than one thermal zone,");
+                    ShowContinueError("then ignore this warning message.  Otherwise, check the surfaces in this radiant system.");
+                }
             }
             
             // check zone multipliers--these must be the same

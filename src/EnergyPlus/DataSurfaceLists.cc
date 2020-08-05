@@ -215,6 +215,7 @@ namespace DataSurfaceLists {
                 }
 
                 SumOfAllFractions = 0.0;
+                bool showSameZoneWarning = true;
                 for (SurfNum = 1; SurfNum <= SurfList(Item).NumOfSurfaces; ++SurfNum) {
                     SurfList(Item).SurfName(SurfNum) = Alphas(SurfNum + 1);
                     SurfList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(SurfNum + 1), Surface);
@@ -228,8 +229,13 @@ namespace DataSurfaceLists {
                             ZoneForSurface = Surface(SurfList(Item).SurfPtr(SurfNum)).Zone;
                         }
                         if (SurfNum > 1) {
-                            if (ZoneForSurface != Surface(SurfList(Item).SurfPtr(SurfNum)).Zone) {
+                            if (ZoneForSurface != Surface(SurfList(Item).SurfPtr(SurfNum)).Zone && showSameZoneWarning) {
                                 ShowWarningError("Not all surfaces in same zone for " + CurrentModuleObject1 + " = " + SurfList(Item).Name);
+                                if (!DataGlobals::DisplayExtraWarnings) {
+                                    ShowContinueError("If this is intentionally a radiant system with surfaces in more than one thermal zone,");
+                                    ShowContinueError("then ignore this warning message.  Use Output:Diagnostics,DisplayExtraWarnings for more details.");
+                                }
+                                showSameZoneWarning = false;
                             }
                         }
                     }
