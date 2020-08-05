@@ -6545,3 +6545,230 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(windowAtticSkylight, DataSurfaces::AllSurfaceListReportOrder[38]);
     EXPECT_EQ(roofWestRoof, DataSurfaces::AllSurfaceListReportOrder[39]);
 }
+
+TEST_F(EnergyPlusFixture, DataSurfaces_FenestrationSurfaceDetailed_VerticesBounds_Min)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        " BuildingSurface:Detailed,",
+        "    Surface 3 - Rectangle,   !- Name",
+        "    Wall,                    !- Surface Type",
+        "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
+        "    Zone1,                   !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    ,                        !- Number of Vertices",
+        "    0.0, 0.0, 0.0,           !- X,Y,Z ==> Vertex 1 {m}",
+        "    1.0, 0.0, 0.0,           !- X,Y,Z ==> Vertex 2 {m}",
+        "    1.0, 0.0, 1.0,           !- X,Y,Z ==> Vertex 3 {m}",
+        "    0.0, 0.0, 1.0;           !- X,Y,Z ==> Vertex 4 {m}",
+
+        " FenestrationSurface:Detailed,",
+        "    Surface 4 - RectangularDoorWindow,    !- Name",
+        "    Window,                  !- Surface Type",
+        "    SINGLE PANE HW WINDOW,   !- Construction Name",
+        "    Surface 3 - Rectangle,   !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.0,                     !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    Autocalculate,           !- Number of Vertices",
+        "    0.2, 0.0, 0.2,           !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.8, 0.0, 0.2;           !- X,Y,Z ==> Vertex 2 {m}", // <== Too few vertices!
+
+        " Zone,",
+        "    Zone1,                   !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0.0,                     !- X Origin {m}",
+        "    0.0,                     !- Y Origin {m}",
+        "    0.0,                     !- Z Origin {m}",
+        "    ,                        !- Type",
+        "    ,                        !- Multiplier",
+        "    ,                        !- Ceiling Height {m}",
+        "    ,                        !- Volume {m3}",
+        "    ,                        !- Floor Area {m2}",
+        "    ,                        !- Zone Inside Convection Algorithm",
+        "    ,                        !- Zone Outside Convection Algorithm",
+        "    No;                      !- Part of Total Floor Area",
+
+        " Construction,",
+        "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Name",
+        "    MAT-CC05 4 HW CONCRETE,  !- Outside Layer",
+        "    CP02 CARPET PAD;         !- Layer 2",
+
+        " Material,",
+        "    MAT-CC05 4 HW CONCRETE,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.1016,                  !- Thickness {m}",
+        "    1.311,                   !- Conductivity {W/m-K}",
+        "    2240,                    !- Density {kg/m3}",
+        "    836.800000000001,        !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.85,                    !- Solar Absorptance",
+        "    0.85;                    !- Visible Absorptance",
+
+        " Material:NoMass,",
+        "    CP02 CARPET PAD,         !- Name",
+        "    Smooth,                  !- Roughness",
+        "    0.1,                     !- Thermal Resistance {m2-K/W}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.8,                     !- Solar Absorptance",
+        "    0.8;                     !- Visible Absorptance",
+
+        " Construction,",
+        "    SINGLE PANE HW WINDOW,   !- Name",
+        "    GLASS - CLEAR PLATE 1 / 4 IN;  !- Outside Layer",
+
+        " WindowMaterial:Glazing,",
+        "    GLASS - CLEAR PLATE 1 / 4 IN,  !- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    6.0000001E-03,           !- Thickness {m}",
+        "    0.7750000,               !- Solar Transmittance at Normal Incidence",
+        "    7.1000002E-02,           !- Front Side Solar Reflectance at Normal Incidence",
+        "    7.1000002E-02,           !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.8810000,               !- Visible Transmittance at Normal Incidence",
+        "    7.9999998E-02,           !- Front Side Visible Reflectance at Normal Incidence",
+        "    7.9999998E-02,           !- Back Side Visible Reflectance at Normal Incidence",
+        "    0,                       !- Infrared Transmittance at Normal Incidence",
+        "    0.8400000,               !- Front Side Infrared Hemispherical Emissivity",
+        "    0.8400000,               !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9000000;               !- Conductivity {W/m-K}",
+
+        "SurfaceConvectionAlgorithm:Inside,TARP;",
+
+        "SurfaceConvectionAlgorithm:Outside,DOE-2;",
+
+        "HeatBalanceAlgorithm,ConductionTransferFunction;",
+
+        "ZoneAirHeatBalanceAlgorithm,",
+        "    AnalyticalSolution;      !- Algorithm",
+
+    });
+
+    ASSERT_FALSE(process_idf(idf_objects, false)); // expect errors
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** <root>[FenestrationSurface:Detailed][Surface 4 - RectangularDoorWindow][vertices] - Array should contain no fewer than 3 elements."
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, DataSurfaces_FenestrationSurfaceDetailed_VerticesBounds_Max)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        " BuildingSurface:Detailed,",
+        "    Surface 3 - Rectangle,   !- Name",
+        "    Wall,                    !- Surface Type",
+        "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
+        "    Zone1,                   !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    ,                        !- Number of Vertices",
+        "    0.0, 0.0, 0.0,           !- X,Y,Z ==> Vertex 1 {m}",
+        "    1.0, 0.0, 0.0,           !- X,Y,Z ==> Vertex 2 {m}",
+        "    1.0, 0.0, 1.0,           !- X,Y,Z ==> Vertex 3 {m}",
+        "    0.0, 0.0, 1.0;           !- X,Y,Z ==> Vertex 4 {m}",
+
+        " FenestrationSurface:Detailed,",
+        "    Surface 4 - RectangularDoorWindow,    !- Name",
+        "    Window,                  !- Surface Type",
+        "    SINGLE PANE HW WINDOW,   !- Construction Name",
+        "    Surface 3 - Rectangle,   !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.0,                     !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    Autocalculate,           !- Number of Vertices",
+        "    0.2, 0.0, 0.2,           !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.8, 0.0, 0.2,           !- X,Y,Z ==> Vertex 2 {m}",
+        "    0.8, 0.0, 0.8,           !- X,Y,Z ==> Vertex 3 {m}",
+        "    0.1, 0.0, 0.8,           !- X,Y,Z ==> Vertex 4 {m}",
+        "    0.2, 0.0, 0.8;           !- X,Y,Z ==> Vertex 5 {m}", // <=== Too many vertices!
+
+        " Zone,",
+        "    Zone1,                   !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0.0,                     !- X Origin {m}",
+        "    0.0,                     !- Y Origin {m}",
+        "    0.0,                     !- Z Origin {m}",
+        "    ,                        !- Type",
+        "    ,                        !- Multiplier",
+        "    ,                        !- Ceiling Height {m}",
+        "    ,                        !- Volume {m3}",
+        "    ,                        !- Floor Area {m2}",
+        "    ,                        !- Zone Inside Convection Algorithm",
+        "    ,                        !- Zone Outside Convection Algorithm",
+        "    No;                      !- Part of Total Floor Area",
+
+        " Construction,",
+        "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Name",
+        "    MAT-CC05 4 HW CONCRETE,  !- Outside Layer",
+        "    CP02 CARPET PAD;         !- Layer 2",
+
+        " Material,",
+        "    MAT-CC05 4 HW CONCRETE,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.1016,                  !- Thickness {m}",
+        "    1.311,                   !- Conductivity {W/m-K}",
+        "    2240,                    !- Density {kg/m3}",
+        "    836.800000000001,        !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.85,                    !- Solar Absorptance",
+        "    0.85;                    !- Visible Absorptance",
+
+        " Material:NoMass,",
+        "    CP02 CARPET PAD,         !- Name",
+        "    Smooth,                  !- Roughness",
+        "    0.1,                     !- Thermal Resistance {m2-K/W}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.8,                     !- Solar Absorptance",
+        "    0.8;                     !- Visible Absorptance",
+
+        " Construction,",
+        "    SINGLE PANE HW WINDOW,   !- Name",
+        "    GLASS - CLEAR PLATE 1 / 4 IN;  !- Outside Layer",
+
+        " WindowMaterial:Glazing,",
+        "    GLASS - CLEAR PLATE 1 / 4 IN,  !- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    6.0000001E-03,           !- Thickness {m}",
+        "    0.7750000,               !- Solar Transmittance at Normal Incidence",
+        "    7.1000002E-02,           !- Front Side Solar Reflectance at Normal Incidence",
+        "    7.1000002E-02,           !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.8810000,               !- Visible Transmittance at Normal Incidence",
+        "    7.9999998E-02,           !- Front Side Visible Reflectance at Normal Incidence",
+        "    7.9999998E-02,           !- Back Side Visible Reflectance at Normal Incidence",
+        "    0,                       !- Infrared Transmittance at Normal Incidence",
+        "    0.8400000,               !- Front Side Infrared Hemispherical Emissivity",
+        "    0.8400000,               !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9000000;               !- Conductivity {W/m-K}",
+
+        "SurfaceConvectionAlgorithm:Inside,TARP;",
+
+        "SurfaceConvectionAlgorithm:Outside,DOE-2;",
+
+        "HeatBalanceAlgorithm,ConductionTransferFunction;",
+
+        "ZoneAirHeatBalanceAlgorithm,",
+        "    AnalyticalSolution;      !- Algorithm",
+
+    });
+
+    ASSERT_FALSE(process_idf(idf_objects, false)); // expect errors
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** <root>[FenestrationSurface:Detailed][Surface 4 - RectangularDoorWindow][vertices] - Array should contain no more than 4 elements."
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
