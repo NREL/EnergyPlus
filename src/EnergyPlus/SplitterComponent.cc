@@ -101,6 +101,7 @@ namespace SplitterComponent {
     // Public because Used by SimAirServingZones and the Direct Air Unit
     int NumSplitters(0); // The Number of Splitters found in the Input
     Array1D_bool CheckEquipName;
+    bool MyEnvrnFlag(true);
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
@@ -128,6 +129,7 @@ namespace SplitterComponent {
         NumSplitters = 0;
         CheckEquipName.deallocate();
         SplitterCond.deallocate();
+        MyEnvrnFlag = true;
     }
 
     void
@@ -226,7 +228,7 @@ namespace SplitterComponent {
         int NumNums;
         int NodeNum;
         int IOStat;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int NumParams;
         int OutNodeNum1;
         int OutNodeNum2;
@@ -390,7 +392,6 @@ namespace SplitterComponent {
         int OutletNode;
         int NodeNum;
         Real64 AirEnthalpy; // [J/kg]
-        static bool MyEnvrnFlag(true);
 
         // FLOW:
 

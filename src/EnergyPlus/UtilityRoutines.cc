@@ -66,7 +66,7 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include "IOFiles.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -101,12 +101,12 @@ namespace EnergyPlus {
 namespace UtilityRoutines {
     bool outputErrorHeader(true);
     ObjexxFCL::gio::Fmt fmtLD("*");
-    ObjexxFCL::gio::Fmt fmtA("(A)");
     std::string appendPerfLog_headerRow("");
     std::string appendPerfLog_valuesRow("");
 
     void clear_state()
     {
+        outputErrorHeader = true;
         appendPerfLog_headerRow = "";
         appendPerfLog_valuesRow = "";
     }
@@ -663,7 +663,6 @@ namespace UtilityRoutines {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
         static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -672,7 +671,6 @@ namespace UtilityRoutines {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int tempfl;
         std::string NumWarnings;
         std::string NumSevere;
         std::string NumWarningsDuringWarmup;
@@ -684,7 +682,6 @@ namespace UtilityRoutines {
         Real64 Seconds; // Elapsed Time Second Reporting
         bool ErrFound;
         bool TerminalError;
-        int write_stat;
 
         if (sqlite) {
             sqlite->updateSQLiteSimulationRecord(true, false);
@@ -695,13 +692,13 @@ namespace UtilityRoutines {
             AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
 
             ShowMessage("Fatal error -- final processing.  More error messages may appear.");
-            SetupNodeVarsForReporting(state.outputFiles);
+            SetupNodeVarsForReporting(state.files);
 
             ErrFound = false;
             TerminalError = false;
-            TestBranchIntegrity(state.dataBranchInputManager, state.outputFiles, ErrFound);
+            TestBranchIntegrity(state.dataBranchInputManager, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
-            TestAirPathIntegrity(state, state.outputFiles, ErrFound);
+            TestAirPathIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
             CheckMarkedNodes(ErrFound);
             if (ErrFound) TerminalError = true;
@@ -711,8 +708,8 @@ namespace UtilityRoutines {
             if (ErrFound) TerminalError = true;
 
             if (!TerminalError) {
-                ReportAirLoopConnections(state.outputFiles);
-                ReportLoopConnections(state.outputFiles);
+                ReportAirLoopConnections(state.files);
+                ReportLoopConnections(state.files);
             }
 
         } else if (!ExitDuringSimulations) {
@@ -721,14 +718,14 @@ namespace UtilityRoutines {
         }
 
         if (AskForSurfacesReport) {
-            ReportSurfaces(state.outputFiles);
+            ReportSurfaces(state.files);
         }
 
         ReportSurfaceErrors();
         CheckPlantOnAbort();
         ShowRecurringErrors();
         SummarizeErrors();
-        CloseMiscOpenFiles(state.outputFiles);
+        CloseMiscOpenFiles(state.files);
         NumWarnings = fmt::to_string(TotalWarningErrors);
         NumSevere = fmt::to_string(TotalSevereErrors);
         NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
@@ -750,7 +747,6 @@ namespace UtilityRoutines {
         Elapsed_Time -= Minutes * 60.0;
         Seconds = Elapsed_Time;
         if (Seconds < 0.0) Seconds = 0.0;
-        static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
         ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
@@ -765,45 +761,43 @@ namespace UtilityRoutines {
         ShowMessage("EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
                     " Severe Errors; Elapsed Time=" + Elapsed);
         DisplayString("EnergyPlus Run Time=" + Elapsed);
-        tempfl = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
-            write_stat = flags.ios();
-        }
-        if (write_stat != 0) {
-            DisplayString("AbortEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write).");
-        }
-        ObjexxFCL::gio::write(tempfl, fmtLD) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
-                                                    " Severe Errors; Elapsed Time=" + Elapsed;
 
-        ObjexxFCL::gio::close(tempfl);
+        {
+            auto tempfl = state.files.endFile.try_open();
+
+            if (!tempfl.good()) {
+                DisplayString("AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+            }
+            print(tempfl,
+                  "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n",
+                  NumWarnings,
+                  NumSevere,
+                  Elapsed);
+        }
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles();
+        SimulationManager::OpenOutputJsonFiles(state.files.json);
 
         if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports();
+            ResultsFramework::OutputSchema->writeTimeSeriesReports(state.files.json);
         }
 
         if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport();
+            ResultsFramework::OutputSchema->WriteReport(state.files.json);
         }
 
 #ifdef EP_Detailed_Timings
-        epSummaryTimes(Time_Finish - Time_Start);
+        epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
 #endif
         std::cerr << "Program terminated: "
                   << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
-        CloseOutOpenFiles();
         // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
         // indicating that E+ terminated with an error.
         if (NumExternalInterfaces > 0) CloseSocket(-1);
         return EXIT_FAILURE;
     }
 
-    void CloseMiscOpenFiles(OutputFiles &outputFiles)
+    void CloseMiscOpenFiles(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -843,82 +837,17 @@ namespace UtilityRoutines {
         //      INTEGER :: UnitNumber
         //      INTEGER :: ios
 
-        CloseReportIllumMaps(outputFiles);
-        CloseDFSFile(outputFiles);
+        CloseReportIllumMaps(ioFiles);
+        CloseDFSFile(ioFiles);
 
-        if (DebugOutput || outputFiles.debug.position() > 0) {
-            outputFiles.debug.close();
+        if (DebugOutput || ioFiles.debug.position() > 0) {
+            ioFiles.debug.close();
         } else {
-            outputFiles.debug.del();
+            ioFiles.debug.del();
         }
     }
 
-    void CloseOutOpenFiles()
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   April 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine scans potential unit numbers and closes
-        // any that are still open.
-
-        // METHODOLOGY EMPLOYED:
-        // Use INQUIRE to determine if file is open.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxUnitNumber(1000);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        bool exists;
-        bool opened;
-        std::string name;
-        const std::string stdin_name("stdin");
-        const std::string stdout_name("stdout");
-        const std::string stderr_name("stderr");
-        bool not_special(false);
-        int UnitNumber;
-        int ios;
-
-        for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(UnitNumber, flags);
-                exists = flags.exists();
-                opened = flags.open();
-                ios = flags.ios();
-                name = flags.name();
-            }
-            if (exists && opened && ios == 0) {
-                not_special = name.compare(stdin_name) != 0;
-                not_special = not_special && (name.compare(stdout_name) != 0);
-                not_special = not_special && (name.compare(stderr_name) != 0);
-                if (not_special) ObjexxFCL::gio::close(UnitNumber);
-            }
-        }
-    }
-
-    int EndEnergyPlus(OutputFiles &outputFiles)
+    int EndEnergyPlus(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -954,8 +883,6 @@ namespace UtilityRoutines {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
-        static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
 
         // INTERFACE BLOCK SPECIFICATIONS
 
@@ -963,18 +890,15 @@ namespace UtilityRoutines {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int tempfl;
         std::string NumWarnings;
         std::string NumSevere;
         std::string NumWarningsDuringWarmup;
         std::string NumSevereDuringWarmup;
         std::string NumWarningsDuringSizing;
         std::string NumSevereDuringSizing;
-        std::string Elapsed;
         int Hours;      // Elapsed Time Hour Reporting
         int Minutes;    // Elapsed Time Minute Reporting
         Real64 Seconds; // Elapsed Time Second Reporting
-        int write_stat;
 
         if (sqlite) {
             sqlite->updateSQLiteSimulationRecord(true, true);
@@ -983,7 +907,7 @@ namespace UtilityRoutines {
         ReportSurfaceErrors();
         ShowRecurringErrors();
         SummarizeErrors();
-        CloseMiscOpenFiles(outputFiles);
+        CloseMiscOpenFiles(ioFiles);
         NumWarnings = RoundSigDigits(TotalWarningErrors);
         strip(NumWarnings);
         NumSevere = RoundSigDigits(TotalSevereErrors);
@@ -1012,7 +936,7 @@ namespace UtilityRoutines {
         Elapsed_Time -= Minutes * 60.0;
         Seconds = Elapsed_Time;
         if (Seconds < 0.0) Seconds = 0.0;
-        ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
+        const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
         ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
         ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
@@ -1030,216 +954,34 @@ namespace UtilityRoutines {
                     " Severe Errors.");
         ShowMessage("EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
         DisplayString("EnergyPlus Run Time=" + Elapsed);
-        tempfl = GetNewUnitNumber();
+
         {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
-            write_stat = flags.ios();
+            auto tempfl = ioFiles.endFile.try_open();
+            if (!tempfl.good()) {
+                DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+            }
+            print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
         }
-        if (write_stat != 0) {
-            DisplayString("EndEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write).");
-        }
-        ObjexxFCL::gio::write(tempfl, fmtA) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere +
-                                                   " Severe Errors; Elapsed Time=" + Elapsed;
-        ObjexxFCL::gio::close(tempfl);
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles();
+        SimulationManager::OpenOutputJsonFiles(ioFiles.json);
 
         if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports();
+            ResultsFramework::OutputSchema->writeTimeSeriesReports(ioFiles.json);
         }
 
         if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport();
+            ResultsFramework::OutputSchema->WriteReport(ioFiles.json);
         }
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(Time_Finish - Time_Start);
 #endif
         std::cerr << "EnergyPlus Completed Successfully." << std::endl;
-        CloseOutOpenFiles();
         // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
         // indicating that E+ finished its simulation
         if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
         return EXIT_SUCCESS;
-    }
-
-    int GetNewUnitNumber()
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie, adapted from reference
-        //       DATE WRITTEN   September 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns a unit number of a unit that can exist and is not connected.  Note
-        // this routine does not magically mark that unit number in use.  In order to
-        // have the unit "used", the source code must OPEN the file.
-
-        // METHODOLOGY EMPLOYED:
-        // Use Inquire function to find out if proposed unit: exists or is opened.
-        // If not, can be used for a new unit number.
-
-        // REFERENCES:
-        // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
-        // Developed at Unicomp, Inc.
-        // Permission to use, copy, modify, and distribute this
-        // software is freely granted, provided that this notice
-        // is preserved.
-
-        // USE STATEMENTS:
-        // na
-
-        //	// Return value
-        //	int UnitNumber; // Result from scanning currently open files
-        //
-        //	// Locals
-        //	// FUNCTION ARGUMENT DEFINITIONS:
-        //
-        //	// FUNCTION PARAMETER DEFINITIONS:
-        //	//  IO Status Values:
-        //
-        //	int const END_OF_RECORD( -2 );
-        //	int const END_OF_FILE( -1 );
-        //
-        //	//  Indicate default input and output units:
-        //
-        //	int const DEFAULT_INPUT_UNIT( 5 );
-        //	int const DEFAULT_OUTPUT_UNIT( 6 );
-        //
-        //	//  Indicate number and value of preconnected units
-        //
-        //	int const NUMBER_OF_PRECONNECTED_UNITS( 2 );
-        //	static Array1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
-        //
-        //	//  Largest allowed unit number (or a large number, if none)
-        //	int const MaxUnitNumber( 1000 );
-        //
-        //	// INTERFACE BLOCK SPECIFICATIONS
-        //	// na
-        //
-        //	// DERIVED TYPE DEFINITIONS
-        //	// na
-        //
-        //	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-        //	bool exists; // File exists
-        //	bool opened; // Unit is open
-        //	int ios; // return value from Inquire intrinsic
-        //
-        //	for ( UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber ) {
-        //		if ( UnitNumber == DEFAULT_INPUT_UNIT || UnitNumber == DEFAULT_OUTPUT_UNIT ) continue;
-        //		if ( any_eq( UnitNumber, PRECONNECTED_UNITS ) ) continue;
-        //		{ IOFlags flags; ObjexxFCL::gio::inquire( UnitNumber, flags ); exists = flags.exists(); opened = flags.open(); ios =
-        //flags.ios(); } 		if ( exists && ! opened && ios == 0 ) return UnitNumber; // result is set in UnitNumber
-        //	}
-        //
-        //	UnitNumber = -1;
-        //
-        //	return UnitNumber;
-
-        return ObjexxFCL::gio::get_unit(); // Autodesk:Note ObjexxFCL::gio system provides this (and protects the F90+ preconnected units
-                                           // {100,101,102})
-    }
-
-    int FindUnitNumber(std::string const &FileName) // File name to be searched.
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   September 1997, adapted from reference
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns a unit number for the file name that is either opened or exists.
-
-        // METHODOLOGY EMPLOYED:
-        // Use Inquire function to find out if proposed unit: exists or is opened.
-        // If not, can be used for a new unit number.
-
-        // REFERENCES:
-        // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
-        // Developed at Unicomp, Inc.
-        // Permission to use, copy, modify, and distribute this
-        // software is freely granted, provided that this notice
-        // is preserved.
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        int UnitNumber; // Unit number that should be used
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  Largest allowed unit number (or a large number, if none)
-        int const MaxUnitNumber(1000);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::string TestFileName; // File name returned from opened file
-        bool exists;              // True if file already exists
-        bool opened;              // True if file is open
-        int ios;                  // Status indicator from INQUIRE intrinsic
-
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(FileName, flags);
-            exists = flags.exists();
-            opened = flags.open();
-            ios = flags.ios();
-        }
-        if (!opened) {
-            UnitNumber = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.POSITION("APPEND");
-                ObjexxFCL::gio::open(UnitNumber, FileName, flags);
-                ios = flags.ios();
-            }
-            if (ios != 0) {
-                DisplayString("FindUnitNumber: Could not open file \"" + FileName + "\" for append.");
-            }
-        } else {
-            std::string::size_type const FileNameLength = len(FileName);
-            std::string::size_type TestFileLength;
-            std::string::size_type Pos; // Position pointer
-            for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-                // Skip preassigned units - ObjexxFCL::gio::inquire breaks std::cout on Windows - these units are assigned in objexx\GlobalStreams
-                // constructor
-                if ((UnitNumber == 0) || (UnitNumber == 5) || (UnitNumber == 6) || (UnitNumber == 100) || (UnitNumber == 101) ||
-                    (UnitNumber == 102)) {
-                    continue;
-                }
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::inquire(UnitNumber, flags);
-                    TestFileName = flags.name();
-                    opened = flags.open();
-                }
-                //  Powerstation returns just file name
-                //  DVF (Digital Fortran) returns whole path
-                TestFileLength = len(TestFileName);
-                Pos = index(TestFileName, FileName);
-                if (Pos != std::string::npos) {
-                    //  Must be the last part of the file
-                    if (Pos + FileNameLength == TestFileLength) break;
-                }
-            }
-        }
-
-        return UnitNumber;
     }
 
     void ConvertCaseToUpper(std::string const &InputString, // Input string
@@ -2072,9 +1814,7 @@ namespace UtilityRoutines {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CacheIPErrorFile;
         using DataGlobals::DoingInputProcessing;
-        using DataGlobals::err_stream;
         using DataStringGlobals::IDDVerString;
         using DataStringGlobals::VerString;
 
@@ -2092,15 +1832,29 @@ namespace UtilityRoutines {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
+        auto *err_stream = []() -> std::ostream *{
+            // NOTE: this is called in too many places to justify changing the interface right now,
+            // so we are using the Singleton (not ideal)
+            if (IOFiles::hasSingleton()) {
+                return IOFiles::getSingleton().err_stream.get();
+            } else {
+                return nullptr;
+            }
+        }();
+
+
         if (UtilityRoutines::outputErrorHeader && err_stream) {
             *err_stream << "Program Version," + VerString + ',' + IDDVerString + DataStringGlobals::NL;
             UtilityRoutines::outputErrorHeader = false;
         }
 
         if (!DoingInputProcessing) {
-            if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
+           if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
         } else {
-            ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
+            // CacheIPErrorFile is never opened or closed
+            // so this output would just go to stdout
+            // ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
+            std::cout << ErrorMessage << '\n';
         }
         if (present(OutUnit1)) {
             print(OutUnit1(), "  {}", ErrorMessage);

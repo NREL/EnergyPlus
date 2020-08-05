@@ -51,13 +51,13 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
@@ -66,6 +66,7 @@
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
@@ -762,7 +763,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         case DataAirSystems::structArrayLegacyFanModels: {
             int locFanTypeNum(0);
             bool errorsFound(false);
-            Fans::GetFanType(state.fans, c->fanAssociatedWithCoilName, locFanTypeNum, errorsFound);
+            Fans::GetFanType(state, c->fanAssociatedWithCoilName, locFanTypeNum, errorsFound);
             if (locFanTypeNum == DataHVACGlobals::FanType_SimpleConstVolume) {
                 c->fanTypeName = "Fan:ConstantVolume";
             } else if (locFanTypeNum == DataHVACGlobals::FanType_SimpleVAV) {
@@ -775,9 +776,9 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
                 c->fanTypeName = "Fan:ComponentModel";
             }
             if (c->supFanNum <= 0) {
-                Fans::GetFanIndex(state.fans, c->fanAssociatedWithCoilName, c->supFanNum, errorsFound, c->fanTypeName);
+                Fans::GetFanIndex(state, c->fanAssociatedWithCoilName, c->supFanNum, errorsFound, c->fanTypeName);
             }
-            c->fanSizeMaxAirVolumeFlow = Fans::GetFanDesignVolumeFlowRate(state.fans, c->fanTypeName, c->fanAssociatedWithCoilName, errorsFound, c->supFanNum);
+            c->fanSizeMaxAirVolumeFlow = Fans::GetFanDesignVolumeFlowRate(state, c->fanTypeName, c->fanAssociatedWithCoilName, errorsFound, c->supFanNum);
             c->fanSizeMaxAirMassFlow = Fans::Fan(c->supFanNum).MaxAirMassFlowRate;
             break;
         }
@@ -1816,7 +1817,7 @@ void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state, std::strin
     if (fanEnumType == DataAirSystems::structArrayLegacyFanModels) {
         if (fanIndex <= 0) {
             bool errorsFound(false);
-            Fans::GetFanIndex(state.fans, fanName, locFanIndex, errorsFound);
+            Fans::GetFanIndex(state, fanName, locFanIndex, errorsFound, ObjexxFCL::Optional_string_const());
         } else {
             locFanIndex = fanIndex;
         }

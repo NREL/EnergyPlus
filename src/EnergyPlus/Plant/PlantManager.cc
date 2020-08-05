@@ -974,7 +974,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "WaterUse:Connections")) {
                                 this_comp.TypeOf_Num = TypeOf_WaterUseConnection;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
-                                this_comp.compPtr = WaterUse::WaterConnectionsType::factory(CompNames(CompNum));
+                                this_comp.compPtr = WaterUse::WaterConnectionsType::factory(state.dataWaterUse, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:Water")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
@@ -1106,20 +1106,20 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "CoolingTower:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_SingleSpd;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-                                this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(CompNames(CompNum));
+                                this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(state.dataCondenserLoopTowers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CoolingTower:TwoSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_TwoSpd;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-                                this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(CompNames(CompNum));
+                                this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(state.dataCondenserLoopTowers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CoolingTower:VariableSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_VarSpd;
-                                this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(CompNames(CompNum));
+                                this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(state.dataCondenserLoopTowers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CoolingTower:VariableSpeed:Merkel")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_VarSpdMerkel;
-                                this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(CompNames(CompNum));
+                                this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(state.dataCondenserLoopTowers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:FuelCell:ExhaustGasToWaterHeatExchanger")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_FCExhaust;
-                                this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory_exhaust(CompNames(CompNum));
+                                this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory_exhaust(state.files, CompNames(CompNum));
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
@@ -1250,7 +1250,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = CTElectricGenerator::CTGeneratorData::factory(CompNames(CompNum));
+                                this_comp.compPtr = CTElectricGenerator::CTGeneratorData::factory(state.dataCTElectricGenerator, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroCHP")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_MicroCHP;
                                 if (LoopSideNum == DemandSide) {
@@ -1258,10 +1258,10 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(CompNames(CompNum));
+                                this_comp.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state.files, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:FuelCell:StackCooler")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_FCStackCooler;
-                                this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory(CompNames(CompNum));
+                                this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory(state.files, CompNames(CompNum));
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {

@@ -75,6 +75,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
@@ -391,12 +392,12 @@ namespace EnergyPlus {
                 // Write eio header
                 static constexpr auto DomainCellsToEIOHeader(
                     "! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells\n");
-                print(state.outputFiles.eio, DomainCellsToEIOHeader);
+                print(state.files.eio, DomainCellsToEIOHeader);
 
                 // Write eio data
                 for (auto &thisDomain : domains) {
                     static constexpr auto DomainCellsToEIO("{},{:5},{:5},{:5}\n");
-                    print(state.outputFiles.eio,
+                    print(state.files.eio,
                           DomainCellsToEIO,
                           thisDomain.Name,
                           thisDomain.NumDomainCells,
@@ -896,7 +897,7 @@ namespace EnergyPlus {
                 // Get slab material properties
                 if (thisDomain.SlabInGradeFlag) {
                     thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
-                                                                                 DataHeatBalance::Material,
+                                                                                 dataMaterial.Material,
                                                                                  DataHeatBalance::TotMaterials);
                     if (thisDomain.SlabMaterialNum == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
@@ -904,12 +905,12 @@ namespace EnergyPlus {
                         ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.SlabThickness = DataHeatBalance::Material(thisDomain.SlabMaterialNum).Thickness;
-                        thisDomain.SlabProperties.Density = DataHeatBalance::Material(
+                        thisDomain.SlabThickness = dataMaterial.Material(thisDomain.SlabMaterialNum).Thickness;
+                        thisDomain.SlabProperties.Density = dataMaterial.Material(
                                 thisDomain.SlabMaterialNum).Density;
-                        thisDomain.SlabProperties.SpecificHeat = DataHeatBalance::Material(
+                        thisDomain.SlabProperties.SpecificHeat = dataMaterial.Material(
                                 thisDomain.SlabMaterialNum).SpecHeat;
-                        thisDomain.SlabProperties.Conductivity = DataHeatBalance::Material(
+                        thisDomain.SlabProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.SlabMaterialNum).Conductivity;
                     }
                 }
@@ -931,7 +932,7 @@ namespace EnergyPlus {
                 // Get horizontal insulation material properties
                 if (thisDomain.HorizInsPresentFlag) {
                     thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(8),
-                                                                                     DataHeatBalance::Material,
+                                                                                     dataMaterial.Material,
                                                                                      DataHeatBalance::TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + "=" +
@@ -939,13 +940,13 @@ namespace EnergyPlus {
                         ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.HorizInsThickness = DataHeatBalance::Material(
+                        thisDomain.HorizInsThickness = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Thickness;
-                        thisDomain.HorizInsProperties.Density = DataHeatBalance::Material(
+                        thisDomain.HorizInsProperties.Density = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Density;
-                        thisDomain.HorizInsProperties.SpecificHeat = DataHeatBalance::Material(
+                        thisDomain.HorizInsProperties.SpecificHeat = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).SpecHeat;
-                        thisDomain.HorizInsProperties.Conductivity = DataHeatBalance::Material(
+                        thisDomain.HorizInsProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                             ErrorsFound = true;
@@ -988,7 +989,7 @@ namespace EnergyPlus {
                 // Get vertical insulation material properties
                 if (thisDomain.VertInsPresentFlag) {
                     thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(11),
-                                                                                    DataHeatBalance::Material,
+                                                                                    dataMaterial.Material,
                                                                                     DataHeatBalance::TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" +
@@ -996,13 +997,13 @@ namespace EnergyPlus {
                         ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.VertInsThickness = DataHeatBalance::Material(
+                        thisDomain.VertInsThickness = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Thickness;
-                        thisDomain.VertInsProperties.Density = DataHeatBalance::Material(
+                        thisDomain.VertInsProperties.Density = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Density;
-                        thisDomain.VertInsProperties.SpecificHeat = DataHeatBalance::Material(
+                        thisDomain.VertInsProperties.SpecificHeat = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).SpecHeat;
-                        thisDomain.VertInsProperties.Conductivity = DataHeatBalance::Material(
+                        thisDomain.VertInsProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                             ErrorsFound = true;
@@ -1327,7 +1328,7 @@ namespace EnergyPlus {
                 // Get horizontal insulation material properties
                 if (thisDomain.HorizInsPresentFlag) {
                     thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
-                                                                                     DataHeatBalance::Material,
+                                                                                     dataMaterial.Material,
                                                                                      DataHeatBalance::TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
@@ -1335,13 +1336,13 @@ namespace EnergyPlus {
                         ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.HorizInsThickness = DataHeatBalance::Material(
+                        thisDomain.HorizInsThickness = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Thickness;
-                        thisDomain.HorizInsProperties.Density = DataHeatBalance::Material(
+                        thisDomain.HorizInsProperties.Density = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Density;
-                        thisDomain.HorizInsProperties.SpecificHeat = DataHeatBalance::Material(
+                        thisDomain.HorizInsProperties.SpecificHeat = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).SpecHeat;
-                        thisDomain.HorizInsProperties.Conductivity = DataHeatBalance::Material(
+                        thisDomain.HorizInsProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                             ErrorsFound = true;
@@ -1389,7 +1390,7 @@ namespace EnergyPlus {
                         ErrorsFound = true;
                     }
                     thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(10),
-                                                                                    DataHeatBalance::Material,
+                                                                                    dataMaterial.Material,
                                                                                     DataHeatBalance::TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" +
@@ -1397,13 +1398,13 @@ namespace EnergyPlus {
                         ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.VertInsThickness = DataHeatBalance::Material(
+                        thisDomain.VertInsThickness = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Thickness;
-                        thisDomain.VertInsProperties.Density = DataHeatBalance::Material(
+                        thisDomain.VertInsProperties.Density = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Density;
-                        thisDomain.VertInsProperties.SpecificHeat = DataHeatBalance::Material(
+                        thisDomain.VertInsProperties.SpecificHeat = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).SpecHeat;
-                        thisDomain.VertInsProperties.Conductivity = DataHeatBalance::Material(
+                        thisDomain.VertInsProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                             ErrorsFound = true;
@@ -1477,7 +1478,7 @@ namespace EnergyPlus {
         bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
                                             int const MaterialNum) {
 
-            if ( (MaterialThickness <= 0.0) || (DataHeatBalance::Material(MaterialNum).ROnly) ) {
+            if ( (MaterialThickness <= 0.0) || (dataMaterial.Material(MaterialNum).ROnly) ) {
                 return true;
             } else {
                 return false;

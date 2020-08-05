@@ -243,11 +243,11 @@ namespace CurveManager {
     {
     public:
         TableFile() = default;
-        TableFile(std::string path);
+        TableFile(IOFiles &ioFiles, std::string path);
         std::string filePath;
         std::vector<std::vector<std::string>> contents;
         std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
-        void load(std::string path);
+        void load(IOFiles &ioFiles, std::string path);
         std::vector<double>& getArray(std::pair<std::size_t, std::size_t> colAndRow);
 
     private:

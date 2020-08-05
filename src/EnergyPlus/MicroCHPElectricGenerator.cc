@@ -112,6 +112,8 @@ namespace MicroCHPElectricGenerator {
     Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput;
 
     bool getMicroCHPInputFlag(true);
+    bool MyOneTimeFlag(true);
+    bool MyEnvrnFlag(true);
 
     void clear_state()
     {
@@ -120,13 +122,15 @@ namespace MicroCHPElectricGenerator {
         getMicroCHPInputFlag = true;
         MicroCHP.deallocate();
         MicroCHPParamInput.deallocate();
+        MyOneTimeFlag = true; // probably not needed
+        MyEnvrnFlag = true;
     }
 
-    PlantComponent *MicroCHPDataStruct::factory(std::string const &objectName)
+    PlantComponent *MicroCHPDataStruct::factory(IOFiles &ioFiles, std::string const &objectName)
     {
         // Process the input data
         if (getMicroCHPInputFlag) {
-            GetMicroCHPGeneratorInput();
+            GetMicroCHPGeneratorInput(ioFiles);
             getMicroCHPInputFlag = false;
         }
 
@@ -142,7 +146,7 @@ namespace MicroCHPElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GetMicroCHPGeneratorInput()
+    void GetMicroCHPGeneratorInput(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brent Griffith
@@ -160,13 +164,12 @@ namespace MicroCHPElectricGenerator {
         int IOStat;                     // IO Status when calling get input subroutine
         Array1D_string AlphArray(25);   // character string data
         Array1D<Real64> NumArray(200);  // numeric data TODO deal with allocatable for extensible
-        static bool ErrorsFound(false); // error flag
-        static bool MyOneTimeFlag(true);
+        bool ErrorsFound(false); // error flag
 
         if (MyOneTimeFlag) {
 
             // call to Fuel supply module to set up data there.
-            GeneratorFuelSupply::GetGeneratorFuelSupplyInput();
+            GeneratorFuelSupply::GetGeneratorFuelSupplyInput(ioFiles);
 
             // First get the Micro CHP Parameters so they can be nested in structure later
             DataIPShortCuts::cCurrentModuleObject = "Generator:MicroCHP:NonNormalizedParameters";
@@ -1261,8 +1264,6 @@ namespace MicroCHPElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // This routine adds up the various skin losses and then
         //  sets the values in the ZoneIntGain structure
-
-        static bool MyEnvrnFlag(true);
 
         if (NumMicroCHPs == 0) return;
 

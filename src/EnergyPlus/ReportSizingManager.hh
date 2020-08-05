@@ -53,14 +53,16 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
+    struct EnergyPlusData;
 
 namespace ReportSizingManager {
 
     // Functions
+
+    void clear_state();
 
     void ReportSizingOutput(std::string const &CompType,        // the type of the component
                             std::string const &CompName,        // the name of the component

@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -66,7 +67,6 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -115,7 +115,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
 )
 {
     if (getInputFlag_) {
-        getPowerManagerInput();
+        getPowerManagerInput(state.files);
         getInputFlag_ = false;
     }
 
@@ -195,7 +195,7 @@ void ElectricPowerServiceManager::reinitZoneGainsAtBeginEnvironment()
     }
 }
 
-void ElectricPowerServiceManager::getPowerManagerInput()
+void ElectricPowerServiceManager::getPowerManagerInput(IOFiles &ioFiles)
 {
     std::string const routineName = "ElectricPowerServiceManager  getPowerManagerInput ";
 
@@ -204,7 +204,7 @@ void ElectricPowerServiceManager::getPowerManagerInput()
     if (numLoadCenters_ > 0) {
         for (auto iLoadCenterNum = 1; iLoadCenterNum <= numLoadCenters_; ++iLoadCenterNum) {
             // call Electric Power Load Center constructor, in place
-            elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(iLoadCenterNum));
+            elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(ioFiles, iLoadCenterNum));
         }
     } else {
         // issue #4639. see if there are any generators, inverters, converters, or storage devcies, that really need a ElectricLoadCenter:Distribution
@@ -247,7 +247,7 @@ void ElectricPowerServiceManager::getPowerManagerInput()
         int anyElectricityPresent = GetMeterIndex("ELECTRICITY:FACILITY");
         int anyPlantLoadProfilePresent = inputProcessor->getNumObjectsFound("LoadProfile:Plant");
         if (anyElectricityPresent > 0 || anyPlantLoadProfilePresent > 0) {
-            elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(0));
+            elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(ioFiles, 0));
             numLoadCenters_ = 1;
         }
     }
@@ -608,8 +608,7 @@ void ElectricPowerServiceManager::checkLoadCenters()
     }
 }
 
-ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
-    int const objectNum)
+ElectPowerLoadCenter::ElectPowerLoadCenter(IOFiles &ioFiles, int const objectNum)
     : numGenerators(0), bussType(ElectricBussType::notYetSet), thermalProd(0.0), thermalProdRate(0.0), inverterPresent(false),
       subpanelFeedInRequest(0.0), subpanelFeedInRate(0.0), subpanelDrawRate(0.0), genElectricProd(0.0), genElectProdRate(0.0), storOpCVDrawRate(0.0),
       storOpCVFeedInRate(0.0), storOpCVChargeRate(0.0), storOpCVDischargeRate(0.0), storOpIsCharging(false), storOpIsDischarging(false),
@@ -902,7 +901,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
         for (auto genCount = 1; genCount <= numGenerators; ++genCount) {
             // call constructor in place
             generatorsPresent_ = true;
-            elecGenCntrlObj.emplace_back(new GeneratorController(DataIPShortCuts::cAlphaArgs(alphaCount),
+            elecGenCntrlObj.emplace_back(new GeneratorController(ioFiles,
+                                                                 DataIPShortCuts::cAlphaArgs(alphaCount),
                                                                  DataIPShortCuts::cAlphaArgs(alphaCount + 1),
                                                                  DataIPShortCuts::rNumericArgs(2 * genCount - 1),
                                                                  DataIPShortCuts::cAlphaArgs(alphaCount + 2),
@@ -1967,7 +1967,8 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(BranchInputManagerData &d
     return thermalLoad;
 }
 
-GeneratorController::GeneratorController(std::string const &objectName,
+GeneratorController::GeneratorController(IOFiles &ioFiles,
+                                         std::string const &objectName,
                                          std::string const &objectType,
                                          Real64 ratedElecPowerOutput,
                                          std::string const &availSchedName,
@@ -2013,7 +2014,7 @@ GeneratorController::GeneratorController(std::string const &objectName,
         // exhaust gas HX is required and it assumed that it has more thermal capacity and is used for control
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCExhaust;
         // and the name of plant component is not the same as the generator because of child object references, so fetch that name
-        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(name);
+        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(ioFiles, name);
         compPlantName = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->ExhaustHX.Name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:MicroCHP")) {
         generatorType = GeneratorType::microCHP;
@@ -2088,7 +2089,8 @@ void GeneratorController::reinitAtBeginEnvironment()
     thermProdRate = 0.0;
 }
 
-void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool const runFlag,
+void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
+                                                     bool const runFlag,
                                                      Real64 const myElecLoadRequest,
                                                      bool const FirstHVACIteration, // Unused 2010 JANUARY
                                                      Real64 &electricPowerOutput,   // Actual generator electric power output
@@ -2119,7 +2121,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool
     }
     case GeneratorType::combTurbine: {
 
-        auto thisCTE = CTElectricGenerator::CTGeneratorData::factory(name);
+        auto thisCTE = CTElectricGenerator::CTGeneratorData::factory(state.dataCTElectricGenerator, name);
         // dummy vars
         PlantLocation L(0,0,0,0);
         Real64 tempLoad = myElecLoadRequest;
@@ -2153,7 +2155,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool
         break;
     }
     case GeneratorType::fuelCell: {
-        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(name);
+        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state.files, name);
         dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->SimFuelCellGenerator(state.dataBranchInputManager, runFlag, myElecLoadRequest, FirstHVACIteration);
         electProdRate = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.ACPowerGen;
         electricityProd = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.ACEnergyGen;
@@ -2164,7 +2166,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool
         break;
     }
     case GeneratorType::microCHP: {
-        auto thisMCHP = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(name);
+        auto thisMCHP = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state.files, name);
 
         // simulate
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->InitMicroCHPNoNormalizeGenerators(state.dataBranchInputManager);
@@ -2207,8 +2209,8 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool
         break;
     }
     case GeneratorType::windTurbine: {
-        WindTurbine::SimWindTurbine(DataGlobalConstants::iGeneratorWindTurbine, name, generatorIndex, runFlag, myElecLoadRequest);
-        WindTurbine::GetWTGeneratorResults(
+        WindTurbine::SimWindTurbine(state, DataGlobalConstants::iGeneratorWindTurbine, name, generatorIndex, runFlag, myElecLoadRequest);
+        WindTurbine::GetWTGeneratorResults(state.dataWindTurbine,
             DataGlobalConstants::iGeneratorWindTurbine, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
         electricPowerOutput = electProdRate;
         thermalPowerOutput = thermProdRate;

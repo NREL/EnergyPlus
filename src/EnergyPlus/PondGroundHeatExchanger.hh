@@ -54,11 +54,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace PondGroundHeatExchanger {
 
@@ -148,6 +149,8 @@ namespace PondGroundHeatExchanger {
 
     // Object Data
     extern Array1D<PondGroundHeatExchangerData> PondGHE;
+
+    void clear_state();
 
     void GetPondGroundHeatExchanger();
 
