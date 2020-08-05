@@ -237,6 +237,11 @@ def add_explicit_extensible_bounds(schema):
     loc['properties']['lines']['minItems'] = 1
 
 def add_implicit_extensible_bounds(schema):
+    """
+    Parses the \min-fields \max-fields, and determines the bounds for the
+    number of extensible groups allowed and places that at root in
+    minItems/maxItems
+    """
     for obj_name, obj_schema in schema['properties'].items():
         if 'max_fields' in obj_schema:
             if not 'extensible_size' in obj_schema:
@@ -255,7 +260,10 @@ def add_implicit_extensible_bounds(schema):
             n_exts = obj_schema['extensible_size']
             n_regular_fields = len(obj_schema['legacy_idd']['fields'])
             min_fields = obj_schema['min_fields']
-            obj_schema['minItems'] = int((min_fields-n_regular_fields) / n_exts)
+            # minItems only if min-fields is greater than the number of regular
+            # fields
+            if (min_fields > n_regular_fields):
+                obj_schema['minItems'] = int((min_fields-n_regular_fields) / n_exts)
             #obj_schema.pop('min_fields')
 
 def change_special_cased_name_fields(schema):
