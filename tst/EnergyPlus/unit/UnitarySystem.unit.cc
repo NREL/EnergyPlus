@@ -15411,8 +15411,6 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
 
     thisSys->sizeSystem(state, FirstHVACIteration, AirLoopNum);
 
-    int MSHPIndex = thisSys->m_DesignSpecMSHPIndex;
-
     // Test direct solution
      DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
      DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
