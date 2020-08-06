@@ -193,7 +193,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     EXPECT_LT(Surface(1).OutWetBulbTemp, -100.0); // this condition is fatal
 }
 
-TEST(SurfaceTest, Plane)
+TEST_F(EnergyPlusFixture, SurfaceTest_Plane)
 {
     {
         SurfaceData s;
@@ -221,7 +221,7 @@ TEST(SurfaceTest, Plane)
     }
 }
 
-TEST(SurfaceTest, Surface2D)
+TEST_F(EnergyPlusFixture, SurfaceTest_Surface2D)
 {
     {
         using Vector2D = Surface2D::Vector2D;
@@ -244,7 +244,7 @@ TEST(SurfaceTest, Surface2D)
     }
 }
 
-TEST(SurfaceTest, AverageHeightRectangle)
+TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
 {
     {
         SurfaceData s;
@@ -299,7 +299,7 @@ TEST(SurfaceTest, AverageHeightRectangle)
     }
 }
 
-TEST(SurfaceTest, AverageHeightTriangle)
+TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightTriangle)
 {
     {
         SurfaceData s;
@@ -326,7 +326,7 @@ TEST(SurfaceTest, AverageHeightTriangle)
     }
 }
 
-TEST(SurfaceTest, AverageHeightL)
+TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightL)
 {
     {
         SurfaceData s;

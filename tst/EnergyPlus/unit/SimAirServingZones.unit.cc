@@ -81,14 +81,12 @@ using namespace SimAirServingZones;
 
 namespace EnergyPlus {
 
-TEST(SimAirServingZones, ReheatCoilSizing)
+TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
 {
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine test the GetHeatingSATempForSizing & GetHeatingSATempHumRatForSizing methods,
     // which are designed to get the proper reheat coil inlet temperature/humidity ratio for sizing
     // depending on the system configurations
-
-    ShowMessage("Begin Test: SimAirServingZones, ReheatCoilSizing");
 
     int NumPrimaryAirSys = 4; // total number of air loops
     int AirLoopNum;           // index of air loops

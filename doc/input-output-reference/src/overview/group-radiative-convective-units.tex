@@ -1014,7 +1014,7 @@ This field is the name of the zone (Ref: Zone) in which the hydronic low tempera
 
 \paragraph{Field: Surface Name or Radiant Surface Group Name}\label{field-surface-name-or-radiant-surface-group-name}
 
-This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Note also that surfaces in a list do not need to be in the same zone or in the zone being served by this system (see previous field). Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 \paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter-000}
 
@@ -1026,26 +1026,24 @@ This field is the total length of pipe embedded in the surface named above in th
 
 \paragraph{Field: Temperature Control Type}\label{field-temperature-control-type}
 
-This field specifies along with the throttling range and setpoint schedules how the user wishes to control the hydronic radiant system. The temperature denoted in the setpoint schedule can refer to one of seven different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, radiant surface inside face temperature, or radiant surface interior temperture. The choice of temperature is controlled by the current field---temperature control type. The user must select from the following options:
+This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of seven different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, or the radiant surface interior temperture. The choice of temperature is controlled by the current field--temperature control type. The user must select from the following options:
 
 \begin{itemize}
 \item
-  MeanAirTemperature
+  MeanAirTemperature - The mean air temperature of the zone being controlled by this radiant system.
 \item
-  MeanRadiantTemperature
+  MeanRadiantTemperature - The mean radiant temperature of the zone being controlled by this radiant system.
 \item
-  OperativeTemperature
+  OperativeTemperature - The operative temperature of the zone being controlled by the radint system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.  
 \item
-  OutdoorDryBulbTemperature
+  OutdoorDryBulbTemperature - The outdoor dry-bulb temperature of the current outdoor environment.
 \item
-  OutdoorWetBulbTemperature
+  OutdoorWetBulbTemperature - The outdoor wet-bulb temperature of the current outdoor environment.
 \item
-  SurfaceFaceTemperature
+  SurfaceFaceTemperature - This option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).
 \item
-  SurfaceInteriorTemperature
+  SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
 \end{itemize}
-
-\emph{Operative temperature} for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.  The \emph{SurfaceFaceTemperature} option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).  The \emph{SurfaceInteriorTemperature} option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
 
 If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information on how the setpoint temperature is established for this particular radiant system.
 
@@ -1280,7 +1278,7 @@ This field is the name of the zone (Ref: Zone) in which the constant flow low te
 
 \paragraph{Field: Surface Name or Radiant Surface Group Name}\label{field-surface-name-or-radiant-surface-group-name-1}
 
-This field is the name of the surface (Ref: \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Note also that surfaces in a list do not need to be in the same zone or in the zone being served by this system (see previous field). Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 \paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter-1-000}
 
@@ -1292,28 +1290,47 @@ This field is the total length of pipe embedded in the surface named above in th
 
 \paragraph{Field: Temperature Control Type}\label{field-temperature-control-type-1}
 
-This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of seven different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, radiant surface inside face temperature, or radiant surface interior temperture. The choice of temperature is controlled by the current field---temperature control type. The user must select from the following options:
+This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of eight different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, the radiant surface interior temperture, or the running mean outdoor dry-bulb temperature. The choice of temperature is controlled by the current field--temperature control type. The user must select from the following options:
 
 \begin{itemize}
 \item
-  MeanAirTemperature
+  MeanAirTemperature - The mean air temperature of the zone being controlled by this radiant system.
 \item
-  MeanRadiantTemperature
+  MeanRadiantTemperature - The mean radiant temperature of the zone being controlled by this radiant system.
 \item
-  OperativeTemperature
+  OperativeTemperature - The operative temperature of the zone being controlled by the radint system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.  
 \item
-  OutdoorDryBulbTemperature
+  OutdoorDryBulbTemperature - The outdoor dry-bulb temperature of the current outdoor environment.
 \item
-  OutdoorWetBulbTemperature
+  OutdoorWetBulbTemperature - The outdoor wet-bulb temperature of the current outdoor environment.
 \item
-  SurfaceFaceTemperature
+  SurfaceFaceTemperature - This option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).
 \item
-  SurfaceInteriorTemperature
+  SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
+\item
+  RunningMeanOutdoorDryBulbTemperature - This option will allow the user to control the inlet water temperature to the system as a function of the running mean outdoor air temperature.  The next field (\hyperref[field-running-mean-outdoor-dry-bulb-temperature-weighting-factor]{Running Mean Outdoor Dry-Bulb Temperature Weighting Factor}) will define how this temperature is actually calculated within EnergyPlus.
 \end{itemize}
 
-\emph{Operative temperature} for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.  The \emph{SurfaceFaceTemperature} option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).  The \emph{SurfaceInteriorTemperature} option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
-
 If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information on how the setpoint temperature is established for this particular radiant system.
+
+\paragraph{Field: Running Mean Outdoor Dry-Bulb Temperature Weighting Factor}\label{field-running-mean-outdoor-dry-bulb-temperature-weighting-factor}
+
+This field specifies the weighting factor that is used to calculate the running mean outdoor dry-bulb temperature.  The running mean outdoor dry-bulb temperature is determined using the following equation:
+
+\begin{equation}
+\Theta_{rm} = (1 - \alpha) \Theta_{ed-1} + \alpha \Theta_{rm-1}
+\label{eq:RunningMeanOutdoorDryBulbTemperatureEquation}
+\end{equation}
+
+where: 
+
+\(\Theta_{rm}\) is the current running mean outdoor dry-bulb temperature that is used to control the radiant system
+
+\(\Theta_{ed-1}\) is the average outdoor dry-bulb temperature from the previous day
+
+\(\Theta_{rm-1}\) is the running mean outdoor dry-bulb temperature from the previous day
+
+\(\alpha\) is the user defined weighting factor that is defined by this field.  It controls the weighting of the running mean outdoor dry-bulb temperature from the previous day and the average outdoor dry-bulb temperature from the previous day for the purposes of calculating the running mean outdoor dry-bulb temperature for the current day.  The value for this weighting factor must be between zero and 1.
 
 \paragraph{Field: Rated Flow Rate}\label{field-rated-flow-rate}
 
@@ -1424,6 +1441,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
       0.012,                  !- Hydronic tubing inside diameter {m}
       400.0,                  !- Hydronic tubing length {m}
       MeanAirTemperature,     !- temperature control type
+      0.8,                    !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
       0.0004,                 !- maximum water volumetric flow rate {m3/s}
       ,                       !-schedule for flow rate (optional, non-existent means constant)
       30000,                  !-Rated Pump Head in Pa
@@ -1487,6 +1505,12 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
   HVAC,Sum,Zone Radiant HVAC Cooling Fluid Heat Transfer Energy {[}J{]}
 \item
   HVAC,Sum,Zone Radiant HVAC Heating Fluid Heat Transfer Energy {[}J{]}
+\item
+  HVAC,Average,Constant Flow Running Mean Outdoor Dry-Bulb Temperature {[}C{]}
+\item
+  HVAC,Average,Constant Flow Previous Day Running Mean Outdoor Dry-Bulb Temperature {[}C{]}
+\item
+  HVAC,Average,Constant Flow Previous Day Average Outdoor Dry-Bulb Temperature {[}C{]}
 \end{itemize}
 
 \paragraph{Zone Radiant HVAC Heating Rate {[}W{]}}\label{zone-radiant-hvac-heating-rate-w-1}
@@ -1561,6 +1585,18 @@ The heat transfer energy for the cooling fluid connection, in Joules.
 
 The heat transfer energy for the heating fluid connection, in Joules.
 
+\paragraph{Zone Radiant HVAC Running Mean Outdoor Dry-Bulb Temperature {[}C{]}}\label{zone-radiant-hvac-running-mean-outdoor-dry-bulb-temperature-1}
+
+This field reports the current running mean outdoor dry-bulb temperature in Celsius. This value is used to control the constant flow low temperature radiant system when the user opts to use the \emph{RunningMeanOutdoorDryBulbTemperature} control type.
+
+\paragraph{Zone Radiant HVAC Previous Day Running Mean Outdoor Dry-Bulb Temperature {[}C{]}}\label{zone-radiant-hvac-previous-day-running-mean-outdoor-dry-bulb-temperature}
+
+This field reports the running mean outdoor dry-bulb temperature of the previous day in Celsius. This value is used to calculate the running mean outdoor dry-bulb temperature when the user opts to use the \emph{RunningMeanOutdoorDryBulbTemperature} control type.
+
+\paragraph{Zone Radiant HVAC Previous Day Average Outdoor Dry-Bulb Temperature {[}C{]}}\label{zone-radiant-hvac-previous-day-average-outdoor-dry-bulb-temperature}
+
+This field reports the average of the outdoor dry-bulb temperature for the previous day in Celsius. This value is used to calculate the running mean outdoor dry-bulb temperature when the user opts to use the \emph{RunningMeanOutdoorDryBulbTemperature} control type.
+
 \subsection{ZoneHVAC:LowTemperatureRadiant:Electric}\label{zonehvaclowtemperatureradiantelectric}
 
 This low temperature radiant system (electric) is a component of zone equipment that is intended to model any ``radiant system'' where electric resistance heating is used to supply energy (heat) to a building surface (wall, ceiling, or floor). The component is controlled by the radiant system controls that are defined in the syntax below and this control does not require the use of a zone thermostat unless the unit is being autosized. Note also that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first. If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.
@@ -1583,7 +1619,7 @@ This field is the name of the zone (Ref: Zone) in which the electric low tempera
 
 \paragraph{Field: Surface Name or Radiant Surface Group Name}\label{field-surface-name-or-radiant-surface-group-name-2}
 
-This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the heating element is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how energy flow is split between the various surfaces. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}, \hyperref[walldetailed]{Wall:Detailed}, \hyperref[roofceilingdetailed]{RoofCeiling:Detailed}, etc.), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the heating element is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how energy flow is split between the various surfaces. Note also that surfaces in a list do not need to be in the same zone or in the zone being served by this system (see previous field). Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}, \hyperref[walldetailed]{Wall:Detailed}, \hyperref[roofceilingdetailed]{RoofCeiling:Detailed}, etc.), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 \paragraph{Field: Heating Design Capacity Method}\label{field-heating-design-capacity-method-6}
 
@@ -1603,26 +1639,24 @@ Enter the heating capacity as a fraction of the autosized heating capacity of lo
 
 \paragraph{Field: Temperature Control Type}\label{field-temperature-control-type-2}
 
-This field specifies along with the throttling range and setpoint schedules how the user wishes to control the low temperature electric radiant system. The temperature denoted in the setpoint schedule can refer to one of seven different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, radiant surface inside face temperature, or radiant surface interior temperture. The choice of temperature is controlled by the current field---temperature control type. The user must select from the following options:
+This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of seven different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, or the radiant surface interior temperture. The choice of temperature is controlled by the current field--temperature control type. The user must select from the following options:
 
 \begin{itemize}
 \item
-  MeanAirTemperature
+  MeanAirTemperature - The mean air temperature of the zone being controlled by this radiant system.
 \item
-  MeanRadiantTemperature
+  MeanRadiantTemperature - The mean radiant temperature of the zone being controlled by this radiant system.
 \item
-  OperativeTemperature
+  OperativeTemperature - The operative temperature of the zone being controlled by the radint system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.  
 \item
-  OutdoorDryBulbTemperature
+  OutdoorDryBulbTemperature - The outdoor dry-bulb temperature of the current outdoor environment.
 \item
-  OutdoorWetBulbTemperature
+  OutdoorWetBulbTemperature - The outdoor wet-bulb temperature of the current outdoor environment.
 \item
-  SurfaceFaceTemperature
+  SurfaceFaceTemperature - This option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).
 \item
-  SurfaceInteriorTemperature
+  SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
 \end{itemize}
-
-\emph{Operative temperature} for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.  The \emph{SurfaceFaceTemperature} option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).  The \emph{SurfaceInteriorTemperature} option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
 
 If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information on how the setpoint temperature is established for this particular radiant system.
 
@@ -1688,7 +1722,7 @@ These outputs are the heating provided by the low temperature radiant system to 
 
 \subsection{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}\label{zonehvaclowtemperatureradiantsurfacegroup}
 
-A low temperature radiant system (hydronic or electric) may consist of multiple active surfaces that serve to condition the space. Surfaces that act serially can be specified as multiple radiant systems using the standard radiant system input described above. However, if the multiple surfaces act in parallel, the Radiant System Surface Group input line is used to specify which surfaces are acting in a coordinated fashion and how energy flow is split between the surfaces. This list of surfaces (the name it is assigned) replaces the name of a single surface in the radiant system input described above. Note that all of the surfaces within a single list must be a part of the same zone and that the zone of these surfaces must also match the zone the radiant system is attempting to condition.
+A low temperature radiant system (hydronic or electric) may consist of multiple active surfaces that serve to condition the space. Surfaces that act serially can be specified as multiple radiant systems using the standard radiant system input described above. However, if the multiple surfaces act in parallel, the Radiant System Surface Group input line is used to specify which surfaces are acting in a coordinated fashion and how energy flow is split between the surfaces. This list of surfaces (the name it is assigned) replaces the name of a single surface in the radiant system input described above. Note that all of the surfaces within a single list do not need to be in the same zone so the zones of these surfaces do not need to match the zone the radiant system is attempting to condition. Keep in mind, however, that if the surfaces within a single surface group do not reside in the zone that these zones must all have the same zone multipliers.
 
 \subsubsection{Inputs}\label{inputs-8-017}
 
@@ -1702,7 +1736,7 @@ The pairs of Surface Name, Flow Fraction to Surface are used in several objects.
 
 \paragraph{Field: Surface \textless{}x\textgreater{} Name}\label{field-surface-x-name-2}
 
-This field is the name of a surface in the zone being conditioned by the radiant system. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of a surface being conditioned by the radiant system. It should be noted that the surfaces listed in this field do \emph{not} need to be present in the zone being served by the radiant system to which this surface is related. This allows radiant systems to span more than one zone and have surfaces controlled by conditions in another zone. When the user does select surfaces that are in different zones than the zone being served by the radiant system, a warning message is generated to alert the user that the surface is not in the same zone as the zone being served by the radiant system. If this is the intent of the user, this warning message can be ignored. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 \paragraph{Field: Flow Fraction for Surface \textless{}x\textgreater{}}\label{field-flow-fraction-for-surface-x}
 
@@ -1716,7 +1750,7 @@ ZoneHVAC:LowTemperatureRadiant:SurfaceGroup,
       Zone 1 Radiant Surfaces, !- name of surface list
       Zn001:Flr001,            !- Surface name 1
       0.75,                    !- Flow fraction for surface 1
-      Zn001:Roof001,           !- Surface name 2
+      Zn002:Flr002,            !- Surface name 2
       0.25;                    !- Flow fraction for surface 2
 \end{lstlisting}
 
