@@ -285,7 +285,9 @@ namespace ThermalComfort {
 
     void clear_state();
 
-    void ManageThermalComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, bool const InitializeOnly); // when called from ZTPC and calculations aren't needed
+    void ManageThermalComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
+                              IOFiles &ioFiles,
+                              bool const InitializeOnly); // when called from ZTPC and calculations aren't needed
 
     void InitThermalComfort();
 
@@ -324,12 +326,14 @@ namespace ThermalComfort {
     void ResetSetPointMet();
 
     void CalcThermalComfortAdaptiveASH55(
+        IOFiles &ioFiles,
         bool const initiate,                  // true if supposed to initiate
         Optional_bool_const wthrsim = _,      // true if this is a weather simulation
         Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day
     );
 
     void CalcThermalComfortAdaptiveCEN15251(
+        IOFiles &ioFiles,
         bool const initiate,                  // true if supposed to initiate
         Optional_bool_const wthrsim = _,      // true if this is a weather simulation
         Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day

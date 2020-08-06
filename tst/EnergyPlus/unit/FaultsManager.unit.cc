@@ -65,8 +65,8 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -459,7 +459,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
     MixedAir::GetOAControllerInputs(state);
 
@@ -689,7 +689,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);  // read schedule data
+    ScheduleManager::ProcessScheduleInput(state.files);  // read schedule data
     int avaiSchedIndex = ScheduleManager::GetScheduleIndex("AVAILSCHED");
     EXPECT_EQ(1, avaiSchedIndex);
     int severitySchedIndex = ScheduleManager::GetScheduleIndex("SEVERITYSCHED");

@@ -218,6 +218,7 @@ namespace FanCoilUnits {
         Real64 DesZoneHeatingLoad; // used for reporting in watts
         int DSOAPtr;               // design specification outdoor air object index
         bool FirstPass;            // detects first time through for resetting sizing data
+        int fanAvailSchIndex;      // fan availability schedule index
 
         // SZVAV Model inputs
         std::string Name;                // name of unit
@@ -269,7 +270,7 @@ namespace FanCoilUnits {
               QUnitOutNoHC(0.0), QUnitOutMaxH(0.0), QUnitOutMaxC(0.0), LimitErrCountH(0), LimitErrCountC(0), ConvgErrCountH(0), ConvgErrCountC(0),
               HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0), TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0),
               ElecEnergy(0.0), DesCoolingLoad(0.0), DesHeatingLoad(0.0), DesZoneCoolingLoad(0.0), DesZoneHeatingLoad(0.0), DSOAPtr(0),
-              FirstPass(true), MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0),
+              FirstPass(true), fanAvailSchIndex(0), MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0),
               MaxNoCoolHeatAirMassFlow(0.0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
               CoolCoilFluidInletNode(0), CoolCoilFluidOutletNodeNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0),
               CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0),

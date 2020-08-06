@@ -56,7 +56,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include "IOFiles.hh"
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -2354,8 +2354,8 @@ namespace FluidProperties {
         if (inputProcessor->getNumSectionsFound("INCREASEGLYCOLERRORLIMIT") > 0) GlycolErrorLimitTest += 10;
         if (inputProcessor->getNumSectionsFound("INCREASEREFRIGERANTERRORLIMIT") > 0) RefrigerantErrorLimitTest += 10;
 
-        if (DebugReportGlycols) ReportAndTestGlycols(OutputFiles::getSingleton());
-        if (DebugReportRefrigerants) ReportAndTestRefrigerants(OutputFiles::getSingleton());
+        if (DebugReportGlycols) ReportAndTestGlycols(IOFiles::getSingleton());
+        if (DebugReportRefrigerants) ReportAndTestRefrigerants(IOFiles::getSingleton());
     }
 
     // Use Array initializers to mimic the complex initialization of the original
@@ -5308,7 +5308,7 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void ReportAndTestGlycols(OutputFiles &outputFiles)
+    void ReportAndTestGlycols(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5359,226 +5359,226 @@ namespace FluidProperties {
             GlycolIndex = 0; // used in routine calls -- value is returned when first 0
             // Lay out the basic values:
             if (GlycolData(GlycolNum).GlycolName != "") {
-                print(outputFiles.debug, "Glycol={}, Mixture fluid={}\n", GlycolData(GlycolNum).Name, GlycolData(GlycolNum).GlycolName);
+                print(ioFiles.debug, "Glycol={}, Mixture fluid={}\n", GlycolData(GlycolNum).Name, GlycolData(GlycolNum).GlycolName);
             } else {
-                print(outputFiles.debug, "Glycol={}\n", GlycolData(GlycolNum).Name);
+                print(ioFiles.debug, "Glycol={}\n", GlycolData(GlycolNum).Name);
             }
-            print(outputFiles.debug, "Concentration:,{:.2R}\n", GlycolData(GlycolNum).Concentration);
+            print(ioFiles.debug, "Concentration:,{:.2R}\n", GlycolData(GlycolNum).Concentration);
             if (GlycolData(GlycolNum).CpDataPresent) {
-                print(outputFiles.debug,
+                print(ioFiles.debug,
                       "Specific Heat Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       GlycolData(GlycolNum).CpLowTempValue,
                       GlycolData(GlycolNum).CpLowTempIndex,
                       GlycolData(GlycolNum).CpHighTempValue,
                       GlycolData(GlycolNum).CpHighTempIndex);
-                print(outputFiles.debug, "{}", "Temperatures:");
+                print(ioFiles.debug, "{}", "Temperatures:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(Loop));
                 }
-                print(outputFiles.debug, ",{}\n", GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts));
-                print(outputFiles.debug, "{}", "Specific Heat:");
+                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts));
+                print(ioFiles.debug, "{}", "Specific Heat:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpValues(Loop));
+                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpValues(Loop));
                 }
-                print(outputFiles.debug, ",{}\n", GlycolData(GlycolNum).CpValues(GlycolData(GlycolNum).NumCpTempPts));
+                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).CpValues(GlycolData(GlycolNum).NumCpTempPts));
             }
             if (GlycolData(GlycolNum).RhoDataPresent) {
-                print(outputFiles.debug,
+                print(ioFiles.debug,
                       "Density Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       GlycolData(GlycolNum).RhoLowTempValue,
                       GlycolData(GlycolNum).RhoLowTempIndex,
                       GlycolData(GlycolNum).RhoHighTempValue,
                       GlycolData(GlycolNum).RhoHighTempIndex);
-                print(outputFiles.debug, "{}", "Temperatures:");
+                print(ioFiles.debug, "{}", "Temperatures:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).RhoTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).RhoTemps(Loop));
                 }
-                print(outputFiles.debug, ",{}\n", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts));
-                print(outputFiles.debug, "{}", "Density:");
+                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts));
+                print(ioFiles.debug, "{}", "Density:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).RhoValues(Loop));
+                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).RhoValues(Loop));
                 }
-                print(outputFiles.debug, ",{}\n", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts));
+                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts));
             }
             if (GlycolData(GlycolNum).CondDataPresent) {
-                print(outputFiles.debug,
+                print(ioFiles.debug,
                       "Conductivity Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       GlycolData(GlycolNum).CondLowTempValue,
                       GlycolData(GlycolNum).CondLowTempIndex,
                       GlycolData(GlycolNum).CondHighTempValue,
                       GlycolData(GlycolNum).CondHighTempIndex);
-                print(outputFiles.debug, "{}", "Temperatures:");
+                print(ioFiles.debug, "{}", "Temperatures:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(Loop));
                 }
-                print(outputFiles.debug, ",{}\n", GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts));
-                print(outputFiles.debug, "{}", "Conductivity:");
+                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts));
+                print(ioFiles.debug, "{}", "Conductivity:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CondValues(Loop));
+                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CondValues(Loop));
                 }
-                print(outputFiles.debug, ",{}\n", GlycolData(GlycolNum).CondValues(GlycolData(GlycolNum).NumCondTempPts));
+                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).CondValues(GlycolData(GlycolNum).NumCondTempPts));
             }
             if (GlycolData(GlycolNum).ViscDataPresent) {
-                print(outputFiles.debug,
+                print(ioFiles.debug,
                       "Viscosity Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       GlycolData(GlycolNum).ViscLowTempValue,
                       GlycolData(GlycolNum).ViscLowTempIndex,
                       GlycolData(GlycolNum).ViscHighTempValue,
                       GlycolData(GlycolNum).ViscHighTempIndex);
-                print(outputFiles.debug, "{}", "Temperatures:");
+                print(ioFiles.debug, "{}", "Temperatures:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(Loop));
                 }
-                print(outputFiles.debug, ",{}\n", GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts));
-                print(outputFiles.debug, "{}", "Viscosity:");
+                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts));
+                print(ioFiles.debug, "{}", "Viscosity:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).ViscValues(Loop));
+                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).ViscValues(Loop));
                 }
-                print(outputFiles.debug, ",{}\n", GlycolData(GlycolNum).ViscValues(GlycolData(GlycolNum).NumViscTempPts));
+                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).ViscValues(GlycolData(GlycolNum).NumViscTempPts));
             }
             // ============================================
             // Glycol Results, using out of bounds to out of bounds values in calling
             // ============================================
 
             // ========= Specific Heat from Temperatures
-            print(outputFiles.debug, "Glycol={} **** Results ****\n", GlycolData(GlycolNum).Name);
+            print(ioFiles.debug, "Glycol={} **** Results ****\n", GlycolData(GlycolNum).Name);
             if (GlycolData(GlycolNum).CpDataPresent) {
-                print(outputFiles.debug, "Specific Heat Results at Temperatures:");
-                print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(1) - incr);
+                print(ioFiles.debug, "Specific Heat Results at Temperatures:");
+                print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(1) - incr);
 
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(Loop));
                     Temperature =
                         GlycolData(GlycolNum).CpTemps(Loop) + (GlycolData(GlycolNum).CpTemps(Loop + 1) - GlycolData(GlycolNum).CpTemps(Loop)) / 2.0;
-                    print(outputFiles.debug, ",{:.2R}", Temperature);
+                    print(ioFiles.debug, ",{:.2R}", Temperature);
                 }
-                print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts));
-                print(outputFiles.debug, ",{:.2R}\n", GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts) + incr);
-                print(outputFiles.debug, "Specific Heat:");
+                print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts));
+                print(ioFiles.debug, ",{:.2R}\n", GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts) + incr);
+                print(ioFiles.debug, "Specific Heat:");
                 Temperature = GlycolData(GlycolNum).CpTemps(1) - incr;
                 ReturnValue = GetSpecificHeatGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
                     Temperature = GlycolData(GlycolNum).CpTemps(Loop);
                     ReturnValue = GetSpecificHeatGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
                     Temperature =
                         GlycolData(GlycolNum).CpTemps(Loop) + (GlycolData(GlycolNum).CpTemps(Loop + 1) - GlycolData(GlycolNum).CpTemps(Loop)) / 2.0;
                     ReturnValue = GetSpecificHeatGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts);
                 ReturnValue = GetSpecificHeatGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 Temperature = GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts) + incr;
                 ReturnValue = GetSpecificHeatGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}\n", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}\n", ReturnValue);
             }
 
             // ========= Density from Temperatures
             if (GlycolData(GlycolNum).RhoDataPresent) {
-                print(outputFiles.debug, "Density Results at Temperatures:");
-                print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).RhoTemps(1) - incr);
+                print(ioFiles.debug, "Density Results at Temperatures:");
+                print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).RhoTemps(1) - incr);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).RhoTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).RhoTemps(Loop));
                     Temperature = GlycolData(GlycolNum).RhoTemps(Loop) +
                                   (GlycolData(GlycolNum).RhoTemps(Loop + 1) - GlycolData(GlycolNum).RhoTemps(Loop)) / 2.0;
-                    print(outputFiles.debug, ",{:.2R}", Temperature);
+                    print(ioFiles.debug, ",{:.2R}", Temperature);
                 }
-                print(outputFiles.debug, ",{}", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts));
-                print(outputFiles.debug, ",{:.2R}\n", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts) + incr);
-                print(outputFiles.debug, "Density:");
+                print(ioFiles.debug, ",{}", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts));
+                print(ioFiles.debug, ",{:.2R}\n", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts) + incr);
+                print(ioFiles.debug, "Density:");
                 Temperature = GlycolData(GlycolNum).RhoTemps(1) - incr;
                 ReturnValue = GetDensityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(outputFiles.debug, ",{:.3R}", ReturnValue);
+                print(ioFiles.debug, ",{:.3R}", ReturnValue);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
                     Temperature = GlycolData(GlycolNum).RhoTemps(Loop);
                     ReturnValue = GetDensityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.3R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.3R}", ReturnValue);
                     Temperature = GlycolData(GlycolNum).RhoTemps(Loop) +
                                   (GlycolData(GlycolNum).RhoTemps(Loop + 1) - GlycolData(GlycolNum).RhoTemps(Loop)) / 2.0;
                     ReturnValue = GetDensityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.3R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.3R}", ReturnValue);
                 }
                 Temperature = GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts);
                 ReturnValue = GetDensityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(outputFiles.debug, ",{:.3R}", ReturnValue);
+                print(ioFiles.debug, ",{:.3R}", ReturnValue);
                 Temperature = GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts) + incr;
                 ReturnValue = GetDensityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(outputFiles.debug, ",{:.3R}\n", ReturnValue);
+                print(ioFiles.debug, ",{:.3R}\n", ReturnValue);
             }
 
             // ========= Conductivity from Temperatures
             if (GlycolData(GlycolNum).CondDataPresent) {
-                print(outputFiles.debug, "Conductivity Results at Temperatures:");
-                print(outputFiles.debug, ",{:.2R}",GlycolData(GlycolNum).CondTemps(1) - incr);
+                print(ioFiles.debug, "Conductivity Results at Temperatures:");
+                print(ioFiles.debug, ",{:.2R}",GlycolData(GlycolNum).CondTemps(1) - incr);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(Loop));
                     Temperature = GlycolData(GlycolNum).CondTemps(Loop) +
                                   (GlycolData(GlycolNum).CondTemps(Loop + 1) - GlycolData(GlycolNum).CondTemps(Loop)) / 2.0;
-                    print(outputFiles.debug, ",{:.2R}", Temperature);
+                    print(ioFiles.debug, ",{:.2R}", Temperature);
                 }
-                print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts));
-                print(outputFiles.debug, ",{:.2R}\n" , GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts) + incr);
-                print(outputFiles.debug, "Conductivity:");
+                print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts));
+                print(ioFiles.debug, ",{:.2R}\n" , GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts) + incr);
+                print(ioFiles.debug, "Conductivity:");
                 Temperature = GlycolData(GlycolNum).CondTemps(1) - incr;
                 ReturnValue = GetConductivityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(outputFiles.debug, ",{:.3R}", ReturnValue);
+                print(ioFiles.debug, ",{:.3R}", ReturnValue);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
                     Temperature = GlycolData(GlycolNum).CondTemps(Loop);
                     ReturnValue = GetConductivityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.3R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.3R}", ReturnValue);
                     Temperature = GlycolData(GlycolNum).CondTemps(Loop) +
                                   (GlycolData(GlycolNum).CondTemps(Loop + 1) - GlycolData(GlycolNum).CondTemps(Loop)) / 2.0;
                     ReturnValue = GetConductivityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.3R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.3R}", ReturnValue);
                 }
                 Temperature = GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts);
                 ReturnValue = GetConductivityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(outputFiles.debug, ",{:.3R}", ReturnValue);
+                print(ioFiles.debug, ",{:.3R}", ReturnValue);
                 Temperature = GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts) + incr;
                 ReturnValue = GetConductivityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(outputFiles.debug, ",{:.3R}\n", ReturnValue);
+                print(ioFiles.debug, ",{:.3R}\n", ReturnValue);
             }
 
             // ========= Viscosity from Temperatures
             if (GlycolData(GlycolNum).ViscDataPresent) {
-                print(outputFiles.debug, "Viscosity Results at Temperatures:");
-                print(outputFiles.debug, ",{:.2R}",GlycolData(GlycolNum).ViscTemps(1) - incr);
+                print(ioFiles.debug, "Viscosity Results at Temperatures:");
+                print(ioFiles.debug, ",{:.2R}",GlycolData(GlycolNum).ViscTemps(1) - incr);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(Loop));
                     Temperature = GlycolData(GlycolNum).ViscTemps(Loop) +
                                   (GlycolData(GlycolNum).ViscTemps(Loop + 1) - GlycolData(GlycolNum).ViscTemps(Loop)) / 2.0;
-                    print(outputFiles.debug, ",{:.2R}", Temperature);
+                    print(ioFiles.debug, ",{:.2R}", Temperature);
                 }
-                print(outputFiles.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts));
-                print(outputFiles.debug, ",{:.2R}\n", GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts) + incr);
-                print(outputFiles.debug, "Viscosity:");
+                print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts));
+                print(ioFiles.debug, ",{:.2R}\n", GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts) + incr);
+                print(ioFiles.debug, "Viscosity:");
                 Temperature = GlycolData(GlycolNum).ViscTemps(1) - incr;
                 ReturnValue = GetViscosityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(outputFiles.debug, ",{:.4R}", ReturnValue);
+                print(ioFiles.debug, ",{:.4R}", ReturnValue);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
                     Temperature = GlycolData(GlycolNum).ViscTemps(Loop);
                     ReturnValue = GetViscosityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.4R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.4R}", ReturnValue);
                     Temperature = GlycolData(GlycolNum).ViscTemps(Loop) +
                                   (GlycolData(GlycolNum).ViscTemps(Loop + 1) - GlycolData(GlycolNum).ViscTemps(Loop)) / 2.0;
                     ReturnValue = GetViscosityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.4R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.4R}", ReturnValue);
                 }
                 Temperature = GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts);
                 ReturnValue = GetViscosityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(outputFiles.debug, ",{:.4R}", ReturnValue);
+                print(ioFiles.debug, ",{:.4R}", ReturnValue);
                 Temperature = GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts) + incr;
                 ReturnValue = GetViscosityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(outputFiles.debug, ",{:.4R}\n", ReturnValue);
+                print(ioFiles.debug, ",{:.4R}\n", ReturnValue);
             }
         }
     }
 
     //*****************************************************************************
 
-    void ReportAndTestRefrigerants(OutputFiles &outputFiles)
+    void ReportAndTestRefrigerants(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5632,175 +5632,175 @@ namespace FluidProperties {
             RefrigIndex = 0; // used in routine calls -- value is returned when first 0
             // Lay out the basic values:
             if (!RefrigData(RefrigNum).Name.empty()) {
-                print(outputFiles.debug, "Refrigerant={}", RefrigData(RefrigNum).Name);
+                print(ioFiles.debug, "Refrigerant={}", RefrigData(RefrigNum).Name);
             }
             if (RefrigData(RefrigNum).NumPsPoints > 0) {
-                print(outputFiles.debug,
+                print(ioFiles.debug,
                       "Saturation Pressures Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       RefrigData(RefrigNum).PsLowTempValue,
                       RefrigData(RefrigNum).PsLowTempIndex,
                       RefrigData(RefrigNum).PsHighTempValue,
                       RefrigData(RefrigNum).PsHighTempIndex);
-                print(outputFiles.debug, "Temperatures:");
+                print(ioFiles.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumPsPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints));
-                print(outputFiles.debug, "Saturation Pressure:");
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints));
+                print(ioFiles.debug, "Saturation Pressure:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumPsPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsValues(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsValues(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).PsValues(RefrigData(RefrigNum).NumPsPoints));
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).PsValues(RefrigData(RefrigNum).NumPsPoints));
             }
             if (RefrigData(RefrigNum).NumHPoints > 0) {
-                print(outputFiles.debug,
+                print(ioFiles.debug,
                       "Enthalpy Saturated Fluid Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       RefrigData(RefrigNum).HfLowTempValue,
                       RefrigData(RefrigNum).HfLowTempIndex,
                       RefrigData(RefrigNum).HfHighTempValue,
                       RefrigData(RefrigNum).HfHighTempIndex);
-                print(outputFiles.debug, "Temperatures:");
+                print(ioFiles.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints));
-                print(outputFiles.debug, "Enthalpy Saturated Fluid:");
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints));
+                print(ioFiles.debug, "Enthalpy Saturated Fluid:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HfValues(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HfValues(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HfValues(RefrigData(RefrigNum).NumHPoints));
-                print(outputFiles.debug,
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HfValues(RefrigData(RefrigNum).NumHPoints));
+                print(ioFiles.debug,
                       "Enthalpy Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       RefrigData(RefrigNum).HfgLowTempValue,
                       RefrigData(RefrigNum).HfgLowTempIndex,
                       RefrigData(RefrigNum).HfgHighTempValue,
                       RefrigData(RefrigNum).HfgHighTempIndex);
 
-                print(outputFiles.debug, "Temperatures:");
+                print(ioFiles.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints));
-                print(outputFiles.debug, "Enthalpy Saturated Fluid/Gas:");
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints));
+                print(ioFiles.debug, "Enthalpy Saturated Fluid/Gas:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HfgValues(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HfgValues(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HfgValues(RefrigData(RefrigNum).NumHPoints));
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HfgValues(RefrigData(RefrigNum).NumHPoints));
             }
             if (RefrigData(RefrigNum).NumCpPoints > 0) {
-                print(outputFiles.debug,
+                print(ioFiles.debug,
                       "Specific Heat Saturated Fluid Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       RefrigData(RefrigNum).CpfLowTempValue,
                       RefrigData(RefrigNum).CpfLowTempIndex,
                       RefrigData(RefrigNum).CpfHighTempValue,
                       RefrigData(RefrigNum).CpfHighTempIndex);
-                print(outputFiles.debug, "Temperatures:");
+                print(ioFiles.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
-                print(outputFiles.debug, "Specific Heat Saturated Fluid:");
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
+                print(ioFiles.debug, "Specific Heat Saturated Fluid:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpfValues(Loop));
+                    print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpfValues(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpfValues(RefrigData(RefrigNum).NumCpPoints));
-                print(outputFiles.debug,
+                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpfValues(RefrigData(RefrigNum).NumCpPoints));
+                print(ioFiles.debug,
                       "Specific Heat Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       RefrigData(RefrigNum).CpfgLowTempValue,
                       RefrigData(RefrigNum).CpfgLowTempIndex,
                       RefrigData(RefrigNum).CpfgHighTempValue,
                       RefrigData(RefrigNum).CpfgHighTempIndex);
-                print(outputFiles.debug, "Temperatures:");
+                print(ioFiles.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
-                print(outputFiles.debug, "Specific Heat Saturated Fluid/Gas:");
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
+                print(ioFiles.debug, "Specific Heat Saturated Fluid/Gas:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpfgValues(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpfgValues(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpfgValues(RefrigData(RefrigNum).NumCpPoints));
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpfgValues(RefrigData(RefrigNum).NumCpPoints));
             }
             if (RefrigData(RefrigNum).NumRhoPoints > 0) {
-                print(outputFiles.debug,
+                print(ioFiles.debug,
                       "Density Saturated Fluid Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       RefrigData(RefrigNum).RhofLowTempValue,
                       RefrigData(RefrigNum).RhofLowTempIndex,
                       RefrigData(RefrigNum).RhofHighTempValue,
                       RefrigData(RefrigNum).RhofHighTempIndex);
-                print(outputFiles.debug, "Temperatures:");
+                print(ioFiles.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints));
-                print(outputFiles.debug, "Density Saturated Fluid:");
+                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints));
+                print(ioFiles.debug, "Density Saturated Fluid:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhofValues(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhofValues(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhofValues(RefrigData(RefrigNum).NumRhoPoints));
-                print(outputFiles.debug, "Density Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
+                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhofValues(RefrigData(RefrigNum).NumRhoPoints));
+                print(ioFiles.debug, "Density Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                                                          RefrigData(RefrigNum).RhofgLowTempValue,
                                                          RefrigData(RefrigNum).RhofgLowTempIndex,
                                                          RefrigData(RefrigNum).RhofgHighTempValue,
                                                          RefrigData(RefrigNum).RhofgHighTempIndex);
-                print(outputFiles.debug, "Temperatures:");
+                print(ioFiles.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints));
-                print(outputFiles.debug, "Density Saturated Fluid/Gas:");
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints));
+                print(ioFiles.debug, "Density Saturated Fluid/Gas:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhofgValues(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhofgValues(Loop));
                 }
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).RhofgValues(RefrigData(RefrigNum).NumRhoPoints));
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).RhofgValues(RefrigData(RefrigNum).NumRhoPoints));
             }
 
             if (RefrigData(RefrigNum).NumSuperTempPts > 0 && RefrigData(RefrigNum).NumSuperPressPts > 0) {
-                print(outputFiles.debug,
+                print(ioFiles.debug,
                       "Superheated Gas Fluid Data points:,NumTemperaturePoints=,{},NumPressurePoints=,{}\n",
                       RefrigData(RefrigNum).NumSuperTempPts,
                       RefrigData(RefrigNum).NumSuperPressPts);
-                print(outputFiles.debug, "Superheated Temperatures:");
+                print(ioFiles.debug, "Superheated Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumSuperTempPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.3R}", RefrigData(RefrigNum).SHTemps(Loop));
+                    print(ioFiles.debug, ",{:.3R}", RefrigData(RefrigNum).SHTemps(Loop));
                 }
-                print(outputFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).SHTemps(RefrigData(RefrigNum).NumSuperTempPts));
-                print(outputFiles.debug, "Superheated Pressures:");
+                print(ioFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).SHTemps(RefrigData(RefrigNum).NumSuperTempPts));
+                print(ioFiles.debug, "Superheated Pressures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumSuperPressPts - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.3R}", RefrigData(RefrigNum).SHPress(Loop));
+                    print(ioFiles.debug, ",{:.3R}", RefrigData(RefrigNum).SHPress(Loop));
                 }
-                print(outputFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).SHPress(RefrigData(RefrigNum).NumSuperPressPts));
+                print(ioFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).SHPress(RefrigData(RefrigNum).NumSuperPressPts));
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumSuperPressPts; ++Loop) {
-                    print(outputFiles.debug, "Superheated Pressure:#{}={:.2R}\n", Loop, RefrigData(RefrigNum).SHPress(Loop));
-                    print(outputFiles.debug, "Enthalpy Superheated Gas:");
+                    print(ioFiles.debug, "Superheated Pressure:#{}={:.2R}\n", Loop, RefrigData(RefrigNum).SHPress(Loop));
+                    print(ioFiles.debug, "Enthalpy Superheated Gas:");
                     for (Loop1 = 1; Loop1 <= RefrigData(RefrigNum).NumSuperTempPts - 1; ++Loop1) {
-                        print(outputFiles.debug, ",{:.3R}", RefrigData(RefrigNum).HshValues(Loop, Loop1));
+                        print(ioFiles.debug, ",{:.3R}", RefrigData(RefrigNum).HshValues(Loop, Loop1));
                     }
-                    print(outputFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).HshValues(Loop, RefrigData(RefrigNum).NumSuperTempPts));
+                    print(ioFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).HshValues(Loop, RefrigData(RefrigNum).NumSuperTempPts));
                 }
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumSuperPressPts; ++Loop) {
-                    print(outputFiles.debug, "Superheated Pressure:#{}={:.2R}\n", RoundSigDigits(Loop), RefrigData(RefrigNum).SHPress(Loop));
-                    print(outputFiles.debug, "Density Superheated Gas:");
+                    print(ioFiles.debug, "Superheated Pressure:#{}={:.2R}\n", RoundSigDigits(Loop), RefrigData(RefrigNum).SHPress(Loop));
+                    print(ioFiles.debug, "Density Superheated Gas:");
                     for (Loop1 = 1; Loop1 <= RefrigData(RefrigNum).NumSuperTempPts - 1; ++Loop1) {
-                        print(outputFiles.debug, ",{:.3R}", RefrigData(RefrigNum).RhoshValues(Loop, Loop1));
+                        print(ioFiles.debug, ",{:.3R}", RefrigData(RefrigNum).RhoshValues(Loop, Loop1));
                     }
-                    print(outputFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).RhoshValues(Loop, RefrigData(RefrigNum).NumSuperTempPts));
+                    print(ioFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).RhoshValues(Loop, RefrigData(RefrigNum).NumSuperTempPts));
                 }
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumSuperTempPts; ++Loop) {
-                    print(outputFiles.debug, "Superheated Temperature:#{}={:.2R}\n", Loop, RefrigData(RefrigNum).SHTemps(Loop));
-                    print(outputFiles.debug, "Enthalpy Superheated Gas:");
+                    print(ioFiles.debug, "Superheated Temperature:#{}={:.2R}\n", Loop, RefrigData(RefrigNum).SHTemps(Loop));
+                    print(ioFiles.debug, "Enthalpy Superheated Gas:");
                     for (Loop1 = 1; Loop1 <= RefrigData(RefrigNum).NumSuperPressPts - 1; ++Loop1) {
-                        print(outputFiles.debug, ",{:.3R}", RefrigData(RefrigNum).HshValues(Loop1, Loop));
+                        print(ioFiles.debug, ",{:.3R}", RefrigData(RefrigNum).HshValues(Loop1, Loop));
                     }
-                    print(outputFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).HshValues(RefrigData(RefrigNum).NumSuperPressPts, Loop));
+                    print(ioFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).HshValues(RefrigData(RefrigNum).NumSuperPressPts, Loop));
                 }
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumSuperTempPts; ++Loop) {
-                    print(outputFiles.debug, "Superheated Temperature:#{}={:.2R}\n", Loop, RefrigData(RefrigNum).SHTemps(Loop));
-                    print(outputFiles.debug, "Density Superheated Gas:");
+                    print(ioFiles.debug, "Superheated Temperature:#{}={:.2R}\n", Loop, RefrigData(RefrigNum).SHTemps(Loop));
+                    print(ioFiles.debug, "Density Superheated Gas:");
                     for (Loop1 = 1; Loop1 <= RefrigData(RefrigNum).NumSuperPressPts - 1; ++Loop1) {
-                        print(outputFiles.debug, ",{:.3R}", RefrigData(RefrigNum).RhoshValues(Loop1, Loop));
+                        print(ioFiles.debug, ",{:.3R}", RefrigData(RefrigNum).RhoshValues(Loop1, Loop));
                     }
-                    print(outputFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).RhoshValues(RefrigData(RefrigNum).NumSuperPressPts, Loop));
+                    print(ioFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).RhoshValues(RefrigData(RefrigNum).NumSuperPressPts, Loop));
                 }
             }
 
@@ -5809,136 +5809,136 @@ namespace FluidProperties {
             // ============================================
 
             // ========= Pressure from Temperatures
-            print(outputFiles.debug, "Refrigerant={} **** Results ****\n", RefrigData(RefrigNum).Name);
+            print(ioFiles.debug, "Refrigerant={} **** Results ****\n", RefrigData(RefrigNum).Name);
             if (RefrigData(RefrigNum).NumPsPoints > 0) {
-                print(outputFiles.debug, "Pressure Results at Temperatures:");
-                print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(1) - incr);
+                print(ioFiles.debug, "Pressure Results at Temperatures:");
+                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(1) - incr);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumPsPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(Loop));
                     Temperature =
                         RefrigData(RefrigNum).PsTemps(Loop) + (RefrigData(RefrigNum).PsTemps(Loop + 1) - RefrigData(RefrigNum).PsTemps(Loop)) / 2.0;
-                    print(outputFiles.debug, ",{:.2R}", Temperature);
+                    print(ioFiles.debug, ",{:.2R}", Temperature);
                 }
-                print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints));
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints) + incr);
-                print(outputFiles.debug, "Saturated Pressures:");
+                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints));
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints) + incr);
+                print(ioFiles.debug, "Saturated Pressures:");
                 Temperature = RefrigData(RefrigNum).PsTemps(1) - incr;
                 ReturnValue = GetSatPressureRefrig(RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumPsPoints - 1; ++Loop) {
                     Temperature = RefrigData(RefrigNum).PsTemps(Loop);
                     ReturnValue = GetSatPressureRefrig(RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
                     Temperature =
                         RefrigData(RefrigNum).PsTemps(Loop) + (RefrigData(RefrigNum).PsTemps(Loop + 1) - RefrigData(RefrigNum).PsTemps(Loop)) / 2.0;
                     ReturnValue = GetSatPressureRefrig(RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints);
                 ReturnValue = GetSatPressureRefrig(RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 Temperature = RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints) + incr;
                 ReturnValue = GetSatPressureRefrig(RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}\n", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}\n", ReturnValue);
             }
 
             // ========= Enthalpy from Temperatures
             if (RefrigData(RefrigNum).NumHPoints > 0) {
-                print(outputFiles.debug, "Enthalpy Results at Temperatures:");
-                print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(1) - incr);
+                print(ioFiles.debug, "Enthalpy Results at Temperatures:");
+                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(1) - incr);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(Loop));
                     Temperature =
                         RefrigData(RefrigNum).HTemps(Loop) + (RefrigData(RefrigNum).HTemps(Loop + 1) - RefrigData(RefrigNum).HTemps(Loop)) / 2.0;
-                    print(outputFiles.debug, ",{:.2R}", Temperature);
+                    print(ioFiles.debug, ",{:.2R}", Temperature);
                 }
-                print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints));
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints) + incr);
-                print(outputFiles.debug, "Saturated Enthalpy:");
+                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints));
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints) + incr);
+                print(ioFiles.debug, "Saturated Enthalpy:");
                 Temperature = RefrigData(RefrigNum).HTemps(1) - incr;
                 ReturnValue = GetSatEnthalpyRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
                     Temperature = RefrigData(RefrigNum).HTemps(Loop);
                     ReturnValue = GetSatEnthalpyRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
                     Temperature =
                         RefrigData(RefrigNum).HTemps(Loop) + (RefrigData(RefrigNum).HTemps(Loop + 1) - RefrigData(RefrigNum).HTemps(Loop)) / 2.0;
                     ReturnValue = GetSatEnthalpyRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints);
                 ReturnValue = GetSatEnthalpyRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 Temperature = RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints) + incr;
                 ReturnValue = GetSatEnthalpyRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}\n", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}\n", ReturnValue);
             }
 
             // ========= Specific Heat from Temperatures
             if (RefrigData(RefrigNum).NumCpPoints > 0) {
-                print(outputFiles.debug, "Specific Heat Results at Temperatures:");
-                print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(1) - incr);
+                print(ioFiles.debug, "Specific Heat Results at Temperatures:");
+                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(1) - incr);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(Loop));
                     Temperature =
                         RefrigData(RefrigNum).CpTemps(Loop) + (RefrigData(RefrigNum).CpTemps(Loop + 1) - RefrigData(RefrigNum).CpTemps(Loop)) / 2.0;
-                    print(outputFiles.debug, ",{:.2R}", Temperature);
+                    print(ioFiles.debug, ",{:.2R}", Temperature);
                 }
-                print(outputFiles.debug,  ",{:.2R}", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints) + incr);
-                print(outputFiles.debug, "Saturated Specific Heat:");
+                print(ioFiles.debug,  ",{:.2R}", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints) + incr);
+                print(ioFiles.debug, "Saturated Specific Heat:");
                 Temperature = RefrigData(RefrigNum).CpTemps(1) - incr;
                 ReturnValue = GetSatSpecificHeatRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
                     Temperature = RefrigData(RefrigNum).CpTemps(Loop);
                     ReturnValue = GetSatSpecificHeatRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
                     Temperature =
                         RefrigData(RefrigNum).CpTemps(Loop) + (RefrigData(RefrigNum).CpTemps(Loop + 1) - RefrigData(RefrigNum).CpTemps(Loop)) / 2.0;
                     ReturnValue = GetSatSpecificHeatRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints);
                 ReturnValue = GetSatSpecificHeatRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 Temperature = RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints) + incr;
                 ReturnValue = GetSatSpecificHeatRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}\n", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}\n", ReturnValue);
             }
 
             // ========= Density from Temperatures
             if (RefrigData(RefrigNum).NumRhoPoints > 0) {
-                print(outputFiles.debug, "Density Results at Temperatures:");
-                print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(1) - incr);
+                print(ioFiles.debug, "Density Results at Temperatures:");
+                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(1) - incr);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
-                    print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(Loop));
+                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(Loop));
                     Temperature = RefrigData(RefrigNum).RhoTemps(Loop) +
                                   (RefrigData(RefrigNum).RhoTemps(Loop + 1) - RefrigData(RefrigNum).RhoTemps(Loop)) / 2.0;
-                    print(outputFiles.debug, ",{:.2R}", Temperature);
+                    print(ioFiles.debug, ",{:.2R}", Temperature);
                 }
-                print(outputFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints));
-                print(outputFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints) + incr);
-                print(outputFiles.debug, "Saturated Density:");
+                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints));
+                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints) + incr);
+                print(ioFiles.debug, "Saturated Density:");
                 Temperature = RefrigData(RefrigNum).RhoTemps(1) - incr;
                 ReturnValue = GetSatDensityRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
                     Temperature = RefrigData(RefrigNum).RhoTemps(Loop);
                     ReturnValue = GetSatDensityRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
                     Temperature = RefrigData(RefrigNum).RhoTemps(Loop) +
                                   (RefrigData(RefrigNum).RhoTemps(Loop + 1) - RefrigData(RefrigNum).RhoTemps(Loop)) / 2.0;
                     ReturnValue = GetSatDensityRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                    print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints);
                 ReturnValue = GetSatDensityRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}", ReturnValue);
                 Temperature = RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints) + incr;
                 ReturnValue = GetSatDensityRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(outputFiles.debug, ",{:.2R}\n", ReturnValue);
+                print(ioFiles.debug, ",{:.2R}\n", ReturnValue);
             }
         }
     }

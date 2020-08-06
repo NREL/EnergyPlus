@@ -175,7 +175,7 @@
 
 ! =========================
 
-  ZoneProperty:UserViewFactors:bySurfaceName,
+  ZoneProperty:UserViewFactors:BySurfaceName,
     Lshaped Zone,            !- Zone or ZoneList Name
     Lshaped Zone:South Wall, !- From Surface 1
     Lshaped Zone:South Wall, !- To Surface 1

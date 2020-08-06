@@ -30,3 +30,81 @@ Field 19, previous field 17. No other changes.
 
 Remaining fields 20 onward are the same as previous fields 18 onwards. No other changes.
 
+# Object Change: Output:DebuggingData
+
+This object uses to accept numeric entries, where 1 = Yes and all others = No. This was changed to a choice type, accepting 'Yes' or 'No', and defaulting to 'No'.
+
+cf #7740.
+
+# Object Change: Output:Diagnostics
+
+This object was made unique, and with an extensible "Key" field to add specific diagnostics.
+
+cf #7742.
+
+# Object Change: ‘ZoneHVAC:LowTemperatureRadiant:VariableFlow’
+
+Summary: A new field was added into the middle of the object, everything else states the same (or shifted back if occurring after the new field).
+
+Fields 1-7 remain the same.
+
+NEW Field F8 (A6): Setpoint Control Type.  Leave blank or assign a value of “HalfFlowPower” (default).
+
+Old Fields 8-29 remain the same, just shifted back one field to Fields 9-30.
+
+# Object Change: ‘ZoneHVAC:LowTemperatureRadiant:Electric’
+
+Summary: A new field was added into the middle of the object, everything else states the same (or shifted back if occurring after the new field).
+
+Fields 1-9 remain the same.
+
+NEW Field F10 (A7): Setpoint Control Type.  Leave blank or assign a value of “HalfFlowPower” (default).
+
+Old Fields 10-11 remain the same, just shifted back one field to Fields 11-12.
+
+# Object Change: ‘ZoneHVAC:LowTemperatureRadiant:ConstantFlow’
+
+Summary: A new field was added into the middle of the object, everything else states the same (or shifted back if occurring after the new field).
+
+Fields 1-7 remain the same.
+
+NEW Field F8 (N3): Running Mean Outdoor Air Temperature Weighting Factor.  Leave blank or assign a value of “0.8” (default).
+
+Old Fields 8-29 remain the same, just shifted back one field to Fields 9-30.
+
+# Minor Changes:
+
+## ZoneProperty:UserViewFactors:BySurfaceName,
+
+The case was changed from `ZoneProperty:UserViewFactors:bySurfaceName` to `ZoneProperty:UserViewFactors:BySurfaceName` to match conventions.
+This will have no effect on EnergyPlus which handles this in a case-insensitive manner.
+
+cf #7499.
+
+## Curve:DoubleExponentialDecay,
+
+Two typos were corrected in field names.
+
+9.3.0:
+
+```
+  N4 , \field Coefficient3 C4
+  N5 , \field Coefficient3 C5
+```
+
+9.4.0:
+
+```
+  N4 , \field Coefficient4 C4
+  N5 , \field Coefficient5 C5
+```
+
+# Object Change: `PerformancePrecisionTradeoffs'
+
+Fields 1-2 (A1, A2) remain the same.
+
+Change in Field 3 (A3): two more key values---Mode06 and Mode07---are added.
+
+Field 4 (N1) remains the same; however it is no longer the last field. See the newly added Field 5 (N2) below.
+
+Newly added Field 5 (N2): MaxAllowedDelTemp, supplied with minimu, maximum, and default values.

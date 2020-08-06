@@ -257,7 +257,7 @@ namespace ZonePlenum {
         Array1D_string cNumericFields;   // Numeric field names
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         bool NodeListError; // Flag for node list error
         bool UniqueNodeError;
         static std::string const RoutineName("GetZonePlenumInput: "); // include trailing blank space
@@ -786,10 +786,8 @@ namespace ZonePlenum {
         int PlenumZoneNum;
         int NodeIndex;
 
-        static bool MyEnvrnFlag(true);
-
         // Do the Begin Environment initializations
-        if (MyEnvrnFlag && BeginEnvrnFlag) {
+        if (dataZonePlenum.MyEnvrnFlag && BeginEnvrnFlag) {
 
             for (PlenumZoneNum = 1; PlenumZoneNum <= dataZonePlenum.NumZoneSupplyPlenums; ++PlenumZoneNum) {
 
@@ -813,11 +811,11 @@ namespace ZonePlenum {
                 dataZonePlenum.ZoneSupPlenCond(PlenumZoneNum).InletMassFlowRateMinAvail = 0.0;
             }
 
-            MyEnvrnFlag = false;
+            dataZonePlenum.MyEnvrnFlag = false;
         }
 
         if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            dataZonePlenum.MyEnvrnFlag = true;
         }
 
         // Do the following initializations (every time step): This should be the info from

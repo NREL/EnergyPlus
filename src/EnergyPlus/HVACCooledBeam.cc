@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -146,8 +147,15 @@ namespace HVACCooledBeam {
 
     // Object Data
     Array1D<CoolBeamData> CoolBeam;
+    bool GetInputFlag(true); // First time, input is "gotten"
+    bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
 
-    // Functions
+    void clear_state() {
+        CheckEquipName.clear();
+        GetInputFlag = true;
+        NumCB = true;
+        ZoneEquipmentListChecked = false;
+    }
 
     void SimCoolBeam(BranchInputManagerData &dataBranchInputManager,
                      std::string const &CompName,   // name of the cooled beam unit
@@ -174,7 +182,6 @@ namespace HVACCooledBeam {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CBNum;                      // index of cooled beam unit being simulated
-        static bool GetInputFlag(true); // First time, input is "gotten"
 
         // First time SimIndUnit is called, get the input for all the cooled beam units
         if (GetInputFlag) {
@@ -444,6 +451,13 @@ namespace HVACCooledBeam {
                                 "Average",
                                 CoolBeam(CBNum).Name);
 
+            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                CoolBeam(CBNum).OutdoorAirFlowRate,
+                                "System",
+                                "Average",
+                                CoolBeam(CBNum).Name);
+
             for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
                 if (CoolBeam(CBNum).AirOutNode == AirDistUnit(ADUNum).OutletNodeNum) {
                     CoolBeam(CBNum).ADUNum = ADUNum;
@@ -534,30 +548,14 @@ namespace HVACCooledBeam {
         int InWaterNode;  // unit inlet chilled water node
         int OutWaterNode; // unit outlet chilled water node
         Real64 RhoAir;    // air density at outside pressure and standard temperature and humidity
-        static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MySizeFlag;
-        static Array1D_bool PlantLoopScanFlag;
         Real64 rho;                                  // local fluid density
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;                                    // Loop checking control variable
         std::string CurrentModuleObject;
         bool errFlag;
 
         CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam";
-        // Do the one time initializations
-        if (MyOneTimeFlag) {
 
-            MyEnvrnFlag.allocate(NumCB);
-            MySizeFlag.allocate(NumCB);
-            PlantLoopScanFlag.allocate(NumCB);
-            MyEnvrnFlag = true;
-            MySizeFlag = true;
-            PlantLoopScanFlag = true;
-            MyOneTimeFlag = false;
-        }
-
-        if (PlantLoopScanFlag(CBNum) && allocated(PlantLoop)) {
+        if (CoolBeam(CBNum).PlantLoopScanFlag && allocated(PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(dataBranchInputManager,
                                     CoolBeam(CBNum).Name,
@@ -575,7 +573,7 @@ namespace HVACCooledBeam {
             if (errFlag) {
                 ShowFatalError("InitCoolBeam: Program terminated for previous conditions.");
             }
-            PlantLoopScanFlag(CBNum) = false;
+            CoolBeam(CBNum).PlantLoopScanFlag = false;
         }
 
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
@@ -590,7 +588,7 @@ namespace HVACCooledBeam {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(CBNum) && !PlantLoopScanFlag(CBNum)) {
+        if (!SysSizingCalc && CoolBeam(CBNum).MySizeFlag && !CoolBeam(CBNum).PlantLoopScanFlag) {
 
             SizeCoolBeam( CBNum);
 
@@ -609,11 +607,11 @@ namespace HVACCooledBeam {
                                CoolBeam(CBNum).CWLoopSideNum,
                                CoolBeam(CBNum).CWBranchNum,
                                CoolBeam(CBNum).CWCompNum);
-            MySizeFlag(CBNum) = false;
+            CoolBeam(CBNum).MySizeFlag = false;
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(CBNum)) {
+        if (BeginEnvrnFlag && CoolBeam(CBNum).MyEnvrnFlag) {
             RhoAir = StdRhoAir;
             InAirNode = CoolBeam(CBNum).AirInNode;
             OutAirNode = CoolBeam(CBNum).AirOutNode;
@@ -643,11 +641,11 @@ namespace HVACCooledBeam {
                 }
             }
 
-            MyEnvrnFlag(CBNum) = false;
+            CoolBeam(CBNum).MyEnvrnFlag= false;
         } // end one time inits
 
         if (!BeginEnvrnFlag) {
-            MyEnvrnFlag(CBNum) = true;
+            CoolBeam(CBNum).MyEnvrnFlag= true;
         }
 
         InAirNode = CoolBeam(CBNum).AirInNode;
@@ -1379,6 +1377,19 @@ namespace HVACCooledBeam {
         CoolBeam(CBNum).BeamCoolingEnergy = CoolBeam(CBNum).BeamCoolingRate * ReportingConstant;
         CoolBeam(CBNum).SupAirCoolingEnergy = CoolBeam(CBNum).SupAirCoolingRate * ReportingConstant;
         CoolBeam(CBNum).SupAirHeatingEnergy = CoolBeam(CBNum).SupAirHeatingRate * ReportingConstant;
+
+        // set zone OA volume flow rate report variable
+        CoolBeam(CBNum).CalcOutdoorAirVolumeFlowRate();
+    }
+
+    void CoolBeamData::CalcOutdoorAirVolumeFlowRate()
+    {
+        // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
+        if (this->AirLoopNum > 0) {
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->AirOutNode).MassFlowRate / DataEnvironment::StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+        } else {
+            this->OutdoorAirFlowRate = 0.0;
+        }
     }
 
 } // namespace HVACCooledBeam
