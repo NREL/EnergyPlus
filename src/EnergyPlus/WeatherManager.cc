@@ -6664,15 +6664,8 @@ namespace WeatherManager {
         // This subroutine gets the location info from the IDF file; latitude,
         //  longitude and time zone number.
 
-        int LocNumAlpha;             // Number of alpha names being passed
-        int LocNumProp;              // Number of properties being passed
-        int IOStat;                  // IO Status when calling get input subroutine
-        Array1D_string LocNames(1);  // Temp Array to transfer location info
-        Array1D<Real64> LocProps(4); // Temporary array to transfer location info
-        int NumLocations;
-
         DataIPShortCuts::cCurrentModuleObject = "Site:Location";
-        NumLocations = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int const NumLocations = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
         if (NumLocations > 1) {
             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
@@ -6680,6 +6673,11 @@ namespace WeatherManager {
         }
 
         if (NumLocations == 1) {
+            int LocNumAlpha;             // Number of alpha names being passed
+            int LocNumProp;              // Number of properties being passed
+            int IOStat;                  // IO Status when calling get input subroutine
+            Array1D_string LocNames(1);  // Temp Array to transfer location info
+            Array1D<Real64> LocProps(4); // Temporary array to transfer location info
             // Call Input Get routine to retrieve Location information
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, 1, LocNames, LocNumAlpha, LocProps, LocNumProp, IOStat);
 
@@ -6727,27 +6725,20 @@ namespace WeatherManager {
 
         static std::string const RoutineName("GetWeatherProperties:");
 
-        int Item;
-        int IOStat;
-        int NumAlpha;
-        int NumNumerics;
         int Found;
         int envFound;
-        int Count;
-        int schPtr;
-        bool MultipleEnvironments;
-        std::string units;
-        OutputProcessor::Unit unitType;
 
         DataIPShortCuts::cCurrentModuleObject = "WeatherProperty:SkyTemperature";
         NumWPSkyTemperatures = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
         WPSkyTemperature.allocate(NumWPSkyTemperatures); // by default, not used.
 
-        for (Item = 1; Item <= NumWPSkyTemperatures; ++Item) {
-            MultipleEnvironments = false;
+        for (int i = 1; i <= NumWPSkyTemperatures; ++i) {
+            int IOStat;
+            int NumAlpha;
+            int NumNumerics;
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
-                                          Item,
+                                          i,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlpha,
                                           DataIPShortCuts::rNumericArgs,
@@ -6758,90 +6749,88 @@ namespace WeatherManager {
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
 
-            {
-                auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(1));
-                if (SELECT_CASE_var.empty()) {
-                    Found = 0;
-                    for (Count = 1; Count <= NumOfEnvrn; ++Count) {
-                        if (Environment(Count).KindOfEnvrn != DataGlobals::ksRunPeriodWeather) continue;
-                        if (Environment(Count).WP_Type1 != 0) {
-                            ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
-                                            "\", indicated Environment Name already assigned.");
-                            if (!Environment(Count).Title.empty()) {
-                                ShowContinueError("...Environment=\"" + Environment(Count).Title + "\", already using " + DataIPShortCuts::cCurrentModuleObject +
-                                                  "=\"" + WPSkyTemperature(Environment(Count).WP_Type1).Name + "\".");
-                            } else {
-                                ShowContinueError("... Runperiod Environment, already using " + DataIPShortCuts::cCurrentModuleObject + "=\"" +
-                                                  WPSkyTemperature(Environment(Count).WP_Type1).Name + "\".");
-                            }
-                            ErrorsFound = true;
+            if (DataIPShortCuts::cAlphaArgs(1).empty()) {
+                Found = 0;
+                for (int j = 1; j <= NumOfEnvrn; ++j) {
+                    if (Environment(j).KindOfEnvrn != DataGlobals::ksRunPeriodWeather) continue;
+                    if (Environment(j).WP_Type1 != 0) {
+                        ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                                        "\", indicated Environment Name already assigned.");
+                        if (!Environment(j).Title.empty()) {
+                            ShowContinueError("...Environment=\"" + Environment(j).Title + "\", already using " + DataIPShortCuts::cCurrentModuleObject +
+                                              "=\"" + WPSkyTemperature(Environment(j).WP_Type1).Name + "\".");
                         } else {
-                            Environment(Count).WP_Type1 = Item;
-                            Found = Count;
+                            ShowContinueError("... Runperiod Environment, already using " + DataIPShortCuts::cCurrentModuleObject + "=\"" +
+                                              WPSkyTemperature(Environment(j).WP_Type1).Name + "\".");
                         }
-                    }
-                    MultipleEnvironments = true;
-                    if (Found == 0) {
-                        ShowWarningError("GetWeatherProperties: WeatherProperty:SkyTemperature=blank, no run periods found.");
-                        ShowContinueError("...SkyTemperature will not be applied.");
-                        continue;
-                    }
-                } else { // really a name
-                    Found = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(1), Environment, &EnvironmentData::Title);
-                    envFound = Found;
-                    if (Found == 0) {
-                        ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid Environment Name referenced.");
-                        ShowContinueError("...remainder of object not processed.");
                         ErrorsFound = true;
-                        continue;
                     } else {
-                        if (Environment(Found).WP_Type1 != 0) {
-                            ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
-                                            "\", indicated Environment Name already assigned.");
-                            ShowContinueError("...Environment=\"" + Environment(Found).Title + "\", already using " + DataIPShortCuts::cCurrentModuleObject + "=\"" +
-                                              WPSkyTemperature(Environment(Found).WP_Type1).Name + "\".");
-                            ErrorsFound = true;
-                        } else {
-                            Environment(Found).WP_Type1 = Item;
-                        }
+                        Environment(j).WP_Type1 = i;
+                        Found = j;
+                    }
+                }
+                if (Found == 0) {
+                    ShowWarningError("GetWeatherProperties: WeatherProperty:SkyTemperature=blank, no run periods found.");
+                    ShowContinueError("...SkyTemperature will not be applied.");
+                    continue;
+                }
+            } else { // really a name
+                Found = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(1), Environment, &EnvironmentData::Title);
+                envFound = Found;
+                if (Found == 0) {
+                    ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid Environment Name referenced.");
+                    ShowContinueError("...remainder of object not processed.");
+                    ErrorsFound = true;
+                    continue;
+                } else {
+                    if (Environment(Found).WP_Type1 != 0) {
+                        ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                                        "\", indicated Environment Name already assigned.");
+                        ShowContinueError("...Environment=\"" + Environment(Found).Title + "\", already using " + DataIPShortCuts::cCurrentModuleObject + "=\"" +
+                                          WPSkyTemperature(Environment(Found).WP_Type1).Name + "\".");
+                        ErrorsFound = true;
+                    } else {
+                        Environment(Found).WP_Type1 = i;
                     }
                 }
             }
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(1)) {
                 UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
-                WPSkyTemperature(Item).Name = DataIPShortCuts::cAlphaArgs(1); // Name
+                WPSkyTemperature(i).Name = DataIPShortCuts::cAlphaArgs(1); // Name
             } else {
-                WPSkyTemperature(Item).Name = "All RunPeriods";
+                WPSkyTemperature(i).Name = "All RunPeriods";
             }
             // Validate Calculation Type.
+            std::string units;
+            OutputProcessor::Unit unitType;
             if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "ScheduleValue")) {
-                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::ScheduleValue;
-                WPSkyTemperature(Item).IsSchedule = true;
+                WPSkyTemperature(i).CalculationType = EmissivityCalcType::ScheduleValue;
+                WPSkyTemperature(i).IsSchedule = true;
                 units = "[C]";
                 unitType = OutputProcessor::Unit::C;
             } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "DifferenceScheduleDryBulbValue")) {
-                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::DryBulbDelta;
-                WPSkyTemperature(Item).IsSchedule = true;
+                WPSkyTemperature(i).CalculationType = EmissivityCalcType::DryBulbDelta;
+                WPSkyTemperature(i).IsSchedule = true;
                 units = "[deltaC]";
                 unitType = OutputProcessor::Unit::deltaC;
             } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "DifferenceScheduleDewPointValue")) {
-                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::DewPointDelta;
-                WPSkyTemperature(Item).IsSchedule = true;
+                WPSkyTemperature(i).CalculationType = EmissivityCalcType::DewPointDelta;
+                WPSkyTemperature(i).IsSchedule = true;
                 units = "[deltaC]";
                 unitType = OutputProcessor::Unit::deltaC;
             } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "Brunt")) {
-                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::BruntModel;
-                WPSkyTemperature(Item).IsSchedule = false;
+                WPSkyTemperature(i).CalculationType = EmissivityCalcType::BruntModel;
+                WPSkyTemperature(i).IsSchedule = false;
             } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "Idso")) {
-                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::IdsoModel;
-                WPSkyTemperature(Item).IsSchedule = false;
+                WPSkyTemperature(i).CalculationType = EmissivityCalcType::IdsoModel;
+                WPSkyTemperature(i).IsSchedule = false;
             } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "BerdahlMartin")) {
-                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::BerdahlMartinModel;
-                WPSkyTemperature(Item).IsSchedule = false;
+                WPSkyTemperature(i).CalculationType = EmissivityCalcType::BerdahlMartinModel;
+                WPSkyTemperature(i).IsSchedule = false;
             } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "ClarkAllen")) {
-                WPSkyTemperature(Item).CalculationType = EmissivityCalcType::ClarkAllenModel;
-                WPSkyTemperature(Item).IsSchedule = false;
+                WPSkyTemperature(i).CalculationType = EmissivityCalcType::ClarkAllenModel;
+                WPSkyTemperature(i).IsSchedule = false;
             } else {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '.');
                 ShowContinueError("...entered value=\"" + DataIPShortCuts::cAlphaArgs(2) +
@@ -6849,11 +6838,11 @@ namespace WeatherManager {
                 ErrorsFound = true;
             }
 
-            if (WPSkyTemperature(Item).IsSchedule) {
-                WPSkyTemperature(Item).ScheduleName = DataIPShortCuts::cAlphaArgs(3);
+            if (WPSkyTemperature(i).IsSchedule) {
+                WPSkyTemperature(i).ScheduleName = DataIPShortCuts::cAlphaArgs(3);
                 if (Environment(Found).KindOfEnvrn == DataGlobals::ksRunPeriodWeather ||
                     Environment(Found).KindOfEnvrn == DataGlobals::ksRunPeriodDesign) {
-                    WPSkyTemperature(Item).ScheduleName = DataIPShortCuts::cAlphaArgs(3);
+                    WPSkyTemperature(i).ScheduleName = DataIPShortCuts::cAlphaArgs(3);
                     // See if it's a schedule.
                     Found = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(3));
                     if (Found == 0) {
@@ -6865,8 +6854,8 @@ namespace WeatherManager {
                                 "\"Schedule:Constant\" objects.");
                         ErrorsFound = true;
                     } else {
-                        WPSkyTemperature(Item).IsSchedule = true;
-                        WPSkyTemperature(Item).SchedulePtr = Found;
+                        WPSkyTemperature(i).IsSchedule = true;
+                        WPSkyTemperature(i).SchedulePtr = Found;
                     }
                 } else { // See if it's a valid schedule.
                     Found = ScheduleManager::GetDayScheduleIndex(DataIPShortCuts::cAlphaArgs(3));
@@ -6879,7 +6868,7 @@ namespace WeatherManager {
                         ErrorsFound = true;
                     } else {
                         if (envFound != 0) {
-                            schPtr = General::FindNumberInList(Found, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs);
+                            int schPtr = General::FindNumberInList(Found, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs);
                             if ((schPtr == 0) || (SPSiteScheduleUnits(schPtr) != units)) {
                                 ++NumSPSiteScheduleNamePtrs;
                                 SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
@@ -6888,25 +6877,25 @@ namespace WeatherManager {
                                                     SPSiteSkyTemperatureScheduleValue(envFound), "Zone", "Average",
                                                     DataIPShortCuts::cAlphaArgs(3));
                             }
-                            WPSkyTemperature(Item).IsSchedule = true;
-                            WPSkyTemperature(Item).SchedulePtr = Found;
+                            WPSkyTemperature(i).IsSchedule = true;
+                            WPSkyTemperature(i).SchedulePtr = Found;
                         }
                     }
                 }
             }
 
-            if (!WPSkyTemperature(Item).IsSchedule && !DataIPShortCuts::lAlphaFieldBlanks(4)) {
+            if (!WPSkyTemperature(i).IsSchedule && !DataIPShortCuts::lAlphaFieldBlanks(4)) {
                 if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(4), "Yes")) {
-                    WPSkyTemperature(Item).UseWeatherFileHorizontalIR = true;
+                    WPSkyTemperature(i).UseWeatherFileHorizontalIR = true;
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(4), "No")) {
-                    WPSkyTemperature(Item).UseWeatherFileHorizontalIR = false;
+                    WPSkyTemperature(i).UseWeatherFileHorizontalIR = false;
                 } else {
                     ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '.');
                     ShowContinueError("...entered value=\"" + DataIPShortCuts::cAlphaArgs(4) + "\", should be Yes or No.");
                     ErrorsFound = true;
                 }
             } else {
-                WPSkyTemperature(Item).UseWeatherFileHorizontalIR = true;
+                WPSkyTemperature(i).UseWeatherFileHorizontalIR = true;
             }
         }
         for (int envrn = 1; envrn <= NumOfEnvrn; ++envrn) {
@@ -6970,21 +6959,18 @@ namespace WeatherManager {
         // This file reads the Ground Reflectances from the input file (optional) and
         // places them in the monthly array.
 
-        int GndNumAlpha;          // Number of construction alpha names being passed
-        int GndNumProp;           // dummy variable for properties being passed
-        int IOStat;               // IO Status when calling get input subroutine
-        int I;                    // Loop counter variable
-        Array1D_string GndAlphas; // Construction Alpha names defined
-        Array1D<Real64> GndProps; // Temporary array to transfer ground reflectances
 
         static ObjexxFCL::gio::Fmt const Format_720("(' Site:GroundReflectance',12(', ',F5.2))");
 
         DataIPShortCuts::cCurrentModuleObject = "Site:GroundReflectance";
-        I = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
-        if (I != 0) {
-            GndProps.allocate(12);
-            GndAlphas.allocate(1);
-            if (I == 1) {
+        int nObjs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        if (nObjs != 0) {
+            Array1D_string GndAlphas(1); // Construction Alpha names defined
+            Array1D<Real64> GndProps(12); // Temporary array to transfer ground reflectances
+            if (nObjs == 1) {
+                int GndNumAlpha;          // Number of construction alpha names being passed
+                int GndNumProp;           // dummy variable for properties being passed
+                int IOStat;               // IO Status when calling get input subroutine
                 // Get the object names for each construction from the input processor
                 inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat);
 
@@ -7000,8 +6986,6 @@ namespace WeatherManager {
                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
                 ErrorsFound = true;
             }
-            GndProps.deallocate();
-            GndAlphas.deallocate();
         }
 
         // Write Final Ground Reflectance Information to the initialization output file
@@ -7012,8 +6996,8 @@ namespace WeatherManager {
                "dimensionless},Nov{dimensionless},Dec{dimensionless}");
 
         print(outputFiles.eio, " Site:GroundReflectance");
-        for (I = 1; I <= 12; ++I) {
-            print(outputFiles.eio, ", {:5.2F}", GroundReflectances(I));
+        for (int i = 1; i <= 12; ++i) {
+            print(outputFiles.eio, ", {:5.2F}", GroundReflectances(i));
         }
         print(outputFiles.eio, "\n");
     }
@@ -7031,21 +7015,17 @@ namespace WeatherManager {
         // This file reads the Snow Ground Reflectance Modifiers from the input file (optional) and
         // places them in the variables.
 
-        int GndNumAlpha;          // Number of construction alpha names being passed
-        int GndNumProp;           // dummy variable for properties being passed
-        int IOStat;               // IO Status when calling get input subroutine
-        int I;                    // Loop counter variable
-        Array1D_string GndAlphas; // Construction Alpha names defined
-        Array1D<Real64> GndProps; // Temporary array to transfer ground reflectances
-
         static ObjexxFCL::gio::Fmt const Format_721("(A,12(', ',F5.2))");
 
         DataIPShortCuts::cCurrentModuleObject = "Site:GroundReflectance:SnowModifier";
-        I = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
-        if (I != 0) {
-            GndProps.allocate(2);
-            GndAlphas.allocate(1);
-            if (I == 1) {
+        int nObjs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        if (nObjs != 0) {
+            Array1D_string GndAlphas(1); // Construction Alpha names defined
+            Array1D<Real64> GndProps(2); // Temporary array to transfer ground reflectances
+            if (nObjs == 1) {
+                int GndNumAlpha;          // Number of construction alpha names being passed
+                int GndNumProp;           // dummy variable for properties being passed
+                int IOStat;               // IO Status when calling get input subroutine
                 // Get the object names for each construction from the input processor
                 inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat);
 
@@ -7057,8 +7037,6 @@ namespace WeatherManager {
                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
                 ErrorsFound = true;
             }
-            GndProps.deallocate();
-            GndAlphas.deallocate();
         }
 
         // Write Final Ground Reflectance Modifier Information to the initialization output file
@@ -7072,8 +7050,8 @@ namespace WeatherManager {
                "dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{"
                "dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}");
         print(outputFiles.eio, "{}"," Site:GroundReflectance:Snow");
-        for (I = 1; I <= 12; ++I) {
-            print(outputFiles.eio, ", {:5.2F}", max(min(GroundReflectances(I) * SnowGndRefModifier, 1.0), 0.0));
+        for (int i = 1; i <= 12; ++i) {
+            print(outputFiles.eio, ", {:5.2F}", max(min(GroundReflectances(i) * SnowGndRefModifier, 1.0), 0.0));
         }
         print(outputFiles.eio, "\n");
         print(outputFiles.eio, "{}\n",
@@ -7082,8 +7060,8 @@ namespace WeatherManager {
                "dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{"
                "dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}");
         print(outputFiles.eio, " Site:GroundReflectance:Snow:Daylighting");
-        for (I = 1; I <= 12; ++I) {
-            print(outputFiles.eio, ", {:5.2F}", max(min(GroundReflectances(I) * SnowGndRefModifierForDayltg, 1.0), 0.0));
+        for (nObjs = 1; nObjs <= 12; ++nObjs) {
+            print(outputFiles.eio, ", {:5.2F}", max(min(GroundReflectances(nObjs) * SnowGndRefModifierForDayltg, 1.0), 0.0));
         }
         print(outputFiles.eio, "\n");
     }
@@ -7100,17 +7078,15 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Reads the input data for the WATER MAINS TEMPERATURES object.
 
-        int NumObjects;
-        int NumAlphas;               // Number of elements in the alpha array
-        int NumNums;                 // Number of elements in the numeric array
-        int IOStat;                  // IO Status when calling get input subroutine
-        Array1D_string AlphArray(2); // Character string data
-        Array1D<Real64> NumArray(2); // Numeric data
-
         DataIPShortCuts::cCurrentModuleObject = "Site:WaterMainsTemperature";
-        NumObjects = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumObjects = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
         if (NumObjects == 1) {
+            int NumAlphas;               // Number of elements in the alpha array
+            int NumNums;                 // Number of elements in the numeric array
+            int IOStat;                  // IO Status when calling get input subroutine
+            Array1D_string AlphArray(2); // Character string data
+            Array1D<Real64> NumArray(2); // Numeric data
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           1,
                                           AlphArray,
@@ -7175,23 +7151,25 @@ namespace WeatherManager {
         // is fit to Fahrenheit units, so the air temperature values are first convert to F, then mains temperature
         // is calculated and converted back to C.
 
+        switch(WaterMainsTempsMethod)
         {
-            auto const SELECT_CASE_var(WaterMainsTempsMethod);
-
-            if (SELECT_CASE_var == WaterMainsTempCalcMethod::Schedule) {
+            case WaterMainsTempCalcMethod::Schedule:
                 DataEnvironment::WaterMainsTemp = ScheduleManager::GetCurrentScheduleValue(WaterMainsTempsSchedule);
-            } else if (SELECT_CASE_var == WaterMainsTempCalcMethod::Correlation) {
+                break;
+            case WaterMainsTempCalcMethod::Correlation:
                 DataEnvironment::WaterMainsTemp = WaterMainsTempFromCorrelation(WaterMainsTempsAnnualAvgAirTemp, WaterMainsTempsMaxDiffAirTemp);
-            } else if (SELECT_CASE_var == WaterMainsTempCalcMethod::CorrelationFromWeatherFile) {
+                break;
+            case WaterMainsTempCalcMethod::CorrelationFromWeatherFile:
                 if (OADryBulbAverage.OADryBulbWeatherDataProcessed) {
                     DataEnvironment::WaterMainsTemp =
-                        WaterMainsTempFromCorrelation(OADryBulbAverage.AnnualAvgOADryBulbTemp, OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff);
+                            WaterMainsTempFromCorrelation(OADryBulbAverage.AnnualAvgOADryBulbTemp, OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff);
                 } else {
                     DataEnvironment::WaterMainsTemp = 10.0; // 50 F
                 }
-            } else {
+                break;
+            default:
                 DataEnvironment::WaterMainsTemp = 10.0; // 50 F
-            }
+                break;
         }
     }
 
@@ -7218,27 +7196,18 @@ namespace WeatherManager {
         // Savings Benchmark for All Residential End-Uses", Proceedings of SimBuild 2004, IBPSA-USA National Conference,
         // Boulder, CO, August 4 - 6, 2004.
 
-        Real64 Tavg;                          // Annual Average Outdoor Air Temperature (F)
-        Real64 Tdiff;                         // Maximum difference in monthly average outdoor air temperatures (deltaF)
-        Real64 Ratio;                         // Value used in correlation
-        Real64 Lag;                           // Value used in correlation
-        Real64 Offset;                        // Value used in correlation
-        Real64 CurrentWaterMainsTemp;         // calculated water main temp (F)
+        // Annual Average Outdoor Air Temperature (F)
+        Real64 const Tavg = AnnualOAAvgDryBulbTemp * (9.0 / 5.0) + 32.0;
+        // Maximum difference in monthly average outdoor air temperatures (deltaF)
+        Real64 const Tdiff = MonthlyOAAvgDryBulbTempMaxDiff * (9.0 / 5.0);
 
-        Tavg = AnnualOAAvgDryBulbTemp * (9.0 / 5.0) + 32.0;
-        Tdiff = MonthlyOAAvgDryBulbTempMaxDiff * (9.0 / 5.0);
+        Real64 const Ratio = 0.4 + 0.01 * (Tavg - 44.0);
+        Real64 const Lag = 35.0 - 1.0 * (Tavg - 44.0);
+        Real64 const Offset = 6.0;
+        int const latitude_sign = (DataEnvironment::Latitude >= 0) ? 1 : -1;
 
-        Ratio = 0.4 + 0.01 * (Tavg - 44.0);
-        Lag = 35.0 - 1.0 * (Tavg - 44.0);
-        Offset = 6.0;
-        int latitude_sign;
-        if (DataEnvironment::Latitude >= 0) {
-            latitude_sign = 1;
-        } else {
-            latitude_sign = -1;
-        }
-
-        CurrentWaterMainsTemp = Tavg + Offset + Ratio * (Tdiff / 2.0) * latitude_sign * std::sin((0.986 * (DataEnvironment::DayOfYear - 15.0 - Lag) - 90) * DataGlobals::DegToRadians);
+        // calculated water main temp (F)
+        Real64 CurrentWaterMainsTemp = Tavg + Offset + Ratio * (Tdiff / 2.0) * latitude_sign * std::sin((0.986 * (DataEnvironment::DayOfYear - 15.0 - Lag) - 90) * DataGlobals::DegToRadians);
 
         if (CurrentWaterMainsTemp < 32.0) CurrentWaterMainsTemp = 32.0;
 
@@ -7257,27 +7226,21 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Reads the input data for the WEATHER STATION object.
 
-        int NumObjects;
-        int NumAlphas;                      // Number of elements in the alpha array
-        int NumNums;                        // Number of elements in the numeric array
-        int IOStat;                         // IO Status when calling get input subroutine
-        Array1D_string AlphArray(1);        // Character string data
-        Array1D<Real64> NumArray(4);        // Numeric data
-        Real64 WeatherFileWindSensorHeight; // Height of the wind sensor at the weather station, i.e., weather file
-        Real64 WeatherFileWindExp;          // Exponent for the wind velocity profile at the weather station
-        Real64 WeatherFileWindBLHeight;     // Boundary layer height for the wind velocity profile at the weather station (m)
-        Real64 WeatherFileTempSensorHeight; // Height of the air temperature sensor at the weather station (m)
-
         DataIPShortCuts::cCurrentModuleObject = "Site:WeatherStation";
-        NumObjects = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int const NumObjects = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
         // Default conditions for a weather station in an open field at a height of 10 m. (These should match the IDD defaults.)
-        WeatherFileWindSensorHeight = 10.0;
-        WeatherFileWindExp = 0.14;
-        WeatherFileWindBLHeight = 270.0;
-        WeatherFileTempSensorHeight = 1.5;
+        Real64 WeatherFileWindSensorHeight = 10.0;      // Height of the wind sensor at the weather station, i.e., weather file
+        Real64 WeatherFileWindExp = 0.14;               // Exponent for the wind velocity profile at the weather station
+        Real64 WeatherFileWindBLHeight = 270.0;         // Boundary layer height for the wind velocity profile at the weather station (m)
+        Real64 WeatherFileTempSensorHeight = 1.5;       // Height of the air temperature sensor at the weather station (m)
 
         if (NumObjects == 1) {
+            int NumAlphas;                      // Number of elements in the alpha array
+            int NumNums;                        // Number of elements in the numeric array
+            int IOStat;                         // IO Status when calling get input subroutine
+            Array1D_string AlphArray(1);        // Character string data
+            Array1D<Real64> NumArray(4);        // Numeric data
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
 
             if (NumNums > 0) WeatherFileWindSensorHeight = NumArray(1);
@@ -7332,12 +7295,12 @@ namespace WeatherManager {
         // REFERENCES:
         // Based on DOE-2.1E subroutine DEXTIL.
 
-        Real64 SDIRH; // Exterior horizontal beam irradiance (W/m2)
-        Real64 SDIFH; // Exterior horizontal sky diffuse irradiance (W/m2)
         // SOLCOS(3), below, is the cosine of the solar zenith angle.
         if (DataEnvironment::SunIsUp) {
-            SDIRH = DataEnvironment::BeamSolarRad * DataEnvironment::SOLCOS(3);
-            SDIFH = DataEnvironment::DifSolarRad;
+            // Exterior horizontal beam irradiance (W/m2)
+            Real64 SDIRH = DataEnvironment::BeamSolarRad * DataEnvironment::SOLCOS(3);
+            // Exterior horizontal sky diffuse irradiance (W/m2)
+            Real64 SDIFH = DataEnvironment::DifSolarRad;
             // Fraction of sky covered by clouds
             DataEnvironment::CloudFraction = pow_2(SDIFH / (SDIRH + SDIFH + 0.0001));
             // Luminous efficacy of sky diffuse solar and beam solar (lumens/W);
@@ -7349,8 +7312,6 @@ namespace WeatherManager {
             DataEnvironment::HISUNF = SDIRH * DataEnvironment::PDIRLW;
             DataEnvironment::HISUNFnorm = DataEnvironment::BeamSolarRad * DataEnvironment::PDIRLW;
         } else {
-            SDIRH = 0.0;
-            SDIFH = 0.0;
             DataEnvironment::CloudFraction = 0.0;
             DataEnvironment::PDIFLW = 0.0;
             DataEnvironment::PDIRLW = 0.0;
@@ -7407,44 +7368,39 @@ namespace WeatherManager {
                                                       128814.0,
                                                       130471.0}); // Monthly exterrestrial direct normal illuminance (lum/m2)
 
-        Real64 SunZenith;      // Solar zenith angle (radians)
-        Real64 SunAltitude;    // Solar altitude angle (radians)
-        Real64 SinSunAltitude; // Sine of the solar altitude angle
-        Real64 Zeta;
-        int ISkyClearness;    // Sky clearness bin
-        Real64 AirMass;       // Relative optical air mass
-        Real64 AtmosMoisture; // Atmospheric moisture (cm of precipitable water)
-
-        SunZenith = std::acos(DataEnvironment::SOLCOS(3));
-        SunAltitude = DataGlobals::PiOvr2 - SunZenith;
-        SinSunAltitude = std::sin(SunAltitude);
+        Real64 const SunZenith = std::acos(DataEnvironment::SOLCOS(3));   // Solar zenith angle (radians)
+        Real64 const SunAltitude = DataGlobals::PiOvr2 - SunZenith;         // Solar altitude angle (radians)
+        Real64 const SinSunAltitude = std::sin(SunAltitude);
         // Clearness of sky. SkyClearness close to 1.0 corresponds to an overcast sky.
         // SkyClearness > 6 is a clear sky.
         // DifSolarRad is the diffuse horizontal irradiance.
         // BeamSolarRad is the direct normal irradiance.
-        Zeta = 1.041 * pow_3(SunZenith);
+        Real64 const Zeta = 1.041 * pow_3(SunZenith);
         DataEnvironment::SkyClearness = ((DataEnvironment::DifSolarRad + DataEnvironment::BeamSolarRad) / (DataEnvironment::DifSolarRad + 0.0001) + Zeta) / (1.0 + Zeta);
-        AirMass = (1.0 - 0.1 * DataEnvironment::Elevation / 1000.0) / (SinSunAltitude + 0.15 / std::pow(SunAltitude / DataGlobals::DegToRadians + 3.885, 1.253));
+        // Relative optical air mass
+        Real64 const AirMass = (1.0 - 0.1 * DataEnvironment::Elevation / 1000.0) / (SinSunAltitude + 0.15 / std::pow(SunAltitude / DataGlobals::DegToRadians + 3.885, 1.253));
         // In the following, 93.73 is the extraterrestrial luminous efficacy
         DataEnvironment::SkyBrightness = (DataEnvironment::DifSolarRad * 93.73) * AirMass / ExtraDirNormIll(DataEnvironment::Month);
+        int ISkyClearness;    // Sky clearness bin
         if (DataEnvironment::SkyClearness <= 1.065) {
             ISkyClearness = 1;
-        } else if (DataEnvironment::SkyClearness > 1.065 && DataEnvironment::SkyClearness <= 1.23) {
+        } else if (DataEnvironment::SkyClearness <= 1.23) {
             ISkyClearness = 2;
-        } else if (DataEnvironment::SkyClearness > 1.23 && DataEnvironment::SkyClearness <= 1.50) {
+        } else if (DataEnvironment::SkyClearness <= 1.50) {
             ISkyClearness = 3;
-        } else if (DataEnvironment::SkyClearness > 1.50 && DataEnvironment::SkyClearness <= 1.95) {
+        } else if (DataEnvironment::SkyClearness <= 1.95) {
             ISkyClearness = 4;
-        } else if (DataEnvironment::SkyClearness > 1.95 && DataEnvironment::SkyClearness <= 2.80) {
+        } else if (DataEnvironment::SkyClearness <= 2.80) {
             ISkyClearness = 5;
-        } else if (DataEnvironment::SkyClearness > 2.80 && DataEnvironment::SkyClearness <= 4.50) {
+        } else if (DataEnvironment::SkyClearness <= 4.50) {
             ISkyClearness = 6;
-        } else if (DataEnvironment::SkyClearness > 4.50 && DataEnvironment::SkyClearness <= 6.20) {
+        } else if (DataEnvironment::SkyClearness <= 6.20) {
             ISkyClearness = 7;
         } else {
             ISkyClearness = 8;
         }
-        AtmosMoisture = std::exp(0.07 * DataEnvironment::OutDewPointTemp - 0.075);
+        // Atmospheric moisture (cm of precipitable water)
+        Real64 const AtmosMoisture = std::exp(0.07 * DataEnvironment::OutDewPointTemp - 0.075);
         // Sky diffuse luminous efficacy
         if (DataEnvironment::SkyBrightness <= 0.0) {
             DiffLumEff = 0.0;
@@ -7480,30 +7436,26 @@ namespace WeatherManager {
 
         Array1D<Real64> longl({-12, 12}); // Lower Longitude value for a Time Zone
         Array1D<Real64> longh({-12, 12}); // Upper Longitude value for a Time Zone
-        int i;                            // Loop variable
-        Real64 temp;                      // temporary value used to determine time zone
-        Real64 tz;                        // resultant tz meridian
 
         GetSTM = 0.0;
 
         longl(0) = -7.5;
         longh(0) = 7.5;
-        for (i = 1; i <= 12; ++i) {
+        for (int i = 1; i <= 12; ++i) {
             longl(i) = longl(i - 1) + 15.0;
             longh(i) = longh(i - 1) + 15.0;
         }
-        for (i = 1; i <= 12; ++i) {
+        for (int i = 1; i <= 12; ++i) {
             longl(-i) = longl(-i + 1) - 15.0;
             longh(-i) = longh(-i + 1) - 15.0;
         }
-        temp = Longitude;
-        temp = mod(temp, 360.0);
-
+        Real64 temp = mod(Longitude, 360.0);
         if (temp > 180.0) temp -= 180.0;
-        for (i = -12; i <= 12; ++i) {
+        Real64 tz;                        // resultant tz meridian
+        for (int i = -12; i <= 12; ++i) {
             if (temp > longl(i) && temp <= longh(i)) {
                 tz = i;
-                tz = mod(tz, 24.0);
+                tz = mod(i, 24.0);
                 GetSTM = tz;
                 break;
             }
@@ -7531,28 +7483,11 @@ namespace WeatherManager {
         static ObjexxFCL::gio::Fmt const fmtA("(A)");
         static ObjexxFCL::gio::Fmt const fmtLD("*");
 
-        int Count;
-        std::string WMO;
-        std::string::size_type Pos;
-        Real64 Number;
-        bool IOStatus;
-        int PMonth;
-        int PDay;
-        int PWeekDay;
-        int PYear;
         WeatherManager::DateType dateType;
         int NumHdArgs;
-        bool errFlag;
-        int CurCount;
-        int CurOne;
-        int NumEPWHolidays;
-        int NumGrndTemps;
-        int TropExtremeCount; // because these can show up as "no dry" need to count and separate.
-        int actcount;
-        bool errflag1; // Local ErrFlag for call to ProcessDateString
 
         // Strip off Header value from Line
-        Pos = index(Line, ',');
+        std::string::size_type Pos = index(Line, ',');
         if ((Pos == std::string::npos) && (!has_prefixi(HeaderString, "COMMENTS"))) {
             ShowSevereError("Invalid Header line in in.epw -- no commas");
             ShowContinueError("Line=" + Line);
@@ -7561,17 +7496,16 @@ namespace WeatherManager {
         if (Pos != std::string::npos) Line.erase(0, Pos + 1);
 
         {
-            auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(HeaderString));
+            auto const HeaderStringUppercase(UtilityRoutines::MakeUPPERCase(HeaderString));
 
-            if (SELECT_CASE_var == "LOCATION") {
+            if (HeaderStringUppercase == "LOCATION") {
 
                 // LOCATION, A1 [City], A2 [State/Province/Region], A3 [Country],
                 // A4 [Source], N1 [WMO], N2 [Latitude],
                 // N3 [Longitude], N4 [Time Zone], N5 [Elevation {m}]
 
                 NumHdArgs = 9;
-                Count = 1;
-                while (Count <= NumHdArgs) {
+                for (int i = 1; i <= NumHdArgs; ++i) {
                     strip(Line);
                     Pos = index(Line, ',');
                     if (Pos == std::string::npos) {
@@ -7587,47 +7521,56 @@ namespace WeatherManager {
                         }
                     }
 
+                    switch(i)
                     {
-                        auto const SELECT_CASE_var1(Count);
-
-                        if (SELECT_CASE_var1 == 1) {
+                        case 1:
                             EPWHeaderTitle = stripped(Line.substr(0, Pos));
-
-                        } else if ((SELECT_CASE_var1 == 2) || (SELECT_CASE_var1 == 3) || (SELECT_CASE_var1 == 4)) {
+                            break;
+                        case 2:
+                        case 3:
+                        case 4:
                             EPWHeaderTitle = strip(EPWHeaderTitle) + ' ' + stripped(Line.substr(0, Pos));
-
-                        } else if (SELECT_CASE_var1 == 5) {
-                            WMO = stripped(Line.substr(0, Pos));
-                            EPWHeaderTitle += " WMO#=" + WMO;
-
-                        } else if ((SELECT_CASE_var1 == 6) || (SELECT_CASE_var1 == 7) || (SELECT_CASE_var1 == 8) || (SELECT_CASE_var1 == 9)) {
-                            Number = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
-                            if (!errFlag) {
-                                {
-                                    auto const SELECT_CASE_var2(Count);
-                                    if (SELECT_CASE_var2 == 6) {
-                                        WeatherFileLatitude = Number;
-                                    } else if (SELECT_CASE_var2 == 7) {
-                                        WeatherFileLongitude = Number;
-                                    } else if (SELECT_CASE_var2 == 8) {
-                                        WeatherFileTimeZone = Number;
-                                    } else if (SELECT_CASE_var2 == 9) {
-                                        WeatherFileElevation = Number;
+                            break;
+                        case 5:
+                            EPWHeaderTitle += " WMO#=" + stripped(Line.substr(0, Pos));
+                            break;
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 9:
+                            {
+                                bool errFlag;
+                                Real64 const Number = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
+                                if (!errFlag) {
+                                    switch (i) {
+                                        case 6:
+                                            WeatherFileLatitude = Number;
+                                            break;
+                                        case 7:
+                                            WeatherFileLongitude = Number;
+                                            break;
+                                        case 8:
+                                            WeatherFileTimeZone = Number;
+                                            break;
+                                        case 9:
+                                            WeatherFileElevation = Number;
+                                            break;
+                                        default:
+                                            break;
                                     }
                                 }
-                            } else {
-                                ShowSevereError("GetEPWHeader:LOCATION, invalid numeric=" + Line.substr(0, Pos));
-                                ErrorsFound = true;
                             }
-                        }
+                            break;
+                        default:
+                            ShowSevereError("GetEPWHeader:LOCATION, invalid numeric=" + Line.substr(0, Pos));
+                            ErrorsFound = true;
+                            break;
                     }
                     Line.erase(0, Pos + 1);
-                    ++Count;
                 }
                 DataEnvironment::WeatherFileLocationTitle = stripped(EPWHeaderTitle);
 
-            } else if (SELECT_CASE_var == "TYPICAL/EXTREME PERIODS") {
-                TropExtremeCount = 0;
+            } else if (HeaderStringUppercase == "TYPICAL/EXTREME PERIODS") {
                 strip(Line);
                 Pos = index(Line, ',');
                 if (Pos == std::string::npos) {
@@ -7641,111 +7584,114 @@ namespace WeatherManager {
                         Pos = len(Line);
                     }
                 }
+                bool IOStatus;
                 NumEPWTypExtSets = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
                 Line.erase(0, Pos + 1);
                 TypicalExtremePeriods.allocate(NumEPWTypExtSets);
-                TropExtremeCount = 0;
-                Count = 1;
-                while (Count <= NumEPWTypExtSets) {
+                int TropExtremeCount = 0;
+                for (int i = 1; i <= NumEPWTypExtSets; ++i) {
                     strip(Line);
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
-                        TypicalExtremePeriods(Count).Title = Line.substr(0, Pos);
+                        TypicalExtremePeriods(i).Title = Line.substr(0, Pos);
                         Line.erase(0, Pos + 1);
                     } else {
                         ShowWarningError("ProcessEPWHeader: Invalid Typical/Extreme Periods Header(WeatherFile)=" + Line.substr(0, Pos));
-                        ShowContinueError("...on processing Typical/Extreme period #" + General::RoundSigDigits(Count));
-                        NumEPWTypExtSets = Count - 1;
+                        ShowContinueError("...on processing Typical/Extreme period #" + General::RoundSigDigits(i));
+                        NumEPWTypExtSets = i - 1;
                         break;
                     }
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
-                        TypicalExtremePeriods(Count).TEType = Line.substr(0, Pos);
+                        TypicalExtremePeriods(i).TEType = Line.substr(0, Pos);
                         Line.erase(0, Pos + 1);
-                        if (UtilityRoutines::SameString(TypicalExtremePeriods(Count).TEType, "EXTREME")) {
-                            if (has_prefixi(TypicalExtremePeriods(Count).Title, "NO DRY SEASON - WEEK NEAR ANNUAL MAX")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "NoDrySeasonMax";
-                            } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "NO DRY SEASON - WEEK NEAR ANNUAL MIN")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "NoDrySeasonMin";
-                            } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "NO WET SEASON - WEEK NEAR ANNUAL MAX")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "NoWetSeasonMax";
-                            } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "NO WET SEASON - WEEK NEAR ANNUAL MIN")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "NoWetSeasonMin";
+                        if (UtilityRoutines::SameString(TypicalExtremePeriods(i).TEType, "EXTREME")) {
+                            if (has_prefixi(TypicalExtremePeriods(i).Title, "NO DRY SEASON - WEEK NEAR ANNUAL MAX")) {
+                                TypicalExtremePeriods(i).ShortTitle = "NoDrySeasonMax";
+                            } else if (has_prefixi(TypicalExtremePeriods(i).Title, "NO DRY SEASON - WEEK NEAR ANNUAL MIN")) {
+                                TypicalExtremePeriods(i).ShortTitle = "NoDrySeasonMin";
+                            } else if (has_prefixi(TypicalExtremePeriods(i).Title, "NO WET SEASON - WEEK NEAR ANNUAL MAX")) {
+                                TypicalExtremePeriods(i).ShortTitle = "NoWetSeasonMax";
+                            } else if (has_prefixi(TypicalExtremePeriods(i).Title, "NO WET SEASON - WEEK NEAR ANNUAL MIN")) {
+                                TypicalExtremePeriods(i).ShortTitle = "NoWetSeasonMin";
                                 // to account for problems earlier in weather files:
-                            } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "NO DRY")) {
+                            } else if (has_prefixi(TypicalExtremePeriods(i).Title, "NO DRY")) {
                                 if (TropExtremeCount == 0) {
-                                    TypicalExtremePeriods(Count).Title = "No Dry Season - Week Near Annual Max";
-                                    TypicalExtremePeriods(Count).ShortTitle = "NoDrySeasonMax";
+                                    TypicalExtremePeriods(i).Title = "No Dry Season - Week Near Annual Max";
+                                    TypicalExtremePeriods(i).ShortTitle = "NoDrySeasonMax";
                                     ++TropExtremeCount;
                                 } else if (TropExtremeCount == 1) {
-                                    TypicalExtremePeriods(Count).Title = "No Dry Season - Week Near Annual Min";
-                                    TypicalExtremePeriods(Count).ShortTitle = "NoDrySeasonMin";
+                                    TypicalExtremePeriods(i).Title = "No Dry Season - Week Near Annual Min";
+                                    TypicalExtremePeriods(i).ShortTitle = "NoDrySeasonMin";
                                     ++TropExtremeCount;
                                 }
                             } else { // make new short titles
-                                if (has_prefixi(TypicalExtremePeriods(Count).Title, "SUMMER")) {
-                                    TypicalExtremePeriods(Count).ShortTitle = "Summer";
-                                } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "WINTER")) {
-                                    TypicalExtremePeriods(Count).ShortTitle = "Winter";
-                                } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "TROPICAL HOT")) {
-                                    TypicalExtremePeriods(Count).ShortTitle = "TropicalHot";
-                                } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "TROPICAL COLD")) {
-                                    TypicalExtremePeriods(Count).ShortTitle = "TropicalCold";
-                                } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "AUTUMN")) {
-                                    TypicalExtremePeriods(Count).ShortTitle = "Autumn";
-                                } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "NO DRY")) {
-                                    TypicalExtremePeriods(Count).ShortTitle = "NoDrySeason";
-                                } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "NO WET")) {
-                                    TypicalExtremePeriods(Count).ShortTitle = "NoWetSeason";
-                                } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "WET ")) {
-                                    TypicalExtremePeriods(Count).ShortTitle = "WetSeason";
-                                } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "DRY ")) {
-                                    TypicalExtremePeriods(Count).ShortTitle = "DrySeason";
-                                } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "SPRING")) {
-                                    TypicalExtremePeriods(Count).ShortTitle = "Spring";
+                                if (has_prefixi(TypicalExtremePeriods(i).Title, "SUMMER")) {
+                                    TypicalExtremePeriods(i).ShortTitle = "Summer";
+                                } else if (has_prefixi(TypicalExtremePeriods(i).Title, "WINTER")) {
+                                    TypicalExtremePeriods(i).ShortTitle = "Winter";
+                                } else if (has_prefixi(TypicalExtremePeriods(i).Title, "TROPICAL HOT")) {
+                                    TypicalExtremePeriods(i).ShortTitle = "TropicalHot";
+                                } else if (has_prefixi(TypicalExtremePeriods(i).Title, "TROPICAL COLD")) {
+                                    TypicalExtremePeriods(i).ShortTitle = "TropicalCold";
+                                } else if (has_prefixi(TypicalExtremePeriods(i).Title, "AUTUMN")) {
+                                    TypicalExtremePeriods(i).ShortTitle = "Autumn";
+                                } else if (has_prefixi(TypicalExtremePeriods(i).Title, "NO DRY")) {
+                                    TypicalExtremePeriods(i).ShortTitle = "NoDrySeason";
+                                } else if (has_prefixi(TypicalExtremePeriods(i).Title, "NO WET")) {
+                                    TypicalExtremePeriods(i).ShortTitle = "NoWetSeason";
+                                } else if (has_prefixi(TypicalExtremePeriods(i).Title, "WET ")) {
+                                    TypicalExtremePeriods(i).ShortTitle = "WetSeason";
+                                } else if (has_prefixi(TypicalExtremePeriods(i).Title, "DRY ")) {
+                                    TypicalExtremePeriods(i).ShortTitle = "DrySeason";
+                                } else if (has_prefixi(TypicalExtremePeriods(i).Title, "SPRING")) {
+                                    TypicalExtremePeriods(i).ShortTitle = "Spring";
                                 }
                             }
                         } else { // not extreme
-                            if (has_prefixi(TypicalExtremePeriods(Count).Title, "SUMMER")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "Summer";
-                            } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "WINTER")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "Winter";
-                            } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "TROPICAL HOT")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "TropicalHot";
-                            } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "TROPICAL COLD")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "TropicalCold";
-                            } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "AUTUMN")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "Autumn";
-                            } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "NO DRY")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "NoDrySeason";
-                            } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "NO WET")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "NoWetSeason";
-                            } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "WET ")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "WetSeason";
-                            } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "DRY ")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "DrySeason";
-                            } else if (has_prefixi(TypicalExtremePeriods(Count).Title, "SPRING")) {
-                                TypicalExtremePeriods(Count).ShortTitle = "Spring";
+                            if (has_prefixi(TypicalExtremePeriods(i).Title, "SUMMER")) {
+                                TypicalExtremePeriods(i).ShortTitle = "Summer";
+                            } else if (has_prefixi(TypicalExtremePeriods(i).Title, "WINTER")) {
+                                TypicalExtremePeriods(i).ShortTitle = "Winter";
+                            } else if (has_prefixi(TypicalExtremePeriods(i).Title, "TROPICAL HOT")) {
+                                TypicalExtremePeriods(i).ShortTitle = "TropicalHot";
+                            } else if (has_prefixi(TypicalExtremePeriods(i).Title, "TROPICAL COLD")) {
+                                TypicalExtremePeriods(i).ShortTitle = "TropicalCold";
+                            } else if (has_prefixi(TypicalExtremePeriods(i).Title, "AUTUMN")) {
+                                TypicalExtremePeriods(i).ShortTitle = "Autumn";
+                            } else if (has_prefixi(TypicalExtremePeriods(i).Title, "NO DRY")) {
+                                TypicalExtremePeriods(i).ShortTitle = "NoDrySeason";
+                            } else if (has_prefixi(TypicalExtremePeriods(i).Title, "NO WET")) {
+                                TypicalExtremePeriods(i).ShortTitle = "NoWetSeason";
+                            } else if (has_prefixi(TypicalExtremePeriods(i).Title, "WET ")) {
+                                TypicalExtremePeriods(i).ShortTitle = "WetSeason";
+                            } else if (has_prefixi(TypicalExtremePeriods(i).Title, "DRY ")) {
+                                TypicalExtremePeriods(i).ShortTitle = "DrySeason";
+                            } else if (has_prefixi(TypicalExtremePeriods(i).Title, "SPRING")) {
+                                TypicalExtremePeriods(i).ShortTitle = "Spring";
                             }
                         }
                     } else {
                         ShowWarningError("ProcessEPWHeader: Invalid Typical/Extreme Periods Header(WeatherFile)=" +
-                                         TypicalExtremePeriods(Count).Title + BlankString + Line.substr(0, Pos));
-                        ShowContinueError("...on processing Typical/Extreme period #" + General::RoundSigDigits(Count));
-                        NumEPWTypExtSets = Count - 1;
+                                         TypicalExtremePeriods(i).Title + BlankString + Line.substr(0, Pos));
+                        ShowContinueError("...on processing Typical/Extreme period #" + General::RoundSigDigits(i));
+                        NumEPWTypExtSets = i - 1;
                         break;
                     }
+                    int PMonth;
+                    int PDay;
+                    int PWeekDay;
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
                         General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                         if (dateType != DateType::InvalidDate) {
                             if (PMonth != 0 && PDay != 0) {
-                                TypicalExtremePeriods(Count).StartMonth = PMonth;
-                                TypicalExtremePeriods(Count).StartDay = PDay;
+                                TypicalExtremePeriods(i).StartMonth = PMonth;
+                                TypicalExtremePeriods(i).StartDay = PDay;
                             }
                         } else {
                             ShowSevereError("ProcessEPWHeader: Invalid Typical/Extreme Periods Start Date Field(WeatherFile)=" + Line.substr(0, Pos));
-                            ShowContinueError("...on processing Typical/Extreme period #" + General::RoundSigDigits(Count));
+                            ShowContinueError("...on processing Typical/Extreme period #" + General::RoundSigDigits(i));
                             ErrorsFound = true;
                         }
                         Line.erase(0, Pos + 1);
@@ -7755,12 +7701,12 @@ namespace WeatherManager {
                         General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                         if (dateType != DateType::InvalidDate) {
                             if (PMonth != 0 && PDay != 0) {
-                                TypicalExtremePeriods(Count).EndMonth = PMonth;
-                                TypicalExtremePeriods(Count).EndDay = PDay;
+                                TypicalExtremePeriods(i).EndMonth = PMonth;
+                                TypicalExtremePeriods(i).EndDay = PDay;
                             }
                         } else {
                             ShowSevereError("ProcessEPWHeader: Invalid Typical/Extreme Periods End Date Field(WeatherFile)=" + Line.substr(0, Pos));
-                            ShowContinueError("...on processing Typical/Extreme period #" + General::RoundSigDigits(Count));
+                            ShowContinueError("...on processing Typical/Extreme period #" + General::RoundSigDigits(i));
                             ErrorsFound = true;
                         }
                         Line.erase(0, Pos + 1);
@@ -7768,104 +7714,102 @@ namespace WeatherManager {
                         General::ProcessDateString(Line, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                         if (dateType != DateType::InvalidDate) {
                             if (PMonth != 0 && PDay != 0) {
-                                TypicalExtremePeriods(Count).EndMonth = PMonth;
-                                TypicalExtremePeriods(Count).EndDay = PDay;
+                                TypicalExtremePeriods(i).EndMonth = PMonth;
+                                TypicalExtremePeriods(i).EndDay = PDay;
                             }
                         } else {
                             ShowSevereError("ProcessEPWHeader: Invalid Typical/Extreme Periods End Date Field(WeatherFile)=" + Line.substr(0, Pos));
                             ErrorsFound = true;
                         }
                     }
-                    ++Count;
                 }
                 // Process periods to set up other values.
-                for (Count = 1; Count <= NumEPWTypExtSets; ++Count) {
+                for (int i = 1; i <= NumEPWTypExtSets; ++i) {
                     // JulianDay (Month,Day,LeapYearValue)
-                    {
-                        auto const SELECT_CASE_var1(UtilityRoutines::MakeUPPERCase(TypicalExtremePeriods(Count).ShortTitle));
-                        if (SELECT_CASE_var1 == "SUMMER") {
-                            if (UtilityRoutines::SameString(TypicalExtremePeriods(Count).TEType, "EXTREME")) {
-                                TypicalExtremePeriods(Count).MatchValue = "SummerExtreme";
-                                TypicalExtremePeriods(Count).MatchValue1 = "TropicalHot";
-                                TypicalExtremePeriods(Count).MatchValue2 = "NoDrySeasonMax";
-                            } else {
-                                TypicalExtremePeriods(Count).MatchValue = "SummerTypical";
-                            }
-
-                        } else if (SELECT_CASE_var1 == "WINTER") {
-                            if (UtilityRoutines::SameString(TypicalExtremePeriods(Count).TEType, "EXTREME")) {
-                                TypicalExtremePeriods(Count).MatchValue = "WinterExtreme";
-                                TypicalExtremePeriods(Count).MatchValue1 = "TropicalCold";
-                                TypicalExtremePeriods(Count).MatchValue2 = "NoDrySeasonMin";
-                            } else {
-                                TypicalExtremePeriods(Count).MatchValue = "WinterTypical";
-                            }
-
-                        } else if (SELECT_CASE_var1 == "AUTUMN") {
-                            TypicalExtremePeriods(Count).MatchValue = "AutumnTypical";
-
-                        } else if (SELECT_CASE_var1 == "SPRING") {
-                            TypicalExtremePeriods(Count).MatchValue = "SpringTypical";
-
-                        } else if (SELECT_CASE_var1 == "WETSEASON") {
-                            TypicalExtremePeriods(Count).MatchValue = "WetSeason";
-
-                        } else if (SELECT_CASE_var1 == "DRYSEASON") {
-                            TypicalExtremePeriods(Count).MatchValue = "DrySeason";
-
-                        } else if (SELECT_CASE_var1 == "NOWETSEASON") {
-                            TypicalExtremePeriods(Count).MatchValue = "NoWetSeason";
-
-                        } else if (SELECT_CASE_var1 == "NODRYSEASON") {
-                            TypicalExtremePeriods(Count).MatchValue = "NoDrySeason";
-
-                        } else if ((SELECT_CASE_var1 == "NODRYSEASONMAX") || (SELECT_CASE_var1 == "NOWETSEASONMAX")) {
-                            TypicalExtremePeriods(Count).MatchValue = TypicalExtremePeriods(Count).ShortTitle;
-                            TypicalExtremePeriods(Count).MatchValue1 = "TropicalHot";
-                            TypicalExtremePeriods(Count).MatchValue2 = "SummerExtreme";
-
-                        } else if ((SELECT_CASE_var1 == "NODRYSEASONMIN") || (SELECT_CASE_var1 == "NOWETSEASONMIN")) {
-                            TypicalExtremePeriods(Count).MatchValue = TypicalExtremePeriods(Count).ShortTitle;
-                            TypicalExtremePeriods(Count).MatchValue1 = "TropicalCold";
-                            TypicalExtremePeriods(Count).MatchValue2 = "WinterExtreme";
-
-                        } else if (SELECT_CASE_var1 == "TROPICALHOT") {
-                            TypicalExtremePeriods(Count).MatchValue = "TropicalHot";
-                            TypicalExtremePeriods(Count).MatchValue1 = "SummerExtreme";
-                            TypicalExtremePeriods(Count).MatchValue2 = "NoDrySeasonMax";
-
-                        } else if (SELECT_CASE_var1 == "TROPICALCOLD") {
-                            TypicalExtremePeriods(Count).MatchValue = "TropicalCold";
-                            TypicalExtremePeriods(Count).MatchValue1 = "WinterExtreme";
-                            TypicalExtremePeriods(Count).MatchValue2 = "NoDrySeasonMin";
-
+                    auto const ExtremePeriodTitle(UtilityRoutines::MakeUPPERCase(TypicalExtremePeriods(i).ShortTitle));
+                    if (ExtremePeriodTitle == "SUMMER") {
+                        if (UtilityRoutines::SameString(TypicalExtremePeriods(i).TEType, "EXTREME")) {
+                            TypicalExtremePeriods(i).MatchValue = "SummerExtreme";
+                            TypicalExtremePeriods(i).MatchValue1 = "TropicalHot";
+                            TypicalExtremePeriods(i).MatchValue2 = "NoDrySeasonMax";
                         } else {
-                            TypicalExtremePeriods(Count).MatchValue = "Invalid - no match";
+                            TypicalExtremePeriods(i).MatchValue = "SummerTypical";
                         }
-                    }
-                    TypicalExtremePeriods(Count).StartJDay =
-                        General::OrdinalDay(TypicalExtremePeriods(Count).StartMonth, TypicalExtremePeriods(Count).StartDay, 0);
-                    TypicalExtremePeriods(Count).EndJDay =
-                        General::OrdinalDay(TypicalExtremePeriods(Count).EndMonth, TypicalExtremePeriods(Count).EndDay, 0);
-                    if (TypicalExtremePeriods(Count).StartJDay <= TypicalExtremePeriods(Count).EndJDay) {
-                        TypicalExtremePeriods(Count).TotalDays = TypicalExtremePeriods(Count).EndJDay - TypicalExtremePeriods(Count).StartJDay + 1;
+
+                    } else if (ExtremePeriodTitle == "WINTER") {
+                        if (UtilityRoutines::SameString(TypicalExtremePeriods(i).TEType, "EXTREME")) {
+                            TypicalExtremePeriods(i).MatchValue = "WinterExtreme";
+                            TypicalExtremePeriods(i).MatchValue1 = "TropicalCold";
+                            TypicalExtremePeriods(i).MatchValue2 = "NoDrySeasonMin";
+                        } else {
+                            TypicalExtremePeriods(i).MatchValue = "WinterTypical";
+                        }
+
+                    } else if (ExtremePeriodTitle == "AUTUMN") {
+                        TypicalExtremePeriods(i).MatchValue = "AutumnTypical";
+
+                    } else if (ExtremePeriodTitle == "SPRING") {
+                        TypicalExtremePeriods(i).MatchValue = "SpringTypical";
+
+                    } else if (ExtremePeriodTitle == "WETSEASON") {
+                        TypicalExtremePeriods(i).MatchValue = "WetSeason";
+
+                    } else if (ExtremePeriodTitle == "DRYSEASON") {
+                        TypicalExtremePeriods(i).MatchValue = "DrySeason";
+
+                    } else if (ExtremePeriodTitle == "NOWETSEASON") {
+                        TypicalExtremePeriods(i).MatchValue = "NoWetSeason";
+
+                    } else if (ExtremePeriodTitle == "NODRYSEASON") {
+                        TypicalExtremePeriods(i).MatchValue = "NoDrySeason";
+
+                    } else if ((ExtremePeriodTitle == "NODRYSEASONMAX") || (ExtremePeriodTitle == "NOWETSEASONMAX")) {
+                        TypicalExtremePeriods(i).MatchValue = TypicalExtremePeriods(i).ShortTitle;
+                        TypicalExtremePeriods(i).MatchValue1 = "TropicalHot";
+                        TypicalExtremePeriods(i).MatchValue2 = "SummerExtreme";
+
+                    } else if ((ExtremePeriodTitle == "NODRYSEASONMIN") || (ExtremePeriodTitle == "NOWETSEASONMIN")) {
+                        TypicalExtremePeriods(i).MatchValue = TypicalExtremePeriods(i).ShortTitle;
+                        TypicalExtremePeriods(i).MatchValue1 = "TropicalCold";
+                        TypicalExtremePeriods(i).MatchValue2 = "WinterExtreme";
+
+                    } else if (ExtremePeriodTitle == "TROPICALHOT") {
+                        TypicalExtremePeriods(i).MatchValue = "TropicalHot";
+                        TypicalExtremePeriods(i).MatchValue1 = "SummerExtreme";
+                        TypicalExtremePeriods(i).MatchValue2 = "NoDrySeasonMax";
+
+                    } else if (ExtremePeriodTitle == "TROPICALCOLD") {
+                        TypicalExtremePeriods(i).MatchValue = "TropicalCold";
+                        TypicalExtremePeriods(i).MatchValue1 = "WinterExtreme";
+                        TypicalExtremePeriods(i).MatchValue2 = "NoDrySeasonMin";
+
                     } else {
-                        TypicalExtremePeriods(Count).TotalDays = General::OrdinalDay(12, 31, LeapYearAdd) - TypicalExtremePeriods(Count).StartJDay +
-                                                                 1 + TypicalExtremePeriods(Count).EndJDay;
+                        TypicalExtremePeriods(i).MatchValue = "Invalid - no match";
+                    }
+                    TypicalExtremePeriods(i).StartJDay =
+                        General::OrdinalDay(TypicalExtremePeriods(i).StartMonth, TypicalExtremePeriods(i).StartDay, 0);
+                    TypicalExtremePeriods(i).EndJDay =
+                        General::OrdinalDay(TypicalExtremePeriods(i).EndMonth, TypicalExtremePeriods(i).EndDay, 0);
+                    if (TypicalExtremePeriods(i).StartJDay <= TypicalExtremePeriods(i).EndJDay) {
+                        TypicalExtremePeriods(i).TotalDays = TypicalExtremePeriods(i).EndJDay - TypicalExtremePeriods(i).StartJDay + 1;
+                    } else {
+                        TypicalExtremePeriods(i).TotalDays = General::OrdinalDay(12, 31, LeapYearAdd) - TypicalExtremePeriods(i).StartJDay +
+                                                             1 + TypicalExtremePeriods(i).EndJDay;
                     }
                 }
 
-            } else if (SELECT_CASE_var == "GROUND TEMPERATURES") {
+            } else if (HeaderStringUppercase == "GROUND TEMPERATURES") {
                 // Added for ground surfaces defined with F or c factor method. TH 7/2009
                 // Assume the 0.5 m set of ground temperatures
                 // or first set on a weather file, if any.
                 Pos = index(Line, ',');
                 if (Pos != std::string::npos) {
-                    NumGrndTemps = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
+                    bool errFlag;
+                    int NumGrndTemps = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
                     if (!errFlag && NumGrndTemps >= 1) {
                         Line.erase(0, Pos + 1);
                         // skip depth, soil conductivity, soil density, soil specific heat
-                        for (Count = 1; Count <= 4; ++Count) {
+                        for (int i = 1; i <= 4; ++i) {
                             Pos = index(Line, ',');
                             if (Pos == std::string::npos) {
                                 Line = BlankString;
@@ -7874,17 +7818,16 @@ namespace WeatherManager {
                             Line.erase(0, Pos + 1);
                         }
                         GroundTempsFCFromEPWHeader = 0.0;
-                        actcount = 0;
-                        for (Count = 1; Count <= 12; ++Count) { // take the first set of ground temperatures.
+                        int actcount = 0;
+                        for (int i = 1; i <= 12; ++i) { // take the first set of ground temperatures.
                             Pos = index(Line, ',');
+                            bool errFlag;
                             if (Pos != std::string::npos) {
-                                Number = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
-                                GroundTempsFCFromEPWHeader(Count) = Number;
+                                GroundTempsFCFromEPWHeader(i) = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
                                 ++actcount;
                             } else {
                                 if (len(Line) > 0) {
-                                    Number = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
-                                    GroundTempsFCFromEPWHeader(Count) = Number;
+                                    GroundTempsFCFromEPWHeader(i) = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
                                     ++actcount;
                                 }
                                 break;
@@ -7895,7 +7838,7 @@ namespace WeatherManager {
                     }
                 }
 
-            } else if (SELECT_CASE_var == "HOLIDAYS/DAYLIGHT SAVING") {
+            } else if (HeaderStringUppercase == "HOLIDAYS/DAYLIGHT SAVING") {
                 // A1, \field LeapYear Observed
                 // \type choice
                 // \key Yes
@@ -7911,8 +7854,7 @@ namespace WeatherManager {
                 // Start with Minimum number of NumHdArgs
                 uppercase(Line);
                 NumHdArgs = 4;
-                Count = 1;
-                while (Count <= NumHdArgs) {
+                for (int i = 1; i <= NumHdArgs; ++i) {
                     strip(Line);
                     Pos = index(Line, ',');
                     if (Pos == std::string::npos) {
@@ -7928,121 +7870,121 @@ namespace WeatherManager {
                         }
                     }
 
-                    {
-                        auto const SELECT_CASE_var1(Count);
+                    int PMonth;
+                    int PDay;
+                    int PWeekDay;
+                    bool IOStatus;
+                    int CurCount = 0;
+                    if (i == 1) {
+                        WFAllowsLeapYears = (Line[0] == 'Y');
+                    } else if (i == 2) {
+                        // In this section, we call ProcessDateString, and if that fails, we can recover from it
+                        // by setting DST to false, so we don't affect ErrorsFound
 
-                        if (SELECT_CASE_var1 == 1) {
-                            WFAllowsLeapYears = (Line[0] == 'Y');
-                        } else if (SELECT_CASE_var1 == 2) {
-                            // In this section, we call ProcessDateString, and if that fails, we can recover from it
-                            // by setting DST to false, so we don't affect ErrorsFound
-
-                            // call ProcessDateString with local bool (unused)
-                            General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, errflag1);
-                            if (dateType != DateType::InvalidDate) {
-                                // ErrorsFound is still false after ProcessDateString
-                                if (PMonth == 0 && PDay == 0) {
-                                    EPWDaylightSaving = false;
-                                } else {
-                                    EPWDaylightSaving = true;
-                                    EPWDST.StDateType = dateType;
-                                    EPWDST.StMon = PMonth;
-                                    EPWDST.StDay = PDay;
-                                    EPWDST.StWeekDay = PWeekDay;
-                                }
+                        // call ProcessDateString with local bool (unused)
+                        bool errflag1;
+                        General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, errflag1);
+                        if (dateType != DateType::InvalidDate) {
+                            // ErrorsFound is still false after ProcessDateString
+                            if (PMonth == 0 && PDay == 0) {
+                                EPWDaylightSaving = false;
                             } else {
-                                // ErrorsFound is untouched
-                                ShowContinueError("ProcessEPWHeader: Invalid Daylight Saving Period Start Date Field(WeatherFile)=" +
-                                                  Line.substr(0, Pos));
-                                ShowContinueError("...invalid header=" + HeaderString);
+                                EPWDaylightSaving = true;
+                                EPWDST.StDateType = dateType;
+                                EPWDST.StMon = PMonth;
+                                EPWDST.StDay = PDay;
+                                EPWDST.StWeekDay = PWeekDay;
+                            }
+                        } else {
+                            // ErrorsFound is untouched
+                            ShowContinueError("ProcessEPWHeader: Invalid Daylight Saving Period Start Date Field(WeatherFile)=" +
+                                              Line.substr(0, Pos));
+                            ShowContinueError("...invalid header=" + HeaderString);
+                            ShowContinueError("...Setting Weather File DST to false.");
+                            EPWDaylightSaving = false;
+                        }
+
+                    } else if (i == 3) {
+                        General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                        if (EPWDaylightSaving) {
+                            if (dateType != DateType::InvalidDate) {
+                                EPWDST.EnDateType = dateType;
+                                EPWDST.EnMon = PMonth;
+                                EPWDST.EnDay = PDay;
+                                EPWDST.EnWeekDay = PWeekDay;
+                            } else {
+                                ShowWarningError("ProcessEPWHeader: Invalid Daylight Saving Period End Date Field(WeatherFile)=" +
+                                                 Line.substr(0, Pos));
                                 ShowContinueError("...Setting Weather File DST to false.");
                                 EPWDaylightSaving = false;
                             }
+                            DST = EPWDST;
+                        }
 
-                        } else if (SELECT_CASE_var1 == 3) {
-                            General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                            if (EPWDaylightSaving) {
-                                if (dateType != DateType::InvalidDate) {
-                                    EPWDST.EnDateType = dateType;
-                                    EPWDST.EnMon = PMonth;
-                                    EPWDST.EnDay = PDay;
-                                    EPWDST.EnWeekDay = PWeekDay;
-                                } else {
-                                    ShowWarningError("ProcessEPWHeader: Invalid Daylight Saving Period End Date Field(WeatherFile)=" +
-                                                     Line.substr(0, Pos));
-                                    ShowContinueError("...Setting Weather File DST to false.");
-                                    EPWDaylightSaving = false;
-                                }
-                                DST = EPWDST;
-                            }
+                    } else if (i == 4) {
+                        int NumEPWHolidays = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+                        NumSpecialDays = NumEPWHolidays + inputProcessor->getNumObjectsFound("RunPeriodControl:SpecialDays");
+                        SpecialDays.allocate(NumSpecialDays);
+                        NumHdArgs = 4 + NumEPWHolidays * 2;
 
-                        } else if (SELECT_CASE_var1 == 4) {
-                            NumEPWHolidays = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
-                            NumSpecialDays = NumEPWHolidays + inputProcessor->getNumObjectsFound("RunPeriodControl:SpecialDays");
-                            SpecialDays.allocate(NumSpecialDays);
-                            NumHdArgs = 4 + NumEPWHolidays * 2;
-                            CurCount = 0;
-
-                        } else if ((SELECT_CASE_var1 >= 5)) {
-                            if (mod(Count, 2) != 0) {
-                                ++CurCount;
-                                if (CurCount > NumSpecialDays) {
-                                    ShowSevereError("Too many SpecialDays");
-                                    ErrorsFound = true;
-                                } else {
-                                    SpecialDays(CurCount).Name = Line.substr(0, Pos);
-                                }
-                                // Process name
+                    } else if ((i >= 5)) {
+                        if (mod(i, 2) != 0) {
+                            ++CurCount;
+                            if (CurCount > NumSpecialDays) {
+                                ShowSevereError("Too many SpecialDays");
+                                ErrorsFound = true;
                             } else {
-                                if (CurCount <= NumSpecialDays) {
-                                    // Process date
-                                    General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                                    if (dateType == DateType::MonthDay) {
-                                        SpecialDays(CurCount).DateType = dateType;
-                                        SpecialDays(CurCount).Month = PMonth;
-                                        SpecialDays(CurCount).Day = PDay;
-                                        SpecialDays(CurCount).WeekDay = 0;
-                                        SpecialDays(CurCount).CompDate = PMonth * 32 + PDay;
-                                        SpecialDays(CurCount).Duration = 1;
-                                        SpecialDays(CurCount).DayType = 1;
-                                        SpecialDays(CurCount).WthrFile = true;
-                                    } else if (dateType != DateType::InvalidDate) {
-                                        SpecialDays(CurCount).DateType = dateType;
-                                        SpecialDays(CurCount).Month = PMonth;
-                                        SpecialDays(CurCount).Day = PDay;
-                                        SpecialDays(CurCount).WeekDay = PWeekDay;
-                                        SpecialDays(CurCount).CompDate = 0;
-                                        SpecialDays(CurCount).Duration = 1;
-                                        SpecialDays(CurCount).DayType = 1;
-                                        SpecialDays(CurCount).WthrFile = true;
-                                    } else if (dateType == DateType::InvalidDate) {
-                                        ShowSevereError("Invalid SpecialDay Date Field(WeatherFile)=" + Line.substr(0, Pos));
-                                        ErrorsFound = true;
-                                    }
+                                SpecialDays(CurCount).Name = Line.substr(0, Pos);
+                            }
+                            // Process name
+                        } else {
+                            if (CurCount <= NumSpecialDays) {
+                                // Process date
+                                General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                                if (dateType == DateType::MonthDay) {
+                                    SpecialDays(CurCount).DateType = dateType;
+                                    SpecialDays(CurCount).Month = PMonth;
+                                    SpecialDays(CurCount).Day = PDay;
+                                    SpecialDays(CurCount).WeekDay = 0;
+                                    SpecialDays(CurCount).CompDate = PMonth * 32 + PDay;
+                                    SpecialDays(CurCount).Duration = 1;
+                                    SpecialDays(CurCount).DayType = 1;
+                                    SpecialDays(CurCount).WthrFile = true;
+                                } else if (dateType != DateType::InvalidDate) {
+                                    SpecialDays(CurCount).DateType = dateType;
+                                    SpecialDays(CurCount).Month = PMonth;
+                                    SpecialDays(CurCount).Day = PDay;
+                                    SpecialDays(CurCount).WeekDay = PWeekDay;
+                                    SpecialDays(CurCount).CompDate = 0;
+                                    SpecialDays(CurCount).Duration = 1;
+                                    SpecialDays(CurCount).DayType = 1;
+                                    SpecialDays(CurCount).WthrFile = true;
+                                } else if (dateType == DateType::InvalidDate) {
+                                    ShowSevereError("Invalid SpecialDay Date Field(WeatherFile)=" + Line.substr(0, Pos));
+                                    ErrorsFound = true;
                                 }
                             }
                         }
                     }
                     Line.erase(0, Pos + 1);
-                    ++Count;
                 }
-                for (Count = 1; Count <= NumEPWTypExtSets; ++Count) {
+                for (int i = 1; i <= NumEPWTypExtSets; ++i) {
                     // General::OrdinalDay (Month,Day,LeapYearValue)
-                    TypicalExtremePeriods(Count).StartJDay =
-                        General::OrdinalDay(TypicalExtremePeriods(Count).StartMonth, TypicalExtremePeriods(Count).StartDay, LeapYearAdd);
-                    TypicalExtremePeriods(Count).EndJDay =
-                        General::OrdinalDay(TypicalExtremePeriods(Count).EndMonth, TypicalExtremePeriods(Count).EndDay, LeapYearAdd);
-                    if (TypicalExtremePeriods(Count).StartJDay <= TypicalExtremePeriods(Count).EndJDay) {
-                        TypicalExtremePeriods(Count).TotalDays = TypicalExtremePeriods(Count).EndJDay - TypicalExtremePeriods(Count).StartJDay + 1;
+                    TypicalExtremePeriods(i).StartJDay =
+                        General::OrdinalDay(TypicalExtremePeriods(i).StartMonth, TypicalExtremePeriods(i).StartDay, LeapYearAdd);
+                    TypicalExtremePeriods(i).EndJDay =
+                        General::OrdinalDay(TypicalExtremePeriods(i).EndMonth, TypicalExtremePeriods(i).EndDay, LeapYearAdd);
+                    if (TypicalExtremePeriods(i).StartJDay <= TypicalExtremePeriods(i).EndJDay) {
+                        TypicalExtremePeriods(i).TotalDays = TypicalExtremePeriods(i).EndJDay - TypicalExtremePeriods(i).StartJDay + 1;
                     } else {
-                        TypicalExtremePeriods(Count).TotalDays = General::OrdinalDay(12, 31, LeapYearAdd) - TypicalExtremePeriods(Count).StartJDay +
-                                                                 1 + TypicalExtremePeriods(Count).EndJDay;
+                        TypicalExtremePeriods(i).TotalDays = General::OrdinalDay(12, 31, LeapYearAdd) - TypicalExtremePeriods(i).StartJDay +
+                                                             1 + TypicalExtremePeriods(i).EndJDay;
                     }
                 }
 
-            } else if ((SELECT_CASE_var == "COMMENTS 1") || (SELECT_CASE_var == "COMMENTS 2") || (SELECT_CASE_var == "DESIGN CONDITIONS")) {
+            } else if ((HeaderStringUppercase == "COMMENTS 1") || (HeaderStringUppercase == "COMMENTS 2") || (HeaderStringUppercase == "DESIGN CONDITIONS")) {
                 // no action
-            } else if (SELECT_CASE_var == "DATA PERIODS") {
+            } else if (HeaderStringUppercase == "DATA PERIODS") {
                 //     N1, \field Number of Data Periods
                 //     N2, \field Number of Records per hour
                 //     A1, \field Data Period 1 Name/Description
@@ -8059,8 +8001,8 @@ namespace WeatherManager {
                 //     A4, \field Data Period 1 End Day
                 uppercase(Line);
                 NumHdArgs = 2;
-                Count = 1;
-                while (Count <= NumHdArgs) {
+                int CurCount = 0;
+                for (int i = 1; i <= NumHdArgs; ++i) {
                     strip(Line);
                     Pos = index(Line, ',');
                     if (Pos == std::string::npos) {
@@ -8076,124 +8018,118 @@ namespace WeatherManager {
                         }
                     }
 
-                    {
-                        auto const SELECT_CASE_var1(Count);
+                    bool IOStatus;
+                    if (i == 1) {
+                        NumDataPeriods = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+                        DataPeriods.allocate(NumDataPeriods);
+                        NumHdArgs += 4 * NumDataPeriods;
+                        if (NumDataPeriods > 0) {
+                            for (auto &e : DataPeriods)
+                                e.NumDays = 0;
+                        }
 
-                        if (SELECT_CASE_var1 == 1) {
-                            NumDataPeriods = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
-                            DataPeriods.allocate(NumDataPeriods);
-                            NumHdArgs += 4 * NumDataPeriods;
-                            if (NumDataPeriods > 0) {
-                                for (auto &e : DataPeriods)
-                                    e.NumDays = 0;
+                    } else if (i == 2) {
+                        NumIntervalsPerHour = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+                    } else if (i >= 3) {
+                        int const CurOne = mod(i - 3, 4);
+                        int PMonth;
+                        int PDay;
+                        int PWeekDay;
+                        int PYear;
+                        if (CurOne == 0) {
+                            // Description of Data Period
+                            ++CurCount;
+                            if (CurCount > NumDataPeriods) {
+                                ShowSevereError("Too many data periods");
+                                ErrorsFound = true;
+                            } else {
+                                DataPeriods(CurCount).Name = Line.substr(0, Pos);
                             }
-                            CurCount = 0;
 
-                        } else if (SELECT_CASE_var1 == 2) {
-                            NumIntervalsPerHour = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
-                        } else if ((SELECT_CASE_var1 >= 3)) {
-                            CurOne = mod(Count - 3, 4);
-
-                            {
-                                auto const SELECT_CASE_var2(CurOne);
-
-                                if (SELECT_CASE_var2 == 0) {
-                                    // Description of Data Period
-                                    ++CurCount;
-                                    if (CurCount > NumDataPeriods) {
-                                        ShowSevereError("Too many data periods");
-                                        ErrorsFound = true;
-                                    } else {
-                                        DataPeriods(CurCount).Name = Line.substr(0, Pos);
-                                    }
-
-                                } else if (SELECT_CASE_var2 == 1) {
-                                    // Start Day of Week
-                                    if (CurCount <= NumDataPeriods) {
-                                        DataPeriods(CurCount).DayOfWeek = Line.substr(0, Pos);
-                                        DataPeriods(CurCount).WeekDay =
-                                            UtilityRoutines::FindItemInList(DataPeriods(CurCount).DayOfWeek, DaysOfWeek, 7);
-                                        if (DataPeriods(CurCount).WeekDay == 0) {
-                                            ShowSevereError(
-                                                fmt::format("Weather File -- Invalid Start Day of Week for Data Period #{}, Invalid day={}",
-                                                            CurCount,
-                                                            DataPeriods(CurCount).DayOfWeek));
-                                            ErrorsFound = true;
-                                        }
-                                    }
-
-                                } else if (SELECT_CASE_var2 == 2) {
-                                    // DataPeriod Start Day
-                                    if (CurCount <= NumDataPeriods) {
-                                        General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
-                                        if (dateType == DateType::MonthDay) {
-                                            DataPeriods(CurCount).StMon = PMonth;
-                                            DataPeriods(CurCount).StDay = PDay;
-                                            DataPeriods(CurCount).StYear = PYear;
-                                            if (PYear != 0) DataPeriods(CurCount).HasYearData = true;
-                                        } else {
-                                            ShowSevereError("Data Periods must be of the form <DayOfYear> or <Month Day> (WeatherFile), found=" +
-                                                            Line.substr(0, Pos));
-                                            ErrorsFound = true;
-                                        }
-                                    }
-
-                                } else if (SELECT_CASE_var2 == 3) {
-                                    if (CurCount <= NumDataPeriods) {
-                                        General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
-                                        if (dateType == DateType::MonthDay) {
-                                            DataPeriods(CurCount).EnMon = PMonth;
-                                            DataPeriods(CurCount).EnDay = PDay;
-                                            DataPeriods(CurCount).EnYear = PYear;
-                                            if (PYear == 0 && DataPeriods(CurCount).HasYearData) {
-                                                ShowWarningError("Data Period (WeatherFile) - Start Date contains year. End Date does not.");
-                                                ShowContinueError("...Assuming same year as Start Date for this data.");
-                                                DataPeriods(CurCount).EnYear = DataPeriods(CurCount).StYear;
-                                            }
-                                        } else {
-                                            ShowSevereError("Data Periods must be of the form <DayOfYear> or <Month Day>, (WeatherFile) found=" +
-                                                            Line.substr(0, Pos));
-                                            ErrorsFound = true;
-                                        }
-                                    }
-                                    if (DataPeriods(CurCount).StYear == 0 || DataPeriods(CurCount).EnYear == 0) {
-                                        DataPeriods(CurCount).DataStJDay =
-                                            General::OrdinalDay(DataPeriods(CurCount).StMon, DataPeriods(CurCount).StDay, LeapYearAdd);
-                                        DataPeriods(CurCount).DataEnJDay =
-                                            General::OrdinalDay(DataPeriods(CurCount).EnMon, DataPeriods(CurCount).EnDay, LeapYearAdd);
-                                        if (DataPeriods(CurCount).DataStJDay <= DataPeriods(CurCount).DataEnJDay) {
-                                            DataPeriods(CurCount).NumDays = DataPeriods(CurCount).DataEnJDay - DataPeriods(CurCount).DataStJDay + 1;
-                                        } else {
-                                            DataPeriods(CurCount).NumDays =
-                                                (365 - DataPeriods(CurCount).DataStJDay + 1) + (DataPeriods(CurCount).DataEnJDay - 1 + 1);
-                                        }
-                                    } else { // weather file has actual year(s)
-                                        JGDate(GregorianToJulian,
-                                               DataPeriods(CurCount).DataStJDay,
-                                               DataPeriods(CurCount).StYear,
-                                               DataPeriods(CurCount).StMon,
-                                               DataPeriods(CurCount).StDay);
-                                        JGDate(GregorianToJulian,
-                                               DataPeriods(CurCount).DataEnJDay,
-                                               DataPeriods(CurCount).EnYear,
-                                               DataPeriods(CurCount).EnMon,
-                                               DataPeriods(CurCount).EnDay);
-                                        DataPeriods(CurCount).NumDays = DataPeriods(CurCount).DataEnJDay - DataPeriods(CurCount).DataStJDay + 1;
-                                    }
-                                    // Have processed the last item for this, can set up Weekdays for months
-                                    DataPeriods(CurCount).MonWeekDay = 0;
-                                    if (!ErrorsFound) {
-                                        SetupWeekDaysByMonth(DataPeriods(CurCount).StMon,
-                                                             DataPeriods(CurCount).StDay,
-                                                             DataPeriods(CurCount).WeekDay,
-                                                             DataPeriods(CurCount).MonWeekDay);
-                                    }
+                        } else if (CurOne == 1) {
+                            // Start Day of Week
+                            if (CurCount <= NumDataPeriods) {
+                                DataPeriods(CurCount).DayOfWeek = Line.substr(0, Pos);
+                                DataPeriods(CurCount).WeekDay =
+                                    UtilityRoutines::FindItemInList(DataPeriods(CurCount).DayOfWeek, DaysOfWeek, 7);
+                                if (DataPeriods(CurCount).WeekDay == 0) {
+                                    ShowSevereError(
+                                        fmt::format("Weather File -- Invalid Start Day of Week for Data Period #{}, Invalid day={}",
+                                                    CurCount,
+                                                    DataPeriods(CurCount).DayOfWeek));
+                                    ErrorsFound = true;
                                 }
+                            }
+
+                        } else if (CurOne == 2) {
+                            // DataPeriod Start Day
+                            if (CurCount <= NumDataPeriods) {
+                                General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
+                                if (dateType == DateType::MonthDay) {
+                                    DataPeriods(CurCount).StMon = PMonth;
+                                    DataPeriods(CurCount).StDay = PDay;
+                                    DataPeriods(CurCount).StYear = PYear;
+                                    if (PYear != 0) DataPeriods(CurCount).HasYearData = true;
+                                } else {
+                                    ShowSevereError("Data Periods must be of the form <DayOfYear> or <Month Day> (WeatherFile), found=" +
+                                                    Line.substr(0, Pos));
+                                    ErrorsFound = true;
+                                }
+                            }
+
+                        } else if (CurOne == 3) {
+                            if (CurCount <= NumDataPeriods) {
+                                General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
+                                if (dateType == DateType::MonthDay) {
+                                    DataPeriods(CurCount).EnMon = PMonth;
+                                    DataPeriods(CurCount).EnDay = PDay;
+                                    DataPeriods(CurCount).EnYear = PYear;
+                                    if (PYear == 0 && DataPeriods(CurCount).HasYearData) {
+                                        ShowWarningError("Data Period (WeatherFile) - Start Date contains year. End Date does not.");
+                                        ShowContinueError("...Assuming same year as Start Date for this data.");
+                                        DataPeriods(CurCount).EnYear = DataPeriods(CurCount).StYear;
+                                    }
+                                } else {
+                                    ShowSevereError("Data Periods must be of the form <DayOfYear> or <Month Day>, (WeatherFile) found=" +
+                                                    Line.substr(0, Pos));
+                                    ErrorsFound = true;
+                                }
+                            }
+                            if (DataPeriods(CurCount).StYear == 0 || DataPeriods(CurCount).EnYear == 0) {
+                                DataPeriods(CurCount).DataStJDay =
+                                    General::OrdinalDay(DataPeriods(CurCount).StMon, DataPeriods(CurCount).StDay, LeapYearAdd);
+                                DataPeriods(CurCount).DataEnJDay =
+                                    General::OrdinalDay(DataPeriods(CurCount).EnMon, DataPeriods(CurCount).EnDay, LeapYearAdd);
+                                if (DataPeriods(CurCount).DataStJDay <= DataPeriods(CurCount).DataEnJDay) {
+                                    DataPeriods(CurCount).NumDays = DataPeriods(CurCount).DataEnJDay - DataPeriods(CurCount).DataStJDay + 1;
+                                } else {
+                                    DataPeriods(CurCount).NumDays =
+                                        (365 - DataPeriods(CurCount).DataStJDay + 1) + (DataPeriods(CurCount).DataEnJDay - 1 + 1);
+                                }
+                            } else { // weather file has actual year(s)
+                                JGDate(GregorianToJulian,
+                                       DataPeriods(CurCount).DataStJDay,
+                                       DataPeriods(CurCount).StYear,
+                                       DataPeriods(CurCount).StMon,
+                                       DataPeriods(CurCount).StDay);
+                                JGDate(GregorianToJulian,
+                                       DataPeriods(CurCount).DataEnJDay,
+                                       DataPeriods(CurCount).EnYear,
+                                       DataPeriods(CurCount).EnMon,
+                                       DataPeriods(CurCount).EnDay);
+                                DataPeriods(CurCount).NumDays = DataPeriods(CurCount).DataEnJDay - DataPeriods(CurCount).DataStJDay + 1;
+                            }
+                            // Have processed the last item for this, can set up Weekdays for months
+                            DataPeriods(CurCount).MonWeekDay = 0;
+                            if (!ErrorsFound) {
+                                SetupWeekDaysByMonth(DataPeriods(CurCount).StMon,
+                                                     DataPeriods(CurCount).StDay,
+                                                     DataPeriods(CurCount).WeekDay,
+                                                     DataPeriods(CurCount).MonWeekDay);
                             }
                         }
                     }
                     Line.erase(0, Pos + 1);
-                    ++Count;
                 }
 
             } else {
