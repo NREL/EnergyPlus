@@ -114,9 +114,6 @@ namespace WeatherManager {
     // and internal Evolutionary Engineering documentation.
 
     // Data
-    int const GregorianToJulian(1); // JGDate argument for Gregorian to Julian Date conversion
-    int const JulianToGregorian(2); // JGDate argument for Julian to Gregorian Date conversion
-
     Real64 const Sigma(5.6697e-8);    // Stefan-Boltzmann constant
 
     static std::string const BlankString;
@@ -8107,17 +8104,10 @@ namespace WeatherManager {
                                         (365 - DataPeriods(CurCount).DataStJDay + 1) + (DataPeriods(CurCount).DataEnJDay - 1 + 1);
                                 }
                             } else { // weather file has actual year(s)
-                                JGDate(GregorianToJulian,
-                                       DataPeriods(CurCount).DataStJDay,
-                                       DataPeriods(CurCount).StYear,
-                                       DataPeriods(CurCount).StMon,
-                                       DataPeriods(CurCount).StDay);
-                                JGDate(GregorianToJulian,
-                                       DataPeriods(CurCount).DataEnJDay,
-                                       DataPeriods(CurCount).EnYear,
-                                       DataPeriods(CurCount).EnMon,
-                                       DataPeriods(CurCount).EnDay);
-                                DataPeriods(CurCount).NumDays = DataPeriods(CurCount).DataEnJDay - DataPeriods(CurCount).DataStJDay + 1;
+                                auto &dataPeriod{DataPeriods(CurCount)};
+                                dataPeriod.DataStJDay = computeJulianDate(dataPeriod.StYear, dataPeriod.StMon, dataPeriod.StDay);
+                                dataPeriod.DataEnJDay = computeJulianDate(dataPeriod.EnYear, dataPeriod.EnMon, dataPeriod.EnDay);
+                                dataPeriod.NumDays = dataPeriod.DataEnJDay - dataPeriod.DataStJDay + 1;
                             }
                             // Have processed the last item for this, can set up Weekdays for months
                             DataPeriods(CurCount).MonWeekDay = 0;
@@ -8307,66 +8297,46 @@ namespace WeatherManager {
         // Create arrays (InterpolationValues, SolarInterpolationValues) dependent on
         // Number of Time Steps in Hour.  This will be used in the "SetCurrentWeather" procedure.
 
-        int halfpoint;
-        int hpoint;
-        int tloop;
-        Real64 tweight;
-        Real64 tweight1;
+        int halfpoint = 0;
 
         Interpolation.allocate(DataGlobals::NumOfTimeStepInHour);
         SolarInterpolation.allocate(DataGlobals::NumOfTimeStepInHour);
         Interpolation = 0.0;
         SolarInterpolation = 0.0;
-        halfpoint = 0;
 
-        for (tloop = 1; tloop <= DataGlobals::NumOfTimeStepInHour; ++tloop) {
-            if (DataGlobals::NumOfTimeStepInHour == 1) {
-                tweight = 1.0;
-            } else {
-                tweight = min(1.0, (double(tloop) / double(DataGlobals::NumOfTimeStepInHour)));
-            }
-
-            Interpolation(tloop) = tweight;
+        for (int tloop = 1; tloop <= DataGlobals::NumOfTimeStepInHour; ++tloop) {
+            Interpolation(tloop) = (DataGlobals::NumOfTimeStepInHour == 1) ? 1.0 : min(1.0, (double(tloop) / double(DataGlobals::NumOfTimeStepInHour)));
         }
 
         if (mod(DataGlobals::NumOfTimeStepInHour, 2) == 0) {
             // even number of time steps.
             halfpoint = DataGlobals::NumOfTimeStepInHour / 2;
             SolarInterpolation(halfpoint) = 1.0;
-            tweight = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
-            hpoint = 1;
-            for (tloop = halfpoint + 1; tloop <= DataGlobals::NumOfTimeStepInHour; ++tloop) {
+            Real64 tweight = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
+            for (int tloop = halfpoint + 1, hpoint = 1; tloop <= DataGlobals::NumOfTimeStepInHour; ++tloop, ++hpoint) {
                 SolarInterpolation(tloop) = 1.0 - hpoint * tweight;
-                ++hpoint;
             }
-            hpoint = 1;
-            for (tloop = halfpoint - 1; tloop >= 1; --tloop) {
+            for (int tloop = halfpoint - 1, hpoint = 1; tloop >= 1; --tloop, ++hpoint) {
                 SolarInterpolation(tloop) = 1.0 - hpoint * tweight;
-                ++hpoint;
             }
         } else { // odd number of time steps
             if (DataGlobals::NumOfTimeStepInHour == 1) {
                 SolarInterpolation(1) = 0.5;
             } else if (DataGlobals::NumOfTimeStepInHour == 3) {
-                tweight = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
                 SolarInterpolation(1) = 5.0 / 6.0;
                 SolarInterpolation(2) = 5.0 / 6.0;
                 SolarInterpolation(3) = 0.5;
             } else {
-                tweight = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
+                Real64 tweight = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
                 halfpoint = DataGlobals::NumOfTimeStepInHour / 2;
-                tweight1 = 1.0 - tweight / 2.0;
+                Real64 tweight1 = 1.0 - tweight / 2.0;
                 SolarInterpolation(halfpoint) = tweight1;
                 SolarInterpolation(halfpoint + 1) = tweight1;
-                hpoint = 1;
-                for (tloop = halfpoint + 2; tloop <= DataGlobals::NumOfTimeStepInHour; ++tloop) {
+                for (int tloop = halfpoint + 2, hpoint = 1; tloop <= DataGlobals::NumOfTimeStepInHour; ++tloop, ++hpoint) {
                     SolarInterpolation(tloop) = tweight1 - hpoint * tweight;
-                    ++hpoint;
                 }
-                hpoint = 1;
-                for (tloop = halfpoint - 1; tloop >= 1; --tloop) {
+                for (int tloop = halfpoint - 1, hpoint = 1; tloop >= 1; --tloop, ++hpoint) {
                     SolarInterpolation(tloop) = tweight1 - hpoint * tweight;
-                    ++hpoint;
                 }
             }
         }
@@ -8385,16 +8355,13 @@ namespace WeatherManager {
         // Make sure Environment derived type is set prior to getting
         // Weather Properties
 
-        int Loop;
-        int LocalLeapYearAdd;
-
         // Transfer weather file information to the Environment derived type
         Envrn = DataEnvironment::TotDesDays + 1;
 
         // Sizing Periods from Weather File
-        for (Loop = 1; Loop <= TotRunDesPers; ++Loop) {
+        for (int i = 1; i <= TotRunDesPers; ++i) {
             auto &env = Environment(Envrn);
-            auto &runPer = RunPeriodDesignInput(Loop);
+            auto &runPer = RunPeriodDesignInput(i);
 
             env.StartMonth = runPer.startMonth;
             env.StartDay = runPer.startDay;
@@ -8416,7 +8383,7 @@ namespace WeatherManager {
             env.cKindOfEnvrn = runPer.periodType;
             env.KindOfEnvrn = DataGlobals::ksRunPeriodDesign;
             env.DesignDayNum = 0;
-            env.RunPeriodDesignNum = Loop;
+            env.RunPeriodDesignNum = i;
             env.DayOfWeek = runPer.dayOfWeek;
             env.MonWeekDay = runPer.monWeekDay;
             env.SetWeekDays = false;
@@ -8427,9 +8394,9 @@ namespace WeatherManager {
         }
 
         // RunPeriods from weather file
-        for (Loop = 1; Loop <= TotRunPers; ++Loop) { // Run Periods.
+        for (int i = 1; i <= TotRunPers; ++i) { // Run Periods.
             auto &env = Environment(Envrn);
-            auto &runPer = RunPeriodInput(Loop);
+            auto &runPer = RunPeriodInput(i);
 
             env.StartMonth = runPer.startMonth;
             env.StartDay = runPer.startDay;
@@ -8453,7 +8420,7 @@ namespace WeatherManager {
                 env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
                 if (env.StartYear == env.EndYear) {
                     // Short-circuit all the calculations, we're in a single year
-                    LocalLeapYearAdd = 0;
+                    int LocalLeapYearAdd = 0;
                     if (isLeapYear(env.StartYear)) {
                         // If a leap year is supported by the weather file, do it.
                         if (WFAllowsLeapYears) {
@@ -8526,66 +8493,6 @@ namespace WeatherManager {
         return false;
     }
 
-    void JGDate(int const jflag, // indicates direction of conversion,
-                int &jdate,      // input/output julian date, typically a 7 or 8 digit integer
-                int &gyyyy,      // input/output gregorian year, should be specified as 4 digits
-                int &gmm,        // input/output gregorian month
-                int &gdd         // input/output gregorian day
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Subroutine JGDate is a gregorian date to actual julian date
-        // converter.  the advantage of storing a julian date in the
-        // jdate format rather than a 5 digit format is that any
-        // number of days can be add or subtracted to jdate and
-        // that result is a proper julian date.
-
-        // REFERENCES:
-        // for discussion of this algorithm,
-        // see cacm, vol 11, no 10, oct 1968, page 657
-
-        int tdate; // integer*4 variable needed for double precision arithmetic
-        int tyyyy; // integer*4 variable needed for double precision arithmetic
-        int tmm;   // integer*4 variable needed for double precision arithmetic
-        int tdd;   // integer*4 variable needed for double precision arithmetic
-        int l;     // temporary variable used in conversion.
-        int n;     // temporary variable used in conversion.
-
-        //                                       gregorian to julian
-        if (jflag == 1) {
-            tyyyy = gyyyy;
-            tmm = gmm;
-            tdd = gdd;
-            l = (tmm - 14) / 12;
-            jdate = tdd - 32075 + 1461 * (tyyyy + 4800 + l) / 4 + 367 * (tmm - 2 - l * 12) / 12 - 3 * ((tyyyy + 4900 + l) / 100) / 4;
-
-        } else if (jflag == 2) {
-            //                                       julian to gregorian
-            tdate = jdate;
-            l = tdate + 68569;
-            n = 4 * l / 146097;
-            l -= (146097 * n + 3) / 4;
-            tyyyy = 4000 * (l + 1) / 1461001;
-            l = l - 1461 * tyyyy / 4 + 31;
-            tmm = 80 * l / 2447;
-            tdd = l - 2447 * tmm / 80;
-            l = tmm / 11;
-            tmm += 2 - 12 * l;
-            tyyyy += 100 * (n - 49) + l;
-            // c
-            gyyyy = tyyyy;
-            gdd = tdd;
-            gmm = tmm;
-        }
-        // c
-    }
-
     int computeJulianDate(int const gyyyy, // input/output gregorian year, should be specified as 4 digits
                           int const gmm,   // input/output gregorian month
                           int const gdd    // input/output gregorian day
@@ -8608,16 +8515,32 @@ namespace WeatherManager {
         // for discussion of this algorithm,
         // see cacm, vol 11, no 10, oct 1968, page 657
 
-        int tyyyy; // integer*4 variable needed for double precision arithmetic
-        int tmm;   // integer*4 variable needed for double precision arithmetic
-        int tdd;   // integer*4 variable needed for double precision arithmetic
-        int l;     // temporary variable used in conversion.
-
-        tyyyy = gyyyy;
-        tmm = gmm;
-        tdd = gdd;
-        l = (tmm - 14) / 12;
+        int tyyyy = gyyyy;
+        int tmm = gmm;
+        int tdd = gdd;
+        int l = (tmm - 14) / 12;
         return tdd - 32075 + 1461 * (tyyyy + 4800 + l) / 4 + 367 * (tmm - 2 - l * 12) / 12 - 3 * ((tyyyy + 4900 + l) / 100) / 4;
+    }
+
+    int computeJulianDate(GregorianDate const gdate)
+    {
+        return computeJulianDate(gdate.year, gdate.month, gdate.day);
+    }
+
+    GregorianDate computeGregorianDate(int const jdate)
+    {
+        int tdate = jdate;
+        int l = tdate + 68569;
+        int n = 4 * l / 146097;
+        l -= (146097 * n + 3) / 4;
+        int tyyyy = 4000 * (l + 1) / 1461001;
+        l = l - 1461 * tyyyy / 4 + 31;
+        int tmm = 80 * l / 2447;
+        int tdd = l - 2447 * tmm / 80;
+        l = tmm / 11;
+        tmm += 2 - 12 * l;
+        tyyyy += 100 * (n - 49) + l;
+        return {tyyyy, tmm, tdd};
     }
 
     WeekDay calculateDayOfWeek(int const year, int const month, int const day)

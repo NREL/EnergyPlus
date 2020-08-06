@@ -202,49 +202,38 @@ TEST_F(EnergyPlusFixture, JGDate_Test)
     // used http://aa.usno.navy.mil/data/docs/JulianDate.php
     //
     int julianDate;
-    int gregorianYear;
-    int gregorianMonth;
-    int gregorianDay;
+    GregorianDate gregorianDate(2016, 5, 25); // when test was made
 
-    gregorianYear = 2016; // when test was made
-    gregorianMonth = 5;
-    gregorianDay = 25;
-    JGDate(GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
+    julianDate = computeJulianDate(gregorianDate);
     EXPECT_EQ(2457534, julianDate);
-    JGDate(JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
-    EXPECT_EQ(2016, gregorianYear);
-    EXPECT_EQ(5, gregorianMonth);
-    EXPECT_EQ(25, gregorianDay);
+    gregorianDate = computeGregorianDate(julianDate);
+    EXPECT_EQ(2016, gregorianDate.year);
+    EXPECT_EQ(5, gregorianDate.month);
+    EXPECT_EQ(25, gregorianDate.day);
 
-    gregorianYear = 2015; // a year before when test was made
-    gregorianMonth = 5;
-    gregorianDay = 25;
-    JGDate(GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
+    gregorianDate.year--; // a year before
+    julianDate = computeJulianDate(gregorianDate);
     EXPECT_EQ(2457168, julianDate);
-    JGDate(JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
-    EXPECT_EQ(2015, gregorianYear);
-    EXPECT_EQ(5, gregorianMonth);
-    EXPECT_EQ(25, gregorianDay);
+    gregorianDate = computeGregorianDate(julianDate);
+    EXPECT_EQ(2015, gregorianDate.year);
+    EXPECT_EQ(5, gregorianDate.month);
+    EXPECT_EQ(25, gregorianDate.day);
 
-    gregorianYear = 1966; // a fine date in history
-    gregorianMonth = 7;
-    gregorianDay = 16;
-    JGDate(GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
+    gregorianDate = {1966, 7, 16}; // a fine date in history
+    julianDate = computeJulianDate(gregorianDate);
     EXPECT_EQ(2439323, julianDate);
-    JGDate(JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
-    EXPECT_EQ(1966, gregorianYear);
-    EXPECT_EQ(7, gregorianMonth);
-    EXPECT_EQ(16, gregorianDay);
+    gregorianDate = computeGregorianDate(julianDate);
+    EXPECT_EQ(1966, gregorianDate.year);
+    EXPECT_EQ(7, gregorianDate.month);
+    EXPECT_EQ(16, gregorianDate.day);
 
-    gregorianYear = 2000; // complex leap year
-    gregorianMonth = 12;
-    gregorianDay = 31;
-    JGDate(GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
+    gregorianDate = {2000, 12, 31}; // complex leap year
+    julianDate = computeJulianDate(gregorianDate);
     EXPECT_EQ(2451910, julianDate);
-    JGDate(JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
-    EXPECT_EQ(2000, gregorianYear);
-    EXPECT_EQ(12, gregorianMonth);
-    EXPECT_EQ(31, gregorianDay);
+    gregorianDate = computeGregorianDate(julianDate);
+    EXPECT_EQ(2000, gregorianDate.year);
+    EXPECT_EQ(12, gregorianDate.month);
+    EXPECT_EQ(31, gregorianDate.day);
 }
 
 TEST_F(EnergyPlusFixture, interpolateWindDirectionTest)

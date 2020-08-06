@@ -127,9 +127,6 @@ namespace WeatherManager {
         SkyTAlgorithmA = 7,      // place holder
     };
 
-    extern int const GregorianToJulian; // JGDate argument for Gregorian to Julian Date conversion
-    extern int const JulianToGregorian; // JGDate argument for Julian to Gregorian Date conversion
-
     extern int const NumDaysInYear;
     extern bool WeatherFileExists;           // Set to true if a weather file exists
     extern bool LocationGathered;            // flag to show if Location exists on Input File (we assume one is there and correct on weather file)
@@ -796,14 +793,20 @@ namespace WeatherManager {
 
     bool isLeapYear(int Year);
 
+    struct GregorianDate
+    {
+        int year;
+        int month;
+        int day;
+
+        GregorianDate(int year, int month, int day) : year(year), month(month), day(day) {}
+    };
+
     int computeJulianDate(int gyyyy, int gmm, int gdd);
 
-    void JGDate(int jflag, // indicates direction of conversion,
-                int &jdate,      // input/output julian date, typically a 7 or 8 digit integer
-                int &gyyyy,      // input/output gregorian year, should be specified as 4 digits
-                int &gmm,        // input/output gregorian month
-                int &gdd         // input/output gregorian day
-    );
+    int computeJulianDate(GregorianDate gdate);
+
+    GregorianDate computeGregorianDate(int jdate);
 
     WeekDay calculateDayOfWeek(int year, int month, int day);
 
