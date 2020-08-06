@@ -810,9 +810,7 @@ namespace WeatherManager {
 
     WeekDay calculateDayOfWeek(int year, int month, int day);
 
-    int calculateDayOfYear(int Month, int Day);
-
-    int calculateDayOfYear(int Month, int Day, bool leapYear);
+    int calculateDayOfYear(int Month, int Day, bool leapYear = false);
 
     bool validMonthDay(int month, int day, int leapYearAdd = 0);
 

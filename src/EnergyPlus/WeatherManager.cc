@@ -8577,24 +8577,6 @@ namespace WeatherManager {
         return static_cast<WeekDay>(DataEnvironment::DayOfWeek);
     }
 
-    int calculateDayOfYear(int const Month, int const Day)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Jason DeGraw
-        //       DATE WRITTEN   October 10, 2017
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Compute the day of the year for non-leap years.
-
-        static std::array<int, 12> const daysbefore{{0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334}};
-
-        // Could probably do some bounds checking here, but for now assume the month is in [1, 12]
-        return daysbefore[Month - 1] + Day;
-    }
-
     int calculateDayOfYear(int const Month, int const Day, bool const leapYear)
     {
 
@@ -8672,30 +8654,15 @@ namespace WeatherManager {
 
         static ObjexxFCL::gio::Fmt const fmtA("(A)");
 
-        Real64 HourlyDryBulbTemp;                                  // hourly outside air dry-bulb temperature read from weather file
         Real64 MonthlyDailyDryBulbMin(200.0);                      // monthly-daily minimum outside air dry-bulb temperature
         Real64 MonthlyDailyDryBulbMax(-200.0);                     // monthly-daily maximum outside air dry-bulb temperature
-        Real64 MonthlyDailyDryBulbAvg(0.0);                        // monthly-daily average outside air dry-bulb temperature
         Real64 AnnualDailyAverageDryBulbTempSum(0.0);              // annual sum of daily average outside air dry-bulb temperature
-        Real64 DailyAverageDryBulbTemp(0.0);                // daily average outside air dry-bulb temperature
         Array1D<Real64> MonthlyAverageDryBulbTemp(12, 0.0); // monthly-daily average outside air temperature
-        Array1D<int> EndDayOfMonthLocal(12, 0);             // number of days in each month
-        std::string lineIn;
-        std::string lineAvg;
-        std::string epwLine;
-        std::string::size_type pos;
-        int AnnualNumberOfDays(0);
-        int i;
-        int j;
-        int ind;
         int readStat;
-        int statFile;
-        int epwFile;
-        bool statFileExists;
-        bool epwFileExists;
-        bool epwHasLeapYear(false);
 
         if (!this->OADryBulbWeatherDataProcessed) {
+            bool statFileExists;
+            bool epwFileExists;
             {
                 {
                     IOFlags flags;
@@ -8711,7 +8678,7 @@ namespace WeatherManager {
             }
             readStat = 0;
             if (statFileExists) {
-                statFile = GetNewUnitNumber();
+                int statFile = GetNewUnitNumber();
                 {
                     IOFlags flags;
                     flags.ACTION("READ");
@@ -8724,14 +8691,16 @@ namespace WeatherManager {
                     ShowContinueError("Water Mains Temperature will be set to a fixed deafult value of 10.0 C.");
                     return;
                 }
+                std::string lineAvg;
                 while (readStat == 0) {
+                    std::string lineIn;
                     {
                         IOFlags flags;
                         ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
                         readStat = flags.ios();
                     }
                     if (has(lineIn, "Monthly Statistics for Dry Bulb temperatures")) {
-                        for (i = 1; i <= 7; ++i) {
+                        for (int i = 1; i <= 7; ++i) {
                             {
                                 IOFlags flags;
                                 ObjexxFCL::gio::read(statFile, fmtA, flags);
@@ -8747,8 +8716,8 @@ namespace WeatherManager {
                     }
                 }
                 ObjexxFCL::gio::close(statFile);
-                AnnualNumberOfDays = 0;
-                for (i = 1; i <= 12; ++i) {
+                int AnnualNumberOfDays = 0;
+                for (int i = 1; i <= 12; ++i) {
                     MonthlyAverageDryBulbTemp(i) = OutputReportTabular::StrToReal(OutputReportTabular::GetColumnUsingTabs(lineAvg, i + 2));
                     AnnualDailyAverageDryBulbTempSum += MonthlyAverageDryBulbTemp(i) * EndDayOfMonth(i);
                     MonthlyDailyDryBulbMin = min(MonthlyDailyDryBulbMin, MonthlyAverageDryBulbTemp(i));
@@ -8760,7 +8729,8 @@ namespace WeatherManager {
                 this->MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
                 this->OADryBulbWeatherDataProcessed = true;
             } else if (epwFileExists) {
-                epwFile = GetNewUnitNumber();
+                int epwFile = GetNewUnitNumber();
+                bool epwHasLeapYear(false);
                 {
                     IOFlags flags;
                     flags.ACTION("READ");
@@ -8773,7 +8743,8 @@ namespace WeatherManager {
                     ShowContinueError("Water Mains Temperature will be set to a fixed deafult value of 10.0 C.");
                     return;
                 }
-                for (i = 1; i <= 8; ++i) { // Headers
+                for (int i = 1; i <= 8; ++i) { // Headers
+                    std::string epwLine;
                     {
                         IOFlags flags;
                         ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
@@ -8781,7 +8752,7 @@ namespace WeatherManager {
                     }
                     if (i == 5) {
                         // HOLIDAYS/DAYLIGHT SAVINGS,Yes,0,0,0
-                        pos = index(epwLine, ',');
+                        std::string::size_type pos = index(epwLine, ',');
                         epwLine.erase(0, pos + 1);
                         pos = index(epwLine, ',');
                         std::string LeapYear = UtilityRoutines::MakeUPPERCase(epwLine.substr(0, pos));
@@ -8790,30 +8761,32 @@ namespace WeatherManager {
                         }
                     }
                 }
-                EndDayOfMonthLocal = EndDayOfMonth;
+                Array1D<int> EndDayOfMonthLocal{EndDayOfMonth};             // number of days in each month
                 if (epwHasLeapYear) {
                     // increase number of days for february by one day if weather data has leap year
                     EndDayOfMonthLocal(2) = EndDayOfMonthLocal(2) + 1;
                 }
                 int DayNum;
                 int DaysCountOfMonth;
-                for (i = 1; i <= 12; ++i) {
-                    MonthlyDailyDryBulbAvg = 0.0;
+                for (int i = 1; i <= 12; ++i) {
+                    Real64 MonthlyDailyDryBulbAvg = 0.0;
                     DaysCountOfMonth = EndDayOfMonthLocal(i);
                     for (DayNum = 1; DayNum <= DaysCountOfMonth; ++DayNum) {
-                        DailyAverageDryBulbTemp = 0.0;
-                        for (j = 1; j <= 24; ++j) {
+                        Real64 DailyAverageDryBulbTemp = 0.0;
+                        for (int j = 1; j <= 24; ++j) {
+                            std::string epwLine;
                             {
                                 IOFlags flags;
                                 ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
                                 readStat = flags.ios();
                             }
-                            for (ind = 1; ind <= 6; ++ind) {
+                            std::string::size_type pos;
+                            for (int ind = 1; ind <= 6; ++ind) {
                                 pos = index(epwLine, ',');
                                 epwLine.erase(0, pos + 1);
                             }
                             pos = index(epwLine, ',');
-                            HourlyDryBulbTemp = OutputReportTabular::StrToReal(epwLine.substr(0, pos));
+                            Real64 HourlyDryBulbTemp = OutputReportTabular::StrToReal(epwLine.substr(0, pos));
                             DailyAverageDryBulbTemp += (HourlyDryBulbTemp / 24.0);
                         }
                         AnnualDailyAverageDryBulbTempSum += DailyAverageDryBulbTemp;
@@ -8826,8 +8799,8 @@ namespace WeatherManager {
                 ObjexxFCL::gio::close(epwFile);
                 // calculate annual average outdoor air dry-bulb temperature and monthly daily average
                 // outdoor air temperature maximum difference
-                AnnualNumberOfDays = 365;
-                if (epwHasLeapYear) AnnualNumberOfDays = AnnualNumberOfDays + 1;
+                int AnnualNumberOfDays = 365;
+                if (epwHasLeapYear) AnnualNumberOfDays++;
                 this->AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
                 this->MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
                 this->MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
@@ -8869,21 +8842,23 @@ namespace WeatherManager {
                       ",Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC}"
                       ",Fixed Default Water Mains Temperature{C}\n";
 
+        switch(WaterMainsTempsMethod)
         {
-            auto const SELECT_CASE_var(WaterMainsTempsMethod);
-            if (SELECT_CASE_var == WaterMainsTempCalcMethod::Schedule) {
+            case WaterMainsTempCalcMethod::Schedule:
                 *eiostream << "Site Water Mains Temperature Information,";
                 *eiostream << calcMethodMap.at(WaterMainsTempsMethod) << "," << WaterMainsTempsScheduleName << ",";
                 *eiostream << General::RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << General::RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2) << ",";
                 *eiostream << "NA\n";
-            } else if (SELECT_CASE_var == WaterMainsTempCalcMethod::Correlation) {
+                break;
+            case WaterMainsTempCalcMethod::Correlation:
                 *eiostream << "Site Water Mains Temperature Information,";
                 *eiostream << calcMethodMap.at(WaterMainsTempsMethod) << ","
                            << "NA"
                            << ",";
                 *eiostream << General::RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << General::RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2) << ",";
                 *eiostream << "NA\n";
-            } else if (SELECT_CASE_var == WaterMainsTempCalcMethod::CorrelationFromWeatherFile) {
+                break;
+            case WaterMainsTempCalcMethod::CorrelationFromWeatherFile:
                 if (OADryBulbAverage.OADryBulbWeatherDataProcessed) {
                     *eiostream << "Site Water Mains Temperature Information,";
                     *eiostream << calcMethodMap.at(WaterMainsTempsMethod) << ","
@@ -8903,7 +8878,8 @@ namespace WeatherManager {
                                << "NA"
                                << "," << General::RoundSigDigits(10.0, 1) << '\n';
                 }
-            } else {
+                break;
+            default:
                 *eiostream << "Site Water Mains Temperature Information,";
                 *eiostream << "FixedDefault"
                            << ","
@@ -8913,7 +8889,7 @@ namespace WeatherManager {
                            << ","
                            << "NA"
                            << "," << General::RoundSigDigits(10.0, 1) << '\n';
-            }
+                break;
         }
 
         print(OutputFiles::getSingleton().eio, "{}", ss.str());
