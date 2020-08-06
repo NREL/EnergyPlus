@@ -683,7 +683,7 @@ namespace WeatherManager {
     // Functions
     void clear_state();
 
-    void ManageWeather(IOFiles &ioFiles);
+    void ManageWeather(EnergyPlusData& state);
 
     void ResetEnvironmentCounter();
 

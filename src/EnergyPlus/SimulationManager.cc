@@ -623,7 +623,7 @@ namespace SimulationManager {
                             }
                         }
 
-                        ManageWeather(state.files);
+                        ManageWeather(state);
 
                         ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
@@ -2128,7 +2128,7 @@ namespace SimulationManager {
 
             BeginTimeStepFlag = true;
 
-            ManageWeather(state.files);
+            ManageWeather(state);
 
             ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
@@ -2143,7 +2143,7 @@ namespace SimulationManager {
             //          ! do another timestep=1
             if (DeveloperFlag) DisplayString("Initializing Simulation - 2nd timestep 1:" + EnvironmentName);
 
-            ManageWeather(state.files);
+            ManageWeather(state);
 
             ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
@@ -2156,7 +2156,7 @@ namespace SimulationManager {
             EndEnvrnFlag = true;
 
             if (DeveloperFlag) DisplayString("Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);
-            ManageWeather(state.files);
+            ManageWeather(state);
 
             ManageExteriorEnergyUse(state.exteriorEnergyUse);
 

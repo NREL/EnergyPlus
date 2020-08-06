@@ -1621,3 +1621,51 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlag, DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue);
 
 }
+TEST_F(EnergyPlusFixture, WeatherDataActuators)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "OutdoorAir:Node, Test node;",
+
+        "EnergyManagementSystem:Actuator,",
+        "TempSetpointLo,          !- Name",
+        "Test node,  !- Actuated Component Unique Name",
+        "System Node Setpoint,    !- Actuated Component Type",
+        "Temperature Minimum Setpoint;    !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Actuator,",
+        "TempSetpointHi,          !- Name",
+        "Test node,  !- Actuated Component Unique Name",
+        "System Node Setpoint,    !- Actuated Component Type",
+        "Temperature Maximum Setpoint;    !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:ProgramCallingManager,",
+        "Dual Setpoint Test Manager,  !- Name",
+        "BeginNewEnvironment,  !- EnergyPlus Model Calling Point",
+        "DualSetpointTestControl;  !- Program Name 1",
+
+        "EnergyManagementSystem:Program,",
+        "DualSetpointTestControl,",
+        "Set TempSetpointLo = 16.0,",
+        "Set TempSetpointHi  = 20.0;",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    OutAirNodeManager::SetOutAirNodes();
+
+    EMSManager::CheckIfAnyEMS(state.files);
+
+    EMSManager::FinishProcessingUserInput = true;
+
+    bool anyRan;
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
+
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyRan, ObjexxFCL::Optional_int_const());
+
+    EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointHi, 20.0, 0.000001);
+
+    EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointLo, 16.0, 0.000001);
+}

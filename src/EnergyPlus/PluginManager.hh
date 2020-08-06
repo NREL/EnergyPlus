@@ -104,6 +104,8 @@ namespace PluginManagement {
         // plugin calling point hooks
         const char * sHookBeginNewEnvironment = "on_begin_new_environment";
         bool bHasBeginNewEnvironment = false;
+        const char* sHookBeginZoneTimestepBeforeSetCurrentWeather = "on_begin_zone_timestep_before_set_current_weather";
+        bool bHasBeginZoneTimestepBeforeSetCurrentWeather = false;
         const char * sHookAfterNewEnvironmentWarmUpIsComplete = "on_after_new_environment_warmup_is_complete";
         bool bHasAfterNewEnvironmentWarmUpIsComplete = false;
         const char * sHookBeginZoneTimestepBeforeInitHeatBalance = "on_begin_zone_timestep_before_init_heat_balance";

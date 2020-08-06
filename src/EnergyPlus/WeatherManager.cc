@@ -564,51 +564,28 @@ namespace WeatherManager {
         PrintDDHeader = true; // did not have an initialization in static function scope
     } // clear_state, for unit tests
 
-    void ManageWeather(IOFiles &ioFiles)
+    void ManageWeather(EnergyPlusData& state)
     {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 1997
         //       MODIFIED       June 1997 (general clean-up)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is the main driver of the weather manager module.
         // It controls the assignment of weather related global variables as
         // well as the reads and writes for weather information.
 
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus "manager" methodology.
+        InitializeWeather(state.files, PrintEnvrnStamp);
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // FLOW:
-
-        InitializeWeather(ioFiles, PrintEnvrnStamp);
+        bool anyEMSRan = false;
+        EMSManager::ManageEMS(
+            state, DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
         SetCurrentWeather();
 
-        ReportWeatherAndTimeInformation(ioFiles, PrintEnvrnStamp);
+        ReportWeatherAndTimeInformation(state.files, PrintEnvrnStamp);
     }
 
     void ResetEnvironmentCounter()

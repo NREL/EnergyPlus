@@ -1138,6 +1138,8 @@ namespace PluginManagement {
                 std::string functionName = (*EP_PyUnicode_AsUTF8)(item);
                 if (functionName == this->sHookBeginNewEnvironment) {
                     this->bHasBeginNewEnvironment = true;
+                } else if (functionName == this->sHookBeginZoneTimestepBeforeSetCurrentWeather) {
+                    this->bHasBeginZoneTimestepBeforeSetCurrentWeather = true;
                 } else if (functionName == this->sHookAfterNewEnvironmentWarmUpIsComplete) {
                     this->bHasAfterNewEnvironmentWarmUpIsComplete = true;
                 } else if (functionName == this->sHookBeginZoneTimestepBeforeInitHeatBalance) {
@@ -1198,6 +1200,10 @@ namespace PluginManagement {
         if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
             if (this->bHasBeginNewEnvironment) {
                 functionName = this->sHookBeginNewEnvironment;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather) {
+            if (this->bHasBeginZoneTimestepBeforeSetCurrentWeather) {
+                functionName = this->sHookBeginZoneTimestepBeforeSetCurrentWeather;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromZoneSizing) {
             if (this->bHasEndOfZoneSizing) {
