@@ -8152,23 +8152,18 @@ namespace WeatherManager {
 
         static ObjexxFCL::gio::Fmt const fmtA("(A)");
         static std::string const Header("DATA PERIODS");
-        std::string::size_type Pos;
-        std::string Line;
-        int NumHdArgs;
-        int Count;
-        int CurCount;
-        int CurOne;
-        int NumPeriods;
-        bool IOStatus;
 
         // Read in Header Information
-
         // Headers should come in order
+        std::string Line;
         while (true) {
             {
                 IOFlags flags;
                 ObjexxFCL::gio::read(WeatherFileUnitNumber, fmtA, flags) >> Line;
-                if (flags.end()) goto Label9998;
+                if (flags.end()) {
+                    ShowFatalError("Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header,
+                                   OptionalOutputFileRef{OutputFiles::getSingleton().eso});
+                }
             }
             uppercase(Line);
             if (has(Line, Header)) break;
@@ -8190,11 +8185,12 @@ namespace WeatherManager {
         //       \key  Saturday
         //     A3, \field Data Period 1 Start Day
         //     A4, \field Data Period 1 End Day
-        NumHdArgs = 2;
-        Count = 1;
-        while (Count <= NumHdArgs) {
+
+        int NumHdArgs = 2;
+        int CurCount = 0;
+        for (int i = 1; i <= NumHdArgs; ++i) {
             strip(Line);
-            Pos = index(Line, ',');
+            std::string::size_type Pos = index(Line, ',');
             if (Pos == std::string::npos) {
                 if (len(Line) == 0) {
                     while (Pos == std::string::npos) {
@@ -8208,40 +8204,15 @@ namespace WeatherManager {
                 }
             }
 
-            {
-                auto const SELECT_CASE_var(Count);
-
-                if (SELECT_CASE_var == 1) {
-                    NumPeriods = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
-                    NumHdArgs += 4 * NumPeriods;
-                    CurCount = 0;
-
-                } else if (SELECT_CASE_var == 2) {
-
-                } else if ((SELECT_CASE_var >= 3)) {
-                    CurOne = mod(Count - 3, 4);
-
-                    {
-                        auto const SELECT_CASE_var1(CurOne);
-
-                        if (SELECT_CASE_var1 == 0) {
-                            // Description of Data Period
-                            ++CurCount;
-
-                        } else if ((SELECT_CASE_var1 >= 1) && (SELECT_CASE_var1 <= 3)) {
-                        }
-                    }
-                }
+            if (i == 1) {
+                bool IOStatus;
+                int const NumPeriods = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+                NumHdArgs += 4 * NumPeriods;
+            } else if ((i >= 3)) {
+                if (mod(i - 3, 4) == 0) ++CurCount;
             }
             Line.erase(0, Pos + 1);
-            ++Count;
         }
-
-        return;
-
-    Label9998:;
-        ShowFatalError("Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header,
-                       OptionalOutputFileRef{OutputFiles::getSingleton().eso});
     }
 
     void ReportMissing_RangeData()
@@ -8264,159 +8235,59 @@ namespace WeatherManager {
         static std::string const RangeString("Out of Range Data Found on Weather Data File");
         static constexpr auto rgFmt("Out of Range {} [{},{}], Number of items={:5}");
 
-        bool MissedHeader;
-        bool OutOfRangeHeader;
-
         if (!DataEnvironment::DisplayWeatherMissingDataWarnings) return;
 
-        MissedHeader = false;
-        if (Missed.DryBulb > 0) {
-            if (!MissedHeader) {
-                ShowWarningError(MissString);
-                MissedHeader = true;
+        bool MissedHeader = false;
+        auto missedHeaderCheck{
+            [&](Real64 const value, std::string const &description){
+                if (value > 0) {
+                    if (!MissedHeader) {
+                        ShowWarningError(MissString);
+                        MissedHeader = true;
+                    }
+                    ShowMessage(format(msFmt, "\"" + description + "\"", value));
+                }
             }
-            ShowMessage(format(msFmt, "\"Dry Bulb Temperatures\"", Missed.DryBulb));
-        }
-        if (Missed.StnPres > 0) {
-            if (!MissedHeader) {
-                ShowWarningError(MissString);
-                MissedHeader = true;
-            }
-            ShowMessage(format(msFmt, "\"Atmospheric Pressure\"", Missed.StnPres));
-        }
-        if (Missed.RelHumid > 0) {
-            if (!MissedHeader) {
-                ShowWarningError(MissString);
-                MissedHeader = true;
-            }
-            ShowMessage(format(msFmt, "\"Relative Humidity\"", Missed.RelHumid));
-        }
-        if (Missed.DewPoint > 0) {
-            if (!MissedHeader) {
-                ShowWarningError(MissString);
-                MissedHeader = true;
-            }
-            ShowMessage(format(msFmt, "\"Dew Point Temperatures\"", Missed.DewPoint));
-        }
-        if (Missed.WindSpd > 0) {
-            if (!MissedHeader) {
-                ShowWarningError(MissString);
-                MissedHeader = true;
-            }
-            ShowMessage(format(msFmt, "\"Wind Speed\"", Missed.WindSpd));
-        }
-        if (Missed.WindDir > 0) {
-            if (!MissedHeader) {
-                ShowWarningError(MissString);
-                MissedHeader = true;
-            }
-            ShowMessage(format(msFmt, "\"Wind Direction\"", Missed.WindDir));
-        }
-        if (Missed.DirectRad > 0) {
-            if (!MissedHeader) {
-                ShowWarningError(MissString);
-                MissedHeader = true;
-            }
-            ShowMessage(format(msFmt, "\"Direct Radiation\"", Missed.DirectRad));
-        }
-        if (Missed.DiffuseRad > 0) {
-            if (!MissedHeader) {
-                ShowWarningError(MissString);
-                MissedHeader = true;
-            }
-            ShowMessage(format(msFmt, "\"Diffuse Radiation\"", Missed.DiffuseRad));
-        }
-        if (Missed.TotSkyCvr > 0) {
-            if (!MissedHeader) {
-                ShowWarningError(MissString);
-                MissedHeader = true;
-            }
-            ShowMessage(format(msFmt, "\"Total Sky Cover\"", Missed.TotSkyCvr));
-        }
-        if (Missed.OpaqSkyCvr > 0) {
-            if (!MissedHeader) {
-                ShowWarningError(MissString);
-                MissedHeader = true;
-            }
-            ShowMessage(format(msFmt, "\"Opaque Sky Cover\"", Missed.OpaqSkyCvr));
-        }
-        if (Missed.SnowDepth > 0) {
-            if (!MissedHeader) {
-                ShowWarningError(MissString);
-                MissedHeader = true;
-            }
-            ShowMessage(format(msFmt, "\"Snow Depth\"", Missed.SnowDepth));
-        }
+        };
+
+        missedHeaderCheck(Missed.DryBulb, "Dry Bulb Temperature");
+        missedHeaderCheck(Missed.StnPres, "Atmospheric Pressure");
+        missedHeaderCheck(Missed.RelHumid, "Relative Humidity");
+        missedHeaderCheck(Missed.DewPoint, "Dew Point Temperatures");
+        missedHeaderCheck(Missed.WindSpd, "Wind Speed");
+        missedHeaderCheck(Missed.WindDir, "Wind Direction");
+        missedHeaderCheck(Missed.DirectRad, "Direct Radiation");
+        missedHeaderCheck(Missed.DiffuseRad, "Diffuse Radiation");
+        missedHeaderCheck(Missed.TotSkyCvr, "Total Sky Cover");
+        missedHeaderCheck(Missed.OpaqSkyCvr, "Opaque Sky Cover");
+        missedHeaderCheck(Missed.SnowDepth, "Snow Depth");
         if (Missed.WeathCodes > 0) {
             ShowWarningError(InvString);
             ShowMessage(format(ivFmt, "\"Weather Codes\" (not equal 9 digits)", Missed.WeathCodes));
         }
-        if (Missed.LiquidPrecip > 0) {
-            if (!MissedHeader) {
-                ShowWarningError(MissString);
-                MissedHeader = true;
-            }
-            ShowMessage(format(msFmt, "\"Liquid Precipitation Depth\"", Missed.LiquidPrecip));
-        }
+        missedHeaderCheck(Missed.LiquidPrecip, "Liquid Precipitation Depth");
 
-        OutOfRangeHeader = false;
-        if (OutOfRange.DryBulb > 0) {
-            if (!OutOfRangeHeader) {
-                ShowWarningError(RangeString);
-                OutOfRangeHeader = true;
+        bool OutOfRangeHeader = false;
+        auto outOfRangeHeaderCheck{
+            [&](Real64 const value, std::string const &description, std::string const &rangeLow, std::string const &rangeHigh, std::string const extraMsg = ""){
+                if (value > 0) {
+                    if (!OutOfRangeHeader) {
+                        ShowWarningError(RangeString);
+                        OutOfRangeHeader = true;
+                    }
+                    ShowMessage(format(rgFmt, description, rangeLow, rangeHigh, value));
+                    if (!extraMsg.empty()) ShowMessage(extraMsg);
+                }
             }
-            ShowMessage(format(rgFmt, "Dry Bulb Temperatures", ">=-90", "<=70", OutOfRange.DryBulb));
-        }
-        if (OutOfRange.StnPres > 0) {
-            if (!OutOfRangeHeader) {
-                ShowWarningError(RangeString);
-                OutOfRangeHeader = true;
-            }
-            ShowMessage(format(rgFmt, "Atmospheric Pressure", ">31000", "<=120000", OutOfRange.StnPres));
-            ShowMessage("Out of Range values set to last good value");
-        }
-        if (OutOfRange.RelHumid > 0) {
-            if (!OutOfRangeHeader) {
-                ShowWarningError(RangeString);
-                OutOfRangeHeader = true;
-            }
-            ShowMessage(format(rgFmt, "Relative Humidity", ">=0", "<=110", OutOfRange.RelHumid));
-        }
-        if (OutOfRange.DewPoint > 0) {
-            if (!OutOfRangeHeader) {
-                ShowWarningError(RangeString);
-                OutOfRangeHeader = true;
-            }
-            ShowMessage(format(rgFmt, "Dew Point Temperatures", ">=-90", "<=70", OutOfRange.DewPoint));
-        }
-        if (OutOfRange.WindSpd > 0) {
-            if (!OutOfRangeHeader) {
-                ShowWarningError(RangeString);
-                OutOfRangeHeader = true;
-            }
-            ShowMessage(format(rgFmt, "Wind Speed", ">=0", "<=40", OutOfRange.WindSpd));
-        }
-        if (OutOfRange.WindDir > 0) {
-            if (!OutOfRangeHeader) {
-                ShowWarningError(RangeString);
-                OutOfRangeHeader = true;
-            }
-            ShowMessage(format(rgFmt, "Wind Direction", ">=0", "<=360", OutOfRange.WindDir));
-        }
-        if (OutOfRange.DirectRad > 0) {
-            if (!OutOfRangeHeader) {
-                ShowWarningError(RangeString);
-                OutOfRangeHeader = true;
-            }
-            ShowMessage(format(rgFmt, "Direct Radiation", ">=0", "NoLimit", OutOfRange.DirectRad));
-        }
-        if (OutOfRange.DiffuseRad > 0) {
-            if (!OutOfRangeHeader) {
-                ShowWarningError(RangeString);
-                OutOfRangeHeader = true;
-            }
-            ShowMessage(format(rgFmt, "Diffuse Radiation", ">=0", "NoLimit", OutOfRange.DiffuseRad));
-        }
+        };
+        outOfRangeHeaderCheck(OutOfRange.DryBulb, "Dry Bulb Temperatures", ">=-90", "<=70");
+        outOfRangeHeaderCheck(OutOfRange.StnPres, "Atmospheric Pressure", ">31000", "<=120000", "Out of Range values set to last good value");
+        outOfRangeHeaderCheck(OutOfRange.RelHumid, "Relative Humidity", ">=0", "<=110");
+        outOfRangeHeaderCheck(OutOfRange.DewPoint, "Dew Point Temperatures", ">=-90", "<=70");
+        outOfRangeHeaderCheck(OutOfRange.WindSpd, "Wind Speed", ">=0", "<=40");
+        outOfRangeHeaderCheck(OutOfRange.WindDir, "Wind Direction", ">=0", "<=360");
+        outOfRangeHeaderCheck(OutOfRange.DirectRad, "Direct Radiation", ">=0", "NoLimit");
+        outOfRangeHeaderCheck(OutOfRange.DiffuseRad, "Diffuse Radiation", ">=0", "NoLimit");
     }
 
     void SetupInterpolationValues()
