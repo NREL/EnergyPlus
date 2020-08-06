@@ -56,7 +56,7 @@
 
 #include <functional>
 
-ENERGYPLUSLIB_API void registerErrorCallback(std::function<void(EnergyPlus::Error e, const std::string &)> f);
+ENERGYPLUSLIB_API void registerErrorCallback(std::function<void(EnergyPlus::Error, const std::string &)> f);
 
 extern "C" {
 #endif
