@@ -307,10 +307,6 @@ namespace SimulationManager {
         bool AnyUnderwaterBoundaries = false;
         int EnvCount;
 
-        // Windows: ensure that EnergyPlusAPI.dll's notion of the "static singleton IOFiles" matches
-        // the exe's notion.
-        // TODO: Remove this after we have eliminated all remaining calls to IOFiles::getSingleton
-        IOFiles::setSingleton(&state.files);
 
         // CreateSQLiteDatabase();
         sqlite = EnergyPlus::CreateSQLiteDatabase();
