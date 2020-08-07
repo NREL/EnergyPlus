@@ -55,6 +55,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -68,7 +69,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -116,15 +116,15 @@ namespace VariableSpeedCoils {
     // Data
     // MODULE PARAMETER DEFINITIONS
 
-    Real64 const RatedInletAirTemp(26.6667);     // 26.6667C or 80F
-    Real64 const RatedInletWetBulbTemp(19.44);   // 19.44 or 67F, cooling mode
-    Real64 const RatedInletAirHumRat(0.01125);   // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    Real64 const RatedInletWaterTemp(29.4);      // 85 F cooling mode
-    Real64 const RatedAmbAirTemp(35.0);          // 95 F cooling mode
-    Real64 const RatedInletAirTempHeat(21.11);   // 21.11C or 70F, heating mode
-    Real64 const RatedInletWaterTempHeat(21.11); // 21.11C or 70F, heating mode
-    Real64 const RatedAmbAirTempHeat(8.33);      // 8.33 or 47F, heating mode
-    Real64 const RatedAmbAirWBHeat(6.11);        // 8.33 or 43F, heating mode, rated wet bulb temperature
+    Real64 const RatedInletAirTemp(26.6667);       // 26.6667C or 80F
+    Real64 const RatedInletWetBulbTemp(19.4444);   // 19.44 or 67F, cooling mode
+    Real64 const RatedInletAirHumRat(0.0111847);   // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    Real64 const RatedInletWaterTemp(29.4444);     // 85 F cooling mode
+    Real64 const RatedAmbAirTemp(35.0);            // 95 F cooling mode
+    Real64 const RatedInletAirTempHeat(21.1111);   // 21.11C or 70F, heating mode
+    Real64 const RatedInletWaterTempHeat(21.1111); // 21.11C or 70F, heating mode
+    Real64 const RatedAmbAirTempHeat(8.3333);      // 8.33 or 47F, heating mode
+    Real64 const RatedAmbAirWBHeat(6.1111);        // 8.33 or 43F, heating mode, rated wet bulb temperature
 
     // Water Systems
     int const CondensateDiscarded(1001); // default mode where water is "lost"
@@ -200,6 +200,7 @@ namespace VariableSpeedCoils {
 
     // Object Data
     Array1D<VariableSpeedCoilData> VarSpeedCoil;
+    bool firstTime(true);
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -231,6 +232,7 @@ namespace VariableSpeedCoils {
         VSHPWHHeatingCapacity = 0.0;
         VSHPWHHeatingCOP = 0.0;
         VarSpeedCoil.deallocate();
+        firstTime = true;
     }
 
     // Default Constructor
@@ -292,7 +294,8 @@ namespace VariableSpeedCoils {
     {
     }
 
-    void SimVariableSpeedCoils(EnergyPlusData &state, std::string const &CompName,   // Coil Name
+    void SimVariableSpeedCoils(EnergyPlusData &state,
+                               std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                int const CyclingScheme,       // Continuous fan OR cycling compressor
                                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -367,7 +370,8 @@ namespace VariableSpeedCoils {
         if ((VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
             (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed)) {
             // Cooling mode
-            InitVarSpeedCoil(state, DXCoilNum,
+            InitVarSpeedCoil(state,
+                             DXCoilNum,
                              MaxONOFFCyclesperHour,
                              HPTimeConstant,
                              FanDelayTime,
@@ -383,7 +387,8 @@ namespace VariableSpeedCoils {
         } else if ((VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) ||
                    (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed)) {
             // Heating mode
-            InitVarSpeedCoil(state, DXCoilNum,
+            InitVarSpeedCoil(state,
+                             DXCoilNum,
                              MaxONOFFCyclesperHour,
                              HPTimeConstant,
                              FanDelayTime,
@@ -397,7 +402,8 @@ namespace VariableSpeedCoils {
             UpdateVarSpeedCoil(DXCoilNum);
         } else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed) {
             // Heating mode
-            InitVarSpeedCoil(state, DXCoilNum,
+            InitVarSpeedCoil(state,
+                             DXCoilNum,
                              MaxONOFFCyclesperHour,
                              HPTimeConstant,
                              FanDelayTime,
@@ -466,7 +472,7 @@ namespace VariableSpeedCoils {
         static int MaxAlphas(0); // Maximum number of alpha input fields
         int IOStat;
         int AlfaFieldIncre;              // increment number of Alfa field
-        static bool ErrorsFound(false);  // If errors detected in input
+        bool ErrorsFound(false);         // If errors detected in input
         Real64 CurveVal;                 // Used to verify modifier curves equal 1 at rated conditions
         Real64 WHInletAirTemp;           // Used to pass proper inlet air temp to HPWH DX coil performance curves
         Real64 WHInletWaterTemp;         // Used to pass proper inlet water temp to HPWH DX coil performance curves
@@ -3178,7 +3184,8 @@ namespace VariableSpeedCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum,                       // Current DXCoilNum under simulation
+    void InitVarSpeedCoil(EnergyPlusData &state,
+                          int const DXCoilNum,                       // Current DXCoilNum under simulation
                           Real64 const MaxONOFFCyclesperHour,        // Maximum cycling rate of heat pump [cycles/hr]
                           Real64 const HPTimeConstant,               // Heat pump time constant [s]
                           Real64 const FanDelayTime,                 // Fan delay time, time delay for the HP's fan to
@@ -3238,7 +3245,7 @@ namespace VariableSpeedCoils {
         Real64 Cp;    // local fluid specific heat
         int SpeedCal; // calculated speed level
         bool errFlag;
-        static bool ErrorsFound(false);    // TRUE when errors found, air loop initialization error
+        bool ErrorsFound(false);           // TRUE when errors found, air loop initialization error
         Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
         int Mode;                          // Performance mode for MultiMode DX coil; Always 1 for other coil types
         Real64 RatedHeatPumpIndoorAirTemp; // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
@@ -3285,7 +3292,8 @@ namespace VariableSpeedCoils {
                     plantTypeOfNum = DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
                 }
                 errFlag = false;
-                ScanPlantLoopsForObject(VarSpeedCoil(DXCoilNum).Name,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        VarSpeedCoil(DXCoilNum).Name,
                                         plantTypeOfNum,
                                         VarSpeedCoil(DXCoilNum).LoopNum,
                                         VarSpeedCoil(DXCoilNum).LoopSide,
@@ -3538,7 +3546,8 @@ namespace VariableSpeedCoils {
             // store fan info for coil
             if (VarSpeedCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                 if (VarSpeedCoil(DXCoilNum).SupplyFanIndex > -1) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state, VarSpeedCoil(DXCoilNum).Name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                 VarSpeedCoil(DXCoilNum).Name,
                                                                  VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                                                                  VarSpeedCoil(DXCoilNum).SupplyFanName,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
@@ -3547,7 +3556,8 @@ namespace VariableSpeedCoils {
 
             } else {
                 if (VarSpeedCoil(DXCoilNum).SupplyFanIndex > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(state, VarSpeedCoil(DXCoilNum).Name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                 VarSpeedCoil(DXCoilNum).Name,
                                                                  VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                                                                  VarSpeedCoil(DXCoilNum).SupplyFanName,
                                                                  DataAirSystems::structArrayLegacyFanModels,
@@ -4081,8 +4091,13 @@ namespace VariableSpeedCoils {
                     }
                     MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
                     // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
+                    if (VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0) {
+                        RatedSourceTempCool = RatedInletWaterTemp;
+                    } else {
+                        RatedSourceTempCool = OutTemp;
+                    }
                     TotCapTempModFac =
-                        CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
+                        CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedSourceTempCool);
 
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
@@ -4153,8 +4168,13 @@ namespace VariableSpeedCoils {
 
                     MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
                     // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
+                    if (VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0) {
+                        RatedSourceTempCool = RatedInletWaterTemp;
+                    } else {
+                        RatedSourceTempCool = OutTemp;
+                    }
                     TotCapTempModFac =
-                        CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
+                        CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedSourceTempCool);
 
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
@@ -4322,7 +4342,7 @@ namespace VariableSpeedCoils {
             }
         }
 
-        // FORCE BACK TO THE RATED AIR FLOW RATE WITH THE SAME RATIO DEFINED BY THE CATLOG DATA
+        // FORCE BACK TO THE RATED AIR FLOW RATE WITH THE SAME RATIO DEFINED BY THE CATALOG DATA
         if (!HardSizeNoDesRunAirFlow) {
             if ((RatedCapCoolTotalAutoSized) && (RatedAirFlowAutoSized)) {
                 RatedAirVolFlowRateDes =
@@ -4643,18 +4663,17 @@ namespace VariableSpeedCoils {
         if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit ||
             VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit) {
 
-            RatedSourceTempCool = RatedInletWaterTemp;
+            if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit) {
+                RatedSourceTempCool = RatedInletWaterTemp;
+            } else {
+                RatedSourceTempCool = RatedInletWaterTempHeat;
+            }
 
             if (PltSizNum > 0) {
                 rhoW = rho;
-            } else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit) {
-                rhoW = GetDensityGlycol(PlantLoop(VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
-                                        RatedInletWaterTemp,
-                                        PlantLoop(VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
-                                        RoutineName);
             } else {
                 rhoW = GetDensityGlycol(PlantLoop(VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
-                                        RatedInletWaterTempHeat,
+                                        RatedSourceTempCool,
                                         PlantLoop(VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
                                         RoutineName);
             }
@@ -5075,10 +5094,9 @@ namespace VariableSpeedCoils {
         Real64 CpAir;    // Specific heat of air [J/kg_C]
         Real64 ReportingConstant;
 
-        bool LatDegradModelSimFlag; // Latent degradation model simulation flag
-        int NumIteration;           // Iteration Counter
-        static int Count(0);        // No idea what this is for.
-        static bool firstTime(true);
+        bool LatDegradModelSimFlag;             // Latent degradation model simulation flag
+        int NumIteration;                       // Iteration Counter
+        static int Count(0);                    // No idea what this is for.
         static Real64 LoadSideInletDBTemp_Init; // rated conditions
         static Real64 LoadSideInletWBTemp_Init; // rated conditions
         static Real64 LoadSideInletHumRat_Init; // rated conditions

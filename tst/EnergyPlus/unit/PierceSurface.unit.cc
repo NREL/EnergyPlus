@@ -53,6 +53,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/PierceSurface.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Vector3.hh>
@@ -67,7 +69,7 @@ using namespace ObjexxFCL;
 using DataVectorTypes::Vector;
 using Vector2D = DataSurfaces::Surface2D::Vector2D;
 
-TEST(PierceSurfaceTest, Rectangular)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_Rectangular)
 {
     DataSurfaces::SurfaceData floor;
     floor.Vertex.dimension(4);
@@ -139,7 +141,7 @@ TEST(PierceSurfaceTest, Rectangular)
     }
 }
 
-TEST(PierceSurfaceTest, Triangular)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_Triangular)
 {
     DataSurfaces::SurfaceData floor;
     floor.Vertex.dimension(3);
@@ -198,7 +200,7 @@ TEST(PierceSurfaceTest, Triangular)
     }
 }
 
-TEST(PierceSurfaceTest, ConvexOctagonal)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_ConvexOctagonal)
 {
     int const N(8); // Number of vertices and edges
     Real64 const TwoPi(8.0 * std::atan(1.0));
@@ -261,7 +263,7 @@ TEST(PierceSurfaceTest, ConvexOctagonal)
     }
 }
 
-TEST(PierceSurfaceTest, Convex8Sides)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_Convex8Sides)
 {
     DataSurfaces::SurfaceData floor;
     floor.Vertex.dimension(8);
@@ -321,7 +323,7 @@ TEST(PierceSurfaceTest, Convex8Sides)
     }
 }
 
-TEST(PierceSurfaceTest, ConvexNGon)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_ConvexNGon)
 {
     int const N(32); // Number of vertices and edges
     Real64 const TwoPi(8.0 * std::atan(1.0));
@@ -386,7 +388,7 @@ TEST(PierceSurfaceTest, ConvexNGon)
     }
 }
 
-TEST(PierceSurfaceTest, NonconvexBoomerang)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_NonconvexBoomerang)
 {
     DataSurfaces::SurfaceData boomerang;
     boomerang.Vertex.dimension(4);
@@ -422,7 +424,7 @@ TEST(PierceSurfaceTest, NonconvexBoomerang)
     }
 }
 
-TEST(PierceSurfaceTest, NonconvexUShape)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_NonconvexUShape)
 {
     DataSurfaces::SurfaceData ushape;
     ushape.Vertex.dimension(8);
@@ -495,7 +497,7 @@ TEST(PierceSurfaceTest, NonconvexUShape)
     }
 }
 
-TEST(PierceSurfaceTest, NonconvexStar4)
+TEST_F(EnergyPlusFixture, PierceSurfaceTest_NonconvexStar4)
 {
     DataSurfaces::SurfaceData star;
     star.Vertex.dimension(8);

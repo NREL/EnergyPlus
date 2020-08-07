@@ -55,22 +55,21 @@
 #include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/char.functions.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/random.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
@@ -164,8 +163,6 @@ namespace RuntimeLanguageProcessor {
     int ActualTimeNum(0);
     int WarmUpFlagNum(0);
 
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
-
     // SUBROUTINE SPECIFICATIONS:
 
     // Object Data
@@ -174,6 +171,7 @@ namespace RuntimeLanguageProcessor {
     std::unordered_map<std::string, std::string> RuntimeReportVarUniqueNames;
 
     // MODULE SUBROUTINES:
+    bool WriteTraceMyOneTimeFlag(false);
 
     // Functions
     void clear_state()
@@ -211,9 +209,10 @@ namespace RuntimeLanguageProcessor {
         WarmUpFlagNum = 0;
         ErlStackUniqueNames.clear();
         RuntimeReportVarUniqueNames.clear();
+        WriteTraceMyOneTimeFlag = false;
     }
 
-    void InitializeRuntimeLanguage()
+    void InitializeRuntimeLanguage(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -301,7 +300,7 @@ namespace RuntimeLanguageProcessor {
             ActualTimeNum = NewEMSVariable("ACTUALTIME", 0);
             WarmUpFlagNum = NewEMSVariable("WARMUPFLAG", 0);
 
-            GetRuntimeLanguageUserInput(); // Load and parse all runtime language objects
+            GetRuntimeLanguageUserInput(ioFiles); // Load and parse all runtime language objects
 
             date_and_time(datestring, _, _, datevalues);
             if (datestring != "") {
@@ -464,7 +463,7 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    void ParseStack(OutputFiles &outputFiles, int const StackNum)
+    void ParseStack(IOFiles &ioFiles, int const StackNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -554,16 +553,16 @@ namespace RuntimeLanguageProcessor {
                 auto const SELECT_CASE_var(Keyword);
 
                 if (SELECT_CASE_var == "RETURN") {
-                    if (DeveloperFlag) print(outputFiles.debug, "RETURN \"{}\"\n", Line);
+                    if (DeveloperFlag) print(ioFiles.debug, "RETURN \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         InstructionNum = AddInstruction(StackNum, LineNum, KeywordReturn);
                     } else {
-                        ParseExpression(outputFiles, Remainder, StackNum, ExpressionNum, Line);
+                        ParseExpression(ioFiles, Remainder, StackNum, ExpressionNum, Line);
                         InstructionNum = AddInstruction(StackNum, LineNum, KeywordReturn, ExpressionNum);
                     }
 
                 } else if (SELECT_CASE_var == "SET") {
-                    if (DeveloperFlag) print(outputFiles.debug, "SET \"{}\"\n", Line);
+                    if (DeveloperFlag) print(ioFiles.debug, "SET \"{}\"\n", Line);
                     Pos = scan(Remainder, '=');
                     if (Pos == std::string::npos) {
                         AddError(StackNum, LineNum, "Equal sign missing for the SET instruction.");
@@ -582,13 +581,13 @@ namespace RuntimeLanguageProcessor {
                         if (Expression.empty()) {
                             AddError(StackNum, LineNum, "Expression missing for the SET instruction.");
                         } else {
-                            ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
+                            ParseExpression(ioFiles, Expression, StackNum, ExpressionNum, Line);
                             InstructionNum = AddInstruction(StackNum, LineNum, KeywordSet, VariableNum, ExpressionNum);
                         }
                     }
 
                 } else if (SELECT_CASE_var == "RUN") {
-                    if (DeveloperFlag) print(outputFiles.debug, "RUN \"{}\"\n", Line);
+                    if (DeveloperFlag) print(ioFiles.debug, "RUN \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         AddError(StackNum, LineNum, "Program or Subroutine name missing for the RUN instruction.");
                     } else {
@@ -606,15 +605,15 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == "IF") {
                     if (DeveloperFlag) {
-                        print(outputFiles.debug, "IF \"{}\"\n", Line);
-                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                        print(ioFiles.debug, "IF \"{}\"\n", Line);
+                        print(ioFiles.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (Remainder.empty()) {
                         AddError(StackNum, LineNum, "Expression missing for the IF instruction.");
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
-                        ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
+                        ParseExpression(ioFiles, Expression, StackNum, ExpressionNum, Line);
                     }
 
                     ++NestedIfDepth;
@@ -630,8 +629,8 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == "ELSEIF") {
                     if (DeveloperFlag) {
-                        print(outputFiles.debug, "ELSEIF \"{}\"\n", Line);
-                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                        print(ioFiles.debug, "ELSEIF \"{}\"\n", Line);
+                        print(ioFiles.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (NestedIfDepth == 0) {
                         AddError(StackNum, LineNum, "Starting IF instruction missing for the ELSEIF instruction.");
@@ -653,7 +652,7 @@ namespace RuntimeLanguageProcessor {
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
-                        ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
+                        ParseExpression(ioFiles, Expression, StackNum, ExpressionNum, Line);
                     }
 
                     InstructionNum = AddInstruction(StackNum, LineNum, KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
@@ -662,8 +661,8 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == "ELSE") {
                     if (DeveloperFlag) {
-                        print(outputFiles.debug, "ELSE \"{}\"\n", Line);
-                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                        print(ioFiles.debug, "ELSE \"{}\"\n", Line);
+                        print(ioFiles.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (NestedIfDepth == 0) {
                         AddError(StackNum, LineNum, "Starting IF instruction missing for the ELSE instruction.");
@@ -694,8 +693,8 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == "ENDIF") {
                     if (DeveloperFlag) {
-                        print(outputFiles.debug, "ENDIF \"{}\"\n", Line);
-                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                        print(ioFiles.debug, "ENDIF \"{}\"\n", Line);
+                        print(ioFiles.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (NestedIfDepth == 0) {
                         AddError(StackNum, LineNum, "Starting IF instruction missing for the ENDIF instruction.");
@@ -727,13 +726,13 @@ namespace RuntimeLanguageProcessor {
                     --NestedIfDepth;
 
                 } else if (SELECT_CASE_var == "WHILE") {
-                    if (DeveloperFlag) print(outputFiles.debug, "WHILE \"{}\"\n", Line);
+                    if (DeveloperFlag) print(ioFiles.debug, "WHILE \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         AddError(StackNum, LineNum, "Expression missing for the WHILE instruction.");
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
-                        ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
+                        ParseExpression(ioFiles, Expression, StackNum, ExpressionNum, Line);
                     }
 
                     ++NestedWhileDepth;
@@ -747,7 +746,7 @@ namespace RuntimeLanguageProcessor {
                     }
 
                 } else if (SELECT_CASE_var == "ENDWHILE") {
-                    if (DeveloperFlag) print(outputFiles.debug, "ENDWHILE \"{}\"\n", Line);
+                    if (DeveloperFlag) print(ioFiles.debug, "ENDWHILE \"{}\"\n", Line);
                     if (NestedWhileDepth == 0) {
                         AddError(StackNum, LineNum, "Starting WHILE instruction missing for the ENDWHILE instruction.");
                         break;
@@ -766,7 +765,7 @@ namespace RuntimeLanguageProcessor {
                     SavedWhileExpressionNum = 0;
 
                 } else {
-                    if (DeveloperFlag) print(outputFiles.debug, "ERROR \"{}\"\n", Line);
+                    if (DeveloperFlag) print(ioFiles.debug, "ERROR \"{}\"\n", Line);
                     AddError(StackNum, LineNum, "Unknown keyword [" + Keyword + "].");
                 }
             }
@@ -881,7 +880,7 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    ErlValueType EvaluateStack(int const StackNum)
+    ErlValueType EvaluateStack(IOFiles &ioFiles, int const StackNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -925,7 +924,7 @@ namespace RuntimeLanguageProcessor {
                     if (ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
                         ReturnValue = EvaluateExpression(ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
 
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     break; // RETURN always terminates an instruction stack
 
                 } else if (SELECT_CASE_var == KeywordSet) {
@@ -939,13 +938,13 @@ namespace RuntimeLanguageProcessor {
                         ErlVariable(VariableNum).Value.Error = ReturnValue.Error;
                     }
 
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
                 } else if (SELECT_CASE_var == KeywordRun) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                    ReturnValue = EvaluateStack(ErlStack(StackNum).Instruction(InstructionNum).Argument1);
+                    WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    ReturnValue = EvaluateStack(ioFiles, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
 
                 } else if ((SELECT_CASE_var == KeywordIf) || (SELECT_CASE_var == KeywordElse)) { // same???
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
@@ -953,7 +952,7 @@ namespace RuntimeLanguageProcessor {
 
                     if (ExpressionNum > 0) { // could be 0 if this was an ELSE
                         ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
-                        WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                        WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                         if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                             // Eventually should handle strings and arrays too
                             InstructionNum = InstructionNum2;
@@ -963,7 +962,7 @@ namespace RuntimeLanguageProcessor {
                         // KeywordELSE  -- kind of a kludge
                         ReturnValue.Type = ValueNumber;
                         ReturnValue.Number = 1.0;
-                        WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                        WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     }
 
                 } else if (SELECT_CASE_var == KeywordGoto) {
@@ -979,14 +978,14 @@ namespace RuntimeLanguageProcessor {
                 } else if (SELECT_CASE_var == KeywordEndIf) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
                 } else if (SELECT_CASE_var == KeywordWhile) {
                     // evaluate expression at while, skip to past endwhile if not true
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
                     ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                         // Eventually should handle strings and arrays too
                         InstructionNum = InstructionNum2;
@@ -1000,7 +999,7 @@ namespace RuntimeLanguageProcessor {
                     ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
                     if ((ReturnValue.Number != 0.0) && (WhileLoopExitCounter <= MaxWhileLoopIterations)) { //  This is the True case
                         // Eventually should handle strings and arrays too
-                        WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
+                        WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
                         InstructionNum = InstructionNum2;
                         ++WhileLoopExitCounter;
 
@@ -1010,11 +1009,11 @@ namespace RuntimeLanguageProcessor {
                             WhileLoopExitCounter = 0;
                             ReturnValue.Type = ValueError;
                             ReturnValue.Error = "Maximum WHILE loop iteration limit reached";
-                            WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                            WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                         } else {
                             ReturnValue.Type = ValueNumber;
                             ReturnValue.Number = 0.0;
-                            WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                            WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                             WhileLoopExitCounter = 0;
                         }
                     }
@@ -1029,7 +1028,8 @@ namespace RuntimeLanguageProcessor {
         return ReturnValue;
     }
 
-    void WriteTrace(int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound)
+    void
+    WriteTrace(IOFiles &ioFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1054,7 +1054,6 @@ namespace RuntimeLanguageProcessor {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(false);
         int LineNum;
         std::string NameString;
         std::string LineNumString;
@@ -1071,10 +1070,10 @@ namespace RuntimeLanguageProcessor {
             if (ReturnValue.Type != ValueError) return;
         }
 
-        if (!MyOneTimeFlag) {
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "****  Begin EMS Language Processor Error and Trace Output  *** ";
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "<Erl program name, line #, line text, result, occurrence timing information ... >";
-            MyOneTimeFlag = true;
+        if (!WriteTraceMyOneTimeFlag) {
+            print(ioFiles.edd, "****  Begin EMS Language Processor Error and Trace Output  *** \n");
+            print(ioFiles.edd, "<Erl program name, line #, line text, result, occurrence timing information ... >\n");
+            WriteTraceMyOneTimeFlag = true;
         }
         // if have not return'd yet then write out full trace
 
@@ -1101,8 +1100,7 @@ namespace RuntimeLanguageProcessor {
         TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 
         if (OutputFullEMSTrace || (OutputEMSErrors && (ReturnValue.Type == ValueError))) {
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA)
-                << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' + TimeString;
+            print(ioFiles.edd, "{},Line {},{},{},{}\n", NameString, LineNumString, LineString, cValueString, TimeString);
         }
 
         if (seriousErrorFound) { // throw EnergyPlus severe then fatal
@@ -1122,7 +1120,7 @@ namespace RuntimeLanguageProcessor {
 
     //******************************************************************************************
 
-    void ParseExpression(OutputFiles &outputFiles,
+    void ParseExpression(IOFiles &ioFiles,
                          std::string const &InString, // String of expression text written in the Runtime Language
                          int const StackNum,          // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
@@ -1285,9 +1283,9 @@ namespace RuntimeLanguageProcessor {
                 if (!ErrorFlag) {
                     Token(NumTokens).Type = TokenNumber;
                     Token(NumTokens).String = StringToken;
-                    if (DeveloperFlag) print(outputFiles.debug, "Number=\"{}\"\n", StringToken);
+                    if (DeveloperFlag) print(ioFiles.debug, "Number=\"{}\"\n", StringToken);
                     Token(NumTokens).Number = UtilityRoutines::ProcessNumber(StringToken, ErrorFlag);
-                    if (DeveloperFlag && ErrorFlag) print(outputFiles.debug, "{}\n", "Numeric error flagged");
+                    if (DeveloperFlag && ErrorFlag) print(ioFiles.debug, "{}\n", "Numeric error flagged");
                     if (MinusFound) {
                         Token(NumTokens).Number = -Token(NumTokens).Number;
                         MinusFound = false;
@@ -1326,7 +1324,7 @@ namespace RuntimeLanguageProcessor {
                 // Save the variable token
                 Token(NumTokens).Type = TokenVariable;
                 Token(NumTokens).String = StringToken;
-                if (DeveloperFlag) print(outputFiles.debug, "Variable=\"{}\"\n", StringToken);
+                if (DeveloperFlag) print(ioFiles.debug, "Variable=\"{}\"\n", StringToken);
                 Token(NumTokens).Variable = NewEMSVariable(StringToken, StackNum);
 
             } else if (is_any_of(NextChar, "+-*/^=<>@|&")) {
@@ -1373,7 +1371,7 @@ namespace RuntimeLanguageProcessor {
 
                     if ((case_insensitive && UtilityRoutines::SameString(potential_match, string)) ||
                         (!case_insensitive && potential_match == string)) {
-                        if (DeveloperFlag) print(outputFiles.debug, "OPERATOR \"{}\"\n", potential_match);
+                        if (DeveloperFlag) print(ioFiles.debug, "OPERATOR \"{}\"\n", potential_match);
                         Token(NumTokens).Operator = op;
                         Token(NumTokens).String = potential_match;
                         Pos += (len - 1);
@@ -1423,7 +1421,7 @@ namespace RuntimeLanguageProcessor {
                         i_parse("@CURVEVALUE", FuncCurveValue)) {
                         // was a built in function operator
                     } else { // throw error
-                        if (DeveloperFlag) print(outputFiles.debug, "ERROR \"{}\"\n", String);
+                        if (DeveloperFlag) print(ioFiles.debug, "ERROR \"{}\"\n", String);
                         ShowFatalError("EMS Runtime Language: did not find valid input for built-in function =" + String);
                     }
                 } else {
@@ -1432,7 +1430,7 @@ namespace RuntimeLanguageProcessor {
                     MultFound = false;
                     DivFound = false;
 
-                    if (DeveloperFlag) print(outputFiles.debug, "OPERATOR \"{}\"\n", StringToken);
+                    if (DeveloperFlag) print(ioFiles.debug, "OPERATOR \"{}\"\n", StringToken);
 
                     if (StringToken == "+") {
                         if (!OperatorProcessing) {
@@ -1473,7 +1471,7 @@ namespace RuntimeLanguageProcessor {
                         Token(NumTokens).String = StringToken;
                     } else {
                         // Uh OH, this should never happen! throw error
-                        if (DeveloperFlag) print(outputFiles.debug, "ERROR \"{}\"\n", StringToken);
+                        if (DeveloperFlag) print(ioFiles.debug, "ERROR \"{}\"\n", StringToken);
                         ShowFatalError("EMS, caught unexpected token = \"" + StringToken + "\" ; while parsing string=" + String);
                     }
                 }
@@ -1484,7 +1482,7 @@ namespace RuntimeLanguageProcessor {
                 // Parse a parenthesis token
                 ++Pos;
                 StringToken = NextChar;
-                if (DeveloperFlag) print(outputFiles.debug, "PAREN \"{}\"\n", StringToken);
+                if (DeveloperFlag) print(ioFiles.debug, "PAREN \"{}\"\n", StringToken);
                 Token(NumTokens).Type = TokenParenthesis;
                 Token(NumTokens).String = StringToken;
                 if (NextChar == '(') {
@@ -1495,7 +1493,7 @@ namespace RuntimeLanguageProcessor {
 
             } else if (is_any_of(NextChar, "\"")) {
                 // Parse a string literal token
-                if (DeveloperFlag) print(outputFiles.debug, "{}\n", "LITERAL STRING");
+                if (DeveloperFlag) print(ioFiles.debug, "{}\n", "LITERAL STRING");
                 ++Pos;
 
             } else {
@@ -1504,7 +1502,7 @@ namespace RuntimeLanguageProcessor {
         }
 
         if (NumErrors > 0) {
-            if (DeveloperFlag) print(outputFiles.debug, "{}\n", "ERROR OUT");
+            if (DeveloperFlag) print(ioFiles.debug, "{}\n", "ERROR OUT");
             ShowFatalError("EMS, previous errors cause termination.");
         }
 
@@ -2452,7 +2450,7 @@ namespace RuntimeLanguageProcessor {
         return ReturnValue;
     }
 
-    void GetRuntimeLanguageUserInput()
+    void GetRuntimeLanguageUserInput(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2473,7 +2471,6 @@ namespace RuntimeLanguageProcessor {
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
         using DataGlobals::TimeStepZone;
-        using DataHeatBalance::Construct;
         using General::TrimSigDigits;
 
         // Locals
@@ -2489,7 +2486,7 @@ namespace RuntimeLanguageProcessor {
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int VariableNum(0); // temporary
         int RuntimeReportVarNum;
         // unused0909  INTEGER    :: Pos
@@ -2816,7 +2813,7 @@ namespace RuntimeLanguageProcessor {
                         continue;
                     }
 
-                    ConstructNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Construct);
+                    ConstructNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), dataConstruction.Construct);
 
                     if (ConstructNum == 0) {
                         if (lAlphaFieldBlanks(2)) {
@@ -2977,7 +2974,7 @@ namespace RuntimeLanguageProcessor {
 
             // Parse the runtime language code
             for (StackNum = 1; StackNum <= NumErlStacks; ++StackNum) {
-                ParseStack(OutputFiles::getSingleton(), StackNum);
+                ParseStack(ioFiles, StackNum);
 
                 if (ErlStack(StackNum).NumErrors > 0) {
                     ShowSevereError("Errors found parsing EMS Runtime Language program or subroutine = " + ErlStack(StackNum).Name);
@@ -3306,9 +3303,9 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "COAL") {
                             ResourceTypeString = "Coal";
                         } else if (SELECT_CASE_var == "FUELOILNO1") {
-                            ResourceTypeString = "FuelOil#1";
+                            ResourceTypeString = "FuelOilNo1";
                         } else if (SELECT_CASE_var == "FUELOILNO2") {
-                            ResourceTypeString = "FuelOil#2";
+                            ResourceTypeString = "FuelOilNo2";
                         } else if (SELECT_CASE_var == "OTHERFUEL1") {
                             ResourceTypeString = "OtherFuel1";
                         } else if (SELECT_CASE_var == "OTHERFUEL2") {

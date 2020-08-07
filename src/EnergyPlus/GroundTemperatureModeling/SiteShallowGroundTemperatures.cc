@@ -54,8 +54,8 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/SiteShallowGroundTemperatures.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -64,7 +64,7 @@ namespace EnergyPlus {
 //******************************************************************************
 
 // Site:GroundTemperature:Shallow factory
-std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactory(OutputFiles &outputFiles, int objectType, std::string objectName)
+std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactory(IOFiles &ioFiles, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -79,7 +79,6 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     using DataEnvironment::GroundTemp_SurfaceObjInput;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
-    using namespace ObjexxFCL::gio;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -121,7 +120,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     }
 
     // Write Final Ground Temp Information to the initialization output file
-    write_ground_temps(outputFiles.eio, "Shallow", thisModel->surfaceGroundTemps);
+    write_ground_temps(ioFiles.eio, "Shallow", thisModel->surfaceGroundTemps);
 
     if (!thisModel->errorsFound) {
         groundTempModels.push_back(thisModel);

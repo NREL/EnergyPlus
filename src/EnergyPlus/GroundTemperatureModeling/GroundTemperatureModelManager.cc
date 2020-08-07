@@ -87,7 +87,7 @@ namespace GroundTemperatureManager {
 
     //******************************************************************************
 
-    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(DataGlobal &dataGlobals, std::string const &objectType_str, std::string const &objectName)
+    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &objectType_str, std::string const &objectName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell
@@ -135,21 +135,20 @@ namespace GroundTemperatureManager {
             }
         }
 
-        auto &outputFiles = OutputFiles::getSingleton();
 
         // If not found, create new instance of the model
         if (objectType == objectType_KusudaGroundTemp) {
-            return KusudaGroundTempsModel::KusudaGTMFactory(dataGlobals, objectType, objectName);
+            return KusudaGroundTempsModel::KusudaGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_FiniteDiffGroundTemp) {
-            return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(dataGlobals, objectType, objectName);
+            return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_SiteBuildingSurfaceGroundTemp) {
-            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(outputFiles, objectType, objectName);
+            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(state.files, objectType, objectName);
         } else if (objectType == objectType_SiteShallowGroundTemp) {
-            return SiteShallowGroundTemps::ShallowGTMFactory(outputFiles, objectType, objectName);
+            return SiteShallowGroundTemps::ShallowGTMFactory(state.files, objectType, objectName);
         } else if (objectType == objectType_SiteDeepGroundTemp) {
-            return SiteDeepGroundTemps::DeepGTMFactory(outputFiles, objectType, objectName);
+            return SiteDeepGroundTemps::DeepGTMFactory(state.files, objectType, objectName);
         } else if (objectType == objectType_SiteFCFactorMethodGroundTemp) {
-            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(outputFiles, objectType, objectName);
+            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state.files, objectType, objectName);
         } else if (objectType == objectType_XingGroundTemp) {
             return XingGroundTempsModel::XingGTMFactory(objectType, objectName);
         } else {

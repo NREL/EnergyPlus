@@ -52,17 +52,17 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
 #include <ostream>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 // This is a helper struct to redirect std::cout. This makes sure std::cout is redirected back and
 // everything is cleaned up properly
@@ -211,6 +211,13 @@ protected:
     // Will return true if string matches the stream and false if it does not
     bool compare_delightin_stream(std::string const &expected_string, bool reset_stream = true);
 
+    // Compare an expected string against the DFS stream. The default is to reset the DFS stream after every call.
+    // It is easier to test successive functions if the DFS stream is 'empty' before the next call.
+    // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
+    // if it makes sense for the unit test to continue after returning from function.
+    // Will return true if string matches the stream and false if it does not
+    bool compare_dfs_stream(std::string const &expected_string, bool reset_stream = true);
+
     // Check if ESO stream has any output. Useful to make sure there are or are not outputs to ESO.
     bool has_json_output(bool reset_stream = true);
 
@@ -235,6 +242,9 @@ protected:
     // Check if delightin stream has any output. Useful to make sure there are or are not outputs to delightin.
     bool has_delightin_output(bool reset_stream = true);
 
+    // Check if DFS stream has any output. Useful to make sure there are or are not outputs to DFS.
+    bool has_dfs_output(bool reset_stream = true);
+
     // This function processes an idf snippet and defaults to using the idd cache for the fixture.
     // The cache should be used for nearly all calls to this function.
     // This more or less replicates inputProcessor->processInput() but in a more usable fashion for unit testing
@@ -258,9 +268,8 @@ protected:
                      std::vector<Real64> const &numbers,
                      std::vector<bool> const &numbers_blank);
 
-    OutputFiles &outputFiles() {
-        return m_outputFiles.get();
-    }
+    // Opens output files as stringstreams
+    void openOutputFiles(IOFiles &ioFiles);
 
 public:
     EnergyPlusData state;
@@ -273,19 +282,20 @@ private:
     // This function should be called by process_idf() so unit tests can take advantage of caching
     // To test this function use InputProcessorFixture
     // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
-    // if it makes sense for the unit test to continue after returning from function.
+    // if it makes sense for the unit test to continue after retrning from function.
     // Will return false if no errors found and true if errors found
 
     static bool process_idd(std::string const &idd, bool &errors_found);
 
-    std::unique_ptr<std::ostringstream> json_stream;
-    std::unique_ptr<std::ostringstream> err_stream;
+    // Note that these are non-owning raw pointers. The `state` object owns the underlying streams.
+    std::ostringstream *json_stream;
+    std::ostringstream *err_stream;
+    
     std::unique_ptr<std::ostringstream> m_cout_buffer;
     std::unique_ptr<std::ostringstream> m_cerr_buffer;
     std::unique_ptr<std::ostringstream> m_delightin_stream;
     std::unique_ptr<RedirectCout> m_redirect_cout;
     std::unique_ptr<RedirectCerr> m_redirect_cerr;
-    std::reference_wrapper<OutputFiles> m_outputFiles{OutputFiles::getSingleton()};
 };
 
 } // namespace EnergyPlus

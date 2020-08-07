@@ -52,14 +52,14 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
-#include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::StandardRatings;
@@ -316,7 +316,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     Real64 IPLV;
-    CalcChillerIPLV(outputFiles(),
+    CalcChillerIPLV(state.files,
                     state.dataChillerElectricEIR.ElectricEIRChiller(1).Name,
                     TypeOf_Chiller_ElectricEIR,
                     state.dataChillerElectricEIR.ElectricEIRChiller(1).RefCap,
@@ -454,7 +454,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetDXCoils();
+    GetDXCoils(state);
 
     auto &thisCoil(DXCoils::DXCoil(1));
     auto &thisCoolPLFfPLR(PerfCurve(thisCoil.PLFFPLR(1)));
@@ -725,7 +725,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetDXCoils();
+    GetDXCoils(state);
 
     auto &thisCoil(DXCoils::DXCoil(1));
     auto &thisCoolPLFfPLR(PerfCurve(thisCoil.MSPLFFPLR(1)));

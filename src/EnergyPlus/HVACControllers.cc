@@ -74,7 +74,6 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/RootFinder.hh>
 #include <EnergyPlus/SetPointManager.hh>
@@ -260,12 +259,6 @@ namespace HVACControllers {
         bool InitControllerOneTimeFlag(true);
         bool InitControllerSetPointCheckFlag(true);
     } // namespace
-
-    static ObjexxFCL::gio::Fmt fmtLD("*");
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
-    static ObjexxFCL::gio::Fmt fmtAA("(A,A)");
-    static ObjexxFCL::gio::Fmt fmtAAA("(A,A,A)");
-    static ObjexxFCL::gio::Fmt fmtAAAA("(A,A,A,A)");
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -951,7 +944,6 @@ namespace HVACControllers {
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::ScanPlantLoopsForNodeNum;
         using PlantUtilities::SetActuatedBranchFlowRate;
-        using Psychrometrics::PsyTdpFnWPb;
         using RootFinder::SetupRootFinder;
         using SetPointManager::GetHumidityRatioVariableType;
         using SetPointManager::iCtrlVarType_HumRat;
@@ -2247,13 +2239,13 @@ namespace HVACControllers {
                     // For temperature and humidity control, after temperature control is converged, check if humidity setpoint is met
                     if (!thisController.HumRatCtrlOverride) {
                         // For humidity control tolerance, always use 0.0001 which is roughly equivalent to a 0.015C change in dewpoint
-                        if (Node(thisController.SensedNode).HumRat > (Node(thisController.SensedNode).HumRatMax + 1.0e-4)) {
+                        if (Node(thisController.SensedNode).HumRat > (Node(thisController.SensedNode).HumRatMax + 1.0e-5)) {
                             // Turn on humdity control and restart controller
                             IsConvergedFlag = false;
                             thisController.HumRatCtrlOverride = true;
                             if (thisController.Action == iReverseAction) {
                                 // Cooling coil controller should always be ReverseAction, but skip this if not
-                                RootFinder::SetupRootFinder(RootFinders(ControlNum), iSlopeDecreasing, iMethodBrent, constant_zero, 1.0e-6, 1.0e-4);
+                                RootFinder::SetupRootFinder(RootFinders(ControlNum), iSlopeDecreasing, iMethodFalsePosition, constant_zero, 1.0e-6, 1.0e-5);
                             }
                             // Do a cold start reset, same as iControllerOpColdStart
                             ResetController(ControlNum, false, IsConvergedFlag);
@@ -2507,10 +2499,6 @@ namespace HVACControllers {
         // DERIVED TYPE DEFINITIONS
         // na
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int FileUnit;
-        int AirLoopNum;
-
         // FLOW
 
         // Detect if statistics have been generated or not for this run
@@ -2518,35 +2506,18 @@ namespace HVACControllers {
             return;
         }
 
-        std::string StatisticsFileName = "statistics.HVACControllers.csv";
+        InputOutputFileName StatisticsFileName{"statistics.HVACControllers.csv"};
+        auto statisticsFile = StatisticsFileName.open("DumpAirLoopStatistics");
 
-        FileUnit = GetNewUnitNumber();
-
-        if (FileUnit <= 0) {
-            ShowWarningError("DumpAirLoopStatistics: Invalid unit for air loop statistics file=\"" + StatisticsFileName + "\"");
-            return;
+        // note that the AirLoopStats object does not seem to be initialized when this code
+        // is executed and it causes a crash here
+        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+            WriteAirLoopStatistics(statisticsFile, PrimaryAirSystem(AirLoopNum), AirLoopStats(AirLoopNum));
         }
 
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(FileUnit, StatisticsFileName, flags);
-            if (flags.err()) goto Label100;
-        }
-
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            WriteAirLoopStatistics(FileUnit, PrimaryAirSystem(AirLoopNum), AirLoopStats(AirLoopNum));
-        }
-
-        ObjexxFCL::gio::close(FileUnit);
-
-        return;
-
-    Label100:;
-        ShowFatalError("DumpAirLoopStatistics: Failed to open statistics file \"" + StatisticsFileName + "\" for output (write).");
     }
 
-    void WriteAirLoopStatistics(int const FileUnit, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats)
+    void WriteAirLoopStatistics(InputOutputFile &statisticsFile, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2593,11 +2564,11 @@ namespace HVACControllers {
 
         // FLOW
 
-        ObjexxFCL::gio::write(FileUnit, fmtAA) << ThisPrimaryAirSystem.Name << ',';
+        print(statisticsFile, "{},\n", ThisPrimaryAirSystem.Name);
 
         // Number of calls to SimAirLoop() has been invoked over the course of the simulation
         // to simulate the specified air loop
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumCalls" << ',' << TrimSigDigits(ThisAirLoopStats.NumCalls);
+        print(statisticsFile, "NumCalls,{}\n", ThisAirLoopStats.NumCalls);
 
         // Warm restart success ratio
         NumWarmRestarts = ThisAirLoopStats.NumSuccessfulWarmRestarts + ThisAirLoopStats.NumFailedWarmRestarts;
@@ -2607,22 +2578,22 @@ namespace HVACControllers {
             WarmRestartSuccessRatio = double(ThisAirLoopStats.NumSuccessfulWarmRestarts) / double(NumWarmRestarts);
         }
 
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumWarmRestarts" << ',' << TrimSigDigits(NumWarmRestarts);
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumSuccessfulWarmRestarts" << ',' << TrimSigDigits(ThisAirLoopStats.NumSuccessfulWarmRestarts);
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumFailedWarmRestarts" << ',' << TrimSigDigits(ThisAirLoopStats.NumFailedWarmRestarts);
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "WarmRestartSuccessRatio" << ',' << TrimSigDigits(WarmRestartSuccessRatio, 10);
+        print(statisticsFile, "NumWarmRestarts,{}\n", NumWarmRestarts);
+        print(statisticsFile, "NumSuccessfulWarmRestarts,{}\n", ThisAirLoopStats.NumSuccessfulWarmRestarts);
+        print(statisticsFile, "NumFailedWarmRestarts,{}\n", ThisAirLoopStats.NumFailedWarmRestarts);
+        print(statisticsFile, "WarmRestartSuccessRatio,{:.10T}\n", WarmRestartSuccessRatio);
 
         // Total number of times SimAirLoopComponents() has been invoked over the course of the simulation
         // to simulate the specified air loop
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "TotSimAirLoopComponents" << ',' << TrimSigDigits(ThisAirLoopStats.TotSimAirLoopComponents);
+        print(statisticsFile, "TotSimAirLoopComponents,{}\n", ThisAirLoopStats.TotSimAirLoopComponents);
         // Maximum number of times SimAirLoopComponents() has been invoked over the course of the simulation
         // to simulate the specified air loop
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "MaxSimAirLoopComponents" << ',' << TrimSigDigits(ThisAirLoopStats.MaxSimAirLoopComponents);
+        print(statisticsFile, "MaxSimAirLoopComponents,{}\n", ThisAirLoopStats.MaxSimAirLoopComponents);
 
         // Aggregated number of iterations needed by all controllers to simulate the specified air loop
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "TotIterations" << ',' << TrimSigDigits(ThisAirLoopStats.TotIterations);
+        print(statisticsFile, "TotIterations,{}\n", ThisAirLoopStats.TotIterations);
         // Maximum number of iterations needed by controllers to simulate the specified air loop
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "MaxIterations" << ',' << TrimSigDigits(ThisAirLoopStats.MaxIterations);
+        print(statisticsFile, "MaxIterations,{}\n", ThisAirLoopStats.MaxIterations);
 
         // Average number of iterations needed by controllers to simulate the specified air loop
         if (ThisAirLoopStats.NumCalls == 0) {
@@ -2631,12 +2602,12 @@ namespace HVACControllers {
             AvgIterations = double(ThisAirLoopStats.TotIterations) / double(ThisAirLoopStats.NumCalls);
         }
 
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "AvgIterations" << ',' << TrimSigDigits(AvgIterations, 10);
+        print(statisticsFile, "AvgIterations,{:.10T}\n", AvgIterations);
 
         // Dump statistics for each controller on this air loop
         for (AirLoopControlNum = 1; AirLoopControlNum <= ThisPrimaryAirSystem.NumControllers; ++AirLoopControlNum) {
 
-            ObjexxFCL::gio::write(FileUnit, fmtAA) << ThisPrimaryAirSystem.ControllerName(AirLoopControlNum) << ',';
+            print(statisticsFile, "{},\n", ThisPrimaryAirSystem.ControllerName(AirLoopControlNum));
 
             // Aggregate iteration trackers across all operating modes
             NumCalls = 0;
@@ -2652,11 +2623,11 @@ namespace HVACControllers {
             }
 
             // Number of times this controller was simulated (should match air loop num calls)
-            ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumCalls" << ',' << TrimSigDigits(NumCalls);
+            print(statisticsFile, "NumCalls,{}\n", NumCalls);
             // Aggregated number of iterations needed by this controller
-            ObjexxFCL::gio::write(FileUnit, fmtAAA) << "TotIterations" << ',' << TrimSigDigits(TotIterations);
+            print(statisticsFile, "TotIterations,{}\n", TotIterations);
             // Aggregated number of iterations needed by this controller
-            ObjexxFCL::gio::write(FileUnit, fmtAAA) << "MaxIterations" << ',' << TrimSigDigits(MaxIterations);
+            print(statisticsFile, "MaxIterations,{}\n", MaxIterations);
 
             // Average number of iterations needed by controllers to simulate the specified air loop
             if (NumCalls == 0) {
@@ -2664,23 +2635,20 @@ namespace HVACControllers {
             } else {
                 AvgIterations = double(TotIterations) / double(NumCalls);
             }
-            ObjexxFCL::gio::write(FileUnit, fmtAAA) << "AvgIterations" << ',' << TrimSigDigits(AvgIterations, 10);
+            print(statisticsFile, "AvgIterations,{:.10T}\n", AvgIterations);
 
             // Dump iteration trackers for each operating mode
             for (iModeNum = iFirstMode; iModeNum <= iLastMode; ++iModeNum) {
 
-                ObjexxFCL::gio::write(FileUnit, fmtAA) << ControllerModeTypes(iModeNum) << ',';
+                print(statisticsFile, "{},\n", ControllerModeTypes(iModeNum));
 
                 // Number of times this controller operated in this mode
-                ObjexxFCL::gio::write(FileUnit, fmtAAA)
-                    << "NumCalls" << ',' << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum));
+                print(statisticsFile, "NumCalls,{}\n", ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum));
 
                 // Aggregated number of iterations needed by this controller
-                ObjexxFCL::gio::write(FileUnit, fmtAAA)
-                    << "TotIterations" << ',' << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).TotIterations(iModeNum));
+                print(statisticsFile, "TotIterations,{}\n", ThisAirLoopStats.ControllerStats(AirLoopControlNum).TotIterations(iModeNum));
                 // Aggregated number of iterations needed by this controller
-                ObjexxFCL::gio::write(FileUnit, fmtAAA)
-                    << "MaxIterations" << ',' << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).MaxIterations(iModeNum));
+                print(statisticsFile, "MaxIterations,{}\n", ThisAirLoopStats.ControllerStats(AirLoopControlNum).MaxIterations(iModeNum));
 
                 // Average number of iterations needed by controllers to simulate the specified air loop
                 if (ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum) == 0) {
@@ -2689,7 +2657,7 @@ namespace HVACControllers {
                     AvgIterations = double(ThisAirLoopStats.ControllerStats(AirLoopControlNum).TotIterations(iModeNum)) /
                                     double(ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum));
                 }
-                ObjexxFCL::gio::write(FileUnit, fmtAAA) << "AvgIterations" << ',' << TrimSigDigits(AvgIterations, 10);
+                print(statisticsFile, "AvgIterations,{:.10T}\n", AvgIterations);
             }
         }
     }
@@ -2732,73 +2700,44 @@ namespace HVACControllers {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string TraceFileName;
-        int TraceFileUnit;
         int ControllerNum;
 
         // Open main controller trace file for each air loop
-        TraceFileName = "controller." + PrimaryAirSystem(AirLoopNum).Name + ".csv";
-        strip(TraceFileName);
+        const auto TraceFileName = "controller." + PrimaryAirSystem(AirLoopNum).Name + ".csv";
 
-        TraceFileUnit = GetNewUnitNumber();
+        // Store file unit in air loop stats
+        AirLoopStats(AirLoopNum).TraceFile->fileName = TraceFileName;
+        AirLoopStats(AirLoopNum).TraceFile->open();
 
-        if (TraceFileUnit <= 0) {
-            ShowWarningError("SetupAirLoopControllersTracer: Invalid unit for air loop controllers trace file=\"" + TraceFileName + "\"");
+        if (!AirLoopStats(AirLoopNum).TraceFile->good()) {
+            ShowFatalError("SetupAirLoopControllersTracer: Failed to open air loop trace file \"" + TraceFileName + "\" for output (write).");
             return;
         }
 
-        // Store file unit in air loop stats
-        AirLoopStats(AirLoopNum).TraceFileUnit = TraceFileUnit;
+        auto &TraceFile = *AirLoopStats(AirLoopNum).TraceFile;
 
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(TraceFileUnit, TraceFileName, flags);
-            if (flags.err()) goto Label100;
-        }
-
-        // List all controllers and their corrresponding handles into main trace file
-        ObjexxFCL::gio::write(TraceFileUnit, fmtAAAA) << "Num" << ',' << "Name" << ',';
+        // List all controllers and their corresponding handles into main trace file
+        print(TraceFile, "Num,Name,\n");
 
         for (ControllerNum = 1; ControllerNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++ControllerNum) {
-            ObjexxFCL::gio::write(TraceFileUnit, fmtAAAA)
-                << TrimSigDigits(ControllerNum) << ',' << PrimaryAirSystem(AirLoopNum).ControllerName(ControllerNum) << ',';
+            print(TraceFile, "{},{},\n", ControllerNum, PrimaryAirSystem(AirLoopNum).ControllerName(ControllerNum));
             // SAME AS ControllerProps(ControllerIndex)%ControllerName BUT NOT YET AVAILABLE
         }
 
         // Skip a bunch of lines
-        ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
-        ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
-        ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
+        print(TraceFile, "\n\n\n");
 
-        // Write column header in main contoller trace file
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(TraceFileUnit, "(12(A,A))", flags)
-                << "ZoneSizingCalc" << ',' << "SysSizingCalc" << ',' << "EnvironmentNum" << ',' << "WarmupFlag" << ',' << "SysTimeStamp" << ','
-                << "SysTimeInterval" << ',' << "BeginTimeStepFlag" << ',' << "FirstTimeStepSysFlag" << ',' << "FirstHVACIteration" << ','
-                << "AirLoopPass" << ',' << "AirLoopNumCallsTot" << ',' << "AirLoopConverged" << ',';
-        }
+        // Write column header in main controller trace file
+        print(TraceFile,
+              "ZoneSizingCalc,SysSizingCalc,EnvironmentNum,WarmupFlag,SysTimeStamp,SysTimeInterval,BeginTimeStepFlag,FirstTimeStepSysFlag,FirstHVACIteration,AirLoopPass,AirLoopNumCallsTot,AirLoopConverged,");
 
         // Write headers for final state
         for (ControllerNum = 1; ControllerNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++ControllerNum) {
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(TraceFileUnit, "(5(A,A,A))", flags)
-                    << "Mode" << TrimSigDigits(ControllerNum) << "IterMax" << TrimSigDigits(ControllerNum) << "XRoot" << TrimSigDigits(ControllerNum)
-                    << "YRoot" << TrimSigDigits(ControllerNum) << "YSetPoint" << TrimSigDigits(ControllerNum);
-            }
+            print(TraceFile, "Mode{},IterMax{},XRoot{},YRoot{},YSetPoint{},\n",
+                  ControllerNum, ControllerNum, ControllerNum,ControllerNum,ControllerNum);
         }
 
-        // Finally goto next line
-        ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
-
-        return;
-
-    Label100:;
-        ShowFatalError("SetupAirLoopControllersTracer: Failed to open air loop trace file \"" + TraceFileName + "\" for output (write).");
+        print(TraceFile, "\n");
     }
 
     void TraceAirLoopControllers(
@@ -2839,11 +2778,10 @@ namespace HVACControllers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControllerNum;
-        int TraceFileUnit;
 
         // FLOW
 
-        // IF no controllers on this air loop then we have nothig to do
+        // IF no controllers on this air loop then we have nothing to do
         if (PrimaryAirSystem(AirLoopNum).NumControllers == 0) return;
         // To avoid tracking statistics in case of no air loop or no HVAC controllers are defined
         if (NumAirLoopStats == 0) return;
@@ -2855,25 +2793,24 @@ namespace HVACControllers {
             AirLoopStats(AirLoopNum).FirstTraceFlag = false;
         }
 
-        TraceFileUnit = AirLoopStats(AirLoopNum).TraceFileUnit;
+        auto &TraceFile = *AirLoopStats(AirLoopNum).TraceFile;
 
-        if (TraceFileUnit <= 0) return;
+        if (!TraceFile.good()) return;
 
         // Write iteration stamp first
-        TraceIterationStamp(TraceFileUnit, FirstHVACIteration, AirLoopPass, AirLoopConverged, AirLoopNumCalls);
+        TraceIterationStamp(TraceFile, FirstHVACIteration, AirLoopPass, AirLoopConverged, AirLoopNumCalls);
 
         // Loop over the air sys controllers and write diagnostic to trace file
         for (ControllerNum = 1; ControllerNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++ControllerNum) {
-
-            TraceAirLoopController(TraceFileUnit, PrimaryAirSystem(AirLoopNum).ControllerIndex(ControllerNum));
+            TraceAirLoopController(TraceFile, PrimaryAirSystem(AirLoopNum).ControllerIndex(ControllerNum));
         }
 
         // Go to next line
-        ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
+        print(TraceFile, "\n");
     }
 
     void TraceIterationStamp(
-        int const TraceFileUnit, bool const FirstHVACIteration, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls)
+        InputOutputFile &TraceFile, bool const FirstHVACIteration, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2921,20 +2858,23 @@ namespace HVACControllers {
 
         // Write step stamp to air loop trace file after reset
         // Note that we do not go to the next line
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(TraceFileUnit, "(4(A,A),2(A,A),6(A,A))", flags)
-                << TrimSigDigits(LogicalToInteger(ZoneSizingCalc)) << ',' << TrimSigDigits(LogicalToInteger(SysSizingCalc)) << ','
-                << TrimSigDigits(CurEnvirNum) << ',' << TrimSigDigits(LogicalToInteger(WarmupFlag)) << ',' << CreateHVACTimeString() << ','
-                << MakeHVACTimeIntervalString() << ',' << TrimSigDigits(LogicalToInteger(BeginTimeStepFlag)) << ','
-                << TrimSigDigits(LogicalToInteger(FirstTimeStepSysFlag)) << ',' << TrimSigDigits(LogicalToInteger(FirstHVACIteration)) << ','
-                << TrimSigDigits(AirLoopPass) << ',' << TrimSigDigits(AirLoopNumCalls) << ',' << TrimSigDigits(LogicalToInteger(AirLoopConverged))
-                << ',';
-        }
+        print(TraceFile,
+              "{},{},{},{},{},{},{},{},{},{},{},{},",
+              LogicalToInteger(ZoneSizingCalc),
+              LogicalToInteger(SysSizingCalc),
+              CurEnvirNum,
+              LogicalToInteger(WarmupFlag),
+              CreateHVACTimeString(),
+              MakeHVACTimeIntervalString(),
+              LogicalToInteger(BeginTimeStepFlag),
+              LogicalToInteger(FirstTimeStepSysFlag),
+              LogicalToInteger(FirstHVACIteration),
+              AirLoopPass,
+              AirLoopNumCalls,
+              LogicalToInteger(AirLoopConverged));
     }
 
-    void TraceAirLoopController(int const TraceFileUnit, int const ControlNum)
+    void TraceAirLoopController(InputOutputFile &TraceFile, int const ControlNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2976,15 +2916,13 @@ namespace HVACControllers {
         ActuatedNode = ControllerProps(ControlNum).ActuatedNode;
         SensedNode = ControllerProps(ControlNum).SensedNode;
 
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(TraceFileUnit, "(2(A,A),3(A,A))", flags)
-                << TrimSigDigits(ControllerProps(ControlNum).Mode) << TrimSigDigits(ControllerProps(ControlNum).NumCalcCalls)
-                << TrimSigDigits(Node(ActuatedNode).MassFlowRate, 10) << TrimSigDigits(Node(SensedNode).Temp, 10)
-                << TrimSigDigits(Node(SensedNode).TempSetPoint, 10);
-        } // controller mode for current step | number of Sim() calls since last reset | X = actuated variable | Y = sensed variable | desired
-          // setpoint
+        print(TraceFile,
+              "{},{},{:.10T},{:.10T},{:.10T},",
+              ControllerProps(ControlNum).Mode,
+              ControllerProps(ControlNum).NumCalcCalls,
+              Node(ActuatedNode).MassFlowRate,
+              Node(SensedNode).Temp,
+              Node(SensedNode).TempSetPoint);
     }
 
     void SetupIndividualControllerTracer(int const ControlNum)
@@ -3020,67 +2958,31 @@ namespace HVACControllers {
         // DERIVED TYPE DEFINITIONS
         // na
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int TraceFileUnit(0);
 
-        // Open and write column header in trace file for each individual controller
-        TraceFileUnit = GetNewUnitNumber();
+        const auto TraceFileName = "controller." + ControllerProps(ControlNum).ControllerName + ".csv";
+        auto &TraceFile = *ControllerProps(ControlNum).TraceFile;
+        TraceFile.fileName = TraceFileName;
+        TraceFile.open();
 
-        if (TraceFileUnit <= 0) {
-            ShowFatalError("SetupIndividualControllerTracer: Invalid unit (<=0) for setting up controller trace file");
+
+        if (!TraceFile.good()) {
+            ShowFatalError("SetupIndividualControllerTracer: Failed to open controller trace file \"" + TraceFileName + "\" for output (write).");
             return;
         }
-
-        std::string TraceFileName = "controller." + ControllerProps(ControlNum).ControllerName + ".csv";
-        strip(TraceFileName);
-
-        // WRITE(*,*) 'Trace file name="', TRIM(TraceFileName) , '"'
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(TraceFileUnit, TraceFileName, flags);
-            if (flags.err()) goto Label100;
-        }
-
-        // Store trace file unit
-        ControllerProps(ControlNum).TraceFileUnit = TraceFileUnit;
 
         // Write header row
         // Masss flow rate
         // Convergence analysis
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(TraceFileUnit, "(19(A,A))", flags) << "EnvironmentNum"
-                                                                     << "WarmupFlag"
-                                                                     << "SysTimeStamp"
-                                                                     << "SysTimeInterval"
-                                                                     << "AirLoopPass"
-                                                                     << "FirstHVACIteration"
-                                                                     << "Operation"
-                                                                     << "NumCalcCalls"
-                                                                     << "SensedNode%MassFlowRate"
-                                                                     << "ActuatedNode%MassFlowRateMinAvail"
-                                                                     << "ActuatedNode%MassFlowRateMaxAvail"
-                                                                     << "X"
-                                                                     << "Y"
-                                                                     << "Setpoint"
-                                                                     << "DeltaSensed"
-                                                                     << "Offset"
-                                                                     << "Mode"
-                                                                     << "IsConvergedFlag"
-                                                                     << "NextActuatedValue";
-        }
+        print(TraceFile,
+              "EnvironmentNum,WarmupFlag,SysTimeStamp,SysTimeInterval,AirLoopPass,FirstHVACIteration,Operation,NumCalcCalls,SensedNode%MassFlowRate,"
+              "ActuatedNode%MassFlowRateMinAvail,ActuatedNode%MassFlowRateMaxAvail,X,Y,Setpoint,DeltaSensed,Offset,Mode,IsConvergedFlag,"
+              "NextActuatedValue");
 
-        WriteRootFinderTraceHeader(TraceFileUnit);
+        WriteRootFinderTraceHeader(TraceFile);
 
         // Finally skip line
-        ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
+        print(TraceFile, "\n");
 
-        return;
-
-    Label100:;
-        ShowFatalError("SetupIndividualControllerTracer: Failed to open controller trace file \"" + TraceFileName + "\" for output (write).");
     }
 
     void TraceIndividualController(int const ControlNum,
@@ -3125,7 +3027,6 @@ namespace HVACControllers {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int TraceFileUnit;
         int ActuatedNode;
         int SensedNode;
         bool SkipLineFlag;
@@ -3140,14 +3041,14 @@ namespace HVACControllers {
             SkipLineFlag = FirstHVACIteration && (ControllerProps(ControlNum).NumCalcCalls == 0);
         }
 
-        TraceFileUnit = ControllerProps(ControlNum).TraceFileUnit;
+        auto &TraceFile = *ControllerProps(ControlNum).TraceFile;
 
         // Nothing to do if trace file not registered
-        if (TraceFileUnit <= 0) return;
+        if (!TraceFile.good()) return;
 
         // Skip a line before each new HVAC step
         if (SkipLineFlag) {
-            ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
+            print(TraceFile, "\n");
         }
 
         // Set the sensed and actuated node numbers
@@ -3155,86 +3056,92 @@ namespace HVACControllers {
         SensedNode = ControllerProps(ControlNum).SensedNode;
 
         // Write iteration stamp
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(TraceFileUnit, "(2(A,A),2(A,A),4(A,A))", flags)
-                << TrimSigDigits(CurEnvirNum) << ',' << TrimSigDigits(LogicalToInteger(WarmupFlag)) << ',' << CreateHVACTimeString() << ','
-                << MakeHVACTimeIntervalString() << ',' << TrimSigDigits(AirLoopPass) << ',' << TrimSigDigits(LogicalToInteger(FirstHVACIteration))
-                << ',' << TrimSigDigits(Operation) << ',' << TrimSigDigits(ControllerProps(ControlNum).NumCalcCalls) << ',';
-        }
+        print(TraceFile,
+              "{},{},{},{},{},{},{},{},",
+              CurEnvirNum,
+              LogicalToInteger(WarmupFlag),
+              CreateHVACTimeString(),
+              MakeHVACTimeIntervalString(),
+              AirLoopPass,
+              LogicalToInteger(FirstHVACIteration),
+              Operation,
+              ControllerProps(ControlNum).NumCalcCalls);
 
         // Write detailed diagnostic
         {
             auto const SELECT_CASE_var(Operation);
             if ((SELECT_CASE_var == iControllerOpColdStart) || (SELECT_CASE_var == iControllerOpWarmRestart)) {
-
-                // Masss flow rate
-                // Convergence analysis
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(TraceFileUnit, "(3(A,A),3(A,A),2(A,A),2(A,A),1(A,A))", flags)
-                        << TrimSigDigits(Node(SensedNode).MassFlowRate, 10) << ',' << TrimSigDigits(Node(ActuatedNode).MassFlowRateMinAvail, 10)
-                        << ',' << TrimSigDigits(Node(ActuatedNode).MassFlowRateMaxAvail, 10) << ','
-                        << TrimSigDigits(ControllerProps(ControlNum).ActuatedValue, 10) << ',' << TrimSigDigits(Node(SensedNode).Temp, 10) << ','
-                        << TrimSigDigits(ControllerProps(ControlNum).SetPointValue, 10) << ',' << ' ' << ',' << ' ' << ','
-                        << TrimSigDigits(ControllerProps(ControlNum).Mode) << ',' << TrimSigDigits(LogicalToInteger(IsConvergedFlag)) << ','
-                        << TrimSigDigits(ControllerProps(ControlNum).NextActuatedValue, 10) << ',';
-                } // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
+                print(TraceFile, "{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{},{},{},{},{:.10T},",
+                      Node(SensedNode).MassFlowRate,
+                      Node(ActuatedNode).MassFlowRateMinAvail,
+                      Node(ActuatedNode).MassFlowRateMaxAvail,
+                      ControllerProps(ControlNum).ActuatedValue,
+                      Node(SensedNode).Temp,
+                      ControllerProps(ControlNum).SetPointValue,
+                      ' ',
+                      ' ',
+                      ControllerProps(ControlNum).Mode,
+                      LogicalToInteger(IsConvergedFlag),
+                      ControllerProps(ControlNum).NextActuatedValue);
+                // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
 
                 // No trace available for root finder yet
                 // Skip call to WriteRootFinderTrace()
 
                 // Finally skip line
-                ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
+                print(TraceFile, "\n");
 
             } else if (SELECT_CASE_var == iControllerOpIterate) {
                 // Masss flow rate
                 // Convergence analysis
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(TraceFileUnit, "(8(A,A),2(A,A),1(A,A))", flags)
-                        << TrimSigDigits(Node(SensedNode).MassFlowRate, 10) << ',' << TrimSigDigits(Node(ActuatedNode).MassFlowRateMinAvail, 10)
-                        << ',' << TrimSigDigits(Node(ActuatedNode).MassFlowRateMaxAvail, 10) << ','
-                        << TrimSigDigits(ControllerProps(ControlNum).ActuatedValue, 10) << ',' << TrimSigDigits(Node(SensedNode).Temp, 10) << ','
-                        << TrimSigDigits(ControllerProps(ControlNum).SetPointValue, 10) << ','
-                        << TrimSigDigits(ControllerProps(ControlNum).DeltaSensed, 10) << ',' << TrimSigDigits(ControllerProps(ControlNum).Offset, 10)
-                        << ',' << TrimSigDigits(ControllerProps(ControlNum).Mode) << ',' << TrimSigDigits(LogicalToInteger(IsConvergedFlag)) << ','
-                        << TrimSigDigits(ControllerProps(ControlNum).NextActuatedValue, 10) << ',';
-                } // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
+
+                print(TraceFile, "{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{},{},{:.10T},",
+                      Node(SensedNode).MassFlowRate,
+                      Node(ActuatedNode).MassFlowRateMinAvail,
+                      Node(ActuatedNode).MassFlowRateMaxAvail,
+                      ControllerProps(ControlNum).ActuatedValue,
+                      Node(SensedNode).Temp,
+                      ControllerProps(ControlNum).SetPointValue,
+                      ControllerProps(ControlNum).DeltaSensed,
+                      ControllerProps(ControlNum).Offset,
+                      ControllerProps(ControlNum).Mode,
+                      LogicalToInteger(IsConvergedFlag),
+                      ControllerProps(ControlNum).NextActuatedValue);
+
+                // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
 
                 // Append trace for root finder
-                WriteRootFinderTrace(TraceFileUnit, RootFinders(ControlNum));
+                WriteRootFinderTrace(TraceFile, RootFinders(ControlNum));
 
                 // Finally skip line
-                ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
+                print(TraceFile, "\n");
 
             } else if (SELECT_CASE_var == iControllerOpEnd) {
                 // Masss flow rate
                 // Convergence analysis
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(TraceFileUnit, "(3(A,A),5(A,A),2(A,A),1(A,A))", flags)
-                        << TrimSigDigits(Node(SensedNode).MassFlowRate, 10) << ',' << TrimSigDigits(Node(ActuatedNode).MassFlowRateMinAvail, 10)
-                        << ',' << TrimSigDigits(Node(ActuatedNode).MassFlowRateMaxAvail, 10) << ','
-                        << TrimSigDigits(ControllerProps(ControlNum).ActuatedValue, 10) << ',' << TrimSigDigits(Node(SensedNode).Temp, 10) << ','
-                        << TrimSigDigits(ControllerProps(ControlNum).SetPointValue, 10) << ','
-                        << TrimSigDigits(ControllerProps(ControlNum).DeltaSensed, 10) << ',' << TrimSigDigits(ControllerProps(ControlNum).Offset, 10)
-                        << ',' << TrimSigDigits(ControllerProps(ControlNum).Mode) << ',' << TrimSigDigits(LogicalToInteger(IsConvergedFlag)) << ','
-                        << TrimSigDigits(ControllerProps(ControlNum).NextActuatedValue, 10) << ',';
-                } // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
+                print(TraceFile, "{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{},{},{:.10T},",
+                      Node(SensedNode).MassFlowRate,
+                      Node(ActuatedNode).MassFlowRateMinAvail,
+                      Node(ActuatedNode).MassFlowRateMaxAvail,
+                      ControllerProps(ControlNum).ActuatedValue,
+                      Node(SensedNode).Temp,
+                      ControllerProps(ControlNum).SetPointValue,
+                      ControllerProps(ControlNum).DeltaSensed,
+                      ControllerProps(ControlNum).Offset,
+                      ControllerProps(ControlNum).Mode,
+                      LogicalToInteger(IsConvergedFlag),
+                      ControllerProps(ControlNum).NextActuatedValue);
+
+                // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
 
                 // No trace available for root finder yet
                 // Skip call to WriteRootFinderTrace()
 
                 // Finally skip line
-                ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
+                print(TraceFile, "\n");
 
                 // Skip an additional line to indicate end of current HVAC step
-                ObjexxFCL::gio::write(TraceFileUnit, fmtLD);
+                print(TraceFile, "\n");
 
             } else {
                 // Should never happen
@@ -3242,6 +3149,8 @@ namespace HVACControllers {
                                ", Controller name=" + ControllerProps(ControlNum).ControllerName);
             }
         }
+
+        TraceFile.flush();
     }
 
     std::string CreateHVACTimeString()

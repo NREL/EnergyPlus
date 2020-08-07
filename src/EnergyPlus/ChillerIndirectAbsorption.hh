@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -61,6 +62,7 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+struct BranchInputManagerData;
 struct ChillerIndirectAbsoprtionData;
 
 namespace ChillerIndirectAbsorption {
@@ -224,7 +226,7 @@ namespace ChillerIndirectAbsorption {
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void initialize(bool RunFlag, Real64 MyLoad);
+        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad);
 
         void setupOutputVars();
 
@@ -238,6 +240,18 @@ namespace ChillerIndirectAbsorption {
     void GetIndirectAbsorberInput(ChillerIndirectAbsoprtionData &chillers);
 
 } // namespace ChillerIndirectAbsorption
+
+    struct ChillerIndirectAbsoprtionData :BaseGlobalStruct {
+        int NumIndirectAbsorbers = 0;
+        bool GetInput = true;
+        Array1D<ChillerIndirectAbsorption::IndirectAbsorberSpecs> IndirectAbsorber;
+        void clear_state() override
+        {
+            NumIndirectAbsorbers = 0;
+            GetInput = true;
+            IndirectAbsorber.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

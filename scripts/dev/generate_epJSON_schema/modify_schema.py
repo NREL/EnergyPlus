@@ -56,7 +56,7 @@ extension_renaming = {
     'Meter:Custom': 'variable_details',
     'UnitarySystemPerformance:Multispeed': 'flow_ratios',
     'SurfaceProperty:ExteriorNaturalVentedCavity': 'surface',
-    'ZoneProperty:UserViewFactors:bySurfaceName': 'view_factors',
+    'ZoneProperty:UserViewFactors:BySurfaceName': 'view_factors',
     'SurfaceProperty:HeatTransferAlgorithm:SurfaceList': 'surface',
     'AirLoopHVAC:ZoneSplitter': 'nodes',
     'AirLoopHVAC:SupplyPath': 'components',
@@ -120,12 +120,14 @@ extension_renaming = {
     'CondenserEquipmentList': 'equipment',
     'AirLoopHVAC:Mixer': 'nodes',
     'AirLoopHVAC:Splitter': 'nodes',
-    'AirLoopHVAC:DedicatedOutdoorAirSystem': 'airloophvacs'
+    'AirLoopHVAC:DedicatedOutdoorAirSystem': 'airloophvacs',
+    'PythonPlugin:Variables': 'global_py_vars',
+    'Output:Diagnostics': 'diagnostics',
 }
 remaining_objects = [
     'Site:SpectrumData',
     'Schedule:Day:List',
-    'MaterialProperty:GlazingSpectralData'
+    'MaterialProperty:GlazingSpectralData',
 ]
 
 

@@ -400,10 +400,11 @@ namespace HVACHXAssistedCoolingCoil {
                 HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType = CurrentModuleObject;
                 HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
                 CoolingCoilErrFlag = false;
-                GetDXCoilIndex(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
+                GetDXCoilIndex(state, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                                HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,
                                CoolingCoilErrFlag,
-                               HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType);
+                               HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
+                               ObjexxFCL::Optional_bool_const());
                 if (CoolingCoilErrFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
                     ErrorsFound = true;

@@ -417,7 +417,7 @@ namespace PackagedThermalStorageCoil {
     // Object Data
     extern Array1D<PackagedTESCoolingCoilStruct> TESCoil;
 
-    // Functions
+    void clear_state();
 
     void SimTESCoil(EnergyPlusData &state, std::string const &CompName, // name of the fan coil unit
                     int &CompIndex,
@@ -428,7 +428,7 @@ namespace PackagedThermalStorageCoil {
 
     void GetTESCoilInput(EnergyPlusData &state);
 
-    void InitTESCoil(int &TESCoilNum);
+    void InitTESCoil(BranchInputManagerData &dataBranchInputManager, int &TESCoilNum);
 
     void SizeTESCoil(int &TESCoilNum);
 

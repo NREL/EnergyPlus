@@ -83,9 +83,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking)
 
     domains.resize(2);
 
-    domains[0].groundTempModel = GetGroundTempModelAndInit(state.dataGlobals, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1");
+    domains[0].groundTempModel = GetGroundTempModelAndInit(state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1");
 
-    domains[1].groundTempModel = GetGroundTempModelAndInit(state.dataGlobals, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
+    domains[1].groundTempModel = GetGroundTempModelAndInit(state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
 
     EXPECT_NE(domains[0].groundTempModel, domains[1].groundTempModel);
 }

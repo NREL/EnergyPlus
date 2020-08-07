@@ -30,7 +30,7 @@
 #include <vector>
 #include <cctype>
 #include <iostream>
-#include <strstream>
+#include <sstream>
 using namespace std;
 
 // writewndo() Error handler include
@@ -305,7 +305,7 @@ istream &operator >> (istream &s, line2 &line)
     point2	lorigin;
 	vector2	ldir;
     Char	c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 	
 	// Expected format: [Point2 Vec2] = [[1 2] [3 4]]
 	
@@ -358,7 +358,7 @@ istream &operator >> (istream &s, lineseg2 &ls)
 {
     point2	end1, end2;
     Char	c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 	
 	// Expected format: [Point2 Point2] = [[1 2] [3 4]]
 	
@@ -413,7 +413,7 @@ istream &operator >> (istream &s, ray2 &ray)
     point2	rorigin;
 	vector2	rdir;
     Char	c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 	
 	// Expected format: [Point2 Vec2] = [[1 2] [3 4]]
 	

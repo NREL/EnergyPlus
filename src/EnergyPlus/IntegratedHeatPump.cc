@@ -90,6 +90,7 @@ namespace IntegratedHeatPump {
 
     void clear_state()
     {
+        GetCoilsInputFlag = true;
         IntegratedHeatPumps.deallocate();
     }
 
