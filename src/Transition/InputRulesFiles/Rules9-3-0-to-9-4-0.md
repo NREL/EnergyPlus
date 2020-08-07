@@ -99,12 +99,26 @@ Two typos were corrected in field names.
   N5 , \field Coefficient5 C5
 ```
 
-# Object Change: `PerformancePrecisionTradeoffs'
+# Object Change: Fuel type synonyms
+For Output:Variable, Output:Meter*, Meter:Custom, Meter:CustomDecrement, 
+Output:Table:Monthly, Output:Table:Annual, Output:Table:TimeBins, EnergyManagementSystem:Sensor, DemandManagerAssignmentList, 
+ElectricLoadCenter:Distribution, UtilityCost:Tariff and other objects with a Meter name or Output:Variable name as an input field:
 
-Fields 1-2 (A1, A2) remain the same.
+Field: Fuel Type (or similar)
 
-Change in Field 3 (A3): two more key values---Mode06 and Mode07---are added.
+9.3.0:
 
-Field 4 (N1) remains the same; however it is no longer the last field. See the newly added Field 5 (N2) below.
+"FuelOil#1" 
+"FuelOil#2"
 
-Newly added Field 5 (N2): MaxAllowedDelTemp, supplied with minimu, maximum, and default values.
+"Fuel Oil #1" 
+"Fuel Oil #2"
+
+
+9.4.0:
+
+"FuelOilNo1" 
+"FuelOilNo2" 
+
+"Fuel Oil No 1" 
+"Fuel Oil No 2" 
