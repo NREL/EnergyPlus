@@ -2856,7 +2856,6 @@ namespace WeatherManager {
         static Real64 NextHrDifSolarRad;
         static Real64 NextHrLiquidPrecip;
         bool RecordDateMatch;
-        Array1D<Real64> HrIRHoriz_Weather(24, 0.0);
 
         struct HourlyWeatherData
         {
@@ -3514,9 +3513,6 @@ namespace WeatherManager {
                     TomorrowTotalSkyCover(CurTimeStep, Hour) = TotalSkyCover;
                     TomorrowOpaqueSkyCover(CurTimeStep, Hour) = OpaqueSkyCover;
 
-                    if (NumIntervalsPerHour == 1 && NumOfTimeStepInHour > 1) 
-                        HrIRHoriz_Weather(Hour) = IRHoriz;
-
                     calcSky(TomorrowHorizIRSky(CurTimeStep, Hour), TomorrowSkyTemp(CurTimeStep, Hour),
                                  OpaqueSkyCover,
                                  DryBulb,
@@ -3690,7 +3686,7 @@ namespace WeatherManager {
                             TomorrowOutDryBulbTemp(TS, Hour),
                             TomorrowOutDewPointTemp(TS, Hour),
                             TomorrowOutRelHum(TS, Hour) * 0.01,
-                            LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(Hour) * WtNow); // HrIRHoriz_Weather(Hour)); 
+                            LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(Hour) * WtNow);  
 
                     TomorrowIsRain(TS, Hour) = TomorrowLiquidPrecip(TS, Hour) >= (0.8 / double(NumOfTimeStepInHour)); // Wthr%IsRain(Hour)
                     TomorrowIsSnow(TS, Hour) = Wthr.IsSnow(Hour);
@@ -10737,6 +10733,8 @@ namespace WeatherManager {
     {
         Real64 ESky;
         
+        if (IRHoriz <= 0.0) IRHoriz = 9999.0;
+
         ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
         if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
             TmrHorizIRSky = ESky * Sigma * pow_4(DryBulb + TKelvin);
