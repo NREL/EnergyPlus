@@ -2930,7 +2930,6 @@ namespace HVACManager {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
-        using DataSurfaces::SurfaceWindow;
         using DataZoneEquipment::ZoneEquipConfig;
         using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::GetCurrentScheduleValue;

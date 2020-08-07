@@ -169,7 +169,6 @@ namespace HeatBalanceManager {
     using DataSurfaces::FrameDividerProperties;
     using DataSurfaces::ShadingTransmittanceVaries;
     using DataSurfaces::StormWindow;
-    using DataSurfaces::SurfaceWindow;
     using DataSurfaces::Suspended;
     using DataSurfaces::TotStormWin;
     using DataSurfaces::TotSurfaces;
@@ -5232,7 +5231,7 @@ namespace HeatBalanceManager {
             CountWarmupDayPoints = 0;
 
             for (SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
-                SurfaceWindow(SurfNum).ThetaFace = 296.15;
+                DataSurfaces::SurfaceWindow(SurfNum).ThetaFace = 296.15;
                 DataSurfaces::SurfWinEffInsSurfTemp(SurfNum) = 23.0;
             }
         }

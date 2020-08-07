@@ -3736,16 +3736,6 @@ namespace HeatBalanceSurfaceManager {
         using General::InterpSw;
         using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
 
-        int ConstrNum;          // Construction number
-        int ConstrNumSh;        // Shaded construction number
-        int ShadeFlag;          // Window shading flag
-        Real64 HMovInsul;       // Conductance of movable insulation
-        Real64 AbsInt;          // Solar absorptance of movable insulation
-        Real64 DividerThermAbs; // Window divider thermal absorptance
-        int MatNumSh;           // Shade layer material number
-        Real64 TauShIR;         // Shade or blind IR transmittance
-        Real64 EffShDevEmiss;   // Effective emissivity of shade or blind
-
         if (!allocated(ITABSF)) {
             ITABSF.dimension(TotSurfaces, 0.0);
             TMULT.dimension(NumOfZones, 0.0);
@@ -3759,10 +3749,10 @@ namespace HeatBalanceSurfaceManager {
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
 
                 if (!Surface(SurfNum).HeatTransSurf) continue;
-                ConstrNum = Surface(SurfNum).Construction;
-                ShadeFlag = SurfWinShadingFlag(SurfNum);
+                int ConstrNum = Surface(SurfNum).Construction;
                 ITABSF(SurfNum) = dataConstruction.Construct(ConstrNum).InsideAbsorpThermal;
-                HMovInsul = 0.0;
+                Real64 HMovInsul = 0.0;
+                Real64 AbsInt;
                 if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
                     if (Surface(SurfNum).MaterialMovInsulInt > 0)
                         EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
@@ -3773,6 +3763,7 @@ namespace HeatBalanceSurfaceManager {
             }
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 // For window with an interior shade or blind, emissivity is a combination of glass and shade/blind emissivity
+                int ShadeFlag = SurfWinShadingFlag(SurfNum);
                 if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn)
                     ITABSF(SurfNum) = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum),
                                                     SurfaceWindow(SurfNum).EffShBlindEmiss) +
@@ -3790,9 +3781,8 @@ namespace HeatBalanceSurfaceManager {
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
 
                 if (!Surface(SurfNum).HeatTransSurf) continue;
-
-                ConstrNum = Surface(SurfNum).Construction;
-                ShadeFlag = SurfWinShadingFlag(SurfNum);
+                int ConstrNum = Surface(SurfNum).Construction;
+                int ShadeFlag = SurfWinShadingFlag(SurfNum);
                 if (ShadeFlag != SwitchableGlazing) {
                     SUM1 += Surface(SurfNum).Area * ITABSF(SurfNum);
                 } else { // Switchable glazing
@@ -3806,16 +3796,16 @@ namespace HeatBalanceSurfaceManager {
                 if (SurfWinFrameArea(SurfNum) > 0.0)
                     SUM1 += SurfWinFrameArea(SurfNum) * (1.0 + 0.5 * SurfWinProjCorrFrIn(SurfNum)) * SurfWinFrameEmis(SurfNum);
                 if (SurfWinDividerArea(SurfNum) > 0.0) {
-                    DividerThermAbs = SurfWinDividerEmis(SurfNum);
+                    Real64 DividerThermAbs = SurfWinDividerEmis(SurfNum);
                     // Suspended (between-glass) divider; relevant emissivity is inner glass emissivity
                     if (SurfWinDividerType(SurfNum) == Suspended) DividerThermAbs = dataConstruction.Construct(ConstrNum).InsideAbsorpThermal;
                     if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
                         // Interior shade or blind in place
-                        ConstrNumSh = SurfWinShadedConstruction(SurfNum);
+                        int ConstrNumSh = SurfWinShadedConstruction(SurfNum);
                         if (SurfWinHasShadeOrBlindLayer(SurfNum)) {
-                            MatNumSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(dataConstruction.Construct(ConstrNumSh).TotLayers);
-                            TauShIR = dataMaterial.Material(MatNumSh).TransThermal;
-                            EffShDevEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss(1);
+                            int MatNumSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(dataConstruction.Construct(ConstrNumSh).TotLayers);
+                            Real64 TauShIR = dataMaterial.Material(MatNumSh).TransThermal;
+                            Real64 EffShDevEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss(1);
                             if (ShadeFlag == IntBlindOn) {
                                 TauShIR = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
                                                         SurfWinMovableSlats(SurfNum),
