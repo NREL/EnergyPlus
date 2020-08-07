@@ -134,7 +134,7 @@ Given \emph{n} and \emph{T}, find \emph{R}:
 
 \subsection{Simple Window Model}\label{simple-window-model}
 
-EnergyPlus includes an alternate model that allows users to enter in simplified window performance indices.~ This model is accessed through the WindowMaterial:SimpleGlazingSystem input object and converts the simple indices into an equivalent single layer window.~ (In addition a special model is used to determine the angular properties of the system -- described below).~ Once the model generates the properties for the layer, the program reuses the bulk of the layer-by-layer model for subsequent calculations.~ The properties of the equivalent layer are determined using the step by step method outlined by Arasteh, Kohler, and Griffith (2009).~ The core equations are documented here.~ The reference contains additional information.
+EnergyPlus includes an alternate model that allows users to enter in simplified window performance indices.~ This model is accessed through the WindowMaterial:SimpleGlazingSystem input object and converts the simple indices into an equivalent single layer window.~ (In addition a special model is used to determine the angular properties of the system -- described below).~ Once the model generates the properties for the layer, the program reuses the bulk of the layer-by-layer model for subsequent calculations.~ The properties of the equivalent layer are determined using the step by step method outlined by Arasteh, Kohler, and Griffith (2009) with modifications to formulate the angular performance in a manner consistent with the angular properties for coated glass in other window models.~ The core equations are documented here.~ The reference contains additional information.
 
 The simplified window model accepts U and SHGC indices and is useful for several reasons:
 
@@ -288,7 +288,7 @@ The visible light reflectance for the front surface is calculated using:
 
 \subsubsection{Step 7. Determine Angular Performance}\label{step-7.-determine-angular-performance}
 
-The angular properties of windows are important because during energy modeling, the solar incidence angles are usually fairly high.~ Angles of incidence are defined as angles from the normal direction extending out from the window.~ The simple glazing system model includes a range of correlations that are selected based on the values for U and SHGC.~ These were chosen to match the types of windows likely to have such performance levels.~ The matrix of possible combinations of U and SHGC values have been mapped to set of 28 bins shown in the following figure.
+The angular properties of windows are important because during energy modeling, the solar incidence angles are usually fairly high.~ Angles of incidence are defined as angles from the normal direction extending out from the window.~ The simple glazing system model includes a range of correlations that are selected based on the values for U and SHGC.~ These were chosen to match the types of windows likely to have such performance levels.~ The matrix of possible combinations of U and SHGC values have been mapped to set of 28 bins shown in the Figure \ref{fig:diagram-of-transmittance-and}.
 
 \begin{figure}[hbtp] % fig 74
 \centering
@@ -296,25 +296,89 @@ The angular properties of windows are important because during energy modeling, 
 \caption{Diagram of Transmittance and Reflectance Correlations Used based on U and SHGC \label{fig:diagram-of-transmittance-and}}
 \end{figure}
 
-There are ten different correlations, A thru J, for both transmission and reflectance.~ The correlations are used in various weighting and interpolation schemes according the figure above.~ The correlations are normalized against the performance at normal incidence.~ EnergyPlus uses these correlations to store the glazing system's angular performance at 10 degree increments and interpolates between them during simulations.~ The model equations use the cosine of the incidence angle, \(\cos (\varphi )\), as the independent variable.~ The correlations have the form:
+There are ten different correlations, A thru J, for both transmission and reflectance.~ The correlations are used in various weighting and interpolation schemes according the figure above.~ The correlations are normalized against the performance at normal incidence.~ EnergyPlus uses these correlations to store the glazing system's angular performance at 10 degree increments and interpolates between them during simulations.~ The model equations use the cosine of the incidence angle, \(\cos (\phi )\), as the independent variable.~ The correlations for transmittance has the form:
 
 \begin{equation}
-T\;or\;R = a\cos {(\varphi )^4} + b\cos {(\varphi )^3} + c\cos {(\varphi )^2} + d\cos (\varphi ) + e
+  T(\phi) = T(0) \tau (\phi )
 \end{equation}
 
-The coefficient values for a, b, c, d, and e are listed in the following tables for each of the curves.
+where
 
-\begin{figure}[hbtp] % fig 75
-\centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image950.png}
-\caption{Normalized Transmittance Correlations for Angular Performance \protect \label{fig:normalized-transmittance-correlations-for}}
-\end{figure}
+\begin{equation}
+  \tau(\phi) = a + b\cos (\phi ) + c\cos {(\phi )^2} + d\cos {(\phi )^3} + e\cos {(\phi )^4}
+\end{equation}
 
-\begin{figure}[hbtp] % fig 76
-\centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image951.png}
-\caption{Normalized Reflectanct Correlations for Angular Performance \protect \label{fig:normalized-reflectanct-correlations-for}}
-\end{figure}
+While the original method described by Arasteh, Kohler, and Griffith (2009) uses a similar equation form for reflectance, the form of the equation and its coefficients used in EnergyPlus have been modified algebraically to use a form consistent with what is used for coated glass elsewhere in the program. To convert from the original equation form,
+
+\begin{equation}
+  R(\phi) = R(0)\rho_{old}(\phi)
+\end{equation}
+
+to the form used for coated glazing,
+
+\begin{equation}
+  R(\phi ) = R(0)(1 - \rho_{new}(\phi )) + \rho_{new}(\phi )
+\end{equation}
+
+set them equal to each other and solve algebraically for $\rho_{new}(\phi )$:
+
+\begin{equation}
+  \rho_{new}(\phi ) = \frac{R(0)\left(\rho_{old}(\phi ) - 1\right)}{1 - R(0)}
+\end{equation}
+
+where,
+
+\begin{equation}
+  \rho_{new}(\phi ) = a_{new} + b_{new}\cos (\phi ) + c_{new}{\cos ^2}(\phi ) + d_{new}{\cos ^3}(\phi ) + e_{new}{\cos ^4}(\phi ) - \tau (\phi )
+\end{equation}
+
+and,
+
+\begin{equation}
+  \rho_{old}(\phi ) = a_{old} + b_{old}\cos (\phi ) + c_{old}{\cos ^2}(\phi ) + d_{old}{\cos ^3}(\phi ) + e_{old}{\cos ^4}(\phi )
+\end{equation}
+
+The updated coefficient values for a, b, c, d, and e are listed for transmittance and reflectance in Tables \ref{tab:normalized-transmittance-correlations-for} and \ref{tab:normalized-reflectance-correlations-for}, respectively.
+
+\begin{table}[tbp]
+  \caption{Normalized Transmittance Correlations for Angular Performance}
+  \label{tab:normalized-transmittance-correlations-for}
+  \centering
+  \begin{tabular}{llllll}
+  \hline
+  Curve                                 & a    & b    & c     & d     & e    \\ \hline
+  A - Single: 3mm clear                 & 0.00 & 3.36 & -3.85 & 1.49  & 0.01 \\
+  B - Single: 3mm bronze                & 0.00 & 2.83 & -2.42 & 0.04  & 0.55 \\
+  C - Single: 6mm bronze                & 0.00 & 2.45 & -1.58 & -0.64 & 0.77 \\
+  D - Single: 3mm coated                & 0.00 & 2.85 & -2.58 & 0.40  & 0.35 \\
+  E - Double: 3mm clear, clear          & 0.00 & 1.51 & 2.49  & -5.87 & 2.88 \\
+  F - Double: 3mm coated, clear         & 0.00 & 1.21 & 3.14  & -6.37 & 3.03 \\
+  G - Double: 3mm tinted, clear         & 0.00 & 1.09 & 3.54  & -6.84 & 3.23 \\
+  H - Double: 6mm coated, clear         & 0.00 & 0.98 & 3.83  & -7.13 & 3.33 \\
+  I - Double: 6mm tinted, clear         & 0.00 & 0.79 & 3.93  & -6.86 & 3.15 \\
+  J - Triple: 3mm coated, clear, coated & 0.00 & 0.08 & 6.02  & -8.84 & 3.74
+  \end{tabular}
+\end{table}
+
+\begin{table}[tbp]
+  \caption{Normalized Reflectance Correlations for Angular Performance}
+  \label{tab:normalized-reflectance-correlations-for}
+  \centering
+  \begin{tabular}{llllll}
+  \hline
+  Curve                                 & a    & b     & c     & d      & e    \\ \hline
+  A - Single: 3mm clear                 & 1.00 & -0.70 & 2.57  & -3.20  & 1.34 \\
+  B - Single: 3mm bronze                & 1.00 & -1.87 & 6.51  & -7.86  & 3.23 \\
+  C - Single: 6mm bronze                & 1.00 & -2.53 & 8.40  & -9.86  & 3.99 \\
+  D - Single: 3mm coated                & 1.00 & -1.86 & 6.40  & -7.64  & 3.10 \\
+  E - Double: 3mm clear, clear          & 1.00 & -1.57 & 5.60  & -6.83  & 2.80 \\
+  F - Double: 3mm coated, clear         & 1.00 & -3.14 & 10.97 & -13.14 & 5.32 \\
+  G - Double: 3mm tinted, clear         & 1.00 & -3.26 & 11.32 & -13.54 & 5.49 \\
+  H - Double: 6mm coated, clear         & 1.00 & -3.39 & 11.69 & -13.94 & 5.64 \\
+  I - Double: 6mm tinted, clear         & 1.00 & -4.07 & 13.55 & -15.74 & 6.27 \\
+  J - Triple: 3mm coated, clear, coated & 1.00 & -4.35 & 14.27 & -16.31 & 6.40 \\ \hline
+  \end{tabular}
+\end{table}
 
 \subsubsection{Application Issues}\label{application-issues}
 
@@ -604,38 +668,6 @@ T(\phi ) = T(0){\bar \tau_{bnz}}(\phi )
 
 \begin{equation}
 R(\phi ) = R(0)(1 - {\bar \rho_{bnz}}(\phi )) + {\bar \rho_{bnz}}(\phi )
-\end{equation}
-
-\subsubsection{Angular Properties for Simple Glazing Systems}\label{angular-properties-for-simple-glazing-systems}
-
-When the glazing system is modeled using the simplified method, an alternate method is used to determine the angular properties.~ The equation for solar transmittance as a function of incidence angle, \(T\left( \phi \right)\), is:
-
-\begin{equation}
-T\left( \phi  \right) = T\left( {\phi  = 0} \right)\,\cos \left( \phi  \right)\,\,\left( {1 + (0.768 + 0.817\,SHG{C^4})\;{{\sin }^3}\left( \phi  \right)} \right)
-\end{equation}
-
-where,
-
-\(T\left( {\phi = 0} \right)\) ~is the normal incidence solar transmittance, \({T_{Sol}}\).
-
-The equation for solar reflectance as a function of incidence angle,~ \(R\left( \phi \right)\), is:
-
-\begin{equation}
-R\left( \phi  \right) = \frac{{R\left( {\phi  = 0} \right)\left( {{f_1}\left( \phi  \right) + {f_2}\left( \phi  \right)\sqrt {SHGC} } \right)}}{{{R_{fit,o}}}}
-\end{equation}
-
-where,
-
-\begin{equation}
-{f_1}\left( \phi  \right) = \left( {\left( {\left( {2.403\cos \left( \phi  \right) - 6.192} \right)\cos \left( \phi  \right) + 5.625} \right)\cos \left( \phi  \right) - 2.095} \right)\cos \left( \phi  \right) + 1
-\end{equation}
-
-\begin{equation}
-{f_2}\left( \phi  \right) = \left( {\left( {\left( { - 1.188\cos \left( \phi  \right) + 2.022} \right)\cos \left( \phi  \right) + 0.137} \right)\cos \left( \phi  \right) - 1.720} \right)\cos \left( \phi  \right)
-\end{equation}
-
-\begin{equation}
-{R_{fit,o}} = 0.7413 - \left( {0.7396\;\sqrt {SHGC} } \right)
 \end{equation}
 
 \subsection{Calculation of Hemispherical Values}\label{calculation-of-hemispherical-values}
