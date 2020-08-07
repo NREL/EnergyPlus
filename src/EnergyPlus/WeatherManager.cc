@@ -3682,13 +3682,15 @@ namespace WeatherManager {
                     TomorrowTotalSkyCover(TS, Hour) = LastHrTotalSkyCover * WtPrevHour + Wthr.TotalSkyCover(Hour) * WtNow;
                     TomorrowOpaqueSkyCover(TS, Hour) = LastHrOpaqueSkyCover * WtPrevHour + Wthr.OpaqueSkyCover(Hour) * WtNow;
 
+                    // TomorrowHorizIRSky(TS, Hour) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(Hour) * WtNow;
                     // Sky emissivity now takes interpolated timestep inputs rather than interpolated calcation esky results
-                    calcSky(TomorrowHorizIRSky(TS, Hour), TomorrowSkyTemp(TS, Hour),
+                    calcSky(TomorrowHorizIRSky(TS, Hour),
+                            TomorrowSkyTemp(TS, Hour),
                             TomorrowOpaqueSkyCover(TS, Hour),
                             TomorrowOutDryBulbTemp(TS, Hour),
                             TomorrowOutDewPointTemp(TS, Hour),
                             TomorrowOutRelHum(TS, Hour) * 0.01,
-                            HrIRHoriz_Weather(Hour)); 
+                            LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(Hour) * WtNow); // HrIRHoriz_Weather(Hour)); 
 
                     TomorrowIsRain(TS, Hour) = TomorrowLiquidPrecip(TS, Hour) >= (0.8 / double(NumOfTimeStepInHour)); // Wthr%IsRain(Hour)
                     TomorrowIsSnow(TS, Hour) = Wthr.IsSnow(Hour);
