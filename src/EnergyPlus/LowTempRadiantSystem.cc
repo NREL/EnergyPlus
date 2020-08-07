@@ -2465,7 +2465,7 @@ namespace LowTempRadiantSystem {
             if (CurZoneEqNum > 0) {
 
                 SizingMethod = HeatingCapacitySizing;
-                FieldNum = 3;
+                FieldNum = 4;
                 PrintFlag = true;
                 SizingString = HydronicRadiantSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
                 CapSizingMethod = HydrRadSys(RadSysNum).HeatingCapMethod;
@@ -2616,7 +2616,7 @@ namespace LowTempRadiantSystem {
             if (CurZoneEqNum > 0) {
 
                 SizingMethod = CoolingCapacitySizing;
-                FieldNum = 8;
+                FieldNum = 9;
                 PrintFlag = true;
                 SizingString = HydronicRadiantSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
                 CapSizingMethod = HydrRadSys(RadSysNum).CoolingCapMethod;
@@ -5386,8 +5386,10 @@ namespace LowTempRadiantSystem {
         // Return value
         Real64 calculateUFromISOStandard;
 
+        int constructionNumber = DataSurfaces::Surface(SurfNum).Construction;
+        
         // Fluid resistance to heat transfer, assumes turbulent flow (Equation B5, p. 38 of ISO Standard 11855-2)
-        Real64 distanceBetweenPipes = 2.0 * dataConstruction.Construct(DataSurfaces::Surface(SurfNum).Construction).ThicknessPerpend;
+        Real64 distanceBetweenPipes = 2.0 * dataConstruction.Construct(constructionNumber).ThicknessPerpend;
         Real64 ratioDiameterToMassFlowLength = this->TubeDiameterInner / WaterMassFlow / this->TubeLength;
         Real64 rFluid = 0.125 / DataGlobals::Pi * std::pow(distanceBetweenPipes, 0.13) * std::pow(ratioDiameterToMassFlowLength,0.87);
         
@@ -5395,10 +5397,9 @@ namespace LowTempRadiantSystem {
         Real64 rTube = 0.5 * distanceBetweenPipes * std::log(this->TubeDiameterOuter/this->TubeDiameterInner) / DataGlobals::Pi / this->TubeConductivity;
         
         // Contact resistance between the pipe and the material in which it is embedded (Equation B7, p. 38 of ISO Standard 11855-2)
-        int constructionNumber = DataSurfaces::Surface(SurfNum).Construction;
         int sourceAfterLayer = dataConstruction.Construct(constructionNumber).SourceAfterLayer;
-        int materialNumber = dataConstruction.Construct(DataSurfaces::Surface(SurfNum).Construction).LayerPoint(sourceAfterLayer);
-        int materialNumberNextLayer = dataConstruction.Construct(DataSurfaces::Surface(SurfNum).Construction).LayerPoint(sourceAfterLayer+1);
+        int materialNumber = dataConstruction.Construct(constructionNumber).LayerPoint(sourceAfterLayer);
+        int materialNumberNextLayer = dataConstruction.Construct(constructionNumber).LayerPoint(sourceAfterLayer+1);
         Real64 averageSlabConductivity = 0.5 * (dataMaterial.Material(materialNumber).Conductivity
                                                 + dataMaterial.Material(materialNumberNextLayer).Conductivity);
         Real64 rContactResistance = 0.5 * distanceBetweenPipes * std::log(distanceBetweenPipes/DataGlobals::Pi/this->TubeDiameterOuter)
