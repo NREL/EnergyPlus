@@ -366,8 +366,7 @@ ENERGYPLUSLIB_API void callbackUnitarySystemSizing(EnergyPlusState state, void (
 // ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(EnergyPlusState state, void (*f)());
 
 /// \brief Register a callback function to be used in place of the EnergyPlus ManageHVAC function.
-/// \details This is an advanced function, currently used by Spawn. When this callback is defined, the
-///          conventional EnergyPlus HVAC simulation is completely bypassed.
+/// \details This callback is a placeholder for advanced use cases, and will be supported in a future release.
 ENERGYPLUSLIB_API void registerExternalHVACManager(EnergyPlusState state, void (*f)(EnergyPlusState));
 
 #ifdef __cplusplus
