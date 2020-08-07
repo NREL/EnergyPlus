@@ -80,6 +80,7 @@ namespace DataGlobals {
     extern bool preserveIDFOrder;
     extern bool stopSimulation;
     extern std::function<void (void *)> externalHVACManager;
+    extern bool externalHVACManagerInitialized;
 
     // MODULE PARAMETER DEFINITIONS:
     extern int const BeginDay;
