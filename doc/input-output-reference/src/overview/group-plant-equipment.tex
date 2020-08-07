@@ -164,17 +164,17 @@ The following output is applicable only for indirect absorption chillersHVAC,Ave
 \item
   HVAC,Average,Chiller Gasoline Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Chiller FuelOil\#1 Rate {[}W{]}
+  HVAC,Average,Chiller FuelOilNo1 Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller FuelOil\#1 Energy {[}J{]}
+  HVAC,Sum,Chiller FuelOilNo1 Energy {[}J{]}
 \item
-  HVAC,Average,Chiller FuelOil\#1 Mass Flow Rate {[}kg/s{]}
+  HVAC,Average,Chiller FuelOilNo1 Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Chiller FuelOil\#2 Rate {[}W{]}
+  HVAC,Average,Chiller FuelOilNo2 Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller FuelOil\#2 Energy {[}J{]}
+  HVAC,Sum,Chiller FuelOilNo2 Energy {[}J{]}
 \item
-  HVAC,Average,Chiller FuelOil\#2 Mass Flow Rate {[}kg/s{]}
+  HVAC,Average,Chiller FuelOilNo2 Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Average,Chiller OtherFuel1 Rate {[}W{]}
 \item
@@ -295,7 +295,7 @@ This output variable is available for heat recovery chillers that model split bu
 
 \subsubsection{Chiller Gas~ Mass {[}kg{]} (Gas Turbine Chiller only)}\label{chiller-gas-mass-kg-gas-turbine-chiller-only}
 
-These outputs are the steam or fuel input for steam or fuel-fired chillers. Valid fuel types depend on the type of chiller. \textless{}Fuel Type\textgreater{} may be one of:~ Gas (natural gas), Steam, Propane, Diesel, Gasoline, FuelOil\#1, FuelOil\#2, OtherFuel1 and OtherFuel2. Consumption is metered on Cooling:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
+These outputs are the steam or fuel input for steam or fuel-fired chillers. Valid fuel types depend on the type of chiller. \textless{}Fuel Type\textgreater{} may be one of:~ Gas (natural gas), Steam, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 and OtherFuel2. Consumption is metered on Cooling:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
 \subsubsection{Chiller Source Hot Water Rate {[}W{]}}\label{chiller-source-hot-water-rate-w}
 
@@ -2483,17 +2483,17 @@ One of the following blocks will be applicable based on fuel type:
 \item
   HVAC,Average,Chiller Gasoline Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Chiller FuelOil\#1 Rate {[}W{]}
+  HVAC,Average,Chiller FuelOilNo1 Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller FuelOil\#1 Energy {[}J{]}
+  HVAC,Sum,Chiller FuelOilNo1 Energy {[}J{]}
 \item
-  HVAC,Average,Chiller FuelOil\#1 Mass Flow Rate {[}kg/s{]}
+  HVAC,Average,Chiller FuelOilNo1 Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Chiller FuelOil\#2 Rate {[}W{]}
+  HVAC,Average,Chiller FuelOilNo2 Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller FuelOil\#2 Energy {[}J{]}
+  HVAC,Sum,Chiller FuelOilNo2 Energy {[}J{]}
 \item
-  HVAC,Average,Chiller FuelOil\#2 Mass Flow Rate {[}kg/s
+  HVAC,Average,Chiller FuelOilNo2 Mass Flow Rate {[}kg/s
 \item
   HVAC,Average,Chiller OtherFuel1 Rate {[}W{]}
 \item
@@ -4080,22 +4080,22 @@ Propane:
   HVAC,Sum,Boiler Propane Energy {[}J{]}
 \end{itemize}
 
-FuelOil\#1:
+FuelOilNo1:
 
 \begin{itemize}
 \item
-  HVAC,Average,Boiler FuelOil\#1 Rate {[}W{]}
+  HVAC,Average,Boiler FuelOilNo1 Rate {[}W{]}
 \item
-  HVAC,Sum,Boiler FuelOil\#1 Energy {[}J{]}
+  HVAC,Sum,Boiler FuelOilNo1 Energy {[}J{]}
 \end{itemize}
 
-FuelOil\#2:
+FuelOilNo2:
 
 \begin{itemize}
 \item
-  HVAC,Average,Boiler FuelOil\#2 Rate {[}W{]}
+  HVAC,Average,Boiler FuelOilNo2 Rate {[}W{]}
 \item
-  HVAC,Sum,Boiler FuelOil\#2 Energy {[}J{]}
+  HVAC,Sum,Boiler FuelOilNo2 Energy {[}J{]}
 \end{itemize}
 
 Coal:
@@ -4173,7 +4173,7 @@ This output is the thermal efficiency for the boiler during heating operation. I
 
 \paragraph{Boiler Electric Power {[}W{]}}\label{boiler-electric-power-w}
 
-These outputs are the energy input to the boiler. Valid fuel types are:~ Electric, Gas (natural gas), Propane, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, OtherFuel1, OtherFuel2. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
+These outputs are the energy input to the boiler. Valid fuel types are:~ Electric, Gas (natural gas), Propane, FuelOilNo1, FuelOilNo2, Coal, Diesel, Gasoline, OtherFuel1, OtherFuel2. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
 \paragraph{Boiler Ancillary Electric Power {[}W{]}}\label{boiler-ancillary-electric-power-w}
 
@@ -4342,22 +4342,22 @@ Propane:
   HVAC,Sum,Boiler Propane Energy {[}J{]}
 \end{itemize}
 
-FuelOil\#1:
+FuelOilNo1:
 
 \begin{itemize}
 \item
-  HVAC,Average,Boiler FuelOil\#1 Rate {[}W{]}
+  HVAC,Average,Boiler FuelOilNo1 Rate {[}W{]}
 \item
-  HVAC,Sum,Boiler FuelOil\#1 Energy {[}J{]}
+  HVAC,Sum,Boiler FuelOilNo1 Energy {[}J{]}
 \end{itemize}
 
-FuelOil\#2:
+FuelOilNo2:
 
 \begin{itemize}
 \item
-  HVAC,Average,Boiler FuelOil\#2 Rate {[}W{]}
+  HVAC,Average,Boiler FuelOilNo2 Rate {[}W{]}
 \item
-  HVAC,Sum,Boiler FuelOil\#2 Energy {[}J{]}
+  HVAC,Sum,Boiler FuelOilNo2 Energy {[}J{]}
 \end{itemize}
 
 Coal:
@@ -4433,7 +4433,7 @@ These outputs are the steam inlet and outlet temperatures and steam flow rate fo
 
 \paragraph{Boiler Electric Energy {[}J{]}}\label{boiler-electric-energy-j}
 
-These outputs are the energy input to the boiler. Valid fuel types are:~ Electric, Gas (natural gas), Propane, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, OtherFuel1, and OtherFuel2. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
+These outputs are the energy input to the boiler. Valid fuel types are:~ Electric, Gas (natural gas), Propane, FuelOilNo1, FuelOilNo2, Coal, Diesel, Gasoline, OtherFuel1, and OtherFuel2. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
 \subsection{Water to Water Heat Pumps}\label{water-to-water-heat-pumps}
 

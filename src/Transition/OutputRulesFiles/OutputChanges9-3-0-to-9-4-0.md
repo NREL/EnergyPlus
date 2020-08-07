@@ -152,3 +152,20 @@ In the PerformancePrecisionTradeoffs section of .eio file, a line of header of p
  Performance Precision Tradeoffs, No, ScriptF, MODE07, 1, Yes, 1, Yes, 60.0, 1.000, 0.1000
 
 See [8121](https://github.com/NREL/EnergyPlus/pull/8121)
+
+### Output:Variables, Output:Meter, Output:Meter:MeterFileOnly, Output:Table:Monthly
+
+*FuelType* changed:
+
+(a) From "FuelOil#1" in 9.3 to "FuelOilNo1" in 9.4
+(b) From "FuelOil#2" in 9.3 to "FuelOilNo2" in 9.4
+
+ 
+(c) From "Fuel Oil #1" in 9.3 to "FuelOilNo1" in 9.4
+(d) From "Fuel Oil #2" in 9.3 to "FuelOilNo2" in 9.4
+
+### table output headings moving from:
+ (a) "Fuel Oil #1" in 9.3 to "Fuel Oil No 1" in 9.4
+ (b) "Fuel Oil #2" in 9.3 to "Fuel Oil No 2" in 9.4
+ 
+
