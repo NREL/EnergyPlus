@@ -401,7 +401,8 @@ class Runtime:
         """
         This function allows a client to register an external HVAC manager function to be called back in EnergyPlus.
         By registering this function, EnergyPlus will bypass all HVAC calculations and expect that this function will
-        manage all HVAC through sensors and actuators.
+        manage all HVAC through sensors and actuators. Right now this function is not well-supported, and this callback
+        should be considered purely as a placeholder until a future release refines the use case.
 
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
