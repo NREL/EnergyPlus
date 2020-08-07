@@ -2465,7 +2465,7 @@ namespace LowTempRadiantSystem {
             if (CurZoneEqNum > 0) {
 
                 SizingMethod = HeatingCapacitySizing;
-                FieldNum = 4;
+                FieldNum = 5;
                 PrintFlag = true;
                 SizingString = HydronicRadiantSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
                 CapSizingMethod = HydrRadSys(RadSysNum).HeatingCapMethod;
@@ -2616,7 +2616,7 @@ namespace LowTempRadiantSystem {
             if (CurZoneEqNum > 0) {
 
                 SizingMethod = CoolingCapacitySizing;
-                FieldNum = 9;
+                FieldNum = 10;
                 PrintFlag = true;
                 SizingString = HydronicRadiantSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
                 CapSizingMethod = HydrRadSys(RadSysNum).CoolingCapMethod;
