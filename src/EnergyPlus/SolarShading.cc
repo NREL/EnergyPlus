@@ -9978,8 +9978,7 @@ namespace SolarShading {
 
             // Window has shading control
 
-            //GLAZER DEV NOTE SHOULD PROBABLY CHOOSE HERE INSTEAD OF THIS HACK FOR DEBUGGING
-            Surface(ISurf).activeWindowShadingControl = Surface(ISurf).windowShadingControlList.front();
+            Surface(ISurf).activeWindowShadingControl = selectActiveWindowShadingControl(ISurf);
 
             IShadingCtrl = Surface(ISurf).activeWindowShadingControl;
             ShadingType = WindowShadingControl(IShadingCtrl).ShadingType;
@@ -10345,6 +10344,25 @@ namespace SolarShading {
 
         } // End of surface loop
     }
+
+    int selectActiveWindowShadingControl(int curSurface)
+    {
+        // J. Glazer - Aug 2020 - For a given surface, determine based on the schedules which window shading control object should be active
+        int selected;
+        if (Surface(curSurface).windowShadingControlList.size() == 1) {
+            selected = Surface(curSurface).windowShadingControlList.front();
+        } else {
+            for (auto wsc = Surface(curSurface).windowShadingControlList.begin(); wsc != Surface(curSurface).windowShadingControlList.end(); ++wsc) {
+                //pick the first WindowShadingControl that has a non-zero schedule value
+                if (ScheduleManager::GetCurrentScheduleValue(WindowShadingControl(*wsc).Schedule) != 0.0) {
+                    selected = *wsc;
+                    break;
+                }
+            }
+        }
+        return (selected);
+    }
+
 
     void WindowGapAirflowControl()
     {
