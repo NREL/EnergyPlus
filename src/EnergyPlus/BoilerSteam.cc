@@ -203,7 +203,7 @@ namespace BoilerSteam {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
                 // Set to Electric to avoid errors when setting up output variables
-                thisBoiler.BoilerFuelTypeForOutputVariable = "Electric";
+                thisBoiler.BoilerFuelTypeForOutputVariable = "Electricity";
                 ErrorsFound = true;
                 FuelTypeError = false;
             }
@@ -423,7 +423,7 @@ namespace BoilerSteam {
                             "BOILERS",
                             _,
                             "Plant");
-        if (UtilityRoutines::SameString(this->BoilerFuelTypeForOutputVariable, "Electric")) {
+        if (UtilityRoutines::SameString(this->BoilerFuelTypeForOutputVariable, "Electricity")) {
             SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Power",
                                 OutputProcessor::Unit::W,
                                 this->FuelUsed,

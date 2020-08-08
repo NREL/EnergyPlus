@@ -765,9 +765,9 @@ namespace MicroturbineElectricGenerator {
 
     void MTGeneratorSpecs::setupOutputVars()
     {
-        SetupOutputVariable("Generator Produced Electric Power", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
+        SetupOutputVariable("Generator Produced Electricity Power", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced Electric Energy",
+        SetupOutputVariable("Generator Produced Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->EnergyGen,
                             "System",
@@ -838,9 +838,9 @@ namespace MicroturbineElectricGenerator {
 
         if (this->StandbyPower > 0.0) { // Report Standby Power if entered by user
             SetupOutputVariable(
-                "Generator Standby Electric Power", OutputProcessor::Unit::W, this->StandbyPowerRate, "System", "Average", this->Name);
+                "Generator Standby Electricity Power", OutputProcessor::Unit::W, this->StandbyPowerRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Standby Electric Energy",
+            SetupOutputVariable("Generator Standby Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->StandbyEnergy,
                                 "System",
@@ -855,9 +855,9 @@ namespace MicroturbineElectricGenerator {
 
         if (this->AncillaryPower > 0.0) { // Report Ancillary Power if entered by user
             SetupOutputVariable(
-                "Generator Ancillary Electric Power", OutputProcessor::Unit::W, this->AncillaryPowerRate, "System", "Average", this->Name);
+                "Generator Ancillary Electricity Power", OutputProcessor::Unit::W, this->AncillaryPowerRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Ancillary Electric Energy", OutputProcessor::Unit::J, this->AncillaryEnergy, "System", "Sum", this->Name);
+            SetupOutputVariable("Generator Ancillary Electricity Energy", OutputProcessor::Unit::J, this->AncillaryEnergy, "System", "Sum", this->Name);
         }
 
         //   Report combustion air outlet conditions if exhaust air calculations are active

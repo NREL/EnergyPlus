@@ -111,8 +111,8 @@ namespace DataGlobalConstants {
     std::string const cRT_Natural_Gas("NaturalGas");
     std::string const cRT_Natural_GasUC("NATURALGAS");
     int const iRT_Natural_Gas(1002);
-    std::string const cRT_Gas("Gas");
-    std::string const cRT_GasUC("GAS");
+    std::string const cRT_Gas("NaturalGas");
+    std::string const cRT_GasUC("NATURALGAS");
     int const iRT_Gas(1002);
     std::string const cRT_Gasoline("Gasoline");
     std::string const cRT_GasolineUC("GASOLINE");
@@ -510,7 +510,7 @@ namespace DataGlobalConstants {
                 ResourceTypeChar = "Electricity";
 
             } else if (SELECT_CASE_var == iRT_Gas) {
-                ResourceTypeChar = "Gas";
+                ResourceTypeChar = "NaturalGas";
 
             } else if (SELECT_CASE_var == iRT_Gasoline) {
                 ResourceTypeChar = "Gasoline";
