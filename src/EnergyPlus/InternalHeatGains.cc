@@ -5181,9 +5181,7 @@ namespace InternalHeatGains {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ActivityLevel_WperPerson; // Units on Activity Level (Schedule)
         Real64 NumberOccupants;          // Number of occupants
-        int SurfNum;                     // DO loop counter for surfaces
         int Loop;
-        int NZ;
         Real64 Q;                  // , QR
         Real64 TotalPeopleGain;    // Total heat gain from people (intermediate calculational variable)
         Real64 SensiblePeopleGain; // Sensible heat gain from people (intermediate calculational variable)
@@ -5265,7 +5263,7 @@ namespace InternalHeatGains {
         //       at 30F were assumed in order to give reasonable values beyond
         //       The reported temperature range.
         for (Loop = 1; Loop <= TotPeople; ++Loop) {
-            NZ = People(Loop).ZonePtr;
+            int NZ = People(Loop).ZonePtr;
             NumberOccupants = People(Loop).NumberOfPeople * GetCurrentScheduleValue(People(Loop).NumberOfPeoplePtr);
             if (People(Loop).EMSPeopleOn) NumberOccupants = People(Loop).EMSNumberOfPeople;
 
@@ -5320,7 +5318,7 @@ namespace InternalHeatGains {
         }
 
         for (Loop = 1; Loop <= TotLights; ++Loop) {
-            NZ = Lights(Loop).ZonePtr;
+            int NZ = Lights(Loop).ZonePtr;
             Q = Lights(Loop).DesignLevel * GetCurrentScheduleValue(Lights(Loop).SchedPtr);
 
             if (ZoneDaylight(NZ).DaylightMethod == SplitFluxDaylighting || ZoneDaylight(NZ).DaylightMethod == DElightDaylighting) {
@@ -5394,7 +5392,7 @@ namespace InternalHeatGains {
             ZoneElectric(Loop).LostRate = Q * ZoneElectric(Loop).FractionLost;
             ZoneElectric(Loop).TotGainRate = Q - ZoneElectric(Loop).LostRate;
 
-            NZ = ZoneElectric(Loop).ZonePtr;
+            int NZ = ZoneElectric(Loop).ZonePtr;
             ZnRpt(NZ).ElecPower += ZoneElectric(Loop).Power;
             ZoneIntGain(NZ).QEERAD += ZoneElectric(Loop).RadGainRate;
             ZoneIntGain(NZ).QEECON += ZoneElectric(Loop).ConGainRate;
@@ -5416,7 +5414,7 @@ namespace InternalHeatGains {
             ZoneGas(Loop).TotGainRate = Q - ZoneGas(Loop).LostRate;
             ZoneGas(Loop).CO2GainRate = Q * ZoneGas(Loop).CO2RateFactor;
 
-            NZ = ZoneGas(Loop).ZonePtr;
+            int NZ = ZoneGas(Loop).ZonePtr;
             ZnRpt(NZ).GasPower += ZoneGas(Loop).Power;
             ZoneIntGain(NZ).QGERAD += ZoneGas(Loop).RadGainRate;
             ZoneIntGain(NZ).QGECON += ZoneGas(Loop).ConGainRate;
@@ -5437,7 +5435,7 @@ namespace InternalHeatGains {
             ZoneOtherEq(Loop).LostRate = Q * ZoneOtherEq(Loop).FractionLost;
             ZoneOtherEq(Loop).TotGainRate = Q - ZoneOtherEq(Loop).LostRate;
 
-            NZ = ZoneOtherEq(Loop).ZonePtr;
+            int NZ = ZoneOtherEq(Loop).ZonePtr;
             ZoneIntGain(NZ).QOERAD += ZoneOtherEq(Loop).RadGainRate;
             ZoneIntGain(NZ).QOECON += ZoneOtherEq(Loop).ConGainRate;
             ZoneIntGain(NZ).QOELAT += ZoneOtherEq(Loop).LatGainRate;
@@ -5457,7 +5455,7 @@ namespace InternalHeatGains {
             ZoneHWEq(Loop).LostRate = Q * ZoneHWEq(Loop).FractionLost;
             ZoneHWEq(Loop).TotGainRate = Q - ZoneHWEq(Loop).LostRate;
 
-            NZ = ZoneHWEq(Loop).ZonePtr;
+            int NZ = ZoneHWEq(Loop).ZonePtr;
             ZnRpt(NZ).HWPower += ZoneHWEq(Loop).Power;
             ZoneIntGain(NZ).QHWRAD += ZoneHWEq(Loop).RadGainRate;
             ZoneIntGain(NZ).QHWCON += ZoneHWEq(Loop).ConGainRate;
@@ -5478,7 +5476,7 @@ namespace InternalHeatGains {
             ZoneSteamEq(Loop).LostRate = Q * ZoneSteamEq(Loop).FractionLost;
             ZoneSteamEq(Loop).TotGainRate = Q - ZoneSteamEq(Loop).LostRate;
 
-            NZ = ZoneSteamEq(Loop).ZonePtr;
+            int NZ = ZoneSteamEq(Loop).ZonePtr;
             ZnRpt(NZ).SteamPower += ZoneSteamEq(Loop).Power;
             ZoneIntGain(NZ).QSERAD += ZoneSteamEq(Loop).RadGainRate;
             ZoneIntGain(NZ).QSECON += ZoneSteamEq(Loop).ConGainRate;
@@ -5487,7 +5485,7 @@ namespace InternalHeatGains {
         }
 
         for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
-            NZ = ZoneBBHeat(Loop).ZonePtr;
+            int NZ = ZoneBBHeat(Loop).ZonePtr;
             if (Zone(NZ).OutDryBulbTemp >= ZoneBBHeat(Loop).HighTemperature) {
                 Q = 0.0;
             } else if (Zone(NZ).OutDryBulbTemp > ZoneBBHeat(Loop).LowTemperature) {
@@ -5515,7 +5513,7 @@ namespace InternalHeatGains {
         }
 
         for (Loop = 1; Loop <= TotCO2Gen; ++Loop) {
-            NZ = ZoneCO2Gen(Loop).ZonePtr;
+            int NZ = ZoneCO2Gen(Loop).ZonePtr;
             ZoneCO2Gen(Loop).CO2GainRate = ZoneCO2Gen(Loop).CO2DesignRate * GetCurrentScheduleValue(ZoneCO2Gen(Loop).SchedPtr);
             ZnRpt(NZ).CO2Rate += ZoneCO2Gen(Loop).CO2GainRate;
         }
@@ -5534,7 +5532,7 @@ namespace InternalHeatGains {
         // store pointer values to hold generic internal gain values constant for entire timestep
         UpdateInternalGainValues();
 
-        for (NZ = 1; NZ <= NumOfZones; ++NZ) {
+        for (int NZ = 1; NZ <= NumOfZones; ++NZ) {
 
             SumAllInternalLatentGains(NZ, ZoneLatentGain(NZ));
             // Added for hybrid model
@@ -5560,24 +5558,31 @@ namespace InternalHeatGains {
         if (CompLoadReportIsReq) {
             AllocateLoadComponentArrays();
         }
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            int const NZ = Surface(SurfNum).Zone;
-            if (!Surface(SurfNum).HeatTransSurf || NZ == 0) continue; // Skip non-heat transfer surfaces
-            int const radEnclosureNum = Zone(Surface(SurfNum).Zone).RadiantEnclosureNum;
-            if (!doLoadComponentPulseNow) {
-                QRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
-            } else {
-                curQL = QL(radEnclosureNum);
-                // for the loads component report during the special sizing run increase the radiant portion
-                // a small amount to create a "pulse" of heat that is used for the delayed loads
-                adjQL = curQL + DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
-                // ITABSF is the Inside Thermal Absorptance
-                // TMULT is a multiplier for each zone
-                // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
-                QRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
-                // store the magnitude and time of the pulse
-                radiantPulseTimestep(CurOverallSimDay, NZ) = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
-                radiantPulseReceived(CurOverallSimDay, SurfNum) = (adjQL - curQL) * TMULT(radEnclosureNum) * ITABSF(SurfNum) * Surface(SurfNum).Area;
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {// Loop through all surfaces...
+            int const firstSurf = Zone(zoneNum).SurfaceFirst;
+            int const lastSurf = Zone(zoneNum).SurfaceLast;
+            if (firstSurf <= 0) continue;
+            for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+//              int const NZ = Surface(SurfNum).Zone;
+                if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+                int const radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
+                if (!doLoadComponentPulseNow) {
+                    QRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
+                } else {
+                    curQL = QL(radEnclosureNum);
+                    // for the loads component report during the special sizing run increase the radiant portion
+                    // a small amount to create a "pulse" of heat that is used for the delayed loads
+                    adjQL = curQL +
+                            DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
+                    // ITABSF is the Inside Thermal Absorptance
+                    // TMULT is a multiplier for each zone
+                    // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
+                    QRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
+                    // store the magnitude and time of the pulse
+                    radiantPulseTimestep(CurOverallSimDay, zoneNum) = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                    radiantPulseReceived(CurOverallSimDay, SurfNum) =
+                            (adjQL - curQL) * TMULT(radEnclosureNum) * ITABSF(SurfNum) * Surface(SurfNum).Area;
+                }
             }
         }
     }

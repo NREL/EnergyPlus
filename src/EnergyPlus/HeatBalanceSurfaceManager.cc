@@ -353,18 +353,10 @@ namespace HeatBalanceSurfaceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ConstrNum;   // Construction index
-        int NZ;          // DO loop counter for zones
-        Real64 QIC;      // Intermediate calculation variable
-        Real64 QOC;      // Intermediate calculation variable
         int SurfNum;     // DO loop counter for surfaces
         int SrdSurfsNum; // DO loop counter for srd surfaces
         int SrdSurfNum;
         Real64 SrdSurfsViewFactor;
-
-        int Term;   // DO loop counter for conduction equation terms
-        Real64 TSC; // Intermediate calculation variable (temperature at source location)
-        Real64 TUC; // Intermediate calculation variable (temperature at user specified location)
 
         // RJH DElight Modification Begin
         Real64 dPowerReducFac;  // Return value Electric Lighting Power Reduction Factor for current Zone and Timestep
@@ -540,6 +532,7 @@ namespace HeatBalanceSurfaceManager {
         for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            if (firstSurfWin <= 0) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 if (Surface(SurfNum).ExtSolar) {
                     SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
@@ -548,7 +541,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        for (NZ = 1; NZ <= NumOfZones; ++NZ) {
+        for (int NZ = 1; NZ <= NumOfZones; ++NZ) {
             if (ZoneDaylight(NZ).DaylightMethod == NoDaylighting) continue;
             ZoneDaylight(NZ).DaylIllumAtRefPt = 0.0;
             ZoneDaylight(NZ).GlareIndexAtRefPt = 0.0;
@@ -691,8 +684,8 @@ namespace HeatBalanceSurfaceManager {
         for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            if (firstSurfWin <= 0) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-
                 SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
                 if (SurfWinShadingFlag(SurfNum) > 0) {
                     SurfWinFracTimeShadingDeviceOn(SurfNum) = 1.0;
@@ -713,7 +706,7 @@ namespace HeatBalanceSurfaceManager {
         InitSolarHeatGains(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager);
 
         if (SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0)) {
-            for (NZ = 1; NZ <= NumOfZones; ++NZ) {
+            for (int NZ = 1; NZ <= NumOfZones; ++NZ) {
                 if (ZoneDaylight(NZ).TotalDaylRefPoints > 0) {
                     if (Zone(NZ).HasInterZoneWindow) {
                         DayltgInterReflIllFrIntWins(NZ);
@@ -771,12 +764,14 @@ namespace HeatBalanceSurfaceManager {
                 // Outside surface temp of "normal" windows not needed in Window5 calculation approach
                 // Window layer temperatures are calculated in CalcHeatBalanceInsideSurf
 
-                ConstrNum = surface.Construction;
+                int ConstrNum = surface.Construction;
                 auto const &construct(dataConstruction.Construct(ConstrNum));
                 if (construct.NumCTFTerms > 1) { // COMPUTE CONSTANT PORTION OF CONDUCTIVE FLUXES.
 
-                    QIC = 0.0;
-                    QOC = 0.0;
+                    Real64 QIC = 0.0;
+                    Real64 QOC = 0.0;
+                    Real64 TSC;
+                    Real64 TUC;
                     if (construct.SourceSinkPresent) {
                         TSC = 0.0;
                         TUC = 0.0;
@@ -784,7 +779,7 @@ namespace HeatBalanceSurfaceManager {
                     auto l11(TH.index(1, 2, SurfNum));
                     auto l12(TH.index(2, 2, SurfNum));
                     auto const s3(TH.size3());
-                    for (Term = 1; Term <=
+                    for (int Term = 1; Term <=
                                    construct.NumCTFTerms; ++Term, l11 += s3, l12 += s3) { // [ l11 ] == ( 1, Term + 1, SurfNum ), [ l12 ] == ( 1, Term + 1, SurfNum )
 
                         // Sign convention for the various terms in the following two equations
@@ -2386,6 +2381,7 @@ namespace HeatBalanceSurfaceManager {
         for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            if (firstSurfWin <= 0) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) { // Faster "inline" than calling SurfaceWindow( SurfNum ).InitSolarHeatGains()
                 SurfWinFrameQRadOutAbs(SurfNum) = 0.0;
                 SurfWinFrameQRadInAbs(SurfNum) = 0.0;
@@ -3409,6 +3405,7 @@ namespace HeatBalanceSurfaceManager {
 
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            if (firstSurfWin <= 0) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) { // Window
                 if (!Surface(SurfNum).HeatTransSurf || zoneNum == 0) continue; // Skip non-heat transfer surfaces
                 if (Surface(SurfNum).Class == SurfaceClass_TDD_Dome) continue; // Skip tubular daylighting device domes
@@ -3761,6 +3758,7 @@ namespace HeatBalanceSurfaceManager {
                                 Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal; // Movable inside insulation present
                 }
             }
+            if (firstSurfWin <= 0) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 // For window with an interior shade or blind, emissivity is a combination of glass and shade/blind emissivity
                 int ShadeFlag = SurfWinShadingFlag(SurfNum);
