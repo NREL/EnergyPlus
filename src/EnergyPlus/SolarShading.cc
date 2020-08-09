@@ -10395,44 +10395,34 @@ namespace SolarShading {
         // Using/Aliasing
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-        // DERIVED TYPE DEFINITIONS
-        // na
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            if (firstSurfWin <= 0) continue;
+            for (int ISurf = firstSurfWin; ISurf <= lastSurfWin; ++ISurf) {
 
-        int ISurf;           // Surface counter
-        int SchedulePtr;     // Schedule pointer
-        Real64 ScheduleMult; // Multiplier value from schedule
+                SurfWinAirflowThisTS(ISurf) = 0.0;
+                if (SurfWinMaxAirflow(ISurf) == 0.0) continue;
+                if (Surface(ISurf).ExtBoundCond != ExternalEnvironment) continue;
+                {
+                    auto const SELECT_CASE_var(SurfWinAirflowControlType(ISurf));
 
-        for (ISurf = 1; ISurf <= TotSurfaces; ++ISurf) {
+                    if (SELECT_CASE_var == AirFlowWindow_ControlType_MaxFlow) {
+                        SurfWinAirflowThisTS(ISurf) = SurfWinMaxAirflow(ISurf);
 
-            if (Surface(ISurf).Class != SurfaceClass_Window) continue;
+                    } else if (SELECT_CASE_var == AirFlowWindow_ControlType_AlwaysOff) {
+                        SurfWinAirflowThisTS(ISurf) = 0.0;
 
-            SurfWinAirflowThisTS(ISurf) = 0.0;
-            if (SurfWinMaxAirflow(ISurf) == 0.0) continue;
-            if (Surface(ISurf).ExtBoundCond != ExternalEnvironment) continue;
-
-            {
-                auto const SELECT_CASE_var(SurfWinAirflowControlType(ISurf));
-
-                if (SELECT_CASE_var == AirFlowWindow_ControlType_MaxFlow) {
-                    SurfWinAirflowThisTS(ISurf) = SurfWinMaxAirflow(ISurf);
-
-                } else if (SELECT_CASE_var == AirFlowWindow_ControlType_AlwaysOff) {
-                    SurfWinAirflowThisTS(ISurf) = 0.0;
-
-                } else if (SELECT_CASE_var == AirFlowWindow_ControlType_Schedule) {
-                    if (SurfWinAirflowHasSchedule(ISurf)) {
-                        SchedulePtr = SurfWinAirflowSchedulePtr(ISurf);
-                        ScheduleMult = GetCurrentScheduleValue(SchedulePtr);
-                        if (ScheduleMult < 0.0 || ScheduleMult > 1.0) {
-                            ShowFatalError("Airflow schedule has a value outside the range 0.0 to 1.0 for window=" + Surface(ISurf).Name);
+                    } else if (SELECT_CASE_var == AirFlowWindow_ControlType_Schedule) {
+                        if (SurfWinAirflowHasSchedule(ISurf)) {
+                            int SchedulePtr = SurfWinAirflowSchedulePtr(ISurf); // Schedule pointer
+                            Real64 ScheduleMult = GetCurrentScheduleValue(SchedulePtr); // Multiplier value from schedule
+                            if (ScheduleMult < 0.0 || ScheduleMult > 1.0) {
+                                ShowFatalError("Airflow schedule has a value outside the range 0.0 to 1.0 for window=" +
+                                               Surface(ISurf).Name);
+                            }
+                            SurfWinAirflowThisTS(ISurf) = ScheduleMult * SurfWinMaxAirflow(ISurf);
                         }
-                        SurfWinAirflowThisTS(ISurf) = ScheduleMult * SurfWinMaxAirflow(ISurf);
                     }
                 }
             }
@@ -11781,45 +11771,45 @@ namespace SolarShading {
         // REFERENCES: See EnergyPlus engineering documentation
         // USE STATEMENTS: na
 
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS: na
-        // INTERFACE BLOCK SPECIFICATIONS: na
-        // DERIVED TYPE DEFINITIONS: na
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            if (firstSurfWin <= 0) continue;
+            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                if (Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).HasShadeControl) {
+                    int WinShadeCtrlNum = Surface(SurfNum).WindowShadingControlPtr; // Window shading control number
+                    int MatNumSh = 0; // Shade layer material number
+                    Real64 AbsorpEff = 0.0;    // Effective absorptance of isolated shade layer (fraction of
+                    //  of incident radiation remaining after reflected portion is
+                    //  removed that is absorbed
+                    if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade ||
+                        WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade ||
+                        WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
+                        int ConstrNumSh = Surface(SurfNum).ShadedConstruction; // Window construction number with shade
+                        int TotLay = dataConstruction.Construct(ConstrNumSh).TotLayers; // Total layers in a construction
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int WinShadeCtrlNum; // Window shading control number
-        int SurfNum;         // Surface number
-        int ConstrNumSh;     // Window construction number with shade
-        int TotLay;          // Total layers in a construction
-        int MatNumSh;        // Shade layer material number
-        Real64 AbsorpEff;    // Effective absorptance of isolated shade layer (fraction of
-        //  of incident radiation remaining after reflected portion is
-        //  removed that is absorbed
-
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).HasShadeControl) {
-                WinShadeCtrlNum = Surface(SurfNum).WindowShadingControlPtr;
-                if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade ||
-                    WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade ||
-                    WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
-                    ConstrNumSh = Surface(SurfNum).ShadedConstruction;
-                    TotLay = dataConstruction.Construct(ConstrNumSh).TotLayers;
-                    if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade) {
-                        MatNumSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay); // Interior shade
-                    } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade) {
-                        MatNumSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(1); // Exterior shade
-                    } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
-                        if (dataConstruction.Construct(ConstrNumSh).TotGlassLayers == 2) {
-                            MatNumSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(3); // Double pane with between-glass shade
-                        } else {
-                            MatNumSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(5); // Triple pane with between-glass shade
+                        if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade) {
+                            MatNumSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay); // Interior shade
+                        } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade) {
+                            MatNumSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(1); // Exterior shade
+                        } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
+                            if (dataConstruction.Construct(ConstrNumSh).TotGlassLayers == 2) {
+                                // Double pane with between-glass shade
+                                MatNumSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(3);
+                            } else {
+                                // Triple pane with between-glass shade
+                                MatNumSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(5);
+                            }
                         }
+                        AbsorpEff = dataMaterial.Material(MatNumSh).AbsorpSolar /
+                                    (dataMaterial.Material(MatNumSh).AbsorpSolar +
+                                     dataMaterial.Material(MatNumSh).Trans + 0.0001);
+                        AbsorpEff = min(max(AbsorpEff, 0.0001),
+                                        0.999); // Constrain to avoid problems with following log eval
+                        SurfWinShadeAbsFacFace1(SurfNum) = (1.0 - std::exp(0.5 * std::log(1.0 - AbsorpEff))) / AbsorpEff;
+                        SurfWinShadeAbsFacFace2(SurfNum) = 1.0 - SurfWinShadeAbsFacFace1(SurfNum);
                     }
-                    AbsorpEff = dataMaterial.Material(MatNumSh).AbsorpSolar / (dataMaterial.Material(MatNumSh).AbsorpSolar + dataMaterial.Material(MatNumSh).Trans + 0.0001);
-                    AbsorpEff = min(max(AbsorpEff, 0.0001), 0.999); // Constrain to avoid problems with following log eval
-                    SurfWinShadeAbsFacFace1(SurfNum) = (1.0 - std::exp(0.5 * std::log(1.0 - AbsorpEff))) / AbsorpEff;
-                    SurfWinShadeAbsFacFace2(SurfNum) = 1.0 - SurfWinShadeAbsFacFace1(SurfNum);
                 }
             }
         }

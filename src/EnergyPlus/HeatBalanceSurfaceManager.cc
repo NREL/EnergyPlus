@@ -3741,8 +3741,7 @@ namespace HeatBalanceSurfaceManager {
         for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
             int const firstSurf = Zone(zoneNum).SurfaceFirst;
             int const lastSurf = Zone(zoneNum).SurfaceLast;
-            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
-            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            if (firstSurf <= 0) continue;
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
 
                 if (!Surface(SurfNum).HeatTransSurf) continue;
@@ -3758,6 +3757,8 @@ namespace HeatBalanceSurfaceManager {
                                 Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal; // Movable inside insulation present
                 }
             }
+            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
             if (firstSurfWin <= 0) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 // For window with an interior shade or blind, emissivity is a combination of glass and shade/blind emissivity
