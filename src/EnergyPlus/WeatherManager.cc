@@ -10738,9 +10738,9 @@ namespace WeatherManager {
         
         if (IRHoriz <= 0.0) IRHoriz = 9999.0;
 
-        ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
         if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
             // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
+            ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
             TmrHorizIRSky = ESky * Sigma * pow_4(DryBulb + TKelvin);
             TmrSkyTemp = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;        
         } 
