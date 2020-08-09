@@ -1879,13 +1879,13 @@ namespace OutputReportPredefined {
         pdstDXCoolCoil2 = newPreDefSubTable(pdrEquip, "DX Cooling Coil ASHRAE 127 Standard Ratings Report");
         pdchDXCoolCoilType = newPreDefColumn(pdstDXCoolCoil2, "DX Cooling Coil Type");
         pdchDXCoolCoilNetCapSIA = newPreDefColumn(pdstDXCoolCoil2, "Rated Net Cooling Capacity Test A [W]");
-        pdchDXCoolCoilElecPowerA = newPreDefColumn(pdstDXCoolCoil2, "Rated Electric Power Test A [W]");
+        pdchDXCoolCoilElecPowerA = newPreDefColumn(pdstDXCoolCoil2, "Rated Electricity Power Test A [W]");
         pdchDXCoolCoilNetCapSIB = newPreDefColumn(pdstDXCoolCoil2, "Rated Net Cooling Capacity Test B [W]");
-        pdchDXCoolCoilElecPowerB = newPreDefColumn(pdstDXCoolCoil2, "Rated Electric Power Test B [W]");
+        pdchDXCoolCoilElecPowerB = newPreDefColumn(pdstDXCoolCoil2, "Rated Electricity Power Test B [W]");
         pdchDXCoolCoilNetCapSIC = newPreDefColumn(pdstDXCoolCoil2, "Rated Net Cooling Capacity Test C [W]");
-        pdchDXCoolCoilElecPowerC = newPreDefColumn(pdstDXCoolCoil2, "Rated Electric Power Test C [W]");
+        pdchDXCoolCoilElecPowerC = newPreDefColumn(pdstDXCoolCoil2, "Rated Electricity Power Test C [W]");
         pdchDXCoolCoilNetCapSID = newPreDefColumn(pdstDXCoolCoil2, "Rated Net Cooling Capacity Test D [W]");
-        pdchDXCoolCoilElecPowerD = newPreDefColumn(pdstDXCoolCoil2, "Rated Electric Power Test D [W]");
+        pdchDXCoolCoilElecPowerD = newPreDefColumn(pdstDXCoolCoil2, "Rated Electricity Power Test D [W]");
 
         pdstDXHeatCoil = newPreDefSubTable(pdrEquip, "DX Heating Coils");
         pdchDXHeatCoilType = newPreDefColumn(pdstDXHeatCoil, "DX Heating Coil Type");
@@ -1907,7 +1907,7 @@ namespace OutputReportPredefined {
         pdchFanTotEff = newPreDefColumn(pdstFan, "Total Efficiency [W/W]");
         pdchFanDeltaP = newPreDefColumn(pdstFan, "Delta Pressure [pa]");
         pdchFanVolFlow = newPreDefColumn(pdstFan, "Max Air Flow Rate [m3/s]");
-        pdchFanPwr = newPreDefColumn(pdstFan, "Rated Electric Power [W]");
+        pdchFanPwr = newPreDefColumn(pdstFan, "Rated Electricity Power [W]");
         pdchFanPwrPerFlow = newPreDefColumn(pdstFan, "Rated Power Per Max Air Flow Rate [W-s/m3]");
         pdchFanMotorIn = newPreDefColumn(pdstFan, "Motor Heat In Air Fraction");
         pdchFanEnergyIndex = newPreDefColumn(pdstFan, "Fan Energy Index");
@@ -1920,7 +1920,7 @@ namespace OutputReportPredefined {
         pdchPumpControl = newPreDefColumn(pdstPump, "Control");
         pdchPumpHead = newPreDefColumn(pdstPump, "Head [pa]");
         pdchPumpFlow = newPreDefColumn(pdstPump, "Water Flow [m3/s]");
-        pdchPumpPower = newPreDefColumn(pdstPump, "Electric Power [W]");
+        pdchPumpPower = newPreDefColumn(pdstPump, "Electricity Power [W]");
         pdchPumpPwrPerFlow = newPreDefColumn(pdstPump, "Power Per Water Flow Rate [W-s/m3]");
         pdchMotEff = newPreDefColumn(pdstPump, "Motor Efficiency [W/W]");
         pdchPumpEndUse = newPreDefColumn(pdstPump, "End Use Subcategory");
@@ -2259,11 +2259,11 @@ namespace OutputReportPredefined {
         pdchEMelecmaxvaluetime = newPreDefColumn(pdstEMelecvalues, "Timestamp of Maximum {TIMESTAMP}");
 
         // Gas Sub Table
-        pdstEMgasvalues = newPreDefSubTable(pdrEnergyMeters, "Annual and Peak Values - Gas");
-        pdchEMgasannual = newPreDefColumn(pdstEMgasvalues, "Gas Annual Value [GJ]");
-        pdchEMgasminvalue = newPreDefColumn(pdstEMgasvalues, "Gas Minimum Value [W]");
+        pdstEMgasvalues = newPreDefSubTable(pdrEnergyMeters, "Annual and Peak Values - Natural Gas");
+        pdchEMgasannual = newPreDefColumn(pdstEMgasvalues, "Natural Gas Annual Value [GJ]");
+        pdchEMgasminvalue = newPreDefColumn(pdstEMgasvalues, "Natural Gas Minimum Value [W]");
         pdchEMgasminvaluetime = newPreDefColumn(pdstEMgasvalues, "Timestamp of Minimum {TIMESTAMP}");
-        pdchEMgasmaxvalue = newPreDefColumn(pdstEMgasvalues, "Gas Maximum Value [W]");
+        pdchEMgasmaxvalue = newPreDefColumn(pdstEMgasvalues, "Natural Gas Maximum Value [W]");
         pdchEMgasmaxvaluetime = newPreDefColumn(pdstEMgasvalues, "Timestamp of Maximum {TIMESTAMP}");
 
         // Cool SubTable
@@ -2554,8 +2554,8 @@ namespace OutputReportPredefined {
         //     Industrial Process
         //     Elevators and Escalators
         //     Total
-        pdchLeedPerfElEneUse = newPreDefColumn(pdstLeedPerf, "Electric Energy Use [GJ]");
-        pdchLeedPerfElDem = newPreDefColumn(pdstLeedPerf, "Electric Demand [W]");
+        pdchLeedPerfElEneUse = newPreDefColumn(pdstLeedPerf, "Electricity Energy Use [GJ]");
+        pdchLeedPerfElDem = newPreDefColumn(pdstLeedPerf, "Electricity Demand [W]");
         pdchLeedPerfGasEneUse = newPreDefColumn(pdstLeedPerf, "Natural Gas Energy Use [GJ]");
         pdchLeedPerfGasDem = newPreDefColumn(pdstLeedPerf, "Natural Gas Demand [W]");
         pdchLeedPerfGasolineEneUse = newPreDefColumn(pdstLeedPerf, "Gasoline Use [GJ]");
