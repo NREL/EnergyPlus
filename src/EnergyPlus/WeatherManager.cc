@@ -3519,9 +3519,6 @@ namespace WeatherManager {
                                  DewPoint,
                                  RelHum,
                                  IRHoriz); 
-                    if (Environment(Envrn).SkyTempModel <= 3 && Environment(Envrn).SkyTempModel != 0) {
-                        TomorrowSkyTemp(CurTimeStep, Hour) = 0.0; // dealt with later
-                    }
 
                     if (ETHoriz >= 9999.0) ETHoriz = 0.0;
                     if (ETDirect >= 9999.0) ETDirect = 0.0;
@@ -10732,7 +10729,7 @@ namespace WeatherManager {
         print(ioFiles.eio, "{}", ss.str());
     }
 
-    void calcSky(Real64 &TmrHorizIRSky, Real64 &TmrSkyTemp, Real64 OpaqueSkyCover, Real64 DryBulb, Real64 DewPoint, Real64 RelHum, Real64 IRHoriz)
+    void calcSky(Real64 &HorizIRSky, Real64 &SkyTemp, Real64 OpaqueSkyCover, Real64 DryBulb, Real64 DewPoint, Real64 RelHum, Real64 IRHoriz)
     {
         Real64 ESky;
         
@@ -10741,27 +10738,22 @@ namespace WeatherManager {
         if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
             // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
             ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
-            TmrHorizIRSky = ESky * Sigma * pow_4(DryBulb + TKelvin);
-            TmrSkyTemp = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;        
+            HorizIRSky = ESky * Sigma * pow_4(DryBulb + TKelvin);
+            if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
+                SkyTemp = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
+            } else {
+                SkyTemp = 0.0; // dealt with later
+            }
         } 
         else {
             // Valid IR from weather files
-            TmrHorizIRSky = IRHoriz;
-            TmrSkyTemp = root_4(IRHoriz / Sigma) - TKelvin;
+            HorizIRSky = IRHoriz;
+            if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
+                SkyTemp = root_4(IRHoriz / Sigma) - TKelvin;
+            } else {
+                SkyTemp = 0.0; // dealt with later
+            }
         }
-
-        //if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
-        //    // Calculate sky temperature, use IRHoriz if not missing
-        //    if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
-        //        // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
-        //        TmrSkyTemp = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;  
-        //    } else {
-        //        // Valid IR from weather files
-        //        TmrSkyTemp = root_4(IRHoriz / Sigma) - TKelvin;
-        //    }
-        //} else {
-        //    TmrSkyTemp = 0.0; // dealt with later
-        //}
     }
 
 } // namespace WeatherManager
