@@ -5450,13 +5450,11 @@ namespace HeatBalanceSurfaceManager {
         Real64 HAir;             // "Convection" coefficient from air to surface (radiation)
         Real64 ConstantTempCoef; // Temperature Coefficient as input or modified using sine wave  COP mod
         int RoughSurf;           // Roughness index of the exterior surface
-        int SurfNum;             // Surface number DO loop counter
         int SrdSurfsNum;         // Surrounding surfaces list number
         int SrdSurfNum;          // Surrounding surface number DO loop counter
         Real64 SrdSurfTempAbs;   // Absolute temperature of a surrounding surface
         Real64 SrdSurfViewFac;   // View factor of a surrounding surface
         Real64 TempExt;          // Exterior temperature boundary condition
-        int ZoneNum;             // Zone number the current surface is attached to
         int OPtr;
         Real64 RhoVaporSat;     // Local temporary saturated vapor density for checking
         bool MovInsulErrorFlag; // Movable Insulation error flag
@@ -5469,7 +5467,7 @@ namespace HeatBalanceSurfaceManager {
         MovInsulErrorFlag = false;
 
         if (AnyConstructInternalSourceInInput) {
-            for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 // Need to transfer any source/sink for a surface to the local array.  Note that
                 // the local array is flux (W/m2) while the QRadSysSource is heat transfer (W).
                 // This must be done at this location so that this is always updated correctly.
@@ -5487,380 +5485,444 @@ namespace HeatBalanceSurfaceManager {
         } else {
             CalcInteriorRadExchange(TH(2, 1, _), 0, NetLWRadToSurf, _, Outside);
         }
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {// Loop through all surfaces...
+            int const firstSurfOpaque = Zone(zoneNum).NonWindowSurfaceFirst;
+            int const lastSurfOpaque = Zone(zoneNum).NonWindowSurfaceLast;
+            if (firstSurfOpaque <= 0) continue;
+            for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
+                // Loop through all surfaces...
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces...
-
-            ZoneNum = Surface(SurfNum).Zone;
-
-            if (present(ZoneToResimulate)) {
-                if ((ZoneNum != ZoneToResimulate) && (AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
-                    continue; // skip surfaces that are not associated with this zone
+                if (present(ZoneToResimulate)) {
+                    if ((zoneNum != ZoneToResimulate) && (AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
+                        continue; // skip surfaces that are not associated with this zone
+                    }
                 }
-            }
 
-            if (!Surface(SurfNum).HeatTransSurf || ZoneNum == 0) continue; // Skip non-heat transfer surfaces
+                if (!Surface(SurfNum).HeatTransSurf || zoneNum == 0) continue; // Skip non-heat transfer surfaces
 
-            if (Surface(SurfNum).Class == SurfaceClass_Window) continue;
-            // Interior windows in partitions use "normal" heat balance calculations
-            // For rest, Outside surface temp of windows not needed in Window5 calculation approach.
-            // Window layer temperatures are calculated in CalcHeatBalanceInsideSurf
+                if (Surface(SurfNum).Class == SurfaceClass_Window) continue;
+                // Interior windows in partitions use "normal" heat balance calculations
+                // For rest, Outside surface temp of windows not needed in Window5 calculation approach.
+                // Window layer temperatures are calculated in CalcHeatBalanceInsideSurf
 
-            // Initializations for this surface
-            ConstrNum = Surface(SurfNum).Construction;
-            HMovInsul = 0.0;
-            HSky = 0.0;
-            HGround = 0.0;
-            HAir = 0.0;
-            HcExtSurf(SurfNum) = 0.0;
-            HAirExtSurf(SurfNum) = 0.0;
-            HSkyExtSurf(SurfNum) = 0.0;
-            HGrdExtSurf(SurfNum) = 0.0;
-            QRadLWOutSrdSurfs(SurfNum) = 0.0;
+                // Initializations for this surface
+                ConstrNum = Surface(SurfNum).Construction;
+                HMovInsul = 0.0;
+                HSky = 0.0;
+                HGround = 0.0;
+                HAir = 0.0;
+                HcExtSurf(SurfNum) = 0.0;
+                HAirExtSurf(SurfNum) = 0.0;
+                HSkyExtSurf(SurfNum) = 0.0;
+                HGrdExtSurf(SurfNum) = 0.0;
+                QRadLWOutSrdSurfs(SurfNum) = 0.0;
 
-            // Calculate heat extract due to additional heat flux source term as the surface boundary condition
+                // Calculate heat extract due to additional heat flux source term as the surface boundary condition
 
-            if (Surface(SurfNum).OutsideHeatSourceTermSchedule) {
-                QAdditionalHeatSourceOutside(SurfNum) =
-                    EnergyPlus::ScheduleManager::GetCurrentScheduleValue(Surface(SurfNum).OutsideHeatSourceTermSchedule);
-            }
+                if (Surface(SurfNum).OutsideHeatSourceTermSchedule) {
+                    QAdditionalHeatSourceOutside(SurfNum) = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(
+                            Surface(SurfNum).OutsideHeatSourceTermSchedule);
+                }
 
-            // Calculate the current outside surface temperature TH(SurfNum,1,1) for the
-            // various different boundary conditions
-            {
-                auto const SELECT_CASE_var(Surface(SurfNum).ExtBoundCond);
+                // Calculate the current outside surface temperature TH(SurfNum,1,1) for the
+                // various different boundary conditions
+                {
+                    auto const SELECT_CASE_var(Surface(SurfNum).ExtBoundCond);
 
-                if (SELECT_CASE_var == Ground) { // Surface in contact with ground
+                    if (SELECT_CASE_var == Ground) { // Surface in contact with ground
 
-                    TH(1, 1, SurfNum) = GroundTemp;
+                        TH(1, 1, SurfNum) = GroundTemp;
 
-                    // Set the only radiant system heat balance coefficient that is non-zero for this case
-                    if (dataConstruction.Construct(ConstrNum).SourceSinkPresent) RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
+                        // Set the only radiant system heat balance coefficient that is non-zero for this case
+                        if (dataConstruction.Construct(ConstrNum).SourceSinkPresent)
+                            RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
 
-                    // start HAMT
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
-                        // Set variables used in the HAMT moisture balance
-                        TempOutsideAirFD(SurfNum) = GroundTemp;
-                        RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(GroundTemp, 1.0, HBSurfManGroundHAMT);
-                        HConvExtFD(SurfNum) = HighHConvLimit;
+                        // start HAMT
+                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                            // Set variables used in the HAMT moisture balance
+                            TempOutsideAirFD(SurfNum) = GroundTemp;
+                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(GroundTemp, 1.0, HBSurfManGroundHAMT);
+                            HConvExtFD(SurfNum) = HighHConvLimit;
 
-                        HMassConvExtFD(SurfNum) =
-                            HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTemp, PsyWFnTdbRhPb(GroundTemp, 1.0, OutBaroPress, RoutineNameGroundTemp)) +
-                              RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnW(OutHumRat));
+                            HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
+                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTemp,
+                                                                          PsyWFnTdbRhPb(GroundTemp, 1.0, OutBaroPress,
+                                                                                        RoutineNameGroundTemp)) +
+                                                        RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
 
-                        HSkyFD(SurfNum) = HSky;
-                        HGrndFD(SurfNum) = HGround;
-                        HAirFD(SurfNum) = HAir;
-                    }
-                    // end HAMT
+                            HSkyFD(SurfNum) = HSky;
+                            HGrndFD(SurfNum) = HGround;
+                            HAirFD(SurfNum) = HAir;
+                        }
+                        // end HAMT
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
-                        // Set variables used in the FD moisture balance
-                        TempOutsideAirFD(SurfNum) = GroundTemp;
-                        RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(GroundTemp, 1.0);
-                        HConvExtFD(SurfNum) = HighHConvLimit;
-                        HMassConvExtFD(SurfNum) =
-                            HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTemp, PsyWFnTdbRhPb(GroundTemp, 1.0, OutBaroPress, RoutineNameGroundTemp)) +
-                              RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnW(OutHumRat));
-                        HSkyFD(SurfNum) = HSky;
-                        HGrndFD(SurfNum) = HGround;
-                        HAirFD(SurfNum) = HAir;
-                    }
-
-                    // Added for FCfactor grounds
-                } else if (SELECT_CASE_var == GroundFCfactorMethod) { // Surface in contact with ground
-
-                    TH(1, 1, SurfNum) = GroundTempFC;
-
-                    // Set the only radiant system heat balance coefficient that is non-zero for this case
-                    if (dataConstruction.Construct(ConstrNum).SourceSinkPresent) RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
-
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
-                        // Set variables used in the HAMT moisture balance
-                        TempOutsideAirFD(SurfNum) = GroundTempFC;
-                        RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(GroundTempFC, 1.0, HBSurfManGroundHAMT);
-                        HConvExtFD(SurfNum) = HighHConvLimit;
-
-                        HMassConvExtFD(SurfNum) =
-                            HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTempFC, PsyWFnTdbRhPb(GroundTempFC, 1.0, OutBaroPress, RoutineNameGroundTempFC)) +
-                              RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnW(OutHumRat));
-
-                        HSkyFD(SurfNum) = HSky;
-                        HGrndFD(SurfNum) = HGround;
-                        HAirFD(SurfNum) = HAir;
-                    }
-
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
-                        // Set variables used in the FD moisture balance
-                        TempOutsideAirFD(SurfNum) = GroundTempFC;
-                        RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(GroundTempFC, 1.0);
-                        HConvExtFD(SurfNum) = HighHConvLimit;
-                        HMassConvExtFD(SurfNum) =
-                            HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTempFC, PsyWFnTdbRhPb(GroundTempFC, 1.0, OutBaroPress, RoutineNameGroundTempFC)) +
-                              RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnW(OutHumRat));
-                        HSkyFD(SurfNum) = HSky;
-                        HGrndFD(SurfNum) = HGround;
-                        HAirFD(SurfNum) = HAir;
-                    }
-
-                } else if (SELECT_CASE_var == OtherSideCoefNoCalcExt) {
-                    // Use Other Side Coefficients to determine the surface film coefficient and
-                    // the exterior boundary condition temperature
-
-                    OPtr = Surface(SurfNum).OSCPtr;
-                    // Set surface temp from previous timestep
-                    if (BeginTimeStepFlag) {
-                        OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
-                    }
-
-                    if (OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
-                        OSC(OPtr).ConstTemp = GetCurrentScheduleValue(OSC(OPtr).ConstTempScheduleIndex);
-                    }
-
-                    //  Allow for modification of TemperatureCoefficient with unitary sine wave.
-                    if (OSC(OPtr).SinusoidalConstTempCoef) { // Sine wave C4
-                        ConstantTempCoef = std::sin(2 * Pi * CurrentTime / OSC(OPtr).SinusoidPeriod);
-                    } else {
-                        ConstantTempCoef = OSC(OPtr).ConstTempCoef;
-                    }
-
-                    OSC(OPtr).OSCTempCalc = (OSC(OPtr).ZoneAirTempCoef * MAT(ZoneNum) + OSC(OPtr).ExtDryBulbCoef * Surface(SurfNum).OutDryBulbTemp +
-                                             ConstantTempCoef * OSC(OPtr).ConstTemp + OSC(OPtr).GroundTempCoef * GroundTemp +
-                                             OSC(OPtr).WindSpeedCoef * Surface(SurfNum).WindSpeed * Surface(SurfNum).OutDryBulbTemp +
-                                             OSC(OPtr).TPreviousCoef * OSC(OPtr).TOutsideSurfPast);
-
-                    // Enforce max/min limits if applicable
-                    if (OSC(OPtr).MinLimitPresent) OSC(OPtr).OSCTempCalc = max(OSC(OPtr).MinTempLimit, OSC(OPtr).OSCTempCalc);
-                    if (OSC(OPtr).MaxLimitPresent) OSC(OPtr).OSCTempCalc = min(OSC(OPtr).MaxTempLimit, OSC(OPtr).OSCTempCalc);
-
-                    TH(1, 1, SurfNum) = OSC(OPtr).OSCTempCalc;
-
-                    // Set the only radiant system heat balance coefficient that is non-zero for this case
-                    if (dataConstruction.Construct(ConstrNum).SourceSinkPresent) RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
-
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                        Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
-                        // Set variables used in the FD moisture balance and HAMT
-                        TempOutsideAirFD(SurfNum) = TH(1, 1, SurfNum);
-                        RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), OutHumRat, OutBaroPress);
-                        HConvExtFD(SurfNum) = HighHConvLimit;
-                        HMassConvExtFD(SurfNum) =
-                            HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(OutBaroPress,
-                                                TempOutsideAirFD(SurfNum),
-                                                PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameOtherSideCoefNoCalcExt)) +
-                              RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnW(OutHumRat));
-                        HSkyFD(SurfNum) = HSky;
-                        HGrndFD(SurfNum) = HGround;
-                        HAirFD(SurfNum) = HAir;
-                    }
-
-                    // This ends the calculations for this surface and goes on to the next SurfNum
-
-                } else if (SELECT_CASE_var == OtherSideCoefCalcExt) { // A surface with other side coefficients that define the outside environment
-
-                    // First, set up the outside convection coefficient and the exterior temperature
-                    // boundary condition for the surface
-                    OPtr = Surface(SurfNum).OSCPtr;
-                    // Set surface temp from previous timestep
-                    if (BeginTimeStepFlag) {
-                        OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
-                    }
-
-                    if (OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
-                        OSC(OPtr).ConstTemp = GetCurrentScheduleValue(OSC(OPtr).ConstTempScheduleIndex);
-                    }
-
-                    HcExtSurf(SurfNum) = OSC(OPtr).SurfFilmCoef;
-
-                    OSC(OPtr).OSCTempCalc = (OSC(OPtr).ZoneAirTempCoef * MAT(ZoneNum) + OSC(OPtr).ExtDryBulbCoef * Surface(SurfNum).OutDryBulbTemp +
-                                             OSC(OPtr).ConstTempCoef * OSC(OPtr).ConstTemp + OSC(OPtr).GroundTempCoef * GroundTemp +
-                                             OSC(OPtr).WindSpeedCoef * Surface(SurfNum).WindSpeed * Surface(SurfNum).OutDryBulbTemp +
-                                             OSC(OPtr).TPreviousCoef * OSC(OPtr).TOutsideSurfPast);
-
-                    // Enforce max/min limits if applicable
-                    if (OSC(OPtr).MinLimitPresent) OSC(OPtr).OSCTempCalc = max(OSC(OPtr).MinTempLimit, OSC(OPtr).OSCTempCalc);
-                    if (OSC(OPtr).MaxLimitPresent) OSC(OPtr).OSCTempCalc = min(OSC(OPtr).MaxTempLimit, OSC(OPtr).OSCTempCalc);
-
-                    TempExt = OSC(OPtr).OSCTempCalc;
-
-                    // Set the only radiant system heat balance coefficient that is non-zero for this case
-                    if (dataConstruction.Construct(ConstrNum).SourceSinkPresent) RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
-
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                        Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
-                        // Set variables used in the FD moisture balance and HAMT
-                        TempOutsideAirFD(SurfNum) = TempExt;
-                        RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), OutHumRat, OutBaroPress);
-                        HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
-                        HMassConvExtFD(SurfNum) =
-                            HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(OutBaroPress,
-                                                TempOutsideAirFD(SurfNum),
-                                                PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameOtherSideCoefCalcExt)) +
-                              RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnW(OutHumRat));
-                        HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
-                        HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
-                        HAirFD(SurfNum) = HAirExtSurf(SurfNum);
-                    }
-
-                    // Call the outside surface temp calculation and pass the necessary terms
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
-                        Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
-                        CalcOutsideSurfTemp(SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
-                        if (MovInsulErrorFlag) ShowFatalError("CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
-                    }
-
-                    // This ends the calculations for this surface and goes on to the next SurfNum
-
-                } else if (SELECT_CASE_var ==
-                           OtherSideCondModeledExt) { // A surface with other side conditions determined from seperate, dynamic component
-                    //                               modeling that defines the "outside environment"
-
-                    // First, set up the outside convection coefficient and the exterior temperature
-                    // boundary condition for the surface
-                    OPtr = Surface(SurfNum).OSCMPtr;
-                    // EMS overrides
-                    if (OSCM(OPtr).EMSOverrideOnTConv) OSCM(OPtr).TConv = OSCM(OPtr).EMSOverrideTConvValue;
-                    if (OSCM(OPtr).EMSOverrideOnHConv) OSCM(OPtr).HConv = OSCM(OPtr).EMSOverrideHConvValue;
-                    if (OSCM(OPtr).EMSOverrideOnTRad) OSCM(OPtr).TRad = OSCM(OPtr).EMSOverrideTRadValue;
-                    if (OSCM(OPtr).EMSOverrideOnHrad) OSCM(OPtr).HRad = OSCM(OPtr).EMSOverrideHradValue;
-                    HcExtSurf(SurfNum) = OSCM(OPtr).HConv;
-
-                    TempExt = OSCM(OPtr).TConv;
-
-                    // Set the only radiant system heat balance coefficient that is non-zero for this case
-                    if (dataConstruction.Construct(ConstrNum).SourceSinkPresent) RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
-
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                        Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
-                        // Set variables used in the FD moisture balance and HAMT
-                        TempOutsideAirFD(SurfNum) = TempExt;
-                        RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), OutHumRat, OutBaroPress);
-                        HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
-                        HMassConvExtFD(SurfNum) =
-                            HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(OutBaroPress,
-                                                                      TempOutsideAirFD(SurfNum),
-                                                                      PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameOSCM)) +
-                                                    RhoVaporAirOut(SurfNum)) *
-                                                   PsyCpAirFnW(OutHumRat));
-                        HSkyFD(SurfNum) = OSCM(OPtr).HRad; // CR 8046, use sky term for surface to baffle IR
-                        HGrndFD(SurfNum) = 0.0;            // CR 8046, null out and use only sky term for surface to baffle IR
-                        HAirFD(SurfNum) = 0.0;             // CR 8046, null out and use only sky term for surface to baffle IR
-                    }
-
-                    // Call the outside surface temp calculation and pass the necessary terms
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
-                        Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
-
-                        if (Surface(SurfNum).ExtCavityPresent) {
-                            CalcExteriorVentedCavity(dataConvectionCoefficients, ioFiles, SurfNum);
+                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+                            // Set variables used in the FD moisture balance
+                            TempOutsideAirFD(SurfNum) = GroundTemp;
+                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(GroundTemp, 1.0);
+                            HConvExtFD(SurfNum) = HighHConvLimit;
+                            HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
+                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTemp,
+                                                                          PsyWFnTdbRhPb(GroundTemp, 1.0, OutBaroPress,
+                                                                                        RoutineNameGroundTemp)) +
+                                                        RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
+                            HSkyFD(SurfNum) = HSky;
+                            HGrndFD(SurfNum) = HGround;
+                            HAirFD(SurfNum) = HAir;
                         }
 
-                        CalcOutsideSurfTemp(SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
-                        if (MovInsulErrorFlag) ShowFatalError("CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
+                        // Added for FCfactor grounds
+                    } else if (SELECT_CASE_var == GroundFCfactorMethod) { // Surface in contact with ground
 
-                    } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                               Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
-                        if (Surface(SurfNum).ExtCavityPresent) {
-                            CalcExteriorVentedCavity(dataConvectionCoefficients, ioFiles, SurfNum);
+                        TH(1, 1, SurfNum) = GroundTempFC;
+
+                        // Set the only radiant system heat balance coefficient that is non-zero for this case
+                        if (dataConstruction.Construct(ConstrNum).SourceSinkPresent)
+                            RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
+
+                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                            // Set variables used in the HAMT moisture balance
+                            TempOutsideAirFD(SurfNum) = GroundTempFC;
+                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(GroundTempFC, 1.0, HBSurfManGroundHAMT);
+                            HConvExtFD(SurfNum) = HighHConvLimit;
+
+                            HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
+                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTempFC,
+                                                                          PsyWFnTdbRhPb(GroundTempFC, 1.0, OutBaroPress,
+                                                                                        RoutineNameGroundTempFC)) +
+                                                        RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
+
+                            HSkyFD(SurfNum) = HSky;
+                            HGrndFD(SurfNum) = HGround;
+                            HAirFD(SurfNum) = HAir;
                         }
-                    }
 
-                    // This ends the calculations for this surface and goes on to the next SurfNum
-                } else if (SELECT_CASE_var == ExternalEnvironment) {
+                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+                            // Set variables used in the FD moisture balance
+                            TempOutsideAirFD(SurfNum) = GroundTempFC;
+                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(GroundTempFC, 1.0);
+                            HConvExtFD(SurfNum) = HighHConvLimit;
+                            HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
+                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTempFC,
+                                                                          PsyWFnTdbRhPb(GroundTempFC, 1.0, OutBaroPress,
+                                                                                        RoutineNameGroundTempFC)) +
+                                                        RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
+                            HSkyFD(SurfNum) = HSky;
+                            HGrndFD(SurfNum) = HGround;
+                            HAirFD(SurfNum) = HAir;
+                        }
 
-                    // checking the EcoRoof presented in the external environment
-                    // recompute each load by calling ecoroof
+                    } else if (SELECT_CASE_var == OtherSideCoefNoCalcExt) {
+                        // Use Other Side Coefficients to determine the surface film coefficient and
+                        // the exterior boundary condition temperature
 
-                    if (Surface(SurfNum).ExtEcoRoof) {
-                        CalcEcoRoof(dataConvectionCoefficients, ioFiles, SurfNum, ZoneNum, ConstrNum, TempExt);
-                        continue;
-                    }
+                        OPtr = Surface(SurfNum).OSCPtr;
+                        // Set surface temp from previous timestep
+                        if (BeginTimeStepFlag) {
+                            OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
+                        }
 
-                    if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
-                    RoughSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Roughness;
-                    AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+                        if (OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
+                            OSC(OPtr).ConstTemp = GetCurrentScheduleValue(OSC(OPtr).ConstTempScheduleIndex);
+                        }
 
-                    // Check for outside movable insulation
-                    if (Surface(SurfNum).MaterialMovInsulExt > 0) {
-                        EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughSurf, AbsThermSurf);
-                        if (HMovInsul > 0)
-                            AbsThermSurf = dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).AbsorpThermal; // Movable outside insulation present
-                    }
+                        //  Allow for modification of TemperatureCoefficient with unitary sine wave.
+                        if (OSC(OPtr).SinusoidalConstTempCoef) { // Sine wave C4
+                            ConstantTempCoef = std::sin(2 * Pi * CurrentTime / OSC(OPtr).SinusoidPeriod);
+                        } else {
+                            ConstantTempCoef = OSC(OPtr).ConstTempCoef;
+                        }
 
-                    // Check for exposure to wind (exterior environment)
-                    if (Surface(SurfNum).ExtWind) {
+                        OSC(OPtr).OSCTempCalc = (OSC(OPtr).ZoneAirTempCoef * MAT(zoneNum) +
+                                                 OSC(OPtr).ExtDryBulbCoef * Surface(SurfNum).OutDryBulbTemp +
+                                                 ConstantTempCoef * OSC(OPtr).ConstTemp +
+                                                 OSC(OPtr).GroundTempCoef * GroundTemp +
+                                                 OSC(OPtr).WindSpeedCoef * Surface(SurfNum).WindSpeed *
+                                                 Surface(SurfNum).OutDryBulbTemp +
+                                                 OSC(OPtr).TPreviousCoef * OSC(OPtr).TOutsideSurfPast);
 
-                        // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in subroutine)
-                        InitExteriorConvectionCoeff(dataConvectionCoefficients,
-                                                    ioFiles,
-                                                    SurfNum,
-                                                    HMovInsul,
-                                                    RoughSurf,
-                                                    AbsThermSurf,
-                                                    TH(1, 1, SurfNum),
-                                                    HcExtSurf(SurfNum),
-                                                    HSkyExtSurf(SurfNum),
-                                                    HGrdExtSurf(SurfNum),
-                                                    HAirExtSurf(SurfNum));
+                        // Enforce max/min limits if applicable
+                        if (OSC(OPtr).MinLimitPresent)
+                            OSC(OPtr).OSCTempCalc = max(OSC(OPtr).MinTempLimit, OSC(OPtr).OSCTempCalc);
+                        if (OSC(OPtr).MaxLimitPresent)
+                            OSC(OPtr).OSCTempCalc = min(OSC(OPtr).MaxTempLimit, OSC(OPtr).OSCTempCalc);
 
-                        if (IsRain) { // Raining: since wind exposed, outside surface gets wet
+                        TH(1, 1, SurfNum) = OSC(OPtr).OSCTempCalc;
 
-                            if (Surface(SurfNum).ExtConvCoeff <= 0) { // Reset HcExtSurf because of wetness
-                                HcExtSurf(SurfNum) = 1000.0;
-                            } else { // User set
-                                HcExtSurf(SurfNum) = SetExtConvectionCoeff(dataConvectionCoefficients, SurfNum);
+                        // Set the only radiant system heat balance coefficient that is non-zero for this case
+                        if (dataConstruction.Construct(ConstrNum).SourceSinkPresent)
+                            RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
+
+                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
+                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                            // Set variables used in the FD moisture balance and HAMT
+                            TempOutsideAirFD(SurfNum) = TH(1, 1, SurfNum);
+                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), OutHumRat,
+                                                                      OutBaroPress);
+                            HConvExtFD(SurfNum) = HighHConvLimit;
+                            HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
+                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                          PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0,
+                                                                                        OutBaroPress,
+                                                                                        RoutineNameOtherSideCoefNoCalcExt)) +
+                                                        RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
+                            HSkyFD(SurfNum) = HSky;
+                            HGrndFD(SurfNum) = HGround;
+                            HAirFD(SurfNum) = HAir;
+                        }
+
+                        // This ends the calculations for this surface and goes on to the next SurfNum
+
+                    } else if (SELECT_CASE_var ==
+                               OtherSideCoefCalcExt) { // A surface with other side coefficients that define the outside environment
+
+                        // First, set up the outside convection coefficient and the exterior temperature
+                        // boundary condition for the surface
+                        OPtr = Surface(SurfNum).OSCPtr;
+                        // Set surface temp from previous timestep
+                        if (BeginTimeStepFlag) {
+                            OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
+                        }
+
+                        if (OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
+                            OSC(OPtr).ConstTemp = GetCurrentScheduleValue(OSC(OPtr).ConstTempScheduleIndex);
+                        }
+
+                        HcExtSurf(SurfNum) = OSC(OPtr).SurfFilmCoef;
+
+                        OSC(OPtr).OSCTempCalc = (OSC(OPtr).ZoneAirTempCoef * MAT(zoneNum) +
+                                                 OSC(OPtr).ExtDryBulbCoef * Surface(SurfNum).OutDryBulbTemp +
+                                                 OSC(OPtr).ConstTempCoef * OSC(OPtr).ConstTemp +
+                                                 OSC(OPtr).GroundTempCoef * GroundTemp +
+                                                 OSC(OPtr).WindSpeedCoef * Surface(SurfNum).WindSpeed *
+                                                 Surface(SurfNum).OutDryBulbTemp +
+                                                 OSC(OPtr).TPreviousCoef * OSC(OPtr).TOutsideSurfPast);
+
+                        // Enforce max/min limits if applicable
+                        if (OSC(OPtr).MinLimitPresent)
+                            OSC(OPtr).OSCTempCalc = max(OSC(OPtr).MinTempLimit, OSC(OPtr).OSCTempCalc);
+                        if (OSC(OPtr).MaxLimitPresent)
+                            OSC(OPtr).OSCTempCalc = min(OSC(OPtr).MaxTempLimit, OSC(OPtr).OSCTempCalc);
+
+                        TempExt = OSC(OPtr).OSCTempCalc;
+
+                        // Set the only radiant system heat balance coefficient that is non-zero for this case
+                        if (dataConstruction.Construct(ConstrNum).SourceSinkPresent)
+                            RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
+
+                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
+                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                            // Set variables used in the FD moisture balance and HAMT
+                            TempOutsideAirFD(SurfNum) = TempExt;
+                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), OutHumRat,
+                                                                      OutBaroPress);
+                            HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
+                            HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
+                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                          PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0,
+                                                                                        OutBaroPress,
+                                                                                        RoutineNameOtherSideCoefCalcExt)) +
+                                                        RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
+                            HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
+                            HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
+                            HAirFD(SurfNum) = HAirExtSurf(SurfNum);
+                        }
+
+                        // Call the outside surface temp calculation and pass the necessary terms
+                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
+                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+                            CalcOutsideSurfTemp(SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
+                            if (MovInsulErrorFlag)
+                                ShowFatalError("CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
+                        }
+
+                        // This ends the calculations for this surface and goes on to the next SurfNum
+
+                    } else if (SELECT_CASE_var ==
+                               OtherSideCondModeledExt) { // A surface with other side conditions determined from seperate, dynamic component
+                        //                               modeling that defines the "outside environment"
+
+                        // First, set up the outside convection coefficient and the exterior temperature
+                        // boundary condition for the surface
+                        OPtr = Surface(SurfNum).OSCMPtr;
+                        // EMS overrides
+                        if (OSCM(OPtr).EMSOverrideOnTConv) OSCM(OPtr).TConv = OSCM(OPtr).EMSOverrideTConvValue;
+                        if (OSCM(OPtr).EMSOverrideOnHConv) OSCM(OPtr).HConv = OSCM(OPtr).EMSOverrideHConvValue;
+                        if (OSCM(OPtr).EMSOverrideOnTRad) OSCM(OPtr).TRad = OSCM(OPtr).EMSOverrideTRadValue;
+                        if (OSCM(OPtr).EMSOverrideOnHrad) OSCM(OPtr).HRad = OSCM(OPtr).EMSOverrideHradValue;
+                        HcExtSurf(SurfNum) = OSCM(OPtr).HConv;
+
+                        TempExt = OSCM(OPtr).TConv;
+
+                        // Set the only radiant system heat balance coefficient that is non-zero for this case
+                        if (dataConstruction.Construct(ConstrNum).SourceSinkPresent)
+                            RadSysToHBConstCoef(SurfNum) = TH(1, 1, SurfNum);
+
+                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
+                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                            // Set variables used in the FD moisture balance and HAMT
+                            TempOutsideAirFD(SurfNum) = TempExt;
+                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), OutHumRat,
+                                                                      OutBaroPress);
+                            HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
+                            HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
+                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                          PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0,
+                                                                                        OutBaroPress,
+                                                                                        RoutineNameOSCM)) +
+                                                        RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
+                            HSkyFD(SurfNum) = OSCM(OPtr).HRad; // CR 8046, use sky term for surface to baffle IR
+                            HGrndFD(SurfNum) = 0.0;            // CR 8046, null out and use only sky term for surface to baffle IR
+                            HAirFD(SurfNum) = 0.0;             // CR 8046, null out and use only sky term for surface to baffle IR
+                        }
+
+                        // Call the outside surface temp calculation and pass the necessary terms
+                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
+                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+
+                            if (Surface(SurfNum).ExtCavityPresent) {
+                                CalcExteriorVentedCavity(dataConvectionCoefficients, ioFiles, SurfNum);
                             }
 
-                            TempExt = Surface(SurfNum).OutWetBulbTemp;
+                            CalcOutsideSurfTemp(SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
+                            if (MovInsulErrorFlag)
+                                ShowFatalError("CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
 
-                            // start HAMT
-                            if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
-                                // Set variables used in the HAMT moisture balance
-                                TempOutsideAirFD(SurfNum) = TempExt;
-                                RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(TempOutsideAirFD(SurfNum), 1.0, HBSurfManRainHAMT);
-                                HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
-                                HMassConvExtFD(SurfNum) =
-                                    HConvExtFD(SurfNum) /
-                                    ((PsyRhoAirFnPbTdbW(OutBaroPress,
-                                                        TempOutsideAirFD(SurfNum),
-                                                        PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf)) +
-                                      RhoVaporAirOut(SurfNum)) *
-                                     PsyCpAirFnW(OutHumRat));
-                                HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
-                                HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
-                                HAirFD(SurfNum) = HAirExtSurf(SurfNum);
+                        } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
+                                   Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                            if (Surface(SurfNum).ExtCavityPresent) {
+                                CalcExteriorVentedCavity(dataConvectionCoefficients, ioFiles, SurfNum);
                             }
-                            // end HAMT
+                        }
 
-                            if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
-                                // Set variables used in the FD moisture balance
-                                TempOutsideAirFD(SurfNum) = TempExt;
-                                RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(TempOutsideAirFD(SurfNum), 1.0);
-                                HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
-                                HMassConvExtFD(SurfNum) =
-                                    HConvExtFD(SurfNum) /
-                                    ((PsyRhoAirFnPbTdbW(OutBaroPress,
-                                                        TempOutsideAirFD(SurfNum),
-                                                        PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf)) +
-                                      RhoVaporAirOut(SurfNum)) *
-                                     PsyCpAirFnW(OutHumRat));
-                                HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
-                                HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
-                                HAirFD(SurfNum) = HAirExtSurf(SurfNum);
+                        // This ends the calculations for this surface and goes on to the next SurfNum
+                    } else if (SELECT_CASE_var == ExternalEnvironment) {
+
+                        // checking the EcoRoof presented in the external environment
+                        // recompute each load by calling ecoroof
+
+                        if (Surface(SurfNum).ExtEcoRoof) {
+                            CalcEcoRoof(dataConvectionCoefficients, ioFiles, SurfNum, zoneNum, ConstrNum, TempExt);
+                            continue;
+                        }
+
+                        if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
+                        RoughSurf = dataMaterial.Material(
+                                dataConstruction.Construct(ConstrNum).LayerPoint(1)).Roughness;
+                        AbsThermSurf = dataMaterial.Material(
+                                dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+
+                        // Check for outside movable insulation
+                        if (Surface(SurfNum).MaterialMovInsulExt > 0) {
+                            EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughSurf, AbsThermSurf);
+                            if (HMovInsul > 0)
+                                AbsThermSurf = dataMaterial.Material(
+                                        Surface(SurfNum).MaterialMovInsulExt).AbsorpThermal; // Movable outside insulation present
+                        }
+
+                        // Check for exposure to wind (exterior environment)
+                        if (Surface(SurfNum).ExtWind) {
+
+                            // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in subroutine)
+                            InitExteriorConvectionCoeff(dataConvectionCoefficients, ioFiles, SurfNum, HMovInsul,
+                                                        RoughSurf, AbsThermSurf, TH(1, 1, SurfNum), HcExtSurf(SurfNum),
+                                                        HSkyExtSurf(SurfNum), HGrdExtSurf(SurfNum),
+                                                        HAirExtSurf(SurfNum));
+
+                            if (IsRain) { // Raining: since wind exposed, outside surface gets wet
+
+                                if (Surface(SurfNum).ExtConvCoeff <= 0) { // Reset HcExtSurf because of wetness
+                                    HcExtSurf(SurfNum) = 1000.0;
+                                } else { // User set
+                                    HcExtSurf(SurfNum) = SetExtConvectionCoeff(dataConvectionCoefficients, SurfNum);
+                                }
+
+                                TempExt = Surface(SurfNum).OutWetBulbTemp;
+
+                                // start HAMT
+                                if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                                    // Set variables used in the HAMT moisture balance
+                                    TempOutsideAirFD(SurfNum) = TempExt;
+                                    RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(TempOutsideAirFD(SurfNum), 1.0,
+                                                                             HBSurfManRainHAMT);
+                                    HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
+                                    HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                                                                        TempOutsideAirFD(
+                                                                                                                SurfNum),
+                                                                                                        PsyWFnTdbRhPb(
+                                                                                                                TempOutsideAirFD(
+                                                                                                                        SurfNum),
+                                                                                                                1.0,
+                                                                                                                OutBaroPress,
+                                                                                                                RoutineNameExtEnvWetSurf)) +
+                                                                                      RhoVaporAirOut(SurfNum)) *
+                                                                                     PsyCpAirFnW(OutHumRat));
+                                    HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
+                                    HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
+                                    HAirFD(SurfNum) = HAirExtSurf(SurfNum);
+                                }
+                                // end HAMT
+
+                                if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+                                    // Set variables used in the FD moisture balance
+                                    TempOutsideAirFD(SurfNum) = TempExt;
+                                    RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(TempOutsideAirFD(SurfNum), 1.0);
+                                    HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
+                                    HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                                                                        TempOutsideAirFD(
+                                                                                                                SurfNum),
+                                                                                                        PsyWFnTdbRhPb(
+                                                                                                                TempOutsideAirFD(
+                                                                                                                        SurfNum),
+                                                                                                                1.0,
+                                                                                                                OutBaroPress,
+                                                                                                                RoutineNameExtEnvWetSurf)) +
+                                                                                      RhoVaporAirOut(SurfNum)) *
+                                                                                     PsyCpAirFnW(OutHumRat));
+                                    HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
+                                    HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
+                                    HAirFD(SurfNum) = HAirExtSurf(SurfNum);
+                                }
+
+                            } else { // Surface is dry, use the normal correlation
+
+                                TempExt = Surface(SurfNum).OutDryBulbTemp;
+
+                                if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
+                                    Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                                    // Set variables used in the FD moisture balance and HAMT
+                                    TempOutsideAirFD(SurfNum) = TempExt;
+                                    RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), OutHumRat,
+                                                                              OutBaroPress);
+                                    HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
+                                    HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                                                                                        TempOutsideAirFD(
+                                                                                                                SurfNum),
+                                                                                                        PsyWFnTdbRhPb(
+                                                                                                                TempOutsideAirFD(
+                                                                                                                        SurfNum),
+                                                                                                                1.0,
+                                                                                                                OutBaroPress,
+                                                                                                                RoutineNameExtEnvDrySurf)) +
+                                                                                      RhoVaporAirOut(SurfNum)) *
+                                                                                     PsyCpAirFnW(OutHumRat));
+                                    //  check for saturation conditions of air
+                                    RhoVaporSat = PsyRhovFnTdbRh(TempOutsideAirFD(SurfNum), 1.0,
+                                                                 HBSurfManDrySurfCondFD);
+                                    if (RhoVaporAirOut(SurfNum) > RhoVaporSat) RhoVaporAirOut(SurfNum) = RhoVaporSat;
+                                    HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
+                                    HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
+                                    HAirFD(SurfNum) = HAirExtSurf(SurfNum);
+                                }
                             }
 
-                        } else { // Surface is dry, use the normal correlation
+                        } else { // No wind
+
+                            // Calculate exterior heat transfer coefficients for windspeed = 0
+                            InitExteriorConvectionCoeff(dataConvectionCoefficients, ioFiles, SurfNum, HMovInsul,
+                                                        RoughSurf, AbsThermSurf, TH(1, 1, SurfNum), HcExtSurf(SurfNum),
+                                                        HSkyExtSurf(SurfNum), HGrdExtSurf(SurfNum),
+                                                        HAirExtSurf(SurfNum));
 
                             TempExt = Surface(SurfNum).OutDryBulbTemp;
 
@@ -5868,160 +5930,119 @@ namespace HeatBalanceSurfaceManager {
                                 Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
                                 // Set variables used in the FD moisture balance and HAMT
                                 TempOutsideAirFD(SurfNum) = TempExt;
-                                RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), OutHumRat, OutBaroPress);
+                                RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), OutHumRat,
+                                                                          OutBaroPress);
                                 HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
-                                HMassConvExtFD(SurfNum) =
-                                    HConvExtFD(SurfNum) /
-                                    ((PsyRhoAirFnPbTdbW(OutBaroPress,
-                                                        TempOutsideAirFD(SurfNum),
-                                                        PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameExtEnvDrySurf)) +
-                                      RhoVaporAirOut(SurfNum)) *
-                                     PsyCpAirFnW(OutHumRat));
-                                //  check for saturation conditions of air
-                                RhoVaporSat = PsyRhovFnTdbRh(TempOutsideAirFD(SurfNum), 1.0, HBSurfManDrySurfCondFD);
-                                if (RhoVaporAirOut(SurfNum) > RhoVaporSat) RhoVaporAirOut(SurfNum) = RhoVaporSat;
+                                HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
+                                                          ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                              PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum),
+                                                                                            1.0, OutBaroPress,
+                                                                                            RoutineNameNoWind)) +
+                                                            RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
                                 HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
                                 HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
                                 HAirFD(SurfNum) = HAirExtSurf(SurfNum);
                             }
                         }
-
-                    } else { // No wind
-
-                        // Calculate exterior heat transfer coefficients for windspeed = 0
-                        InitExteriorConvectionCoeff(dataConvectionCoefficients,
-                                                    ioFiles,
-                                                    SurfNum,
-                                                    HMovInsul,
-                                                    RoughSurf,
-                                                    AbsThermSurf,
-                                                    TH(1, 1, SurfNum),
-                                                    HcExtSurf(SurfNum),
-                                                    HSkyExtSurf(SurfNum),
-                                                    HGrdExtSurf(SurfNum),
-                                                    HAirExtSurf(SurfNum));
-
-                        TempExt = Surface(SurfNum).OutDryBulbTemp;
-
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
-                            // Set variables used in the FD moisture balance and HAMT
-                            TempOutsideAirFD(SurfNum) = TempExt;
-                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), OutHumRat, OutBaroPress);
-                            HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
-                            HMassConvExtFD(SurfNum) =
-                                HConvExtFD(SurfNum) /
-                                ((PsyRhoAirFnPbTdbW(OutBaroPress,
-                                                    TempOutsideAirFD(SurfNum),
-                                                    PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameNoWind)) +
-                                  RhoVaporAirOut(SurfNum)) *
-                                 PsyCpAirFnW(OutHumRat));
-                            HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
-                            HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
-                            HAirFD(SurfNum) = HAirExtSurf(SurfNum);
-                        }
-                    }
-                    // Calculate LWR from surrounding surfaces if defined for an exterior surface
-                    QRadLWOutSrdSurfs(SurfNum) = 0;
-                    if (Surface(SurfNum).HasSurroundingSurfProperties) {
-                        SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
-                        TSurf = TH(1, 1, SurfNum) + KelvinConv;
-                        for (SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
-                            SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            SrdSurfTempAbs =
-                                GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + KelvinConv;
-                            QRadLWOutSrdSurfs(SurfNum) += StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
-                        }
-                    }
-
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
-                        Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
-
-                        CalcOutsideSurfTemp(SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
-                        if (MovInsulErrorFlag) ShowFatalError("CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
-                    }
-
-                } else if (SELECT_CASE_var == KivaFoundation) {
-                    RoughSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Roughness;
-                    AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
-
-                    // Set Kiva exterior convection algorithms
-                    InitExteriorConvectionCoeff(dataConvectionCoefficients,
-                                                ioFiles,
-                                                SurfNum,
-                                                HMovInsul,
-                                                RoughSurf,
-                                                AbsThermSurf,
-                                                TH(1, 1, SurfNum),
-                                                HcExtSurf(SurfNum),
-                                                HSkyExtSurf(SurfNum),
-                                                HGrdExtSurf(SurfNum),
-                                                HAirExtSurf(SurfNum));
-
-                } else { // for interior or other zone surfaces
-
-                    if (Surface(SurfNum).ExtBoundCond == SurfNum) { // Regular partition/internal mass
-
-                        TH(1, 1, SurfNum) = TempSurfIn(SurfNum);
-
-                        // No need to set any radiant system heat balance coefficients here--will be done during inside heat balance
-
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
-                            // Set variables used in the FD moisture balance HAMT
-                            TempOutsideAirFD(SurfNum) = TempSurfIn(SurfNum);
-                            RhoVaporAirOut(SurfNum) = RhoVaporAirIn(SurfNum);
-                            HConvExtFD(SurfNum) = HConvIn(SurfNum);
-                            HMassConvExtFD(SurfNum) =
-                                HConvExtFD(SurfNum) /
-                                ((PsyRhoAirFnPbTdbW(OutBaroPress,
-                                                    TempOutsideAirFD(SurfNum),
-                                                    PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameOther)) +
-                                  RhoVaporAirOut(SurfNum)) *
-                                 PsyCpAirFnW(OutHumRat));
-                            HSkyFD(SurfNum) = 0.0;
-                            HGrndFD(SurfNum) = 0.0;
-                            HAirFD(SurfNum) = 0.0;
+                        // Calculate LWR from surrounding surfaces if defined for an exterior surface
+                        QRadLWOutSrdSurfs(SurfNum) = 0;
+                        if (Surface(SurfNum).HasSurroundingSurfProperties) {
+                            SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
+                            TSurf = TH(1, 1, SurfNum) + KelvinConv;
+                            for (SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(
+                                    SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
+                                SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(
+                                        SrdSurfNum).ViewFactor;
+                                SrdSurfTempAbs = GetCurrentScheduleValue(
+                                        SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
+                                                 KelvinConv;
+                                QRadLWOutSrdSurfs(SurfNum) += StefanBoltzmann * AbsThermSurf * SrdSurfViewFac *
+                                                              (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
+                            }
                         }
 
-                    } else { // Interzone partition
+                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
+                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
 
-                        TH(1, 1, SurfNum) = TH(2, 1, Surface(SurfNum).ExtBoundCond);
-
-                        // No need to set any radiant system heat balance coefficients here--will be done during inside heat balance
-
-                        if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
-                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
-                            // Set variables used in the FD moisture balance and HAMT
-                            TempOutsideAirFD(SurfNum) = TH(2, 1, Surface(SurfNum).ExtBoundCond);
-                            RhoVaporAirOut(SurfNum) = RhoVaporAirIn(Surface(SurfNum).ExtBoundCond);
-                            HConvExtFD(SurfNum) = HConvIn(Surface(SurfNum).ExtBoundCond);
-                            HMassConvExtFD(SurfNum) =
-                                HConvExtFD(SurfNum) /
-                                ((PsyRhoAirFnPbTdbW(OutBaroPress,
-                                                    TempOutsideAirFD(SurfNum),
-                                                    PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameIZPart)) +
-                                  RhoVaporAirOut(SurfNum)) *
-                                 PsyCpAirFnW(OutHumRat));
-                            HSkyFD(SurfNum) = 0.0;
-                            HGrndFD(SurfNum) = 0.0;
-                            HAirFD(SurfNum) = 0.0;
+                            CalcOutsideSurfTemp(SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
+                            if (MovInsulErrorFlag)
+                                ShowFatalError("CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
                         }
-                    }
 
-                    // This ends the calculations for this surface and goes on to the next SurfNum
+                    } else if (SELECT_CASE_var == KivaFoundation) {
+                        RoughSurf = dataMaterial.Material(
+                                dataConstruction.Construct(ConstrNum).LayerPoint(1)).Roughness;
+                        AbsThermSurf = dataMaterial.Material(
+                                dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+
+                        // Set Kiva exterior convection algorithms
+                        InitExteriorConvectionCoeff(dataConvectionCoefficients, ioFiles, SurfNum, HMovInsul, RoughSurf,
+                                                    AbsThermSurf, TH(1, 1, SurfNum), HcExtSurf(SurfNum),
+                                                    HSkyExtSurf(SurfNum), HGrdExtSurf(SurfNum), HAirExtSurf(SurfNum));
+
+                    } else { // for interior or other zone surfaces
+
+                        if (Surface(SurfNum).ExtBoundCond == SurfNum) { // Regular partition/internal mass
+
+                            TH(1, 1, SurfNum) = TempSurfIn(SurfNum);
+
+                            // No need to set any radiant system heat balance coefficients here--will be done during inside heat balance
+
+                            if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
+                                Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                                // Set variables used in the FD moisture balance HAMT
+                                TempOutsideAirFD(SurfNum) = TempSurfIn(SurfNum);
+                                RhoVaporAirOut(SurfNum) = RhoVaporAirIn(SurfNum);
+                                HConvExtFD(SurfNum) = HConvIn(SurfNum);
+                                HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
+                                                          ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                              PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum),
+                                                                                            1.0, OutBaroPress,
+                                                                                            RoutineNameOther)) +
+                                                            RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
+                                HSkyFD(SurfNum) = 0.0;
+                                HGrndFD(SurfNum) = 0.0;
+                                HAirFD(SurfNum) = 0.0;
+                            }
+
+                        } else { // Interzone partition
+
+                            TH(1, 1, SurfNum) = TH(2, 1, Surface(SurfNum).ExtBoundCond);
+
+                            // No need to set any radiant system heat balance coefficients here--will be done during inside heat balance
+
+                            if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
+                                Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+                                // Set variables used in the FD moisture balance and HAMT
+                                TempOutsideAirFD(SurfNum) = TH(2, 1, Surface(SurfNum).ExtBoundCond);
+                                RhoVaporAirOut(SurfNum) = RhoVaporAirIn(Surface(SurfNum).ExtBoundCond);
+                                HConvExtFD(SurfNum) = HConvIn(Surface(SurfNum).ExtBoundCond);
+                                HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
+                                                          ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                              PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum),
+                                                                                            1.0, OutBaroPress,
+                                                                                            RoutineNameIZPart)) +
+                                                            RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
+                                HSkyFD(SurfNum) = 0.0;
+                                HGrndFD(SurfNum) = 0.0;
+                                HAirFD(SurfNum) = 0.0;
+                            }
+                        }
+
+                        // This ends the calculations for this surface and goes on to the next SurfNum
+                    }
                 }
+
+                // fill in reporting values for outside face
+
+                QdotConvOutRepPerArea(SurfNum) = GetQdotConvOutRepPerArea(SurfNum);
+
+                QdotConvOutRep(SurfNum) = QdotConvOutRepPerArea(SurfNum) * Surface(SurfNum).Area;
+
+                QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
+
+                QHeatEmiReport(SurfNum) = QAirExtReport(SurfNum) - QdotConvOutRep(SurfNum);
             }
-
-            // fill in reporting values for outside face
-
-            QdotConvOutRepPerArea(SurfNum) = GetQdotConvOutRepPerArea(SurfNum);
-
-            QdotConvOutRep(SurfNum) = QdotConvOutRepPerArea(SurfNum) * Surface(SurfNum).Area;
-
-            QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
-
-            QHeatEmiReport(SurfNum) = QAirExtReport(SurfNum) - QdotConvOutRep(SurfNum);
 
         } // ...end of DO loop over all surface (actually heat transfer surfaces)
     }
