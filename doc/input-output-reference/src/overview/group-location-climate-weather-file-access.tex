@@ -1055,7 +1055,7 @@ Site:HeightVariation,
 Ground temperatures are used for the ground heat transfer model. There can be only one ground temperature object included, and it is used as the outside surface temperature for all surfaces with Outside Boundary Condition = Ground. The object is options if you have no surfaces with ground contact. The outside surface temperature for individual surfaces can be specified using the OtherSideCoefficients (ref: \hyperref[surfacepropertyothersidecoefficients]{SurfaceProperty:OtherSideCoefficients}) object that allows Toutside to be set with a schedule. This permits using any number of different outside face temperatures in addition to the ground temperature.
 
 \begin{callout}
-Caution: The ``undisturbed'' ground temperatures calculated by the weather converter should not be used in building losses but are appropriate to be used in the \hyperref[sitegroundtemperatureshallow]{Site:GroundTemperature:Shallow} and \hyperref[sitegroundtemperaturedeep]{Site:GroundTemperature:Deep} objects. The reasoning (for building losses) is that these values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this document to calculate custom monthly average ground temperatures (see the Ground Heat Transfer section). This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is 2C less than the average indoor space temperature.
+Caution: The ``undisturbed'' ground temperatures calculated by the weather converter should not be used in building losses but are appropriate to be used in the \hyperref[sitegroundtemperatureshallow]{Site:GroundTemperature:Shallow} and \hyperref[sitegroundtemperaturedeep]{Site:GroundTemperature:Deep} objects. The reasoning (for building losses) is that these values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this document to calculate custom monthly average ground temperatures (see the Ground Heat Transfer section). This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is 2$^\circ$C less than the average indoor space temperature.
 \end{callout}
 
 More information about determining appropriate ground temperatures is given in the Auxiliary Programs document.
@@ -1181,11 +1181,11 @@ The specific heat of dry soil, in J/kg-K.
 
 \subsubsection{Field: Average Annual Ground Surface Temperature}\label{field-average-annual-ground-surface-temperature}
 
-This is the average ground surface temperature throughout the entire year, in °C.
+This is the average ground surface temperature throughout the entire year, in $^\circ$C.
 
 \subsubsection{Field: Average Amplitude of Annual Ground Surface Temperature}\label{field-average-amplitude-of-annual-ground-surface-temperature}
 
-This is the average amplitude of the ground surface temperature, in °C.
+This is the average amplitude of the ground surface temperature, in $^\circ$C.
 
 \subsubsection{Field: Phase Shift of Minimum Surface Temperature}\label{field-phase-shift-of-minimum-surface-temperature}
 
@@ -1379,7 +1379,7 @@ Alpha field indicating whether the domain will update temperatures at each zone 
 
 \paragraph{Field: Geometric Mesh Coefficient}
 
-This numeric field represents the compression of cell distribution A value in this field equal to 1 would result in a uniform distribution, while a value of 2 would provide a highly skewed distribution. Values for this field should be limited from $1.0$ to $2.0$. If this field is omitted, the default value is 1.6.
+This numeric field represents the compression of cell distribution A value in this field equal to 1 would result in a uniform distribution, while a value of 2 would provide a highly skewed distribution. Values for this field should be limited from 1.0 to 2.0. If this field is omitted, the default value is 1.6.
 
 \paragraph{Field: Mesh Density Parameter}
 
@@ -1585,7 +1585,7 @@ Alpha field indicates whether vertical insulation is present. Options include ``
 
 \paragraph{Field: Vertical Insulation Name}\label{field-vertical-insulation-name-1}
 
-This alpha field is the name of a material object representing the vertical basement insulation. It should be noted that the material listed here cannot be a "no mass" material (\hyperref[materialnomass]{Material:NoMass}) that is defined by R-Value only but should be defined as a regular material with an actual thickness. This optional argument is only required if vertical insulation is present.
+This alpha field is the name of a material object representing the vertical basement insulation. It should be noted that the material listed here cannot be a ``no mass'' material (\hyperref[materialnomass]{Material:NoMass}) that is defined by R-Value only but should be defined as a regular material with an actual thickness. This optional argument is only required if vertical insulation is present.
 
 \paragraph{Field: Vertical Insulation Depth}\label{field-vertical-insulation-depth-1}
 
@@ -1732,7 +1732,7 @@ These values can be calculated from annual weather data using the auxillary prog
 
 Alternatively, the Site:WaterMainsTemperature object can read values from a schedule. This is useful for measured data or when water comes from a source other than buried pipes, e.g., a river or lake.
 
-If there is no Site:WaterMainsTemperature object in the input file, a default constant value of 10 C is assumed.
+If there is no Site:WaterMainsTemperature object in the input file, a default constant value of 10$^\circ$C is assumed.
 
 \subsubsection{Inputs}\label{inputs-21-003}
 
@@ -1836,7 +1836,7 @@ RoofIrrigation,
 
 \subsection{Solar and Visible Spectrum Objects}\label{solar-and-visible-spectrum-objects}
 
-The next two objects enable users to enter solar and visible spectrum which is used to calculate the thermal and visual performance of windows if their glazings are defined with full spectral data. EnergyPlus versions 8.0 and older hard-wired the solar and visible spectrum. The solar spectrum assumes air mass 1.5 terrestrial solar global spectral irradiance values (W/m2-micron) on a 37o tilted surface, based on ISO 9845-1 and ASTM E 892; derived from Optics5 data file ISO-9845GlobalNorm.std, 10-14-99. The visible/photopic spectrum is based on CIE 1931 observer; ISO/CIE 10527, CIE Standard Calorimetric Observers; derived from Optics5 data file ``CIE 1931 Color Match from E308.txt'', which is the same as WINDOW4 file Cie31t.dat.
+The next two objects enable users to enter solar and visible spectrum which is used to calculate the thermal and visual performance of windows if their glazings are defined with full spectral data. EnergyPlus versions 8.0 and older hard-wired the solar and visible spectrum. The solar spectrum assumes air mass 1.5 terrestrial solar global spectral irradiance values (W/m2-micron) on a 37$^\circ$ tilted surface, based on ISO 9845-1 and ASTM E 892; derived from Optics5 data file ISO-9845GlobalNorm.std, 10-14-99. The visible/photopic spectrum is based on CIE 1931 observer; ISO/CIE 10527, CIE Standard Calorimetric Observers; derived from Optics5 data file ``CIE 1931 Color Match from E308.txt'', which is the same as WINDOW4 file Cie31t.dat.
 
 \subsection{Site:SolarAndVisibleSpectrum}\label{sitesolarandvisiblespectrum}
 
@@ -1886,11 +1886,11 @@ This field specifies the type of spectrum data. Choices are Solar and Visible.
 
 \paragraph{Field: Wavelength \textless{}n\textgreater{}}\label{field-wavelength-n}
 
-This field specifies the nth wavelength in micron.
+This field specifies the n$^{th}$ wavelength in micron.
 
 \paragraph{Field: Spectrum \textless{}n\textgreater{}}\label{field-spectrum-n}
 
-This field specifies the nth spectrum corresponding to the nth wavelength.
+This field specifies the n$^{th}$ spectrum corresponding to the nth wavelength.
 
 IDF example:
 
@@ -1915,11 +1915,11 @@ Site:SpectrumData,
   ...;
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs-3-011}
+\subsection{Climate Group Outputs}\label{outputs-3-011}
 
 Climate related variables appear in two places for EnergyPlus outputs. Certain objects that are invariant throughout a simulation period have lines appear in the eplusout.eio file. For descriptions of this reporting, please see the Output Details and Examples document.
 
-\subsubsection{Outputs}\label{outputs-4-008}
+\subsubsection{Weather Data Related Outputs}\label{outputs-4-008}
 
 Variables related to ambient environment data are available at timestep and higher resolutions. Below is a variable dictionary of these variables and subsequent definitions:
 
