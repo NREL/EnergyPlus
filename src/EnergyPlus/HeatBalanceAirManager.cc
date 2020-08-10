@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
@@ -4214,6 +4215,9 @@ namespace HeatBalanceAirManager {
         // na
 
         if(DataGlobals::externalHVACManager) {
+          if (!DataGlobals::externalHVACManagerInitialized) {
+              initializeForExternalHVACManager(state);
+          }
           DataGlobals::externalHVACManager(&state);
         } else {
           ManageHVAC(state);
@@ -4226,6 +4230,16 @@ namespace HeatBalanceAirManager {
     }
 
     // END Algorithm Section of the Module
+
+    void initializeForExternalHVACManager(EnergyPlusData &state) {
+        // this function will ultimately provide a nice series of calls that initialize all the hvac stuff needed
+        // to allow an external hvac manager to play nice with E+
+        EnergyPlus::ZoneTempPredictorCorrector::InitZoneAirSetPoints(state.dataZoneTempPredictorCorrector);
+        if (!EnergyPlus::DataZoneEquipment::ZoneEquipInputsFilled) {
+            EnergyPlus::DataZoneEquipment::GetZoneEquipmentData(state);
+            EnergyPlus::DataZoneEquipment::ZoneEquipInputsFilled = true;
+        }
+    }
 
     void ReportZoneMeanAirTemp()
     {

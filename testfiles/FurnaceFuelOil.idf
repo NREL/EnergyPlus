@@ -1305,9 +1305,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,FuelOil#2:Facility,monthly;
+  Output:Meter:MeterFileOnly,FuelOilNo2:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,FuelOil#2:HVAC,monthly;
+  Output:Meter:MeterFileOnly,FuelOilNo2:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -1317,9 +1317,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,FuelOil#2:Facility,runperiod;
+  Output:Meter:MeterFileOnly,FuelOilNo2:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,FuelOil#2:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,FuelOilNo2:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 

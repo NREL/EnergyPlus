@@ -962,9 +962,8 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
     EXPECT_NEAR(1.13, Surface(surfNum).Height, 0.01);
 }
 
-TEST(SurfaceGeometryUnitTests, distance)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_distance)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, distance");
 
     DataVectorTypes::Vector a;
     DataVectorTypes::Vector b;
@@ -1004,10 +1003,8 @@ TEST(SurfaceGeometryUnitTests, distance)
     EXPECT_NEAR(26.7955, distance(a, b), 0.0001);
 }
 
-TEST(SurfaceGeometryUnitTests, isAlmostEqual3dPt)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual3dPt)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, isAlmostEqual3dPt");
-
     DataVectorTypes::Vector a;
     DataVectorTypes::Vector b;
 
@@ -1056,10 +1053,8 @@ TEST(SurfaceGeometryUnitTests, isAlmostEqual3dPt)
     EXPECT_TRUE(isAlmostEqual3dPt(a, b));
 }
 
-TEST(SurfaceGeometryUnitTests, isAlmostEqual2dPt)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual2dPt)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, isAlmostEqual2dPt");
-
     DataVectorTypes::Vector_2d a;
     DataVectorTypes::Vector_2d b;
 
@@ -1100,10 +1095,8 @@ TEST(SurfaceGeometryUnitTests, isAlmostEqual2dPt)
     EXPECT_TRUE(isAlmostEqual2dPt(a, b));
 }
 
-TEST(SurfaceGeometryUnitTests, isPointOnLineBetweenPoints)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isPointOnLineBetweenPoints)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, isPointOnLineBetweenPoints");
-
     DataVectorTypes::Vector a;
     DataVectorTypes::Vector b;
     DataVectorTypes::Vector t;
@@ -1163,10 +1156,8 @@ TEST(SurfaceGeometryUnitTests, isPointOnLineBetweenPoints)
     EXPECT_TRUE(isPointOnLineBetweenPoints(a, b, t));
 }
 
-TEST(SurfaceGeometryUnitTests, findIndexOfVertex)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_findIndexOfVertex)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, findIndexOfVertex");
-
     DataVectorTypes::Vector a;
     std::vector<DataVectorTypes::Vector> list;
 
@@ -1206,10 +1197,8 @@ TEST(SurfaceGeometryUnitTests, findIndexOfVertex)
     EXPECT_EQ(-1, findIndexOfVertex(a, list)); // not found
 }
 
-TEST(SurfaceGeometryUnitTests, listOfFacesFacingAzimuth_test)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_listOfFacesFacingAzimuth_test)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, listOfFacesFacingAzimuth_test");
-
     DataVectorTypes::Polyhedron zonePoly;
     std::vector<int> results;
 
@@ -1276,10 +1265,8 @@ TEST(SurfaceGeometryUnitTests, listOfFacesFacingAzimuth_test)
     EXPECT_EQ(9, results.at(1));
 }
 
-TEST(SurfaceGeometryUnitTests, areSurfaceHorizAndVert_test)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areSurfaceHorizAndVert_test)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, areSurfaceHorizAndVert_test");
-
     DataVectorTypes::Polyhedron zonePoly;
 
     Surface.allocate(9);
@@ -1402,10 +1389,8 @@ TEST(SurfaceGeometryUnitTests, areSurfaceHorizAndVert_test)
     EXPECT_FALSE(areWallsVertical);
 }
 
-TEST(SurfaceGeometryUnitTests, areWallHeightSame_test)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areWallHeightSame_test)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, areWallHeightSame_test");
-
     DataVectorTypes::Polyhedron zonePoly;
     std::vector<int> results;
 
@@ -1479,10 +1464,8 @@ TEST(SurfaceGeometryUnitTests, areWallHeightSame_test)
     EXPECT_FALSE(areWallHeightSame(zonePoly));
 }
 
-TEST(SurfaceGeometryUnitTests, findPossibleOppositeFace_test)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_findPossibleOppositeFace_test)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, findPossibleOppositeFace_test");
-
     DataVectorTypes::Polyhedron zonePoly;
 
     Surface.allocate(4);
@@ -1549,10 +1532,8 @@ TEST(SurfaceGeometryUnitTests, findPossibleOppositeFace_test)
     EXPECT_EQ(-1, findPossibleOppositeFace(zonePoly, 3)); // not found
 }
 
-TEST(SurfaceGeometryUnitTests, areCornersEquidistant_test)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areCornersEquidistant_test)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, areCornersEquidistant_test");
-
     DataVectorTypes::Polyhedron zonePoly;
 
     zonePoly.NumSurfaceFaces = 2;
@@ -1605,10 +1586,8 @@ TEST(SurfaceGeometryUnitTests, areCornersEquidistant_test)
     EXPECT_FALSE(areCornersEquidistant(zonePoly, 1, 2, dist));
 }
 
-TEST(SurfaceGeometryUnitTests, areOppositeWallsSame_test)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areOppositeWallsSame_test)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, areOppositeWallsSame_test");
-
     DataVectorTypes::Polyhedron zonePoly;
 
     Surface.allocate(4);
@@ -1739,10 +1718,8 @@ TEST(SurfaceGeometryUnitTests, areOppositeWallsSame_test)
     EXPECT_FALSE(areOppositeWallsSame(zonePoly, area, dist)); // now neither wall matches
 }
 
-TEST(SurfaceGeometryUnitTests, areFloorAndCeilingSame_test)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areFloorAndCeilingSame_test)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, areFloorAndCeilingSame_test");
-
     DataVectorTypes::Polyhedron zonePoly;
 
     Surface.allocate(2);
@@ -1799,10 +1776,8 @@ TEST(SurfaceGeometryUnitTests, areFloorAndCeilingSame_test)
     EXPECT_FALSE(areFloorAndCeilingSame(zonePoly));
 }
 
-TEST(SurfaceGeometryUnitTests, makeListOfUniqueVertices_test)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_makeListOfUniqueVertices_test)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, makeListOfUniqueVertices_test");
-
     DataVectorTypes::Polyhedron zonePoly;
 
     zonePoly.NumSurfaceFaces = 6;
@@ -1941,10 +1916,8 @@ TEST(SurfaceGeometryUnitTests, makeListOfUniqueVertices_test)
     EXPECT_EQ(Vector(10., 8., 0.), uniqueVertices.at(7));
 }
 
-TEST(SurfaceGeometryUnitTests, numberOfEdgesNotTwoForEnclosedVolumeTest_test)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_numberOfEdgesNotTwoForEnclosedVolumeTest_test)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, numberOfEdgesNotTwoForEnclosedVolumeTest_test");
-
     DataVectorTypes::Polyhedron zonePoly;
 
     zonePoly.NumSurfaceFaces = 6;
@@ -2088,10 +2061,8 @@ TEST(SurfaceGeometryUnitTests, numberOfEdgesNotTwoForEnclosedVolumeTest_test)
     EXPECT_EQ(size_t(4), e2.size());
 }
 
-TEST(SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_updateZonePolygonsForMissingColinearPoints_test)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test");
-
     DataVectorTypes::Polyhedron zonePoly;
 
     zonePoly.NumSurfaceFaces = 7;
@@ -2253,10 +2224,8 @@ TEST(SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test)
     EXPECT_EQ(size_t(0), e2.size());
 }
 
-TEST(SurfaceGeometryUnitTests, insertVertexOnFace_test)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_insertVertexOnFace_test)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, insertVertexOnFace_test");
-
     DataVectorTypes::Face faceOfPoly;
 
     // insert in first position
@@ -2384,10 +2353,8 @@ TEST(SurfaceGeometryUnitTests, insertVertexOnFace_test)
     faceOfPoly.FacePoints.deallocate();
 }
 
-TEST(SurfaceGeometryUnitTests, isEnclosedVolume_SimpleBox_test)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isEnclosedVolume_SimpleBox_test)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, isEnclosedVolume_SimpleBox_test");
-
     DataVectorTypes::Polyhedron zonePoly;
 
     zonePoly.NumSurfaceFaces = 6;
@@ -2449,10 +2416,8 @@ TEST(SurfaceGeometryUnitTests, isEnclosedVolume_SimpleBox_test)
     EXPECT_FALSE(isEnclosedVolume(zonePoly, edgeNot2));
 }
 
-TEST(SurfaceGeometryUnitTests, isEnclosedVolume_BoxWithSplitSide_test)
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isEnclosedVolume_BoxWithSplitSide_test)
 {
-    ShowMessage("Begin Test: SurfaceGeometryUnitTests, isEnclosedVolume_BoxWithSplitSide_test");
-
     DataVectorTypes::Polyhedron zonePoly;
 
     zonePoly.NumSurfaceFaces = 7;

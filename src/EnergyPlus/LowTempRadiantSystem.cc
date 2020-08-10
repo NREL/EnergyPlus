@@ -577,25 +577,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Error checking for zones and construction information
-            for (SurfNum = 1; SurfNum <= thisRadSys.NumOfSurfaces; ++SurfNum) {
-                if (thisRadSys.SurfacePtr(SurfNum) == 0) continue; // invalid surface -- detected earlier
-                if (Surface(thisRadSys.SurfacePtr(SurfNum)).Zone != thisRadSys.ZonePtr) {
-                    ShowSevereError("Surface referenced in " + CurrentModuleObject +
-                                    " not in same zone as Radiant System, surface=" + Surface(thisRadSys.SurfacePtr(SurfNum)).Name);
-                    ShowContinueError("Surface in Zone=" + Zone(Surface(thisRadSys.SurfacePtr(SurfNum)).Zone).Name +
-                                      " Hydronic Radiant System in " + cAlphaFields(3) + " = " + Alphas(3));
-                    ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
-                    ErrorsFound = true;
-                }
-                if (Surface(thisRadSys.SurfacePtr(SurfNum)).Construction == 0) continue; // Invalid construction -- detected earlier
-                if (!dataConstruction.Construct(Surface(thisRadSys.SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
-                    ShowSevereError("Construction referenced in Hydronic Radiant System Surface does not have a source/sink present");
-                    ShowContinueError("Surface name= " + Surface(thisRadSys.SurfacePtr(SurfNum)).Name +
-                                      "  Construction name = " + dataConstruction.Construct(Surface(thisRadSys.SurfacePtr(SurfNum)).Construction).Name);
-                    ShowContinueError("Construction needs to be defined with a \"Construction:InternalSource\" object.");
-                    ErrorsFound = true;
-                }
-            }
+            thisRadSys.errorCheckZonesAndConstructions(ErrorsFound);
 
             thisRadSys.TubeDiameter = Numbers(1);
             thisRadSys.TubeLength = Numbers(2);
@@ -905,25 +887,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Error checking for zones and construction information
-            for (SurfNum = 1; SurfNum <= thisCFloSys.NumOfSurfaces; ++SurfNum) {
-                if (thisCFloSys.SurfacePtr(SurfNum) == 0) continue; // invalid surface -- detected earlier
-                if (Surface(thisCFloSys.SurfacePtr(SurfNum)).Zone != thisCFloSys.ZonePtr) {
-                    ShowSevereError("Surface referenced in " + CurrentModuleObject +
-                                    " not in same zone as Radiant System, surface=" + Surface(thisCFloSys.SurfacePtr(SurfNum)).Name);
-                    ShowContinueError("Surface in Zone=" + Zone(Surface(thisCFloSys.SurfacePtr(SurfNum)).Zone).Name +
-                                      " Constant Flow Radiant System in " + cAlphaFields(3) + " = " + Alphas(3));
-                    ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
-                    ErrorsFound = true;
-                }
-                if (Surface(thisCFloSys.SurfacePtr(SurfNum)).Construction == 0) continue; // invalid construction, detected earlier
-                if (!dataConstruction.Construct(Surface(thisCFloSys.SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
-                    ShowSevereError("Construction referenced in Constant Flow Radiant System Surface does not have a source/sink");
-                    ShowContinueError("Surface name= " + Surface(thisCFloSys.SurfacePtr(SurfNum)).Name +
-                                      "  Construction name = " + dataConstruction.Construct(Surface(thisCFloSys.SurfacePtr(SurfNum)).Construction).Name);
-                    ShowContinueError("Construction needs to be defined with a \"Construction:InternalSource\" object.");
-                    ErrorsFound = true;
-                }
-            }
+            thisCFloSys.errorCheckZonesAndConstructions(ErrorsFound);
 
             thisCFloSys.TubeDiameter = Numbers(1);
             thisCFloSys.TubeLength = Numbers(2);
@@ -1143,25 +1107,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Error checking for zones and construction information
-            for (SurfNum = 1; SurfNum <= thisElecSys.NumOfSurfaces; ++SurfNum) {
-                if (thisElecSys.SurfacePtr(SurfNum) == 0) continue; // Invalid surface -- detected earlier
-                if (Surface(thisElecSys.SurfacePtr(SurfNum)).Zone != thisElecSys.ZonePtr) {
-                    ShowSevereError("Surface referenced in " + CurrentModuleObject +
-                                    " not in same zone as Radiant System, surface=" + Surface(thisElecSys.SurfacePtr(SurfNum)).Name);
-                    ShowContinueError("Surface in Zone=" + Zone(Surface(thisElecSys.SurfacePtr(SurfNum)).Zone).Name +
-                                      " Electric Radiant System in " + cAlphaFields(3) + " = " + Alphas(3));
-                    ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
-                    ErrorsFound = true;
-                }
-                if (Surface(thisElecSys.SurfacePtr(SurfNum)).Construction == 0) continue; // invalid construction -- detected earlier
-                if (!dataConstruction.Construct(Surface(thisElecSys.SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
-                    ShowSevereError("Construction referenced in Electric Radiant System Surface does not have a source/sink present");
-                    ShowContinueError("Surface name= " + Surface(thisElecSys.SurfacePtr(SurfNum)).Name +
-                                      "  Construction name = " + dataConstruction.Construct(Surface(thisElecSys.SurfacePtr(SurfNum)).Construction).Name);
-                    ShowContinueError("Construction needs to be defined with a \"Construction:InternalSource\" object.");
-                    ErrorsFound = true;
-                }
-            }
+            thisElecSys.errorCheckZonesAndConstructions(ErrorsFound);
 
             // Heating user input data
             // Determine Low Temp Radiant heating design capacity sizing method
@@ -1674,6 +1620,51 @@ namespace LowTempRadiantSystem {
             return LowTempRadiantSetpointTypes::halfFlowPower;
         }
 
+    }
+
+    void RadiantSystemBaseData::errorCheckZonesAndConstructions(bool &errorsFound)
+    {
+        Real64 zoneMultipliers = 0.0;
+        Real64 zoneMultipliersSurface = 0.0;
+        Real64 zoneMultiplersTolerance = 0.001;
+        for (int SurfNum = 1; SurfNum <= this->NumOfSurfaces; ++SurfNum) {
+            
+            if (this->SurfacePtr(SurfNum) == 0) continue; // invalid surface -- detected earlier
+            
+            if (DataGlobals::DisplayExtraWarnings) {
+                // check zone numbers--ok if they are not the same
+                // group warning issued earlier, show detailed warning here
+                if (Surface(this->SurfacePtr(SurfNum)).Zone != this->ZonePtr) {
+                    ShowWarningError("A surface referenced in a Low Temperature Radiant System is not in same zone as the radiant system itself");
+                    ShowContinueError("Surface = " + Surface(this->SurfacePtr(SurfNum)).Name);
+                    ShowContinueError("Surface in Zone = " + DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Name +
+                        ". Radiant System in Zone = " + this->ZoneName);
+                    ShowContinueError("Occurs in Low Temperature Radiant System = " + this->Name);
+                    ShowContinueError("If this is intentionally a radiant system with surfaces in more than one thermal zone,");
+                    ShowContinueError("then ignore this warning message.  Otherwise, check the surfaces in this radiant system.");
+                }
+            }
+            
+            // check zone multipliers--these must be the same
+            if (SurfNum == 1) zoneMultipliers = double(DataHeatBalance::Zone(this->ZonePtr).Multiplier) *double(DataHeatBalance::Zone(this->ZonePtr).ListMultiplier);
+            zoneMultipliersSurface = double(DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Multiplier)
+                                            * double(DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).ListMultiplier);
+            if (std::abs(zoneMultipliers-zoneMultipliersSurface)>zoneMultiplersTolerance) {
+                ShowSevereError("The zone multipliers are not the same for all surfaces contained in this radiant system");
+                ShowContinueError("This is not allowed and must be fixed for the simulation to run.");
+                ShowContinueError("Occurs in Low Temperature Radiant System = " + this->Name);
+                errorsFound = true;
+            }
+                        
+            // make sure that this construction is defined with a source/sink--this must be the case or it can't serve as a radiant system surface
+            if (!dataConstruction.Construct(Surface(this->SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
+                ShowSevereError("Construction referenced in Radiant System Surface does not have a source/sink present");
+                ShowContinueError("Surface name= " + Surface(this->SurfacePtr(SurfNum)).Name +
+                                  "  Construction name = " + dataConstruction.Construct(Surface(this->SurfacePtr(SurfNum)).Construction).Name);
+                ShowContinueError("Construction needs to be defined with a \"Construction:InternalSource\" object.");
+                errorsFound = true;
+            }
+        }
     }
 
     void InitLowTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep

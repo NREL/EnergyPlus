@@ -1413,7 +1413,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     EXPECT_EQ(InitErrorFound, true);
 }
 
-TEST_F(EnergyPlusFixture, LowTempElecRadSurfaceGroupTest)
+TEST_F(LowTempRadiantSystemTest, LowTempElecRadSurfaceGroupTest)
 {
 
     int RadSysNum(1);
@@ -1488,15 +1488,21 @@ TEST_F(EnergyPlusFixture, LowTempElecRadSurfaceGroupTest)
     Surface(1).Name = "ZN001:FLR001";
     Surface(1).ZoneName = "WEST ZONE";
     Surface(1).Zone = 1;
+    Surface(1).Construction = 1;
     Surface(2).Name = "ZN001:FLR002";
     Surface(2).ZoneName = "WEST ZONE";
     Surface(2).Zone = 1;
+    Surface(2).Construction = 1;
     Surface(3).Name = "ZN002:FLR001";
     Surface(3).ZoneName = "EAST ZONE";
     Surface(3).Zone = 2;
+    Surface(3).Construction = 1;
     Surface(4).Name = "ZN002:FLR002";
     Surface(4).ZoneName = "EAST ZONE";
     Surface(4).Zone = 2;
+    Surface(4).Construction = 1;
+    dataConstruction.Construct.allocate(1);
+    dataConstruction.Construct(1).SourceSinkPresent = true;
 
     GetLowTempRadiantSystem();
     EXPECT_EQ(2, LowTempRadiantSystem::NumOfElecLowTempRadSys);
@@ -2273,6 +2279,101 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(scheduleIndex,throttlingRange);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
+}
+
+TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
+{
+    bool actualErrorsFound;
+    std::string const Alpha1("Zone Name");
+    std::string const Alpha2("An Amazing Zone");
+    std::string const Alpha3("Hydronic Radiant System");
+    std::string const Alpha4("An Excellent Radiant System");
+
+    HydrRadSys.allocate(1);
+    auto &thisRadSys (HydrRadSys(1));
+    thisRadSys.NumOfSurfaces = 3;
+    thisRadSys.SurfacePtr.allocate(thisRadSys.NumOfSurfaces);
+    thisRadSys.SurfacePtr(1) = 1;
+    thisRadSys.SurfacePtr(2) = 2;
+    thisRadSys.SurfacePtr(3) = 3;
+    thisRadSys.ZonePtr = 1;
+    Surface.allocate(3);
+    Zone.allocate(3);
+    dataConstruction.Construct.allocate(2);
+    dataConstruction.Construct(1).SourceSinkPresent = true;
+    dataConstruction.Construct(2).SourceSinkPresent = false;
+
+    // Test 1a: Surfaces are in the same zones, zone multipliers are all the same, and the construct has a source/sink.
+    //          Everything is "ok" so the result should be the error flag is FALSE.
+    actualErrorsFound = false;
+    Surface(1).Zone = 1;
+    Surface(2).Zone = 1;
+    Surface(3).Zone = 1;
+    Zone(1).Multiplier = 1.0;
+    Zone(1).ListMultiplier = 1.0;
+    Zone(2).Multiplier = 1.0;
+    Zone(2).ListMultiplier = 1.0;
+    Zone(3).Multiplier = 1.0;
+    Zone(3).ListMultiplier = 1.0;
+    Surface(1).Construction = 1;
+    Surface(2).Construction = 1;
+    Surface(3).Construction = 1;
+    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound);
+    EXPECT_FALSE(actualErrorsFound);
+
+    // Test 1b: Surfaces are in different zones, zone multipliers are all the same, and the construct has a source/sink.
+    //          Surfaces being in different zones is "ok" so the result should be the error flag is FALSE.
+    actualErrorsFound = false;
+    Surface(1).Zone = 1;
+    Surface(2).Zone = 2;
+    Surface(3).Zone = 3;
+    Zone(1).Multiplier = 1.0;
+    Zone(1).ListMultiplier = 1.0;
+    Zone(2).Multiplier = 1.0;
+    Zone(2).ListMultiplier = 1.0;
+    Zone(3).Multiplier = 1.0;
+    Zone(3).ListMultiplier = 1.0;
+    Surface(1).Construction = 1;
+    Surface(2).Construction = 1;
+    Surface(3).Construction = 1;
+    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound);
+    EXPECT_FALSE(actualErrorsFound);
+
+    // Test 2: Surfaces are in different zones, zone multipliers are NOT all the same (one is 7 instead of 2), and the construct has a source/sink.
+    //         Zone multipliers can NOT be different so the result should be the error flag is TRUE.
+    actualErrorsFound = false;
+    Surface(1).Zone = 1;
+    Surface(2).Zone = 2;
+    Surface(3).Zone = 3;
+    Zone(1).Multiplier = 2.0;
+    Zone(1).ListMultiplier = 1.0;
+    Zone(2).Multiplier = 2.0;
+    Zone(2).ListMultiplier = 1.0;
+    Zone(3).Multiplier = 7.0;
+    Zone(3).ListMultiplier = 1.0;
+    Surface(1).Construction = 1;
+    Surface(2).Construction = 1;
+    Surface(3).Construction = 1;
+    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound);
+    EXPECT_TRUE(actualErrorsFound);
+
+    // Test 3: Surfaces are in the same zones, zone multipliers are all the same, and one construct does NOT have a source/sink.
+    //         Surface constructions MUST have a source/sink to be used for a radiant system so the result should be the error flag is TRUE.
+    actualErrorsFound = false;
+    Surface(1).Zone = 1;
+    Surface(2).Zone = 1;
+    Surface(3).Zone = 1;
+    Zone(1).Multiplier = 2.0;
+    Zone(1).ListMultiplier = 1.0;
+    Zone(2).Multiplier = 2.0;
+    Zone(2).ListMultiplier = 1.0;
+    Zone(3).Multiplier = 2.0;
+    Zone(3).ListMultiplier = 1.0;
+    Surface(1).Construction = 1;
+    Surface(2).Construction = 1;
+    Surface(3).Construction = 2;
+    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound);
+    EXPECT_TRUE(actualErrorsFound);
 }
 
 TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
