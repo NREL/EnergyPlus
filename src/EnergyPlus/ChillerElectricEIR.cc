@@ -736,9 +736,9 @@ namespace ChillerElectricEIR {
 
         SetupOutputVariable("Chiller Cycling Ratio", OutputProcessor::Unit::None, this->ChillerCyclingRatio, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller Electric Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+        SetupOutputVariable("Chiller Electricity Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller Electric Energy",
+        SetupOutputVariable("Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Energy,
                             "System",
@@ -852,9 +852,9 @@ namespace ChillerElectricEIR {
 
             if (this->CondenserFanPowerRatio > 0) {
                 SetupOutputVariable(
-                    "Chiller Condenser Fan Electric Power", OutputProcessor::Unit::W, this->CondenserFanPower, "System", "Average", this->Name);
+                    "Chiller Condenser Fan Electricity Power", OutputProcessor::Unit::W, this->CondenserFanPower, "System", "Average", this->Name);
 
-                SetupOutputVariable("Chiller Condenser Fan Electric Energy",
+                SetupOutputVariable("Chiller Condenser Fan Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->CondenserFanEnergyConsumption,
                                     "System",
@@ -893,16 +893,16 @@ namespace ChillerElectricEIR {
 
                 if (this->BasinHeaterPowerFTempDiff > 0.0) {
                     SetupOutputVariable(
-                        "Chiller Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                        "Chiller Basin Heater Electricity Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
 
-                    SetupOutputVariable("Chiller Basin Heater Electric Energy",
+                    SetupOutputVariable("Chiller Basin Heater Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         this->BasinHeaterConsumption,
                                         "System",
                                         "Sum",
                                         this->Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "CHILLERS",
                                         _,
                                         "Plant");
