@@ -226,7 +226,9 @@ std::string InputOutputFile::get_output()
     }
 }
 
-InputOutputFile::InputOutputFile(std::string FileName) : fileName(std::move(FileName))
+InputOutputFile::InputOutputFile(std::string FileName, const bool DefaultToStdout) 
+  : fileName{std::move(FileName)},
+    defaultToStdOut{DefaultToStdout}
 {
 }
 

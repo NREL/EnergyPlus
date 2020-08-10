@@ -501,10 +501,10 @@ namespace UtilityRoutines {
             FuelTypeOutput = "Coal";
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOil#1";
+            FuelTypeOutput = "FuelOilNo1";
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOil#2";
+            FuelTypeOutput = "FuelOilNo2";
 
         } else if (SELECT_CASE_var == "PROPANE") {
             FuelTypeOutput = "Propane";
@@ -593,12 +593,12 @@ namespace UtilityRoutines {
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOil#1";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
+            FuelTypeOutput = "FuelOilNo1";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO1");
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOil#2";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
+            FuelTypeOutput = "FuelOilNo2";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO2");
 
         } else if (SELECT_CASE_var == "PROPANE") {
             FuelTypeOutput = "Propane";
