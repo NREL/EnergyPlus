@@ -2450,8 +2450,8 @@ namespace FanCoilUnits {
                             Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
                         }
                     }
-                    QUnitOut = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                                                 Node(OutletNode).Temp, Node(InletNode).HumRat, Node(InletNode).Temp, Node(InletNode).HumRat);
+                    CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat, QUnitOut);
+
                     // if heating
                 } else if (UnitOn && QCoilHeatSP > SmallLoad && TempControlType(ZoneNum) != SingleCoolingSetPoint) {
                     // get full load result
@@ -2607,8 +2607,7 @@ namespace FanCoilUnits {
                             }
                         }
                     }
-                    QUnitOut = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                                                 Node(OutletNode).Temp, Node(InletNode).HumRat, Node(InletNode).Temp, Node(InletNode).HumRat);
+                    CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat, QUnitOut);
                 } else {
                     // no action
                     QUnitOut = QUnitOutNoHC;
@@ -3273,8 +3272,7 @@ namespace FanCoilUnits {
                 SpecHumOut = Node(OutletNode).HumRat;
                 SpecHumIn = Node(InletNode).HumRat;
                 LatentOutput = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate (kg/s), dehumid = negative
-                QSensUnitOutNoATM = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                                                      Node(OutletNode).Temp, Node(InletNode).HumRat, Node(InletNode).Temp, Node(InletNode).HumRat);
+                CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat, QSensUnitOutNoATM);
                 QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
                 // report variables
                 FanCoil(FanCoilNum).HeatPower = max(0.0, QSensUnitOutNoATM);
@@ -3296,8 +3294,7 @@ namespace FanCoilUnits {
                 SpecHumOut = Node(OutletNode).HumRat;
                 SpecHumIn = Node(InletNode).HumRat;
                 LatentOutput = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate (kg/s), dehumid = negative
-                QSensUnitOutNoATM = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                                                      Node(OutletNode).Temp, Node(InletNode).HumRat, Node(InletNode).Temp, Node(InletNode).HumRat);
+                CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat, QSensUnitOutNoATM);
                 QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
                 // report variables
                 FanCoil(FanCoilNum).HeatPower = max(0.0, QSensUnitOutNoATM);
@@ -3746,22 +3743,13 @@ namespace FanCoilUnits {
             if (FanCoil(FanCoilNum).ATMixerType == ATMixer_SupplySide) {
                 // Now calculate the ATM mixer if it is on the supply side of the zone unit
                 SimATMixer(FanCoil(FanCoilNum).ATMixerName, FirstHVACIteration, FanCoil(FanCoilNum).ATMixerIndex);
-            }
-        }
-
-        if (FanCoil(FanCoilNum).ATMixerExists) {
-            if (FanCoil(FanCoilNum).ATMixerType == ATMixer_SupplySide) {
-                LoadMet =
-                    Node(ATMixOutNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                                                          Node(ATMixOutNode).Temp, Node(ZoneNode).HumRat, Node(ZoneNode).Temp, Node(ZoneNode).HumRat);
+                CalcZoneSensibleOutput(Node(ATMixOutNode).MassFlowRate, Node(ATMixOutNode).Temp, Node(ZoneNode).Temp, Node(ZoneNode).HumRat, LoadMet);
             } else {
                 // ATM Mixer on inlet side
-                LoadMet = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                                            Node(OutletNode).Temp, Node(ZoneNode).HumRat, Node(ZoneNode).Temp, Node(ZoneNode).HumRat);
+                CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(ZoneNode).Temp, Node(ZoneNode).HumRat, LoadMet);
             }
         } else {
-            LoadMet = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
-                                        Node(OutletNode).Temp, Node(InletNode).HumRat, Node(InletNode).Temp, Node(InletNode).HumRat);
+            CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat, LoadMet);
         }
     }
 
