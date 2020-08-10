@@ -83,6 +83,7 @@ ENERGYPLUSLIB_API void callbackEndOfZoneSizing(EnergyPlusState state, std::funct
 ENERGYPLUSLIB_API void callbackEndOfSystemSizing(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 ENERGYPLUSLIB_API void callbackUnitarySystemSizing(EnergyPlusState state, const std::function<void (EnergyPlusState)>& f);
+ENERGYPLUSLIB_API void registerExternalHVACManager(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 //ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 
 extern "C" {
@@ -152,6 +153,12 @@ ENERGYPLUSLIB_API void stateDelete(EnergyPlusState state);
 /// \see requestVariable
 /// \see stateNew
 ENERGYPLUSLIB_API int energyplus(EnergyPlusState state, int argc, const char *argv[]);
+
+/// \brief Stop an EnergyPlus simulation early
+/// \details This function can be used by an API client to end a simulation before the end of the scheduled run periods.
+///          The simulation will end gracefully and all output files will be finalized and closed before the
+///          EnergyPlus process is complete.
+ENERGYPLUSLIB_API void stopSimulation();
 
 /// \brief Asks EnergyPlus to issue a warning message to the error file.
 /// \details During an EnergyPlus simulation, if certain conditions arise, it may be useful to alert the user using
@@ -357,6 +364,10 @@ ENERGYPLUSLIB_API void callbackUnitarySystemSizing(EnergyPlusState state, void (
 // The user defined component model won't actually call out to this API endpoint -- it is coupled with a specific
 // plugin instance in the code.
 // ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(EnergyPlusState state, void (*f)());
+
+/// \brief Register a callback function to be used in place of the EnergyPlus ManageHVAC function.
+/// \details This callback is a placeholder for advanced use cases, and will be supported in a future release.
+ENERGYPLUSLIB_API void registerExternalHVACManager(EnergyPlusState state, void (*f)(EnergyPlusState));
 
 #ifdef __cplusplus
 }

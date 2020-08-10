@@ -183,6 +183,8 @@ namespace LowTempRadiantSystem {
                                                                       std::string const& controlInputField
         );
 
+        void errorCheckZonesAndConstructions(bool &errorsFound);
+        
         Real64 setRadiantSystemControlTemperature();
 
         Real64 calculateOperationalFraction(Real64 const offTemperature, Real64 const controlTemperature, Real64 const throttlingRange);
