@@ -1949,6 +1949,10 @@ Variables related to ambient environment data are available at timestep and high
 \item
   Zone,Average,Site Direct Solar Radiation Rate per Area {[}W/m2{]}
 \item
+  Zone,Average,Site Total Sky Cover []
+\item
+  Zone,Average,Site Opaque Sky Cover []
+\item
   Zone,Sum,Site Precipitation Depth {[}m{]}
 \item
   Zone,Average,Site Ground Reflected Solar Radiation Rate per Area {[}W/m2{]}
@@ -2057,6 +2061,14 @@ Diffuse solar is the amount of solar radiation in W/m$^2$ received from the sky 
 \paragraph{Site Direct Solar Radiation Rate per Area {[}W/m2{]}}\label{site-direct-solar-radiation-rate-per-area-wm2}
 
 Site Direct Solar Radiation Rate per Area is amount of solar radiation in W/m$^2$ received within a 5.7$^\circ$ field of view centered on the sun. This is also known as Beam Solar.
+
+\paragraph{Site Total Sky Cover {[]}}\label{site-total-sky-cover}
+
+This is the Total Sky cover in tenths of sky. The value ranges from 0 (clear) to 10 (full cover). 
+
+\paragraph{Site Opaque Sky Cover {[]}}\label{site-opaque-sky-cover}
+
+This is the Opaque Sky Cover in tenths of sky. The value ranges from 0 (clear) to 10 (full cover). 
 
 \paragraph{Site Precipitation Depth {[}m{]}}\label{site-precipitation-depth-m}
 
@@ -2173,7 +2185,7 @@ This is the scheduled amount of irrigation for the green roof (ecoroof) based on
 
 This is the actual amount of irrigation for the green roof (ecoroof) based on the scheduled user input and moisture state/saturation of the soil. Amount is measured in meters.
 
-\subsection{Outputs for local temperature/wind speed calculations}\label{outputs-for-local-temperaturewind-speed-calculations}
+\subsubsection{Outputs for local temperature/wind speed calculations}\label{outputs-for-local-temperaturewind-speed-calculations}
 
 Local atmospheric properties for outdoor air temperature and wind speed are separately calculated and reported for all zones, surfaces, and outdoor air nodes. The output variables are associated with their respective objects:
 
@@ -2194,30 +2206,30 @@ Local atmospheric properties for outdoor air temperature and wind speed are sepa
   HVAC,Average,System Node Temperature {[}C{]}~~~~~~~ (for OUTDOOR AIR NODE object)
 \end{itemize}
 
-\subsubsection{Zone Outdoor Air Drybulb Temperature {[}C{]}}\label{zone-outdoor-air-drybulb-temperature-c}
+\paragraph{Zone Outdoor Air Drybulb Temperature {[}C{]}}\label{zone-outdoor-air-drybulb-temperature-c}
 
 The outdoor air dry-bulb temperature calculated at the height above ground of the zone centroid.
 
-\subsubsection{Zone Outdoor Air Wetbulb Temperature {[}C{]}}\label{zone-outdoor-air-wetbulb-temperature-c}
+\paragraph{Zone Outdoor Air Wetbulb Temperature {[}C{]}}\label{zone-outdoor-air-wetbulb-temperature-c}
 
 The outdoor air wet-bulb temperature calculated at the height above ground of the zone centroid.
 
-\subsubsection{Zone Outdoor Air Wind Speed {[}m/s{]}}\label{zone-outdoor-air-wind-speed-ms}
+\paragraph{Zone Outdoor Air Wind Speed {[}m/s{]}}\label{zone-outdoor-air-wind-speed-ms}
 
 The outdoor wind speed calculated at the height above ground of the zone centroid.
 
-\subsubsection{Surface Ext Outdoor Dry Bulb {[}C{]}}\label{surface-ext-outdoor-dry-bulb-c}
+\paragraph{Surface Ext Outdoor Dry Bulb {[}C{]}}\label{surface-ext-outdoor-dry-bulb-c}
 
 The outdoor air dry-bulb temperature calculated at the height above ground of the surface centroid.
 
-\subsubsection{Surface Ext Outdoor Wet Bulb {[}C{]}}\label{surface-ext-outdoor-wet-bulb-c}
+\paragraph{Surface Ext Outdoor Wet Bulb {[}C{]}}\label{surface-ext-outdoor-wet-bulb-c}
 
 The outdoor air wet-bulb temperature calculated at the height above ground of the surface centroid.
 
-\subsubsection{Surface Ext Wind Speed {[}m/s{]}}\label{surface-ext-wind-speed-ms}
+\paragraph{Surface Ext Wind Speed {[}m/s{]}}\label{surface-ext-wind-speed-ms}
 
 The outdoor wind speed calculated at the height above ground of the surface centroid.
 
-\subsubsection{System Node Temperature {[}C{]}}\label{system-node-temperature-c}
+\paragraph{System Node Temperature {[}C{]}}\label{system-node-temperature-c}
 
 When reporting for the \textbf{\hyperref[outdoorairnode]{OutdoorAir:Node}} object, this is the outdoor air dry-bulb temperature calculated at the height above ground of the node, if height is specified in the input.

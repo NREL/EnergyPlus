@@ -904,6 +904,8 @@ namespace WeatherManager {
                 "Site Diffuse Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, DifSolarRad, "Zone", "Average", "Environment");
             SetupOutputVariable(
                 "Site Direct Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, BeamSolarRad, "Zone", "Average", "Environment");
+            SetupOutputVariable("Site Total Sky Cover", OutputProcessor::Unit::None, TotalCloudCover, "Zone", "Average", "Environment");
+            SetupOutputVariable("Site Opaque Sky Cover", OutputProcessor::Unit::None, OpaqueCloudCover, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Precipitation Depth", OutputProcessor::Unit::m, LiquidPrecipitation, "Zone", "Sum", "Environment");
             SetupOutputVariable(
                 "Site Ground Reflected Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, GndSolarRad, "Zone", "Average", "Environment");
@@ -929,8 +931,6 @@ namespace WeatherManager {
             SetupOutputVariable("Site Daylighting Model Sky Clearness", OutputProcessor::Unit::None, SkyClearness, "Zone", "Average", "Environment");
             SetupOutputVariable(
                 "Site Daylighting Model Sky Brightness", OutputProcessor::Unit::None, SkyBrightness, "Zone", "Average", "Environment");
-            SetupOutputVariable("Site Total Sky Cover", OutputProcessor::Unit::None, TotalCloudCover, "Zone", "Average", "Environment");
-            SetupOutputVariable("Site Opaque Sky Cover", OutputProcessor::Unit::None, OpaqueCloudCover, "Zone", "Average", "Environment");            
             SetupOutputVariable("Site Daylight Saving Time Status", OutputProcessor::Unit::None, DSTIndicator, "Zone", "State", "Environment");
             SetupOutputVariable("Site Day Type Index", OutputProcessor::Unit::None, RptDayType, "Zone", "State", "Environment");
             SetupOutputVariable("Site Mains Water Temperature", OutputProcessor::Unit::C, WaterMainsTemp, "Zone", "Average", "Environment");
