@@ -37,3 +37,8 @@ A new subtable "Coil Sizing Summary" has been added at the end of the "HVAC Sizi
 A new "Coils Sizing Details" (CoilSizingDetails) report has been added. It is an optional report which is included with AllSummary*. The new report has over 80 columns of data. The "Coil Sizing Summary" subtable described above is a straight subset of this report with only about 30 columns.
 
 See [6454](https://github.com/NREL/EnergyPlus/pull/6454)
+
+### Remove blank fields in Output:Table:SummaryReports
+If any field is blank, remove it and move remaining fields up one.
+
+See [6919](https://github.com/NREL/EnergyPlus/issues/6919)

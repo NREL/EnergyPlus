@@ -51,6 +51,7 @@
 #include <fstream>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+#include <iostream>
 #include <ostream>
 #include <vector>
 #include <cassert>
@@ -124,6 +125,9 @@ private:
 class InputOutputFile
 {
 public:
+    std::string fileName;
+    bool defaultToStdOut = false;
+
     void close();
     void del();
     bool good() const;
@@ -132,14 +136,13 @@ public:
     // a reference back to itself
     InputOutputFile &ensure_open(const std::string &caller);
 
-    std::string fileName;
     void open(const bool forAppend = false);
     std::fstream::pos_type position() const noexcept;
     std::vector<std::string> getLines();
     void open_as_stringstream();
     std::string get_output();
     void flush();
-    explicit InputOutputFile(std::string FileName);
+    explicit InputOutputFile(std::string FileName, const bool DefaultToStdOut = false);
 
 private:
     std::unique_ptr<std::iostream> os;
@@ -265,7 +268,7 @@ public:
     InputOutputFileName delightIn{"eplusout.delightin"};
 
     InputOutputFile mtd{"eplusout.mtd"};
-    InputOutputFile edd{"eplusout.edd"};
+    InputOutputFile edd{"eplusout.edd", true}; // write to stdout if no file never opened
     InputOutputFile shade{"eplusshading.csv"};
 
     InputOutputFileName screenCsv{"eplusscreen.csv"};
@@ -357,8 +360,20 @@ template <typename... Args> void print(std::ostream &os, fmt::string_view format
 
 template <typename... Args> void print(InputOutputFile &outputFile, fmt::string_view format_str, const Args &... args)
 {
-    assert(outputFile.os);
-    EnergyPlus::vprint(*outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));
+    auto *outputStream = [&]() -> std::ostream * {
+        if (outputFile.os) {
+            return outputFile.os.get();
+        } else {
+            if (outputFile.defaultToStdOut) {
+                return &std::cout;
+            } else {
+                assert(outputFile.os);
+                return nullptr;
+            }
+        }
+    }();
+
+    EnergyPlus::vprint(*outputStream, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
 template <typename... Args> std::string format(fmt::string_view format_str, const Args &... args)

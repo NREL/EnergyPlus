@@ -307,10 +307,6 @@ namespace SimulationManager {
         bool AnyUnderwaterBoundaries = false;
         int EnvCount;
 
-        // Windows: ensure that EnergyPlusAPI.dll's notion of the "static singleton IOFiles" matches
-        // the exe's notion.
-        // TODO: Remove this after we have eliminated all remaining calls to IOFiles::getSingleton
-        IOFiles::setSingleton(&state.files);
 
         // CreateSQLiteDatabase();
         sqlite = EnergyPlus::CreateSQLiteDatabase();
@@ -493,6 +489,7 @@ namespace SimulationManager {
         WarmupFlag = true;
 
         while (Available) {
+            if (stopSimulation) break;
 
             GetNextEnvironment(state, Available, ErrorsFound);
 
@@ -547,6 +544,7 @@ namespace SimulationManager {
             ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+                if (stopSimulation) break;
 
                 if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
 
@@ -589,11 +587,14 @@ namespace SimulationManager {
                 }
 
                 for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+                    if (stopSimulation) break;
 
                     BeginHourFlag = true;
                     EndHourFlag = false;
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+                        if (stopSimulation) break;
+
                         if (AnySlabsInModel || AnyBasementsInModel) {
                             SimulateGroundDomains(state, false);
                         }

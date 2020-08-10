@@ -98,6 +98,10 @@ void errorHandler(EnergyPlusState state, const char * message) {
     }
 }
 
+void externalHVAC(EnergyPlusState state) {
+    printf("External HVAC called\n");
+}
+
 int main(int argc, const char * argv[]) {
 //    callbackBeginNewEnvironment(BeginNewEnvironmentHandler);
 //    callbackAfterNewEnvironmentWarmupComplete(AfterNewEnvironmentWarmupCompleteHandler);
@@ -132,5 +136,8 @@ int main(int argc, const char * argv[]) {
         printf("There were %d warnings!\n", numWarnings);
         numWarnings = 0;
     }
+    stateReset(state);
+    registerExternalHVACManager(state, externalHVAC);
+    energyplus(state, argc, argv);
     return 0;
 }
