@@ -11752,7 +11752,6 @@ namespace DXCoils {
         Real64 RhoWater;                 // Density of water [kg/m3]
         Real64 CondAirMassFlow;          // Condenser air mass flow rate [kg/s]
         Real64 EvapCondPumpElecPower;    // Evaporative condenser electric pump power [W]
-        static Real64 MinAirHumRat(0.0); // minimum of the inlet air humidity ratio and the outlet air humidity ratio
         static int DXMode(1);            // Performance mode for MultiMode DX coil; Always 1 for other coil types
         Real64 OutdoorDryBulb;           // Outdoor dry-bulb temperature at condenser (C)
         Real64 OutdoorWetBulb;           // Outdoor wet-bulb temperature at condenser (C)
@@ -12126,8 +12125,7 @@ namespace DXCoils {
                     OutletAirDryBulbTemp = HSOutletAirDryBulbTemp;
                 } else {
                     if (FanOpMode == ContFanCycCoil) {
-                        // average latent heat of vaporization, {J/kg} that maintains correct sensible/latent split;
-                        MinAirHumRat = min(InletAirHumRat, SpeedRatio * HSOutletAirHumRat + (1.0 - SpeedRatio) * LSOutletAirHumRat);
+                        Real64 MinAirHumRat(0.0); // set to zero because MinAirHumRat is unused argument
                         Hfg = PsyHfgAirFnWTdb(MinAirHumRat, HSOutletAirDryBulbTemp * SpeedRatio + (1.0 - SpeedRatio) * LSOutletAirDryBulbTemp);
                         // Average outlet HR
                         OutletAirHumRat = InletAirHumRat - DXCoil(DXCoilNum).LatCoolingEnergyRate / Hfg / DXCoil(DXCoilNum).InletAirMassFlowRate;
@@ -12365,8 +12363,8 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).LatCoolingEnergyRate * CycRatio;
                 if (FanOpMode == ContFanCycCoil) {
                     OutletAirEnthalpy = InletAirEnthalpy - DXCoil(DXCoilNum).TotalCoolingEnergyRate / DXCoil(DXCoilNum).InletAirMassFlowRate;
-                    Hfg = Psychrometrics::PsyHfgAvgFnTdb2Tdb1(OutletAirDryBulbTemp * CycRatio + (1.0 - CycRatio) * InletAirDryBulbTemp,
-                                                              InletAirDryBulbTemp); 
+                    Real64 MinAirHumRat(0.0); // set to zero because MinAirHumRat is unused argument
+                    Hfg = PsyHfgAirFnWTdb(MinAirHumRat, OutletAirDryBulbTemp * CycRatio + (1.0 - CycRatio) * InletAirDryBulbTemp);
                     OutletAirHumRat = InletAirHumRat - DXCoil(DXCoilNum).LatCoolingEnergyRate / Hfg / DXCoil(DXCoilNum).InletAirMassFlowRate;
                     OutletAirDryBulbTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                     if (OutletAirDryBulbTemp < OutletAirDryBulbTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
