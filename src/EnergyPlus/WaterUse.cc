@@ -84,6 +84,7 @@ namespace WaterUse {
     //       MODIFIED       Brent Griffith, plant upgrade
     //       RE-ENGINEERED  na
 
+
     void SimulateWaterUse(BranchInputManagerData &dataBranchInputManager, WaterUseData &dataWaterUse, bool FirstHVACIteration)
     {
 
@@ -103,14 +104,13 @@ namespace WaterUse {
         int WaterEquipNum;
         int WaterConnNum;
         int NumIteration;
-        static bool MyEnvrnFlagLocal(true);
 
         if (dataWaterUse.getWaterUseInputFlag) {
             GetWaterUseInput(dataWaterUse);
             dataWaterUse.getWaterUseInputFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlagLocal) {
+        if (DataGlobals::BeginEnvrnFlag && dataWaterUse.MyEnvrnFlagLocal) {
             if (dataWaterUse.numWaterEquipment > 0) {
                 for (auto &e : dataWaterUse.WaterEquipment) {
                     e.SensibleRate = 0.0;
@@ -128,10 +128,10 @@ namespace WaterUse {
                     e.TotalMassFlowRate = 0.0;
             }
 
-            MyEnvrnFlagLocal = false;
+            dataWaterUse.MyEnvrnFlagLocal = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlagLocal = true;
+        if (!DataGlobals::BeginEnvrnFlag) dataWaterUse.MyEnvrnFlagLocal = true;
 
         // Simulate all unconnected WATER USE EQUIPMENT objects
         for (WaterEquipNum = 1; WaterEquipNum <= dataWaterUse.numWaterEquipment; ++WaterEquipNum) {

@@ -61,9 +61,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
+    class IOFiles;
     struct EnergyPlusData;
-    class OutputFiles;
 
 namespace WeatherManager {
 
@@ -135,7 +134,6 @@ namespace WeatherManager {
     extern Real64 WeatherFileLongitude;
     extern Real64 WeatherFileTimeZone;
     extern Real64 WeatherFileElevation;
-    extern int WeatherFileUnitNumber;                  // File unit number for the weather file
     extern Array1D<Real64> GroundTempsFCFromEPWHeader; // F or C factor method
     extern WaterMainsTempCalcMethod WaterMainsTempsMethod;                  // Water mains temperature calculation method
     extern Real64 WaterMainsTempsAnnualAvgAirTemp;     // Annual average outdoor air temperature (C)
@@ -155,10 +153,41 @@ namespace WeatherManager {
     extern int Envrn;                      // Counter for environments
     extern int NumOfEnvrn;                 // Number of environments to be simulated
 
+    extern Array2D_bool TodayIsRain;             // Rain indicator, true=rain
+    extern Array2D_bool TodayIsSnow;             // Snow indicator, true=snow
+    extern Array2D<Real64> TodayRainAmount;      // ficitious indicator of Rain
+    extern Array2D<Real64> TodaySnowAmount;      // ficitious indicator of Snow
+    extern Array2D<Real64> TodayOutDryBulbTemp;  // Dry bulb temperature of outside air
+    extern Array2D<Real64> TodayOutWetBulbTemp;  // Wet bulb temperature of outside air
+    extern Array2D<Real64> TodayOutDewPointTemp; // Dew Point Temperature of outside air
+    extern Array2D<Real64> TodayOutBaroPress;    // Barometric pressure of outside air
+    extern Array2D<Real64> TodayOutHumRat;       // Humidity ratio of outside air
+    extern Array2D<Real64> TodayOutRelHum;       // Relative Humidity of outside air
+    extern Array2D<Real64> TodayWindSpeed;       // Wind speed of outside air
+    extern Array2D<Real64> TodayWindDir;         // Wind direction of outside air
+    extern Array2D<Real64> TodaySkyTemp;         // Sky temperature
+    extern Array2D<Real64> TodayHorizIRSky;      // Horizontal IR from Sky
+    extern Array2D<Real64> TodayBeamSolarRad;    // Direct normal solar irradiance
+    extern Array2D<Real64> TodayDifSolarRad;     // Sky diffuse horizontal solar irradiance
     extern Array2D<Real64> TodayAlbedo;          // Albedo
+    extern Array2D<Real64> TodayLiquidPrecip;    // Liquid Precipitation Depth (mm)
 
+    extern Array2D_bool TomorrowIsRain;             // Rain indicator, true=rain
+    extern Array2D_bool TomorrowIsSnow;             // Snow indicator, true=snow
+    extern Array2D<Real64> TomorrowRainAmount;      // ficitious indicator of Rain
+    extern Array2D<Real64> TomorrowSnowAmount;      // ficitious indicator of Snow
+    extern Array2D<Real64> TomorrowOutDryBulbTemp;  // Dry bulb temperature of outside air
+    extern Array2D<Real64> TomorrowOutDewPointTemp; // Dew Point Temperature of outside air
+    extern Array2D<Real64> TomorrowOutBaroPress;    // Barometric pressure of outside air
     extern Array2D<Real64> TomorrowOutRelHum;       // Relative Humidity of outside air
+    extern Array2D<Real64> TomorrowWindSpeed;       // Wind speed of outside air
+    extern Array2D<Real64> TomorrowWindDir;         // Wind direction of outside air
+    extern Array2D<Real64> TomorrowSkyTemp;         // Sky temperature
     extern Array2D<Real64> TomorrowHorizIRSky;      // Horizontal IR from Sky
+    extern Array2D<Real64> TomorrowBeamSolarRad;    // Direct normal solar irradiance
+    extern Array2D<Real64> TomorrowDifSolarRad;     // Sky diffuse horizontal solar irradiance
+    extern Array2D<Real64> TomorrowAlbedo;          // Albedo
+    extern Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth
 
     extern Real64 TimeStepFraction;                              // Fraction of hour each time step represents
     extern Array1D_int EndDayOfMonth;
@@ -573,7 +602,7 @@ namespace WeatherManager {
     // Functions
     void clear_state();
 
-    void ManageWeather();
+    void ManageWeather(IOFiles &ioFiles);
 
     void ResetEnvironmentCounter();
 
@@ -614,18 +643,19 @@ namespace WeatherManager {
 
     void SetSpecialDayDates(Array1D_int const &MonWeekDay); // Weekday of each day 1 of month
 
-    void InitializeWeather(bool &printEnvrnStamp); // Set to true when the environment header should be printed
+    void InitializeWeather(IOFiles &ioFiles, bool &printEnvrnStamp); // Set to true when the environment header should be printed
 
     void UpdateWeatherData();
 
     void SetCurrentWeather();
 
-    void ReadWeatherForDay(int DayToRead,          // =1 when starting out, otherwise signifies next day
+    void ReadWeatherForDay(IOFiles &ioFiles,
+                           int DayToRead,          // =1 when starting out, otherwise signifies next day
                            int Environ,            // Environment being simulated
                            bool BackSpaceAfterRead // True if weather file is to be backspaced after read
     );
 
-    void ReadEPlusWeatherForDay(OutputFiles &outputFiles,
+    void ReadEPlusWeatherForDay(IOFiles &ioFiles,
                                 int DayToRead,          // =1 when starting out, otherwise signifies next day
                                 int Environ,            // Environment being simulated
                                 bool BackSpaceAfterRead // True if weather file is to be backspaced after read
@@ -676,7 +706,7 @@ namespace WeatherManager {
                                   Real64 &LiquidPrecip        // LiquidPrecip
     );
 
-    void SetUpDesignDay(OutputFiles &outputFiles, int EnvrnNum); // Environment number passed into the routine
+    void SetUpDesignDay(IOFiles &ioFiles, int EnvrnNum); // Environment number passed into the routine
 
     Real64 AirMass(Real64 CosZen); // COS( solar zenith), 0 - 1
 
@@ -713,24 +743,24 @@ namespace WeatherManager {
 
     void DetermineSunUpDown(Array1D<Real64> &SunDirectionCosines);
 
-    void OpenWeatherFile(bool &ErrorsFound);
+    void OpenWeatherFile(EnergyPlusData &state, bool &ErrorsFound);
 
-    void OpenEPlusWeatherFile(OutputFiles &outputFiles,
+    void OpenEPlusWeatherFile(EnergyPlusData &state,
                               bool &ErrorsFound,       // Will be set to true if errors found
                               bool ProcessHeader // Set to true when headers should be processed (rather than just read)
     );
 
-    void CloseWeatherFile();
+    void CloseWeatherFile(IOFiles &ioFiles);
 
-    void ResolveLocationInformation(OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if no location evident
+    void ResolveLocationInformation(IOFiles &ioFiles, bool &ErrorsFound); // Set to true if no location evident
 
     void CheckLocationValidity();
 
     void CheckWeatherFileValidity();
 
-    void ReportOutputFileHeaders(OutputFiles &outputFiles);
+    void ReportOutputFileHeaders(IOFiles &ioFiles);
 
-    void ReportWeatherAndTimeInformation(OutputFiles &outputFiles,
+    void ReportWeatherAndTimeInformation(IOFiles &ioFiles,
                                          bool &printEnvrnStamp); // Set to true when the environment header should be printed
 
     void ReadUserWeatherInput(EnergyPlusData &state);
@@ -755,9 +785,9 @@ namespace WeatherManager {
 
     void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetGroundReflectances(OutputFiles &outputFiles, bool &ErrorsFound);
+    void GetGroundReflectances(IOFiles &ioFiles, bool &ErrorsFound);
 
-    void GetSnowGroundRefModifiers(OutputFiles &outputFiles, bool &ErrorsFound);
+    void GetSnowGroundRefModifiers(IOFiles &ioFiles, bool &ErrorsFound);
 
     void GetWaterMainsTemperatures(bool &ErrorsFound);
 
@@ -768,7 +798,7 @@ namespace WeatherManager {
                                   Real64 MonthlyOAAvgDryBulbTempMaxDiff // monthly daily average OA drybulb temperature maximum difference
     );
 
-    void GetWeatherStation(OutputFiles &outputFiles, bool &ErrorsFound);
+    void GetWeatherStation(IOFiles &ioFiles, bool &ErrorsFound);
 
     void DayltgCurrentExtHorizIllum();
 
@@ -778,12 +808,9 @@ namespace WeatherManager {
 
     Real64 GetSTM(Real64 Longitude); // Longitude from user input
 
-    void ProcessEPWHeader(std::string const &HeaderString,
-                          std::string &Line,
-                          bool &ErrorsFound         // Set to true when errors were found, unchanged otherwise
-    );
+    void ProcessEPWHeader(IOFiles &ioFiles, std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
 
-    void SkipEPlusWFHeader();
+    void SkipEPlusWFHeader(IOFiles &ioFiles);
 
     void ReportMissing_RangeData();
 
@@ -829,12 +856,12 @@ namespace WeatherManager {
               MonthlyDailyAverageDryBulbTemp(12, 0.0)
         {
         }
-        void CalcAnnualAndMonthlyDryBulbTemp(); // true if this is CorrelationFromWeatherFile
+        void CalcAnnualAndMonthlyDryBulbTemp(IOFiles &ioFiles); // true if this is CorrelationFromWeatherFile
     };
 
     extern AnnualMonthlyDryBulbWeatherData OADryBulbAverage;
 
-    void ReportWaterMainsTempParameters();
+    void ReportWaterMainsTempParameters(IOFiles &ioFiles);
 
 } // namespace WeatherManager
 

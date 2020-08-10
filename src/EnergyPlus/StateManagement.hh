@@ -49,6 +49,5 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-    void clearThisState(EnergyPlusData &state);
-    void clearAllStates(OutputFiles &outputFiles);
+    void clearAllStates(EnergyPlusData &state);
 }
