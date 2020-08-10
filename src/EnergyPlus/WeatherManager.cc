@@ -68,7 +68,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -1187,7 +1186,7 @@ namespace WeatherManager {
 
                         // Report Actual Dates for Daylight Saving and Special Days
                         if (!DataGlobals::KickOffSimulation) {
-                            std::string Source = "";
+                            std::string Source;
                             if (UseDaylightSaving) {
                                 if (EPWDaylightSaving) {
                                     Source = "WeatherFile";
@@ -3294,7 +3293,7 @@ namespace WeatherManager {
         }
     }
 
-    void ErrorInterpretWeatherDataLine(int const WYear, int const WMonth, int const WDay, int const WHour, int const WMinute, std::string const SaveLine, std::string const Line)
+    void ErrorInterpretWeatherDataLine(int const WYear, int const WMonth, int const WDay, int const WHour, int const WMinute, std::string const &SaveLine, std::string const &Line)
     {
         ShowSevereError(format("Invalid Weather Line at date={:4}/{:2}/{:2} Hour#={:2} Min#={:2}", WYear, WMonth, WDay, WHour, WMinute));
         ShowContinueError("Full Data Line=" + SaveLine);
@@ -6897,25 +6896,25 @@ namespace WeatherManager {
         // Initialize Site:GroundTemperature:BuildingSurface object
         siteBuildingSurfaceGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
         if (siteBuildingSurfaceGroundTempsPtr) {
-            ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound ? true : ErrorsFound;
+            ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound || ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:FCFactorMethod object
         siteFCFactorMethodGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "");
         if (siteFCFactorMethodGroundTempsPtr) {
-            ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound ? true : ErrorsFound;
+            ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound || ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:Shallow object
         siteShallowGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:SHALLOW", "");
         if (siteShallowGroundTempsPtr) {
-            ErrorsFound = siteShallowGroundTempsPtr->errorsFound ? true : ErrorsFound;
+            ErrorsFound = siteShallowGroundTempsPtr->errorsFound || ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:Deep object
         siteDeepGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:DEEP", "");
         if (siteDeepGroundTempsPtr) {
-            ErrorsFound = siteDeepGroundTempsPtr->errorsFound ? true : ErrorsFound;
+            ErrorsFound = siteDeepGroundTempsPtr->errorsFound || ErrorsFound;
         }
     }
 
@@ -7796,7 +7795,6 @@ namespace WeatherManager {
                         int actcount = 0;
                         for (int i = 1; i <= 12; ++i) { // take the first set of ground temperatures.
                             Pos = index(Line, ',');
-                            bool errFlag;
                             if (Pos != std::string::npos) {
                                 GroundTempsFCFromEPWHeader(i) = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
                                 ++actcount;
@@ -8234,7 +8232,7 @@ namespace WeatherManager {
 
         bool OutOfRangeHeader = false;
         auto outOfRangeHeaderCheck{
-            [&](Real64 const value, std::string const &description, std::string const &rangeLow, std::string const &rangeHigh, std::string const extraMsg = ""){
+            [&](Real64 const value, std::string const &description, std::string const &rangeLow, std::string const &rangeHigh, std::string const &extraMsg = ""){
                 if (value > 0) {
                     if (!OutOfRangeHeader) {
                         ShowWarningError(RangeString);

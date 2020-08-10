@@ -667,7 +667,7 @@ namespace WeatherManager {
                                    int &currentDayOfWeek          // Current Day of Week
     );
 
-    void ErrorInterpretWeatherDataLine(int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string SaveLine, std::string Line);
+    void ErrorInterpretWeatherDataLine(int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string &SaveLine, std::string &Line);
 
     void InterpretWeatherDataLine(std::string &Line,
                                   bool &ErrorFound,       // True if an error is found, false otherwise
