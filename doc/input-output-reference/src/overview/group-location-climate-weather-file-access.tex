@@ -841,7 +841,7 @@ Of course, these could not all appear in the same IDF as only one DaylightSaving
 
 Sky Temperature, or radiative sky temperature, is internally calculated by EnergyPlus with an empirical model using sky cloudiness factors and current clear sky emissivity. For flexibility, the following object can be entered to override the entire internal sky temperature calculation from schedule import.
 
-In particular, during Weather File Run Periods, the sky temperature is derived by the horizontal infrared radiation if presented in the weather file input by default. For flexibility, the field \textbf{Use Weather File Horizontal IR} can be set to "No" to ignore horizontal IR values from the weather file and always use the specified sky model for horizontal infrared radiation and sky temperature calculations.
+In particular, during Weather File Run Periods, the sky temperature is derived by the horizontal infrared radiation if presented in the weather file input by default. For flexibility, the field \textbf{Use Weather File Horizontal IR} can be set to ``No'' to ignore horizontal IR values from the weather file and always use the specified sky model for horizontal infrared radiation and sky temperature calculations.
 
 By default, EnergyPlus calculates clear sky emissivity using Clark-Allen model. The following object can also be entered to adopt alternative sky emissivity calculation methods. Alternative methods of sky emissivity calculation include the calibrated forms of Berdahl \& Martin, Brunt, and Idso model. Their algorithms are all described in the Engineering Reference document. Much of the literature describes the sky temperature as relative to water vapor pressure, drybulb or dewpoint temperature.
 
@@ -2048,17 +2048,15 @@ Sky\;Temperature = {\left( {\frac{{Horizontal\;IR}}{{Sigma}}} \right)^{\frac{1}{
 
 \paragraph{Site Horizontal Infrared Radiation Rate per Area {[}W/m2{]}}\label{site-horizontal-infrared-radiation-rate-per-area-wm2}
 
-The horizontal infrared radiation intensity is expressed in W/m\(^{2}\) based, if missing from the weather file, on opaque sky cover, sky emissivity, temperature and other factors. The general calculation of Site Horizontal Infrared Radiation Rate per Area is discussed in both the Engineering Reference and the Auxiliary Programs document.
+The horizontal infrared radiation intensity is expressed in W/m$^2$ based, if missing from the weather file, on opaque sky cover, sky emissivity, temperature and other factors. The general calculation of Site Horizontal Infrared Radiation Rate per Area is discussed in both the Engineering Reference and the Auxiliary Programs document.
 
 \paragraph{Site Diffuse Solar Radiation Rate per Area {[}W/m2{]}}\label{site-diffuse-solar-radiation-rate-per-area-wm2}
 
-Diffuse solar is the amount of solar radiation in W/m\(^{2}\) received from the sky (excluding the
-
-solar disk) on a horizontal surface.
+Diffuse solar is the amount of solar radiation in W/m$^2$ received from the sky (excluding the solar disk) on a horizontal surface.
 
 \paragraph{Site Direct Solar Radiation Rate per Area {[}W/m2{]}}\label{site-direct-solar-radiation-rate-per-area-wm2}
 
-Site Direct Solar Radiation Rate per Area is amount of solar radiation in W/m\(^{2}\) received within a 5.7° field of view centered on the sun. This is also known as Beam Solar.
+Site Direct Solar Radiation Rate per Area is amount of solar radiation in W/m$^2$ received within a 5.7$^\circ$ field of view centered on the sun. This is also known as Beam Solar.
 
 \paragraph{Site Precipitation Depth {[}m{]}}\label{site-precipitation-depth-m}
 
@@ -2068,7 +2066,7 @@ If the weather file does not have a liquid precipitation field but does have the
 
 \paragraph{Site Ground Reflected Solar Radiation Rate per Area {[}W/m2{]}}\label{site-ground-reflected-solar-radiation-rate-per-area-wm2}
 
-The ground reflected solar amount (W/m\(^{2}\)) is derived from the Beam Solar, Diffuse Solar, User specified Ground Reflectance (for month) and Solar Altitude Angle:
+The ground reflected solar amount (W/m$^2$) is derived from the Beam Solar, Diffuse Solar, User specified Ground Reflectance (for month) and Solar Altitude Angle:
 
 \begin{multline}
   \rm{Groundreflectedsolar}
@@ -2100,7 +2098,7 @@ Outdoor enthalpy is derived at each timestep from the Site Outdoor Air Drybulb T
 
 \paragraph{Site Outdoor Air Density {[}kg/m3{]}}\label{site-outdoor-air-density-kgm3}
 
-Outdoor air density is derived at each timestep from the Site Outdoor Air Barometric Pressure, the Outdoor Dry-bulb temperature and the Outdoor Humidity Ratio. It is reported in units kg/m\(^{3}\).
+Outdoor air density is derived at each timestep from the Site Outdoor Air Barometric Pressure, the Outdoor Dry-bulb temperature and the Outdoor Humidity Ratio. It is reported in units kg/m$^3$.
 
 \paragraph{Site Solar Azimuth Angle {[}deg{]}}\label{site-solar-azimuth-angle-deg}
 
@@ -2118,7 +2116,7 @@ The Solar Altitude Angle (b) is the angle of the sun above the horizontal (degre
 
 \paragraph{Site Solar Hour Angle {[}deg{]}}\label{site-solar-hour-angle-deg}
 
-The Solar Hour Angle (\emph{H}) gives the apparent solar time for the current time period (degrees). It is common astronomical practice to express the hour angle in hours, minutes and seconds of time rather than in degrees. You can convert the hour angle displayed from EnergyPlus to time by dividing by 15. (Note that 1 hour is equivalent to 15 degrees; 360° of the Earth's rotation takes place every 24 hours.) The relationship of angles in degrees to time is shown in the following table:
+The Solar Hour Angle (\emph{H}) gives the apparent solar time for the current time period (degrees). It is common astronomical practice to express the hour angle in hours, minutes and seconds of time rather than in degrees. You can convert the hour angle displayed from EnergyPlus to time by dividing by 15. (Note that 1 hour is equivalent to 15 degrees; 360$^\circ$ of the Earth's rotation takes place every 24 hours.) The relationship of angles in degrees to time is shown in the following table:
 
 % table 6
 \begin{longtable}[c]{@{}ll@{}}
