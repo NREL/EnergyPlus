@@ -835,18 +835,18 @@ namespace EvaporativeCoolers {
 
         for (EvapCoolNum = 1; EvapCoolNum <= NumEvapCool; ++EvapCoolNum) {
             // Setup Report variables for the Evap Coolers
-            SetupOutputVariable("Evaporative Cooler Electric Energy",
+            SetupOutputVariable("Evaporative Cooler Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 EvapCond(EvapCoolNum).EvapCoolerEnergy,
                                 "System",
                                 "Sum",
                                 EvapCond(EvapCoolNum).EvapCoolerName,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Cooling",
                                 _,
                                 "System");
-            SetupOutputVariable("Evaporative Cooler Electric Power",
+            SetupOutputVariable("Evaporative Cooler Electricity Power",
                                 OutputProcessor::Unit::W,
                                 EvapCond(EvapCoolNum).EvapCoolerPower,
                                 "System",

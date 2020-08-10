@@ -761,7 +761,7 @@ namespace HeatBalanceAirManager {
                                     "System",
                                     "Average",
                                     Zone(ZoneAirBalance(Loop).ZonePtr).Name);
-                SetupOutputVariable("Zone Combined Outdoor Air Fan Electric Energy",
+                SetupOutputVariable("Zone Combined Outdoor Air Fan Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZnAirRpt(ZoneAirBalance(Loop).ZonePtr).OABalanceFanElec,
                                     "System",
@@ -1868,7 +1868,7 @@ namespace HeatBalanceAirManager {
                                                 "System",
                                                 "Average",
                                                 Zone(Ventilation(Loop).ZonePtr).Name);
-                            SetupOutputVariable("Zone Ventilation Fan Electric Energy",
+                            SetupOutputVariable("Zone Ventilation Fan Electricity Energy",
                                                 OutputProcessor::Unit::J,
                                                 ZnAirRpt(Ventilation(Loop).ZonePtr).VentilFanElec,
                                                 "System",
@@ -2271,7 +2271,7 @@ namespace HeatBalanceAirManager {
                                         "System",
                                         "Average",
                                         Zone(Ventilation(VentiCount).ZonePtr).Name);
-                    SetupOutputVariable("Zone Ventilation Fan Electric Energy",
+                    SetupOutputVariable("Zone Ventilation Fan Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZnAirRpt(Ventilation(VentiCount).ZonePtr).VentilFanElec,
                                         "System",

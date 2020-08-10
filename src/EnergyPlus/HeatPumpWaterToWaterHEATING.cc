@@ -389,13 +389,13 @@ namespace HeatPumpWaterToWaterHEATING {
 
         // CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Heating'
         for (GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum) {
-            SetupOutputVariable("Heat Pump Electric Power",
+            SetupOutputVariable("Heat Pump Electricity Power",
                                 OutputProcessor::Unit::W,
                                 GSHP(GSHPNum).Power,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Heat Pump Electric Energy",
+            SetupOutputVariable("Heat Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 GSHP(GSHPNum).Energy,
                                 "System",
