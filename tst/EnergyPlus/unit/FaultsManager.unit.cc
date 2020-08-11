@@ -221,6 +221,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
+    DataEnvironment::StdRhoAir = 1.2;
+
     // Run CheckAndReadFaults which will call GetFanInput if not done yet
     EXPECT_NO_THROW(CheckAndReadFaults(state));
     compare_err_stream("", true);
@@ -307,6 +309,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
+
+    DataEnvironment::StdRhoAir = 1.2;
 
     // Run CheckAndReadFaults which will call GetFanInput if not done yet
     EXPECT_NO_THROW(CheckAndReadFaults(state));
