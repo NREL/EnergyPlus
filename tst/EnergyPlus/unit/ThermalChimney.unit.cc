@@ -61,8 +61,8 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -1094,24 +1094,24 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
 
     bool localErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, localErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
     HeatBalanceManager::GetZoneData(localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, localErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetConstructData(localErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, localErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.files, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, localErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(state.files);
     ScheduleManager::ScheduleInputProcessed = true;
 
     DataHeatBalance::Zone(2).HasWindow = true;

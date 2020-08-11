@@ -55,13 +55,14 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
+    class IOFiles;
     struct EnergyPlusData;
-    class OutputFiles;
 
 namespace ReportSizingManager {
 
     // Functions
+
+    void clear_state();
 
     void ReportSizingOutput(std::string const &CompType,        // the type of the component
                             std::string const &CompName,        // the name of the component

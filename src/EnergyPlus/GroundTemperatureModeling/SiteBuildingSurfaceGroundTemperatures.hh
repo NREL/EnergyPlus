@@ -59,7 +59,7 @@
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 // Derived class for Site:GroundTemperature:BuildingSurface
 class SiteBuildingSurfaceGroundTemps : public BaseGroundTempsModel
@@ -74,7 +74,7 @@ public:
     }
 
     static std::shared_ptr<SiteBuildingSurfaceGroundTemps>
-    BuildingSurfaceGTMFactory(OutputFiles &outputFiles, int objectType, std::string objectName);
+    BuildingSurfaceGTMFactory(IOFiles &ioFiles, int objectType, std::string objectName);
 
     Real64 getGroundTemp() override;
 

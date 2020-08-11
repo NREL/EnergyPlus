@@ -156,13 +156,32 @@ namespace SteamBaseboardRadiator {
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
     Array1D_bool SetLoopIndexFlag; // get loop number flag
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
+    bool GetInputFlag(true); // one time get input flag
+    bool MyOneTimeFlag(true);
+    bool ZoneEquipmentListChecked(false);
 
     // Object Data
     Array1D<SteamBaseboardParams> SteamBaseboard;
     Array1D<SteamBaseboardNumericFieldData> SteamBaseboardNumericFields;
 
+    void clear_state() {
+        NumSteamBaseboards = 0;
+        SteamIndex = 0;
+        QBBSteamRadSource.clear();
+        QBBSteamRadSrcAvg.clear();
+        ZeroSourceSumHATsurf.clear();
+        LastQBBSteamRadSrc.clear();
+        LastSysTimeElapsed.clear();
+        LastTimeStepSys.clear();
+        MySizeFlag.clear();
+        CheckEquipName.clear();
+        SetLoopIndexFlag.clear();
+        GetInputFlag = true;
+        MyOneTimeFlag = true;
+        ZoneEquipmentListChecked = false;
+        SteamBaseboard.clear();
+        SteamBaseboardNumericFields.clear();
+    }
     // Functions
 
     void SimSteamBaseboard(EnergyPlusData &state, std::string const &EquipName,
@@ -191,7 +210,6 @@ namespace SteamBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum;               // index of unit in baseboard array
-        static bool GetInputFlag(true); // one time get input flag
         Real64 QZnReq;                  // zone load not yet satisfied
         Real64 MaxSteamFlow;
         Real64 MinSteamFlow;
@@ -350,7 +368,7 @@ namespace SteamBaseboardRadiator {
         int NumNumbers;        // Number of Numbers for each GetobjectItem call
         int SurfNum;           // Surface number Do loop counter
         int IOStat;
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         bool SteamMessageNeeded;
 
         SteamMessageNeeded = true;
@@ -756,8 +774,6 @@ namespace SteamBaseboardRadiator {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
-        static bool ZoneEquipmentListChecked(false);
         static Array1D_bool MyEnvrnFlag;
         int Loop;
         int SteamInletNode;
@@ -1168,7 +1184,7 @@ namespace SteamBaseboardRadiator {
             // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
             DistributeBBSteamRadGains();
             // Now "simulate" the system by recalculating the heat balances
-            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
             HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
             // Here an assumption is made regarding radiant heat transfer to people.
@@ -1245,16 +1261,6 @@ namespace SteamBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SteamInletNode;
         int SteamOutletNode;
-        static int Iter(0);
-        static bool MyEnvrnFlag(true);
-
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
-            Iter = 0;
-            MyEnvrnFlag = false;
-        }
-        if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
-        }
 
         // First, update the running average if necessary...
         if (LastSysTimeElapsed(BaseboardNum) == SysTimeElapsed) {

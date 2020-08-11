@@ -207,13 +207,13 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Diesel:Facility,         !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    FuelOil#1:Facility,      !- Variable or Meter 3 Name
+    FuelOilNo1:Facility,      !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    FuelOil#1:Facility,      !- Variable or Meter 4 Name
+    FuelOilNo1:Facility,      !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    FuelOil#2:Facility,      !- Variable or Meter 5 Name
+    FuelOilNo2:Facility,      !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    FuelOil#2:Facility,      !- Variable or Meter 6 Name
+    FuelOilNo2:Facility,      !- Variable or Meter 6 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -303,25 +303,25 @@
   Output:Table:Monthly,
     End-Use Energy Consumption - Fuel Oil,  !- Name
     ,                        !- Digits After Decimal
-    ExteriorEquipment:FuelOil#1,  !- Variable or Meter 1 Name
+    ExteriorEquipment:FuelOilNo1,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Cooling:FuelOil#1,       !- Variable or Meter 2 Name
+    Cooling:FuelOilNo1,       !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:FuelOil#1,       !- Variable or Meter 3 Name
+    Heating:FuelOilNo1,       !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    WaterSystems:FuelOil#1,  !- Variable or Meter 4 Name
+    WaterSystems:FuelOilNo1,  !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    Cogeneration:FuelOil#1,  !- Variable or Meter 5 Name
+    Cogeneration:FuelOilNo1,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    ExteriorEquipment:FuelOil#2,  !- Variable or Meter 6 Name
+    ExteriorEquipment:FuelOilNo2,  !- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
-    Cooling:FuelOil#2,       !- Variable or Meter 7 Name
+    Cooling:FuelOilNo2,       !- Variable or Meter 7 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 7
-    Heating:FuelOil#2,       !- Variable or Meter 8 Name
+    Heating:FuelOilNo2,       !- Variable or Meter 8 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 8
-    WaterSystems:FuelOil#2,  !- Variable or Meter 9 Name
+    WaterSystems:FuelOilNo2,  !- Variable or Meter 9 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 9
-    Cogeneration:FuelOil#2,  !- Variable or Meter 10 Name
+    Cogeneration:FuelOilNo2,  !- Variable or Meter 10 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 10
 
   Output:Table:Monthly,
@@ -453,25 +453,25 @@
   Output:Table:Monthly,
     Peak Energy End-Use - Fuel Oil,  !- Name
     ,                        !- Digits After Decimal
-    ExteriorEquipment:FuelOil#1,  !- Variable or Meter 1 Name
+    ExteriorEquipment:FuelOilNo1,  !- Variable or Meter 1 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 1
-    Cooling:FuelOil#1,       !- Variable or Meter 2 Name
+    Cooling:FuelOilNo1,       !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Heating:FuelOil#1,       !- Variable or Meter 3 Name
+    Heating:FuelOilNo1,       !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
-    WaterSystems:FuelOil#1,  !- Variable or Meter 4 Name
+    WaterSystems:FuelOilNo1,  !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    Cogeneration:FuelOil#1,  !- Variable or Meter 5 Name
+    Cogeneration:FuelOilNo1,  !- Variable or Meter 5 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 5
-    ExteriorEquipment:FuelOil#2,  !- Variable or Meter 6 Name
+    ExteriorEquipment:FuelOilNo2,  !- Variable or Meter 6 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 6
-    Cooling:FuelOil#2,       !- Variable or Meter 7 Name
+    Cooling:FuelOilNo2,       !- Variable or Meter 7 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 7
-    Heating:FuelOil#2,       !- Variable or Meter 8 Name
+    Heating:FuelOilNo2,       !- Variable or Meter 8 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 8
-    WaterSystems:FuelOil#2,  !- Variable or Meter 9 Name
+    WaterSystems:FuelOilNo2,  !- Variable or Meter 9 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 9
-    Cogeneration:FuelOil#2,  !- Variable or Meter 10 Name
+    Cogeneration:FuelOilNo2,  !- Variable or Meter 10 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 10
 
   Output:Table:Monthly,

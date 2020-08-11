@@ -1444,7 +1444,7 @@ namespace FaultsManager {
 
             // Read in fan if not done yet
             if (state.fans.GetFanInputFlag) {
-                Fans::GetFanInput(state.fans);
+                Fans::GetFanInput(state);
             }
 
             cFaultCurrentObject = cFaults(9); // fault object string

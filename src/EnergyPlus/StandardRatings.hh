@@ -140,7 +140,7 @@ namespace StandardRatings {
 
     // Functions
 
-    void CalcChillerIPLV(OutputFiles &outputFiles,
+    void CalcChillerIPLV(IOFiles &ioFiles,
                          std::string const &ChillerName,             // Name of Chiller for which IPLV is calculated
                          int const ChillerType,                      // Type of Chiller - EIR or Reformulated EIR
                          Real64 const RefCap,                        // Reference capacity of chiller [W]
@@ -160,7 +160,7 @@ namespace StandardRatings {
                                           Array1<Real64> const &Par         // par(1)  = Condenser inlet temperature at AHRI Standard
     );
 
-    void ReportChillerIPLV(OutputFiles &outputFiles,
+    void ReportChillerIPLV(IOFiles &ioFiles,
                            std::string const &ChillerName, // Name of Chiller for which IPLV is calculated
                            int const ChillerType,          // Type of Chiller - EIR or Reformulated EIR
                            Real64 const IPLVValueSI,       // IPLV value in SI units {W/W}
@@ -175,7 +175,7 @@ namespace StandardRatings {
     );
 
     void CalcDXCoilStandardRating(
-        OutputFiles &outputFiles,
+        IOFiles &ioFiles,
         std::string const &DXCoilName,                             // Name of DX coil for which HSPF is calculated
         std::string const &DXCoilType,                             // Type of DX coil for which HSPF is calculated
         int const DXCoilType_Num,                                  // Integer Type of DX coil - heating or cooling
@@ -294,7 +294,7 @@ namespace StandardRatings {
         Optional_int_const DefrostControl = _                      // defrost control; 1=timed, 2=on-demand
     );
 
-    void ReportDXCoilRating(OutputFiles &outputFiles,
+    void ReportDXCoilRating(IOFiles &ioFiles,
                             std::string const &CompType,    // Type of component
                             std::string const &CompName,    // Name of component
                             int const CompTypeNum,          // TypeNum of component
@@ -310,7 +310,7 @@ namespace StandardRatings {
                             int const RegionNum             // Region Number for which HSPF is calculated
     );
 
-    void ReportDXCoolCoilDataCenterApplication(OutputFiles &outputFiles,
+    void ReportDXCoolCoilDataCenterApplication(IOFiles &ioFiles,
                                                std::string const &CompType,           // Type of component
                                                std::string const &CompName,           // Name of component
                                                int const CompTypeNum,                 // TypeNum of component
