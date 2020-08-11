@@ -1593,8 +1593,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
     DataSurfaces::Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
     DataSurfaces::Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
-    DataSurfaces::Surface(1).activeWindowShadingControl = 1;
-    DataSurfaces::Surface(2).activeWindowShadingControl = 2;
+    DataSurfaces::Surface(1).windowShadingControlList.push_back(1);
+    DataSurfaces::Surface(2).windowShadingControlList.push_back(2);
     DataSurfaces::Surface(1).HasShadeControl = true;
     DataSurfaces::Surface(2).HasShadeControl = true;
 
@@ -1609,6 +1609,9 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::WindowShadingControl(2).ShadingType = DataSurfaces::WSC_ST_ExteriorScreen;
 
     DataSurfaces::TotSurfaces = 2;
+
+    DataSurfaces::Surface(1).activeWindowShadingControl = SolarShading::selectActiveWindowShadingControl(1);
+    DataSurfaces::Surface(2).activeWindowShadingControl = SolarShading::selectActiveWindowShadingControl(2);
 
     SetupWindowShadingControlActuators();
 
