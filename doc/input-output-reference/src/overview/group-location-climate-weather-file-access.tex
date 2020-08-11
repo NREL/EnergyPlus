@@ -1919,7 +1919,7 @@ Site:SpectrumData,
 
 Climate related variables appear in two places for EnergyPlus outputs. Certain objects that are invariant throughout a simulation period have lines appear in the eplusout.eio file. For descriptions of this reporting, please see the Output Details and Examples document.
 
-\subsubsection{Weather Data Related Outputs}\label{outputs-4-008}
+\subsection{Weather Data Related Outputs}\label{outputs-4-008}
 
 Variables related to ambient environment data are available at timestep and higher resolutions. Below is a variable dictionary of these variables and subsequent definitions:
 
@@ -2010,39 +2010,39 @@ Variables related to ambient environment data are available at timestep and high
 
 Note that these data values may be interpolated from ``hour'' points (ref: Weather Data Hourly Interpolation). Most of the data values represent the ``average'' over the reporting resolution period.
 
-\paragraph{Site Outdoor Air Drybulb Temperature {[}C{]}}\label{site-outdoor-air-drybulb-temperature-c}
+\subsubsection{Site Outdoor Air Drybulb Temperature {[}C{]}}\label{site-outdoor-air-drybulb-temperature-c}
 
 This is the outdoor dry-bulb temperature in degrees C.
 
-\paragraph{Site Outdoor Air Dewpoint Temperature {[}C{]}}\label{site-outdoor-air-dewpoint-temperature-c}
+\subsubsection{Site Outdoor Air Dewpoint Temperature {[}C{]}}\label{site-outdoor-air-dewpoint-temperature-c}
 
 This is the outdoor dewpoint temperature in degrees C.
 
-\paragraph{Site Outdoor Air Wetbulb Temperature {[}C{]}}\label{site-outdoor-air-wetbulb-temperature-c}
+\subsubsection{Site Outdoor Air Wetbulb Temperature {[}C{]}}\label{site-outdoor-air-wetbulb-temperature-c}
 
 The outdoor wet-bulb temperature is derived (at the timestep) from the values for dry-bulb temperature, humidity ratio and barometric pressure.
 
-\paragraph{Site Outdoor Air Humidity Ratio {[}kgWater/kgAir{]}}\label{site-outdoor-air-humidity-ratio-kgwaterkgair}
+\subsubsection{Site Outdoor Air Humidity Ratio {[}kgWater/kgAir{]}}\label{site-outdoor-air-humidity-ratio-kgwaterkgair}
 
 The outdoor humidity ratio is derived (at the timestep) from the dry-bulb temperature, relative humidity and barometric pressure.
 
-\paragraph{Site Outdoor Air Relative Humidity {[}\%{]}}\label{site-outdoor-air-relative-humidity}
+\subsubsection{Site Outdoor Air Relative Humidity {[}\%{]}}\label{site-outdoor-air-relative-humidity}
 
 This is the outdoor relative humidity expressed in percent.
 
-\paragraph{Site Outdoor Air Barometric Pressure {[}Pa{]}}\label{site-outdoor-air-barometric-pressure-pa}
+\subsubsection{Site Outdoor Air Barometric Pressure {[}Pa{]}}\label{site-outdoor-air-barometric-pressure-pa}
 
 This is the atmospheric/barometric pressure in Pa.
 
-\paragraph{Site Wind Speed {[}m/s{]}}\label{site-wind-speed-ms}
+\subsubsection{Site Wind Speed {[}m/s{]}}\label{site-wind-speed-ms}
 
 This is the outdoor wind speed in m/s.
 
-\paragraph{Site Wind Direction {[}deg{]}}\label{site-wind-direction-deg}
+\subsubsection{Site Wind Direction {[}deg{]}}\label{site-wind-direction-deg}
 
 This is the wind direction (N = 0, E = 90, S = 180, W = 270).
 
-\paragraph{Site Sky Temperature {[}C{]}}\label{site-sky-temperature-c}
+\subsubsection{Site Sky Temperature {[}C{]}}\label{site-sky-temperature-c}
 
 The sky temperature is derived from horizontal infrared radiation intensity. It is expressed in degrees C. The default calculation is shown below but this value may be modified by the WeatherProperty:SkyTemperature object. Note that Sigma is the Stefan-Boltzmann constant in the following equation:
 
@@ -2050,33 +2050,33 @@ The sky temperature is derived from horizontal infrared radiation intensity. It 
 Sky\;Temperature = {\left( {\frac{{Horizontal\;IR}}{{Sigma}}} \right)^{\frac{1}{4}}} - {273.15_{Conversion\;from\;Kelvin\;to\;Centigrade}}
 \end{equation}
 
-\paragraph{Site Horizontal Infrared Radiation Rate per Area {[}W/m2{]}}\label{site-horizontal-infrared-radiation-rate-per-area-wm2}
+\subsubsection{Site Horizontal Infrared Radiation Rate per Area {[}W/m2{]}}\label{site-horizontal-infrared-radiation-rate-per-area-wm2}
 
 The horizontal infrared radiation intensity is expressed in W/m$^2$ based, if missing from the weather file, on opaque sky cover, sky emissivity, temperature and other factors. The general calculation of Site Horizontal Infrared Radiation Rate per Area is discussed in both the Engineering Reference and the Auxiliary Programs document.
 
-\paragraph{Site Diffuse Solar Radiation Rate per Area {[}W/m2{]}}\label{site-diffuse-solar-radiation-rate-per-area-wm2}
+\subsubsection{Site Diffuse Solar Radiation Rate per Area {[}W/m2{]}}\label{site-diffuse-solar-radiation-rate-per-area-wm2}
 
 Diffuse solar is the amount of solar radiation in W/m$^2$ received from the sky (excluding the solar disk) on a horizontal surface.
 
-\paragraph{Site Direct Solar Radiation Rate per Area {[}W/m2{]}}\label{site-direct-solar-radiation-rate-per-area-wm2}
+\subsubsection{Site Direct Solar Radiation Rate per Area {[}W/m2{]}}\label{site-direct-solar-radiation-rate-per-area-wm2}
 
 Site Direct Solar Radiation Rate per Area is amount of solar radiation in W/m$^2$ received within a 5.7$^\circ$ field of view centered on the sun. This is also known as Beam Solar.
 
-\paragraph{Site Total Sky Cover {[]}}\label{site-total-sky-cover}
+\subsubsection{Site Total Sky Cover {[]}}\label{site-total-sky-cover}
 
-This is the Total Sky cover in tenths of sky. The value ranges from 0 (clear) to 10 (full cover). 
+This is the total sky cover in tenths of sky. The value ranges from 0 (clear) to 10 (full cover). 
 
-\paragraph{Site Opaque Sky Cover {[]}}\label{site-opaque-sky-cover}
+\subsubsection{Site Opaque Sky Cover {[]}}\label{site-opaque-sky-cover}
 
-This is the Opaque Sky Cover in tenths of sky. The value ranges from 0 (clear) to 10 (full cover). 
+This is the opaque sky Cover in tenths of sky. The value ranges from 0 (clear) to 10 (full cover). 
 
-\paragraph{Site Precipitation Depth {[}m{]}}\label{site-precipitation-depth-m}
+\subsubsection{Site Precipitation Depth {[}m{]}}\label{site-precipitation-depth-m}
 
 This is the amount of liquid precipitation (m). The source of this field may be the weather file or the Site:Precipitation object. The weather file values are in millimeters, but the report here is in meters. Two separate entities are displayed -- from the weather file the key value is ``Environment''; from the Site:Precipitation object the key value is Site:Precipitation.
 
 If the weather file does not have a liquid precipitation field but does have the present weather fields, then a heuristic calculation is attempted for both flagging when it is raining and the amount of precipitation. If the weather file does have liquid precipitation fields, then the output (e.g. monthly) can be compared with the weather file stat file.
 
-\paragraph{Site Ground Reflected Solar Radiation Rate per Area {[}W/m2{]}}\label{site-ground-reflected-solar-radiation-rate-per-area-wm2}
+\subsubsection{Site Ground Reflected Solar Radiation Rate per Area {[}W/m2{]}}\label{site-ground-reflected-solar-radiation-rate-per-area-wm2}
 
 The ground reflected solar amount (W/m$^2$) is derived from the Beam Solar, Diffuse Solar, User specified Ground Reflectance (for month) and Solar Altitude Angle:
 
@@ -2088,31 +2088,31 @@ The ground reflected solar amount (W/m$^2$) is derived from the Beam Solar, Diff
 
 where if the calculation returns a value \textless{} 0.0, then 0.0 will be reported.
 
-\paragraph{Site Ground Temperature {[}C{]}}\label{site-ground-temperature-c}
+\subsubsection{Site Ground Temperature {[}C{]}}\label{site-ground-temperature-c}
 
 The ground temperature is reported in degrees C -- this is a user-specified input by month.
 
-\paragraph{Site Surface Ground Temperature {[}C{]}}\label{site-surface-ground-temperature-c}
+\subsubsection{Site Surface Ground Temperature {[}C{]}}\label{site-surface-ground-temperature-c}
 
 The ground temperature is reported in degrees C -- this is a user-specified input (object: Site:GroundTemperature:Shallow) by month.
 
-\paragraph{Site Deep Ground Temperature {[}C{]}}\label{site-deep-ground-temperature-c}
+\subsubsection{Site Deep Ground Temperature {[}C{]}}\label{site-deep-ground-temperature-c}
 
 The ground temperature is reported in degrees C -- this is a user-specified input (object: Site:GroundTemperature:Deep) by month.
 
-\paragraph{Site Simple Factor Model Ground Temperature {[}C{]}}\label{site-simple-factor-model-ground-temperature-c}
+\subsubsection{Site Simple Factor Model Ground Temperature {[}C{]}}\label{site-simple-factor-model-ground-temperature-c}
 
 The Site Simple Factor Model Ground Temperature is reported in degrees C -- this is a user-specified input (object: Site:GroundTemperature:FCfactorMethod) by month or gleaned from the weather file as noted in the description of the object.
 
-\paragraph{Site Outdoor Air Enthalpy {[}J/kg{]}}\label{site-outdoor-air-enthalpy-jkg}
+\subsubsection{Site Outdoor Air Enthalpy {[}J/kg{]}}\label{site-outdoor-air-enthalpy-jkg}
 
 Outdoor enthalpy is derived at each timestep from the Site Outdoor Air Drybulb Temperature and the Site Outdoor Air Humidity Ratio. It is reported in J/kg.
 
-\paragraph{Site Outdoor Air Density {[}kg/m3{]}}\label{site-outdoor-air-density-kgm3}
+\subsubsection{Site Outdoor Air Density {[}kg/m3{]}}\label{site-outdoor-air-density-kgm3}
 
 Outdoor air density is derived at each timestep from the Site Outdoor Air Barometric Pressure, the Outdoor Dry-bulb temperature and the Outdoor Humidity Ratio. It is reported in units kg/m$^3$.
 
-\paragraph{Site Solar Azimuth Angle {[}deg{]}}\label{site-solar-azimuth-angle-deg}
+\subsubsection{Site Solar Azimuth Angle {[}deg{]}}\label{site-solar-azimuth-angle-deg}
 
 The Solar Azimuth Angle (f) is measured from the North (clockwise) and is expressed in degrees. This is shown more clearly in the following figure.
 
@@ -2122,11 +2122,11 @@ The Solar Azimuth Angle (f) is measured from the North (clockwise) and is expres
 \caption{Solar Position Illustration \protect \label{fig:solar-position-illustration}}
 \end{figure}
 
-\paragraph{Site Solar Altitude Angle {[}deg{]}}\label{site-solar-altitude-angle-deg}
+\subsubsection{Site Solar Altitude Angle {[}deg{]}}\label{site-solar-altitude-angle-deg}
 
 The Solar Altitude Angle (b) is the angle of the sun above the horizontal (degrees).
 
-\paragraph{Site Solar Hour Angle {[}deg{]}}\label{site-solar-hour-angle-deg}
+\subsubsection{Site Solar Hour Angle {[}deg{]}}\label{site-solar-hour-angle-deg}
 
 The Solar Hour Angle (\emph{H}) gives the apparent solar time for the current time period (degrees). It is common astronomical practice to express the hour angle in hours, minutes and seconds of time rather than in degrees. You can convert the hour angle displayed from EnergyPlus to time by dividing by 15. (Note that 1 hour is equivalent to 15 degrees; 360$^\circ$ of the Earth's rotation takes place every 24 hours.) The relationship of angles in degrees to time is shown in the following table:
 
@@ -2151,41 +2151,41 @@ Unit of Angle & Equivalent time \tabularnewline
 \bottomrule
 \end{longtable}
 
-\paragraph{Site Rain Status {[]}}\label{site-rain-status}
+\subsubsection{Site Rain Status {[]}}\label{site-rain-status}
 
 This field shows whether or not (1 = yes, 0 = no) the weather shows ``raining''. For a Design Day, one can denote rain for the entire day but not timestep by timestep. Weather files may indicate rain for a single time interval. This is an ``averaged'' field -- thus a 1 shown for a time period (e.g. daily reporting) means that it was raining during each timestep of that period.
 
-\paragraph{Site Snow on Ground Status {[]}}\label{site-snow-on-ground-status}
+\subsubsection{Site Snow on Ground Status {[]}}\label{site-snow-on-ground-status}
 
 This field shows whether or not (1 = yes, 0 = no) the weather shows ``snow on the ground''. For a Design Day, one can denote snow for the entire day but not timestep by timestep. Weather files may indicate snow (snow depth) for a single time interval. This is an ``averaged'' field -- thus a 1 shown for a time period (e.g. daily reporting) means that there was snow on the ground during each timestep of that period.
 
-\paragraph{Site Daylight Saving Time Status {[]}}\label{site-daylight-saving-time-status}
+\subsubsection{Site Daylight Saving Time Status {[]}}\label{site-daylight-saving-time-status}
 
 This field shows when daylight saving time (1 = yes, 0 = no) is in effect. Though shown as an average variable, this value is only set on a daily basis.
 
-\paragraph{Site Day Type Index {[]}}\label{site-day-type-index}
+\subsubsection{Site Day Type Index {[]}}\label{site-day-type-index}
 
 This field shows what ``day type'' the current day is. Day types are (1 = Sunday, 2 = Monday, etc.) with Holiday = 8, SummerDesignDay = 9, WinterDesignDay = 10, CustomDay1 = 11, CustomDay2 = 12. Though shown as an average variable, this value is only set on a daily basis.
 
-\paragraph{Site Mains Water Temperature {[}C{]}}\label{site-mains-water-temperature-c}
+\subsubsection{Site Mains Water Temperature {[}C{]}}\label{site-mains-water-temperature-c}
 
 The value of the Water Mains Temperature is reported in C following the calculation shown in the Water Mains Temperature object.
 
-\paragraph{Site Precipitation Rate {[}m/s{]}}\label{site-precipitation-rate-ms}
+\subsubsection{Site Precipitation Rate {[}m/s{]}}\label{site-precipitation-rate-ms}
 
-\paragraph{Site Precipitation Depth {[}m{]}}\label{site-precipitation-depth-m-1}
+\subsubsection{Site Precipitation Depth {[}m{]}}\label{site-precipitation-depth-m-1}
 
 The rate and quantity of precipitation at the site. These outputs are only available if a Site Precipitation object is used. Precipitation is measured in meters.
 
-\paragraph{Water System Roof Irrigation Scheduled Depth{[}m{]}}\label{water-system-roof-irrigation-scheduled-depthm}
+\subsubsection{Water System Roof Irrigation Scheduled Depth{[}m{]}}\label{water-system-roof-irrigation-scheduled-depthm}
 
 This is the scheduled amount of irrigation for the green roof (ecoroof) based on the user input. Amount is measured in meters.
 
-\paragraph{Water System Roof Irrigation Actual Depth{[}m{]}}\label{water-system-roof-irrigation-actual-depthm}
+\subsubsection{Water System Roof Irrigation Actual Depth{[}m{]}}\label{water-system-roof-irrigation-actual-depthm}
 
 This is the actual amount of irrigation for the green roof (ecoroof) based on the scheduled user input and moisture state/saturation of the soil. Amount is measured in meters.
 
-\subsubsection{Outputs for local temperature/wind speed calculations}\label{outputs-for-local-temperaturewind-speed-calculations}
+\subsection{Outputs for local temperature/wind speed calculations}\label{outputs-for-local-temperaturewind-speed-calculations}
 
 Local atmospheric properties for outdoor air temperature and wind speed are separately calculated and reported for all zones, surfaces, and outdoor air nodes. The output variables are associated with their respective objects:
 
@@ -2206,30 +2206,30 @@ Local atmospheric properties for outdoor air temperature and wind speed are sepa
   HVAC,Average,System Node Temperature {[}C{]}~~~~~~~ (for OUTDOOR AIR NODE object)
 \end{itemize}
 
-\paragraph{Zone Outdoor Air Drybulb Temperature {[}C{]}}\label{zone-outdoor-air-drybulb-temperature-c}
+\subsubsection{Zone Outdoor Air Drybulb Temperature {[}C{]}}\label{zone-outdoor-air-drybulb-temperature-c}
 
 The outdoor air dry-bulb temperature calculated at the height above ground of the zone centroid.
 
-\paragraph{Zone Outdoor Air Wetbulb Temperature {[}C{]}}\label{zone-outdoor-air-wetbulb-temperature-c}
+\subsubsection{Zone Outdoor Air Wetbulb Temperature {[}C{]}}\label{zone-outdoor-air-wetbulb-temperature-c}
 
 The outdoor air wet-bulb temperature calculated at the height above ground of the zone centroid.
 
-\paragraph{Zone Outdoor Air Wind Speed {[}m/s{]}}\label{zone-outdoor-air-wind-speed-ms}
+\subsubsection{Zone Outdoor Air Wind Speed {[}m/s{]}}\label{zone-outdoor-air-wind-speed-ms}
 
 The outdoor wind speed calculated at the height above ground of the zone centroid.
 
-\paragraph{Surface Ext Outdoor Dry Bulb {[}C{]}}\label{surface-ext-outdoor-dry-bulb-c}
+\subsubsection{Surface Ext Outdoor Dry Bulb {[}C{]}}\label{surface-ext-outdoor-dry-bulb-c}
 
 The outdoor air dry-bulb temperature calculated at the height above ground of the surface centroid.
 
-\paragraph{Surface Ext Outdoor Wet Bulb {[}C{]}}\label{surface-ext-outdoor-wet-bulb-c}
+\subsubsection{Surface Ext Outdoor Wet Bulb {[}C{]}}\label{surface-ext-outdoor-wet-bulb-c}
 
 The outdoor air wet-bulb temperature calculated at the height above ground of the surface centroid.
 
-\paragraph{Surface Ext Wind Speed {[}m/s{]}}\label{surface-ext-wind-speed-ms}
+\subsubsection{Surface Ext Wind Speed {[}m/s{]}}\label{surface-ext-wind-speed-ms}
 
 The outdoor wind speed calculated at the height above ground of the surface centroid.
 
-\paragraph{System Node Temperature {[}C{]}}\label{system-node-temperature-c}
+\subsubsection{System Node Temperature {[}C{]}}\label{system-node-temperature-c}
 
 When reporting for the \textbf{\hyperref[outdoorairnode]{OutdoorAir:Node}} object, this is the outdoor air dry-bulb temperature calculated at the height above ground of the node, if height is specified in the input.
