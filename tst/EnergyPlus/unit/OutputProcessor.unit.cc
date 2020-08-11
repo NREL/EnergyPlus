@@ -3541,8 +3541,8 @@ namespace OutputProcessor {
     TEST_F(EnergyPlusFixture, OutputProcessor_setupOutputVariable_endUseSubKey)
     {
         std::string const idf_objects = delimited_string({
-            "Output:Variable,*,Chiller Electric Energy,runperiod;",
-            "Output:Variable,*,Lights Electric Energy,runperiod;",
+            "Output:Variable,*,Chiller Electricity Energy,runperiod;",
+            "Output:Variable,*,Lights Electricity Energy,runperiod;",
             "Output:Variable,*,Environmental Impact Fuel Oil No 2 CO2 Emissions Mass,runperiod;",
         });
 
@@ -3551,7 +3551,7 @@ namespace OutputProcessor {
         GetReportVariableInput(state.files);
 
         Real64 cooling_consumption = 0.;
-        SetupOutputVariable("Chiller Electric Energy",
+        SetupOutputVariable("Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
                             cooling_consumption,
                             "System",
@@ -3565,7 +3565,7 @@ namespace OutputProcessor {
 
 
         Real64 light_consumption = 0.;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3903,15 +3903,15 @@ namespace OutputProcessor {
             "    MyGeneralLights,         !- Name",
             "    Electricity,             !- Fuel Type",
             "    SPACE1-1 Lights 1,       !- Key Name 1",
-            "    Lights Electric Energy,  !- Output Variable or Meter Name 1",
+            "    Lights Electricity Energy,  !- Output Variable or Meter Name 1",
             "    SPACE2-1 Lights 1,       !- Key Name 2",
-            "    Lights Electric Energy,  !- Output Variable or Meter Name 2",
+            "    Lights Electricity Energy,  !- Output Variable or Meter Name 2",
             "    SPACE3-1 Lights 1,       !- Key Name 3",
-            "    Lights Electric Energy,  !- Output Variable or Meter Name 3",
+            "    Lights Electricity Energy,  !- Output Variable or Meter Name 3",
             "    SPACE4-1 Lights 1,       !- Key Name 4",
-            "    Lights Electric Energy,  !- Output Variable or Meter Name 4",
+            "    Lights Electricity Energy,  !- Output Variable or Meter Name 4",
             "    SPACE5-1 Lights 1,       !- Key Name 5",
-            "    Lights Electric Energy;  !- Output Variable or Meter Name 5",
+            "    Lights Electricity Energy;  !- Output Variable or Meter Name 5",
             "  Meter:Custom,",
             "    Building Infiltration Heat Loss,  !- Name",
             "    Generic,                 !- Fuel Type",
@@ -3927,7 +3927,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
         Real64 light_consumption = 0;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3941,7 +3941,7 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3955,7 +3955,7 @@ namespace OutputProcessor {
                             "SPACE2-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3969,7 +3969,7 @@ namespace OutputProcessor {
                             "SPACE3-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3983,7 +3983,7 @@ namespace OutputProcessor {
                             "SPACE4-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4149,7 +4149,7 @@ namespace OutputProcessor {
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4163,7 +4163,7 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4177,7 +4177,7 @@ namespace OutputProcessor {
                             "SPACE2-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4191,7 +4191,7 @@ namespace OutputProcessor {
                             "SPACE3-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4205,7 +4205,7 @@ namespace OutputProcessor {
                             "SPACE4-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4393,7 +4393,7 @@ namespace OutputProcessor {
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4407,7 +4407,7 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4421,7 +4421,7 @@ namespace OutputProcessor {
                             "SPACE2-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4435,7 +4435,7 @@ namespace OutputProcessor {
                             "SPACE3-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4449,7 +4449,7 @@ namespace OutputProcessor {
                             "SPACE4-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4650,7 +4650,7 @@ namespace OutputProcessor {
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4664,7 +4664,7 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4678,7 +4678,7 @@ namespace OutputProcessor {
                             "SPACE2-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4692,7 +4692,7 @@ namespace OutputProcessor {
                             "SPACE3-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4706,7 +4706,7 @@ namespace OutputProcessor {
                             "SPACE4-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4995,7 +4995,7 @@ namespace OutputProcessor {
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -5076,7 +5076,7 @@ namespace OutputProcessor {
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
