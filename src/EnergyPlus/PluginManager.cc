@@ -845,21 +845,12 @@ namespace PluginManagement {
                     std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
                     PluginManager::addToPythonPath(sanitizedInputFileDir, false);
                 }
-                if (fields.find("search_path_1") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_1")), true);
-                }
-                if (fields.find("search_path_2") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_2")), true);
-                }
-                if (fields.find("search_path_3") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_3")), true);
-                }
-                if (fields.find("search_path_4") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_4")), true);
-                }
-                if (fields.find("search_path_5") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_5")), true);
-                }
+                try {
+                    auto const vars = fields.at("py_search_paths");
+                    for (const auto &var : vars) {
+                        PluginManager::addToPythonPath(PluginManager::sanitizedPath(var.at("search_path")), true);
+                    }
+                } catch (...) {}
             }
         }
 
