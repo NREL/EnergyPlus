@@ -8920,7 +8920,8 @@ namespace WeatherManager {
                         }
                     }
                 }
-                Array1D<int> EndDayOfMonthLocal{EndDayOfMonth}; // number of days in each month
+                Array1D<int> EndDayOfMonthLocal;
+                EndDayOfMonthLocal = EndDayOfMonth;
                 if (epwHasLeapYear) {
                     // increase number of days for february by one day if weather data has leap year
                     EndDayOfMonthLocal(2) = EndDayOfMonthLocal(2) + 1;
