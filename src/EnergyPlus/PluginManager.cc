@@ -62,6 +62,8 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <nlohmann/json.hpp>
+
 namespace EnergyPlus {
 namespace PluginManagement {
     std::unique_ptr<PluginManager> pluginManager;
@@ -850,7 +852,10 @@ namespace PluginManagement {
                     for (const auto &var : vars) {
                         PluginManager::addToPythonPath(PluginManager::sanitizedPath(var.at("search_path")), true);
                     }
-                } catch (...) {}
+                } catch (nlohmann::json::out_of_range& e) {
+                    // catch when no paths are passed
+                    // nothing to do here
+                }
             }
         }
 
