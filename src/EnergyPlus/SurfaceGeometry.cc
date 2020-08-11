@@ -1943,7 +1943,7 @@ namespace SurfaceGeometry {
 
                 // TH 2/9/2010. Fixed for CR 8010 for speed up purpose rather than fixing the problem
                 if (Surface(SurfNum).HasShadeControl) {
-                    WinShadingControlPtr = Surface(SurfNum).windowShadingControlList.front(); // use first item since others should be identical
+                    WinShadingControlPtr = Surface(SurfNum).activeWindowShadingControl; // use first item since others should be identical
                     if (WindowShadingControl(WinShadingControlPtr).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle)
                         SurfaceWindow(SurfNum).MovableSlats = true;
                 }
@@ -1994,9 +1994,6 @@ namespace SurfaceGeometry {
                     //  ENDIF
                     // ENDIF
                 }
-
-                // set the active shading control to the first one defined for now - this will be updated during timestep later
-                Surface(SurfNum).activeWindowShadingControl = Surface(SurfNum).windowShadingControlList.front();
 
             } // End of surface loop
 
@@ -4580,7 +4577,7 @@ namespace SurfaceGeometry {
         // Otherwise, create shaded construction if WindowShadingControl for this window has
         // interior or exterior shade/blind (but not between-glass shade/blind) specified.
 
-        WSCPtr = SurfaceTmp(SurfNum).windowShadingControlList.front(); // only need to do the first since the rest should have the same shading type and construction
+        WSCPtr = SurfaceTmp(SurfNum).activeWindowShadingControl; // only need to do the first since the rest should have the same shading type and construction
         ConstrNumSh = 0;
         if (!ErrorsFound && SurfaceTmp(SurfNum).HasShadeControl) {
             ConstrNumSh = WindowShadingControl(WSCPtr).ShadedConstruction;
@@ -8420,6 +8417,7 @@ namespace SurfaceGeometry {
                 if (UtilityRoutines::SameString(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), SurfaceTmp(SurfNum).Name)) {
                     SurfaceTmp(SurfNum).windowShadingControlList.push_back(iShadeCtrl);
                     SurfaceTmp(SurfNum).HasShadeControl = true;
+                    SurfaceTmp(SurfNum).activeWindowShadingControl = iShadeCtrl;
                     // check to make the window refenced is an exterior window
                     if (SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) {
                         ErrorsFound = true;

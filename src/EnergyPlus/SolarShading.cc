@@ -1566,7 +1566,7 @@ namespace SolarShading {
                     // Added TH 5/26/2009 for switchable windows to report switching factor (tinted level)
                     // CurrentModuleObject='Switchable Windows'
                     if (Surface(SurfLoop).HasShadeControl) {
-                        if (WindowShadingControl(Surface(SurfLoop).windowShadingControlList.front()).ShadingType == WSC_ST_SwitchableGlazing) {
+                        if (WindowShadingControl(Surface(SurfLoop).activeWindowShadingControl).ShadingType == WSC_ST_SwitchableGlazing) {
                             // IF (SurfaceWindow(SurfLoop)%ShadingFlag == SwitchableGlazing) THEN  !ShadingFlag is not set to SwitchableGlazing yet!
                             SetupOutputVariable("Surface Window Switchable Glazing Switching Factor",
                                                 OutputProcessor::Unit::None,
@@ -10348,7 +10348,7 @@ namespace SolarShading {
     int selectActiveWindowShadingControl(int curSurface)
     {
         // J. Glazer - Aug 2020 - For a given surface, determine based on the schedules which window shading control object should be active
-        int selected;
+        int selected = 0;
         if (Surface(curSurface).windowShadingControlList.size() == 1) {
             selected = Surface(curSurface).windowShadingControlList.front();
         } else {

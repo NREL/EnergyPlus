@@ -3312,40 +3312,40 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     Surface.allocate(TotSurfaces);
 
     Surface(1).Name = "Fene-07";
-    Surface(1).activeWindowShadingControl = 2;
+    Surface(1).windowShadingControlList.push_back(2);
 
     Surface(2).Name = "Fene-01";
-    Surface(2).activeWindowShadingControl = 1;
+    Surface(2).windowShadingControlList.push_back(1);
 
     Surface(3).Name = "Fene-08";
-    Surface(3).activeWindowShadingControl = 3;
+    Surface(3).windowShadingControlList.push_back(3);
 
     Surface(4).Name = "Fene-02";
-    Surface(4).activeWindowShadingControl = 1;
+    Surface(4).windowShadingControlList.push_back(1);
 
     Surface(5).Name = "Fene-10";
-    Surface(5).activeWindowShadingControl = 0;
+    Surface(5).windowShadingControlList.push_back(0);
 
     Surface(6).Name = "Fene-03";
-    Surface(6).activeWindowShadingControl = 1;
+    Surface(6).windowShadingControlList.push_back(1);
 
     Surface(7).Name = "Fene-09";
-    Surface(7).activeWindowShadingControl = 3;
+    Surface(7).windowShadingControlList.push_back(3);
 
     Surface(8).Name = "Fene-04";
-    Surface(8).activeWindowShadingControl = 2;
+    Surface(8).windowShadingControlList.push_back(2);
 
     Surface(9).Name = "Fene-10";
-    Surface(9).activeWindowShadingControl = 0;
+    Surface(9).windowShadingControlList.push_back(0);
 
     Surface(10).Name = "Fene-05";
-    Surface(10).activeWindowShadingControl = 2;
+    Surface(10).windowShadingControlList.push_back(2);
 
     Surface(11).Name = "Fene-11";
-    Surface(11).activeWindowShadingControl = 0;
+    Surface(11).windowShadingControlList.push_back(0);
 
     Surface(12).Name = "Fene-06";
-    Surface(12).activeWindowShadingControl = 2;
+    Surface(12).windowShadingControlList.push_back(2);
 
     bool Err = false;
 
