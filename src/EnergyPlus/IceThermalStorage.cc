@@ -1136,9 +1136,9 @@ namespace IceThermalStorage {
         SetupOutputVariable("Ice Thermal Storage Cooling Charge Energy", OutputProcessor::Unit::J, this->ChargingEnergy, "System", "Sum", this->Name);
 
         SetupOutputVariable(
-            "Ice Thermal Storage Ancillary Electric Power", OutputProcessor::Unit::W, this->ParasiticElecRate, "System", "Average", this->Name);
+            "Ice Thermal Storage Ancillary Electricity Power", OutputProcessor::Unit::W, this->ParasiticElecRate, "System", "Average", this->Name);
 
-        SetupOutputVariable("Ice Thermal Storage Ancillary Electric Energy",
+        SetupOutputVariable("Ice Thermal Storage Ancillary Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->ParasiticElecEnergy,
                             "System",

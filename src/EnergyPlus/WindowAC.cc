@@ -667,13 +667,13 @@ namespace WindowAC {
                                 "System",
                                 "Sum",
                                 state.dataWindowAC.WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Electric Power",
+            SetupOutputVariable("Zone Window Air Conditioner Electricity Power",
                                 OutputProcessor::Unit::W,
                                 state.dataWindowAC.WindAC(WindACNum).ElecPower,
                                 "System",
                                 "Average",
                                 state.dataWindowAC.WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Electric Energy",
+            SetupOutputVariable("Zone Window Air Conditioner Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWindowAC.WindAC(WindACNum).ElecConsumption,
                                 "System",

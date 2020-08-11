@@ -6491,13 +6491,13 @@ namespace RefrigeratedCase {
                                         "Sum",
                                         RefrigCase(caseNum).Name);
 
-                    SetupOutputVariable("Refrigeration Case Evaporator Fan Electric Power",
+                    SetupOutputVariable("Refrigeration Case Evaporator Fan Electricity Power",
                                         OutputProcessor::Unit::W,
                                         RefrigCase(caseNum).ElecFanPower,
                                         "Zone",
                                         "Average",
                                         RefrigCase(caseNum).Name);
-                    SetupOutputVariable("Refrigeration Case Evaporator Fan Electric Energy",
+                    SetupOutputVariable("Refrigeration Case Evaporator Fan Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         RefrigCase(caseNum).ElecFanConsumption,
                                         "Zone",
@@ -6509,13 +6509,13 @@ namespace RefrigeratedCase {
                                         "General",
                                         "Building",
                                         RefrigCase(caseNum).ZoneName);
-                    SetupOutputVariable("Refrigeration Case Lighting Electric Power",
+                    SetupOutputVariable("Refrigeration Case Lighting Electricity Power",
                                         OutputProcessor::Unit::W,
                                         RefrigCase(caseNum).ElecLightingPower,
                                         "Zone",
                                         "Average",
                                         RefrigCase(caseNum).Name);
-                    SetupOutputVariable("Refrigeration Case Lighting Electric Energy",
+                    SetupOutputVariable("Refrigeration Case Lighting Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         RefrigCase(caseNum).ElecLightingConsumption,
                                         "Zone",
@@ -6547,13 +6547,13 @@ namespace RefrigeratedCase {
 
                     // Report only for cases having anti-sweat heaters
                     if (RefrigCase(caseNum).AntiSweatControlType > ASNone) {
-                        SetupOutputVariable("Refrigeration Case Anti Sweat Electric Power",
+                        SetupOutputVariable("Refrigeration Case Anti Sweat Electricity Power",
                                             OutputProcessor::Unit::W,
                                             RefrigCase(caseNum).ElecAntiSweatPower,
                                             "Zone",
                                             "Average",
                                             RefrigCase(caseNum).Name);
-                        SetupOutputVariable("Refrigeration Case Anti Sweat Electric Energy",
+                        SetupOutputVariable("Refrigeration Case Anti Sweat Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             RefrigCase(caseNum).ElecAntiSweatConsumption,
                                             "Zone",
@@ -6571,13 +6571,13 @@ namespace RefrigeratedCase {
 
                     if (RefrigCase(caseNum).DefrostType == DefElectric || RefrigCase(caseNum).DefrostType == DefElectricOnDemand ||
                         RefrigCase(caseNum).DefrostType == DefElectricTerm) {
-                        SetupOutputVariable("Refrigeration Case Defrost Electric Power",
+                        SetupOutputVariable("Refrigeration Case Defrost Electricity Power",
                                             OutputProcessor::Unit::W,
                                             RefrigCase(caseNum).ElecDefrostPower,
                                             "Zone",
                                             "Average",
                                             RefrigCase(caseNum).Name);
-                        SetupOutputVariable("Refrigeration Case Defrost Electric Energy",
+                        SetupOutputVariable("Refrigeration Case Defrost Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             RefrigCase(caseNum).ElecDefrostConsumption,
                                             "Zone",
@@ -6651,25 +6651,25 @@ namespace RefrigeratedCase {
                                         "Zone",
                                         "Sum",
                                         WalkIn(walkInNum).Name);
-                    SetupOutputVariable("Refrigeration Walk In Ancillary Electric Power",
+                    SetupOutputVariable("Refrigeration Walk In Ancillary Electricity Power",
                                         OutputProcessor::Unit::W,
                                         WalkIn(walkInNum).TotalElecPower,
                                         "Zone",
                                         "Average",
                                         WalkIn(walkInNum).Name);
-                    SetupOutputVariable("Refrigeration Walk In Ancillary Electric Energy",
+                    SetupOutputVariable("Refrigeration Walk In Ancillary Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         WalkIn(walkInNum).TotalElecConsumption,
                                         "Zone",
                                         "Sum",
                                         WalkIn(walkInNum).Name);
-                    SetupOutputVariable("Refrigeration Walk In Fan Electric Power",
+                    SetupOutputVariable("Refrigeration Walk In Fan Electricity Power",
                                         OutputProcessor::Unit::W,
                                         WalkIn(walkInNum).ElecFanPower,
                                         "Zone",
                                         "Average",
                                         WalkIn(walkInNum).Name);
-                    SetupOutputVariable("Refrigeration Walk In Fan Electric Energy",
+                    SetupOutputVariable("Refrigeration Walk In Fan Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         WalkIn(walkInNum).ElecFanConsumption,
                                         "Zone",
@@ -6680,13 +6680,13 @@ namespace RefrigeratedCase {
                                         "REFRIGERATION",
                                         "General",
                                         "Building");
-                    SetupOutputVariable("Refrigeration Walk In Lighting Electric Power",
+                    SetupOutputVariable("Refrigeration Walk In Lighting Electricity Power",
                                         OutputProcessor::Unit::W,
                                         WalkIn(walkInNum).ElecLightingPower,
                                         "Zone",
                                         "Average",
                                         WalkIn(walkInNum).Name);
-                    SetupOutputVariable("Refrigeration Walk In Lighting Electric Energy",
+                    SetupOutputVariable("Refrigeration Walk In Lighting Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         WalkIn(walkInNum).ElecLightingConsumption,
                                         "Zone",
@@ -6697,13 +6697,13 @@ namespace RefrigeratedCase {
                                         "REFRIGERATION",
                                         "General",
                                         "Building");
-                    SetupOutputVariable("Refrigeration Walk In Heater Electric Power",
+                    SetupOutputVariable("Refrigeration Walk In Heater Electricity Power",
                                         OutputProcessor::Unit::W,
                                         WalkIn(walkInNum).ElecHeaterPower,
                                         "Zone",
                                         "Average",
                                         WalkIn(walkInNum).Name);
-                    SetupOutputVariable("Refrigeration Walk In Heater Electric Energy",
+                    SetupOutputVariable("Refrigeration Walk In Heater Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         WalkIn(walkInNum).ElecHeaterConsumption,
                                         "Zone",
@@ -6717,13 +6717,13 @@ namespace RefrigeratedCase {
 
                     // Report only for WalkIns using electric defrost
                     if (WalkIn(walkInNum).DefrostType == WalkInDefrostElec) {
-                        SetupOutputVariable("Refrigeration Walk In Defrost Electric Power",
+                        SetupOutputVariable("Refrigeration Walk In Defrost Electricity Power",
                                             OutputProcessor::Unit::W,
                                             WalkIn(walkInNum).ElecDefrostPower,
                                             "Zone",
                                             "Average",
                                             WalkIn(walkInNum).Name);
-                        SetupOutputVariable("Refrigeration Walk In Defrost Electric Energy",
+                        SetupOutputVariable("Refrigeration Walk In Defrost Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             WalkIn(walkInNum).ElecDefrostConsumption,
                                             "Zone",
@@ -6843,19 +6843,19 @@ namespace RefrigeratedCase {
                                         "HVAC",
                                         "Average",
                                         WarehouseCoil(coilNum).Name);
-                    SetupOutputVariable("Refrigeration Zone Air Chiller Total Electric Power",
+                    SetupOutputVariable("Refrigeration Zone Air Chiller Total Electricity Power",
                                         OutputProcessor::Unit::W,
                                         WarehouseCoil(coilNum).TotalElecPower,
                                         "HVAC",
                                         "Average",
                                         WarehouseCoil(coilNum).Name);
-                    SetupOutputVariable("Refrigeration Zone Air Chiller Total Electric Energy",
+                    SetupOutputVariable("Refrigeration Zone Air Chiller Total Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         WarehouseCoil(coilNum).TotalElecConsumption,
                                         "HVAC",
                                         "Sum",
                                         WarehouseCoil(coilNum).Name); // components are metered seperately
-                    SetupOutputVariable("Refrigeration Zone Air Chiller Fan Electric Power",
+                    SetupOutputVariable("Refrigeration Zone Air Chiller Fan Electricity Power",
                                         OutputProcessor::Unit::W,
                                         WarehouseCoil(coilNum).ElecFanPower,
                                         "HVAC",
@@ -6872,13 +6872,13 @@ namespace RefrigeratedCase {
                                         "REFRIGERATION",
                                         "General",
                                         "Building");
-                    SetupOutputVariable("Refrigeration Zone Air Chiller Heater Electric Power",
+                    SetupOutputVariable("Refrigeration Zone Air Chiller Heater Electricity Power",
                                         OutputProcessor::Unit::W,
                                         WarehouseCoil(coilNum).ElecHeaterPower,
                                         "HVAC",
                                         "Average",
                                         WarehouseCoil(coilNum).Name);
-                    SetupOutputVariable("Refrigeration Zone Air Chiller Heater Electric Energy",
+                    SetupOutputVariable("Refrigeration Zone Air Chiller Heater Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         WarehouseCoil(coilNum).ElecHeaterConsumption,
                                         "HVAC",
@@ -6940,13 +6940,13 @@ namespace RefrigeratedCase {
 
                     // Report only for Warehouse coils using electric defrost
                     if (WarehouseCoil(coilNum).DefrostType == DefrostElec) {
-                        SetupOutputVariable("Refrigeration Zone Air Chiller Defrost Electric Power",
+                        SetupOutputVariable("Refrigeration Zone Air Chiller Defrost Electricity Power",
                                             OutputProcessor::Unit::W,
                                             WarehouseCoil(coilNum).ElecDefrostPower,
                                             "HVAC",
                                             "Average",
                                             WarehouseCoil(coilNum).Name);
-                        SetupOutputVariable("Refrigeration Zone Air Chiller Defrost Electric Energy",
+                        SetupOutputVariable("Refrigeration Zone Air Chiller Defrost Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             WarehouseCoil(coilNum).ElecDefrostConsumption,
                                             "HVAC",
@@ -7121,13 +7121,13 @@ namespace RefrigeratedCase {
             for (int secondNum = 1; secondNum <= NumSimulationSecondarySystems; ++secondNum) {
                 if (Secondary(secondNum).NumSysAttach == 1) {
                     if (Secondary(secondNum).CoilFlag) { // secondary system serves chillers and is solved on HVAC time step
-                        SetupOutputVariable("Refrigeration Air Chiller Secondary Loop Pump Electric Power",
+                        SetupOutputVariable("Refrigeration Air Chiller Secondary Loop Pump Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Secondary(secondNum).PumpPowerTotal,
                                             "HVAC",
                                             "Average",
                                             Secondary(secondNum).Name);
-                        SetupOutputVariable("Refrigeration Air Chiller Secondary Loop Pump Electric Energy",
+                        SetupOutputVariable("Refrigeration Air Chiller Secondary Loop Pump Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Secondary(secondNum).PumpElecEnergyTotal,
                                             "HVAC",
@@ -7199,13 +7199,13 @@ namespace RefrigeratedCase {
                                             "Sum",
                                             Secondary(secondNum).Name);
                     } else { // Secondary loop serves cases and walk-ins on zone(load) time step
-                        SetupOutputVariable("Refrigeration Secondary Loop Pump Electric Power",
+                        SetupOutputVariable("Refrigeration Secondary Loop Pump Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Secondary(secondNum).PumpPowerTotal,
                                             "Zone",
                                             "Average",
                                             Secondary(secondNum).Name);
-                        SetupOutputVariable("Refrigeration Secondary Loop Pump Electric Energy",
+                        SetupOutputVariable("Refrigeration Secondary Loop Pump Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Secondary(secondNum).PumpElecEnergyTotal,
                                             "Zone",
@@ -7300,13 +7300,13 @@ namespace RefrigeratedCase {
             // CurrentModuleObject='Refrigeration:CompressorRack'
             for (int rackNum = 1; rackNum <= DataHeatBalance::NumRefrigeratedRacks; ++rackNum) {
                 if (RefrigRack(rackNum).CoilFlag) { // rack serves chillers and is solved on HVAC time step
-                    SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Electric Power",
+                    SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Electricity Power",
                                         OutputProcessor::Unit::W,
                                         RefrigRack(rackNum).RackCompressorPower,
                                         "HVAC",
                                         "Average",
                                         RefrigRack(rackNum).Name);
-                    SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Electric Energy",
+                    SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         RefrigRack(rackNum).RackElecConsumption,
                                         "HVAC",
@@ -7317,13 +7317,13 @@ namespace RefrigeratedCase {
                                         "REFRIGERATION",
                                         RefrigRack(rackNum).EndUseSubcategory,
                                         "Plant");
-                    SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Condenser Fan Electric Power",
+                    SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Condenser Fan Electricity Power",
                                         OutputProcessor::Unit::W,
                                         RefrigRack(rackNum).ActualCondenserFanPower,
                                         "HVAC",
                                         "Average",
                                         RefrigRack(rackNum).Name);
-                    SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Condenser Fan Electric Energy",
+                    SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Condenser Fan Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         RefrigRack(rackNum).CondenserFanConsumption,
                                         "HVAC",
@@ -7359,13 +7359,13 @@ namespace RefrigeratedCase {
                                         RefrigRack(rackNum).Name);
 
                     if (RefrigRack(rackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
-                        SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electric Power",
+                        SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electricity Power",
                                             OutputProcessor::Unit::W,
                                             RefrigRack(rackNum).ActualEvapPumpPower,
                                             "HVAC",
                                             "Average",
                                             RefrigRack(rackNum).Name);
-                        SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electric Energy",
+                        SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             RefrigRack(rackNum).EvapPumpConsumption,
                                             "HVAC",
@@ -7376,13 +7376,13 @@ namespace RefrigeratedCase {
                                             "REFRIGERATION",
                                             RefrigRack(rackNum).EndUseSubcategory,
                                             "Plant");
-                        SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electric Power",
+                        SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electricity Power",
                                             OutputProcessor::Unit::W,
                                             RefrigRack(rackNum).BasinHeaterPower,
                                             "HVAC",
                                             "Average",
                                             RefrigRack(rackNum).Name);
-                        SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electric Energy",
+                        SetupOutputVariable("Refrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             RefrigRack(rackNum).BasinHeaterConsumption,
                                             "HVAC",
@@ -7450,13 +7450,13 @@ namespace RefrigeratedCase {
 
                 } else { // Rack serves cases and walkins on zone (load) time step
 
-                    SetupOutputVariable("Refrigeration Compressor Rack Electric Power",
+                    SetupOutputVariable("Refrigeration Compressor Rack Electricity Power",
                                         OutputProcessor::Unit::W,
                                         RefrigRack(rackNum).RackCompressorPower,
                                         "Zone",
                                         "Average",
                                         RefrigRack(rackNum).Name);
-                    SetupOutputVariable("Refrigeration Compressor Rack Electric Energy",
+                    SetupOutputVariable("Refrigeration Compressor Rack Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         RefrigRack(rackNum).RackElecConsumption,
                                         "Zone",
@@ -7467,13 +7467,13 @@ namespace RefrigeratedCase {
                                         "REFRIGERATION",
                                         RefrigRack(rackNum).EndUseSubcategory,
                                         "Plant");
-                    SetupOutputVariable("Refrigeration Compressor Rack Condenser Fan Electric Power",
+                    SetupOutputVariable("Refrigeration Compressor Rack Condenser Fan Electricity Power",
                                         OutputProcessor::Unit::W,
                                         RefrigRack(rackNum).ActualCondenserFanPower,
                                         "Zone",
                                         "Average",
                                         RefrigRack(rackNum).Name);
-                    SetupOutputVariable("Refrigeration Compressor Rack Condenser Fan Electric Energy",
+                    SetupOutputVariable("Refrigeration Compressor Rack Condenser Fan Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         RefrigRack(rackNum).CondenserFanConsumption,
                                         "Zone",
@@ -7509,13 +7509,13 @@ namespace RefrigeratedCase {
                                         RefrigRack(rackNum).Name);
 
                     if (RefrigRack(rackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
-                        SetupOutputVariable("Refrigeration Compressor Rack Evaporative Condenser Pump Electric Power",
+                        SetupOutputVariable("Refrigeration Compressor Rack Evaporative Condenser Pump Electricity Power",
                                             OutputProcessor::Unit::W,
                                             RefrigRack(rackNum).ActualEvapPumpPower,
                                             "Zone",
                                             "Average",
                                             RefrigRack(rackNum).Name);
-                        SetupOutputVariable("Refrigeration Compressor Rack Evaporative Condenser Pump Electric Energy",
+                        SetupOutputVariable("Refrigeration Compressor Rack Evaporative Condenser Pump Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             RefrigRack(rackNum).EvapPumpConsumption,
                                             "Zone",
@@ -7526,13 +7526,13 @@ namespace RefrigeratedCase {
                                             "REFRIGERATION",
                                             RefrigRack(rackNum).EndUseSubcategory,
                                             "Plant");
-                        SetupOutputVariable("Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electric Power",
+                        SetupOutputVariable("Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electricity Power",
                                             OutputProcessor::Unit::W,
                                             RefrigRack(rackNum).BasinHeaterPower,
                                             "Zone",
                                             "Average",
                                             RefrigRack(rackNum).Name);
-                        SetupOutputVariable("Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electric Energy",
+                        SetupOutputVariable("Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             RefrigRack(rackNum).BasinHeaterConsumption,
                                             "Zone",
@@ -7634,44 +7634,44 @@ namespace RefrigeratedCase {
             for (int refrigSysNum = 1; refrigSysNum <= DataHeatBalance::NumRefrigSystems; ++refrigSysNum) {
                 if (System(refrigSysNum).CoilFlag) { // system serves chillers and is solved on HVAC time step
                     if (System(refrigSysNum).NumStages == 1) {
-                        SetupOutputVariable("Refrigeration Air Chiller System Total Compressor Electric Power",
+                        SetupOutputVariable("Refrigeration Air Chiller System Total Compressor Electricity Power",
                                             OutputProcessor::Unit::W,
                                             System(refrigSysNum).TotCompPower,
                                             "HVAC",
                                             "Average",
                                             System(refrigSysNum).Name);
-                        SetupOutputVariable("Refrigeration Air Chiller System Total Compressor Electric Energy",
+                        SetupOutputVariable("Refrigeration Air Chiller System Total Compressor Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             System(refrigSysNum).TotCompElecConsump,
                                             "HVAC",
                                             "Sum",
                                             System(refrigSysNum).Name);
                     } else if (System(refrigSysNum).NumStages == 2) {
-                        SetupOutputVariable("Refrigeration Air Chiller System Total Low Stage Compressor Electric Power",
+                        SetupOutputVariable("Refrigeration Air Chiller System Total Low Stage Compressor Electricity Power",
                                             OutputProcessor::Unit::W,
                                             System(refrigSysNum).TotCompPower,
                                             "HVAC",
                                             "Average",
                                             System(refrigSysNum).Name);
-                        SetupOutputVariable("Refrigeration Air Chiller System Total Low Stage Compressor Electric Energy",
+                        SetupOutputVariable("Refrigeration Air Chiller System Total Low Stage Compressor Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             System(refrigSysNum).TotCompElecConsump,
                                             "HVAC",
                                             "Sum",
                                             System(refrigSysNum).Name);
-                        SetupOutputVariable("Refrigeration Air Chiller System Total High Stage Compressor Electric Power",
+                        SetupOutputVariable("Refrigeration Air Chiller System Total High Stage Compressor Electricity Power",
                                             OutputProcessor::Unit::W,
                                             System(refrigSysNum).TotHiStageCompPower,
                                             "HVAC",
                                             "Average",
                                             System(refrigSysNum).Name);
-                        SetupOutputVariable("Refrigeration Air Chiller System Total High Stage Compressor Electric Energy",
+                        SetupOutputVariable("Refrigeration Air Chiller System Total High Stage Compressor Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             System(refrigSysNum).TotHiStageCompElecConsump,
                                             "HVAC",
                                             "Sum",
                                             System(refrigSysNum).Name);
-                        SetupOutputVariable("Refrigeration Air Chiller System Total Low and High Stage Compressor Electric Energy",
+                        SetupOutputVariable("Refrigeration Air Chiller System Total Low and High Stage Compressor Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             System(refrigSysNum).TotCompElecConsumpTwoStage,
                                             "HVAC",
@@ -7850,44 +7850,44 @@ namespace RefrigeratedCase {
                                         System(refrigSysNum).Name);
                 } else { // NOT System(SysNum)%CoilFlag, so serving loads on zone timestep
                     if (System(refrigSysNum).NumStages == 1) {
-                        SetupOutputVariable("Refrigeration System Total Compressor Electric Power",
+                        SetupOutputVariable("Refrigeration System Total Compressor Electricity Power",
                                             OutputProcessor::Unit::W,
                                             System(refrigSysNum).TotCompPower,
                                             "Zone",
                                             "Average",
                                             System(refrigSysNum).Name);
-                        SetupOutputVariable("Refrigeration System Total Compressor Electric Energy",
+                        SetupOutputVariable("Refrigeration System Total Compressor Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             System(refrigSysNum).TotCompElecConsump,
                                             "Zone",
                                             "Sum",
                                             System(refrigSysNum).Name);
                     } else if (System(refrigSysNum).NumStages == 2) {
-                        SetupOutputVariable("Refrigeration System Total Low Stage Compressor Electric Power",
+                        SetupOutputVariable("Refrigeration System Total Low Stage Compressor Electricity Power",
                                             OutputProcessor::Unit::W,
                                             System(refrigSysNum).TotCompPower,
                                             "Zone",
                                             "Average",
                                             System(refrigSysNum).Name);
-                        SetupOutputVariable("Refrigeration System Total Low Stage Compressor Electric Energy",
+                        SetupOutputVariable("Refrigeration System Total Low Stage Compressor Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             System(refrigSysNum).TotCompElecConsump,
                                             "Zone",
                                             "Sum",
                                             System(refrigSysNum).Name);
-                        SetupOutputVariable("Refrigeration System Total High Stage Compressor Electric Power",
+                        SetupOutputVariable("Refrigeration System Total High Stage Compressor Electricity Power",
                                             OutputProcessor::Unit::W,
                                             System(refrigSysNum).TotHiStageCompPower,
                                             "Zone",
                                             "Average",
                                             System(refrigSysNum).Name);
-                        SetupOutputVariable("Refrigeration System Total High Stage Compressor Electric Energy",
+                        SetupOutputVariable("Refrigeration System Total High Stage Compressor Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             System(refrigSysNum).TotHiStageCompElecConsump,
                                             "Zone",
                                             "Sum",
                                             System(refrigSysNum).Name);
-                        SetupOutputVariable("Refrigeration System Total Low and High Stage Compressor Electric Energy",
+                        SetupOutputVariable("Refrigeration System Total Low and High Stage Compressor Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             System(refrigSysNum).TotCompElecConsumpTwoStage,
                                             "Zone",
@@ -8088,13 +8088,13 @@ namespace RefrigeratedCase {
                 // CurrentModuleObject='Refrigeration:Compressor'
                 if (Compressor(compNum).NumSysAttach == 1) { // only set up reports for compressors that are used once and only once
                     if (Compressor(compNum).CoilFlag) {      // Compressor serving system with chillers on HVAC time step
-                        SetupOutputVariable("Refrigeration Air Chiller System Compressor Electric Power",
+                        SetupOutputVariable("Refrigeration Air Chiller System Compressor Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Compressor(compNum).Power,
                                             "HVAC",
                                             "Average",
                                             Compressor(compNum).Name);
-                        SetupOutputVariable("Refrigeration Air Chiller System Compressor Electric Energy",
+                        SetupOutputVariable("Refrigeration Air Chiller System Compressor Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Compressor(compNum).ElecConsumption,
                                             "HVAC",
@@ -8124,13 +8124,13 @@ namespace RefrigeratedCase {
                                             "Average",
                                             Compressor(compNum).Name);
                     } else { // serve cases/walkins on zone time step
-                        SetupOutputVariable("Refrigeration Compressor Electric Power",
+                        SetupOutputVariable("Refrigeration Compressor Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Compressor(compNum).Power,
                                             "Zone",
                                             "Average",
                                             Compressor(compNum).Name);
-                        SetupOutputVariable("Refrigeration Compressor Electric Energy",
+                        SetupOutputVariable("Refrigeration Compressor Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Compressor(compNum).ElecConsumption,
                                             "Zone",
@@ -8220,13 +8220,13 @@ namespace RefrigeratedCase {
                     } // not cascade because recovered energy on cascade systems passed up to higher temperature system
 
                     if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserTypeAir) {
-                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Fan Electric Power",
+                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Fan Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Condenser(condNum).ActualFanPower,
                                             "HVAC",
                                             "Average",
                                             Condenser(condNum).Name);
-                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Fan Electric Energy",
+                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Fan Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Condenser(condNum).FanElecEnergy,
                                             "HVAC",
@@ -8240,13 +8240,13 @@ namespace RefrigeratedCase {
                     } // Air cooled
 
                     if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
-                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Fan Electric Power",
+                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Fan Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Condenser(condNum).ActualFanPower,
                                             "HVAC",
                                             "Average",
                                             Condenser(condNum).Name);
-                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Fan Electric Energy",
+                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Fan Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Condenser(condNum).FanElecEnergy,
                                             "HVAC",
@@ -8257,13 +8257,13 @@ namespace RefrigeratedCase {
                                             "REFRIGERATION",
                                             Condenser(condNum).EndUseSubcategory,
                                             "Plant");
-                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Pump Electric Power",
+                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Pump Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Condenser(condNum).ActualEvapPumpPower,
                                             "HVAC",
                                             "Average",
                                             Condenser(condNum).Name);
-                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Pump Electric Energy",
+                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Pump Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Condenser(condNum).EvapPumpConsumption,
                                             "HVAC",
@@ -8274,13 +8274,13 @@ namespace RefrigeratedCase {
                                             "REFRIGERATION",
                                             Condenser(condNum).EndUseSubcategory,
                                             "Plant");
-                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Basin Heater Electric Power",
+                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Basin Heater Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Condenser(condNum).BasinHeaterPower,
                                             "HVAC",
                                             "Average",
                                             Condenser(condNum).Name);
-                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Basin Heater Electric Energy",
+                        SetupOutputVariable("Refrigeration Air Chiller System Condenser Basin Heater Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Condenser(condNum).BasinHeaterConsumption,
                                             "HVAC",
@@ -8375,13 +8375,13 @@ namespace RefrigeratedCase {
                     } // not cascade because recovered energy on cascade systems passed up to higher temperature system
 
                     if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserTypeAir) {
-                        SetupOutputVariable("Refrigeration System Condenser Fan Electric Power",
+                        SetupOutputVariable("Refrigeration System Condenser Fan Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Condenser(condNum).ActualFanPower,
                                             "Zone",
                                             "Average",
                                             Condenser(condNum).Name);
-                        SetupOutputVariable("Refrigeration System Condenser Fan Electric Energy",
+                        SetupOutputVariable("Refrigeration System Condenser Fan Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Condenser(condNum).FanElecEnergy,
                                             "Zone",
@@ -8395,13 +8395,13 @@ namespace RefrigeratedCase {
                     } // Air cooled
 
                     if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
-                        SetupOutputVariable("Refrigeration System Condenser Fan Electric Power",
+                        SetupOutputVariable("Refrigeration System Condenser Fan Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Condenser(condNum).ActualFanPower,
                                             "Zone",
                                             "Average",
                                             Condenser(condNum).Name);
-                        SetupOutputVariable("Refrigeration System Condenser Fan Electric Energy",
+                        SetupOutputVariable("Refrigeration System Condenser Fan Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Condenser(condNum).FanElecEnergy,
                                             "Zone",
@@ -8412,13 +8412,13 @@ namespace RefrigeratedCase {
                                             "REFRIGERATION",
                                             Condenser(condNum).EndUseSubcategory,
                                             "Plant");
-                        SetupOutputVariable("Refrigeration System Condenser Pump Electric Power",
+                        SetupOutputVariable("Refrigeration System Condenser Pump Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Condenser(condNum).ActualEvapPumpPower,
                                             "Zone",
                                             "Average",
                                             Condenser(condNum).Name);
-                        SetupOutputVariable("Refrigeration System Condenser Pump Electric Energy",
+                        SetupOutputVariable("Refrigeration System Condenser Pump Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Condenser(condNum).EvapPumpConsumption,
                                             "Zone",
@@ -8429,13 +8429,13 @@ namespace RefrigeratedCase {
                                             "REFRIGERATION",
                                             Condenser(condNum).EndUseSubcategory,
                                             "Plant");
-                        SetupOutputVariable("Refrigeration System Condenser Basin Heater Electric Power",
+                        SetupOutputVariable("Refrigeration System Condenser Basin Heater Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Condenser(condNum).BasinHeaterPower,
                                             "Zone",
                                             "Average",
                                             Condenser(condNum).Name);
-                        SetupOutputVariable("Refrigeration System Condenser Basin Heater Electric Energy",
+                        SetupOutputVariable("Refrigeration System Condenser Basin Heater Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Condenser(condNum).BasinHeaterConsumption,
                                             "Zone",
@@ -8520,19 +8520,19 @@ namespace RefrigeratedCase {
             // CurrentModuleObject='Refrigeration:TranscriticalSystem'
             for (int refrigSysNum = 1; refrigSysNum <= NumTransRefrigSystems; ++refrigSysNum) {
                 // for both SingleStage and TwoStage systems (medium temperature loads present)
-                SetupOutputVariable("Refrigeration Transcritical System Total High Pressure Compressor Electric Power",
+                SetupOutputVariable("Refrigeration Transcritical System Total High Pressure Compressor Electricity Power",
                                     OutputProcessor::Unit::W,
                                     TransSystem(refrigSysNum).TotCompPowerHP,
                                     "Zone",
                                     "Average",
                                     TransSystem(refrigSysNum).Name);
-                SetupOutputVariable("Refrigeration Transcritical System Total High Pressure Compressor Electric Energy",
+                SetupOutputVariable("Refrigeration Transcritical System Total High Pressure Compressor Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     TransSystem(refrigSysNum).TotCompElecConsumpHP,
                                     "Zone",
                                     "Sum",
                                     TransSystem(refrigSysNum).Name);
-                SetupOutputVariable("Refrigeration Transcritical System Total Compressor Electric Energy",
+                SetupOutputVariable("Refrigeration Transcritical System Total Compressor Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     TransSystem(refrigSysNum).TotCompElecConsump,
                                     "Zone",
@@ -8623,13 +8623,13 @@ namespace RefrigeratedCase {
                                     "Average",
                                     TransSystem(refrigSysNum).Name);
                 if (TransSystem(refrigSysNum).TransSysType == 2) { // for TwoStage system only (low temperature loads present)
-                    SetupOutputVariable("Refrigeration Transcritical System Low Pressure Compressor Electric Power",
+                    SetupOutputVariable("Refrigeration Transcritical System Low Pressure Compressor Electricity Power",
                                         OutputProcessor::Unit::W,
                                         TransSystem(refrigSysNum).TotCompPowerLP,
                                         "Zone",
                                         "Average",
                                         TransSystem(refrigSysNum).Name);
-                    SetupOutputVariable("Refrigeration Transcritical System Low Pressure Compressor Electric Energy",
+                    SetupOutputVariable("Refrigeration Transcritical System Low Pressure Compressor Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         TransSystem(refrigSysNum).TotCompElecConsumpLP,
                                         "Zone",
@@ -8714,13 +8714,13 @@ namespace RefrigeratedCase {
                     int compNum = TransSystem(refrigSysNum).CompressorNumLP(compIndex);
                     // CurrentModuleObject='Refrigeration:Compressor'
                     if (Compressor(compNum).NumSysAttach == 1) { // only set up reports for compressors that are used once and only once
-                        SetupOutputVariable("Refrigeration Compressor Electric Power",
+                        SetupOutputVariable("Refrigeration Compressor Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Compressor(compNum).Power,
                                             "Zone",
                                             "Average",
                                             Compressor(compNum).Name);
-                        SetupOutputVariable("Refrigeration Compressor Electric Energy",
+                        SetupOutputVariable("Refrigeration Compressor Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Compressor(compNum).ElecConsumption,
                                             "Zone",
@@ -8757,13 +8757,13 @@ namespace RefrigeratedCase {
                     int compNum = TransSystem(refrigSysNum).CompressorNumHP(compIndex);
                     // CurrentModuleObject='Refrigeration:Compressor'
                     if (Compressor(compNum).NumSysAttach == 1) { // only set up reports for compressors that are used once and only once
-                        SetupOutputVariable("Refrigeration Compressor Electric Power",
+                        SetupOutputVariable("Refrigeration Compressor Electricity Power",
                                             OutputProcessor::Unit::W,
                                             Compressor(compNum).Power,
                                             "Zone",
                                             "Average",
                                             Compressor(compNum).Name);
-                        SetupOutputVariable("Refrigeration Compressor Electric Energy",
+                        SetupOutputVariable("Refrigeration Compressor Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Compressor(compNum).ElecConsumption,
                                             "Zone",
@@ -8813,13 +8813,13 @@ namespace RefrigeratedCase {
                                     "Zone",
                                     "Sum",
                                     GasCooler(GCNum).Name);
-                SetupOutputVariable("Refrigeration Transcritical System Gas Cooler Fan Electric Power",
+                SetupOutputVariable("Refrigeration Transcritical System Gas Cooler Fan Electricity Power",
                                     OutputProcessor::Unit::W,
                                     GasCooler(GCNum).ActualFanPower,
                                     "Zone",
                                     "Average",
                                     GasCooler(GCNum).Name);
-                SetupOutputVariable("Refrigeration Transcritical System Gas Cooler Fan Electric Energy",
+                SetupOutputVariable("Refrigeration Transcritical System Gas Cooler Fan Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     GasCooler(GCNum).FanElecEnergy,
                                     "Zone",

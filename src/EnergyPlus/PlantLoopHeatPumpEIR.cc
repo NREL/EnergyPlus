@@ -383,28 +383,28 @@ namespace EIRPlantLoopHeatPumps {
                 "Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C, this->sourceSideInletTemp, "System", "Average", this->name);
             SetupOutputVariable(
                 "Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, this->sourceSideOutletTemp, "System", "Average", this->name);
-            SetupOutputVariable("Heat Pump Electric Power", OutputProcessor::Unit::W, this->powerUsage, "System", "Average", this->name);
+            SetupOutputVariable("Heat Pump Electricity Power", OutputProcessor::Unit::W, this->powerUsage, "System", "Average", this->name);
             if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
-                SetupOutputVariable("Heat Pump Electric Energy",
+                SetupOutputVariable("Heat Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->powerEnergy,
                                     "System",
                                     "Sum",
                                     this->name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "Cooling",
                                     "Heat Pump",
                                     "Plant");
             } else if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
-                SetupOutputVariable("Heat Pump Electric Energy",
+                SetupOutputVariable("Heat Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->powerEnergy,
                                     "System",
                                     "Sum",
                                     this->name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "Heating",
                                     "Heat Pump",
                                     "Plant");

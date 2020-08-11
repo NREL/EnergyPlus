@@ -4158,7 +4158,7 @@ namespace HVACVariableRefrigerantFlow {
                 } else if (UtilityRoutines::SameString(SuppHeatingCoilType, "Coil:Heating:Steam")) {
                     VRFTU(VRFTUNum).SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
                 } else if (UtilityRoutines::SameString(SuppHeatingCoilType, "Coil:Heating:Fuel") ||
-                           UtilityRoutines::SameString(SuppHeatingCoilType, "Coil:Heating:Electricity")) {
+                           UtilityRoutines::SameString(SuppHeatingCoilType, "Coil:Heating:Electric")) {
                     VRFTU(VRFTUNum).SuppHeatCoilType_Num =
                         HeatingCoils::GetHeatingCoilTypeNum(state, SuppHeatingCoilType, SuppHeatingCoilName, errFlag);
                 }

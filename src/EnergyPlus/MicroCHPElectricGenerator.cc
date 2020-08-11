@@ -419,9 +419,9 @@ namespace MicroCHPElectricGenerator {
         SetupOutputVariable("Generator Cool Down Mode Time", OutputProcessor::Unit::s, this->A42Model.CoolDownModeTime, "System", "Sum", this->Name);
 
         SetupOutputVariable(
-            "Generator Produced Electric Power", OutputProcessor::Unit::W, this->A42Model.ACPowerGen, "System", "Average", this->Name);
+            "Generator Produced Electricity Power", OutputProcessor::Unit::W, this->A42Model.ACPowerGen, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced Electric Energy",
+        SetupOutputVariable("Generator Produced Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->A42Model.ACEnergyGen,
                             "System",
@@ -496,10 +496,10 @@ namespace MicroCHPElectricGenerator {
             "Generator Fuel LHV Basis Rate", OutputProcessor::Unit::W, this->A42Model.FuelEnergyUseRateLHV, "System", "Average", this->Name);
 
         SetupOutputVariable(
-            "Generator Fuel Compressor Electric Power", OutputProcessor::Unit::W, this->A42Model.FuelCompressPower, "System", "Average", this->Name);
+            "Generator Fuel Compressor Electricity Power", OutputProcessor::Unit::W, this->A42Model.FuelCompressPower, "System", "Average", this->Name);
 
         SetupOutputVariable(
-            "Generator Fuel Compressor Electric Energy", OutputProcessor::Unit::J, this->A42Model.FuelCompressEnergy, "System", "Sum", this->Name);
+            "Generator Fuel Compressor Electricity Energy", OutputProcessor::Unit::J, this->A42Model.FuelCompressEnergy, "System", "Sum", this->Name);
 
         SetupOutputVariable("Generator Fuel Compressor Skin Heat Loss Rate",
                             OutputProcessor::Unit::W,

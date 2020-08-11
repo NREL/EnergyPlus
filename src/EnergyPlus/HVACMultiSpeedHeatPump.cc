@@ -1616,31 +1616,31 @@ namespace HVACMultiSpeedHeatPump {
 
         for (MSHPNum = 1; MSHPNum <= NumMSHeatPumps; ++MSHPNum) {
             // Setup Report Variables for MSHP Equipment
-            SetupOutputVariable("Unitary System Ancillary Electric Power",
+            SetupOutputVariable("Unitary System Ancillary Electricity Power",
                                 OutputProcessor::Unit::W,
                                 MSHeatPump(MSHPNum).AuxElecPower,
                                 "System",
                                 "Average",
                                 MSHeatPump(MSHPNum).Name);
-            SetupOutputVariable("Unitary System Cooling Ancillary Electric Energy",
+            SetupOutputVariable("Unitary System Cooling Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 MSHeatPumpReport(MSHPNum).AuxElecCoolConsumption,
                                 "System",
                                 "Sum",
                                 MSHeatPump(MSHPNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Cooling",
                                 _,
                                 "System");
-            SetupOutputVariable("Unitary System Heating Ancillary Electric Energy",
+            SetupOutputVariable("Unitary System Heating Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 MSHeatPumpReport(MSHPNum).AuxElecHeatConsumption,
                                 "System",
                                 "Sum",
                                 MSHeatPump(MSHPNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Heating",
                                 _,
                                 "System");
@@ -1656,13 +1656,13 @@ namespace HVACMultiSpeedHeatPump {
                                 "System",
                                 "Average",
                                 MSHeatPump(MSHPNum).Name);
-            SetupOutputVariable("Unitary System Electric Power",
+            SetupOutputVariable("Unitary System Electricity Power",
                                 OutputProcessor::Unit::W,
                                 MSHeatPump(MSHPNum).ElecPower,
                                 "System",
                                 "Average",
                                 MSHeatPump(MSHPNum).Name);
-            SetupOutputVariable("Unitary System Electric Energy",
+            SetupOutputVariable("Unitary System Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 MSHeatPumpReport(MSHPNum).ElecPowerConsumption,
                                 "System",

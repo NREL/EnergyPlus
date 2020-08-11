@@ -945,13 +945,13 @@ namespace WaterManager {
                                     "Wellwater",
                                     _,
                                     "System");
-                SetupOutputVariable("Water System Groundwater Well Pump Electric Power",
+                SetupOutputVariable("Water System Groundwater Well Pump Electricity Power",
                                     OutputProcessor::Unit::W,
                                     GroundwaterWell(Item).PumpPower,
                                     "System",
                                     "Average",
                                     GroundwaterWell(Item).Name);
-                SetupOutputVariable("Water System Groundwater Well Pump Electric Energy",
+                SetupOutputVariable("Water System Groundwater Well Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     GroundwaterWell(Item).PumpEnergy,
                                     "System",
