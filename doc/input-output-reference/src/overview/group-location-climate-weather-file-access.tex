@@ -1055,7 +1055,7 @@ Site:HeightVariation,
 Ground temperatures are used for the ground heat transfer model. There can be only one ground temperature object included, and it is used as the outside surface temperature for all surfaces with Outside Boundary Condition = Ground. The object is options if you have no surfaces with ground contact. The outside surface temperature for individual surfaces can be specified using the OtherSideCoefficients (ref: \hyperref[surfacepropertyothersidecoefficients]{SurfaceProperty:OtherSideCoefficients}) object that allows Toutside to be set with a schedule. This permits using any number of different outside face temperatures in addition to the ground temperature.
 
 \begin{callout}
-Caution: The ``undisturbed'' ground temperatures calculated by the weather converter should not be used in building losses but are appropriate to be used in the \hyperref[sitegroundtemperatureshallow]{Site:GroundTemperature:Shallow} and \hyperref[sitegroundtemperaturedeep]{Site:GroundTemperature:Deep} objects. The reasoning (for building losses) is that these values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this document to calculate custom monthly average ground temperatures (see the Ground Heat Transfer section). This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is 2$^\circ$C less than the average indoor space temperature.
+Caution: The ``undisturbed'' ground temperatures calculated by the weather converter should not be used in building losses but are appropriate to be used in the \hyperref[sitegroundtemperatureshallow]{Site:GroundTemperature:Shallow} and \hyperref[sitegroundtemperaturedeep]{Site:GroundTemperature:Deep} objects. The reasoning (for building losses) is that these values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this document to calculate custom monthly average ground temperatures (see the Ground Heat Transfer section). This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is \SI{2}{\degreeCelsius} less than the average indoor space temperature.
 \end{callout}
 
 More information about determining appropriate ground temperatures is given in the Auxiliary Programs document.
@@ -1181,11 +1181,11 @@ The specific heat of dry soil, in J/kg-K.
 
 \subsubsection{Field: Average Annual Ground Surface Temperature}\label{field-average-annual-ground-surface-temperature}
 
-This is the average ground surface temperature throughout the entire year, in $^\circ$C.
+This is the average ground surface temperature throughout the entire year, in \si{\degreeCelsius}.
 
 \subsubsection{Field: Average Amplitude of Annual Ground Surface Temperature}\label{field-average-amplitude-of-annual-ground-surface-temperature}
 
-This is the average amplitude of the ground surface temperature, in $^\circ$C.
+This is the average amplitude of the ground surface temperature, in \si{degreeCelsius}.
 
 \subsubsection{Field: Phase Shift of Minimum Surface Temperature}\label{field-phase-shift-of-minimum-surface-temperature}
 
@@ -1732,7 +1732,7 @@ These values can be calculated from annual weather data using the auxillary prog
 
 Alternatively, the Site:WaterMainsTemperature object can read values from a schedule. This is useful for measured data or when water comes from a source other than buried pipes, e.g., a river or lake.
 
-If there is no Site:WaterMainsTemperature object in the input file, a default constant value of 10$^\circ$C is assumed.
+If there is no Site:WaterMainsTemperature object in the input file, a default constant value of \SI{10}{\degreeCelsius} is assumed.
 
 \subsubsection{Inputs}\label{inputs-21-003}
 
@@ -1836,7 +1836,7 @@ RoofIrrigation,
 
 \subsection{Solar and Visible Spectrum Objects}\label{solar-and-visible-spectrum-objects}
 
-The next two objects enable users to enter solar and visible spectrum which is used to calculate the thermal and visual performance of windows if their glazings are defined with full spectral data. EnergyPlus versions 8.0 and older hard-wired the solar and visible spectrum. The solar spectrum assumes air mass 1.5 terrestrial solar global spectral irradiance values (W/m2-micron) on a 37$^\circ$ tilted surface, based on ISO 9845-1 and ASTM E 892; derived from Optics5 data file ISO-9845GlobalNorm.std, 10-14-99. The visible/photopic spectrum is based on CIE 1931 observer; ISO/CIE 10527, CIE Standard Calorimetric Observers; derived from Optics5 data file ``CIE 1931 Color Match from E308.txt'', which is the same as WINDOW4 file Cie31t.dat.
+The next two objects enable users to enter solar and visible spectrum which is used to calculate the thermal and visual performance of windows if their glazings are defined with full spectral data. EnergyPlus versions 8.0 and older hard-wired the solar and visible spectrum. The solar spectrum assumes air mass 1.5 terrestrial solar global spectral irradiance values (W/m2-micron) on a \ang{37} tilted surface, based on ISO 9845-1 and ASTM E 892; derived from Optics5 data file ISO-9845GlobalNorm.std, 10-14-99. The visible/photopic spectrum is based on CIE 1931 observer; ISO/CIE 10527, CIE Standard Calorimetric Observers; derived from Optics5 data file ``CIE 1931 Color Match from E308.txt'', which is the same as WINDOW4 file Cie31t.dat.
 
 \subsection{Site:SolarAndVisibleSpectrum}\label{sitesolarandvisiblespectrum}
 
@@ -1886,11 +1886,11 @@ This field specifies the type of spectrum data. Choices are Solar and Visible.
 
 \paragraph{Field: Wavelength \textless{}n\textgreater{}}\label{field-wavelength-n}
 
-This field specifies the n$^{th}$ wavelength in micron.
+This field specifies the n$^\textrm{th}$ wavelength in micron.
 
 \paragraph{Field: Spectrum \textless{}n\textgreater{}}\label{field-spectrum-n}
 
-This field specifies the n$^{th}$ spectrum corresponding to the nth wavelength.
+This field specifies the n$^\textrm{th}$ spectrum corresponding to the nth wavelength.
 
 IDF example:
 
@@ -2052,15 +2052,15 @@ Sky\;Temperature = {\left( {\frac{{Horizontal\;IR}}{{Sigma}}} \right)^{\frac{1}{
 
 \subsubsection{Site Horizontal Infrared Radiation Rate per Area {[}W/m2{]}}\label{site-horizontal-infrared-radiation-rate-per-area-wm2}
 
-The horizontal infrared radiation intensity is expressed in W/m$^2$ based, if missing from the weather file, on opaque sky cover, sky emissivity, temperature and other factors. The general calculation of Site Horizontal Infrared Radiation Rate per Area is discussed in both the Engineering Reference and the Auxiliary Programs document.
+The horizontal infrared radiation intensity is expressed in \si{W/m^2} based, if missing from the weather file, on opaque sky cover, sky emissivity, temperature and other factors. The general calculation of Site Horizontal Infrared Radiation Rate per Area is discussed in both the Engineering Reference and the Auxiliary Programs document.
 
 \subsubsection{Site Diffuse Solar Radiation Rate per Area {[}W/m2{]}}\label{site-diffuse-solar-radiation-rate-per-area-wm2}
 
-Diffuse solar is the amount of solar radiation in W/m$^2$ received from the sky (excluding the solar disk) on a horizontal surface.
+Diffuse solar is the amount of solar radiation in \si{W/m^2} received from the sky (excluding the solar disk) on a horizontal surface.
 
 \subsubsection{Site Direct Solar Radiation Rate per Area {[}W/m2{]}}\label{site-direct-solar-radiation-rate-per-area-wm2}
 
-Site Direct Solar Radiation Rate per Area is amount of solar radiation in W/m$^2$ received within a 5.7$^\circ$ field of view centered on the sun. This is also known as Beam Solar.
+Site Direct Solar Radiation Rate per Area is amount of solar radiation in \si{W/m^2} received within a \ang{5.7} field of view centered on the sun. This is also known as Beam Solar.
 
 \subsubsection{Site Total Sky Cover {[]}}\label{site-total-sky-cover}
 
@@ -2078,7 +2078,7 @@ If the weather file does not have a liquid precipitation field but does have the
 
 \subsubsection{Site Ground Reflected Solar Radiation Rate per Area {[}W/m2{]}}\label{site-ground-reflected-solar-radiation-rate-per-area-wm2}
 
-The ground reflected solar amount (W/m$^2$) is derived from the Beam Solar, Diffuse Solar, User specified Ground Reflectance (for month) and Solar Altitude Angle:
+The ground reflected solar amount (\si{W/m^2}) is derived from the Beam Solar, Diffuse Solar, User specified Ground Reflectance (for month) and Solar Altitude Angle:
 
 \begin{multline}
   \rm{Groundreflectedsolar}
@@ -2110,7 +2110,7 @@ Outdoor enthalpy is derived at each timestep from the Site Outdoor Air Drybulb T
 
 \subsubsection{Site Outdoor Air Density {[}kg/m3{]}}\label{site-outdoor-air-density-kgm3}
 
-Outdoor air density is derived at each timestep from the Site Outdoor Air Barometric Pressure, the Outdoor Dry-bulb temperature and the Outdoor Humidity Ratio. It is reported in units kg/m$^3$.
+Outdoor air density is derived at each timestep from the Site Outdoor Air Barometric Pressure, the Outdoor Dry-bulb temperature and the Outdoor Humidity Ratio. It is reported in units \si{kg/m^3}.
 
 \subsubsection{Site Solar Azimuth Angle {[}deg{]}}\label{site-solar-azimuth-angle-deg}
 
@@ -2128,7 +2128,7 @@ The Solar Altitude Angle (b) is the angle of the sun above the horizontal (degre
 
 \subsubsection{Site Solar Hour Angle {[}deg{]}}\label{site-solar-hour-angle-deg}
 
-The Solar Hour Angle (\emph{H}) gives the apparent solar time for the current time period (degrees). It is common astronomical practice to express the hour angle in hours, minutes and seconds of time rather than in degrees. You can convert the hour angle displayed from EnergyPlus to time by dividing by 15. (Note that 1 hour is equivalent to 15 degrees; 360$^\circ$ of the Earth's rotation takes place every 24 hours.) The relationship of angles in degrees to time is shown in the following table:
+The Solar Hour Angle (\emph{H}) gives the apparent solar time for the current time period (degrees). It is common astronomical practice to express the hour angle in hours, minutes and seconds of time rather than in degrees. You can convert the hour angle displayed from EnergyPlus to time by dividing by 15. (Note that 1 hour is equivalent to 15 degrees; \ang{360} of the Earth's rotation takes place every 24 hours.) The relationship of angles in degrees to time is shown in the following table:
 
 % table 6
 \begin{longtable}[c]{@{}ll@{}}
