@@ -4269,44 +4269,15 @@ namespace HeatBalanceAirManager {
         int ZoneLoop;             // Counter for the # of zones (nz)
         int TempControlledZoneID; // index for zone in TempConrolled Zone structure
         Real64 thisMRTFraction;   // temp working value for radiative fraction/weight
-        bool ErrorsFound = false;
 
         for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) {
             // The mean air temperature is actually ZTAV which is the average
             // temperature of the air temperatures at the system time step for the
             // entire zone time step.
-
-            if (isnan(ZTAV(ZoneLoop))) {
-                ShowSevereError("Invalid Mean Air Temp in Zone " +  std::to_string(ZoneLoop));
-                ErrorsFound = true;
-                ZnAirRpt(ZoneLoop).MeanAirTemp = 0.0;
-            } else {
-                ZnAirRpt(ZoneLoop).MeanAirTemp = ZTAV(ZoneLoop);
-            }
-
-            if (isnan(ZoneAirHumRatAvg(ZoneLoop))) {
-                ShowSevereError("Invalid Air Humidity Ratio Average in Zone " +  std::to_string(ZoneLoop));
-                ErrorsFound = true;
-                ZnAirRpt(ZoneLoop).MeanAirHumRat = 0.0;
-            } else {
-                ZnAirRpt(ZoneLoop).MeanAirHumRat = ZoneAirHumRatAvg(ZoneLoop);
-            }
-
-            if (isnan(MRT(ZoneLoop)) || isnan(ZTAV(ZoneLoop))) {
-                ShowSevereError("Invalid Operative Temperature in Zone " +  std::to_string(ZoneLoop));
-                ErrorsFound = true;
-                ZnAirRpt(ZoneLoop).OperativeTemp = 0.0;
-            } else {
-                ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (ZTAV(ZoneLoop) + MRT(ZoneLoop));
-            }
-
-            if (isnan(ZnAirRpt(ZoneLoop).MeanAirHumRat) || isnan(OutBaroPress)) {
-                ShowSevereError("Invalid Air Mean Dew Point Temperature in Zone " +  std::to_string(ZoneLoop));
-                ErrorsFound = true;
-                ZnAirRpt(ZoneLoop).MeanAirDewPointTemp = 0.0;
-            } else {
-                ZnAirRpt(ZoneLoop).MeanAirDewPointTemp = PsyTdpFnWPb(ZnAirRpt(ZoneLoop).MeanAirHumRat, OutBaroPress);
-            }
+            ZnAirRpt(ZoneLoop).MeanAirTemp = ZTAV(ZoneLoop);
+            ZnAirRpt(ZoneLoop).MeanAirHumRat = ZoneAirHumRatAvg(ZoneLoop);
+            ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (ZTAV(ZoneLoop) + MRT(ZoneLoop));
+            ZnAirRpt(ZoneLoop).MeanAirDewPointTemp = PsyTdpFnWPb(ZnAirRpt(ZoneLoop).MeanAirHumRat, OutBaroPress);
 
             // if operative temperature control is being used, then radiative fraction/weighting
             //  might be defined by user to be something different than 0.5, even scheduled over simulation period
@@ -4324,10 +4295,6 @@ namespace HeatBalanceAirManager {
                         ZnAirRpt(ZoneLoop).ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV(ZoneLoop) + thisMRTFraction * MRT(ZoneLoop);
                     }
                 }
-            }
-
-            if (ErrorsFound){
-                ShowFatalError("ReportZoneMeanAirTemp: Program terminated for previous conditions.");
             }
         }
     }

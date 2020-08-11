@@ -6466,7 +6466,11 @@ namespace AirflowNetworkBalanceManager {
                             UThermal = pow(RThermTotal, -1);
 
                             // Duct conduction, assuming effectiveness = 1 - exp(-NTU)
-                            Ei = General::epexp(-UThermal * DuctSurfArea / (DirSign * AirflowNetworkLinkSimu(i).FLOW * CpAir));
+                            if (AirflowNetworkLinkSimu(i).FLOW == 0.0) {
+                                Ei = 0.0;
+                            } else {
+                                Ei = General::epexp(-UThermal * DuctSurfArea / (DirSign * AirflowNetworkLinkSimu(i).FLOW * CpAir));
+                            }
                             Real64 QCondDuct = std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir * (Tamb - Tin) * (1 - Ei);
 
                             TDuctSurf = Tamb - QCondDuct * RThermConvOut / DuctSurfArea;
@@ -6633,18 +6637,6 @@ namespace AirflowNetworkBalanceManager {
                     dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
                     dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir * Ei;
                     dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Tamb * (1.0 - Ei) * CpAir;
-                }
-            }
-            if (CompTypeNum == CompTypeNum_COI) { // heating or cooling coil
-                TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
-                if (AirflowNetworkLinkSimu(i).FLOW > 0.0) { // flow direction is the same as input from node 1 to node 2
-                    LF = AirflowNetworkLinkageData(i).NodeNums[0];
-                    LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    DirSign = 1.0;
-                } else { // flow direction is the opposite as input from node 2 to node 1
-                    LF = AirflowNetworkLinkageData(i).NodeNums[1];
-                    LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    DirSign = -1.0;
                 }
             }
             // Calculate temp in a constant pressure drop element
@@ -6944,18 +6936,6 @@ namespace AirflowNetworkBalanceManager {
                     dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Wamb * (1.0 - Ei);
                 }
             }
-            if (CompTypeNum == CompTypeNum_COI) { // heating or cooling coil
-                TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
-                if (AirflowNetworkLinkSimu(i).FLOW > 0.0) { // flow direction is the same as input from node 1 to node 2
-                    LF = AirflowNetworkLinkageData(i).NodeNums[0];
-                    LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    DirSign = 1.0;
-                } else { // flow direction is the opposite as input from node 2 to node 1
-                    LF = AirflowNetworkLinkageData(i).NodeNums[1];
-                    LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    DirSign = -1.0;
-                }
-            }
             // Calculate temp in a constant pressure drop component
             if (CompTypeNum == CompTypeNum_CPD && CompName == std::string()) { // constant pressure element only
                 if (AirflowNetworkLinkSimu(i).FLOW > 0.0) {                  // flow direction is the same as input from node 1 to node 2
@@ -7021,11 +7001,9 @@ namespace AirflowNetworkBalanceManager {
                                    AirflowNetworkLinkageData(i).Name);
                 }
                 if (AirflowNetworkLinkSimu(i).FLOW > 0.0) {
-                    LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
                     load = Node(NT).HumRat - Node(NF).HumRat;
                 } else {
-                    LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     load = Node(NF).HumRat - Node(NT).HumRat;
                 }
