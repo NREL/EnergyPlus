@@ -49,7 +49,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include "IOFiles.hh"
 #include <EnergyPlus/TARCOGArgs.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
@@ -93,7 +93,8 @@ namespace TARCOGArgs {
 
     // Functions
 
-    int ArgCheck(int const nlayer,
+    int ArgCheck(Files &files,
+                 int const nlayer,
                  int const iwd,
                  Real64 const tout,
                  Real64 const tind,
@@ -235,9 +236,11 @@ namespace TARCOGArgs {
 
         // bi...Write debug output files - if debug flag = 1:
 
-        if (WriteDebugOutput) {
+        if (files.WriteDebugOutput) {
 
-            WriteInputArguments(tout,
+            WriteInputArguments(files.DebugOutputFile,
+                                files.DBGD,
+                                tout,
                                 tind,
                                 trmin,
                                 wso,
@@ -296,7 +299,8 @@ namespace TARCOGArgs {
                                 xgcp,
                                 xwght);
 
-            WriteTARCOGInputFile(VersionNumber,
+            WriteTARCOGInputFile(files,
+                                 VersionNumber,
                                  tout,
                                  tind,
                                  trmin,

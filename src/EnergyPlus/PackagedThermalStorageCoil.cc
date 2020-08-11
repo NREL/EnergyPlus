@@ -164,12 +164,19 @@ namespace PackagedThermalStorageCoil {
     int NumTESCoils;
     Array1D_bool CheckEquipName;
     bool GetTESInputFlag(true);
+    bool MyOneTimeFlag(true);  // One time flag used to allocate MyEnvrnFlag and MySizeFlag
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
     // Object Data
     Array1D<PackagedTESCoolingCoilStruct> TESCoil;
 
-    // Functions
+    void clear_state() {
+        NumTESCoils = 0;
+        CheckEquipName.clear();
+        GetTESInputFlag = true;
+        MyOneTimeFlag = true;
+        TESCoil.clear();
+    }
 
     void SimTESCoil(EnergyPlusData &state, std::string const &CompName, // name of the fan coil unit
                     int &CompIndex,
@@ -222,7 +229,7 @@ namespace PackagedThermalStorageCoil {
 
         TESOpMode = 1;
 
-        InitTESCoil(TESCoilNum);
+        InitTESCoil(state.dataBranchInputManager, TESCoilNum);
 
         TESOpMode = TESCoil(TESCoilNum).CurControlMode;
         {
@@ -1814,7 +1821,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void InitTESCoil(int &TESCoilNum)
+    void InitTESCoil(BranchInputManagerData &dataBranchInputManager, int &TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1856,7 +1863,6 @@ namespace PackagedThermalStorageCoil {
         static Array1D_bool MySizeFlag;   // One time sizing flag
         static Array1D_bool MyEnvrnFlag;  // flag for init once at start of environment
         static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
-        static bool MyOneTimeFlag(true);  // One time flag used to allocate MyEnvrnFlag and MySizeFlag
         bool errFlag;
         int plloopnum;
         int lsnum;
@@ -1881,7 +1887,7 @@ namespace PackagedThermalStorageCoil {
 
             if (TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
                 errFlag = false;
-                ScanPlantLoopsForObject(TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum, errFlag);
+                ScanPlantLoopsForObject(dataBranchInputManager, TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum, errFlag);
 
                 // double check node names match
                 if (errFlag) {

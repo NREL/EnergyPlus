@@ -63,11 +63,12 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -174,6 +175,7 @@ namespace ScheduleManager {
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool CheckScheduleValueMinMaxRunOnceOnly(true);
+        bool DoScheduleReportingSetup(true);
     } // namespace
 
     // Derived Types Variables
@@ -213,9 +215,10 @@ namespace ScheduleManager {
         UniqueWeekScheduleNames.clear();
         Schedule.deallocate();
         UniqueScheduleNames.clear();
+        DoScheduleReportingSetup = true;
     }
 
-    void ProcessScheduleInput(OutputFiles &outputFiles)
+    void ProcessScheduleInput(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -241,7 +244,6 @@ namespace ScheduleManager {
         using DataStringGlobals::CharTab;
         using DataSystemVariables::CheckForActualFileName;
         using DataSystemVariables::iUnicode_end;
-        using DataSystemVariables::TempFullFileName;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -323,7 +325,6 @@ namespace ScheduleManager {
         int UntilFld;
         int xxcount;
         //  REAL(r64) tempval
-        static bool FullYearSet(false);
         static std::string CurrentThrough;
         static std::string LastFor;
         static std::string errmsg;
@@ -333,16 +334,13 @@ namespace ScheduleManager {
         Array1D<Real64> hourlyFileValues;
         std::map<std::string, int> CSVAllColumnNames;
         std::map<int, Array1D<Real64>> CSVAllColumnNameAndValues;
-        int SchdFile;
         int colCnt;
         int rowCnt;
         int wordStart;
         int wordEnd;
         std::string::size_type sepPos;
-        std::string LineIn;
         std::string subString;
         Real64 columnValue;
-        int read_stat;
         int iDay;
         int hDay;
         int jHour;
@@ -352,7 +350,6 @@ namespace ScheduleManager {
         std::string::size_type sPos;
         std::string CurrentModuleObject; // for ease in getting objects
         int MaxNums1;
-        std::string::size_type endLine;
         std::string ColumnSep;
         bool firstLine;
         bool FileIntervalInterpolated;
@@ -538,47 +535,36 @@ namespace ScheduleManager {
             inputProcessor->getObjectItem(
                 CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
             std::string ShadingSunlitFracFileName = Alphas(1);
-            CheckForActualFileName(outputFiles, ShadingSunlitFracFileName, FileExists, TempFullFileName);
+            CheckForActualFileName(ioFiles, ShadingSunlitFracFileName, FileExists, ioFiles.TempFullFileName.fileName);
             if (!FileExists) {
                 ShowSevereError(RoutineName + ":\"" + ShadingSunlitFracFileName +
                                 "\" not found when External Shading Calculation Method = ImportedShading.");
                 ShowContinueError("Certain run environments require a full path to be included with the file name in the input field.");
                 ShowContinueError("Try again with putting full path and file name in the field.");
                 ShowFatalError("Program terminates due to previous condition.");
-            } else {
-                SchdFile = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("read");
-                    ObjexxFCL::gio::open(SchdFile, TempFullFileName, flags);
-                    read_stat = flags.ios();
-                }
-                if (read_stat != 0) {
-                    ShowSevereError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\" cannot be opened.");
-                    ShowContinueError("... It may be open in another program (such as Excel).  Please close and try again.");
+            }
+
+            auto SchdFile = ioFiles.TempFullFileName.try_open();
+            if (!SchdFile.good()) {
+                ShowSevereError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\" cannot be opened.");
+                ShowContinueError("... It may be open in another program (such as Excel).  Please close and try again.");
+                ShowFatalError("Program terminates due to previous condition.");
+            }
+            // check for stripping
+            auto LineIn = SchdFile.readLine();
+            const auto endLine = len(LineIn.data);
+            if (endLine > 0) {
+                if (int(LineIn.data[endLine - 1]) == iUnicode_end) {
+                    SchdFile.close();
+                    ShowSevereError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\" appears to be a Unicode or binary file.");
+                    ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
                     ShowFatalError("Program terminates due to previous condition.");
                 }
-                // check for stripping
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
-                    read_stat = flags.ios();
-                }
-                endLine = len(LineIn);
-                if (endLine > 0) {
-                    if (int(LineIn[endLine - 1]) == iUnicode_end) {
-                        ObjexxFCL::gio::close(SchdFile);
-                        ShowSevereError(RoutineName + ":\"" + ShadingSunlitFracFileName + "\" appears to be a Unicode or binary file.");
-                        ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
-                        ShowFatalError("Program terminates due to previous condition.");
-                    }
-                }
-                ObjexxFCL::gio::backspace(SchdFile);
             }
+            SchdFile.backspace();
 
             numerrors = 0;
             errFlag = false;
-            read_stat = 0;
 
             rowCnt = 0;
             firstLine = true;
@@ -588,10 +574,8 @@ namespace ScheduleManager {
                 rowLimitCount = 365 * 24 * NumOfTimeStepInHour;
             }
             ColumnSep = CharComma;
-            while (read_stat == 0) { // end of file
-                IOFlags flags;
-                ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
-                read_stat = flags.ios();
+            while (!LineIn.eof) { // end of file
+                LineIn = SchdFile.readLine();
                 ++rowCnt;
                 if (rowCnt - 2 > rowLimitCount) break;
                 colCnt = 0;
@@ -599,7 +583,7 @@ namespace ScheduleManager {
                 columnValue = 0.0;
                 // scan through the line and write values into 2d array
                 while (true) {
-                    sepPos = index(LineIn, ColumnSep);
+                    sepPos = index(LineIn.data, ColumnSep);
                     ++colCnt;
                     if (sepPos != std::string::npos) {
                         if (sepPos > 0) {
@@ -607,20 +591,20 @@ namespace ScheduleManager {
                         } else {
                             wordEnd = wordStart;
                         }
-                        subString = LineIn.substr(wordStart, wordEnd - wordStart + 1);
+                        subString = LineIn.data.substr(wordStart, wordEnd - wordStart + 1);
                         // the next word will start after the comma
                         wordStart = sepPos + 1;
                         // get rid of separator so next INDEX will find next separator
-                        LineIn.erase(0, wordStart);
+                        LineIn.data.erase(0, wordStart);
                         firstLine = false;
                         wordStart = 0;
                     } else {
                         // no more commas
-                        subString = LineIn.substr(wordStart);
+                        subString = LineIn.data.substr(wordStart);
                         if (firstLine && subString == BlankString) {
                             ShowWarningError(RoutineName + ":\"" + ShadingSunlitFracFileName +
                                              "\"  first line does not contain the indicated column separator=comma.");
-                            ShowContinueError("...first 40 characters of line=[" + LineIn.substr(0, 40) + ']');
+                            ShowContinueError("...first 40 characters of line=[" + LineIn.data.substr(0, 40) + ']');
                             firstLine = false;
                         }
                         break;
@@ -660,7 +644,7 @@ namespace ScheduleManager {
                     }
                 }
             }
-            ObjexxFCL::gio::close(SchdFile);
+            SchdFile.close();
 
             if (rowCnt - 2 != rowLimitCount) {
                 if (rowCnt - 2 < rowLimitCount) {
@@ -725,7 +709,7 @@ namespace ScheduleManager {
         Schedule(0).ScheduleTypePtr = 0;
         Schedule(0).WeekSchedulePointer = 0;
 
-        print(outputFiles.audit.ensure_open("ProcessScheduleInput"), "{}\n", "  Processing Schedule Input -- Start");
+        print(ioFiles.audit.ensure_open("ProcessScheduleInput"), "{}\n", "  Processing Schedule Input -- Start");
 
         //!! Get Schedule Types
 
@@ -1135,7 +1119,7 @@ namespace ScheduleManager {
                 if (DayIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex + 1) + " \"" +
                                         Alphas(InLoopIndex + 1) + "\" not Found",
-                                    OptionalOutputFileRef{outputFiles.audit});
+                                    OptionalOutputFileRef{ioFiles.audit});
                     ErrorsFound = true;
                 } else {
                     WeekSchedule(LoopIndex).DaySchedulePointer(InLoopIndex) = DayIndex;
@@ -1170,7 +1154,7 @@ namespace ScheduleManager {
                 if (DayIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex + 1) + " \"" +
                                         Alphas(InLoopIndex + 1) + "\" not Found",
-                                    OptionalOutputFileRef{outputFiles.audit});
+                                    OptionalOutputFileRef{ioFiles.audit});
                     ShowContinueError("ref: " + cAlphaFields(InLoopIndex) + " \"" + Alphas(InLoopIndex) + "\"");
                     ErrorsFound = true;
                 } else {
@@ -1240,7 +1224,7 @@ namespace ScheduleManager {
                 if (WeekIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex) + "=\"" +
                                         Alphas(InLoopIndex) + "\" not found.",
-                                    OptionalOutputFileRef{outputFiles.audit});
+                                    OptionalOutputFileRef{ioFiles.audit});
                     ErrorsFound = true;
                 } else {
                     // Process for month, day
@@ -1276,13 +1260,13 @@ namespace ScheduleManager {
             }
             if (any_eq(DaysInYear, 0)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(LoopIndex).Name + "\" has missing days in its schedule pointers",
-                                OptionalOutputFileRef{outputFiles.audit});
+                                OptionalOutputFileRef{ioFiles.audit});
                 ErrorsFound = true;
             }
             if (any_gt(DaysInYear, 1)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(LoopIndex).Name +
                                     "\" has overlapping days in its schedule pointers",
-                                OptionalOutputFileRef{outputFiles.audit});
+                                OptionalOutputFileRef{ioFiles.audit});
                 ErrorsFound = true;
             }
 
@@ -1357,7 +1341,7 @@ namespace ScheduleManager {
             StartPointer = 1;
             WkCount = 0;
             DyCount = 0;
-            FullYearSet = false;
+            bool FullYearSet = false;
             while (NumField < NumAlphas) {
                 //   Process "Through"
                 if (!has_prefix(Alphas(NumField), "THROUGH:") && !has_prefix(Alphas(NumField), "THROUGH")) {
@@ -1567,13 +1551,13 @@ namespace ScheduleManager {
             }
             if (any_eq(DaysInYear, 0)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + "\" has missing days in its schedule pointers",
-                                OptionalOutputFileRef{outputFiles.audit});
+                                OptionalOutputFileRef{ioFiles.audit});
                 ErrorsFound = true;
             }
             if (any_gt(DaysInYear, 1)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name +
                                     "\" has overlapping days in its schedule pointers",
-                                OptionalOutputFileRef{outputFiles.audit});
+                                OptionalOutputFileRef{ioFiles.audit});
                 ErrorsFound = true;
             }
 
@@ -1766,7 +1750,7 @@ namespace ScheduleManager {
             //      ENDDO
             //    ENDIF
 
-            CheckForActualFileName(outputFiles, Alphas(3), FileExists, TempFullFileName);
+            CheckForActualFileName(ioFiles, Alphas(3), FileExists, ioFiles.TempFullFileName.fileName);
 
             //    INQUIRE(file=Alphas(3),EXIST=FileExists)
             // Setup file reading parameters
@@ -1778,48 +1762,32 @@ namespace ScheduleManager {
                 ShowContinueError("Try again with putting full path and file name in the field.");
                 ErrorsFound = true;
             } else {
-                SchdFile = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("read");
-                    ObjexxFCL::gio::open(SchdFile, TempFullFileName, flags);
-                    read_stat = flags.ios();
-                }
-                if (read_stat != 0) {
+                auto SchdFile = ioFiles.TempFullFileName.try_open();
+                if (!SchdFile.good()) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
                                     "\" cannot be opened.");
                     ShowContinueError("... It may be open in another program (such as Excel).  Please close and try again.");
                     ShowFatalError("Program terminates due to previous condition.");
                 }
                 // check for stripping
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
-                    read_stat = flags.ios();
-                }
-                endLine = len(LineIn);
+                auto LineIn = SchdFile.readLine();
+                const auto endLine = len(LineIn.data);
                 if (endLine > 0) {
-                    if (int(LineIn[endLine - 1]) == iUnicode_end) {
-                        ObjexxFCL::gio::close(SchdFile);
+                    if (int(LineIn.data[endLine - 1]) == iUnicode_end) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
                                         " appears to be a Unicode or binary file.");
                         ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
                         ShowFatalError("Program terminates due to previous condition.");
                     }
                 }
-                ObjexxFCL::gio::backspace(SchdFile);
+                SchdFile.backspace();
 
                 // skip lines if any need to be skipped.
                 numerrors = 0;
                 rowCnt = 0;
-                read_stat = 0;
                 if (skiprowCount > 0) {      // Numbers(2) has number of rows to skip
-                    while (read_stat == 0) { // end of file
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
-                            read_stat = flags.ios();
-                        }
+                    while (!LineIn.eof) { // end of file
+                        LineIn = SchdFile.readLine();
                         ++rowCnt;
                         if (rowCnt == skiprowCount) {
                             break;
@@ -1831,19 +1799,15 @@ namespace ScheduleManager {
                 // for the rest of the lines read from the file
                 rowCnt = 0;
                 firstLine = true;
-                while (read_stat == 0) { // end of file
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(SchdFile, fmtA, flags) >> LineIn;
-                        read_stat = flags.ios();
-                    }
+                while (!LineIn.eof) { // end of file
+                    LineIn = SchdFile.readLine();
                     ++rowCnt;
                     colCnt = 0;
                     wordStart = 0;
                     columnValue = 0.0;
                     // scan through the line looking for a specific column
                     while (true) {
-                        sepPos = index(LineIn, ColumnSep);
+                        sepPos = index(LineIn.data, ColumnSep);
                         ++colCnt;
                         if (sepPos != std::string::npos) {
                             if (sepPos > 0) {
@@ -1851,20 +1815,20 @@ namespace ScheduleManager {
                             } else {
                                 wordEnd = wordStart;
                             }
-                            subString = LineIn.substr(wordStart, wordEnd - wordStart + 1);
+                            subString = LineIn.data.substr(wordStart, wordEnd - wordStart + 1);
                             // the next word will start after the comma
                             wordStart = sepPos + 1;
                             // get rid of separator so next INDEX will find next separator
-                            LineIn.erase(0, wordStart);
+                            LineIn.data.erase(0, wordStart);
                             firstLine = false;
                             wordStart = 0;
                         } else {
                             // no more commas
-                            subString = LineIn.substr(wordStart);
+                            subString = LineIn.data.substr(wordStart);
                             if (firstLine && subString == BlankString) {
                                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                                  "\" first line does not contain the indicated column separator=" + Alphas(4) + '.');
-                                ShowContinueError("...first 40 characters of line=[" + LineIn.substr(0, 40) + ']');
+                                ShowContinueError("...first 40 characters of line=[" + LineIn.data.substr(0, 40) + ']');
                                 firstLine = false;
                             }
                             break;
@@ -1884,7 +1848,7 @@ namespace ScheduleManager {
                     hourlyFileValues(rowCnt) = columnValue;
                     if (rowCnt == rowLimitCount) break;
                 }
-                ObjexxFCL::gio::close(SchdFile);
+                SchdFile.close();
 
                 // schedule values have been filled into the hourlyFileValues array.
 
@@ -2312,21 +2276,21 @@ namespace ScheduleManager {
 
                     if (SELECT_CASE_var == "HOURLY") {
                         RptLevel = 1;
-                        ReportScheduleDetails(outputFiles, RptLevel);
+                        ReportScheduleDetails(ioFiles, RptLevel);
 
                     } else if ((SELECT_CASE_var == "TIMESTEP") || (SELECT_CASE_var == "DETAILED")) {
                         RptLevel = 2;
-                        ReportScheduleDetails(outputFiles, RptLevel);
+                        ReportScheduleDetails(ioFiles, RptLevel);
 
                     } else if (SELECT_CASE_var == "IDF") {
                         RptLevel = 3;
-                        ReportScheduleDetails(outputFiles, RptLevel);
+                        ReportScheduleDetails(ioFiles, RptLevel);
 
                     } else {
                         ShowWarningError(RoutineName + "Report for Schedules should specify \"HOURLY\" or \"TIMESTEP\" (\"DETAILED\")");
                         ShowContinueError("HOURLY report will be done");
                         RptLevel = 1;
-                        ReportScheduleDetails(outputFiles, RptLevel);
+                        ReportScheduleDetails(ioFiles, RptLevel);
                     }
                 }
             }
@@ -2339,10 +2303,10 @@ namespace ScheduleManager {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        print(outputFiles.audit, "{}\n", "  Processing Schedule Input -- Complete");
+        print(ioFiles.audit, "{}\n", "  Processing Schedule Input -- Complete");
     }
 
-    void ReportScheduleDetails(OutputFiles &outputFiles, int const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    void ReportScheduleDetails(IOFiles &ioFiles, int const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt
     {
 
         // SUBROUTINE INFORMATION:
@@ -2434,13 +2398,13 @@ namespace ScheduleManager {
                 static constexpr auto SchDFmt{",{}"};
                 static constexpr auto SchDFmtdata{",{}"};
                 if (LevelOfDetail == 1) {
-                    print(outputFiles.eio, SchTFmt0, "Hourly");
+                    print(ioFiles.eio, SchTFmt0, "Hourly");
                 } else {
-                    print(outputFiles.eio, SchTFmt0, "Timestep");
+                    print(ioFiles.eio, SchTFmt0, "Timestep");
                 }
 
                 static constexpr auto SchTFmt("! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,Continuous? {Yes/No - Discrete}");
-                print(outputFiles.eio, "{}\n", SchTFmt);
+                print(ioFiles.eio, "{}\n", SchTFmt);
                 // SchDFmt Header (DaySchedule) builds the appropriate set of commas/times based on detail level
                 //      DO Count=1,NumF
                 //        SchDFmt=TRIM(SchDFmt)//'A'
@@ -2448,19 +2412,19 @@ namespace ScheduleManager {
                 //      ENDDO
                 //      SchDFmt=TRIM(SchDFmt)//')'
                 static constexpr auto SchDFmt0("! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>");
-                print(outputFiles.eio, "{}", SchDFmt0);
+                print(ioFiles.eio, "{}", SchDFmt0);
                 for (Count = 1; Count <= NumF; ++Count) {
-                    print(outputFiles.eio, SchDFmt, TimeHHMM(Count));
+                    print(ioFiles.eio, SchDFmt, TimeHHMM(Count));
                 }
-                print(outputFiles.eio, "\n");
+                print(ioFiles.eio, "\n");
                 // SchWFmt Header (WeekSchedule)
                 std::string SchWFmt("! <WeekSchedule>,Name");
                 for (Count = 1; Count <= MaxDayTypes; ++Count) {
                     SchWFmt += "," + ValidDayTypes(Count);
                 }
-                print(outputFiles.eio, "{}\n", SchWFmt);
+                print(ioFiles.eio, "{}\n", SchWFmt);
                 static constexpr auto SchSFmt("! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31");
-                print(outputFiles.eio, "{}\n", SchSFmt);
+                print(ioFiles.eio, "{}\n", SchSFmt);
 
                 for (Count = 1; Count <= NumScheduleTypes; ++Count) {
                     if (ScheduleType(Count).Limited) {
@@ -2483,7 +2447,7 @@ namespace ScheduleManager {
                         YesNo2 = "N/A";
                     }
                     static constexpr auto SchTFmtdata("ScheduleTypeLimits,{},{},{},{},{}\n");
-                    print(outputFiles.eio, SchTFmtdata, ScheduleType(Count).Name, NoAverageLinear, Num1, Num2, YesNo2);
+                    print(ioFiles.eio, SchTFmtdata, ScheduleType(Count).Name, NoAverageLinear, Num1, Num2, YesNo2);
                 }
 
                 //      WRITE(Num1,*) NumOfTimeStepInHour*24
@@ -2508,18 +2472,18 @@ namespace ScheduleManager {
                     }
                     static constexpr auto SchDFmtdata0("DaySchedule,{},{},{},{}");
                     if (LevelOfDetail == 1) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               SchDFmtdata0,
                               DaySchedule(Count).Name,
                               ScheduleType(DaySchedule(Count).ScheduleTypePtr).Name,
                               NoAverageLinear,
                               "Values:");
                         for (Hr = 1; Hr <= 24; ++Hr) {
-                            print(outputFiles.eio, SchDFmtdata, RoundTSValue(NumOfTimeStepInHour, Hr));
+                            print(ioFiles.eio, SchDFmtdata, RoundTSValue(NumOfTimeStepInHour, Hr));
                         }
-                        print(outputFiles.eio, "\n");
+                        print(ioFiles.eio, "\n");
                     } else if (LevelOfDetail == 2) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               SchDFmtdata0,
                               DaySchedule(Count).Name,
                               ScheduleType(DaySchedule(Count).ScheduleTypePtr).Name,
@@ -2527,93 +2491,93 @@ namespace ScheduleManager {
                               "Values:");
                         for (Hr = 1; Hr <= 24; ++Hr) {
                             for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
-                                print(outputFiles.eio, SchDFmtdata, RoundTSValue(TS, Hr));
+                                print(ioFiles.eio, SchDFmtdata, RoundTSValue(TS, Hr));
                             }
                         }
-                        print(outputFiles.eio, "\n");
+                        print(ioFiles.eio, "\n");
                     }
                 }
 
                 for (Count = 1; Count <= NumWeekSchedules; ++Count) {
                     static constexpr auto SchWFmtdata("Schedule:Week:Daily,{}");
-                    print(outputFiles.eio, SchWFmtdata, WeekSchedule(Count).Name);
+                    print(ioFiles.eio, SchWFmtdata, WeekSchedule(Count).Name);
                     for (NumF = 1; NumF <= MaxDayTypes; ++NumF) {
-                        print(outputFiles.eio, ",{}", DaySchedule(WeekSchedule(Count).DaySchedulePointer(NumF)).Name);
+                        print(ioFiles.eio, ",{}", DaySchedule(WeekSchedule(Count).DaySchedulePointer(NumF)).Name);
                     }
-                    print(outputFiles.eio, "\n");
+                    print(ioFiles.eio, "\n");
                 }
 
                 for (Count = 1; Count <= NumSchedules; ++Count) {
                     NumF = 1;
-                    print(outputFiles.eio, "Schedule,{},{}",Schedule(Count).Name, ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
+                    print(ioFiles.eio, "Schedule,{},{}",Schedule(Count).Name, ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
                     while (NumF <= 366) {
                         TS = Schedule(Count).WeekSchedulePointer(NumF);
                         static constexpr auto ThruFmt(",Through {} {:02},{}");
                         while (Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
                             if (NumF == 366) {
                                 General::InvOrdinalDay(NumF, PMon, PDay, 1);
-                                print(outputFiles.eio, ThruFmt, Months(PMon), PDay, WeekSchedule(TS).Name);
+                                print(ioFiles.eio, ThruFmt, Months(PMon), PDay, WeekSchedule(TS).Name);
                             }
                             ++NumF;
                             if (NumF > 366) break; // compound If might have a problem unless this included.
                         }
                         if (NumF <= 366) {
                             General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
-                            print(outputFiles.eio, ThruFmt, Months(PMon), PDay, WeekSchedule(TS).Name);
+                            print(ioFiles.eio, ThruFmt, Months(PMon), PDay, WeekSchedule(TS).Name);
                         }
                     }
-                    print(outputFiles.eio, "\n");
+                    print(ioFiles.eio, "\n");
                 }
 
             } else if (SELECT_CASE_var == 3) {
                 for (Count = 1; Count <= NumSchedules; ++Count) {
-                    print(outputFiles.debug, "\n");
-                    print(outputFiles.debug, "  Schedule:Compact,\n");
-                    print(outputFiles.debug, "    {},           !- Name\n", Schedule(Count).Name);
-                    print(outputFiles.debug, "    {},          !- ScheduleTypeLimits\n", ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
+                    print(ioFiles.debug, "\n");
+                    print(ioFiles.debug, "  Schedule:Compact,\n");
+                    print(ioFiles.debug, "    {},           !- Name\n", Schedule(Count).Name);
+                    print(ioFiles.debug, "    {},          !- ScheduleTypeLimits\n", ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
                     NumF = 1;
                     while (NumF <= 366) {
                         TS = Schedule(Count).WeekSchedulePointer(NumF);
                         while (Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
                             if (NumF == 366) {
                                 General::InvOrdinalDay(NumF, PMon, PDay, 1);
-                                print(outputFiles.debug, "    Through: {}/{},\n", PMon, PDay);
+                                print(ioFiles.debug, "    Through: {}/{},\n", PMon, PDay);
                                 iDayP = 0;
                                 for (DT = 2; DT <= 6; ++DT) {
-                                    print(outputFiles.debug, "    For: {},\n", ValidDayTypes(DT));
+                                    print(ioFiles.debug, "    For: {},\n", ValidDayTypes(DT));
                                     iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                     iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                     if (iDay != iDayP) {
                                         for (Hr = 1; Hr <= 24; ++Hr) {
-                                            print(outputFiles.debug, "    Until: {}:{},{:.2R},\n", Hr, ShowMinute(NumOfTimeStepInHour), DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
+                                            print(ioFiles.debug, "    Until: {}:{},{:.2R},\n", Hr, ShowMinute(NumOfTimeStepInHour), DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
                                         }
                                     } else {
-                                        print(outputFiles.debug, "    Same as previous\n");
+                                        print(ioFiles.debug, "    Same as previous\n");
                                     }
                                     iDayP = iDay;
                                 }
                                 DT = 1;
-                                print(outputFiles.debug, "    For: {},\n", ValidDayTypes(DT));
+                                print(ioFiles.debug, "    For: {},\n", ValidDayTypes(DT));
                                 iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                 iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                 if (iDay != iDayP) {
                                     for (Hr = 1; Hr <= 24; ++Hr) {
-                                        print(outputFiles.debug, "    Until: {}:{},{:.2R},\n", Hr, ShowMinute(NumOfTimeStepInHour), DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
+                                        print(ioFiles.debug, "    Until: {}:{},{:.2R},\n", Hr, ShowMinute(NumOfTimeStepInHour), DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
                                     }
                                 } else {
-                                    print(outputFiles.debug, "    Same as previous\n");
+                                    print(ioFiles.debug, "    Same as previous\n");
                                 }
                                 iDayP = iDay;
                                 for (DT = 7; DT <= MaxDayTypes; ++DT) {
-                                    print(outputFiles.debug, "    For: {},\n", ValidDayTypes(DT));
+                                    print(ioFiles.debug, "    For: {},\n", ValidDayTypes(DT));
                                     iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                     iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                     if (iDay != iDayP) {
                                         for (Hr = 1; Hr <= 24; ++Hr) {
-                                            print(outputFiles.debug, "    Until: {}:{},{:.2R},\n", Hr, ShowMinute(NumOfTimeStepInHour), DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
+                                            print(ioFiles.debug, "    Until: {}:{},{:.2R},\n", Hr, ShowMinute(NumOfTimeStepInHour), DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
                                         }
                                     } else {
-                                        print(outputFiles.debug, "    Same as previous\n");
+                                        print(ioFiles.debug, "    Same as previous\n");
                                     }
                                     iDayP = iDay;
                                 }
@@ -2623,55 +2587,55 @@ namespace ScheduleManager {
                         }
                         if (NumF <= 366) {
                             General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
-                            print(outputFiles.debug, "    Through: {}/{},\n", PMon, PDay);
+                            print(ioFiles.debug, "    Through: {}/{},\n", PMon, PDay);
                             iDayP = 0;
                             for (DT = 2; DT <= 6; ++DT) {
-                                print(outputFiles.debug, "    For: {},\n", ValidDayTypes(DT));
+                                print(ioFiles.debug, "    For: {},\n", ValidDayTypes(DT));
                                 iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                 iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                 if (iDay != iDayP) {
                                     for (Hr = 1; Hr <= 24; ++Hr) {
-                                        print(outputFiles.debug,
+                                        print(ioFiles.debug,
                                               "    Until: {}:{},{:.2R},\n",
                                               Hr,
                                               ShowMinute(NumOfTimeStepInHour),
                                               DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
                                     }
                                 } else {
-                                    print(outputFiles.debug, "    Same as previous\n");
+                                    print(ioFiles.debug, "    Same as previous\n");
                                 }
                                 iDayP = iDay;
                             }
                             DT = 1;
-                            print(outputFiles.debug, "    For: {},\n", ValidDayTypes(DT));
+                            print(ioFiles.debug, "    For: {},\n", ValidDayTypes(DT));
                             iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                             iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                             if (iDay != iDayP) {
                                 for (Hr = 1; Hr <= 24; ++Hr) {
-                                    print(outputFiles.debug,
+                                    print(ioFiles.debug,
                                           "    Until: {}:{},{:.2R},\n",
                                           Hr,
                                           ShowMinute(NumOfTimeStepInHour),
                                           DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
                                 }
                             } else {
-                                print(outputFiles.debug, "    Same as previous\n");
+                                print(ioFiles.debug, "    Same as previous\n");
                             }
                             iDayP = iDay;
                             for (DT = 7; DT <= MaxDayTypes; ++DT) {
-                                print(outputFiles.debug, "    For: {},\n", ValidDayTypes(DT));
+                                print(ioFiles.debug, "    For: {},\n", ValidDayTypes(DT));
                                 iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
                                 iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                 if (iDay != iDayP) {
                                     for (Hr = 1; Hr <= 24; ++Hr) {
-                                        print(outputFiles.debug,
+                                        print(ioFiles.debug,
                                               "    Until: {}:{},{:.2R},\n",
                                               Hr,
                                               ShowMinute(NumOfTimeStepInHour),
                                               DaySchedule(iDay).TSValue(NumOfTimeStepInHour, Hr));
                                     }
                                 } else {
-                                    print(outputFiles.debug, "    Same as previous\n");
+                                    print(ioFiles.debug, "    Same as previous\n");
                                 }
                                 iDayP = iDay;
                             }
@@ -2743,12 +2707,13 @@ namespace ScheduleManager {
             }
         }
 
+        // Checking if valid index is passed is necessary
         if (ScheduleIndex == -1) {
             return 1.0;
         } else if (ScheduleIndex == 0) {
             return 0.0;
         } else if (!Schedule(ScheduleIndex).EMSActuatedOn) {
-            return Schedule(ScheduleIndex).CurrentValue;
+            return Schedule(ScheduleIndex).CurrentValue;  // This block probably unecessary, UpdateScheduleValues already does it
         } else {
             return Schedule(ScheduleIndex).EMSValue;
         }
@@ -2776,7 +2741,6 @@ namespace ScheduleManager {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2792,59 +2756,26 @@ namespace ScheduleManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ScheduleIndex;
-        int WhichHour;
-        int WeekSchedulePointer;
-        int DaySchedulePointer;
 
         if (!ScheduleInputProcessed) {
-            ProcessScheduleInput(OutputFiles::getSingleton());
+            ProcessScheduleInput(IOFiles::getSingleton());
             ScheduleInputProcessed = true;
         }
 
-        WhichHour = HourOfDay + DSTIndicator;
-
-        for (ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
-
+        for (int ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
             if (Schedule(ScheduleIndex).EMSActuatedOn) {
                 Schedule(ScheduleIndex).CurrentValue = Schedule(ScheduleIndex).EMSValue;
             } else {
-                // Hourly Value
-                if (WhichHour <= 24) {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
-                    if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                    }
-                    Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour);
-                } else if (TimeStep <= NumOfTimeStepInHour) {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule + 1);
-                    if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                    }
-                    Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour - 24);
-                } else {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule + 1);
-                    if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                    }
-                    Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
-                }
+                Schedule(ScheduleIndex).CurrentValue = LookUpScheduleValue(ScheduleIndex, DataGlobals::HourOfDay, DataGlobals::TimeStep);
             }
         }
     }
 
     Real64 LookUpScheduleValue(int const ScheduleIndex,
-                               int const ThisHour,    // Negative => unspecified
+                               int const ThisHour,
                                int const ThisTimeStep // Negative => unspecified
     )
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   January 2003
@@ -2862,10 +2793,9 @@ namespace ScheduleManager {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
 
         // Return value
-        Real64 LookUpScheduleValue(0.0);
+        Real64 scheduleValue(0.0);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -2880,101 +2810,58 @@ namespace ScheduleManager {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int WeekSchedulePointer;
-        int DaySchedulePointer;
-        int WhichHour;
-        int WhichTimeStep;
 
-        if (!ScheduleInputProcessed) {
-            ProcessScheduleInput(OutputFiles::getSingleton());
-            ScheduleInputProcessed = true;
+        if (ThisHour > 24) {
+            ShowFatalError("LookUpScheduleValue called with thisHour=" + fmt::to_string(ThisHour));
         }
 
         if (ScheduleIndex == -1) {
-            LookUpScheduleValue = 1.0;
-            return LookUpScheduleValue;
+            return 1.0;
         } else if (ScheduleIndex == 0) {
-            LookUpScheduleValue = 0.0;
-            return LookUpScheduleValue;
+            return 0.0;
         }
 
-        if (ThisHour < 0) { // ThisHour unspecified
-            LookUpScheduleValue = GetCurrentScheduleValue(ScheduleIndex);
-
-            //  ELSEIF (ThisHour == 0) THEN  ! odd answers when thishour=0 (initialization of shadowing)
-            //    LookUpScheduleValue=GetCurrentScheduleValue(ScheduleIndex)
-
-        } else { // ThisHour specified
-            //  so, current date, but maybe TimeStep added
-
-            // Determine which Week Schedule is used
-            //  Cant use stored day of year because of leap year inconsistency
-            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
-
-            // Now, which day?
-            if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-            } else {
-                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-            }
-
-            // Hourly Value
-            WhichHour = HourOfDay + DSTIndicator;
-            if (WhichHour <= 24) {
-                LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour);
-            } else {
-                LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour - 24);
-            }
-            WhichHour = ThisHour;
-            while (WhichHour < 1) {
-                WhichHour += 24;
-            }
-            if (WhichHour > 24) {
-                while (WhichHour > 24) {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(General::OrdinalDay(MonthTomorrow, DayOfMonthTomorrow, 1));
-                    if (DayOfWeekTomorrow <= 7 && HolidayIndexTomorrow > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndexTomorrow);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeekTomorrow);
-                    }
-                    WhichHour -= 24;
-                }
-            } else {
-                // Determine which Week Schedule is used
-                //  Cant use stored day of year because of leap year inconsistency
-                WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
-
-                // Now, which day?
-                if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                    DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                } else {
-                    DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                }
-            }
-            WhichHour += DSTIndicator;
-            if (ThisTimeStep >= 0) { // ThisTimeStep specified
-                if (ThisTimeStep == 0) {
-                    WhichTimeStep = NumOfTimeStepInHour;
-                } else {
-                    WhichTimeStep = ThisTimeStep;
-                }
-                if (WhichHour <= 24) {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(WhichTimeStep, WhichHour);
-                } else if (ThisTimeStep <= NumOfTimeStepInHour) {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(WhichTimeStep, WhichHour - 24);
-                } else {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
-                }
-            } else {
-                if (WhichHour <= 24) {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour);
-                } else {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
-                }
-            }
+        if (!ScheduleInputProcessed) {
+            ProcessScheduleInput(IOFiles::getSingleton());
+            ScheduleInputProcessed = true;
         }
 
-        return LookUpScheduleValue;
+        //  so, current date, but maybe TimeStep added
+
+        // Hourly Value
+        int thisHour = ThisHour + DSTIndicator;
+        int thisDayOfYear = DataEnvironment::DayOfYear_Schedule;
+        int thisDayOfWeek = DataEnvironment::DayOfWeek;
+        int thisHolidayIndex = DataEnvironment::HolidayIndex;
+        if (thisHour > 24) { // In case HourOfDay is 24 and DSTIndicator is 1, you're actually the next day
+            thisDayOfYear += 1;
+            thisHour -= 24;
+            thisDayOfWeek = DataEnvironment::DayOfWeekTomorrow;
+            thisHolidayIndex = DataEnvironment::HolidayIndexTomorrow;
+        }
+
+        // In the case where DST is applied on 12/31 at 24:00, which is the case for a Southern Hemisphere location for eg
+        // (DayOfYear_Schedule is a bit weird, ScheduleManager always assumes LeapYear)
+        if (thisDayOfYear == 367) {
+            thisDayOfYear = 1;
+        }
+
+        int WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(thisDayOfYear);
+        int DaySchedulePointer;
+
+        // TODO: the (thisDayOfWeek < 7) looks fishy and maybe uncessary... how about if there are more than 7 holidays?
+        // It should use 7 + thisHolidayIndex in that case but it won't
+        if (thisDayOfWeek <= 7 && thisHolidayIndex > 0) {
+            DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + thisHolidayIndex);
+        } else {
+            DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(thisDayOfWeek);
+        }
+
+        // If Unspecified or equal to zero, use NumOfTimeStepInHour, otherwise use supplied
+        int thisTimeStep = ThisTimeStep > 0 ? ThisTimeStep : NumOfTimeStepInHour;
+        scheduleValue = DaySchedule(DaySchedulePointer).TSValue(thisTimeStep, thisHour);
+
+        return scheduleValue;
     }
 
     int GetScheduleIndex(std::string const &ScheduleName)
@@ -2997,7 +2884,7 @@ namespace ScheduleManager {
         int WeekCtr;
 
         if (!ScheduleInputProcessed) {
-            ProcessScheduleInput(OutputFiles::getSingleton());
+            ProcessScheduleInput(IOFiles::getSingleton());
             ScheduleInputProcessed = true;
         }
 
@@ -3063,7 +2950,7 @@ namespace ScheduleManager {
         int curSchType;
 
         if (!ScheduleInputProcessed) {
-            ProcessScheduleInput(OutputFiles::getSingleton());
+            ProcessScheduleInput(IOFiles::getSingleton());
             ScheduleInputProcessed = true;
         }
 
@@ -3096,7 +2983,7 @@ namespace ScheduleManager {
         int GetDayScheduleIndex;
 
         if (!ScheduleInputProcessed) {
-            ProcessScheduleInput(OutputFiles::getSingleton());
+            ProcessScheduleInput(IOFiles::getSingleton());
             ScheduleInputProcessed = true;
         }
 
@@ -3152,7 +3039,7 @@ namespace ScheduleManager {
         int DaySchedulePointer;
 
         if (!ScheduleInputProcessed) {
-            ProcessScheduleInput(OutputFiles::getSingleton());
+            ProcessScheduleInput(IOFiles::getSingleton());
             ScheduleInputProcessed = true;
         }
 
@@ -3229,7 +3116,7 @@ namespace ScheduleManager {
         // na
 
         if (!ScheduleInputProcessed) {
-            ProcessScheduleInput(OutputFiles::getSingleton());
+            ProcessScheduleInput(IOFiles::getSingleton());
             ScheduleInputProcessed = true;
         }
 
@@ -4872,7 +4759,7 @@ namespace ScheduleManager {
         // na
 
         if (!ScheduleInputProcessed) {
-            ProcessScheduleInput(OutputFiles::getSingleton());
+            ProcessScheduleInput(IOFiles::getSingleton());
             ScheduleInputProcessed = true;
         }
 
@@ -4925,19 +4812,14 @@ namespace ScheduleManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ScheduleIndex;
-        int WhichHour;
-        static bool DoScheduleReportingSetup(true);
-        int WeekSchedulePointer;
-        int DaySchedulePointer;
 
         if (!ScheduleInputProcessed) {
-            ProcessScheduleInput(OutputFiles::getSingleton());
+            ProcessScheduleInput(IOFiles::getSingleton());
             ScheduleInputProcessed = true;
         }
 
         if (DoScheduleReportingSetup) { // CurrentModuleObject='Any Schedule'
-            for (ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
+            for (int ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
                 // Set Up Reporting
                 SetupOutputVariable("Schedule Value",
                                     OutputProcessor::Unit::None,
@@ -4949,40 +4831,9 @@ namespace ScheduleManager {
             DoScheduleReportingSetup = false;
         }
 
-        WhichHour = HourOfDay + DSTIndicator;
-        for (ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
-
-            if (Schedule(ScheduleIndex).EMSActuatedOn) {
-                Schedule(ScheduleIndex).CurrentValue = Schedule(ScheduleIndex).EMSValue;
-            } else {
-                // Hourly Value
-                if (WhichHour <= 24) {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
-                    if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                    }
-                    Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour);
-                } else if (TimeStep <= NumOfTimeStepInHour) {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule + 1);
-                    if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                    }
-                    Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour - 24);
-                } else {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule + 1);
-                    if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-                    }
-                    Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
-                }
-            }
-        }
+        // TODO: Is this needed?
+        // Why is it doing exactly the same as UpdateScheduleValues?
+        UpdateScheduleValues();
     }
 
     void ReportOrphanSchedules()

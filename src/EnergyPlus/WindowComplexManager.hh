@@ -53,11 +53,16 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+    //forward declaration
+    struct EnergyPlusData;
+    struct WindowComplexManagerData;
 
 namespace WindowComplexManager {
 
@@ -70,34 +75,6 @@ namespace WindowComplexManager {
     using DataBSDFWindow::BSDFWindowGeomDescr;
     using DataBSDFWindow::BSDFWindowInputStruct;
     using DataVectorTypes::Vector;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
-    extern Real64 const sigma; // Stefan-Boltzmann constant
-    extern Real64 const PressureDefault;
-
-    extern int const Calculate_Geometry;
-    extern int const Copy_Geometry;
-
-    extern int const TmpLen; // Length increment of temporary arrays
-
-    extern int const Front_Incident; // Ray identification types
-    extern int const Front_Transmitted;
-    extern int const Front_Reflected;
-    extern int const Back_Incident;
-    extern int const Back_Transmitted;
-    extern int const Back_Reflected;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumComplexWind; // Total number of complex windows
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE WindowComplexManager:
-
-    // Types
 
     struct WindowIndex
     {
@@ -131,36 +108,31 @@ namespace WindowComplexManager {
         }
     };
 
-    // Object Data
-    extern Array1D<BasisStruct> BasisList;
-    extern Array1D<WindowIndex> WindowList;
-    extern Array2D<WindowStateIndex> WindowStateList;
-
     // Functions
 
-    void clear_state();
+    //void clear_state();
 
-    void InitBSDFWindows();
+    void InitBSDFWindows(WindowComplexManagerData &dataWindowComplexManager);
 
     void AllocateCFSStateHourlyData(int const iSurf, // Surface number
                                     int const iState // Complex fenestration state number
     );
 
-    void ExpandComplexState(int const iSurf, // Surface number
+    void ExpandComplexState(WindowComplexManagerData &dataWindowComplexManager, int const iSurf, // Surface number
                             int const iConst // Construction number
     );
 
-    void CheckCFSStates(int const iSurf); // Surface number
+    void CheckCFSStates(WindowComplexManagerData &dataWindowComplexManager, int const iSurf); // Surface number
 
-    void InitComplexWindows();
+    void InitComplexWindows(WindowComplexManagerData &dataWindowComplexManager);
 
-    void UpdateComplexWindows();
+    void UpdateComplexWindows(WindowComplexManagerData &dataWindowComplexManager);
 
-    void CFSShadeAndBeamInitialization(int const iSurf, // Window surface number
+    void CFSShadeAndBeamInitialization(WindowComplexManagerData &dataWindowComplexManager, int const iSurf, // Window surface number
                                        int const iState // Window state number
     );
 
-    void CalculateWindowBeamProperties(int const ISurf,                   // Window surface number
+    void CalculateWindowBeamProperties(WindowComplexManagerData &dataWindowComplexManager, int const ISurf,                   // Window surface number
                                        int const IState,                  // Window state number
                                        BSDFWindowGeomDescr const &Window, // Window Geometry
                                        BSDFGeomDescr const &Geom,         // State Geometry
@@ -169,7 +141,7 @@ namespace WindowComplexManager {
                                        int const TS                       // Timestep number
     );
 
-    void CalcStaticProperties();
+    void CalcStaticProperties(WindowComplexManagerData &dataWindowComplexManager);
 
     void CalculateBasisLength(BSDFWindowInputStruct const &Input, // BSDF data input struct for this construction
                               int const IConst,                   // Construction number of input
@@ -191,7 +163,7 @@ namespace WindowComplexManager {
                           int const InputType      // Basis type
     );
 
-    void SetupComplexWindowStateGeometry(int const ISurf,             // Surface number of the complex fenestration
+    void SetupComplexWindowStateGeometry(WindowComplexManagerData &dataWindowComplexManager, int const ISurf,             // Surface number of the complex fenestration
                                          int const IState,            // State number of the complex fenestration state
                                          int const IConst,            // Pointer to construction for this state
                                          BSDFWindowGeomDescr &Window, // Window Geometry
@@ -212,14 +184,14 @@ namespace WindowComplexManager {
 
     BSDFDaylghtPosition DaylghtAltAndAzimuth(Vector const &UnitVect); // vector which needs to be converted
 
-    Vector WorldVectFromW6(Real64 const Theta, // Polar angle in W6 Coords
+    Vector WorldVectFromW6(WindowComplexManagerData &dataWindowComplexManager, Real64 const Theta, // Polar angle in W6 Coords
                            Real64 const Phi,   // Azimuthal angle in W6 Coords
                            int const RadType,  // Type of radiation: Front_Incident, etc.
                            Real64 const Gamma, // Surface tilt angle, radians, world coordinate system
                            Real64 const Alpha  // Surface azimuth, radians, world coordinate system
     );
 
-    int FindInBasis(Vector const &RayToFind,  // Ray vector direction in world CS
+    int FindInBasis(WindowComplexManagerData &dataWindowComplexManager, Vector const &RayToFind,  // Ray vector direction in world CS
                     int const RadType,        // Type of radiation: Front_Incident, etc.
                     int const ISurf,          // Window Surface number
                     int const IState,         // Complex Fenestration state number
@@ -228,7 +200,7 @@ namespace WindowComplexManager {
                     Real64 &Phi               // Phi value for ray
     );
 
-    void W6CoordsFromWorldVect(Vector const &RayVect, // Ray vector direction in world CS
+    void W6CoordsFromWorldVect(WindowComplexManagerData &dataWindowComplexManager, Vector const &RayVect, // Ray vector direction in world CS
                                int const RadType,     // Type of radiation: Front_Incident, etc.
                                Real64 const Gamma,    // Surface tilt angle, world coordinate system
                                Real64 const Alpha,    // Surface azimuth, world coordinate system
@@ -236,7 +208,7 @@ namespace WindowComplexManager {
                                Real64 &Phi            // Azimuthal angle in W6 Coords
     );
 
-    void CalcComplexWindowThermal(int const SurfNum,          // Surface number
+    void CalcComplexWindowThermal(WindowComplexManagerData &dataWindowComplexManager, int const SurfNum,          // Surface number
                                   int &ConstrNum,             // Construction number
                                   Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                   Real64 &SurfInsideTemp,     // Inside window surface temperature
@@ -258,6 +230,54 @@ namespace WindowComplexManager {
     //=================================================================================================
 
 } // namespace WindowComplexManager
+
+    struct WindowComplexManagerData : BaseGlobalStruct {
+
+        Real64 const sigma; // Stefan-Boltzmann constant
+        Real64 const PressureDefault;
+
+        int const Calculate_Geometry;
+        int const Copy_Geometry;
+
+        int const TmpLen; // Length increment of temporary arrays
+
+        int const Front_Incident; // Ray identification types
+        int const Front_Transmitted;
+        int const Front_Reflected;
+        int const Back_Incident;
+        int const Back_Transmitted;
+        int const Back_Reflected;
+
+        int NumComplexWind; // Total number of complex windows
+
+        Array1D<DataBSDFWindow::BasisStruct> BasisList;
+        Array1D<WindowComplexManager::WindowIndex> WindowList;
+        Array2D<WindowComplexManager::WindowStateIndex> WindowStateList;
+
+        bool InitComplexWindowsOnce = true; // Flag for insuring things happen once
+        bool InitBSDFWindowsOnce = true;
+        bool resetAbunchOfStuff = true;
+
+        void clear_state() //override
+        {
+            NumComplexWind = 0;
+            BasisList.deallocate();
+            WindowList.deallocate();
+            WindowStateList.deallocate();
+            InitComplexWindowsOnce = true;
+            InitBSDFWindowsOnce = true;
+            resetAbunchOfStuff = true;
+        }
+
+        // Default Constructor
+        WindowComplexManagerData()
+            : sigma(5.6697e-8), PressureDefault(101325.0), Calculate_Geometry(1), Copy_Geometry(2),
+            TmpLen(20), Front_Incident(1), Front_Transmitted(2), Front_Reflected(3), Back_Incident(4),
+            Back_Transmitted(5), Back_Reflected(6), NumComplexWind(0)
+        {
+        }
+
+    };
 
 } // namespace EnergyPlus
 

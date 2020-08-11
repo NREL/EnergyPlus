@@ -57,6 +57,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DataDElight.hh>
 #include <EnergyPlus/DataDaylighting.hh>
@@ -69,6 +70,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -112,7 +114,7 @@ namespace DElightManagerF {
     // USE STATEMENTS:
     using namespace DataDElight;
 
-    void DElightInputGenerator(OutputFiles &outputFiles)
+    void DElightInputGenerator(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -214,7 +216,7 @@ namespace DElightManagerF {
         int iNumWndoConsts = 0;
 
         // Open a file for writing DElight input from EnergyPlus data
-        auto delightInFile = outputFiles.delightIn.open("DElightInputGenerator");
+        auto delightInFile = ioFiles.delightIn.open("DElightInputGenerator");
 
         // Start of DElight input file
         print(delightInFile, Format_901, CurrentDateTime);
@@ -331,10 +333,10 @@ namespace DElightManagerF {
                             // Is this Surface exposed to the exterior?
                             if (surf.ExtSolar) {
                                 // Get the index for the outside (i.e., 1st) Material Layer for this Construction
-                                iMatlLayer = Construct(iconstruct).LayerPoint(1);
+                                iMatlLayer = dataConstruction.Construct(iconstruct).LayerPoint(1);
                                 // Get the outside visible reflectance of this material layer
                                 // (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
-                                rExtVisRefl = 1.0 - Material(iMatlLayer).AbsorpVisible;
+                                rExtVisRefl = 1.0 - dataMaterial.Material(iMatlLayer).AbsorpVisible;
                             } else {
                                 rExtVisRefl = 0.0;
                             }
@@ -346,7 +348,7 @@ namespace DElightManagerF {
                                   cNameWOBlanks,
                                   surf.Azimuth,
                                   surf.Tilt,
-                                  Construct(iconstruct).ReflectVisDiffBack,
+                                  dataConstruction.Construct(iconstruct).ReflectVisDiffBack,
                                   rExtVisRefl,
                                   surf.Sides);
 
@@ -647,14 +649,14 @@ namespace DElightManagerF {
             print(delightInFile,
                   Format_921,
                   iWndoConstIndexes(iconst) + 10000,
-                  Construct(iWndoConstIndexes(iconst)).TransDiffVis,
-                  Construct(iWndoConstIndexes(iconst)).ReflectVisDiffBack,
-                  Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(1),
-                  Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(2),
-                  Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(3),
-                  Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(4),
-                  Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(5),
-                  Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(6));
+                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransDiffVis,
+                  dataConstruction.Construct(iWndoConstIndexes(iconst)).ReflectVisDiffBack,
+                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(1),
+                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(2),
+                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(3),
+                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(4),
+                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(5),
+                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(6));
 
         } // Glass Type loop
 

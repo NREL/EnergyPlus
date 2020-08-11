@@ -101,6 +101,12 @@ namespace MicroturbineElectricGenerator {
     // Object Data
     Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
 
+    void clear_state() {
+        NumMTGenerators = 0;
+        GetMTInput = true;
+        MTGenerator.clear();
+    }
+
     PlantComponent *MTGeneratorSpecs::factory(std::string const &objectName)
     {
         // Process the input data for generator if it hasn't been done already
@@ -881,7 +887,8 @@ namespace MicroturbineElectricGenerator {
         OptLoad = 0.0;
     }
 
-    void MTGeneratorSpecs::InitMTGenerators(bool const RunFlag,
+    void MTGeneratorSpecs::InitMTGenerators(BranchInputManagerData &dataBranchInputManager,
+                                            bool const RunFlag,
                                             Real64 const MyLoad, // electrical load in W
                                             bool const FirstHVACIteration)
     {
@@ -908,7 +915,8 @@ namespace MicroturbineElectricGenerator {
 
         if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_Generator_MicroTurbine,
                                                     this->HRLoopNum,
                                                     this->HRLoopSideNum,

@@ -61,8 +61,8 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -1094,24 +1094,24 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
 
     bool localErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, localErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
     HeatBalanceManager::GetZoneData(localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.outputFiles, localErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetConstructData(localErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, localErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.files, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.outputFiles, localErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(state.files);
     ScheduleManager::ScheduleInputProcessed = true;
 
     DataHeatBalance::Zone(2).HasWindow = true;
@@ -1120,10 +1120,14 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     DataHeatBalance::HConvIn.allocate(TotSurfaces);
     DataHeatBalance::HConvIn = 0.1;
     DataHeatBalSurface::TempSurfIn = 25.00;
-    DataHeatBalSurface::TempSurfIn(8) = 25.92;
-    DataHeatBalSurface::TempSurfIn(9) = 25.92;
-    DataHeatBalSurface::TempSurfIn(12) = 26.99;
-    DataHeatBalSurface::TempSurfIn(24) = 22.99;
+    int surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001", DataSurfaces::Surface);
+    DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;
+    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001:WIN001", DataSurfaces::Surface);
+    DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;
+    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL004", DataSurfaces::Surface);
+    DataHeatBalSurface::TempSurfIn(surfNum) = 26.99;
+    surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", DataSurfaces::Surface);
+    DataHeatBalSurface::TempSurfIn(surfNum) = 22.99;
     DataHeatBalFanSys::MAT.allocate(DataGlobals::NumOfZones);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(DataGlobals::NumOfZones);
     DataHeatBalFanSys::MAT = 23.0;
