@@ -948,7 +948,7 @@ if( BUILD_TESTING )
 
     configure_file( "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_DataTransferTypes.py" "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py" COPYONLY)
     add_test(NAME "API.test_DataTransferTypes"
-            COMMAND "${PYTHON_EXECUTABLE}" -m pytest "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py"
+            COMMAND "${PYTHON_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
   endif()

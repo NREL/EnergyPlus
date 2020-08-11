@@ -1,49 +1,53 @@
-import pytest
+import unittest
 
 from pyenergyplus.api import EnergyPlusAPI
 from pyenergyplus.common import EnergyPlusException
 
 api = EnergyPlusAPI()
 
-class TestPythonAPITypes():
+
+class TestPythonAPITypes(unittest.TestCase):
     """
     py.test on EnergyPlusAPI.exchange functions to see type checking in action
     """
 
     def test_get_actuator_handle(self):
 
-        assert (-1 == api.exchange.get_actuator_handle(
-            u"Weather Data", u"Outdoor Dew Point", u"Environment"))
+        self.assertEqual(api.exchange.get_actuator_handle(
+            u"Weather Data", u"Outdoor Dew Point", u"Environment"), -1)
 
         # Wrong number of arguments
-        with pytest.raises(TypeError) as e:
+        with self.assertRaises(TypeError) as cm:
             api.exchange.get_actuator_handle(
                 u"Weather Data", u"Outdoor Dew Point")
-            assert ("get_actuator_handle() missing 1 required positional argument: 'actuator_key'" in str(e.value))
+        self.assertIn("get_actuator_handle() missing 1 required positional argument: 'actuator_key'", str(cm.exception))
 
-        with pytest.raises(EnergyPlusException) as e:
+        with self.assertRaises(EnergyPlusException) as cm:
             api.exchange.get_actuator_handle(
                 1, u"Outdoor Dew Point", u"Environment")
-            assert ("`get_actuator_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not '1'" in str(e.value))
+            self.assertIn("`get_actuator_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not '1'", str(cm.exception))
 
-        with pytest.raises(EnergyPlusException) as e:
+        with self.assertRaises(EnergyPlusException) as cm:
             api.exchange.get_actuator_handle(
                 u"Weather Data", 2, u"Environment")
-            assert ("`get_actuator_handle` expects `control_type` as a `str` or UTF-8 encoded `bytes`, not '2'" in str(e.value))
+            self.assertIn("`get_actuator_handle` expects `control_type` as a `str` or UTF-8 encoded `bytes`, not '2'", str(cm.exception))
 
-        with pytest.raises(EnergyPlusException) as e:
+        with self.assertRaises(EnergyPlusException) as cm:
             api.exchange.get_actuator_handle(
                 u"Weather Data", u"Outdoor Dew Point", 3)
-            assert ("`get_actuator_handle` expects `actuator_key` as a `str` or UTF-8 encoded `bytes`, not '3'" in str(e.value))
-
+            self.assertIn("`get_actuator_handle` expects `actuator_key` as a `str` or UTF-8 encoded `bytes`, not '3'", str(cm.exception))
 
     def test_get_variable_value(self):
-        assert(0.0 == api.exchange.get_variable_value(-1))
+        self.assertEqual(api.exchange.get_variable_value(-1), 0.0)
 
-        with pytest.raises(TypeError) as e:
+        with self.assertRaises(TypeError) as cm:
             api.exchange.get_variable_value()
-            assert ("get_variable_value() missing 1 required positional argument: 'variable_handle'" in str(e.value))
+            self.assertIn("get_variable_value() missing 1 required positional argument: 'variable_handle'", str(cm.exception))
 
-        with pytest.raises(EnergyPlusException) as e:
+        with self.assertRaises(EnergyPlusException) as cm:
             api.exchange.get_variable_value(u"foo")
-            assert ("`get_variable_value` expects `variable_handle` as a `str` or UTF-8 encoded `bytes`, not 'foo'" in str(e.value))
+            self.assertIn("`get_variable_value` expects `variable_handle` as a `str` or UTF-8 encoded `bytes`, not 'foo'", str(cm.exception))
+
+
+if __name__ == '__main__':
+    unittest.main()
