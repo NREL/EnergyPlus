@@ -482,7 +482,7 @@ namespace MicroCHPElectricGenerator {
                             "Sum",
                             this->Name,
                             _,
-                            "Gas",
+                            "NaturalGas",
                             "COGENERATION",
                             _,
                             "Plant");

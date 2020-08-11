@@ -1096,7 +1096,7 @@ namespace FuelCellElectricGenerator {
                             "Sum",
                             this->Name,
                             _,
-                            "Gas",
+                            "NaturalGas",
                             "COGENERATION",
                             _,
                             "Plant");
