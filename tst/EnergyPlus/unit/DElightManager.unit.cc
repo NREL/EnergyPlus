@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DElightManagerF.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -60,11 +61,10 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -303,13 +303,13 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
 
     bool foundErrors = false;
 
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state.outputFiles, foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(foundErrors); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
@@ -324,7 +324,7 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.outputFiles, foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()
@@ -332,7 +332,7 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
 
     DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state.files);
     ScheduleManager::ScheduleInputProcessed = true;
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 1;

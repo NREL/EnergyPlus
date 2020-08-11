@@ -2712,6 +2712,8 @@
 
   Output:Variable,*,Boiler Heating Rate,timestep;
 
+  Output:Variable,*,Boiler Steam Efficiency,timestep;
+
   Output:Variable,Steam Boiler Plant Boiler Inlet Node,System Node Mass Flow Rate,timestep;
 
   Output:Variable,Steam Boiler Plant Boiler Inlet Node,System Node Temperature,timestep;

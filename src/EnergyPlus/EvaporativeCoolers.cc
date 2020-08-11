@@ -154,7 +154,7 @@ namespace EvaporativeCoolers {
         // These are purposefully not in the header file as an extern variable. No one outside of this should
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool InitEvapCoolerMyOneTimeFlag(true);
+        bool MySetPointCheckFlag(true);
         bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
     }                                         // namespace
 
@@ -163,7 +163,6 @@ namespace EvaporativeCoolers {
     // MODULE VARIABLE DECLARATIONS:
     bool GetInputEvapComponentsFlag(true); // Flag set to make sure you get input once
     int NumEvapCool(0);                    // The Number of Evap Coolers found in the Input
-    Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
 
     int NumZoneEvapUnits(0);
@@ -311,7 +310,7 @@ namespace EvaporativeCoolers {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         GetInputEvapComponentsFlag = false;
         // Start getting the input data
@@ -969,13 +968,7 @@ namespace EvaporativeCoolers {
         int ControlNode;
         int OutNode;
         int EvapUnitNum;
-        static bool MySetPointCheckFlag(true);
-        static bool localSetPointCheck(false);
-
-        if (InitEvapCoolerMyOneTimeFlag) {
-            MySizeFlag.dimension(NumEvapCool, true);
-            InitEvapCoolerMyOneTimeFlag = false;
-        }
+        bool localSetPointCheck(false);
 
         // FLOW:
         // Check that setpoint is active
@@ -1008,11 +1001,11 @@ namespace EvaporativeCoolers {
             MySetPointCheckFlag = false;
         }
 
-        if (!SysSizingCalc && MySizeFlag(EvapCoolNum)) {
+        if (!SysSizingCalc && EvapCond(EvapCoolNum).MySizeFlag) {
             // for each cooler, do the sizing once.
             SizeEvapCooler(EvapCoolNum);
 
-            MySizeFlag(EvapCoolNum) = false;
+            EvapCond(EvapCoolNum).MySizeFlag = false;
         }
 
         // Do the following initializations (every time step): This should be the info from
@@ -1115,10 +1108,10 @@ namespace EvaporativeCoolers {
         using ReportSizingManager::ReportSizingOutput;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool CoolerOnOApath(false);
-        static bool CoolerOnMainAirLoop(false);
-        static int AirSysBranchLoop(0);
-        static int BranchComp(0);
+        bool CoolerOnOApath(false);
+        bool CoolerOnMainAirLoop(false);
+        int AirSysBranchLoop(0);
+        int BranchComp(0);
         bool HardSizeNoDesRun;          // Indicator to a hard-sized field with no design sizing data
         bool IsAutoSize;                // Indicator to autosize
         Real64 IndirectVolFlowRateDes;  // Autosized volume flow rate for reporting
@@ -2264,9 +2257,9 @@ namespace EvaporativeCoolers {
         Real64 PurgeHumRat;
         Real64 PurgeEnthalpy;
         Real64 PurgeTemp;
-        static Real64 BlowDownVdot(0.0);
-        static Real64 DriftVdot(0.0);
-        static Real64 EvapVdot(0.0);
+        Real64 BlowDownVdot(0.0);
+        Real64 DriftVdot(0.0);
+        Real64 EvapVdot(0.0);
 
         // If the Evaporative Cooler  is operating there should be some mass flow rate
         //  Also the evap cooler has to be scheduled to be available
@@ -2518,9 +2511,9 @@ namespace EvaporativeCoolers {
         Real64 RhoWater;
         Real64 RhoAir; // Density of the primary side air
         Real64 MassFlowRateSecMin;
-        static Real64 BlowDownVdot(0.0);
-        static Real64 DriftVdot(0.0);
-        static Real64 EvapVdot(0.0);
+        Real64 BlowDownVdot(0.0);
+        Real64 DriftVdot(0.0);
+        Real64 EvapVdot(0.0);
 
         FlowRatioSecDry = 0.0;
         FlowRatioSecWet = 0.0;
@@ -3288,9 +3281,9 @@ namespace EvaporativeCoolers {
         Real64 MassFlowRateSysDesign;  // primary air design mass flow rate
         Real64 MassFlowRateSys;        // primary air current mass flow rate
         int InletNode;                 // inlet node number
-        static Real64 BlowDownVdot(0.0);
-        static Real64 DriftVdot(0.0);
-        static Real64 EvapVdot(0.0);
+        Real64 BlowDownVdot(0.0);
+        Real64 DriftVdot(0.0);
+        Real64 EvapVdot(0.0);
         bool EvapCoolerOperatingLimitFlag(false);
 
         EvapCoolerOperatingLimitFlag = false;
@@ -3462,7 +3455,7 @@ namespace EvaporativeCoolers {
         int InletNode;
         int OutletNodeSec;
         int InletNodeSec;
-        static Real64 AvailWaterRate(0.0);
+        Real64 AvailWaterRate(0.0);
 
         OutletNode = EvapCond(EvapCoolNum).OutletNode;
         InletNode = EvapCond(EvapCoolNum).InletNode;
@@ -3673,7 +3666,7 @@ namespace EvaporativeCoolers {
         int MaxNumbers;                  // Maximum number of numeric fields in all objects
         int NumFields;                   // Total number of fields in object
         int IOStatus;                    // Used in GetObjectItem
-        static bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
         bool errFlag;
         Real64 FanVolFlow;
         int UnitLoop;
@@ -3756,21 +3749,23 @@ namespace EvaporativeCoolers {
                 ZoneEvapUnit(UnitLoop).FanName = Alphas(8);
                 errFlag = false;
                 if (!UtilityRoutines::SameString(ZoneEvapUnit(UnitLoop).FanObjectClassName, "Fan:SystemModel")) {
-                    GetFanType(state.fans, ZoneEvapUnit(UnitLoop).FanName,
+                    GetFanType(state,
+                               ZoneEvapUnit(UnitLoop).FanName,
                                ZoneEvapUnit(UnitLoop).FanType_Num,
                                errFlag,
                                CurrentModuleObject,
                                ZoneEvapUnit(UnitLoop).Name);
-                    GetFanIndex(state.fans, ZoneEvapUnit(UnitLoop).FanName, ZoneEvapUnit(UnitLoop).FanIndex, errFlag, CurrentModuleObject);
+                    GetFanIndex(
+                        state, ZoneEvapUnit(UnitLoop).FanName, ZoneEvapUnit(UnitLoop).FanIndex, errFlag, CurrentModuleObject);
                     ZoneEvapUnit(UnitLoop).FanInletNodeNum =
-                        GetFanInletNode(state.fans, ZoneEvapUnit(UnitLoop).FanObjectClassName, ZoneEvapUnit(UnitLoop).FanName, errFlag);
+                        GetFanInletNode(state, ZoneEvapUnit(UnitLoop).FanObjectClassName, ZoneEvapUnit(UnitLoop).FanName, errFlag);
                     ZoneEvapUnit(UnitLoop).FanOutletNodeNum =
-                        GetFanOutletNode(state.fans, ZoneEvapUnit(UnitLoop).FanObjectClassName, ZoneEvapUnit(UnitLoop).FanName, errFlag);
+                        GetFanOutletNode(state, ZoneEvapUnit(UnitLoop).FanObjectClassName, ZoneEvapUnit(UnitLoop).FanName, errFlag);
                     GetFanVolFlow(ZoneEvapUnit(UnitLoop).FanIndex, FanVolFlow);
                     ZoneEvapUnit(UnitLoop).ActualFanVolFlowRate = FanVolFlow;
                     // Get the fan's availability schedule
                     ZoneEvapUnit(UnitLoop).FanAvailSchedPtr =
-                        GetFanAvailSchPtr(state.fans, ZoneEvapUnit(UnitLoop).FanObjectClassName, ZoneEvapUnit(UnitLoop).FanName, errFlag);
+                        GetFanAvailSchPtr(state, ZoneEvapUnit(UnitLoop).FanObjectClassName, ZoneEvapUnit(UnitLoop).FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...specified in " + CurrentModuleObject + " = " + ZoneEvapUnit(UnitLoop).Name);
                         ErrorsFound = true;
@@ -3778,7 +3773,7 @@ namespace EvaporativeCoolers {
                 } else if (UtilityRoutines::SameString(ZoneEvapUnit(UnitLoop).FanObjectClassName, "Fan:SystemModel")) {
 
                     ZoneEvapUnit(UnitLoop).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(ZoneEvapUnit(UnitLoop).FanName)); // call constructor
+                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, ZoneEvapUnit(UnitLoop).FanName)); // call constructor
                     ZoneEvapUnit(UnitLoop).FanIndex = HVACFan::getFanObjectVectorIndex(ZoneEvapUnit(UnitLoop).FanName);
                     ZoneEvapUnit(UnitLoop).FanInletNodeNum = HVACFan::fanObjs[ZoneEvapUnit(UnitLoop).FanIndex]->inletNodeNum;
                     ZoneEvapUnit(UnitLoop).FanOutletNodeNum = HVACFan::fanObjs[ZoneEvapUnit(UnitLoop).FanIndex]->outletNodeNum;
@@ -4749,7 +4744,7 @@ namespace EvaporativeCoolers {
         Real64 MinHumRat;
         Array1D<Real64> Par(5); // Parameters passed to RegulaFalsi
         Real64 FanSpeedRatio;
-        static Real64 ErrorToler(0.001); // error tolerance
+        Real64 ErrorToler(0.001); // error tolerance
         int SolFla;                      // Flag of RegulaFalsi solver
         Real64 FullFlowSensibleOutputProvided;
 
@@ -5005,13 +5000,12 @@ namespace EvaporativeCoolers {
         NumZoneEvapUnits = 0;
         ZoneEvapUnit.clear();
         ZoneEvapCoolerUnitFields.clear();
-        GetInputEvapComponentsFlag = false;
+        GetInputEvapComponentsFlag = true;
         GetInputZoneEvapUnit = true;
         UniqueEvapCondNames.clear();
-        MySizeFlag.clear();
         CheckEquipName.clear();
         CheckZoneEvapUnitName.clear();
-        InitEvapCoolerMyOneTimeFlag = true;
+        MySetPointCheckFlag = true;
         ZoneEquipmentListChecked = false;
     }
 

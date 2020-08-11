@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 
@@ -70,6 +71,7 @@ TEST_F(EnergyPlusFixture, ConstructionInternalSource)
         "	4,                       !- Temperature Calculation Requested After Layer Number",
         "	2,                       !- Dimensions for the CTF Calculation",
         "	0.3048,                  !- Tube Spacing {m}",
+        "   0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request"
         "	CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer",
         "	INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2",
         "	GYP1,                    !- Layer 3",
@@ -81,7 +83,7 @@ TEST_F(EnergyPlusFixture, ConstructionInternalSource)
 
     bool errorsFound(false);
 
-    GetConstructData(errorsFound);
+    GetConstructData(state.files, errorsFound);
 
-    EXPECT_NEAR(0.1524, Construct(1).ThicknessPerpend, 0.0001);
+    EXPECT_NEAR(0.1524,  dataConstruction.Construct(1).ThicknessPerpend, 0.0001);
 }

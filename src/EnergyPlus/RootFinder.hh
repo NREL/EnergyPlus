@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataRootFinder.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
@@ -100,7 +101,7 @@ namespace RootFinder {
     void IterateRootFinder(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
                            Real64 const X,                     // X value of current iterate
                            Real64 const Y,                     // Y value of current iterate
-                           Optional_bool IsDoneFlag = _        // If TRUE indicates that the iteration should be stopped
+                           bool &IsDoneFlag                    // If TRUE indicates that the iteration should be stopped
     );
 
     int CheckInternalConsistency(RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
@@ -127,10 +128,6 @@ namespace RootFinder {
 
     bool CheckRootFinderConvergence(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
                                     Real64 const Y                            // Y value for current iterate
-    );
-
-    bool CheckIncrementRoundOff(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
-                                Real64 const X                            // X value for current iterate
     );
 
     bool CheckBracketRoundOff(RootFinderDataType const &RootFinderData); // Data used by root finding algorithm
@@ -177,21 +174,21 @@ namespace RootFinder {
 
     Real64 BrentMethod(RootFinderDataType &RootFinderData); // Data used by root finding algorithm
 
-    void WriteRootFinderTraceHeader(int const TraceFileUnit); // Unit for trace file
+    void WriteRootFinderTraceHeader(InputOutputFile &TraceFileUnit); // Unit for trace file
 
-    void WriteRootFinderTrace(int const TraceFileUnit,                 // Unit for trace file
+    void WriteRootFinderTrace(InputOutputFile &TraceFile,                 // Unit for trace file
                               RootFinderDataType const &RootFinderData // Data used by root finding algorithm
     );
 
-    void WritePoint(int const TraceFileUnit,    // Unit for trace file
+    void WritePoint(InputOutputFile &TraceFile,    // Unit for trace file
                     PointType const &PointData, // Point data structure
                     bool const ShowXValue);
 
-    void DebugRootFinder(int const FileUnit,                      // File unit where to write debugging info
+    void DebugRootFinder(InputOutputFile &DebugFile,                   // File unit where to write debugging info
                          RootFinderDataType const &RootFinderData // Data used by root finding algorithm
     );
 
-    void WriteRootFinderStatus(int const FileUnit,                      // File unit where to write the status description
+    void WriteRootFinderStatus(InputOutputFile &File,                      // File unit where to write the status description
                                RootFinderDataType const &RootFinderData // Data used by root finding algorithm
     );
 

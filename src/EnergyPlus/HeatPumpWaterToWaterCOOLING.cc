@@ -170,11 +170,12 @@ namespace HeatPumpWaterToWaterCOOLING {
         OptLoad = this->NomCap * this->OptPartLoadRat;
     }
 
-    void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) {
+    void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) {
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_HPWaterPECooling,
                                                     this->SourceLoopNum,
                                                     this->SourceLoopSideNum,
@@ -186,7 +187,8 @@ namespace HeatPumpWaterToWaterCOOLING {
                                                     _,
                                                     this->SourceSideInletNodeNum,
                                                     _);
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_HPWaterPECooling,
                                                     this->LoadLoopNum,
                                                     this->LoadLoopSideNum,
@@ -253,7 +255,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
         // Allocate Arrays
         GSHP.allocate(NumGSHPs);
-        
+
         for (GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum) {
             inputProcessor->getObjectItem(ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
             UtilityRoutines::IsNameEmpty(AlphArray(1), ModuleCompNameUC, ErrorsFound);
@@ -502,7 +504,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
     void GshpPeCoolingSpecs::initialize()
     {
-        
+
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    July 2007

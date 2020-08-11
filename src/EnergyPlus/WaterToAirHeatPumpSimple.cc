@@ -54,12 +54,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
@@ -72,6 +72,7 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
@@ -167,19 +168,8 @@ namespace WaterToAirHeatPumpSimple {
     Real64 Winput(0.0);                 // Power Consumption [W]
     Real64 PLRCorrLoadSideMdot(0.0);    // Load Side Mdot corrected for Part Load Ratio of the unit
     bool MyOneTimeFlag(true);           // one time allocation flag
-
+    bool firstTime(true);
     // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine
-
-    // Utility routines
 
     // Object Data
     Array1D<SimpleWatertoAirHPConditions> SimpleWatertoAirHP;
@@ -190,9 +180,13 @@ namespace WaterToAirHeatPumpSimple {
     // Functions
     void clear_state()
     {
+        NumWatertoAirHPs = 0;
         MyOneTimeFlag = true;
         GetCoilsInputFlag = true;
+        MySizeFlag.clear();
+        SimpleHPTimeStepFlag.clear();
         SimpleWatertoAirHP.deallocate();
+        firstTime = true;
     }
 
     void SimWatertoAirHPSimple(EnergyPlusData &state, std::string const &CompName,   // Coil Name
@@ -885,7 +879,8 @@ namespace WaterToAirHeatPumpSimple {
 
         if (MyPlantScanFlag(HPNum) && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(SimpleWatertoAirHP(HPNum).Name,
+            ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                    SimpleWatertoAirHP(HPNum).Name,
                                     SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum,
                                     SimpleWatertoAirHP(HPNum).LoopNum,
                                     SimpleWatertoAirHP(HPNum).LoopSide,
@@ -2203,7 +2198,6 @@ namespace WaterToAirHeatPumpSimple {
         bool LatDegradModelSimFlag; // Latent degradation model simulation flag
         int NumIteration;           // Iteration Counter
         static int Count(0);        // No idea what this is for.
-        static bool firstTime(true);
         static Real64 LoadSideInletDBTemp_Init; // rated conditions
         static Real64 LoadSideInletWBTemp_Init; // rated conditions
         static Real64 LoadSideInletHumRat_Init; // rated conditions

@@ -59,10 +59,12 @@ typedef void* PyObjectWrap;
 
 namespace EnergyPlus {
 
+    struct EnergyPlusData;
+
 namespace PluginManagement {
 
-    void registerNewCallback(int iCalledFrom, const std::function<void ()>& f);
-    void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan);
+    void registerNewCallback(EnergyPlusData &state, int iCalledFrom, const std::function<void (void *)>& f);
+    void runAnyRegisteredCallbacks(EnergyPlusData &state, int iCalledFrom, bool &anyRan);
     void onBeginEnvironment();
     std::string pythonStringForUsage();
 
@@ -144,7 +146,7 @@ namespace PluginManagement {
         static int numActiveCallbacks();
         static void addToPythonPath(const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
-        void setupOutputVariables();
+        static void setupOutputVariables();
 
         int maxGlobalVariableIndex = -1;
         void addGlobalVariable(const std::string& name);
@@ -153,16 +155,16 @@ namespace PluginManagement {
         static void setGlobalVariableValue(int handle, Real64 value);
 
         int maxTrendVariableIndex = -1;
-        int getTrendVariableHandle(const std::string& name);
-        Real64 getTrendVariableValue(int handle, int timeIndex);
+        static int getTrendVariableHandle(const std::string& name);
+        static Real64 getTrendVariableValue(int handle, int timeIndex);
         static size_t getTrendVariableHistorySize(int handle);
-        Real64 getTrendVariableAverage(int handle, int count);
-        Real64 getTrendVariableMin(int handle, int count);
-        Real64 getTrendVariableMax(int handle, int count);
-        Real64 getTrendVariableSum(int handle, int count);
-        Real64 getTrendVariableDirection(int handle, int count);
+        static Real64 getTrendVariableAverage(int handle, int count);
+        static Real64 getTrendVariableMin(int handle, int count);
+        static Real64 getTrendVariableMax(int handle, int count);
+        static Real64 getTrendVariableSum(int handle, int count);
+        static Real64 getTrendVariableDirection(int handle, int count);
 
-        void updatePluginValues();
+        static void updatePluginValues();
 
         static int getLocationOfUserDefinedPlugin(std::string const &programName);
         static void runSingleUserDefinedPlugin(int index);

@@ -102,7 +102,11 @@ namespace WaterManager {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    // na
+    bool MyOneTimeFlag(true);
+    bool GetInputFlag(true); // First time, input is "gotten"
+    bool MyEnvrnFlag(true);   // flag for init once at start of environment
+    bool MyWarmupFlag(false); // flag for init after warmup complete
+    bool MyTankDemandCheckFlag(true);
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -115,6 +119,15 @@ namespace WaterManager {
     // pointers for water storage tanks and their demand arrays
 
     // Functions
+
+    void clear_state()
+    {
+        MyOneTimeFlag = true;
+        GetInputFlag = true;
+        MyEnvrnFlag = true;
+        MyWarmupFlag = false;
+        MyTankDemandCheckFlag = true;
+    }
 
     void ManageWater()
     {
@@ -162,10 +175,9 @@ namespace WaterManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true); // First time, input is "gotten"
-        static int RainColNum(0);
-        static int TankNum(0);
-        static int WellNum(0);
+        int RainColNum(0);
+        int TankNum(0);
+        int WellNum(0);
 
         if (GetInputFlag) {
             GetWaterManagerInput();
@@ -244,8 +256,7 @@ namespace WaterManager {
         static int NumAlphas(0);        // Number of Alphas for each GetObjectItem call
         static int NumNumbers(0);       // Number of Numbers for each GetObjectItem call
         static int IOStatus(0);         // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        static bool MyOneTimeFlag(true);
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         static int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
         static int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
         static int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
@@ -1765,9 +1776,6 @@ namespace WaterManager {
         int TankNum;
         int RainColNum;
         int WellNum;
-        static bool MyEnvrnFlag(true);   // flag for init once at start of environment
-        static bool MyWarmupFlag(false); // flag for init after warmup complete
-        static bool MyTankDemandCheckFlag(true);
 
         if (BeginEnvrnFlag && MyEnvrnFlag) {
             for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {

@@ -54,8 +54,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/datatransfer.h>
@@ -248,7 +248,7 @@ public:
 
     void simulateTimeStepAndReport()
     {
-        UpdateMeterReporting(state.outputFiles);
+        UpdateMeterReporting(state.files);
         UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
     }
 };

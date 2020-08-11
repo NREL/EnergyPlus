@@ -54,9 +54,15 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZoneTempPredictorCorrectorData;
+
+    // Forward Declarations
+    struct EnergyPlusData;
+    struct WindowManagerData;
 
 namespace HWBaseboardRadiator {
 
@@ -190,7 +196,7 @@ namespace HWBaseboardRadiator {
 
     void SizeHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    void CalcHWBaseboard(int &BaseboardNum, Real64 &LoadMet);
+    void CalcHWBaseboard(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
 
     void UpdateHWBaseboard(int const BaseboardNum);
 

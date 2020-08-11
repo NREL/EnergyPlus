@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
@@ -53,7 +54,6 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -485,7 +485,7 @@ namespace ExteriorEnergyUse {
             FuelTypeString = "Coal";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo1")) {
             FuelTypeNumber = ExteriorFuelUsage::FuelOil1Use;
-            FuelTypeString = "FuelOil#1";
+            FuelTypeString = "FuelOilNo1";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Propane")) {
             FuelTypeNumber = ExteriorFuelUsage::PropaneUse;
             FuelTypeString = "Propane";
@@ -497,7 +497,7 @@ namespace ExteriorEnergyUse {
             FuelTypeString = "Diesel";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo2")) {
             FuelTypeNumber = ExteriorFuelUsage::FuelOil2Use;
-            FuelTypeString = "FuelOil#2";
+            FuelTypeString = "FuelOilNo2";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "OtherFuel1")) {
             FuelTypeNumber = ExteriorFuelUsage::OtherFuel1Use;
             FuelTypeString = "OtherFuel1";

@@ -51,13 +51,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -759,6 +759,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    2,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
+        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
         "    CLN-INS,                 !- Outside Layer",
         "    GYP1,                    !- Layer 2",
         "    GYP2,                    !- Layer 3",
@@ -770,6 +771,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    2,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
+        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
         "    MAT-CLNG-1,              !- Outside Layer",
         "    GYP2,                    !- Layer 2",
         "    GYP1,                    !- Layer 3",
@@ -781,6 +783,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    2,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
+        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
         "    INS - EXPANDED EXT POLYSTYRENE R12,  !- Outside Layer",
         "    CONC,                    !- Layer 2",
         "    CONC,                    !- Layer 3",
@@ -2296,10 +2299,10 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.outputFiles);  // read schedule data
+    ProcessScheduleInput(state.files);  // read schedule data
 
     ErrorsFound = false;
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
@@ -2307,11 +2310,11 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    GetMaterialData(state.outputFiles, ErrorsFound); // read construction material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read construction material data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    HeatBalanceManager::GetConstructData(ErrorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;

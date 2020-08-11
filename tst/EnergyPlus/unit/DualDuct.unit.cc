@@ -54,8 +54,10 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -64,11 +66,9 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DualDuct.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
@@ -349,7 +349,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_GetInputs)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     DualDuct::GetDualDuctInput();
 
     //dual duct  VAV air terminal get input test
@@ -432,7 +432,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state.files);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -450,7 +450,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
     DualDuct::GetDualDuctInput();
 
     auto &thisDDAirTerminal = DualDuct::dd_airterminal(DDNum);

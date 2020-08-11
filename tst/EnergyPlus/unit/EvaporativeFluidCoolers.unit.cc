@@ -73,7 +73,7 @@ namespace EnergyPlus {
 class EvapFluidCoolersFixture : public EnergyPlusFixture
 {
 public:
- 
+
 protected:
     virtual void SetUp()
     {
@@ -159,12 +159,14 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     ExpectedMaxLoad = 20902.8677;
     ExpectedOptLoad = 10451.4338;
     ExpectedMinLoad = 0.0;
-    
+
     // Call the routine to be tested and see if the fix is correct
+    PlantLocation loc = PlantLocation(1, 1, 1, 1);
+    thisEFC.onInitLoopEquip(state, loc);
     thisEFC.getDesignCapacities(pl, MaxLoad, MinLoad, OptLoad);
-    EXPECT_NEAR(MaxLoad,ExpectedMaxLoad,0.01);
-    EXPECT_NEAR(MinLoad,ExpectedMinLoad,0.01);
-    EXPECT_NEAR(OptLoad,ExpectedOptLoad,0.01);
+    EXPECT_NEAR(MaxLoad, ExpectedMaxLoad,0.01);
+    EXPECT_NEAR(MinLoad, ExpectedMinLoad,0.01);
+    EXPECT_NEAR(OptLoad, ExpectedOptLoad,0.01);
 
 }
 

@@ -117,6 +117,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                                     I N S E R T    L O C A L    V A R I A B L E S    H E R E                                     !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  LOGICAL :: processNumberErrFlag
+  INTEGER :: convertedNumber
+
+  INTEGER :: numOutputDiagnostics = 0
+  INTEGER :: numOutputDiagnosticsNames = 0
+  INTEGER outputDiagnosticNum
+  CHARACTER(len=MaxNameLength) :: OutputDiagnosticsName
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: OutputDiagnosticsNames
+  LOGICAL :: alreadyProcessedOneOutputDiagnostic=.false.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -254,7 +263,34 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
 ! Do any kind of Preprocessing that is needed here (eg: a first pass on objects to store some attributes etc)
 
+     ! Begin Pre-process Output:Diagnostics which is now a unique-object, gathering all the unique diagnostic keys used
+          numOutputDiagnostics = GetNumObjectsFound('OUTPUT:DIAGNOSTICS')
+          ! No need if we do not have duplicate ones already
+          IF (numOutputDiagnostics > 1) THEN
 
+            CALL DisplayString('Processing IDF -- OutputDiagnostics preprocessing . . .')
+
+            IF(ALLOCATED(OutputDiagnosticsNames)) DEALLOCATE(OutputDiagnosticsNames)
+
+            ! 12 unique key choices
+            ALLOCATE(OutputDiagnosticsNames(12))
+
+            numOutputDiagnosticsNames = 0
+
+            ! First pass to get all current unique OutputDiagnostic Keys
+            DO outputDiagnosticNum=1,numOutputDiagnostics
+              CALL GetObjectItem('OUTPUT:DIAGNOSTICS',outputDiagnosticNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+              DO CurField = 1, NumAlphas
+                OutputDiagnosticsName = MakeUPPERCase(TRIM(Alphas(CurField)))
+                IF ( .not. (ANY(OutputDiagnosticsNames == OutputDiagnosticsName) )) THEN
+                  numOutputDiagnosticsNames = numOutputDiagnosticsNames + 1
+                  OutputDiagnosticsNames(numOutputDiagnosticsNames) = OutputDiagnosticsName
+                ENDIF
+              ENDDO
+            ENDDO
+            CALL DisplayString('Processing IDF -- OutputDiagnostics preprocessing complete.')
+          ENDIF
+       ! End Pre-process OutputDiagnostics
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                                       P R O C E S S I N G                                                        !
@@ -368,6 +404,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with C, insert the rules here
 
+              CASE('CONSTRUCTION:INTERNALSOURCE')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:5)=InArgs(1:5)
+                  OutArgs(6) = '0.0'
+                  OutArgs(7:CurArgs+1)=InArgs(6:CurArgs)
+                  CurArgs = CurArgs + 1
+
               ! If your original object starts with D, insert the rules here
 
               ! If your original object starts with E, insert the rules here
@@ -378,6 +422,30 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with H, insert the rules here
 
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:7)=InArgs(1:7)
+                  OutArgs(8) = 'HalfFlowPower'
+                  OutArgs(9:CurArgs+1)=InArgs(8:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:9)=InArgs(1:9)
+                  OutArgs(10) = 'HalfFlowPower'
+                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:7)=InArgs(1:7)
+                  OutArgs(8) = '0.8'
+                  OutArgs(9:CurArgs+1)=InArgs(8:CurArgs)
+                  CurArgs = CurArgs + 1
+
               ! If your original object starts with I, insert the rules here
 
               ! If your original object starts with L, insert the rules here
@@ -387,8 +455,58 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with N, insert the rules here
 
               ! If your original object starts with O, insert the rules here
+              CASE('OUTPUT:DEBUGGINGDATA')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  NoDiff=.false.
+                  ! This object previously used a numeric field, where 1 would mean TRUE and any other would mean FALSE
+                  ! and it is being replaced by a Yes/No choice field now
+                  DO CurField = 1, CurArgs
+                    ! Default to No
+                    OutArgs(CurField) = 'No'
+                    convertedNumber = ProcessNumber(InArgs(CurField), processNumberErrFlag)
+                    IF (processNumberErrFlag) THEN
+                      CALL ShowWarningError('For ' // TRIM(ObjectName) // ', field "' // TRIM(FldNames(CurField)) // '"="' // &
+                        TRIM(InArgs(CurField)) // '" is not a number, defaulting to No', Auditf)
+                    ELSE IF (INT(convertedNumber) == 1) THEN
+                      OutArgs(CurField) = 'Yes'
+                    END IF
+                  END DO
+
+
+              CASE('OUTPUT:DIAGNOSTICS')
+                  ! This is now a unique object, but it should be quite rare to encounter cases where two of these were present
+                  ! and this does not affect the simulation, so do nothing fancy but write any extra one as a comment
+                  ! and write to the audit file. The user will already get a warning in the console about it being unique
+                  IF (.not. alreadyProcessedOneOutputDiagnostic) THEN
+                    CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                    IF (numOutputDiagnostics > 1) THEN
+                      ! Consolidate all into this one
+                      OutArgs(1:numOutputDiagnosticsNames) = OutputDiagnosticsNames(1:numOutputDiagnosticsNames)
+                      CurArgs = numOutputDiagnosticsNames
+                      NoDiff=.false.
+                    ELSE
+                      ! Business as usual
+                      OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                      NoDiff=.true.
+                    ENDIF
+                    alreadyProcessedOneOutputDiagnostic=.true.
+                  ELSE
+                    WRITE(Auditf,fmta) 'Object="'//TRIM(ObjectName)//'" is now a unique object in the "new" IDD.'
+                    WRITE(Auditf,fmta) '... will be listed as comments on the new output file but keys consolidated in the first found.'
+                    CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
+                    Written=.true.
+                  ENDIF
 
               ! If your original object starts with P, insert the rules here
+
+              CASE('PERFORMANCEPRECISIONTRADEOFFS')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:4)=InArgs(1:4)
+                  IF (MakeUPPERCase(OutArgs(3)) == 'MODE05') THEN
+                    OutArgs(3) = 'Mode06'
+                  ENDIF
+
 
               ! If your original object starts with R, insert the rules here
 
@@ -404,11 +522,30 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with Z, insert the rules here
 
+              CASE('ZONEHVAC:HYBRIDUNITARYHVAC')
+                ObjectName = "ZoneHVAC:HybridUnitaryHVAC"
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  ! fields 1-14 same
+                  OutArgs(1:14)=InArgs(1:14)
+                  ! insert Fan Heat Included in Lookup Tables field
+                  OutArgs(15)='Yes'
+                  ! insert Fan Heat Gain Location
+                  OutArgs(16)=Blank
+                  ! insert Fan Heat Gain In Airstream Fraction field
+                  OutArgs(17)=Blank
+                  ! same Scaling Factor
+                  OutArgs(18)=InArgs(15)
+                  ! remove Number of Operating Modes
+                  OutArgs(19)=InArgs(17)
+                  ! all others equal
+                  OutArgs(20:CurArgs+2)=InArgs(18:CurArgs)
+                  CurArgs = CurArgs + 2
+                  NoDiff = .false.
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                   Changes for report variables, meters, tables -- update names                                   !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! TODO: not sure if need to keep all of this...
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
@@ -839,6 +976,63 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     EXIT
                   ENDIF
                 ENDDO
+
+    !!!   Changes for other objects that reference meter names -- update names
+              CASE('DEMANDMANAGERASSIGNMENTLIST',  &
+                   'UtilityCost:Tariff')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+
+                CALL ScanOutputVariablesForReplacement(  &
+                   2,  &
+                   DelThis,  &
+                   checkrvi,  &
+                   nodiff,  &
+                   ObjectName,  &
+                   DifLfn,      &
+                   .false.,  & !OutVar
+                   .true., & !MtrVar
+                   .false., & !TimeBinVar
+                   CurArgs, &
+                   Written, &
+                   .false.)
+
+              CASE('ELECTRICLOADCENTER:DISTRIBUTION')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+
+               ! Field 6  A5,  \field Generator Track Meter Scheme Meter Name
+                CALL ScanOutputVariablesForReplacement(  &
+                   6,  &
+                   DelThis,  &
+                   checkrvi,  &
+                   nodiff,  &
+                   ObjectName,  &
+                   DifLfn,      &
+                   .false.,  & !OutVar
+                   .true., & !MtrVar
+                   .false., & !TimeBinVar
+                   CurArgs, &
+                   Written, &
+                   .false.)
+
+               ! Field 12    A11, \field Storage Control Track Meter Name
+                CALL ScanOutputVariablesForReplacement(  &
+                   12,  &
+                   DelThis,  &
+                   checkrvi,  &
+                   nodiff,  &
+                   ObjectName,  &
+                   DifLfn,      &
+                   .false.,  & !OutVar
+                   .true., & !MtrVar
+                   .false., & !TimeBinVar
+                   CurArgs, &
+                   Written, &
+                   .false.)
+
 
               ! ANY OTHER OBJECT
               CASE DEFAULT
