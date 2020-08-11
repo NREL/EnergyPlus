@@ -1442,7 +1442,7 @@ namespace FaultsManager {
         // read faults input of Fault_type 109: Fouled Air Filters
         for (int jFault_AirFilter = 1; jFault_AirFilter <= NumFaultyAirFilter; ++jFault_AirFilter) {
 
-            // Read in chiller if not done yet
+            // Read in fan if not done yet
             if (state.fans.GetFanInputFlag) {
                 Fans::GetFanInput(state.fans);
             }
