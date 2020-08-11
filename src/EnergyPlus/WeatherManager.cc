@@ -8463,7 +8463,7 @@ namespace WeatherManager {
                                        std::string const &description,
                                        std::string const &rangeLow,
                                        std::string const &rangeHigh,
-                                       std::string const &extraMsg = "") {
+                                       std::string const &extraMsg) {
             if (value > 0) {
                 if (!OutOfRangeHeader) {
                     ShowWarningError(RangeString);
@@ -8473,14 +8473,14 @@ namespace WeatherManager {
                 if (!extraMsg.empty()) ShowMessage(extraMsg);
             }
         }};
-        outOfRangeHeaderCheck(OutOfRange.DryBulb, "Dry Bulb Temperatures", ">=-90", "<=70");
+        outOfRangeHeaderCheck(OutOfRange.DryBulb, "Dry Bulb Temperatures", ">=-90", "<=70", "");
         outOfRangeHeaderCheck(OutOfRange.StnPres, "Atmospheric Pressure", ">31000", "<=120000", "Out of Range values set to last good value");
-        outOfRangeHeaderCheck(OutOfRange.RelHumid, "Relative Humidity", ">=0", "<=110");
-        outOfRangeHeaderCheck(OutOfRange.DewPoint, "Dew Point Temperatures", ">=-90", "<=70");
-        outOfRangeHeaderCheck(OutOfRange.WindSpd, "Wind Speed", ">=0", "<=40");
-        outOfRangeHeaderCheck(OutOfRange.WindDir, "Wind Direction", ">=0", "<=360");
-        outOfRangeHeaderCheck(OutOfRange.DirectRad, "Direct Radiation", ">=0", "NoLimit");
-        outOfRangeHeaderCheck(OutOfRange.DiffuseRad, "Diffuse Radiation", ">=0", "NoLimit");
+        outOfRangeHeaderCheck(OutOfRange.RelHumid, "Relative Humidity", ">=0", "<=110", "");
+        outOfRangeHeaderCheck(OutOfRange.DewPoint, "Dew Point Temperatures", ">=-90", "<=70", "");
+        outOfRangeHeaderCheck(OutOfRange.WindSpd, "Wind Speed", ">=0", "<=40", "");
+        outOfRangeHeaderCheck(OutOfRange.WindDir, "Wind Direction", ">=0", "<=360", "");
+        outOfRangeHeaderCheck(OutOfRange.DirectRad, "Direct Radiation", ">=0", "NoLimit", "");
+        outOfRangeHeaderCheck(OutOfRange.DiffuseRad, "Diffuse Radiation", ">=0", "NoLimit", "");
     }
 
     void SetupInterpolationValues()
