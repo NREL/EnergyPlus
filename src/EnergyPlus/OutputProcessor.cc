@@ -4015,7 +4015,6 @@ namespace OutputProcessor {
 
         // Using/Aliasing
         using namespace DataPrecisionGlobals;
-        using DataStringGlobals::NL;
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -4184,7 +4183,6 @@ namespace OutputProcessor {
         // na
 
         // Using/Aliasing
-        using DataStringGlobals::NL;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4294,7 +4292,6 @@ namespace OutputProcessor {
         // na
 
         // Using/Aliasing
-        using DataStringGlobals::NL;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4872,7 +4869,6 @@ namespace OutputProcessor {
 
         // Using/Aliasing
         using namespace DataPrecisionGlobals;
-        using DataStringGlobals::NL;
         using General::strip_trailing_zeros;
 
         // Locals
