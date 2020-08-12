@@ -451,6 +451,7 @@ namespace HVACManager {
 
         if (UseZoneTimeStepHistory) PreviousTimeStep = TimeStepZone;
         for (SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
+            if (DataGlobals::stopSimulation) break;
 
             if (TimeStepSys < TimeStepZone) {
 
@@ -915,6 +916,8 @@ namespace HVACManager {
         // true, then specific components must be resimulated.
         while ((SimAirLoopsFlag || SimZoneEquipmentFlag || SimNonZoneEquipmentFlag || SimPlantLoopsFlag || SimElecCircuitsFlag) &&
                (HVACManageIteration <= MaxIter)) {
+
+            if (DataGlobals::stopSimulation) break;
 
             ManageEMS(state, emsCallFromHVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
 
