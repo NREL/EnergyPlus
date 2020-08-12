@@ -2513,15 +2513,8 @@ TEST_F(LowTempRadiantSystemTest, calculateUFromISOStandardTest)
     thisCFloSys.TubeLength = 100.0;
     thisCFloSys.TubeConductivity = 0.5;
     Real64 WaterMassFlow = 0.001;
-    dataConstruction.Construct(1).SourceAfterLayer = 1;
-    dataConstruction.Construct(1).LayerPoint.allocate(2);
-    dataConstruction.Construct(1).LayerPoint(1) = 1;
-    dataConstruction.Construct(1).LayerPoint(2) = 2;
-    dataMaterial.Material.allocate(2);
-    dataMaterial.Material(1).Conductivity = 0.5;
-    dataMaterial.Material(2).Conductivity = 1.5;
 
-    Real64 expectedResult = 1.75045;
+    Real64 expectedResult = 28.00687;
     Real64 allowedDifference = 0.00001;
     Real64 actualResult = thisCFloSys.calculateUFromISOStandard(SurfNum, WaterMassFlow);
     EXPECT_NEAR(expectedResult, actualResult, allowedDifference);

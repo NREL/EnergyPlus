@@ -5378,10 +5378,9 @@ namespace LowTempRadiantSystem {
         // from ISO Standard 11855, Part 2 (2012): "Building environment design — Design, dimensioning,
         // installation and control of embedded radiant heating and cooling systems — Part 2:
         // Determination of the design heating and cooling capacity."  This looks exclusively at the heat transfer
-        // between the fluid and the inner side of the pipe, heat conduction through the pipe,
-        // and the contact resistance between the outer side of the pipe and the material of the
-        // slab.  The remainder of the ISO calculation relates to the slab itself which is modeled
-        // using transient heat conduction here in EnergyPlus.
+        // between the fluid and the inner side of the pipe and heat conduction through the pipe.  The remainder
+        // of the ISO calculation relates to the slab itself which is modeled using transient heat conduction here
+        // in EnergyPlus.
         
         // Return value
         Real64 calculateUFromISOStandard;
@@ -5396,16 +5395,7 @@ namespace LowTempRadiantSystem {
         // Resistance to heat transfer (conduction through the piping material, Equation B6, p. 38 of ISO Standard 11855-2)
         Real64 rTube = 0.5 * distanceBetweenPipes * std::log(this->TubeDiameterOuter/this->TubeDiameterInner) / DataGlobals::Pi / this->TubeConductivity;
         
-        // Contact resistance between the pipe and the material in which it is embedded (Equation B7, p. 38 of ISO Standard 11855-2)
-        int sourceAfterLayer = dataConstruction.Construct(constructionNumber).SourceAfterLayer;
-        int materialNumber = dataConstruction.Construct(constructionNumber).LayerPoint(sourceAfterLayer);
-        int materialNumberNextLayer = dataConstruction.Construct(constructionNumber).LayerPoint(sourceAfterLayer+1);
-        Real64 averageSlabConductivity = 0.5 * (dataMaterial.Material(materialNumber).Conductivity
-                                                + dataMaterial.Material(materialNumberNextLayer).Conductivity);
-        Real64 rContactResistance = 0.5 * distanceBetweenPipes * std::log(distanceBetweenPipes/DataGlobals::Pi/this->TubeDiameterOuter)
-                                        / DataGlobals::Pi / averageSlabConductivity;
-
-        calculateUFromISOStandard = 1.0 / (rFluid + rTube + rContactResistance);
+        calculateUFromISOStandard = 1.0 / (rFluid + rTube);
         
         return calculateUFromISOStandard;
     }

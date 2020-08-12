@@ -675,7 +675,7 @@ where Pr is the Prandtl number of water and \(Re_D\) is the Reynolds number whic
 
 The parameter m is the absolute viscosity of water.~ For internal pipe flow, the flow is assumed to be turbulent for ReD \(\geq\) 2300.
 
-\textbf{\emph{ISOStandard Heat Transfer Model}}.  In this model, the tubes and contact resistance are assumed to have an impact on the overall heat transfer.  So, conduction through the tube wall and the effect of an imperfect connection between the pipe itself and the surrounding system must be determined in addition to convection.  The method used in EnergyPlus for this model is based on ISO Standard 11855-2(2012) which is entitled "Building environment design — Design, dimensioning, installation and control of embedded radiant heating and cooling systems — Part 2: Determination of the design heating and cooling capacity".  The key equations from the ISO Standard are summarized in Appendix B of Standard 11855-2 and are outlined below.
+\textbf{\emph{ISOStandard Heat Transfer Model}}.  In this model, the convection between the fluid and the tubes and the conduction resistance of the tubes themselves are assumed to have an impact on the overall heat transfer.  The method used in EnergyPlus for this model is based on ISO Standard 11855-2(2012) which is entitled``Building environment design — Design, dimensioning, installation and control of embedded radiant heating and cooling systems — Part 2: Determination of the design heating and cooling capacity''.  The key equations from the ISO Standard are summarized in Appendix B of Standard 11855-2 and are outlined below.
 
 In ISO Standard 11855-2, the heat convection for turbulent flow between the circulating fluid and the inside wall of the tube is characterized by the following equation:
 
@@ -693,18 +693,10 @@ The resistance of the pipe wall is characterized by this equation:
 
 where \(k_{tube}\) is the thermal conductivity of the tube material.
 
-The contact resistance is determined using the following relationship:
-
-\begin{equation}
-{R_{contact}} = \frac{W ln\frac{W}{\pi D_{out}}}{2 \pi k_{slab}}
-\end{equation}
-
-where \(k_{slab}\) is the thermal conductivity of the material in which the tubes are embedded.
-
 Finally, the U-value for this model is calculated using:
 
 \begin{equation}
-U = \frac{1}{{R_{conv}} + {R_{tube}} + {R_{contact}}}
+U = \frac{1}{{R_{conv}} + {R_{tube}}}
 \end{equation}
 
 This U-value is then used in Equation~\ref{eq:NTURadSysEquationGeneric} to calculate NTU in the heat exchanger formulation shown above.

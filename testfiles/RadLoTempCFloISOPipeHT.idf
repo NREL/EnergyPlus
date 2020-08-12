@@ -124,7 +124,7 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -1896,7 +1896,7 @@
     Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
     ISOStandard,             !- Fluid to Radiant Surface Heat Transfer Model
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
@@ -1931,7 +1931,7 @@
     Zn002:Flr001,            !- Surface Name or Radiant Surface Group Name
     ISOStandard,             !- Fluid to Radiant Surface Heat Transfer Model
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
@@ -1966,7 +1966,7 @@
     Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
     ISOStandard,             !- Fluid to Radiant Surface Heat Transfer Model
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
@@ -2200,14 +2200,14 @@
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,50.00;      !- Field 3
+    Until: 24:00,55.00;      !- Field 3
 
   Schedule:Compact,
     RADHEATLOWWATERTEMP,     !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,30.00;      !- Field 3
+    Until: 24:00,35.00;      !- Field 3
 
   Schedule:Compact,
     RADHEATHIGHCONTROLTEMP,  !- Name
@@ -2221,21 +2221,21 @@
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,15.00;      !- Field 3
+    Until: 24:00,10.00;      !- Field 3
 
   Schedule:Compact,
     RADCOOLHIGHWATERTEMP,    !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,15.00;      !- Field 3
+    Until: 24:00,5.00;       !- Field 3
 
   Schedule:Compact,
     RADCOOLLOWWATERTEMP,     !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,10.00;      !- Field 3
+    Until: 24:00,5.00;       !- Field 3
 
   Schedule:Compact,
     RADCOOLHIGHCONTROLTEMP,  !- Name
