@@ -8494,6 +8494,7 @@ namespace SurfaceGeometry {
             WindowShadingControl(a).GlareControlIsActive == WindowShadingControl(b).GlareControlIsActive &&
             WindowShadingControl(a).SlatAngleControlForBlinds == WindowShadingControl(b).SlatAngleControlForBlinds &&
             WindowShadingControl(a).SetPoint2 == WindowShadingControl(b).SetPoint2 &&
+            WindowShadingControl(a).DaylightingControlName == WindowShadingControl(b).DaylightingControlName &&
             WindowShadingControl(a).DaylightControlIndex == WindowShadingControl(b).DaylightControlIndex &&
             WindowShadingControl(a).MultiSurfaceCtrlIsGroup == WindowShadingControl(b).MultiSurfaceCtrlIsGroup);
     }

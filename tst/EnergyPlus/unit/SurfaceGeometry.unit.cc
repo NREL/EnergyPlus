@@ -3469,6 +3469,134 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     EXPECT_EQ(WindowShadingControl(3).FenestrationIndex(2), 7);
 }
 
+TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
+{
+
+        WindowShadingControl.allocate(2);
+
+        WindowShadingControl(1).Name = "TheShadingControl";
+        WindowShadingControl(1).ZoneIndex = 57;
+        WindowShadingControl(1).SequenceNumber = 3;
+        WindowShadingControl(1).ShadingType = WSC_ST_ExteriorShade;
+        WindowShadingControl(1).ShadedConstruction = 14;
+        WindowShadingControl(1).ShadingDevice = 17;
+        WindowShadingControl(1).ShadingControlType = WSCT_OnIfScheduled;
+        WindowShadingControl(1).Schedule = 83;
+        WindowShadingControl(1).SetPoint = 200;
+        WindowShadingControl(1).SetPoint2 = 170;
+        WindowShadingControl(1).ShadingControlIsScheduled = true;
+        WindowShadingControl(1).GlareControlIsActive = false;
+        WindowShadingControl(1).SlatAngleSchedule = 84;
+        WindowShadingControl(1).SlatAngleControlForBlinds = WSC_SAC_BlockBeamSolar;
+        WindowShadingControl(1).DaylightingControlName = "TheDaylightingControl";
+        WindowShadingControl(1).DaylightControlIndex = 7;
+        WindowShadingControl(1).MultiSurfaceCtrlIsGroup = false;
+        
+        WindowShadingControl(1).FenestrationCount = 3;
+        WindowShadingControl(1).FenestrationName.allocate(WindowShadingControl(1).FenestrationCount);
+        WindowShadingControl(1).FenestrationName(1) = "Fene-01";
+        WindowShadingControl(1).FenestrationName(2) = "Fene-02";
+        WindowShadingControl(1).FenestrationName(3) = "Fene-03";
+        WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
+        WindowShadingControl(1).FenestrationIndex(1) = 11;
+        WindowShadingControl(1).FenestrationIndex(2) = 12;
+        WindowShadingControl(1).FenestrationIndex(3) = 13;
+
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        //no changes
+        EXPECT_TRUE(isWindowShadingControlSimilar(1, 2));
+
+        //changes to portions of struct that are not "similar" 
+        // these should not impact similarity so changes are ignored
+
+        WindowShadingControl(2).Name = "Different";
+        EXPECT_TRUE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).SequenceNumber = 9;
+        EXPECT_TRUE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).ShadedConstruction = 73;
+        EXPECT_TRUE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).ShadingDevice = 21;
+        EXPECT_TRUE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).Schedule = 91;
+        EXPECT_TRUE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).SlatAngleSchedule = 76;
+        EXPECT_TRUE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).FenestrationCount = 4;
+        EXPECT_TRUE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).FenestrationName(3) = "Fene-Different";
+        EXPECT_TRUE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).FenestrationIndex(3) = 17;
+        EXPECT_TRUE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+
+        //changes to portions of struct that are "similar"
+        //these are important so they should be shown as false
+
+        WindowShadingControl(2).ZoneIndex = 83;
+        EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).ShadingType = WSC_ST_BetweenGlassBlind;
+        EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).ShadingControlType = WSCT_OffNight_OnDay_HiSolarWindow;
+        EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).SetPoint = 140;
+        EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).SetPoint2 = 169;
+        EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).ShadingControlIsScheduled = false;
+        EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).GlareControlIsActive = true;
+        EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).SlatAngleControlForBlinds = WSC_SAC_FixedSlatAngle;
+        EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).DaylightingControlName = "Different";
+        EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).DaylightControlIndex = 12;
+        EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+        WindowShadingControl(2).MultiSurfaceCtrlIsGroup = true;
+        EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
+        WindowShadingControl(2) = WindowShadingControl(1);
+
+
+}
+
 TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
 {
     // Test surface heat transfer algorithms and heat balance surface lists

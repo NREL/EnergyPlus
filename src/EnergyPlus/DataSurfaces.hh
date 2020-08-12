@@ -1391,7 +1391,7 @@ namespace DataSurfaces {
                                         //    slat angle is set to the value given in the associated Material:WindowBlind.
         std::string DaylightingControlName;    // string holding the Daylighting Control Object Name string
         int DaylightControlIndex;              // Pointer to the array of Daylighting Controls
-        int MultiSurfaceCtrlIsGroup;           // True if Group, False if Sequential - type of control order when multiple surfaces are referenced
+        bool MultiSurfaceCtrlIsGroup;           // True if Group, False if Sequential - type of control order when multiple surfaces are referenced
         int FenestrationCount;                 // count of fenestration references
         Array1D<std::string> FenestrationName; // string holding list of fenestration surfaces
         Array1D_int FenestrationIndex;         // Pointers to fenestration surfaces
