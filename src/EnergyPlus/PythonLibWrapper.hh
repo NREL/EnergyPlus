@@ -73,6 +73,7 @@ extern "C" {
     PYTHONWRAP_API int EP_Wrap_PyRun_SimpleString(const char * c);
     PYTHONWRAP_API int EP_Wrap_Py_FinalizeEx();
     PYTHONWRAP_API void EP_Wrap_PyErr_Fetch(PyObject **pType, PyObject **pValue, PyObject **pTrace);
+    PYTHONWRAP_API void EP_Wrap_PyErr_NormalizeException(PyObject **pType, PyObject **pValue, PyObject **pTrace);
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_Repr(PyObject * o);
     PYTHONWRAP_API PyObject * EP_Wrap_PyUnicode_AsEncodedString(PyObject *unicode, const char *encoding, const char *errors);
     PYTHONWRAP_API char * EP_Wrap_PyBytes_AsString(PyObject *o);
@@ -88,6 +89,7 @@ extern "C" {
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallObject(PyObject *callable, PyObject *args);
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_GetAttrString(PyObject *o, const char *attr_name);
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallFunction(PyObject *callable, const char *format);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallFunction3Args(PyObject *callable, const char *format, PyObject * arg1, PyObject * arg2, PyObject * arg3);
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallMethod(PyObject *obj, const char *name, const char *format);
     PYTHONWRAP_API int EP_Wrap_PyList_Check(PyObject *p);
     PYTHONWRAP_API unsigned long EP_Wrap_PyList_Size(PyObject *list);
