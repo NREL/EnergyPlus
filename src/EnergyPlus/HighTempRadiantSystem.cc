@@ -660,7 +660,7 @@ namespace HighTempRadiantSystem {
                                     _,
                                     "System");
             } else if (HighTempRadSys(Item).HeaterType == Electric) {
-                SetupOutputVariable("Zone Radiant HVAC Electricity Power",
+                SetupOutputVariable("Zone Radiant HVAC Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     HighTempRadSys(Item).ElecPower,
                                     "System",

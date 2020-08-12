@@ -441,7 +441,7 @@ namespace CoolTower {
                                 "System",
                                 "Average",
                                 Zone(dataCoolTower.CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Pump Electricity Power",
+            SetupOutputVariable("Zone Cooltower Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 dataCoolTower.CoolTowerSys(CoolTowerNum).PumpElecPower,
                                 "System",

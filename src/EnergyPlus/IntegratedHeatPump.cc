@@ -1860,7 +1860,7 @@ namespace IntegratedHeatPump {
                                 "System",
                                 "Average",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Electricity Power",
+            SetupOutputVariable("Integrated Heat Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 IntegratedHeatPumps(DXCoilNum).TotalPower,
                                 "System",

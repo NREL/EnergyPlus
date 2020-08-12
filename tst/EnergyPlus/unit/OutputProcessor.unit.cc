@@ -5018,7 +5018,7 @@ namespace OutputProcessor {
             "   ** Warning ** The following Report Variables were requested but not generated -- check.rdd file",
             "   **   ~~~   ** Either the IDF did not contain these elements, the variable name is misspelled,",
             "   **   ~~~   ** or the requested variable is an advanced output which requires Output : Diagnostics, DisplayAdvancedReportVariables;",
-            "   ************* Key=*, VarName=BOILER NATURALGas RATE, Frequency=Detailed",
+            "   ************* Key=*, VarName=BOILER NATURALGAS RATE, Frequency=Detailed",
             "   ************* Key=*, VarName=BOILER HEATING RATE, Frequency=Detailed",
         });
 

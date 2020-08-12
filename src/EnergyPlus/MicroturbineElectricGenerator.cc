@@ -765,7 +765,7 @@ namespace MicroturbineElectricGenerator {
 
     void MTGeneratorSpecs::setupOutputVars()
     {
-        SetupOutputVariable("Generator Produced Electricity Power", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
+        SetupOutputVariable("Generator Produced Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
         SetupOutputVariable("Generator Produced Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -838,7 +838,7 @@ namespace MicroturbineElectricGenerator {
 
         if (this->StandbyPower > 0.0) { // Report Standby Power if entered by user
             SetupOutputVariable(
-                "Generator Standby Electricity Power", OutputProcessor::Unit::W, this->StandbyPowerRate, "System", "Average", this->Name);
+                "Generator Standby Electricity Rate", OutputProcessor::Unit::W, this->StandbyPowerRate, "System", "Average", this->Name);
 
             SetupOutputVariable("Generator Standby Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -855,7 +855,7 @@ namespace MicroturbineElectricGenerator {
 
         if (this->AncillaryPower > 0.0) { // Report Ancillary Power if entered by user
             SetupOutputVariable(
-                "Generator Ancillary Electricity Power", OutputProcessor::Unit::W, this->AncillaryPowerRate, "System", "Average", this->Name);
+                "Generator Ancillary Electricity Rate", OutputProcessor::Unit::W, this->AncillaryPowerRate, "System", "Average", this->Name);
 
             SetupOutputVariable("Generator Ancillary Electricity Energy", OutputProcessor::Unit::J, this->AncillaryEnergy, "System", "Sum", this->Name);
         }

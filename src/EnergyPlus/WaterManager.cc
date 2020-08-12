@@ -945,7 +945,7 @@ namespace WaterManager {
                                     "Wellwater",
                                     _,
                                     "System");
-                SetupOutputVariable("Water System Groundwater Well Pump Electricity Power",
+                SetupOutputVariable("Water System Groundwater Well Pump Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     GroundwaterWell(Item).PumpPower,
                                     "System",

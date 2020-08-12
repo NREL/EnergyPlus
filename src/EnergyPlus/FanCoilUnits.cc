@@ -1009,7 +1009,7 @@ namespace FanCoilUnits {
                                 "System",
                                 "Sum",
                                 FanCoil(FanCoilNum).Name);
-            SetupOutputVariable("Fan Coil Fan Electricity Power",
+            SetupOutputVariable("Fan Coil Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 FanCoil(FanCoilNum).ElecPower,
                                 "System",

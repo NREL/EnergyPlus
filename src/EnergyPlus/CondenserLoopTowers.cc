@@ -1928,7 +1928,7 @@ namespace CondenserLoopTowers {
             SetupOutputVariable(
                 "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electricity Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->FanEnergy,
@@ -1947,7 +1947,7 @@ namespace CondenserLoopTowers {
                 "Cooling Tower Fan Cycling Ratio", OutputProcessor::Unit::None, this->FanCyclingRatio, "System", "Average", this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(
-                    "Cooling Tower Basin Heater Electricity Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                    "Cooling Tower Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
                 SetupOutputVariable("Cooling Tower Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
@@ -1969,7 +1969,7 @@ namespace CondenserLoopTowers {
             SetupOutputVariable(
                 "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electricity Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->FanEnergy,
@@ -1987,7 +1987,7 @@ namespace CondenserLoopTowers {
             SetupOutputVariable("Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, "System", "Average", this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(
-                    "Cooling Tower Basin Heater Electricity Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                    "Cooling Tower Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
                 SetupOutputVariable("Cooling Tower Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
@@ -2009,7 +2009,7 @@ namespace CondenserLoopTowers {
             SetupOutputVariable(
                 "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electricity Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->FanEnergy,
@@ -2028,7 +2028,7 @@ namespace CondenserLoopTowers {
             SetupOutputVariable("Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, "System", "Average", this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(
-                    "Cooling Tower Basin Heater Electricity Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                    "Cooling Tower Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
                 SetupOutputVariable("Cooling Tower Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
@@ -2050,7 +2050,7 @@ namespace CondenserLoopTowers {
             SetupOutputVariable(
                 "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electricity Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->FanEnergy,
@@ -2067,7 +2067,7 @@ namespace CondenserLoopTowers {
             SetupOutputVariable("Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, "System", "Average", this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(
-                    "Cooling Tower Basin Heater Electricity Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                    "Cooling Tower Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
                 SetupOutputVariable("Cooling Tower Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,

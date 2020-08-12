@@ -194,7 +194,7 @@ namespace PVWatts {
     void PVWattsGenerator::setupOutputVariables()
     {
         // Set up output variables
-        SetupOutputVariable("Generator Produced DC Electricity Power", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
+        SetupOutputVariable("Generator Produced DC Electricity Rate", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
         SetupOutputVariable("Generator Produced DC Electricity Energy",
                             OutputProcessor::Unit::J,
                             m_outputDCEnergy,

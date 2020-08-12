@@ -4577,7 +4577,7 @@ namespace HVACVariableRefrigerantFlow {
         // Set up output variables
         for (VRFNum = 1; VRFNum <= NumVRFTU; ++VRFNum) {
             if (VRFTU(VRFNum).CoolingCoilPresent) {
-                SetupOutputVariable("Zone VRF Air Terminal Cooling Electricity Power",
+                SetupOutputVariable("Zone VRF Air Terminal Cooling Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRFTU(VRFNum).ParasiticCoolElecPower,
                                     "System",
@@ -4632,7 +4632,7 @@ namespace HVACVariableRefrigerantFlow {
                                     VRFTU(VRFNum).Name);
             }
             if (VRFTU(VRFNum).HeatingCoilPresent) {
-                SetupOutputVariable("Zone VRF Air Terminal Heating Electricity Power",
+                SetupOutputVariable("Zone VRF Air Terminal Heating Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRFTU(VRFNum).ParasiticHeatElecPower,
                                     "System",
@@ -4716,7 +4716,7 @@ namespace HVACVariableRefrigerantFlow {
                                 "Average",
                                 VRF(NumCond).Name);
             if (VRF(NumCond).FuelType == FuelTypeElectric) {
-                SetupOutputVariable("VRF Heat Pump Cooling Electricity Power",
+                SetupOutputVariable("VRF Heat Pump Cooling Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).ElecCoolingPower,
                                     "System",
@@ -4753,7 +4753,7 @@ namespace HVACVariableRefrigerantFlow {
                                     "System");
             }
             if (VRF(NumCond).FuelType == FuelTypeElectric) {
-                SetupOutputVariable("VRF Heat Pump Heating Electricity Power",
+                SetupOutputVariable("VRF Heat Pump Heating Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).ElecHeatingPower,
                                     "System",
@@ -4799,7 +4799,7 @@ namespace HVACVariableRefrigerantFlow {
             if (VRF(NumCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                 // For VRF_FluidTCtrl Model
                 SetupOutputVariable(
-                    "VRF Heat Pump Compressor Electricity Power", OutputProcessor::Unit::W, VRF(NumCond).Ncomp, "System", "Average", VRF(NumCond).Name);
+                    "VRF Heat Pump Compressor Electricity Rate", OutputProcessor::Unit::W, VRF(NumCond).Ncomp, "System", "Average", VRF(NumCond).Name);
                 SetupOutputVariable("VRF Heat Pump Outdoor Unit Fan Power",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).OUFanPower,
@@ -4891,7 +4891,7 @@ namespace HVACVariableRefrigerantFlow {
 
             if (VRF(NumCond).DefrostStrategy == Resistive ||
                 (VRF(NumCond).DefrostStrategy == ReverseCycle && VRF(NumCond).FuelType == FuelTypeElectric)) {
-                SetupOutputVariable("VRF Heat Pump Defrost Electricity Power",
+                SetupOutputVariable("VRF Heat Pump Defrost Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).DefrostPower,
                                     "System",
@@ -4944,7 +4944,7 @@ namespace HVACVariableRefrigerantFlow {
                                 "Average",
                                 VRF(NumCond).Name);
 
-            SetupOutputVariable("VRF Heat Pump Crankcase Heater Electricity Power",
+            SetupOutputVariable("VRF Heat Pump Crankcase Heater Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 VRF(NumCond).CrankCaseHeaterPower,
                                 "System",
@@ -5013,7 +5013,7 @@ namespace HVACVariableRefrigerantFlow {
                                     "Cooling",
                                     _,
                                     "System");
-                SetupOutputVariable("VRF Heat Pump Evaporative Condenser Pump Electricity Power",
+                SetupOutputVariable("VRF Heat Pump Evaporative Condenser Pump Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).EvapCondPumpElecPower,
                                     "System",
@@ -5032,7 +5032,7 @@ namespace HVACVariableRefrigerantFlow {
                                     "System");
 
                 if (VRF(NumCond).BasinHeaterPowerFTempDiff > 0.0) {
-                    SetupOutputVariable("VRF Heat Pump Basin Heater Electricity Power",
+                    SetupOutputVariable("VRF Heat Pump Basin Heater Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         VRF(NumCond).BasinHeaterPower,
                                         "System",

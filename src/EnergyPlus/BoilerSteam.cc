@@ -423,21 +423,12 @@ namespace BoilerSteam {
                             "BOILERS",
                             _,
                             "Plant");
-        if (UtilityRoutines::SameString(this->BoilerFuelTypeForOutputVariable, "Electricity")) {
-            SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Power",
-                                OutputProcessor::Unit::W,
-                                this->FuelUsed,
-                                "System",
-                                "Average",
-                                this->Name);
-        } else {
-            SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
-                                OutputProcessor::Unit::W,
-                                this->FuelUsed,
-                                "System",
-                                "Average",
-                                this->Name);
-        }
+        SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->FuelUsed,
+                            "System",
+                            "Average",
+                            this->Name);
         SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelConsumed,

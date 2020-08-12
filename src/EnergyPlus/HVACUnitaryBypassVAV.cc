@@ -1354,7 +1354,7 @@ namespace HVACUnitaryBypassVAV {
                                 "Sum",
                                 CBVAV(CBVAVNum).Name);
             SetupOutputVariable(
-                "Unitary System Electricity Power", OutputProcessor::Unit::W, CBVAV(CBVAVNum).ElecPower, "System", "Average", CBVAV(CBVAVNum).Name);
+                "Unitary System Electricity Rate", OutputProcessor::Unit::W, CBVAV(CBVAVNum).ElecPower, "System", "Average", CBVAV(CBVAVNum).Name);
             SetupOutputVariable(
                 "Unitary System Electricity Energy", OutputProcessor::Unit::J, CBVAV(CBVAVNum).ElecConsumption, "System", "Sum", CBVAV(CBVAVNum).Name);
             SetupOutputVariable("Unitary System Fan Part Load Ratio",

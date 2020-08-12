@@ -1610,7 +1610,7 @@ namespace PackagedThermalStorageCoil {
                                 "Sum",
                                 TESCoil(item).Name);
             SetupOutputVariable(
-                "Cooling Coil Electricity Power", OutputProcessor::Unit::W, TESCoil(item).ElecCoolingPower, "System", "Average", TESCoil(item).Name);
+                "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, TESCoil(item).ElecCoolingPower, "System", "Average", TESCoil(item).Name);
             SetupOutputVariable("Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 TESCoil(item).ElecCoolingEnergy,
@@ -1636,7 +1636,7 @@ namespace PackagedThermalStorageCoil {
                                 "COOLING",
                                 "Thermal Protection",
                                 "System");
-            SetupOutputVariable("Cooling Coil Cold Weather Protection Electricity Power",
+            SetupOutputVariable("Cooling Coil Cold Weather Protection Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 TESCoil(item).ElectColdWeatherPower,
                                 "System",
@@ -1753,7 +1753,7 @@ namespace PackagedThermalStorageCoil {
                                         "System");
                 }
 
-                SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Power",
+                SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     TESCoil(item).EvapCondPumpElecPower,
                                     "System",
@@ -1771,7 +1771,7 @@ namespace PackagedThermalStorageCoil {
                                     _,
                                     "System");
 
-                SetupOutputVariable("Cooling Coil Basin Heater Electricity Power",
+                SetupOutputVariable("Cooling Coil Basin Heater Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     TESCoil(item).ElectEvapCondBasinHeaterPower,
                                     "System",

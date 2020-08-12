@@ -1299,7 +1299,7 @@ namespace VentilatedSlab {
                                 "System",
                                 "Average",
                                 VentSlab(Item).Name);
-            SetupOutputVariable("Zone Ventilated Slab Fan Electricity Power",
+            SetupOutputVariable("Zone Ventilated Slab Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 VentSlab(Item).ElecFanPower,
                                 "System",

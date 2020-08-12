@@ -662,7 +662,7 @@ namespace UnitHeater {
                                 "System",
                                 "Sum",
                                 UnitHeat(UnitHeatNum).Name);
-            SetupOutputVariable("Zone Unit Heater Fan Electricity Power",
+            SetupOutputVariable("Zone Unit Heater Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 UnitHeat(UnitHeatNum).ElecPower,
                                 "System",

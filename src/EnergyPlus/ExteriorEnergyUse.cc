@@ -216,14 +216,14 @@ namespace ExteriorEnergyUse {
             if (AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("ExteriorLights",
                                  exteriorEnergyUse.ExteriorLights(Item).Name,
-                                 "Electricity Power",
+                                 "Electricity Rate",
                                  "W",
                                  exteriorEnergyUse.ExteriorLights(Item).PowerActuatorOn,
                                  exteriorEnergyUse.ExteriorLights(Item).PowerActuatorValue);
             }
 
             SetupOutputVariable(
-                "Exterior Lights Electricity Power", OutputProcessor::Unit::W, exteriorEnergyUse.ExteriorLights(Item).Power, "Zone", "Average", exteriorEnergyUse.ExteriorLights(Item).Name);
+                "Exterior Lights Electricity Rate", OutputProcessor::Unit::W, exteriorEnergyUse.ExteriorLights(Item).Power, "Zone", "Average", exteriorEnergyUse.ExteriorLights(Item).Name);
 
             SetupOutputVariable("Exterior Lights Electricity Energy",
                                 OutputProcessor::Unit::J,

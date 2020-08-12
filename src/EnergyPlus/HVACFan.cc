@@ -601,7 +601,7 @@ namespace HVACFan {
             ShowFatalError(routineName + "Errors found in input for fan name = " + name + ".  Program terminates.");
         }
 
-        SetupOutputVariable("Fan Electricity Power", OutputProcessor::Unit::W, m_fanPower, "System", "Average", name);
+        SetupOutputVariable("Fan Electricity Rate", OutputProcessor::Unit::W, m_fanPower, "System", "Average", name);
         SetupOutputVariable("Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, m_deltaTemp, "System", "Average", name);
         SetupOutputVariable("Fan Heat Gain to Air", OutputProcessor::Unit::W, m_powerLossToAir, "System", "Average", name);
         SetupOutputVariable("Fan Electricity Energy",

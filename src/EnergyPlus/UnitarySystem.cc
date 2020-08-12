@@ -6959,7 +6959,7 @@ namespace UnitarySystems {
                                     "System",
                                     "Average",
                                     unitarySys[sysNum].Name);
-                SetupOutputVariable("Unitary System Ancillary Electricity Power",
+                SetupOutputVariable("Unitary System Ancillary Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     unitarySys[sysNum].m_TotalAuxElecPower,
                                     "System",
@@ -7055,7 +7055,7 @@ namespace UnitarySystems {
                                             "Cooling",
                                             _,
                                             "System");
-                        SetupOutputVariable("Unitary System Electricity Power",
+                        SetupOutputVariable("Unitary System Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             unitarySys[sysNum].m_ElecPower,
                                             "System",

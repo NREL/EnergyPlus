@@ -2925,7 +2925,7 @@ namespace OutputReportTabular {
         if (namedMonthly(35).show) {
             curReport = AddMonthlyReport("ChillerReportMonthly", 2);
             AddMonthlyFieldSetInput(curReport, "Chiller Electricity Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Chiller Electricity Power", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Chiller Electricity Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Chiller Electricity Energy", "", aggTypeHoursNonZero);
             AddMonthlyFieldSetInput(curReport, "Chiller Evaporator Cooling Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Chiller Evaporator Cooling Rate", "", aggTypeMaximum);
@@ -2939,7 +2939,7 @@ namespace OutputReportTabular {
             curReport = AddMonthlyReport("TowerReportMonthly", 2);
             AddMonthlyFieldSetInput(curReport, "Cooling Tower Fan Electricity Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Cooling Tower Fan Electricity Energy", "", aggTypeHoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Cooling Tower Fan Electricity Power", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cooling Tower Fan Electricity Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Cooling Tower Heat Transfer Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Cooling Tower Inlet Temperature", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Cooling Tower Outlet Temperature", "", aggTypeSumOrAvg);
@@ -2955,7 +2955,7 @@ namespace OutputReportTabular {
             AddMonthlyFieldSetInput(curReport, "Boiler Inlet Temperature", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Boiler Outlet Temperature", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Boiler Mass Flow Rate", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Boiler Ancillary Electricity Power", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Boiler Ancillary Electricity Rate", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Boiler Part Load Ratio", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Boiler Part Load Ratio", "", aggTypeMaximum);
         }
@@ -2972,8 +2972,8 @@ namespace OutputReportTabular {
             AddMonthlyFieldSetInput(curReport, "Cooling Coil Total Cooling Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Cooling Coil Sensible Cooling Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Cooling Coil Latent Cooling Rate", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Electricity Power", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Crankcase Heater Electricity Power", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cooling Coil Electricity Rate", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cooling Coil Crankcase Heater Electricity Rate", "", aggTypeMaximum);
         }
         if (namedMonthly(39).show) {
             curReport = AddMonthlyReport("WindowReportMonthly", 2);
@@ -3084,7 +3084,7 @@ namespace OutputReportTabular {
             AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Total Cooling Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Sensible Cooling Rate", "", aggTypeValueWhenMaxMin);
             AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Latent Cooling Rate", "", aggTypeValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Electricity Power", "", aggTypeValueWhenMaxMin);
+            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Electricity Rate", "", aggTypeValueWhenMaxMin);
         }
         if (namedMonthly(50).show) {
             curReport = AddMonthlyReport("WaterHeaterReportMonthly", 2);
@@ -3146,14 +3146,14 @@ namespace OutputReportTabular {
             curReport = AddMonthlyReport("FanReportMonthly", 2);
             AddMonthlyFieldSetInput(curReport, "Fan Electricity Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Fan Rise in Air Temperature", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Fan Electricity Power", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Fan Electricity Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Fan Rise in Air Temperature", "", aggTypeValueWhenMaxMin);
         }
         if (namedMonthly(56).show) {
             curReport = AddMonthlyReport("PumpReportMonthly", 2);
             AddMonthlyFieldSetInput(curReport, "Pump Electricity Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Pump Fluid Heat Gain Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Pump Electricity Power", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Pump Electricity Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Pump Shaft Power", "", aggTypeValueWhenMaxMin);
             AddMonthlyFieldSetInput(curReport, "Pump Fluid Heat Gain Rate", "", aggTypeValueWhenMaxMin);
             AddMonthlyFieldSetInput(curReport, "Pump Outlet Temperature", "", aggTypeValueWhenMaxMin);

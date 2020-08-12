@@ -361,7 +361,7 @@ namespace BaseboardElectric {
                                 _,
                                 "System");
 
-            SetupOutputVariable("Baseboard Electricity Power",
+            SetupOutputVariable("Baseboard Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 thisBaseboard.ElecUseRate,
                                 "System",

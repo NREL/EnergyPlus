@@ -516,12 +516,12 @@ namespace ChillerExhaustAbsorption {
         SetupOutputVariable(
             "Chiller Heater Cooling Source Heat COP", OutputProcessor::Unit::W_W, this->ThermalEnergyCOP, "System", "Average", ChillerName);
 
-        SetupOutputVariable("Chiller Heater Electricity Power", OutputProcessor::Unit::W, this->ElectricPower, "System", "Average", ChillerName);
+        SetupOutputVariable("Chiller Heater Electricity Rate", OutputProcessor::Unit::W, this->ElectricPower, "System", "Average", ChillerName);
         // Do not include this on meters, this would duplicate the cool electric and heat electric
         SetupOutputVariable("Chiller Heater Electricity Energy", OutputProcessor::Unit::J, this->ElectricEnergy, "System", "Sum", ChillerName);
 
         SetupOutputVariable(
-            "Chiller Heater Cooling Electricity Power", OutputProcessor::Unit::W, this->CoolElectricPower, "System", "Average", ChillerName);
+            "Chiller Heater Cooling Electricity Rate", OutputProcessor::Unit::W, this->CoolElectricPower, "System", "Average", ChillerName);
         SetupOutputVariable("Chiller Heater Cooling Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->CoolElectricEnergy,
@@ -535,7 +535,7 @@ namespace ChillerExhaustAbsorption {
                             "Plant");
 
         SetupOutputVariable(
-            "Chiller Heater Heating Electricity Power", OutputProcessor::Unit::W, this->HeatElectricPower, "System", "Average", ChillerName);
+            "Chiller Heater Heating Electricity Rate", OutputProcessor::Unit::W, this->HeatElectricPower, "System", "Average", ChillerName);
         SetupOutputVariable("Chiller Heater Heating Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->HeatElectricEnergy,

@@ -535,7 +535,7 @@ namespace WindTurbine {
         if (ErrorsFound) ShowFatalError(CurrentModuleObject + " errors occurred in input.  Program terminates.");
 
         for (WindTurbineNum = 1; WindTurbineNum <= dataWindTurbine.NumWindTurbines; ++WindTurbineNum) {
-            SetupOutputVariable("Generator Produced Electricity Power",
+            SetupOutputVariable("Generator Produced Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 dataWindTurbine.WindTurbineSys(WindTurbineNum).Power,
                                 "System",

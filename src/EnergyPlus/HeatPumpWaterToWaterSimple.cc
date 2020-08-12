@@ -599,7 +599,7 @@ namespace HeatPumpWaterToWaterSimple {
 
         for (GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum) {
             // setup output variables
-            SetupOutputVariable("Heat Pump Electricity Power",
+            SetupOutputVariable("Heat Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 GSHP(GSHPNum).reportPower,
                                 "System",

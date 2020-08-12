@@ -366,21 +366,12 @@ namespace Boilers {
                             "BOILERS",
                             _,
                             "Plant");
-        if (UtilityRoutines::SameString(this->BoilerFuelTypeForOutputVariable, "Electricity")) {
-            SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Power",
-                                OutputProcessor::Unit::W,
-                                this->FuelUsed,
-                                "System",
-                                "Average",
-                                this->Name);
-        } else {
-            SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
-                                OutputProcessor::Unit::W,
-                                this->FuelUsed,
-                                "System",
-                                "Average",
-                                this->Name);
-        }
+        SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->FuelUsed,
+                            "System",
+                            "Average",
+                            this->Name);
         SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelConsumed,
@@ -395,7 +386,7 @@ namespace Boilers {
         SetupOutputVariable("Boiler Inlet Temperature", OutputProcessor::Unit::C, this->BoilerInletTemp, "System", "Average", this->Name);
         SetupOutputVariable("Boiler Outlet Temperature", OutputProcessor::Unit::C, this->BoilerOutletTemp, "System", "Average", this->Name);
         SetupOutputVariable("Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, this->BoilerMassFlowRate, "System", "Average", this->Name);
-        SetupOutputVariable("Boiler Ancillary Electricity Power", OutputProcessor::Unit::W, this->ParasiticElecPower, "System", "Average", this->Name);
+        SetupOutputVariable("Boiler Ancillary Electricity Rate", OutputProcessor::Unit::W, this->ParasiticElecPower, "System", "Average", this->Name);
         SetupOutputVariable("Boiler Ancillary Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->ParasiticElecConsumption,

@@ -736,7 +736,7 @@ namespace ChillerElectricEIR {
 
         SetupOutputVariable("Chiller Cycling Ratio", OutputProcessor::Unit::None, this->ChillerCyclingRatio, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller Electricity Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+        SetupOutputVariable("Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
 
         SetupOutputVariable("Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -852,7 +852,7 @@ namespace ChillerElectricEIR {
 
             if (this->CondenserFanPowerRatio > 0) {
                 SetupOutputVariable(
-                    "Chiller Condenser Fan Electricity Power", OutputProcessor::Unit::W, this->CondenserFanPower, "System", "Average", this->Name);
+                    "Chiller Condenser Fan Electricity Rate", OutputProcessor::Unit::W, this->CondenserFanPower, "System", "Average", this->Name);
 
                 SetupOutputVariable("Chiller Condenser Fan Electricity Energy",
                                     OutputProcessor::Unit::J,
@@ -893,7 +893,7 @@ namespace ChillerElectricEIR {
 
                 if (this->BasinHeaterPowerFTempDiff > 0.0) {
                     SetupOutputVariable(
-                        "Chiller Basin Heater Electricity Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                        "Chiller Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
 
                     SetupOutputVariable("Chiller Basin Heater Electricity Energy",
                                         OutputProcessor::Unit::J,

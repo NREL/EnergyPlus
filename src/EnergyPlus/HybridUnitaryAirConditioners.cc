@@ -996,7 +996,7 @@ namespace HybridUnitaryAirConditioners {
                                 "System",
                                 "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Electricity Power",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).FinalElectricalPower,
                                 "System",
@@ -1077,7 +1077,7 @@ namespace HybridUnitaryAirConditioners {
                                 "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Fan Electricity Power",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).SupplyFanElectricPower,
                                 "System",

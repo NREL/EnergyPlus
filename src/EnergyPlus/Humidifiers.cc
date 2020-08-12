@@ -528,7 +528,7 @@ namespace Humidifiers {
                                     "System");
             }
             if (Humidifier(HumNum).HumType_Code == Humidifier_Steam_Electric) {
-                SetupOutputVariable("Humidifier Electricity Power",
+                SetupOutputVariable("Humidifier Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     Humidifier(HumNum).ElecUseRate,
                                     "System",
@@ -565,7 +565,7 @@ namespace Humidifiers {
                                     "HUMIDIFIER",
                                     _,
                                     "System");
-                SetupOutputVariable("Humidifier Auxiliary Electricity Power",
+                SetupOutputVariable("Humidifier Auxiliary Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     Humidifier(HumNum).AuxElecUseRate,
                                     "System",

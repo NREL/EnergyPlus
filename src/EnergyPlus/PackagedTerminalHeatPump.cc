@@ -3418,7 +3418,7 @@ namespace PackagedTerminalHeatPump {
                                 "System",
                                 "Sum",
                                 PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Electricity Power",
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 PTUnit(PTUnitNum).ElecPower,
                                 "System",
@@ -3525,7 +3525,7 @@ namespace PackagedTerminalHeatPump {
                                 "System",
                                 "Sum",
                                 PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Electricity Power",
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 PTUnit(PTUnitNum).ElecPower,
                                 "System",
@@ -3631,7 +3631,7 @@ namespace PackagedTerminalHeatPump {
                                 "System",
                                 "Sum",
                                 PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Electricity Power",
+            SetupOutputVariable("Zone Water to Air Heat Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 PTUnit(PTUnitNum).ElecPower,
                                 "System",

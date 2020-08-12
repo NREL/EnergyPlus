@@ -491,7 +491,7 @@ namespace ZoneDehumidifier {
                                 "System",
                                 "Sum",
                                 dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Electricity Power",
+            SetupOutputVariable("Zone Dehumidifier Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).ElecPower,
                                 "System",
@@ -508,7 +508,7 @@ namespace ZoneDehumidifier {
                                 "COOLING",
                                 _,
                                 "System");
-            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electricity Power",
+            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticElecPower,
                                 "System",

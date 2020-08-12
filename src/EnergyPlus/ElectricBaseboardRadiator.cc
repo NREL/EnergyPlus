@@ -538,7 +538,7 @@ namespace ElectricBaseboardRadiator {
                                 "HEATING",
                                 _,
                                 "System");
-            SetupOutputVariable("Baseboard Electricity Power",
+            SetupOutputVariable("Baseboard Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 ElecBaseboard(BaseboardNum).ElecUseRate,
                                 "System",

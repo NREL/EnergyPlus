@@ -1189,7 +1189,7 @@ namespace HeatRecovery {
                                 _,
                                 "System");
 
-            SetupOutputVariable("Heat Exchanger Electricity Power",
+            SetupOutputVariable("Heat Exchanger Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 ExchCond(ExchNum).ElecUseRate,
                                 "System",

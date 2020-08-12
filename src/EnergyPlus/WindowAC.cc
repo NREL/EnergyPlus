@@ -667,7 +667,7 @@ namespace WindowAC {
                                 "System",
                                 "Sum",
                                 state.dataWindowAC.WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Electricity Power",
+            SetupOutputVariable("Zone Window Air Conditioner Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWindowAC.WindAC(WindACNum).ElecPower,
                                 "System",

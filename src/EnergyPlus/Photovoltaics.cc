@@ -688,7 +688,7 @@ namespace Photovoltaics {
             }
 
             // set up report variables CurrentModuleObject='Photovoltaics'
-            SetupOutputVariable("Generator Produced DC Electricity Power",
+            SetupOutputVariable("Generator Produced DC Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 PVarray(PVnum).Report.DCPower,
                                 "System",

@@ -613,7 +613,7 @@ namespace WaterToAirHeatPump {
 
             if (WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingParamEst) {
                 // COOLING COIL: Setup Report variables for the Heat Pump
-                SetupOutputVariable("Cooling Coil Electricity Power",
+                SetupOutputVariable("Cooling Coil Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     WatertoAirHP(HPNum).Power,
                                     "System",
@@ -712,7 +712,7 @@ namespace WaterToAirHeatPump {
                                     WatertoAirHP(HPNum).Name);
             } else if (WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingParamEst) {
                 // HEATING COIL Setup Report variables for the Heat Pump
-                SetupOutputVariable("Heating Coil Electricity Power",
+                SetupOutputVariable("Heating Coil Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     WatertoAirHP(HPNum).Power,
                                     "System",

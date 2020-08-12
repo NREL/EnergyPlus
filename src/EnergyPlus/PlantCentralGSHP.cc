@@ -802,14 +802,14 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Heater System Cooling Electricity Power",
+        SetupOutputVariable("Chiller Heater System Cooling Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->Report.TotElecCoolingPwr,
                             "System",
                             "Average",
                             this->Name);
 
-        SetupOutputVariable("Chiller Heater System Heating Electricity Power",
+        SetupOutputVariable("Chiller Heater System Heating Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->Report.TotElecHeatingPwr,
                             "System",
@@ -921,14 +921,14 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Cooling Electricity Power Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable("Chiller Heater Cooling Electricity Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::W,
                                     this->ChillerHeater(ChillerHeaterNum).Report.CoolingPower,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Heating Electricity Power Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable("Chiller Heater Heating Electricity Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::W,
                                     this->ChillerHeater(ChillerHeaterNum).Report.HeatingPower,
                                     "System",

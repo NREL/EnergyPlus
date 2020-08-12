@@ -928,7 +928,7 @@ namespace EvaporativeFluidCoolers {
 
         SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
 
-        SetupOutputVariable("Cooling Tower Fan Electricity Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
+        SetupOutputVariable("Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
 
         SetupOutputVariable("Cooling Tower Fan Electricity Energy",
                             OutputProcessor::Unit::J,

@@ -846,7 +846,7 @@ namespace EvaporativeCoolers {
                                 "Cooling",
                                 _,
                                 "System");
-            SetupOutputVariable("Evaporative Cooler Electricity Power",
+            SetupOutputVariable("Evaporative Cooler Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 EvapCond(EvapCoolNum).EvapCoolerPower,
                                 "System",
