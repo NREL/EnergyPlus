@@ -838,11 +838,21 @@ namespace PluginManagement {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
-                std::string workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
+                std::string workingDirFlagUC = "YES";
+                try {
+                    workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
+                } catch (nlohmann::json::out_of_range &e) {
+                    // defaulted to YES
+                }
                 if (workingDirFlagUC == "YES") {
                     PluginManager::addToPythonPath(".", false);
                 }
-                std::string inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
+                std::string inputFileDirFlagUC = "YES";
+                try {
+                    inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
+                } catch (nlohmann::json::out_of_range &e) {
+                    // defaulted to YES
+                }
                 if (inputFileDirFlagUC == "YES") {
                     std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
                     PluginManager::addToPythonPath(sanitizedInputFileDir, false);
@@ -850,7 +860,12 @@ namespace PluginManagement {
                 try {
                     auto const vars = fields.at("py_search_paths");
                     for (const auto &var : vars) {
-                        PluginManager::addToPythonPath(PluginManager::sanitizedPath(var.at("search_path")), true);
+                        try {
+                            std::cout << var.at("search_path");
+                            PluginManager::addToPythonPath(PluginManager::sanitizedPath(var.at("search_path")), true);
+                        } catch (nlohmann::json::out_of_range &e) {
+                            // empty entry
+                        }
                     }
                 } catch (nlohmann::json::out_of_range& e) {
                     // catch when no paths are passed
@@ -1306,6 +1321,8 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
     void PluginManager::addToPythonPath(const std::string &path, bool userDefinedPath)
     {
+        if (path.empty()) return;
+
         std::string command = "sys.path.insert(0, \"" + path + "\")";
         if ((*EP_PyRun_SimpleString)(command.c_str()) == 0) {
             if (userDefinedPath) {
