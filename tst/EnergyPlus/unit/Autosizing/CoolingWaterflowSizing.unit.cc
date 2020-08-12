@@ -337,6 +337,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     eiooutput = std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Water Flow Rate [m3/s], 4.76474E-004\n"
                             " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Design Water Flow Rate [m3/s], 2.00000E-004\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+
+    // call the clearState
+    sizer.clearState();
 }
 
 } // namespace EnergyPlus

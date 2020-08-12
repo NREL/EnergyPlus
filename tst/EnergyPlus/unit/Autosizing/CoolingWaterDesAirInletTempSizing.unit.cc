@@ -278,7 +278,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     sizer.autoSizedValue = 0.0;             // reset for next test
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    // Test 12 - Airloop Equipment - no OA coils
+    // Test 12 - Airloop Equipment - DataDesInletAirTemp > 0, NumOACoils = 1
     DataSizing::SysSizingRunDone = true;
     EnergyPlus::DataSizing::FinalSysSizing.allocate(1);
     EnergyPlus::DataSizing::SysSizInput.allocate(1);
@@ -287,9 +287,27 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     EnergyPlus::DataSizing::FinalSysSizing(1).MixTempAtCoolPeak = 20.15;
     EnergyPlus::DataSizing::FinalSysSizing(1).RetTempAtCoolPeak = 24.11;
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).OutTempAtCoolPeak = 27.88;
+
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
 
+    // do sizing
+    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).NumOACoolCoils = 1;
+    DataSizing::DataDesInletAirTemp = 19.155;
+    sizer.wasAutoSized = false;
+    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(inputValue, errorsFound);
+    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
+    EXPECT_TRUE(sizer.wasAutoSized);
+    EXPECT_NEAR(19.155, sizedValue, 0.001);
+    sizer.autoSizedValue = 0.0; // reset for next test
+    DataSizing::DataDesInletAirTemp = 0.0;
+    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).NumOACoolCoils = 0;
+    DataSizing::DataDesInletAirTemp = 0.0;
+
+    // Test 13 - Airloop Equipment - no OA coils
+    // start with an auto-sized value as the user input
+    inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
     printFlag = true;
@@ -306,7 +324,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    // Test 13 - Airloop Equipment - 1 OA coil, use PrecoolHumRat
+    // Test 14 - Airloop Equipment - 1 OA coil, use PrecoolHumRat
     DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).NumOACoolCoils = 1;
     EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).PrecoolTemp = 12.21;
 
@@ -323,7 +341,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     EXPECT_NEAR(12.21, sizedValue, 0.00001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 14 - Airloop Equipment - 1 OA coil use mixture of outdoor and return hum rat since DataFlowUsedForSizing > 0
+    // Test 15 - Airloop Equipment - 1 OA coil use mixture of outdoor and return hum rat since DataFlowUsedForSizing > 0
     EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow = 0.01;
     EnergyPlus::DataSizing::DataFlowUsedForSizing = 0.1; // system volume flow
     // start with an auto-sized value as the user input
@@ -339,7 +357,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // OUTDOOR AIR SYSTEM EQUIPMENT TESTING
-    // Test 15 - Outdoor Air System Equipment, no DOAS air loop
+    // Test 16 - Outdoor Air System Equipment, no DOAS air loop
     EnergyPlus::DataSizing::OASysEqSizing.allocate(1);
     EnergyPlus::DataAirLoop::OutsideAirSys.allocate(1);
     DataSizing::CurOASysNum = 1;
@@ -356,7 +374,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     EXPECT_NEAR(outAirTemp, sizedValue, 0.00001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 16 - Outdoor Air System Equipment with DOAS system
+    // Test 17 - Outdoor Air System Equipment with DOAS system
     EnergyPlus::DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.0;
     EnergyPlus::DataAirLoop::OutsideAirSys(1).AirLoopDOASNum = 0;
     state.dataAirLoopHVACDOAS.airloopDOAS.emplace_back();
@@ -377,7 +395,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     // reset eio stream
     has_eio_output(true);
 
-    // Test 17 - Outdoor Air System Equipment with DOAS system, hard-sized humidity ratio
+    // Test 18 - Outdoor Air System Equipment with DOAS system, hard-sized humidity ratio
     // start with an auto-sized value as the user input
     inputValue = 24.44; // value not previously used
 
@@ -398,6 +416,9 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
         std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Inlet Air Temperature [C], 27.44000\n"
                     " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Design Inlet Air Temperature [C], 24.44000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+
+    // call the API clearState
+    sizer.clearState();
 }
 
 } // namespace EnergyPlus

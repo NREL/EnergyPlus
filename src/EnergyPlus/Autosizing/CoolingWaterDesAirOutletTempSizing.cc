@@ -84,7 +84,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(Real64 _originalValue, bool &erro
                 this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).CoolDesTemp;
             }
             Real64 fanDeltaT = 0.0;
-            if ( this->dataFanPlacement == DataSizing::zoneFanPlacement::zoneDrawThru) {
+            if (this->dataFanPlacement == DataSizing::zoneFanPlacement::zoneDrawThru) {
                 // calculate fan heat to get fan air-side delta T
                 Real64 FanCoolLoad = this->calcFanDesHeatGain(this->dataAirFlowUsedForSizing);
                 if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {
@@ -96,16 +96,23 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(Real64 _originalValue, bool &erro
             this->autoSizedValue -= fanDeltaT;
 
             if (this->autoSizedValue < this->dataDesInletWaterTemp && this->dataWaterFlowUsedForSizing > 0.0) { // flow here is water vol flow rate
-                std::string msg =
-                    this->callingRoutine + ":" + " Coil=\"" + this->compName +
-                    "\", Cooling Coil has leaving air temperature < entering water temperature.";
+                std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
+                                  "\", Cooling Coil has leaving air temperature < entering water temperature.";
                 this->addErrorMessage(msg);
                 ShowWarningError(msg);
-                ShowContinueError("    Tair,out  =  " + General::RoundSigDigits(this->autoSizedValue, 3));
-                ShowContinueError("    Twater,in = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3));
+                msg = "    Tair,out  =  " + General::RoundSigDigits(this->autoSizedValue, 3);
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
+                msg = "    Twater,in = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3);
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
                 this->autoSizedValue = this->dataDesInletWaterTemp + 0.5;
-                ShowContinueError("....coil leaving air temperature will be reset to:");
-                ShowContinueError("    Tair,out = " + General::RoundSigDigits(this->autoSizedValue, 3));
+                msg = "....coil leaving air temperature will be reset to:";
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
+                msg = "    Tair,out = " + General::RoundSigDigits(this->autoSizedValue, 3);
+                this->addErrorMessage(msg);
+                ShowContinueError(msg);
             }
         }
     } else if (this->curSysNum > 0) {
@@ -113,8 +120,8 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(Real64 _originalValue, bool &erro
             this->autoSizedValue = _originalValue;
         } else {
             if (this->curOASysNum > 0) {
-                if ( this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                    this->autoSizedValue = this->airloopDOAS[ this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].PrecoolTemp;
+                if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
+                    this->autoSizedValue = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].PrecoolTemp;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).PrecoolTemp;
                 }
@@ -146,16 +153,19 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(Real64 _originalValue, bool &erro
                 this->autoSizedValue -= fanDeltaT;
             }
             if (this->autoSizedValue < this->dataDesInletWaterTemp && this->dataWaterFlowUsedForSizing > 0.0) {
-                std::string msg =
-                    this->callingRoutine + ":" + " Coil=\"" + this->compName +
-                    "\", Cooling Coil has leaving air temperature < entering water temperature.";
+                std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
+                                  "\", Cooling Coil has leaving air temperature < entering water temperature.";
                 this->addErrorMessage(msg);
                 ShowWarningError(msg);
-                ShowContinueError("    Tair,out  =  " + General::RoundSigDigits(this->autoSizedValue, 3));
-                ShowContinueError("    Twater,in = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3));
+                msg = "    Tair,out  =  " + General::RoundSigDigits(this->autoSizedValue, 3);
+                ShowContinueError(msg);
+                msg = "    Twater,in = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3);
+                ShowContinueError(msg);
                 this->autoSizedValue = this->dataDesInletWaterTemp + 0.5;
-                ShowContinueError("....coil leaving air temperature will be reset to:");
-                ShowContinueError("    Tair,out = " + General::RoundSigDigits(this->autoSizedValue, 3));
+                msg = "....coil leaving air temperature will be reset to:";
+                ShowContinueError(msg);
+                msg = "    Tair,out = " + General::RoundSigDigits(this->autoSizedValue, 3);
+                ShowContinueError(msg);
             }
         }
     }

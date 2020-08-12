@@ -163,9 +163,9 @@ Real64 ASHRAEMinSATCoolingSizer::size(Real64 _originalValue, bool &errorsFound)
                     (this->dataCapacityUsedForSizing / (this->dataFlowUsedForSizing * DataEnvironment::StdRhoAir *
                                                         Psychrometrics::PsyCpAirFnW(this->finalZoneSizing(this->curZoneEqNum).ZoneHumRatAtCoolPeak)));
             } else {
+                this->errorType = AutoSizingResultType::ErrorType1;
                 std::string msg =
                     this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
-                this->errorType = AutoSizingResultType::ErrorType1;
                 this->addErrorMessage(msg);
                 ShowSevereError(msg);
                 msg = "SizingString = " + this->sizingString +
@@ -187,9 +187,9 @@ Real64 ASHRAEMinSATCoolingSizer::size(Real64 _originalValue, bool &errorsFound)
                                         (this->dataFlowUsedForSizing * DataEnvironment::StdRhoAir *
                                          Psychrometrics::PsyCpAirFnW(this->finalZoneSizing(this->dataZoneUsedForSizing).ZoneHumRatAtCoolPeak)));
             } else {
+                this->errorType = AutoSizingResultType::ErrorType1;
                 std::string msg =
                     this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
-                this->errorType = AutoSizingResultType::ErrorType1;
                 this->addErrorMessage(msg);
                 ShowSevereError(msg);
                 msg = "SizingString = " + this->sizingString +
@@ -225,9 +225,9 @@ Real64 ASHRAEMaxSATHeatingSizer::size(Real64 _originalValue, bool &errorsFound)
                     (this->dataCapacityUsedForSizing / (this->dataFlowUsedForSizing * DataEnvironment::StdRhoAir *
                                                         Psychrometrics::PsyCpAirFnW(this->finalZoneSizing(this->curZoneEqNum).ZoneHumRatAtHeatPeak)));
             } else {
+                this->errorType = AutoSizingResultType::ErrorType1;
                 std::string msg =
                     this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
-                this->errorType = AutoSizingResultType::ErrorType1;
                 this->addErrorMessage(msg);
                 ShowSevereError(msg);
                 msg = "SizingString = " + this->sizingString +
@@ -249,9 +249,9 @@ Real64 ASHRAEMaxSATHeatingSizer::size(Real64 _originalValue, bool &errorsFound)
                                         (this->dataFlowUsedForSizing * DataEnvironment::StdRhoAir *
                                          Psychrometrics::PsyCpAirFnW(this->finalZoneSizing(this->dataZoneUsedForSizing).ZoneHumRatAtHeatPeak)));
             } else {
+                this->errorType = AutoSizingResultType::ErrorType1;
                 std::string msg =
                     this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
-                this->errorType = AutoSizingResultType::ErrorType1;
                 this->addErrorMessage(msg);
                 ShowSevereError(msg);
                 msg = "SizingString = " + this->sizingString +
@@ -283,6 +283,7 @@ Real64 DesiccantDehumidifierBFPerfDataFaceVelocitySizer::size(Real64 _originalVa
         this->autoSizedValue = 4.30551 + 0.01969 * this->dataAirFlowUsedForSizing;
         this->autoSizedValue = min(6.0, this->autoSizedValue);
     }
+    if (this->isEpJSON) this->sizingString = "nominal_air_face_velocity [m/s]";
     this->selectSizerOutput(errorsFound);
     return this->autoSizedValue;
 }

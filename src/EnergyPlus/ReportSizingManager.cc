@@ -62,22 +62,18 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -333,26 +329,14 @@ namespace ReportSizingManager {
         using DataGlobals::DisplayExtraWarnings;
         using namespace DataSizing;
         using namespace DataHVACGlobals;
-        using DataPlant::PlantLoop;
-        using DesiccantDehumidifiers::DesicDehum;
-        using Fans::FanDesDT;
         using Fans::FanDesHeatGain;
-        using FluidProperties::GetDensityGlycol;
-        using FluidProperties::GetSpecificHeatGlycol;
         using General::RoundSigDigits;
-        using General::SolveRoot;
         using General::TrimSigDigits;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
-        using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        using Psychrometrics::PsyTdbFnHW;
-        using Psychrometrics::PsyTdpFnWPb;
         using Psychrometrics::PsyTwbFnTdbWPb;
-        using Psychrometrics::PsyWFnTdbH;
         using Psychrometrics::PsyWFnTdbRhPb;
-        using Psychrometrics::PsyWFnTdpPb;
-        using WaterCoils::SimpleHeatingCoilUAResidual;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DDNum;                                 // design day number corresponding to TimeStepNumAtMax
