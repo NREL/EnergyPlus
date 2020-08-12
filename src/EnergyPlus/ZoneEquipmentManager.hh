@@ -92,9 +92,9 @@ namespace ZoneEquipmentManager {
 
     void InitZoneEquipment(ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration); // unused 1208
 
-    void SizeZoneEquipment(EnergyPlusData &state, OutputFiles &outputFiles);
+    void SizeZoneEquipment(EnergyPlusData &state);
 
-    void SetUpZoneSizingArrays(EnergyPlusData &state, OutputFiles &outputFiles);
+    void SetUpZoneSizingArrays(EnergyPlusData &state);
 
     void RezeroZoneSizingArrays();
 
@@ -146,9 +146,10 @@ namespace ZoneEquipmentManager {
                                    Real64 &DOASSupHR    // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
     );
 
-    void AutoCalcDOASControlStrategy(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles);
+    void AutoCalcDOASControlStrategy(ZoneEquipmentManagerData &dataZoneEquipmentManager, IOFiles &ioFiles);
 
-    void ReportZoneSizingDOASInputs(ZoneEquipmentManagerData &dataZoneEquipmentManager, OutputFiles &outputFiles,
+    void ReportZoneSizingDOASInputs(ZoneEquipmentManagerData &dataZoneEquipmentManager,
+                                    IOFiles &ioFiles,
                                     std::string const &ZoneName,         // the name of the zone
                                     std::string const &DOASCtrlStrategy, // DOAS control strategy
                                     Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]

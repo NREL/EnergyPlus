@@ -90,6 +90,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EcoRoofManager.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
@@ -101,12 +102,12 @@
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -251,7 +252,7 @@ namespace HeatBalanceSurfaceManager {
         // Solve the zone heat balance 'Detailed' solution
         // Call the outside and inside surface heat balances
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Outside Surface Heat Balance");
-        CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+        CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Inside Surface Heat Balance");
         CalcHeatBalanceInsideSurf(state);
 
@@ -280,7 +281,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        ManageThermalComfort(state.dataZoneTempPredictorCorrector, false); // "Record keeping" for the zone
+        ManageThermalComfort(state.dataZoneTempPredictorCorrector, state.files, false); // "Record keeping" for the zone
 
         ReportSurfaceHeatBalance();
         if (ZoneSizingCalc) GatherComponentLoadsSurface();
@@ -332,7 +333,6 @@ namespace HeatBalanceSurfaceManager {
         using DataRoomAirModel::IsZoneCV;
         using DataRoomAirModel::IsZoneDV;
         using DataRoomAirModel::IsZoneUI;
-        using DataSystemVariables::GoodIOStatValue;
         using HeatBalanceIntRadExchange::CalcInteriorRadExchange;
         using HeatBalFiniteDiffManager::InitHeatBalFiniteDiff;
         using InternalHeatGains::ManageInternalHeatGains;
@@ -375,9 +375,7 @@ namespace HeatBalanceSurfaceManager {
         Real64 dLatitude;       // double value for argument passing
         Real64 dCloudFraction;  // double value for argument passing
         int iErrorFlag;         // Error Flag for warning/errors returned from DElight
-        int iDElightErrorFile;  // Unit number for reading DElight Error File (eplusout.delightdfdmp)
         int iReadStatus;        // Error File Read Status
-        std::string cErrorLine; // Each DElight Error line can be up to 210 characters long
         std::string cErrorMsg;  // Each DElight Error Message can be up to 200 characters long
         bool bEndofErrFile;     // End of Error File flag
         int iDElightRefPt;      // Reference Point number for reading DElight Dump File (eplusout.delighteldmp)
@@ -385,7 +383,6 @@ namespace HeatBalanceSurfaceManager {
         // RJH DElight Modification End
 
         int MapNum;
-        int iwriteStatus;
         bool errFlag;
         bool elOpened;
         //  LOGICAL :: ShadowingSurf
@@ -521,7 +518,7 @@ namespace HeatBalanceSurfaceManager {
         // Calculate factors that are used to determine how much long-wave radiation from internal
         // gains is absorbed by interior surfaces
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Absorption Factors");
-        if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange(state.outputFiles);
+        if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange(state.files);
         ComputeIntThermalAbsorpFactors();
 
         // Calculate factors for diffuse solar absorbed by room surfaces and interior shades
@@ -597,15 +594,8 @@ namespace HeatBalanceSurfaceManager {
                 // RJH 2008-03-07: If no warnings/errors then read refpt illuminances for standard output reporting
                 if (iErrorFlag != 0) {
                     // Open DElight Electric Lighting Error File for reading
-                    iDElightErrorFile = GetNewUnitNumber();
-                    // RJH 2008-03-07: open file with READWRITE
-                    {
-                        IOFlags flags;
-                        flags.ACTION("READWRITE");
-                        ObjexxFCL::gio::open(iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags);
-                        iwriteStatus = flags.ios();
-                    }
-                    if (iwriteStatus == 0) {
+                    auto iDElightErrorFile = state.files.outputDelightDfdmpFileName.try_open();
+                    if (iDElightErrorFile.good()) {
                         elOpened = true;
                     } else {
                         elOpened = false;
@@ -619,34 +609,31 @@ namespace HeatBalanceSurfaceManager {
                     // and process them using standard EPlus warning/error handling calls
                     bEndofErrFile = false;
                     iReadStatus = 0;
-                    while (!bEndofErrFile && iwriteStatus == 0 && iReadStatus == 0) {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(iDElightErrorFile, fmtA, flags) >> cErrorLine;
-                            iReadStatus = flags.ios();
-                        }
-                        if (iReadStatus < GoodIOStatValue) {
+                    while (!bEndofErrFile && elOpened) {
+                        auto cErrorLine = iDElightErrorFile.readLine();
+                        if (cErrorLine.eof) {
                             bEndofErrFile = true;
                             continue;
                         }
+
                         // Is the current line a Warning message?
-                        if (has_prefix(cErrorLine, "WARNING: ")) {
-                            cErrorMsg = cErrorLine.substr(9);
+                        if (has_prefix(cErrorLine.data, "WARNING: ")) {
+                            cErrorMsg = cErrorLine.data.substr(9);
                             ShowWarningError(cErrorMsg);
                         }
                         // Is the current line an Error message?
-                        if (has_prefix(cErrorLine, "ERROR: ")) {
-                            cErrorMsg = cErrorLine.substr(7);
+                        if (has_prefix(cErrorLine.data, "ERROR: ")) {
+                            cErrorMsg = cErrorLine.data.substr(7);
                             ShowSevereError(cErrorMsg);
                             iErrorFlag = 1;
                         }
                     }
 
                     // Close DElight Error File and delete
+
                     if (elOpened) {
-                        IOFlags flags;
-                        flags.DISPOSE("DELETE");
-                        ObjexxFCL::gio::close(iDElightErrorFile, flags);
+                        iDElightErrorFile.close();
+                        FileSystem::removeFile(iDElightErrorFile.fileName);
                     };
                     // If any DElight Error occurred then ShowFatalError to terminate
                     if (iErrorFlag > 0) {
@@ -655,17 +642,8 @@ namespace HeatBalanceSurfaceManager {
                 } else { // RJH 2008-03-07: No errors
                     // extract reference point illuminance values from DElight Electric Lighting dump file for reporting
                     // Open DElight Electric Lighting Dump File for reading
-                    iDElightErrorFile = GetNewUnitNumber();
-                    {
-                        IOFlags flags;
-                        flags.ACTION("READWRITE");
-                        ObjexxFCL::gio::open(iDElightErrorFile, DataStringGlobals::outputDelightEldmpFileName, flags);
-                        iwriteStatus = flags.ios();
-                    }
-                    //            IF (iwriteStatus /= 0) THEN
-                    //              CALL ShowFatalError('InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output (readwrite).')
-                    //            ENDIF
-                    if (iwriteStatus == 0) {
+                    auto iDElightErrorFile = state.files.outputDelightEldmpFileName.try_open();
+                    if (iDElightErrorFile.is_open()) {
                         elOpened = true;
                     } else {
                         elOpened = false;
@@ -676,13 +654,10 @@ namespace HeatBalanceSurfaceManager {
                     bEndofErrFile = false;
                     iDElightRefPt = 0;
                     iReadStatus = 0;
-                    while (!bEndofErrFile && iwriteStatus == 0 && iReadStatus == 0) {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(iDElightErrorFile, fmtLD, flags) >> dRefPtIllum;
-                            iReadStatus = flags.ios();
-                        }
-                        if (iReadStatus < GoodIOStatValue) {
+                    while (!bEndofErrFile && elOpened) {
+                        auto line = iDElightErrorFile.read<Real64>();
+                        dRefPtIllum = line.data;
+                        if (line.eof) {
                             bEndofErrFile = true;
                             continue;
                         }
@@ -696,9 +671,8 @@ namespace HeatBalanceSurfaceManager {
 
                     // Close DElight Electric Lighting Dump File and delete
                     if (elOpened) {
-                        IOFlags flags;
-                        flags.DISPOSE("DELETE");
-                        ObjexxFCL::gio::close(iDElightErrorFile, flags);
+                        iDElightErrorFile.close();
+                        FileSystem::removeFile(iDElightErrorFile.fileName);
                     };
                 }
                 // Store the calculated total zone Power Reduction Factor due to DElight daylighting
@@ -734,12 +708,12 @@ namespace HeatBalanceSurfaceManager {
                         DayltgInterReflIllFrIntWins(NZ);
                         DayltgGlareWithIntWins(ZoneDaylight(NZ).GlareIndexAtRefPt, NZ);
                     }
-                    DayltgElecLightingControl(state.outputFiles, NZ);
+                    DayltgElecLightingControl(state.files, NZ);
                 }
             }
         } else if (mapResultsToReport && TimeStep == NumOfTimeStepInHour) {
             for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
-                ReportIllumMap(state.outputFiles, MapNum);
+                ReportIllumMap(state.files, MapNum);
             }
             mapResultsToReport = false;
         }
@@ -750,7 +724,7 @@ namespace HeatBalanceSurfaceManager {
         InitIntSolarDistribution();
 
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Convection Coefficients");
-        InitInteriorConvectionCoeffs(state.dataConvectionCoefficients, TempSurfInTmp);
+        InitInteriorConvectionCoeffs(state.dataConvectionCoefficients, state.files, TempSurfInTmp);
 
         if (BeginSimFlag) { // Now's the time to report surfaces, if desired
             //    if (firstTime) CALL DisplayString('Reporting Surfaces')
@@ -761,7 +735,7 @@ namespace HeatBalanceSurfaceManager {
 
         // Initialize the temperature history terms for conduction through the surfaces
         if (DataHeatBalance::AnyCondFD) {
-            InitHeatBalFiniteDiff();
+            InitHeatBalFiniteDiff(state.files);
         }
 
         CTFConstOutPart = 0.0;
@@ -4166,7 +4140,7 @@ namespace HeatBalanceSurfaceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool SurfPropOverridesPresent(false); // detect if EMS ever used for this and inits need to execute
+        bool SurfPropOverridesPresent(false); // detect if EMS ever used for this and inits need to execute
         int MaterNum;                                // do loop counter over materials
         int ConstrNum;                               // do loop counter over constructions
         int TotLayers;                               // count of material layers in a construction
@@ -4261,7 +4235,7 @@ namespace HeatBalanceSurfaceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool SurfConstructOverridesPresent(false); // detect if EMS ever used for this and inits need to execute
+        bool SurfConstructOverridesPresent(false); // detect if EMS ever used for this and inits need to execute
 
         if (std::any_of(Surface.begin(), Surface.end(), [](DataSurfaces::SurfaceData const &e) { return e.EMSConstructionOverrideON; }))
             SurfConstructOverridesPresent = true;
@@ -4485,7 +4459,7 @@ namespace HeatBalanceSurfaceManager {
             SwimmingPoolOn) {
             // Solve the zone heat balance 'Detailed' solution
             // Call the outside and inside surface heat balances
-            CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+            CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
             CalcHeatBalanceInsideSurf(state);
         }
     }
@@ -5070,7 +5044,9 @@ namespace HeatBalanceSurfaceManager {
 
     // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) now moved into namespace
 
-    void CalcHeatBalanceOutsideSurf(ConvectionCoefficientsData &dataConvectionCoefficients, Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
+    void CalcHeatBalanceOutsideSurf(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                    IOFiles &ioFiles,
+                                    Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -5477,7 +5453,7 @@ namespace HeatBalanceSurfaceManager {
                         Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
 
                         if (Surface(SurfNum).ExtCavityPresent) {
-                            CalcExteriorVentedCavity(dataConvectionCoefficients, SurfNum);
+                            CalcExteriorVentedCavity(dataConvectionCoefficients, ioFiles, SurfNum);
                         }
 
                         CalcOutsideSurfTemp(SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
@@ -5486,7 +5462,7 @@ namespace HeatBalanceSurfaceManager {
                     } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
                                Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
                         if (Surface(SurfNum).ExtCavityPresent) {
-                            CalcExteriorVentedCavity(dataConvectionCoefficients, SurfNum);
+                            CalcExteriorVentedCavity(dataConvectionCoefficients, ioFiles, SurfNum);
                         }
                     }
 
@@ -5497,7 +5473,7 @@ namespace HeatBalanceSurfaceManager {
                     // recompute each load by calling ecoroof
 
                     if (Surface(SurfNum).ExtEcoRoof) {
-                        CalcEcoRoof(dataConvectionCoefficients, SurfNum, ZoneNum, ConstrNum, TempExt);
+                        CalcEcoRoof(dataConvectionCoefficients, ioFiles, SurfNum, ZoneNum, ConstrNum, TempExt);
                         continue;
                     }
 
@@ -5517,6 +5493,7 @@ namespace HeatBalanceSurfaceManager {
 
                         // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in subroutine)
                         InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                                                    ioFiles,
                                                     SurfNum,
                                                     HMovInsul,
                                                     RoughSurf,
@@ -5603,6 +5580,7 @@ namespace HeatBalanceSurfaceManager {
 
                         // Calculate exterior heat transfer coefficients for windspeed = 0
                         InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                                                    ioFiles,
                                                     SurfNum,
                                                     HMovInsul,
                                                     RoughSurf,
@@ -5659,6 +5637,7 @@ namespace HeatBalanceSurfaceManager {
 
                     // Set Kiva exterior convection algorithms
                     InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                                                ioFiles,
                                                 SurfNum,
                                                 HMovInsul,
                                                 RoughSurf,
@@ -5810,9 +5789,10 @@ namespace HeatBalanceSurfaceManager {
             ZoneWinHeatLossRepEnergy = 0.0;
 
             if (AllCTF) {
-                CalcHeatBalanceInsideSurf2CTFOnly(state.dataConvectionCoefficients, state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, 1, NumOfZones, DataSurfaces::AllIZSurfaceList);
+                CalcHeatBalanceInsideSurf2CTFOnly(state.dataConvectionCoefficients, state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files, 1, NumOfZones, DataSurfaces::AllIZSurfaceList);
             } else {
                 CalcHeatBalanceInsideSurf2(state.dataConvectionCoefficients, state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager,
+                                           state.files,
                                            DataSurfaces::AllHTSurfaceList,
                                            DataSurfaces::AllIZSurfaceList,
                                            DataSurfaces::AllHTNonWindowSurfaceList,
@@ -5842,7 +5822,7 @@ namespace HeatBalanceSurfaceManager {
             auto const &zoneHTWindowSurfList(Zone(ZoneToResimulate).ZoneHTWindowSurfaceList);
             // Cannot use CalcHeatBalanceInsideSurf2CTFOnly because resimulated zone includes adjacent interzone surfaces
             CalcHeatBalanceInsideSurf2(
-                state.dataConvectionCoefficients, state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
+                state.dataConvectionCoefficients, state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
             // Sort window heat gain/loss
             if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
                 ZoneWinHeatGainRep(ZoneToResimulate) = ZoneWinHeatGain(ZoneToResimulate);
@@ -5854,7 +5834,11 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void CalcHeatBalanceInsideSurf2(ConvectionCoefficientsData &dataConvectionCoefficients, WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager,
+    void CalcHeatBalanceInsideSurf2(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                    WindowComplexManagerData &dataWindowComplexManager,
+                                    WindowEquivalentLayerData &dataWindowEquivalentLayer,
+                                    WindowManagerData &dataWindowManager,
+                                    IOFiles &ioFiles,
                                     const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                     const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
@@ -6023,7 +6007,7 @@ namespace HeatBalanceSurfaceManager {
             // The choice of 30 is not significant--just want to do this a couple of
             // times before the iteration limit is hit.
             if ((InsideSurfIterations > 0) && (mod(InsideSurfIterations, ItersReevalConvCoeff) == 0)) {
-                ConvectionCoefficients::InitInteriorConvectionCoeffs(dataConvectionCoefficients, TempSurfIn, ZoneToResimulate);
+                ConvectionCoefficients::InitInteriorConvectionCoeffs(dataConvectionCoefficients, ioFiles, TempSurfIn, ZoneToResimulate);
             }
 
             if (DataHeatBalance::AnyEMPD || DataHeatBalance::AnyHAMT) {
@@ -6078,7 +6062,7 @@ namespace HeatBalanceSurfaceManager {
                         surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) { // Regular CTF Surface and/or EMPD surface
 
                         if (surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) {
-                            MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(SurfNum, TempSurfInTmp(SurfNum), MAT_zone, TempSurfInSat);
+                            MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(ioFiles, SurfNum, TempSurfInTmp(SurfNum), MAT_zone, TempSurfInSat);
                         }
                         // Pre-calculate a few terms
                         //
@@ -6154,10 +6138,10 @@ namespace HeatBalanceSurfaceManager {
                     } else if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD || surface.HeatTransferAlgorithm == HeatTransferModel_HAMT) {
 
                         if (surface.HeatTransferAlgorithm == HeatTransferModel_HAMT)
-                            HeatBalanceHAMTManager::ManageHeatBalHAMT(SurfNum, TempSurfInTmp(SurfNum), TempSurfOutTmp); // HAMT
+                            HeatBalanceHAMTManager::ManageHeatBalHAMT(ioFiles, SurfNum, TempSurfInTmp(SurfNum), TempSurfOutTmp); // HAMT
 
                         if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD) {
-                            HeatBalFiniteDiffManager::ManageHeatBalFiniteDiff(SurfNum, TempSurfInTmp(SurfNum), TempSurfOutTmp);
+                            HeatBalFiniteDiffManager::ManageHeatBalFiniteDiff(ioFiles, SurfNum, TempSurfInTmp(SurfNum), TempSurfOutTmp);
                         }
 
                         TH11 = TempSurfOutTmp;
@@ -6179,7 +6163,7 @@ namespace HeatBalanceSurfaceManager {
                             surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) { // Regular CTF Surface and/or EMPD surface
 
                             if (surface.HeatTransferAlgorithm == HeatTransferModel_EMPD) {
-                                MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(SurfNum, TempSurfInTmp(SurfNum), MAT_zone, TempSurfInSat);
+                                MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(ioFiles, SurfNum, TempSurfInTmp(SurfNum), MAT_zone, TempSurfInSat);
                             }
                             // Pre-calculate a few terms
                             Real64 const TempTerm(CTFConstInPart(SurfNum) + QRadThermInAbs(SurfNum) + QRadSWInAbs(SurfNum) +
@@ -6284,11 +6268,11 @@ namespace HeatBalanceSurfaceManager {
                                     OtherSideZoneNum = Surface(OtherSideSurfNum).Zone;
                                     TempOutsideAirFD(SurfNum) = MAT(OtherSideZoneNum);
                                 }
-                                HeatBalanceHAMTManager::ManageHeatBalHAMT(SurfNum, TempSurfInTmp(SurfNum), TempSurfOutTmp);
+                                HeatBalanceHAMTManager::ManageHeatBalHAMT(ioFiles, SurfNum, TempSurfInTmp(SurfNum), TempSurfOutTmp);
                             }
 
                             if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD)
-                                HeatBalFiniteDiffManager::ManageHeatBalFiniteDiff(SurfNum, TempSurfInTmp(SurfNum), TempSurfOutTmp);
+                                HeatBalFiniteDiffManager::ManageHeatBalFiniteDiff(ioFiles, SurfNum, TempSurfInTmp(SurfNum), TempSurfOutTmp);
 
                             TH11 = TempSurfOutTmp;
 
@@ -6417,6 +6401,7 @@ namespace HeatBalanceSurfaceManager {
                                 // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in
                                 // subroutine)
                                 ConvectionCoefficients::InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                                                                                    ioFiles,
                                                                                     SurfNum,
                                                                                     0.0,
                                                                                     RoughSurf,
@@ -6435,6 +6420,7 @@ namespace HeatBalanceSurfaceManager {
 
                                 // Calculate exterior heat transfer coefficients for windspeed = 0
                                 ConvectionCoefficients::InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                                                                                    ioFiles,
                                                                                     SurfNum,
                                                                                     0.0,
                                                                                     RoughSurf,
@@ -6680,7 +6666,11 @@ namespace HeatBalanceSurfaceManager {
         CalculateZoneMRT(ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
     }
 
-    void CalcHeatBalanceInsideSurf2CTFOnly(ConvectionCoefficientsData &dataConvectionCoefficients, WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager,
+    void CalcHeatBalanceInsideSurf2CTFOnly(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                           WindowComplexManagerData &dataWindowComplexManager,
+                                           WindowEquivalentLayerData &dataWindowEquivalentLayer,
+                                           WindowManagerData &dataWindowManager,
+                                           IOFiles &ioFiles,
                                            const int FirstZone,             // First zone to simulate
                                            const int LastZone,              // Last zone to simulate
                                            const std::vector<int> &IZSurfs, // Last zone to simulate
@@ -6873,7 +6863,7 @@ namespace HeatBalanceSurfaceManager {
             // The choice of 30 is not significant--just want to do this a couple of
             // times before the iteration limit is hit.
             if ((InsideSurfIterations > 0) && (mod(InsideSurfIterations, ItersReevalConvCoeff) == 0)) {
-                ConvectionCoefficients::InitInteriorConvectionCoeffs(dataConvectionCoefficients, TempSurfIn, ZoneToResimulate);
+                ConvectionCoefficients::InitInteriorConvectionCoeffs(dataConvectionCoefficients, ioFiles, TempSurfIn, ZoneToResimulate);
                 // Since HConvIn has changed re-calculate a few terms - non-window surfaces
                 for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
                     int const firstSurf = Zone(zoneNum).NonWindowSurfaceFirst;
@@ -7116,6 +7106,7 @@ namespace HeatBalanceSurfaceManager {
                                     // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in
                                     // subroutine)
                                     ConvectionCoefficients::InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                                                                                        ioFiles,
                                                                                         surfNum,
                                                                                         0.0,
                                                                                         RoughSurf,
@@ -7134,6 +7125,7 @@ namespace HeatBalanceSurfaceManager {
 
                                     // Calculate exterior heat transfer coefficients for windspeed = 0
                                     ConvectionCoefficients::InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                                                                                        ioFiles,
                                                                                         surfNum,
                                                                                         0.0,
                                                                                         RoughSurf,
@@ -7789,7 +7781,7 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void CalcExteriorVentedCavity(ConvectionCoefficientsData &dataConvectionCoefficients, int const SurfNum) // index of surface
+    void CalcExteriorVentedCavity(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const SurfNum) // index of surface
     {
 
         // SUBROUTINE INFORMATION:
@@ -7871,6 +7863,7 @@ namespace HeatBalanceSurfaceManager {
         for (iter = 1; iter <= 3; ++iter) { // this is a sequential solution approach.
 
             CalcPassiveExteriorBaffleGap(dataConvectionCoefficients,
+                                         ioFiles,
                                          ExtVentedCavity(CavNum).SurfPtrs,
                                          holeArea,
                                          ExtVentedCavity(CavNum).Cv,

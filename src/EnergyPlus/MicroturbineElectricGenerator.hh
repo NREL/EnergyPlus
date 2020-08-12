@@ -70,6 +70,8 @@ namespace MicroturbineElectricGenerator {
     extern int NumMTGenerators; // number of MT Generators specified in input
     extern bool GetMTInput;     // then TRUE, calls subroutine to read input file.
 
+    void clear_state();
+
     struct MTGeneratorSpecs : PlantComponent
     {
         // Members

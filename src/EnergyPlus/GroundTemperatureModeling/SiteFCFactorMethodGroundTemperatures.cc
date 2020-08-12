@@ -57,8 +57,8 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -68,7 +68,7 @@ namespace EnergyPlus {
 
 // Site:GroundTemperature:FCFactorMethod factory
 std::shared_ptr<SiteFCFactorMethodGroundTemps>
-SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(OutputFiles &outputFiles, int objectType, std::string objectName)
+SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(IOFiles &ioFiles, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -141,7 +141,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(OutputFiles &outputFiles, int 
 
     // Write Final Ground Temp Information to the initialization output file
     if (FCGroundTemps) {
-        write_ground_temps(outputFiles.eio, "FCfactorMethod", thisModel->fcFactorGroundTemps);
+        write_ground_temps(ioFiles.eio, "FCfactorMethod", thisModel->fcFactorGroundTemps);
     }
 
     if (found && !thisModel->errorsFound) {
