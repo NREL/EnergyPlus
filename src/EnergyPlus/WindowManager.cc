@@ -5349,10 +5349,9 @@ namespace WindowManager {
             }
         }
 
-        Real64 afp = 1 - rfp - tfp;  // total absorptance
-        Real64 abp = 1 - rbp - tfp;  // total absorptance
-        assert(afp >= 0.0);
-        assert(abp >= 0.0);
+        // total absorptance cannot be negative
+        assert(1 - rfp - tfp >= 0.0);
+        assert(1 - rbp - tfp >= 0.0);
     }
 
     Real64 InterpolateBetweenTwoValues(Real64 const X, Real64 const X0, Real64 const X1, Real64 const F0, Real64 const F1)
