@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
@@ -258,20 +257,20 @@ namespace Boilers {
                                                             DataIPShortCuts::cAlphaFieldNames(4)); // Field Name
 
                 // if curve uses temperature, make sure water temp mode has been set
-                if (CurveManager::PerfCurve(thisBoiler.EfficiencyCurvePtr).NumDims == 2) { // curve uses water temperature
+                if (dataCurveManager.PerfCurve(thisBoiler.EfficiencyCurvePtr).NumDims == 2) { // curve uses water temperature
                     if (thisBoiler.CurveTempMode == TempMode::NOTSET) {                    // throw error
                         if (!DataIPShortCuts::lAlphaFieldBlanks(3)) {
                             ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                             ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + DataIPShortCuts::cAlphaArgs(3));
                             ShowContinueError("boilers.Boiler using curve type of " +
-                                              CurveManager::PerfCurve(thisBoiler.EfficiencyCurvePtr).ObjectType + " must specify " +
+                                              dataCurveManager.PerfCurve(thisBoiler.EfficiencyCurvePtr).ObjectType + " must specify " +
                                               DataIPShortCuts::cAlphaFieldNames(3));
                             ShowContinueError("Available choices are EnteringBoiler or LeavingBoiler");
                         } else {
                             ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                             ShowContinueError("Field " + DataIPShortCuts::cAlphaFieldNames(3) + " is blank");
                             ShowContinueError("boilers.Boiler using curve type of " +
-                                              CurveManager::PerfCurve(thisBoiler.EfficiencyCurvePtr).ObjectType +
+                                              dataCurveManager.PerfCurve(thisBoiler.EfficiencyCurvePtr).ObjectType +
                                               " must specify either EnteringBoiler or LeavingBoiler");
                         }
                         ErrorsFound = true;
@@ -836,7 +835,7 @@ namespace Boilers {
 
         // calculate normalized efficiency based on curve object type
         if (this->EfficiencyCurvePtr > 0) {
-            if (CurveManager::PerfCurve(this->EfficiencyCurvePtr).NumDims == 2) {
+            if (dataCurveManager.PerfCurve(this->EfficiencyCurvePtr).NumDims == 2) {
                 if (this->CurveTempMode == TempMode::ENTERINGBOILERTEMP) {
                     EffCurveOutput = CurveManager::CurveValue(this->EfficiencyCurvePtr, this->BoilerPLR, DataLoopNode::Node(BoilerInletNode).Temp);
                 } else if (this->CurveTempMode == TempMode::LEAVINGBOILERTEMP) {
@@ -856,7 +855,7 @@ namespace Boilers {
                     ShowWarningError("Boiler:HotWater \"" + this->Name + "\"");
                     ShowContinueError("...Normalized Boiler Efficiency Curve output is less than or equal to 0.");
                     ShowContinueError("...Curve input x value (PLR)     = " + General::TrimSigDigits(this->BoilerPLR, 5));
-                    if (CurveManager::PerfCurve(this->EfficiencyCurvePtr).NumDims == 2) {
+                    if (dataCurveManager.PerfCurve(this->EfficiencyCurvePtr).NumDims == 2) {
                         if (this->CurveTempMode == TempMode::ENTERINGBOILERTEMP) {
                             ShowContinueError("...Curve input y value (Tinlet) = " +
                                               General::TrimSigDigits(DataLoopNode::Node(BoilerInletNode).Temp, 2));
@@ -888,7 +887,7 @@ namespace Boilers {
                     ShowContinueError("...Calculated Boiler Efficiency is greater than 1.1.");
                     ShowContinueError("...Boiler Efficiency calculations shown below.");
                     ShowContinueError("...Curve input x value (PLR)     = " + General::TrimSigDigits(this->BoilerPLR, 5));
-                    if (CurveManager::PerfCurve(this->EfficiencyCurvePtr).NumDims == 2) {
+                    if (dataCurveManager.PerfCurve(this->EfficiencyCurvePtr).NumDims == 2) {
                         if (this->CurveTempMode == TempMode::ENTERINGBOILERTEMP) {
                             ShowContinueError("...Curve input y value (Tinlet) = " +
                                               General::TrimSigDigits(DataLoopNode::Node(BoilerInletNode).Temp, 2));

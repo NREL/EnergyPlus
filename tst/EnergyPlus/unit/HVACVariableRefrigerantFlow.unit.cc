@@ -195,16 +195,16 @@ protected:
         DataSizing::NumSysSizInput = 1;
         DataSizing::SysSizInput.allocate(1);
         DataSizing::SysSizInput(1).AirLoopNum = 1;
-        CurveManager::NumCurves = 10;
-        CurveManager::PerfCurve.allocate(10);
-        CurveManager::PerfCurve(1).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-        CurveManager::PerfCurve(1).CurveType = CurveTypeEnum::Linear;
-        CurveManager::PerfCurve(1).Coeff1 = 1.0;
-        CurveManager::PerfCurve(1).CurveMax = 1.0;
-        CurveManager::PerfCurve(2).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-        CurveManager::PerfCurve(2).CurveType = CurveTypeEnum::Linear;
-        CurveManager::PerfCurve(2).Coeff1 = 1.0;
-        CurveManager::PerfCurve(2).CurveMax = 1.0;
+        dataCurveManager.NumCurves = 10;
+        dataCurveManager.PerfCurve.allocate(10);
+        dataCurveManager.PerfCurve(1).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+        dataCurveManager.PerfCurve(1).CurveType = CurveTypeEnum::Linear;
+        dataCurveManager.PerfCurve(1).Coeff1 = 1.0;
+        dataCurveManager.PerfCurve(1).CurveMax = 1.0;
+        dataCurveManager.PerfCurve(2).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+        dataCurveManager.PerfCurve(2).CurveType = CurveTypeEnum::Linear;
+        dataCurveManager.PerfCurve(2).Coeff1 = 1.0;
+        dataCurveManager.PerfCurve(2).CurveMax = 1.0;
 
         int NumAirLoops = DataHVACGlobals::NumPrimaryAirSys = 1; // allocate to 1 air loop and adjust/resize as needed
         DataAirSystems::PrimaryAirSystem.allocate(NumAirLoops);
@@ -2732,8 +2732,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     Array1D<Real64> Par;
 
     // Allocate
-    NumCurves = 1; // CurveManager::NumCurves
-    PerfCurve.allocate(NumCurves);
+    dataCurveManager.NumCurves = 1; // CurveManager::NumCurves
+    dataCurveManager.PerfCurve.allocate(dataCurveManager.NumCurves);
 
     NumPar = 3;
     Par.allocate(NumPar);
@@ -2744,26 +2744,26 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     Par(3) = CurveNum;
 
     // Inputs: parameters
-    PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
-    PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-    PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
-    PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
-    PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2
-    PerfCurve(CurveNum).Coeff4 = -17.043566; // Coefficient4 y
-    PerfCurve(CurveNum).Coeff5 = -.40346383; // Coefficient5 y**2
-    PerfCurve(CurveNum).Coeff6 = 0.29573589; // Coefficient6 x*y
-    PerfCurve(CurveNum).Var1Min = 15;        // Minimum Value of x
-    PerfCurve(CurveNum).Var1Max = 65;        // Maximum Value of x
-    PerfCurve(CurveNum).Var2Min = -30;       // Minimum Value of y
-    PerfCurve(CurveNum).Var2Max = 15;        // Maximum Value of y
+    dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    dataCurveManager.PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
+    dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    dataCurveManager.PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
+    dataCurveManager.PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
+    dataCurveManager.PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2
+    dataCurveManager.PerfCurve(CurveNum).Coeff4 = -17.043566; // Coefficient4 y
+    dataCurveManager.PerfCurve(CurveNum).Coeff5 = -.40346383; // Coefficient5 y**2
+    dataCurveManager.PerfCurve(CurveNum).Coeff6 = 0.29573589; // Coefficient6 x*y
+    dataCurveManager.PerfCurve(CurveNum).Var1Min = 15;        // Minimum Value of x
+    dataCurveManager.PerfCurve(CurveNum).Var1Max = 65;        // Maximum Value of x
+    dataCurveManager.PerfCurve(CurveNum).Var2Min = -30;       // Minimum Value of y
+    dataCurveManager.PerfCurve(CurveNum).Var2Max = 15;        // Maximum Value of y
 
     // Run and Check
     double CompResidual = HVACVariableRefrigerantFlow::CompResidual_FluidTCtrl(Te, Par);
     EXPECT_NEAR(1.652, CompResidual, 0.005);
 
     // Clean up
-    PerfCurve.deallocate();
+    dataCurveManager.PerfCurve.deallocate();
     Par.deallocate();
 }
 
@@ -14228,8 +14228,8 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_TRUE(ErrorsFound);
     // set pointer to components
     auto &thisVRF(VRF(1));
-    auto &thisCoolEIRFPLR(PerfCurve(thisVRF.CoolEIRFPLR1));
-    auto &thisHeatEIRFPLR(PerfCurve(thisVRF.HeatEIRFPLR1));
+    auto &thisCoolEIRFPLR(dataCurveManager.PerfCurve(thisVRF.CoolEIRFPLR1));
+    auto &thisHeatEIRFPLR(dataCurveManager.PerfCurve(thisVRF.HeatEIRFPLR1));
     // check user input VRF Minimum PLR
     EXPECT_EQ(0.15, thisVRF.MinPLR);
     // EIRFPLR curve minimum PLR value specified

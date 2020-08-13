@@ -285,11 +285,11 @@ protected:
         cbvav.CBVAVBoxOutletNode.allocate(1);
         cbvav.CBVAVBoxOutletNode(1) = 11;
 
-        CurveManager::PerfCurve.allocate(1);
-        CurveManager::NumCurves = 1;
-        CurveManager::PerfCurve(1).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
-        CurveManager::PerfCurve(1).CurveType = CurveManager::CurveTypeEnum::Linear;
-        CurveManager::PerfCurve(1).Coeff1 = 1.0;
+        dataCurveManager.PerfCurve.allocate(1);
+        dataCurveManager.NumCurves = 1;
+        dataCurveManager.PerfCurve(1).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
+        dataCurveManager.PerfCurve(1).CurveType = CurveManager::CurveTypeEnum::Linear;
+        dataCurveManager.PerfCurve(1).Coeff1 = 1.0;
 
         DataEnvironment::OutDryBulbTemp = 35.0;
         DataEnvironment::OutHumRat = 0.0141066;

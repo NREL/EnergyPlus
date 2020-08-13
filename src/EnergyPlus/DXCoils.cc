@@ -2067,7 +2067,7 @@ namespace DXCoils {
                                                             cAlphaFields(5));               // Field Name
 
                 if (!ErrorsFound) {
-                    if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
+                    if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).CCapFTemp(1),
@@ -2131,7 +2131,7 @@ namespace DXCoils {
                                                             cAlphaFields(7));              // Field Name
 
                 if (!ErrorsFound) {
-                    if (CurveManager::PerfCurve(DXCoil(DXCoilNum).EIRFTemp(1)).NumDims == 1) {
+                    if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).EIRFTemp(1)).NumDims == 1) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).EIRFTemp(1),
@@ -3175,7 +3175,7 @@ namespace DXCoils {
                                                                 cAlphaFields(10));           // Field Name
 
                     if (!ErrorsFound) {
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCapFTemp).NumDims == 1) {
+                        if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).HCapFTemp).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCapFTemp,
@@ -3263,7 +3263,7 @@ namespace DXCoils {
                                                                 cAlphaFields(13));           // Field Name
 
                     if (!ErrorsFound) {
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCOPFTemp).NumDims == 1) {
+                        if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).HCOPFTemp).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCOPFTemp,
@@ -3573,7 +3573,7 @@ namespace DXCoils {
                                                                 cAlphaFields(6));            // Field Name
 
                     if (!ErrorsFound) {
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCapFTemp).NumDims == 1) {
+                        if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).HCapFTemp).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCapFTemp,
@@ -3635,7 +3635,7 @@ namespace DXCoils {
                                                                 cAlphaFields(8));            // Field Name
 
                     if (!ErrorsFound) {
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCOPFTemp).NumDims == 1) {
+                        if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).HCOPFTemp).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCOPFTemp,
@@ -4470,7 +4470,7 @@ namespace DXCoils {
                                                                 cAlphaFields(10 + (I - 1) * 6));  // Field Name
 
                     if (!ErrorsFound) {
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(I)).NumDims == 1) {
+                        if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(I)).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).MSCCapFTemp(I),
@@ -4538,7 +4538,7 @@ namespace DXCoils {
                                                                 cAlphaFields(12 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(I)).NumDims == 1) {
+                        if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(I)).NumDims == 1) {
                             checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).MSEIRFTemp(I),
@@ -4764,7 +4764,7 @@ namespace DXCoils {
                                                         cAlphaFields(3));               // Field Name
 
             if (!ErrorsFound) {
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
+                if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
                     checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                 DXCoil(DXCoilNum).Name,
                                                 DXCoil(DXCoilNum).CCapFTemp(1),
@@ -4903,7 +4903,7 @@ namespace DXCoils {
                                                             cAlphaFields(5));               // Field Name
 
                 if (!ErrorsFound) {
-                    if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
+                    if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
                         checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).CCapFTemp(1),
@@ -5013,15 +5013,15 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 {
-                    if (CurveManager::PerfCurve(indexSHCurve).ObjectType == "Curve:Quadratic") {
-                        DXCoil(DXCoilNum).C1Te = EnergyPlus::CurveManager::PerfCurve(indexSHCurve).Coeff1;
-                        DXCoil(DXCoilNum).C2Te = EnergyPlus::CurveManager::PerfCurve(indexSHCurve).Coeff2;
-                        DXCoil(DXCoilNum).C3Te = EnergyPlus::CurveManager::PerfCurve(indexSHCurve).Coeff3;
+                    if (dataCurveManager.PerfCurve(indexSHCurve).ObjectType == "Curve:Quadratic") {
+                        DXCoil(DXCoilNum).C1Te = EnergyPlus::dataCurveManager.PerfCurve(indexSHCurve).Coeff1;
+                        DXCoil(DXCoilNum).C2Te = EnergyPlus::dataCurveManager.PerfCurve(indexSHCurve).Coeff2;
+                        DXCoil(DXCoilNum).C3Te = EnergyPlus::dataCurveManager.PerfCurve(indexSHCurve).Coeff3;
 
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...illegal " + cAlphaFields(5) +
-                                          " type for this object = " + CurveManager::PerfCurve(indexSHCurve).ObjectType);
+                                          " type for this object = " + dataCurveManager.PerfCurve(indexSHCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
                         ErrorsFound = true;
                     }
@@ -5110,15 +5110,15 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 {
-                    if (CurveManager::PerfCurve(indexSCCurve).ObjectType == "Curve:Quadratic") {
-                        DXCoil(DXCoilNum).C1Tc = EnergyPlus::CurveManager::PerfCurve(indexSCCurve).Coeff1;
-                        DXCoil(DXCoilNum).C2Tc = EnergyPlus::CurveManager::PerfCurve(indexSCCurve).Coeff2;
-                        DXCoil(DXCoilNum).C3Tc = EnergyPlus::CurveManager::PerfCurve(indexSCCurve).Coeff3;
+                    if (dataCurveManager.PerfCurve(indexSCCurve).ObjectType == "Curve:Quadratic") {
+                        DXCoil(DXCoilNum).C1Tc = EnergyPlus::dataCurveManager.PerfCurve(indexSCCurve).Coeff1;
+                        DXCoil(DXCoilNum).C2Tc = EnergyPlus::dataCurveManager.PerfCurve(indexSCCurve).Coeff2;
+                        DXCoil(DXCoilNum).C3Tc = EnergyPlus::dataCurveManager.PerfCurve(indexSCCurve).Coeff3;
 
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...illegal " + cAlphaFields(5) +
-                                          " type for this object = " + CurveManager::PerfCurve(indexSCCurve).ObjectType);
+                                          " type for this object = " + dataCurveManager.PerfCurve(indexSCCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
                         ErrorsFound = true;
                     }
@@ -8057,7 +8057,7 @@ namespace DXCoils {
 
         // get output of Heating Capacity and Heating COP curves (curves default to 1 if user has not specified curve name)
         if (Coil.HCapFTemp > 0) {
-            if (CurveManager::PerfCurve(Coil.HCapFTemp).NumDims == 1) {
+            if (dataCurveManager.PerfCurve(Coil.HCapFTemp).NumDims == 1) {
                 HeatCapFTemp = CurveValue(Coil.HCapFTemp, InletAirTemp);
             } else {
                 HeatCapFTemp = CurveValue(Coil.HCapFTemp, InletAirTemp, InletWaterTemp);
@@ -8068,7 +8068,7 @@ namespace DXCoils {
                     ShowWarningMessage(Coil.DXCoilType + " \"" + Coil.Name + "\":");
                     ShowContinueError(" HPWH Heating Capacity Modifier curve (function of temperature) output is negative (" +
                                       TrimSigDigits(HeatCapFTemp, 3) + ").");
-                    if (CurveManager::PerfCurve(Coil.HCapFTemp).NumDims == 2) {
+                    if (dataCurveManager.PerfCurve(Coil.HCapFTemp).NumDims == 2) {
                         ShowContinueError(" Negative value occurs using an inlet air temperature of " + TrimSigDigits(InletAirTemp, 1) +
                                           " and an inlet water temperature of " + TrimSigDigits(InletWaterTemp, 1) + '.');
                     } else {
@@ -8092,7 +8092,7 @@ namespace DXCoils {
         }
 
         if (Coil.HCOPFTemp > 0) {
-            if (CurveManager::PerfCurve(Coil.HCOPFTemp).NumDims == 1) {
+            if (dataCurveManager.PerfCurve(Coil.HCOPFTemp).NumDims == 1) {
                 HeatCOPFTemp = CurveValue(Coil.HCOPFTemp, InletAirTemp);
             } else {
                 HeatCOPFTemp = CurveValue(Coil.HCOPFTemp, InletAirTemp, InletWaterTemp);
@@ -8103,7 +8103,7 @@ namespace DXCoils {
                     ShowWarningMessage(Coil.DXCoilType + " \"" + Coil.Name + "\":");
                     ShowContinueError(" HPWH Heating COP Modifier curve (function of temperature) output is negative (" +
                                       TrimSigDigits(HeatCOPFTemp, 3) + ").");
-                    if (CurveManager::PerfCurve(Coil.HCOPFTemp).NumDims == 2) {
+                    if (dataCurveManager.PerfCurve(Coil.HCOPFTemp).NumDims == 2) {
                         ShowContinueError(" Negative value occurs using an inlet air temperature of " + TrimSigDigits(InletAirTemp, 1) +
                                           " and an inlet water temperature of " + TrimSigDigits(InletWaterTemp, 1) + '.');
                     } else {
@@ -8755,7 +8755,7 @@ namespace DXCoils {
                     TotCapTempModFac = 1.0;
                     TotCapFlowModFac = 1.0;
                 } else {
-                    if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
+                    if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
                         TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
                     } else {
                         TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(Mode), CondInletTemp);
@@ -8767,7 +8767,7 @@ namespace DXCoils {
                             ShowWarningMessage(RoutineName + DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name + "\":");
                             ShowContinueError(" Total Cooling Capacity Modifier curve (function of temperature) output is negative (" +
                                               TrimSigDigits(TotCapTempModFac, 3) + ").");
-                            if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
+                            if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
                                 ShowContinueError(" Negative value occurs using a condenser inlet air temperature of " +
                                                   TrimSigDigits(CondInletTemp, 1) + " and an inlet air wet-bulb temperature of " +
                                                   TrimSigDigits(InletAirWetBulbC, 1) + '.');
@@ -9139,7 +9139,7 @@ namespace DXCoils {
                         ShowWarningMessage(RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name + "\":");
                         ShowContinueError(" Energy Input Ratio Modifier curve (function of temperature) output is negative (" +
                                           TrimSigDigits(EIRTempModFac, 3) + ").");
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 2) {
+                        if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 2) {
                             ShowContinueError(" Negative value occurs using a condenser inlet air temperature of " + TrimSigDigits(CondInletTemp, 1) +
                                               " and an inlet air wet-bulb temperature of " + TrimSigDigits(InletAirWetBulbC, 1) + '.');
                         } else {
@@ -10178,7 +10178,7 @@ namespace DXCoils {
             // Model was extended to accept bi-quadratic curves. This allows sensitivity of the heating capacity
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
             // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
-            if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
+            if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
                 {
                     auto const SELECT_CASE_var(DXCoil(DXCoilNum).HeatingPerformanceOATType);
                     if (SELECT_CASE_var == DryBulbIndicator) {
@@ -10316,7 +10316,7 @@ namespace DXCoils {
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
             // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
             if (DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating && DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating) {
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 1) {
+                if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 1) {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), OutdoorDryBulb);
                 } else {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -12746,7 +12746,7 @@ namespace DXCoils {
                 // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
                 // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
                 // Low speed
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS)).NumDims == 1) {
+                if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS)).NumDims == 1) {
                     TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS), OutdoorDryBulb);
                 } else {
                     TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -12756,7 +12756,7 @@ namespace DXCoils {
                 // Calculate total heating capacity for off-rated conditions
                 TotCapLS = DXCoil(DXCoilNum).MSRatedTotCap(SpeedNumLS) * TotCapFlowModFac * TotCapTempModFac;
                 // High speed
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS)).NumDims == 1) {
+                if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS)).NumDims == 1) {
                     TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS), OutdoorDryBulb);
                 } else {
                     TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -12770,7 +12770,7 @@ namespace DXCoils {
                 // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
                 // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
                 // Low Speed
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS)).NumDims == 1) {
+                if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS)).NumDims == 1) {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), OutdoorDryBulb);
                 } else {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -12778,7 +12778,7 @@ namespace DXCoils {
                 EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFFlow(SpeedNumLS), AirMassFlowRatioLS);
                 EIRLS = 1.0 / DXCoil(DXCoilNum).MSRatedCOP(SpeedNumLS) * EIRTempModFac * EIRFlowModFac;
                 // High Speed
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS)).NumDims == 1) {
+                if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS)).NumDims == 1) {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), OutdoorDryBulb);
                 } else {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -12979,7 +12979,7 @@ namespace DXCoils {
                 // Model was extended to accept bi-quadratic curves. This allows sensitivity of the heating capacity
                 // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
                 // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum)).NumDims == 1) {
+                if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum)).NumDims == 1) {
                     TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum), OutdoorDryBulb);
                 } else {
                     TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -13060,7 +13060,7 @@ namespace DXCoils {
                 // Model was extended to accept bi-quadratic curves. This allows sensitivity of the EIR
                 // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
                 // advised to use the bi-quadratic curve if sufficient manufacturer data is available.
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(1)).NumDims == 1) {
+                if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(1)).NumDims == 1) {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(1), OutdoorDryBulb);
                 } else {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(1), InletAirDryBulbTemp, OutdoorDryBulb);
@@ -16259,7 +16259,7 @@ namespace DXCoils {
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
             // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
             if (DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating && DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating) {
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 1) {
+                if (dataCurveManager.PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 1) {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), OutdoorDryBulb);
                 } else {
                     EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);

@@ -74,6 +74,19 @@
 
 namespace EnergyPlus {
 
+void CurveManagerData::clear_state()
+{
+    NumCurves = 0;
+    GetCurvesInputFlag = true;
+    UniqueCurveNames.clear();
+    PerfCurve.deallocate();
+    dataCurveManager.btwxtManager.clear();
+    CurveValueMyBeginTimeStepFlag = true;
+    FrictionFactorErrorHasOccurred = false;
+}
+
+CurveManagerData dataCurveManager;  // NOLINT(cert-err58-cpp)
+
 namespace CurveManager {
     // Module containing the Curve Manager routines
 
@@ -113,16 +126,6 @@ namespace CurveManager {
     std::map<std::string, Btwxt::Method>  BtwxtManager::extrapMethods =                                 // NOLINT(cert-err58-cpp)
             {{"Linear", Btwxt::Method::LINEAR}, {"Constant", Btwxt::Method::CONSTANT}};
 
-    int NumCurves(0);              // Autodesk Was used unintialized in InitCurveReporting
-    bool GetCurvesInputFlag(true); // First time, input is "gotten"
-
-    // Object Data
-    Array1D<PerformanceCurveData> PerfCurve;
-    BtwxtManager btwxtManager;
-    std::unordered_map<std::string, std::string> UniqueCurveNames;
-    bool CurveValueMyBeginTimeStepFlag;
-    bool FrictionFactorErrorHasOccurred = false;
-
     // Functions
     void BtwxtMessageCallback(
         const Btwxt::MsgLevel messageType,
@@ -146,19 +149,6 @@ namespace CurveManager {
         }
     }
 
-    // Clears the global data in CurveManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        NumCurves = 0;
-        GetCurvesInputFlag = true;
-        UniqueCurveNames.clear();
-        PerfCurve.deallocate();
-        btwxtManager.clear();
-        CurveValueMyBeginTimeStepFlag = true;  // uhh, this static wasn't initialized inside the CurveValue function
-        FrictionFactorErrorHasOccurred = false;
-    }
-
     void ResetPerformanceCurveOutput()
     {
         // SUBROUTINE INFORMATION:
@@ -172,13 +162,13 @@ namespace CurveManager {
 
         using DataLoopNode::SensedNodeFlagValue;
 
-        for (int CurveIndex = 1; CurveIndex <= NumCurves; ++CurveIndex) {
-            PerfCurve(CurveIndex).CurveOutput = SensedNodeFlagValue;
-            PerfCurve(CurveIndex).CurveInput1 = SensedNodeFlagValue;
-            PerfCurve(CurveIndex).CurveInput2 = SensedNodeFlagValue;
-            PerfCurve(CurveIndex).CurveInput3 = SensedNodeFlagValue;
-            PerfCurve(CurveIndex).CurveInput4 = SensedNodeFlagValue;
-            PerfCurve(CurveIndex).CurveInput5 = SensedNodeFlagValue;
+        for (int CurveIndex = 1; CurveIndex <= dataCurveManager.NumCurves; ++CurveIndex) {
+            dataCurveManager.PerfCurve(CurveIndex).CurveOutput = SensedNodeFlagValue;
+            dataCurveManager.PerfCurve(CurveIndex).CurveInput1 = SensedNodeFlagValue;
+            dataCurveManager.PerfCurve(CurveIndex).CurveInput2 = SensedNodeFlagValue;
+            dataCurveManager.PerfCurve(CurveIndex).CurveInput3 = SensedNodeFlagValue;
+            dataCurveManager.PerfCurve(CurveIndex).CurveInput4 = SensedNodeFlagValue;
+            dataCurveManager.PerfCurve(CurveIndex).CurveInput5 = SensedNodeFlagValue;
         }
     }
 
@@ -209,21 +199,21 @@ namespace CurveManager {
 
         // need to be careful on where and how resetting curve outputs to some "iactive value" is done
         // EMS can intercept curves and modify output
-        if (BeginEnvrnFlag && CurveValueMyBeginTimeStepFlag) {
+        if (BeginEnvrnFlag && dataCurveManager.CurveValueMyBeginTimeStepFlag) {
             ResetPerformanceCurveOutput();
-            CurveValueMyBeginTimeStepFlag = false;
+            dataCurveManager.CurveValueMyBeginTimeStepFlag = false;
         }
 
         if (!BeginEnvrnFlag) {
-            CurveValueMyBeginTimeStepFlag = true;
+            dataCurveManager.CurveValueMyBeginTimeStepFlag = true;
         }
 
-        if ((CurveIndex <= 0) || (CurveIndex > NumCurves)) {
+        if ((CurveIndex <= 0) || (CurveIndex > dataCurveManager.NumCurves)) {
             ShowFatalError("CurveValue: Invalid curve passed.");
         }
 
         {
-            auto const SELECT_CASE_var(PerfCurve(CurveIndex).InterpolationType);
+            auto const SELECT_CASE_var(dataCurveManager.PerfCurve(CurveIndex).InterpolationType);
             if (SELECT_CASE_var == InterpTypeEnum::EvaluateCurveToLimits) {
                 CurveValue = PerformanceCurveObject(CurveIndex, Var1, Var2, Var3);
             } else if (SELECT_CASE_var == InterpTypeEnum::BtwxtMethod) {
@@ -233,15 +223,15 @@ namespace CurveManager {
             }
         }
 
-        if (PerfCurve(CurveIndex).EMSOverrideOn) CurveValue = PerfCurve(CurveIndex).EMSOverrideCurveValue;
+        if (dataCurveManager.PerfCurve(CurveIndex).EMSOverrideOn) CurveValue = dataCurveManager.PerfCurve(CurveIndex).EMSOverrideCurveValue;
 
-        PerfCurve(CurveIndex).CurveOutput = CurveValue;
-        PerfCurve(CurveIndex).CurveInput1 = Var1;
-        if (present(Var2)) PerfCurve(CurveIndex).CurveInput2 = Var2;
-        if (present(Var3)) PerfCurve(CurveIndex).CurveInput3 = Var3;
-        if (present(Var4)) PerfCurve(CurveIndex).CurveInput4 = Var4;
-        if (present(Var5)) PerfCurve(CurveIndex).CurveInput5 = Var5;
-        if (present(Var6)) PerfCurve(CurveIndex).CurveInput6 = Var6;
+        dataCurveManager.PerfCurve(CurveIndex).CurveOutput = CurveValue;
+        dataCurveManager.PerfCurve(CurveIndex).CurveInput1 = Var1;
+        if (present(Var2)) dataCurveManager.PerfCurve(CurveIndex).CurveInput2 = Var2;
+        if (present(Var3)) dataCurveManager.PerfCurve(CurveIndex).CurveInput3 = Var3;
+        if (present(Var4)) dataCurveManager.PerfCurve(CurveIndex).CurveInput4 = Var4;
+        if (present(Var5)) dataCurveManager.PerfCurve(CurveIndex).CurveInput5 = Var5;
+        if (present(Var6)) dataCurveManager.PerfCurve(CurveIndex).CurveInput6 = Var6;
 
         return CurveValue;
     }
@@ -252,7 +242,7 @@ namespace CurveManager {
         bool GetInputErrorsFound = false;
 
         GetCurveInputData(GetInputErrorsFound);
-        GetCurvesInputFlag = false;
+        dataCurveManager.GetCurvesInputFlag = false;
 
         if (GetInputErrorsFound) {
             ShowFatalError("GetCurveInput: Errors found in getting Curve Objects.  Preceding condition(s) cause termination.");
@@ -347,13 +337,13 @@ namespace CurveManager {
 
         NumWPCValTab = inputProcessor->getNumObjectsFound("AirflowNetwork:MultiZone:WindPressureCoefficientValues");
 
-        NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
+        dataCurveManager.NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
                     NumTableLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
                     NumExpDecay + NumDoubleExpDecay + NumQLinear + NumChillerPartLoadWithLift + NumWPCValTab;
 
         // allocate the data structure
-        PerfCurve.allocate(NumCurves);
-        UniqueCurveNames.reserve(NumCurves);
+        dataCurveManager.PerfCurve.allocate(dataCurveManager.NumCurves);
+        dataCurveManager.UniqueCurveNames.reserve(dataCurveManager.NumCurves);
         // initialize the array
 
         CurveNum = 0;
@@ -371,32 +361,32 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
 
             // could add checks for blank numeric fields, and use field names for errors.
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 2;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            PerfCurve(CurveNum).Coeff6 = Numbers(6);
-            PerfCurve(CurveNum).Var1Min = Numbers(7);
-            PerfCurve(CurveNum).Var1Max = Numbers(8);
-            PerfCurve(CurveNum).Var2Min = Numbers(9);
-            PerfCurve(CurveNum).Var2Max = Numbers(10);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 2;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Coeff6 = Numbers(6);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(7);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(8);
+            dataCurveManager.PerfCurve(CurveNum).Var2Min = Numbers(9);
+            dataCurveManager.PerfCurve(CurveNum).Var2Max = Numbers(10);
             if (NumNumbers > 10 && !lNumericFieldBlanks(11)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(11);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(11);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 11 && !lNumericFieldBlanks(12)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(12);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(12);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(7) > Numbers(8)) { // error
@@ -442,42 +432,42 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
 
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::ChillerPartLoadWithLift;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 3;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::ChillerPartLoadWithLift;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 3;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
 
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            PerfCurve(CurveNum).Coeff6 = Numbers(6);
-            PerfCurve(CurveNum).Coeff7 = Numbers(7);
-            PerfCurve(CurveNum).Coeff8 = Numbers(8);
-            PerfCurve(CurveNum).Coeff9 = Numbers(9);
-            PerfCurve(CurveNum).Coeff10 = Numbers(10);
-            PerfCurve(CurveNum).Coeff11 = Numbers(11);
-            PerfCurve(CurveNum).Coeff12 = Numbers(12);
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Coeff6 = Numbers(6);
+            dataCurveManager.PerfCurve(CurveNum).Coeff7 = Numbers(7);
+            dataCurveManager.PerfCurve(CurveNum).Coeff8 = Numbers(8);
+            dataCurveManager.PerfCurve(CurveNum).Coeff9 = Numbers(9);
+            dataCurveManager.PerfCurve(CurveNum).Coeff10 = Numbers(10);
+            dataCurveManager.PerfCurve(CurveNum).Coeff11 = Numbers(11);
+            dataCurveManager.PerfCurve(CurveNum).Coeff12 = Numbers(12);
 
-            PerfCurve(CurveNum).Var1Min = Numbers(13);
-            PerfCurve(CurveNum).Var1Max = Numbers(14);
-            PerfCurve(CurveNum).Var2Min = Numbers(15);
-            PerfCurve(CurveNum).Var2Max = Numbers(16);
-            PerfCurve(CurveNum).Var3Min = Numbers(17);
-            PerfCurve(CurveNum).Var3Max = Numbers(18);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(13);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(14);
+            dataCurveManager.PerfCurve(CurveNum).Var2Min = Numbers(15);
+            dataCurveManager.PerfCurve(CurveNum).Var2Max = Numbers(16);
+            dataCurveManager.PerfCurve(CurveNum).Var3Min = Numbers(17);
+            dataCurveManager.PerfCurve(CurveNum).Var3Max = Numbers(18);
 
             if (NumNumbers > 18 && !lNumericFieldBlanks(19)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(19);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(19);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 19 && !lNumericFieldBlanks(20)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(20);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(20);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (NumAlphas >= 2) {
@@ -517,25 +507,25 @@ namespace CurveManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             ++CurveNum;
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            PerfCurve(CurveNum).Var1Min = Numbers(5);
-            PerfCurve(CurveNum).Var1Max = Numbers(6);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(6);
             if (NumNumbers > 6 && !lNumericFieldBlanks(7)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(7);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(7);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 7 && !lNumericFieldBlanks(8)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(8);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(8);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(5) > Numbers(6)) { // error
@@ -570,27 +560,27 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quartic;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            PerfCurve(CurveNum).Var1Min = Numbers(6);
-            PerfCurve(CurveNum).Var1Max = Numbers(7);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quartic;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(6);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(7);
             if (NumNumbers > 7 && !lNumericFieldBlanks(8)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(8);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(8);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 8 && !lNumericFieldBlanks(9)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(9);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(9);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(6) > Numbers(7)) { // error
@@ -625,25 +615,25 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Var1Min = Numbers(4);
-            PerfCurve(CurveNum).Var1Max = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(5);
             if (NumNumbers > 5 && !lNumericFieldBlanks(6)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(6);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(6);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 6 && !lNumericFieldBlanks(7)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(7);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(7);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(4) > Numbers(5)) { // error
@@ -678,30 +668,30 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadraticLinear;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 2;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            PerfCurve(CurveNum).Coeff6 = Numbers(6);
-            PerfCurve(CurveNum).Var1Min = Numbers(7);
-            PerfCurve(CurveNum).Var1Max = Numbers(8);
-            PerfCurve(CurveNum).Var2Min = Numbers(9);
-            PerfCurve(CurveNum).Var2Max = Numbers(10);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadraticLinear;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 2;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Coeff6 = Numbers(6);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(7);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(8);
+            dataCurveManager.PerfCurve(CurveNum).Var2Min = Numbers(9);
+            dataCurveManager.PerfCurve(CurveNum).Var2Max = Numbers(10);
             if (NumNumbers > 10 && !lNumericFieldBlanks(11)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(11);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(11);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 11 && !lNumericFieldBlanks(12)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(12);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(12);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(7) > Numbers(8)) { // error
@@ -747,30 +737,30 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::CubicLinear;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 2;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            PerfCurve(CurveNum).Coeff6 = Numbers(6);
-            PerfCurve(CurveNum).Var1Min = Numbers(7);
-            PerfCurve(CurveNum).Var1Max = Numbers(8);
-            PerfCurve(CurveNum).Var2Min = Numbers(9);
-            PerfCurve(CurveNum).Var2Max = Numbers(10);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::CubicLinear;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 2;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Coeff6 = Numbers(6);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(7);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(8);
+            dataCurveManager.PerfCurve(CurveNum).Var2Min = Numbers(9);
+            dataCurveManager.PerfCurve(CurveNum).Var2Max = Numbers(10);
             if (NumNumbers > 10 && !lNumericFieldBlanks(11)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(11);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(11);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 11 && !lNumericFieldBlanks(12)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(12);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(12);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(7) > Numbers(8)) { // error
@@ -816,24 +806,24 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::Linear;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Var1Min = Numbers(3);
-            PerfCurve(CurveNum).Var1Max = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::Linear;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(4);
             if (NumNumbers > 4 && !lNumericFieldBlanks(5)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(5);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(5);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 5 && !lNumericFieldBlanks(6)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(6);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(6);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(3) > Numbers(4)) { // error
@@ -868,34 +858,34 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiCubic;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 2;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            PerfCurve(CurveNum).Coeff6 = Numbers(6);
-            PerfCurve(CurveNum).Coeff7 = Numbers(7);
-            PerfCurve(CurveNum).Coeff8 = Numbers(8);
-            PerfCurve(CurveNum).Coeff9 = Numbers(9);
-            PerfCurve(CurveNum).Coeff10 = Numbers(10);
-            PerfCurve(CurveNum).Var1Min = Numbers(11);
-            PerfCurve(CurveNum).Var1Max = Numbers(12);
-            PerfCurve(CurveNum).Var2Min = Numbers(13);
-            PerfCurve(CurveNum).Var2Max = Numbers(14);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiCubic;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 2;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Coeff6 = Numbers(6);
+            dataCurveManager.PerfCurve(CurveNum).Coeff7 = Numbers(7);
+            dataCurveManager.PerfCurve(CurveNum).Coeff8 = Numbers(8);
+            dataCurveManager.PerfCurve(CurveNum).Coeff9 = Numbers(9);
+            dataCurveManager.PerfCurve(CurveNum).Coeff10 = Numbers(10);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(11);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(12);
+            dataCurveManager.PerfCurve(CurveNum).Var2Min = Numbers(13);
+            dataCurveManager.PerfCurve(CurveNum).Var2Max = Numbers(14);
             if (NumNumbers > 14 && !lNumericFieldBlanks(15)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(15);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(15);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 15 && !lNumericFieldBlanks(16)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(16);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(16);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(11) > Numbers(12)) { // error
@@ -941,15 +931,15 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::TriQuadratic;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 3;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Tri2ndOrder.allocate(1);
-            for (auto &e : PerfCurve(CurveNum).Tri2ndOrder) {
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::TriQuadratic;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 3;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Tri2ndOrder.allocate(1);
+            for (auto &e : dataCurveManager.PerfCurve(CurveNum).Tri2ndOrder) {
                 e.CoeffA0 = Numbers(1);
                 e.CoeffA1 = Numbers(2);
                 e.CoeffA2 = Numbers(3);
@@ -978,19 +968,19 @@ namespace CurveManager {
                 e.CoeffA25 = Numbers(26);
                 e.CoeffA26 = Numbers(27);
             }
-            PerfCurve(CurveNum).Var1Min = Numbers(28);
-            PerfCurve(CurveNum).Var1Max = Numbers(29);
-            PerfCurve(CurveNum).Var2Min = Numbers(30);
-            PerfCurve(CurveNum).Var2Max = Numbers(31);
-            PerfCurve(CurveNum).Var3Min = Numbers(32);
-            PerfCurve(CurveNum).Var3Max = Numbers(33);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(28);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(29);
+            dataCurveManager.PerfCurve(CurveNum).Var2Min = Numbers(30);
+            dataCurveManager.PerfCurve(CurveNum).Var2Max = Numbers(31);
+            dataCurveManager.PerfCurve(CurveNum).Var3Min = Numbers(32);
+            dataCurveManager.PerfCurve(CurveNum).Var3Max = Numbers(33);
             if (NumNumbers > 33 && !lNumericFieldBlanks(34)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(34);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(34);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 34 && !lNumericFieldBlanks(35)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(35);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(35);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(28) > Numbers(29)) { // error
@@ -1047,34 +1037,34 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadLinear;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 4;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            PerfCurve(CurveNum).Var1Min = Numbers(6);
-            PerfCurve(CurveNum).Var1Max = Numbers(7);
-            PerfCurve(CurveNum).Var2Min = Numbers(8);
-            PerfCurve(CurveNum).Var2Max = Numbers(9);
-            PerfCurve(CurveNum).Var3Min = Numbers(10);
-            PerfCurve(CurveNum).Var3Max = Numbers(11);
-            PerfCurve(CurveNum).Var4Min = Numbers(12);
-            PerfCurve(CurveNum).Var4Max = Numbers(13);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadLinear;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 4;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(6);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(7);
+            dataCurveManager.PerfCurve(CurveNum).Var2Min = Numbers(8);
+            dataCurveManager.PerfCurve(CurveNum).Var2Max = Numbers(9);
+            dataCurveManager.PerfCurve(CurveNum).Var3Min = Numbers(10);
+            dataCurveManager.PerfCurve(CurveNum).Var3Max = Numbers(11);
+            dataCurveManager.PerfCurve(CurveNum).Var4Min = Numbers(12);
+            dataCurveManager.PerfCurve(CurveNum).Var4Max = Numbers(13);
 
             if (NumNumbers > 13 && !lNumericFieldBlanks(14)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(14);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(14);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 14 && !lNumericFieldBlanks(15)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(15);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(15);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(6) > Numbers(7)) { // error
@@ -1142,25 +1132,25 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::Exponent;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Var1Min = Numbers(4);
-            PerfCurve(CurveNum).Var1Max = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::Exponent;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(5);
             if (NumNumbers > 5 && !lNumericFieldBlanks(6)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(6);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(6);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 6 && !lNumericFieldBlanks(7)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(7);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(7);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
@@ -1188,29 +1178,29 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::FanPressureRise;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 2;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            PerfCurve(CurveNum).Var1Min = Numbers(5);
-            PerfCurve(CurveNum).Var1Max = Numbers(6);
-            PerfCurve(CurveNum).Var2Min = Numbers(7);
-            PerfCurve(CurveNum).Var2Max = Numbers(8);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::FanPressureRise;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 2;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(6);
+            dataCurveManager.PerfCurve(CurveNum).Var2Min = Numbers(7);
+            dataCurveManager.PerfCurve(CurveNum).Var2Max = Numbers(8);
 
             if (NumNumbers > 8 && !lNumericFieldBlanks(9)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(9);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(9);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 9 && !lNumericFieldBlanks(10)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(10);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(10);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(5) > Numbers(6)) { // error
@@ -1242,27 +1232,27 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialSkewNormal;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            PerfCurve(CurveNum).Var1Min = Numbers(5);
-            PerfCurve(CurveNum).Var1Max = Numbers(6);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialSkewNormal;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(6);
 
             if (NumNumbers > 6 && !lNumericFieldBlanks(7)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(7);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(7);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 7 && !lNumericFieldBlanks(8)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(8);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(8);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(5) > Numbers(6)) { // error
@@ -1298,28 +1288,28 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::Sigmoid;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            PerfCurve(CurveNum).Var1Min = Numbers(6);
-            PerfCurve(CurveNum).Var1Max = Numbers(7);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::Sigmoid;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(6);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(7);
 
             if (NumNumbers > 7 && !lNumericFieldBlanks(8)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(8);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(8);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 8 && !lNumericFieldBlanks(9)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(9);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(9);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(6) > Numbers(7)) { // error
@@ -1355,26 +1345,26 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola1;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Var1Min = Numbers(4);
-            PerfCurve(CurveNum).Var1Max = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola1;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(5);
 
             if (NumNumbers > 5 && !lNumericFieldBlanks(6)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(6);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(6);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 6 && !lNumericFieldBlanks(7)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(7);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(7);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(4) > Numbers(5)) { // error
@@ -1410,26 +1400,26 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola2;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Var1Min = Numbers(4);
-            PerfCurve(CurveNum).Var1Max = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola2;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(5);
 
             if (NumNumbers > 5 && !lNumericFieldBlanks(6)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(6);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(6);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 6 && !lNumericFieldBlanks(7)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(7);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(7);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(4) > Numbers(5)) { // error
@@ -1465,26 +1455,26 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialDecay;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Var1Min = Numbers(4);
-            PerfCurve(CurveNum).Var1Max = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialDecay;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(5);
 
             if (NumNumbers > 5 && !lNumericFieldBlanks(6)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(6);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(6);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 6 && !lNumericFieldBlanks(7)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(7);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(7);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (Numbers(4) > Numbers(5)) { // error
@@ -1520,28 +1510,28 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
-            PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CurveTypeEnum::DoubleExponentialDecay;
-            PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-            PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-            PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            PerfCurve(CurveNum).Var1Min = Numbers(6);
-            PerfCurve(CurveNum).Var1Max = Numbers(7);
+            dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+            dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::DoubleExponentialDecay;
+            dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
+            dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            dataCurveManager.PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            dataCurveManager.PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            dataCurveManager.PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            dataCurveManager.PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            dataCurveManager.PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            dataCurveManager.PerfCurve(CurveNum).Var1Min = Numbers(6);
+            dataCurveManager.PerfCurve(CurveNum).Var1Max = Numbers(7);
 
             if (NumNumbers > 7 && !lNumericFieldBlanks(8)) {
-                PerfCurve(CurveNum).CurveMin = Numbers(8);
-                PerfCurve(CurveNum).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMin = Numbers(8);
+                dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
             }
             if (NumNumbers > 8 && !lNumericFieldBlanks(9)) {
-                PerfCurve(CurveNum).CurveMax = Numbers(9);
-                PerfCurve(CurveNum).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveNum).CurveMax = Numbers(9);
+                dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
             if (NumAlphas >= 2) {
@@ -1624,7 +1614,7 @@ namespace CurveManager {
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
                     ++CurveNum;
-                    GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                    GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
                     // Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
                     if (!UtilityRoutines::SameString(Alphas(2), wpcName)) {
@@ -1634,25 +1624,25 @@ namespace CurveManager {
                         ErrorsFound = true;
                     }
 
-                    PerfCurve(CurveNum).Name = Alphas(1);
-                    PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
-                    PerfCurve(CurveNum).NumDims = 1;
+                    dataCurveManager.PerfCurve(CurveNum).Name = Alphas(1);
+                    dataCurveManager.PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+                    dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
 
-                    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
+                    dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
 
                     std::string contextString = CurrentModuleObject + " \"" + Alphas(1) + "\"";
                     Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &contextString);
 
-                    PerfCurve(CurveNum).Var1Min = 0.0;
-                    PerfCurve(CurveNum).Var1MinPresent = true;
-                    PerfCurve(CurveNum).Var1Max = 360.0;
-                    PerfCurve(CurveNum).Var1MaxPresent = true;
+                    dataCurveManager.PerfCurve(CurveNum).Var1Min = 0.0;
+                    dataCurveManager.PerfCurve(CurveNum).Var1MinPresent = true;
+                    dataCurveManager.PerfCurve(CurveNum).Var1Max = 360.0;
+                    dataCurveManager.PerfCurve(CurveNum).Var1MaxPresent = true;
 
-                    PerfCurve(CurveNum).CurveMin = -1.0;
-                    PerfCurve(CurveNum).CurveMinPresent = true;
+                    dataCurveManager.PerfCurve(CurveNum).CurveMin = -1.0;
+                    dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
 
-                    PerfCurve(CurveNum).CurveMax = 1.0;
-                    PerfCurve(CurveNum).CurveMaxPresent = true;
+                    dataCurveManager.PerfCurve(CurveNum).CurveMax = 1.0;
+                    dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
 
                     MaxTableNums = NumNumbers;
                     if (NumNumbers != numWindDir) {
@@ -1677,9 +1667,9 @@ namespace CurveManager {
                         std::vector<Btwxt::GridAxis> gridAxes;
                         gridAxes.emplace_back(axis, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double> {0.0, 360.0});
 
-                        auto gridIndex = btwxtManager.addGrid(Alphas(1), Btwxt::GriddedData(gridAxes));
-                        PerfCurve(CurveNum).TableIndex = gridIndex;
-                        PerfCurve(CurveNum).GridValueIndex = btwxtManager.addOutputValues(gridIndex, lookupValues);
+                        auto gridIndex = dataCurveManager.btwxtManager.addGrid(Alphas(1), Btwxt::GriddedData(gridAxes));
+                        dataCurveManager.PerfCurve(CurveNum).TableIndex = gridIndex;
+                        dataCurveManager.PerfCurve(CurveNum).GridValueIndex = dataCurveManager.btwxtManager.addOutputValues(gridIndex, lookupValues);
                     }
                 }
             }
@@ -1694,7 +1684,7 @@ namespace CurveManager {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed("Table:IndependentVariable", thisObjectName);
-                btwxtManager.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName),fields);
+                dataCurveManager.btwxtManager.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName),fields);
             }
         }
 
@@ -1721,9 +1711,9 @@ namespace CurveManager {
                     Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
 
                     // Find independent variable input data
-                    if (btwxtManager.independentVarRefs.count(indVarName)) {
+                    if (dataCurveManager.btwxtManager.independentVarRefs.count(indVarName)) {
                         // If found, read data
-                        auto const &indVarInstance = btwxtManager.independentVarRefs.at(indVarName);
+                        auto const &indVarInstance = dataCurveManager.btwxtManager.independentVarRefs.at(indVarName);
 
                         // TODO: Actually use this to define output variable units
                         if (indVarInstance.count("unit_type")) {
@@ -1749,11 +1739,11 @@ namespace CurveManager {
                             std::size_t colNum = indVarInstance.at("external_file_column_number").get<std::size_t>() - 1;
                             std::size_t rowNum = indVarInstance.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
-                            if (!btwxtManager.tableFiles.count(filePath)) {
-                                btwxtManager.tableFiles.emplace(filePath, TableFile{IOFiles::getSingleton(), filePath});
+                            if (!dataCurveManager.btwxtManager.tableFiles.count(filePath)) {
+                                dataCurveManager.btwxtManager.tableFiles.emplace(filePath, TableFile{IOFiles::getSingleton(), filePath});
                             }
 
-                            axis = btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
+                            axis = dataCurveManager.btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
 
                             // remove NANs
                             axis.erase(std::remove_if(axis.begin(), axis.end(), [](const double &x){return std::isnan(x);}), axis.end());
@@ -1775,7 +1765,7 @@ namespace CurveManager {
 
                         Btwxt::Method interpMethod, extrapMethod;
                         if (indVarInstance.count("interpolation_method")){
-                            interpMethod = BtwxtManager::interpMethods.at(indVarInstance.at("interpolation_method"));
+                            interpMethod = CurveManager::BtwxtManager::interpMethods.at(indVarInstance.at("interpolation_method"));
                         } else {
                             interpMethod = Btwxt::Method::CUBIC;
                         }
@@ -1785,7 +1775,7 @@ namespace CurveManager {
                                 ShowSevereError(contextString + ": Extrapolation method \"Unavailable\" is not yet available.");
                                 ErrorsFound = true;
                             }
-                            extrapMethod = BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method"));
+                            extrapMethod = CurveManager::BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method"));
                         } else {
                             extrapMethod = Btwxt::Method::LINEAR;
                         }
@@ -1830,8 +1820,8 @@ namespace CurveManager {
                     }
 
                 }
-                // Add grid to btwxtManager
-                btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
+                // Add grid to dataCurveManager.btwxtManager
+                dataCurveManager.btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
             }
         }
 
@@ -1844,14 +1834,14 @@ namespace CurveManager {
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed("Table:Lookup", thisObjectName);
                 ++CurveNum;
-                PerfCurve(CurveNum).Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
-                PerfCurve(CurveNum).ObjectType = "Table:Lookup";
-                PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
+                dataCurveManager.PerfCurve(CurveNum).Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                dataCurveManager.PerfCurve(CurveNum).ObjectType = "Table:Lookup";
+                dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
 
                 std::string
                     indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name"));
 
-                std::string contextString = "Table:Lookup \"" + PerfCurve(CurveNum).Name + "\"";
+                std::string contextString = "Table:Lookup \"" + dataCurveManager.PerfCurve(CurveNum).Name + "\"";
                 Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
 
                 // TODO: Actually use this to define output variable units
@@ -1862,49 +1852,49 @@ namespace CurveManager {
                     }
                 }
 
-                int gridIndex = btwxtManager.getGridIndex(indVarListName, ErrorsFound);
-                PerfCurve(CurveNum).TableIndex = gridIndex;
-                int numDims = btwxtManager.getNumGridDims(gridIndex);
-                PerfCurve(CurveNum).NumDims = numDims;
+                int gridIndex = dataCurveManager.btwxtManager.getGridIndex(indVarListName, ErrorsFound);
+                dataCurveManager.PerfCurve(CurveNum).TableIndex = gridIndex;
+                int numDims = dataCurveManager.btwxtManager.getNumGridDims(gridIndex);
+                dataCurveManager.PerfCurve(CurveNum).NumDims = numDims;
 
                 for (int i = 1; i <= std::min(6, numDims); ++i) {
                     double vMin, vMax;
                     std::tie(vMin, vMax) = varListLimits.at(indVarListName)[i - 1];
                     if (i==1) {
-                        PerfCurve(CurveNum).Var1Min = vMin;
-                        PerfCurve(CurveNum).Var1Max = vMax;
+                        dataCurveManager.PerfCurve(CurveNum).Var1Min = vMin;
+                        dataCurveManager.PerfCurve(CurveNum).Var1Max = vMax;
                     } else if (i==2) {
-                        PerfCurve(CurveNum).Var2Min = vMin;
-                        PerfCurve(CurveNum).Var2Max = vMax;
+                        dataCurveManager.PerfCurve(CurveNum).Var2Min = vMin;
+                        dataCurveManager.PerfCurve(CurveNum).Var2Max = vMax;
                     } else if (i==3) {
-                        PerfCurve(CurveNum).Var3Min = vMin;
-                        PerfCurve(CurveNum).Var3Max = vMax;
+                        dataCurveManager.PerfCurve(CurveNum).Var3Min = vMin;
+                        dataCurveManager.PerfCurve(CurveNum).Var3Max = vMax;
                     } else if (i==4) {
-                        PerfCurve(CurveNum).Var4Min = vMin;
-                        PerfCurve(CurveNum).Var4Max = vMax;
+                        dataCurveManager.PerfCurve(CurveNum).Var4Min = vMin;
+                        dataCurveManager.PerfCurve(CurveNum).Var4Max = vMax;
                     } else if (i==5) {
-                        PerfCurve(CurveNum).Var5Min = vMin;
-                        PerfCurve(CurveNum).Var5Max = vMax;
+                        dataCurveManager.PerfCurve(CurveNum).Var5Min = vMin;
+                        dataCurveManager.PerfCurve(CurveNum).Var5Max = vMax;
                     } else if (i==6) {
-                        PerfCurve(CurveNum).Var6Min = vMin;
-                        PerfCurve(CurveNum).Var6Max = vMax;
+                        dataCurveManager.PerfCurve(CurveNum).Var6Min = vMin;
+                        dataCurveManager.PerfCurve(CurveNum).Var6Max = vMax;
                     }
                 }
 
                 if (fields.count("minimum_output")) {
-                    PerfCurve(CurveNum).CurveMin = fields.at("minimum_output");
-                    PerfCurve(CurveNum).CurveMinPresent = true;
+                    dataCurveManager.PerfCurve(CurveNum).CurveMin = fields.at("minimum_output");
+                    dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = true;
                 } else {
-                    PerfCurve(CurveNum).CurveMin = -DBL_MAX;
-                    PerfCurve(CurveNum).CurveMinPresent = false;
+                    dataCurveManager.PerfCurve(CurveNum).CurveMin = -DBL_MAX;
+                    dataCurveManager.PerfCurve(CurveNum).CurveMinPresent = false;
                 }
 
                 if (fields.count("maximum_output")) {
-                    PerfCurve(CurveNum).CurveMax = fields.at("maximum_output");
-                    PerfCurve(CurveNum).CurveMaxPresent = true;
+                    dataCurveManager.PerfCurve(CurveNum).CurveMax = fields.at("maximum_output");
+                    dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = true;
                 } else {
-                    PerfCurve(CurveNum).CurveMax = DBL_MAX;
-                    PerfCurve(CurveNum).CurveMaxPresent = false;
+                    dataCurveManager.PerfCurve(CurveNum).CurveMax = DBL_MAX;
+                    dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent = false;
                 }
 
                 // Normalize data
@@ -1939,11 +1929,11 @@ namespace CurveManager {
                     std::size_t colNum = fields.at("external_file_column_number").get<std::size_t>() - 1;
                     std::size_t rowNum = fields.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
-                    if (!btwxtManager.tableFiles.count(filePath)) {
-                        btwxtManager.tableFiles.emplace(filePath, TableFile{IOFiles::getSingleton(), filePath});
+                    if (!dataCurveManager.btwxtManager.tableFiles.count(filePath)) {
+                        dataCurveManager.btwxtManager.tableFiles.emplace(filePath, TableFile{IOFiles::getSingleton(), filePath});
                     }
 
-                    lookupValues = btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
+                    lookupValues = dataCurveManager.btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
 
                     // remove NANs
                     lookupValues.erase(std::remove_if(lookupValues.begin(), lookupValues.end(),  [](const double &x){return std::isnan(x);}), lookupValues.end());
@@ -1957,7 +1947,7 @@ namespace CurveManager {
                     ErrorsFound = true;
                 }
 
-                PerfCurve(CurveNum).GridValueIndex = btwxtManager.addOutputValues(gridIndex, lookupValues);
+                dataCurveManager.PerfCurve(CurveNum).GridValueIndex = dataCurveManager.btwxtManager.addOutputValues(gridIndex, lookupValues);
 
                 if (normalizeMethod == NM_AUTO_WITH_DIVISOR) {
                     auto const normalizeTarget = varListNormalizeTargets.at(indVarListName);
@@ -1982,21 +1972,21 @@ namespace CurveManager {
                     } else if (pointsSpecified) {
                         // normalizeGridValues normalizes curve values to 1.0 at the normalization target, and returns the scalar needed to perform this normalization.
                         // The result is multiplied by the input normalizationDivisor again for the AutomaticWithDivisor case, in which normalizeGridValues returns a compound scalar.
-                        normalizationDivisor = btwxtManager.normalizeGridValues(gridIndex, PerfCurve(CurveNum).GridValueIndex, normalizeTarget, normalizationDivisor)*normalizationDivisor;
+                        normalizationDivisor = dataCurveManager.btwxtManager.normalizeGridValues(gridIndex, dataCurveManager.PerfCurve(CurveNum).GridValueIndex, normalizeTarget, normalizationDivisor)*normalizationDivisor;
                     }
                 }
 
                 if ((normalizeMethod == NM_DIVISOR_ONLY) || (normalizeMethod == NM_AUTO_WITH_DIVISOR)) {
-                    if (PerfCurve(CurveNum).CurveMaxPresent) {
-                        PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
+                    if (dataCurveManager.PerfCurve(CurveNum).CurveMaxPresent) {
+                        dataCurveManager.PerfCurve(CurveNum).CurveMax = dataCurveManager.PerfCurve(CurveNum).CurveMax / normalizationDivisor;
                     }
-                    if (PerfCurve(CurveNum).CurveMinPresent) {
-                        PerfCurve(CurveNum).CurveMin = PerfCurve(CurveNum).CurveMin / normalizationDivisor;
+                    if (dataCurveManager.PerfCurve(CurveNum).CurveMinPresent) {
+                        dataCurveManager.PerfCurve(CurveNum).CurveMin = dataCurveManager.PerfCurve(CurveNum).CurveMin / normalizationDivisor;
                     }
                 }
             }
         }
-        btwxtManager.tableFiles.clear();
+        dataCurveManager.btwxtManager.tableFiles.clear();
     }
 
     int BtwxtManager::getGridIndex(std::string &indVarListName, bool &ErrorsFound) {
@@ -2132,8 +2122,8 @@ namespace CurveManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CurveIndex;
 
-        for (CurveIndex = 1; CurveIndex <= NumCurves; ++CurveIndex) {
-            for (int dim = 1; dim <= PerfCurve(CurveIndex).NumDims; ++dim) {
+        for (CurveIndex = 1; CurveIndex <= dataCurveManager.NumCurves; ++CurveIndex) {
+            for (int dim = 1; dim <= dataCurveManager.PerfCurve(CurveIndex).NumDims; ++dim) {
                 std::string numStr = std::to_string(dim);
 
                 // TODO: Make CurveInput an Array for better looping here...
@@ -2141,50 +2131,50 @@ namespace CurveManager {
                 case 1:
                     SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
-                                        PerfCurve(CurveIndex).CurveInput1,
+                                        dataCurveManager.PerfCurve(CurveIndex).CurveInput1,
                                         "HVAC",
                                         "Average",
-                                        PerfCurve(CurveIndex).Name);
+                                        dataCurveManager.PerfCurve(CurveIndex).Name);
                     break;
                 case 2:
                     SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
-                                        PerfCurve(CurveIndex).CurveInput2,
+                                        dataCurveManager.PerfCurve(CurveIndex).CurveInput2,
                                         "HVAC",
                                         "Average",
-                                        PerfCurve(CurveIndex).Name);
+                                        dataCurveManager.PerfCurve(CurveIndex).Name);
                     break;
                 case 3:
                     SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
-                                        PerfCurve(CurveIndex).CurveInput3,
+                                        dataCurveManager.PerfCurve(CurveIndex).CurveInput3,
                                         "HVAC",
                                         "Average",
-                                        PerfCurve(CurveIndex).Name);
+                                        dataCurveManager.PerfCurve(CurveIndex).Name);
                     break;
                 case 4:
                     SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
-                                        PerfCurve(CurveIndex).CurveInput4,
+                                        dataCurveManager.PerfCurve(CurveIndex).CurveInput4,
                                         "HVAC",
                                         "Average",
-                                        PerfCurve(CurveIndex).Name);
+                                        dataCurveManager.PerfCurve(CurveIndex).Name);
                     break;
                 case 5:
                     SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
-                                        PerfCurve(CurveIndex).CurveInput5,
+                                        dataCurveManager.PerfCurve(CurveIndex).CurveInput5,
                                         "HVAC",
                                         "Average",
-                                        PerfCurve(CurveIndex).Name);
+                                        dataCurveManager.PerfCurve(CurveIndex).Name);
                     break;
                 case 6:
                     SetupOutputVariable("Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
-                                        PerfCurve(CurveIndex).CurveInput6,
+                                        dataCurveManager.PerfCurve(CurveIndex).CurveInput6,
                                         "HVAC",
                                         "Average",
-                                        PerfCurve(CurveIndex).Name);
+                                        dataCurveManager.PerfCurve(CurveIndex).Name);
                     break;
                 default:
                     // Warning?
@@ -2194,10 +2184,10 @@ namespace CurveManager {
             // set the output up last so it shows up after the input in the csv file
             SetupOutputVariable("Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
-                                PerfCurve(CurveIndex).CurveOutput,
+                                dataCurveManager.PerfCurve(CurveIndex).CurveOutput,
                                 "HVAC",
                                 "Average",
-                                PerfCurve(CurveIndex).Name);
+                                dataCurveManager.PerfCurve(CurveIndex).Name);
         }
 
         for (CurveIndex = 1; CurveIndex <= DataBranchAirLoopPlant::NumPressureCurves; ++CurveIndex) {
@@ -2228,13 +2218,13 @@ namespace CurveManager {
         }
 
         if (DataGlobals::AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
-            for (CurveIndex = 1; CurveIndex <= NumCurves; ++CurveIndex) {
+            for (CurveIndex = 1; CurveIndex <= dataCurveManager.NumCurves; ++CurveIndex) {
                 SetupEMSActuator("Curve",
-                                 PerfCurve(CurveIndex).Name,
+                                 dataCurveManager.PerfCurve(CurveIndex).Name,
                                  "Curve Result",
                                  "[unknown]",
-                                 PerfCurve(CurveIndex).EMSOverrideOn,
-                                 PerfCurve(CurveIndex).EMSOverrideCurveValue);
+                                 dataCurveManager.PerfCurve(CurveIndex).EMSOverrideOn,
+                                 dataCurveManager.PerfCurve(CurveIndex).EMSOverrideCurveValue);
             } // All performance curves
         }
         if (DataGlobals::AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
@@ -2282,7 +2272,7 @@ namespace CurveManager {
         Real64 CurveValueNumer; // Numerator in in exponential skew normal curve
         Real64 CurveValueDenom; // Numerator in in exponential skew normal curve
         Real64 CurveValueExp;   // Exponential term in sigmoid curve
-        auto const &Curve(PerfCurve(CurveIndex));
+        auto const &Curve(dataCurveManager.PerfCurve(CurveIndex));
 
         Real64 const V1(max(min(Var1, Curve.Var1Max), Curve.Var1Min));                        // 1st independent variable after limits imposed
         Real64 const V2(Var2.present() ? max(min(Var2, Curve.Var2Max), Curve.Var2Min) : 0.0); // 2nd independent variable after limits imposed
@@ -2378,40 +2368,40 @@ namespace CurveManager {
     {
       // TODO: Generalize for N-dims
       Real64 var = Var1;
-      var = max(min(var, PerfCurve(CurveIndex).Var1Max), PerfCurve(CurveIndex).Var1Min);
+      var = max(min(var, dataCurveManager.PerfCurve(CurveIndex).Var1Max), dataCurveManager.PerfCurve(CurveIndex).Var1Min);
       std::vector<double> target{var};
       if (present(Var2)) {
         var = Var2;
-        var = max(min(var, PerfCurve(CurveIndex).Var2Max), PerfCurve(CurveIndex).Var2Min);
+        var = max(min(var, dataCurveManager.PerfCurve(CurveIndex).Var2Max), dataCurveManager.PerfCurve(CurveIndex).Var2Min);
         target.push_back(var);
       }
       if (present(Var3)) {
         var = Var3;
-        var = max(min(var, PerfCurve(CurveIndex).Var3Max), PerfCurve(CurveIndex).Var3Min);
+        var = max(min(var, dataCurveManager.PerfCurve(CurveIndex).Var3Max), dataCurveManager.PerfCurve(CurveIndex).Var3Min);
         target.push_back(var);
       }
       if (present(Var4)) {
         var = Var4;
-        var = max(min(var, PerfCurve(CurveIndex).Var4Max), PerfCurve(CurveIndex).Var4Min);
+        var = max(min(var, dataCurveManager.PerfCurve(CurveIndex).Var4Max), dataCurveManager.PerfCurve(CurveIndex).Var4Min);
         target.push_back(var);
       }
       if (present(Var5)) {
         var = Var5;
-        var = max(min(var, PerfCurve(CurveIndex).Var5Max), PerfCurve(CurveIndex).Var5Min);
+        var = max(min(var, dataCurveManager.PerfCurve(CurveIndex).Var5Max), dataCurveManager.PerfCurve(CurveIndex).Var5Min);
         target.push_back(var);
       }
       if (present(Var6)) {
         var = Var6;
-        var = max(min(var, PerfCurve(CurveIndex).Var6Max), PerfCurve(CurveIndex).Var6Min);
+        var = max(min(var, dataCurveManager.PerfCurve(CurveIndex).Var6Max), dataCurveManager.PerfCurve(CurveIndex).Var6Min);
         target.push_back(var);
       }
 
-      std::string contextString = "Table:Lookup \"" + PerfCurve(CurveIndex).Name + "\"";
+      std::string contextString = "Table:Lookup \"" + dataCurveManager.PerfCurve(CurveIndex).Name + "\"";
       Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
-      Real64 TableValue = btwxtManager.getGridValue(PerfCurve(CurveIndex).TableIndex,PerfCurve(CurveIndex).GridValueIndex,target);
+      Real64 TableValue = dataCurveManager.btwxtManager.getGridValue(dataCurveManager.PerfCurve(CurveIndex).TableIndex,dataCurveManager.PerfCurve(CurveIndex).GridValueIndex,target);
 
-      if (PerfCurve(CurveIndex).CurveMinPresent) TableValue = max(TableValue, PerfCurve(CurveIndex).CurveMin);
-      if (PerfCurve(CurveIndex).CurveMaxPresent) TableValue = min(TableValue, PerfCurve(CurveIndex).CurveMax);
+      if (dataCurveManager.PerfCurve(CurveIndex).CurveMinPresent) TableValue = max(TableValue, dataCurveManager.PerfCurve(CurveIndex).CurveMin);
+      if (dataCurveManager.PerfCurve(CurveIndex).CurveMaxPresent) TableValue = min(TableValue, dataCurveManager.PerfCurve(CurveIndex).CurveMax);
 
       return TableValue;
     }
@@ -2496,7 +2486,7 @@ namespace CurveManager {
                         std::string curveFieldText)
     {
         // Returns true if errors found
-        int curveDim = PerfCurve(CurveIndex).NumDims;
+        int curveDim = dataCurveManager.PerfCurve(CurveIndex).NumDims;
         if (std::find(validDims.begin(),validDims.end(), curveDim) != validDims.end()) {
             // Compatible
             return false;
@@ -2510,7 +2500,7 @@ namespace CurveManager {
             }
             std::string plural1 = curveDim > 1 ? "s" : "";
             std::string plural2 = validDims[validDims.size()-1] > 1 ? "s" : "";
-            ShowContinueError("...Input curve=\"" + PerfCurve(CurveIndex).Name + "\" has " + std::to_string(curveDim) + " dimension" + plural1 + ".");
+            ShowContinueError("...Input curve=\"" + dataCurveManager.PerfCurve(CurveIndex).Name + "\" has " + std::to_string(curveDim) + " dimension" + plural1 + ".");
             ShowContinueError("...Curve type must have " + validString + " dimension" + plural2 + ".");
             return true;
         }
@@ -2532,7 +2522,7 @@ namespace CurveManager {
         std::string GetCurveName;
 
         if (CurveIndex > 0) {
-            GetCurveName = PerfCurve(CurveIndex).Name;
+            GetCurveName = dataCurveManager.PerfCurve(CurveIndex).Name;
         } else {
             GetCurveName = "";
         }
@@ -2558,14 +2548,14 @@ namespace CurveManager {
         int GetCurveIndex;
 
         // First time GetCurveIndex is called, get the input for all the performance curves
-        if (GetCurvesInputFlag) {
+        if (dataCurveManager.GetCurvesInputFlag) {
             GetCurveInput();
             GetPressureSystemInput();
-            GetCurvesInputFlag = false;
+            dataCurveManager.GetCurvesInputFlag = false;
         }
 
-        if (NumCurves > 0) {
-            GetCurveIndex = UtilityRoutines::FindItemInList(CurveName, PerfCurve);
+        if (dataCurveManager.NumCurves > 0) {
+            GetCurveIndex = UtilityRoutines::FindItemInList(CurveName, dataCurveManager.PerfCurve);
         } else {
             GetCurveIndex = 0;
         }
@@ -2623,12 +2613,12 @@ namespace CurveManager {
         // Given the curve index, returns the minimum and maximum values specified in the input
         // for the independent variables of the performance curve.
 
-        Var1Min = PerfCurve(CurveIndex).Var1Min;
-        Var1Max = PerfCurve(CurveIndex).Var1Max;
-        if (present(Var2Min)) Var2Min = PerfCurve(CurveIndex).Var2Min;
-        if (present(Var2Max)) Var2Max = PerfCurve(CurveIndex).Var2Max;
-        if (present(Var3Min)) Var3Min = PerfCurve(CurveIndex).Var3Min;
-        if (present(Var3Max)) Var3Max = PerfCurve(CurveIndex).Var3Max;
+        Var1Min = dataCurveManager.PerfCurve(CurveIndex).Var1Min;
+        Var1Max = dataCurveManager.PerfCurve(CurveIndex).Var1Max;
+        if (present(Var2Min)) Var2Min = dataCurveManager.PerfCurve(CurveIndex).Var2Min;
+        if (present(Var2Max)) Var2Max = dataCurveManager.PerfCurve(CurveIndex).Var2Max;
+        if (present(Var3Min)) Var3Min = dataCurveManager.PerfCurve(CurveIndex).Var3Min;
+        if (present(Var3Max)) Var3Max = dataCurveManager.PerfCurve(CurveIndex).Var3Max;
     }
 
     void SetCurveOutputMinMaxValues(int const CurveIndex,            // index of curve in curve array
@@ -2651,22 +2641,22 @@ namespace CurveManager {
         // Using/Aliasing
         using General::TrimSigDigits;
 
-        if (CurveIndex > 0 && CurveIndex <= NumCurves) {
+        if (CurveIndex > 0 && CurveIndex <= dataCurveManager.NumCurves) {
 
             if (present(CurveMin)) {
-                PerfCurve(CurveIndex).CurveMin = CurveMin;
-                PerfCurve(CurveIndex).CurveMinPresent = true;
+                dataCurveManager.PerfCurve(CurveIndex).CurveMin = CurveMin;
+                dataCurveManager.PerfCurve(CurveIndex).CurveMinPresent = true;
             }
 
             if (present(CurveMax)) {
-                PerfCurve(CurveIndex).CurveMax = CurveMax;
-                PerfCurve(CurveIndex).CurveMaxPresent = true;
+                dataCurveManager.PerfCurve(CurveIndex).CurveMax = CurveMax;
+                dataCurveManager.PerfCurve(CurveIndex).CurveMaxPresent = true;
             }
 
         } else {
 
             ShowSevereError("SetCurveOutputMinMaxValues: CurveIndex=[" + TrimSigDigits(CurveIndex) +
-                            "] not in range of curves=[1:" + TrimSigDigits(NumCurves) + "].");
+                            "] not in range of curves=[1:" + TrimSigDigits(dataCurveManager.NumCurves) + "].");
             ErrorsFound = true;
         }
     }
@@ -2716,7 +2706,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurveObjectName, cAlphaFieldNames(1), ErrsFound);
+            GlobalNames::VerifyUniqueInterObjectName(dataCurveManager.UniqueCurveNames, Alphas(1), CurveObjectName, cAlphaFieldNames(1), ErrsFound);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).Name = Alphas(1);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).EquivDiameter = Numbers(1);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).MinorLossCoeff = Numbers(2);
@@ -2769,10 +2759,10 @@ namespace CurveManager {
         std::string GenericCurveType;
 
         // If input is not gotten, go ahead and get it now
-        if (GetCurvesInputFlag) {
+        if (dataCurveManager.GetCurvesInputFlag) {
             GetCurveInput();
             GetPressureSystemInput();
-            GetCurvesInputFlag = false;
+            dataCurveManager.GetCurvesInputFlag = false;
         }
 
         // Initialize
@@ -2785,9 +2775,9 @@ namespace CurveManager {
         // See if it is valid
         if (TempCurveIndex > 0) {
             // We have to check the type of curve to make sure it is single independent variable type
-            GenericCurveType = PerfCurve(TempCurveIndex).ObjectType;
+            GenericCurveType = dataCurveManager.PerfCurve(TempCurveIndex).ObjectType;
             {
-                if (PerfCurve(TempCurveIndex).NumDims == 1) {
+                if (dataCurveManager.PerfCurve(TempCurveIndex).NumDims == 1) {
                     PressureCurveType = PressureCurve_Generic;
                     PressureCurveIndex = TempCurveIndex;
                 } else {
@@ -2957,7 +2947,7 @@ namespace CurveManager {
         if (Term3 != 0.0) {
             CalculateMoodyFrictionFactor = std::pow(Term3, -2.0);
         } else {
-            if (!FrictionFactorErrorHasOccurred) {
+            if (!dataCurveManager.FrictionFactorErrorHasOccurred) {
                 RR = RoundSigDigits(RoughnessRatio, 7);
                 Re = RoundSigDigits(ReynoldsNumber, 1);
                 ShowSevereError("Plant Pressure System: Error in moody friction factor calculation");
@@ -2965,7 +2955,7 @@ namespace CurveManager {
                 ShowContinueError("These conditions resulted in an unhandled numeric issue.");
                 ShowContinueError("Please contact EnergyPlus support/development team to raise an alert about this issue");
                 ShowContinueError("This issue will occur only one time.  The friction factor has been reset to 0.04 for calculations");
-                FrictionFactorErrorHasOccurred = true;
+                dataCurveManager.FrictionFactorErrorHasOccurred = true;
             }
             CalculateMoodyFrictionFactor = 0.04;
         }

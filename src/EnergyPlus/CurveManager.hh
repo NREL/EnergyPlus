@@ -67,6 +67,7 @@
 #include <griddeddata.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -105,9 +106,6 @@ namespace CurveManager {
         EvaluateCurveToLimits,
         BtwxtMethod
     };
-
-    extern int NumCurves;
-    extern bool GetCurvesInputFlag; // First time, input is "gotten"
 
     struct TriQuadraticCurveDataStruct
     {
@@ -277,9 +275,6 @@ namespace CurveManager {
         std::vector<Btwxt::RegularGridInterpolator> grids;
     };
 
-    // Object Data
-    extern Array1D<PerformanceCurveData> PerfCurve;
-    extern BtwxtManager btwxtManager;
     // Functions
 
     void BtwxtMessageCallback(
@@ -287,10 +282,6 @@ namespace CurveManager {
         std::string message,
         void *contextPtr
     );
-
-    // Clears the global data in CurveManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
 
     void ResetPerformanceCurveOutput();
 
@@ -387,6 +378,20 @@ namespace CurveManager {
     );
 
 } // namespace CurveManager
+
+struct CurveManagerData : BaseGlobalStruct {
+    int NumCurves = 0;
+    bool GetCurvesInputFlag = true;
+    Array1D<CurveManager::PerformanceCurveData> PerfCurve;
+    CurveManager::BtwxtManager btwxtManager;
+    std::unordered_map<std::string, std::string> UniqueCurveNames;
+    bool CurveValueMyBeginTimeStepFlag;
+    bool FrictionFactorErrorHasOccurred = false;
+
+    void clear_state() override;
+};
+
+extern CurveManagerData dataCurveManager;
 
 } // namespace EnergyPlus
 

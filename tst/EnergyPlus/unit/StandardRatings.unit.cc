@@ -73,7 +73,6 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 {
     // Test that the standard ratings calculation with negative curve value
 
-    using CurveManager::NumCurves;
     using DXCoils::DXCoil;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using StandardRatings::SingleSpeedDXHeatingCoilStandardRatings;
@@ -117,12 +116,12 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.RegionNum = 4;
     Coil.OATempCompressorOn = -5.0;
     Coil.OATempCompressorOnOffBlank = "true";
-    NumCurves = 5;
-    PerfCurve.allocate(NumCurves);
+    dataCurveManager.NumCurves = 5;
+    dataCurveManager.PerfCurve.allocate(dataCurveManager.NumCurves);
     PerformanceCurveData *pCurve;
 
     int const nCapfT = 1;
-    pCurve = &PerfCurve(nCapfT);
+    pCurve = &dataCurveManager.PerfCurve(nCapfT);
     pCurve->CurveType = CurveTypeEnum::Cubic;
     pCurve->NumDims = 1;
     pCurve->Name = "PTHPHeatingCAPFT";
@@ -136,7 +135,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.CCapFTemp(1) = nCapfT;
 
     int const nCapfFF = 2;
-    pCurve = &PerfCurve(nCapfFF);
+    pCurve = &dataCurveManager.PerfCurve(nCapfFF);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->NumDims = 1;
     pCurve->Name = "HPHeatCapfFF";
@@ -150,7 +149,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.CCapFFlow(1) = nCapfFF;
 
     int const nEIRfT = 3;
-    pCurve = &PerfCurve(nEIRfT);
+    pCurve = &dataCurveManager.PerfCurve(nEIRfT);
     pCurve->CurveType = CurveTypeEnum::Cubic;
     pCurve->NumDims = 1;
     pCurve->Name = "PTHPHeatingEIRFT";
@@ -163,7 +162,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.EIRFTemp(1) = nEIRfT;
 
     int const nEIRfFF = 4;
-    pCurve = &PerfCurve(nEIRfFF);
+    pCurve = &dataCurveManager.PerfCurve(nEIRfFF);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->NumDims = 1;
     pCurve->Name = "HPHeatEIRfFF";
@@ -177,7 +176,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.EIRFFlow(1) = nEIRfFF;
 
     int const nPLFfPLR = 5;
-    pCurve = &PerfCurve(nPLFfPLR);
+    pCurve = &dataCurveManager.PerfCurve(nPLFfPLR);
     pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->NumDims = 1;
     pCurve->Name = "HPHeatPLFfPLR";
@@ -190,8 +189,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->CurveMax = 1;
     Coil.PLFFPLR(1) = nPLFfPLR;
 
-    for (int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum) {
-        PerformanceCurveData &rCurve = PerfCurve(CurveNum);
+    for (int CurveNum = 1; CurveNum <= dataCurveManager.NumCurves; ++CurveNum) {
+        PerformanceCurveData &rCurve = dataCurveManager.PerfCurve(CurveNum);
         if (rCurve.CurveType == CurveTypeEnum::Cubic) {
             rCurve.ObjectType = "Curve:Cubic";
         } else if (rCurve.CurveType == CurveTypeEnum::Quadratic) {
@@ -241,7 +240,6 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 TEST_F(EnergyPlusFixture, ChillerIPLVTest)
 {
 
-    using CurveManager::NumCurves;
     using StandardRatings::CalcChillerIPLV;
     using DataPlant::TypeOf_Chiller_ElectricEIR;
 
@@ -254,60 +252,60 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     state.dataChillerElectricEIR.ElectricEIRChiller(1).MinUnloadRat = 0.15;
 
     int CurveNum;
-    NumCurves = 3;
-    PerfCurve.allocate(NumCurves);
+    dataCurveManager.NumCurves = 3;
+    dataCurveManager.PerfCurve.allocate(dataCurveManager.NumCurves);
 
     // Cap=f(T)
     CurveNum = 1;
-    PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
-    PerfCurve(CurveNum).NumDims = 2;
-    PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
-    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-    PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpCapfT";
-    PerfCurve(CurveNum).Coeff1 = 0.98898813;
-    PerfCurve(CurveNum).Coeff2 = 0.036832851;
-    PerfCurve(CurveNum).Coeff3 = 0.000174006;
-    PerfCurve(CurveNum).Coeff4 = -0.000275634;
-    PerfCurve(CurveNum).Coeff5 = -0.000143667;
-    PerfCurve(CurveNum).Coeff6 = -0.000246286;
-    PerfCurve(CurveNum).Var1Min = 4.44;
-    PerfCurve(CurveNum).Var1Max = 10;
-    PerfCurve(CurveNum).Var2Min = 23.89;
-    PerfCurve(CurveNum).Var2Max = 46.11;
+    dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    dataCurveManager.PerfCurve(CurveNum).NumDims = 2;
+    dataCurveManager.PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
+    dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    dataCurveManager.PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpCapfT";
+    dataCurveManager.PerfCurve(CurveNum).Coeff1 = 0.98898813;
+    dataCurveManager.PerfCurve(CurveNum).Coeff2 = 0.036832851;
+    dataCurveManager.PerfCurve(CurveNum).Coeff3 = 0.000174006;
+    dataCurveManager.PerfCurve(CurveNum).Coeff4 = -0.000275634;
+    dataCurveManager.PerfCurve(CurveNum).Coeff5 = -0.000143667;
+    dataCurveManager.PerfCurve(CurveNum).Coeff6 = -0.000246286;
+    dataCurveManager.PerfCurve(CurveNum).Var1Min = 4.44;
+    dataCurveManager.PerfCurve(CurveNum).Var1Max = 10;
+    dataCurveManager.PerfCurve(CurveNum).Var2Min = 23.89;
+    dataCurveManager.PerfCurve(CurveNum).Var2Max = 46.11;
     state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerCapFTIndex = 1;
 
     // EIR=f(T)
     CurveNum = 2;
-    PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
-    PerfCurve(CurveNum).NumDims = 2;
-    PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
-    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-    PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpEIRfT";
-    PerfCurve(CurveNum).Coeff1 = 0.814058418;
-    PerfCurve(CurveNum).Coeff2 = 0.002335553;
-    PerfCurve(CurveNum).Coeff3 = 0.000817786;
-    PerfCurve(CurveNum).Coeff4 = -0.017129784;
-    PerfCurve(CurveNum).Coeff5 = 0.000773288;
-    PerfCurve(CurveNum).Coeff6 = -0.000922024;
-    PerfCurve(CurveNum).Var1Min = 4.44;
-    PerfCurve(CurveNum).Var1Max = 10;
-    PerfCurve(CurveNum).Var2Min = 10;
-    PerfCurve(CurveNum).Var2Max = 46.11;
+    dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    dataCurveManager.PerfCurve(CurveNum).NumDims = 2;
+    dataCurveManager.PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
+    dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    dataCurveManager.PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpEIRfT";
+    dataCurveManager.PerfCurve(CurveNum).Coeff1 = 0.814058418;
+    dataCurveManager.PerfCurve(CurveNum).Coeff2 = 0.002335553;
+    dataCurveManager.PerfCurve(CurveNum).Coeff3 = 0.000817786;
+    dataCurveManager.PerfCurve(CurveNum).Coeff4 = -0.017129784;
+    dataCurveManager.PerfCurve(CurveNum).Coeff5 = 0.000773288;
+    dataCurveManager.PerfCurve(CurveNum).Coeff6 = -0.000922024;
+    dataCurveManager.PerfCurve(CurveNum).Var1Min = 4.44;
+    dataCurveManager.PerfCurve(CurveNum).Var1Max = 10;
+    dataCurveManager.PerfCurve(CurveNum).Var2Min = 10;
+    dataCurveManager.PerfCurve(CurveNum).Var2Max = 46.11;
     state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerEIRFTIndex = 2;
 
     // EIR=f(PLR)
     CurveNum = 3;
-    PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
-    PerfCurve(CurveNum).NumDims = 1;
-    PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-    PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpEIRfPLR";
-    PerfCurve(CurveNum).Coeff1 = -0.08117804;
-    PerfCurve(CurveNum).Coeff2 = 1.433532026;
-    PerfCurve(CurveNum).Coeff3 = -0.762289434;
-    PerfCurve(CurveNum).Coeff4 = 0.412199944;
-    PerfCurve(CurveNum).Var1Min = 0;
-    PerfCurve(CurveNum).Var1Max = 1;
+    dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
+    dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
+    dataCurveManager.PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
+    dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    dataCurveManager.PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpEIRfPLR";
+    dataCurveManager.PerfCurve(CurveNum).Coeff1 = -0.08117804;
+    dataCurveManager.PerfCurve(CurveNum).Coeff2 = 1.433532026;
+    dataCurveManager.PerfCurve(CurveNum).Coeff3 = -0.762289434;
+    dataCurveManager.PerfCurve(CurveNum).Coeff4 = 0.412199944;
+    dataCurveManager.PerfCurve(CurveNum).Var1Min = 0;
+    dataCurveManager.PerfCurve(CurveNum).Var1Max = 1;
     state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     Real64 IPLV;
@@ -452,7 +450,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     GetDXCoils(state);
 
     auto &thisCoil(DXCoils::DXCoil(1));
-    auto &thisCoolPLFfPLR(PerfCurve(thisCoil.PLFFPLR(1)));
+    auto &thisCoolPLFfPLR(dataCurveManager.PerfCurve(thisCoil.PLFFPLR(1)));
     // ckeck user PLF curve coefficients
     EXPECT_EQ(0.90, thisCoolPLFfPLR.Coeff1);
     EXPECT_EQ(0.10, thisCoolPLFfPLR.Coeff2);
@@ -723,7 +721,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     GetDXCoils(state);
 
     auto &thisCoil(DXCoils::DXCoil(1));
-    auto &thisCoolPLFfPLR(PerfCurve(thisCoil.MSPLFFPLR(1)));
+    auto &thisCoolPLFfPLR(dataCurveManager.PerfCurve(thisCoil.MSPLFFPLR(1)));
     // ckeck user PLF curve coefficients
     EXPECT_EQ(0.90, thisCoolPLFfPLR.Coeff1);
     EXPECT_EQ(0.10, thisCoolPLFfPLR.Coeff2);

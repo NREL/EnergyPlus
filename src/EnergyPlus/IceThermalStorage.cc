@@ -909,7 +909,7 @@ namespace IceThermalStorage {
                 ErrorsFound = true;
             }
 
-            int dischargeCurveDim = CurveManager::PerfCurve(DetailedIceStorage(iceNum).DischargeCurveNum).NumDims;
+            int dischargeCurveDim = dataCurveManager.PerfCurve(DetailedIceStorage(iceNum).DischargeCurveNum).NumDims;
             if (dischargeCurveDim != 2) {
                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ": Discharge curve must have 2 independent variables");
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
@@ -949,7 +949,7 @@ namespace IceThermalStorage {
                 ErrorsFound = true;
             }
 
-            int chargeCurveDim = CurveManager::PerfCurve(DetailedIceStorage(iceNum).ChargeCurveNum).NumDims;
+            int chargeCurveDim = dataCurveManager.PerfCurve(DetailedIceStorage(iceNum).ChargeCurveNum).NumDims;
             if (chargeCurveDim != 2) {
                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ": Charge curve must have 2 independent variables");
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));

@@ -96,8 +96,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     bool TestRestult;
 
     // Allocate
-    NumCurves = 1;
-    PerfCurve.allocate(NumCurves);
+    dataCurveManager.NumCurves = 1;
+    dataCurveManager.PerfCurve.allocate(dataCurveManager.NumCurves);
 
     state.fans.NumFans = 2;
     Fan.allocate(state.fans.NumFans);
@@ -105,17 +105,17 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Inputs: fan curve
     CurveNum = 1;
-    PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
-    PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-    PerfCurve(CurveNum).Coeff1 = 1151.1;
-    PerfCurve(CurveNum).Coeff2 = 13.509;
-    PerfCurve(CurveNum).Coeff3 = -0.9105;
-    PerfCurve(CurveNum).Coeff4 = -0.0129;
-    PerfCurve(CurveNum).Coeff5 = 0.0;
-    PerfCurve(CurveNum).Coeff6 = 0.0;
-    PerfCurve(CurveNum).Var1Min = 7.0;
-    PerfCurve(CurveNum).Var1Max = 21.0;
+    dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
+    dataCurveManager.PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
+    dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    dataCurveManager.PerfCurve(CurveNum).Coeff1 = 1151.1;
+    dataCurveManager.PerfCurve(CurveNum).Coeff2 = 13.509;
+    dataCurveManager.PerfCurve(CurveNum).Coeff3 = -0.9105;
+    dataCurveManager.PerfCurve(CurveNum).Coeff4 = -0.0129;
+    dataCurveManager.PerfCurve(CurveNum).Coeff5 = 0.0;
+    dataCurveManager.PerfCurve(CurveNum).Coeff6 = 0.0;
+    dataCurveManager.PerfCurve(CurveNum).Var1Min = 7.0;
+    dataCurveManager.PerfCurve(CurveNum).Var1Max = 21.0;
 
     // Inputs:
     FanNum = 1;
@@ -145,7 +145,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     EXPECT_FALSE(TestRestult);
 
     // Clean up
-    PerfCurve.deallocate();
+    dataCurveManager.PerfCurve.deallocate();
     Fan.deallocate();
 }
 
@@ -351,25 +351,25 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     double FanFaultyDeltaPressInc = 0.10; // Increase by 10%
 
     // Allocate
-    NumCurves = 1;
-    PerfCurve.allocate(NumCurves);
+    dataCurveManager.NumCurves = 1;
+    dataCurveManager.PerfCurve.allocate(dataCurveManager.NumCurves);
 
     state.fans.NumFans = 1;
     Fan.allocate(state.fans.NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
-    PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
-    PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-    PerfCurve(CurveNum).Coeff1 = 1151.1;
-    PerfCurve(CurveNum).Coeff2 = 13.509;
-    PerfCurve(CurveNum).Coeff3 = -0.9105;
-    PerfCurve(CurveNum).Coeff4 = -0.0129;
-    PerfCurve(CurveNum).Coeff5 = 0.0;
-    PerfCurve(CurveNum).Coeff6 = 0.0;
-    PerfCurve(CurveNum).Var1Min = 7.0;
-    PerfCurve(CurveNum).Var1Max = 21.0;
+    dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
+    dataCurveManager.PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
+    dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    dataCurveManager.PerfCurve(CurveNum).Coeff1 = 1151.1;
+    dataCurveManager.PerfCurve(CurveNum).Coeff2 = 13.509;
+    dataCurveManager.PerfCurve(CurveNum).Coeff3 = -0.9105;
+    dataCurveManager.PerfCurve(CurveNum).Coeff4 = -0.0129;
+    dataCurveManager.PerfCurve(CurveNum).Coeff5 = 0.0;
+    dataCurveManager.PerfCurve(CurveNum).Coeff6 = 0.0;
+    dataCurveManager.PerfCurve(CurveNum).Var1Min = 7.0;
+    dataCurveManager.PerfCurve(CurveNum).Var1Max = 21.0;
 
     // Inputs: fans
     FanNum = 1;
@@ -385,7 +385,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     EXPECT_NEAR(3.845, FanDesignFlowRateDec, 0.005);
 
     // Clean up
-    PerfCurve.deallocate();
+    dataCurveManager.PerfCurve.deallocate();
     Fan.deallocate();
 }
 

@@ -4623,14 +4623,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWindPressureTable)
 
     // Load and verify the table
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_EQ(0, CurveManager::NumCurves);
+    EXPECT_EQ(0, dataCurveManager.NumCurves);
     CurveManager::GetCurveInput();
-    CurveManager::GetCurvesInputFlag = false;
-    ASSERT_EQ(1, CurveManager::NumCurves);
-    EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
+    dataCurveManager.GetCurvesInputFlag = false;
+    ASSERT_EQ(1, dataCurveManager.NumCurves);
+    EXPECT_EQ(1, dataCurveManager.PerfCurve(1).NumDims);
     EXPECT_EQ("EFACADE_WPCCURVE", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("EFACADE_WPCCURVE"));
-    EXPECT_EQ("Table:Lookup", CurveManager::PerfCurve(1).ObjectType);
+    EXPECT_EQ("Table:Lookup", dataCurveManager.PerfCurve(1).ObjectType);
     EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(1, 0.0));   // In-range value
     EXPECT_DOUBLE_EQ(0.54, CurveManager::CurveValue(1, 105.0));  // In-range value
     EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(1, -10.0)); // Minimum x
@@ -4705,14 +4705,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWPCValue)
 
     // Load and verify the table
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_EQ(0, CurveManager::NumCurves);
+    EXPECT_EQ(0, dataCurveManager.NumCurves);
     CurveManager::GetCurveInput();
-    CurveManager::GetCurvesInputFlag = false;
-    ASSERT_EQ(1, CurveManager::NumCurves);
-    EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
+    dataCurveManager.GetCurvesInputFlag = false;
+    ASSERT_EQ(1, dataCurveManager.NumCurves);
+    EXPECT_EQ(1, dataCurveManager.PerfCurve(1).NumDims);
     EXPECT_EQ("NFACADE_WPCVALUE", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("NFACADE_WPCVALUE"));
-    EXPECT_EQ("AirflowNetwork:MultiZone:WindPressureCoefficientValues", CurveManager::PerfCurve(1).ObjectType);
+    EXPECT_EQ("AirflowNetwork:MultiZone:WindPressureCoefficientValues", dataCurveManager.PerfCurve(1).ObjectType);
     EXPECT_DOUBLE_EQ(0.6, CurveManager::CurveValue(1, 0.0));     // In-range value
     EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(1, 105.0)); // In-range value
     EXPECT_DOUBLE_EQ(0.6, CurveManager::CurveValue(1, -10.0));   // Minimum x
@@ -5712,7 +5712,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
-    EXPECT_EQ(CurveManager::NumCurves, 2);
+    EXPECT_EQ(dataCurveManager.NumCurves, 2);
 
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
 
@@ -6416,7 +6416,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
-    EXPECT_EQ(CurveManager::NumCurves, 2);
+    EXPECT_EQ(dataCurveManager.NumCurves, 2);
 
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
 
@@ -7037,13 +7037,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
 
     SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
-  
+
     CurveManager::GetCurveInput();
-    EXPECT_EQ(CurveManager::NumCurves, 1);
+    EXPECT_EQ(dataCurveManager.NumCurves, 1);
 
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
 
-    EXPECT_EQ(CurveManager::NumCurves, 6);
+    EXPECT_EQ(dataCurveManager.NumCurves, 6);
 
     // Check the curves
     Real64 cp105N = -0.5 * (0.44267457181949038 + 0.68051108580039887);
@@ -7728,7 +7728,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
-    EXPECT_EQ(CurveManager::NumCurves, 1);
+    EXPECT_EQ(dataCurveManager.NumCurves, 1);
 
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
 
@@ -8362,7 +8362,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
-    EXPECT_EQ(CurveManager::NumCurves, 1);
+    EXPECT_EQ(dataCurveManager.NumCurves, 1);
 
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
 
@@ -9095,7 +9095,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
-    EXPECT_EQ(CurveManager::NumCurves, 2);
+    EXPECT_EQ(dataCurveManager.NumCurves, 2);
 
     DataGlobals::AnyLocalEnvironmentsInModel = true;
     OutAirNodeManager::SetOutAirNodes();
@@ -9570,12 +9570,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
-    EXPECT_EQ(0, CurveManager::NumCurves);
+    EXPECT_EQ(0, dataCurveManager.NumCurves);
 
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
 
     // Check that the correct number of curves has been generated (5 facade directions + 2 windows)
-    EXPECT_EQ(7, CurveManager::NumCurves);
+    EXPECT_EQ(7, dataCurveManager.NumCurves);
 
     // Check the airflow elements
     ASSERT_EQ(3u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -13223,7 +13223,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
     DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
     DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
     DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 3;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(3); 
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(3);
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(2).TypeOf = "Fan:VariableVolume";
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "CVF";
@@ -13659,7 +13659,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
-    EXPECT_EQ(0, CurveManager::NumCurves);
+    EXPECT_EQ(0, dataCurveManager.NumCurves);
 
     // #6912
     DataHeatBalFanSys::MAT.allocate(1);

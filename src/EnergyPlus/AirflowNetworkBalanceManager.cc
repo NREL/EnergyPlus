@@ -6075,24 +6075,24 @@ namespace AirflowNetworkBalanceManager {
         std::string contextString = "CalcWindPressureCoeffs: Creating table \"" + name + "\"";
         Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &contextString);
 
-        int CurveNum = CurveManager::PerfCurve.size() + 1;
-        CurveManager::PerfCurve.push_back(CurveManager::PerformanceCurveData());
+        int CurveNum = dataCurveManager.PerfCurve.size() + 1;
+        dataCurveManager.PerfCurve.push_back(CurveManager::PerformanceCurveData());
 
-        CurveManager::PerfCurve(CurveNum).Name = name;
-        CurveManager::PerfCurve(CurveNum).ObjectType = "Table:Lookup";
-        CurveManager::PerfCurve(CurveNum).NumDims = 1;
+        dataCurveManager.PerfCurve(CurveNum).Name = name;
+        dataCurveManager.PerfCurve(CurveNum).ObjectType = "Table:Lookup";
+        dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
 
-        CurveManager::PerfCurve(CurveNum).InterpolationType = CurveManager::InterpTypeEnum::BtwxtMethod;
+        dataCurveManager.PerfCurve(CurveNum).InterpolationType = CurveManager::InterpTypeEnum::BtwxtMethod;
 
-        CurveManager::PerfCurve(CurveNum).Var1Min = 0.0;
-        CurveManager::PerfCurve(CurveNum).Var1MinPresent = true;
-        CurveManager::PerfCurve(CurveNum).Var1Max = 360.0;
-        CurveManager::PerfCurve(CurveNum).Var1MaxPresent = true;
+        dataCurveManager.PerfCurve(CurveNum).Var1Min = 0.0;
+        dataCurveManager.PerfCurve(CurveNum).Var1MinPresent = true;
+        dataCurveManager.PerfCurve(CurveNum).Var1Max = 360.0;
+        dataCurveManager.PerfCurve(CurveNum).Var1MaxPresent = true;
 
-        CurveManager::PerfCurve(CurveNum).TableIndex = gridIndex;
-        CurveManager::PerfCurve(CurveNum).GridValueIndex = CurveManager::btwxtManager.addOutputValues(gridIndex, y);
+        dataCurveManager.PerfCurve(CurveNum).TableIndex = gridIndex;
+        dataCurveManager.PerfCurve(CurveNum).GridValueIndex = dataCurveManager.btwxtManager.addOutputValues(gridIndex, y);
 
-        CurveManager::NumCurves += 1;
+        EnergyPlus::dataCurveManager.NumCurves += 1;
         return CurveNum;
     }
 
@@ -6244,7 +6244,7 @@ namespace AirflowNetworkBalanceManager {
         std::vector<Btwxt::GridAxis> dirs30Axes;
         dirs30Axes.emplace_back(dirs30, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
 
-        auto dirs30GridIndex = CurveManager::btwxtManager.addGrid("30 Degree Increments", Btwxt::GriddedData(dirs30Axes));
+        auto dirs30GridIndex = dataCurveManager.btwxtManager.addGrid("30 Degree Increments", Btwxt::GriddedData(dirs30Axes));
 
         if (AirflowNetworkNumOfSingleSideZones == 0) { // do the standard surface average coefficient calculation
             // Create the array of wind directions
@@ -6390,7 +6390,7 @@ namespace AirflowNetworkBalanceManager {
             std::vector<Btwxt::GridAxis> dirs10Axes;
             dirs10Axes.emplace_back(dirs10, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
 
-            auto dirs10GridIndex = CurveManager::btwxtManager.addGrid("10 Degree Increments", Btwxt::GriddedData(dirs10Axes));
+            auto dirs10GridIndex = dataCurveManager.btwxtManager.addGrid("10 Degree Increments", Btwxt::GriddedData(dirs10Axes));
 
             for (FacadeNum = 1; FacadeNum <= 4; ++FacadeNum) {
                 valsByFacade[FacadeNum - 1].push_back(valsByFacade[FacadeNum - 1][0]); // Enforce periodicity

@@ -6852,7 +6852,6 @@ namespace WindowManager {
         using General::RoundSigDigits;
         using General::ScanForReports;
         // InterpBlind ! Blind profile angle interpolation function
-        using CurveManager::PerfCurve;
         using WindowComplexManager::CalcComplexWindowThermal;
         using WindowComplexManager::UpdateComplexWindows;
 
@@ -7134,9 +7133,9 @@ namespace WindowManager {
                                 }
                                 if (dataMaterial.Material(Layer).GlassSpectralAndAngle) {
                                     OpticalDataType = "SpectralAndAngle";
-                                    SpectralDataName = PerfCurve(dataMaterial.Material(Layer).GlassSpecAngTransDataPtr).Name + ", " +
-                                                       PerfCurve(dataMaterial.Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
-                                                       PerfCurve(dataMaterial.Material(Layer).GlassSpecAngBRefleDataPtr).Name;
+                                    SpectralDataName = dataCurveManager.PerfCurve(dataMaterial.Material(Layer).GlassSpecAngTransDataPtr).Name + ", " +
+                                                       dataCurveManager.PerfCurve(dataMaterial.Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
+                                                       dataCurveManager.PerfCurve(dataMaterial.Material(Layer).GlassSpecAngBRefleDataPtr).Name;
                                 }
                                 static constexpr auto Format_707(" WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{"
                                                                  ":.5R},{:.5R},{:.5R},{:.5R},{:.5R},{}\n");

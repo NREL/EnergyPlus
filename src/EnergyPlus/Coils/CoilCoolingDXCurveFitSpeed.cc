@@ -240,13 +240,13 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       rated_total_capacity(0.0),
       rated_evap_fan_power_per_volume_flow_rate(0.0),
       ratedWasteHeatFractionOfPowerInput(0.0),  // rated waste heat fraction of power input
-      evap_condenser_pump_power_fraction(0.0), 
+      evap_condenser_pump_power_fraction(0.0),
       evap_condenser_effectiveness(0.0),
 
       FanOpMode(0),              // fan operating mode, constant or cycling fan
       parentModeRatedGrossTotalCap(0.0),
       parentModeRatedEvapAirFlowRate(0.0),
-      parentModeRatedCondAirFlowRate(0.0), 
+      parentModeRatedCondAirFlowRate(0.0),
       parentOperatingMode(0),
 
       ambPressure(0.0),          // outdoor pressure {Pa}
@@ -354,7 +354,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state)
     if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 2) {
         ReportSizingManager::RequestSizing(state,CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName, 0.667);
     } else if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 3) {
-        ReportSizingManager::RequestSizing(state,CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName, 0.333);    
+        ReportSizingManager::RequestSizing(state,CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName, 0.333);
     } else {
         ReportSizingManager::RequestSizing(state,CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName);
     }
@@ -366,7 +366,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state)
     if (this->indexSHRFT > 0 && this->indexSHRFFF > 0) {
         this->RatedCBF = 0.001;
     } else {
-    
+
     this->RatedCBF = CalcBypassFactor(RatedInletAirTemp,
                                       RatedInletAirHumRat,
                                       Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat),
@@ -423,7 +423,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
 
         Real64 TotCapTempModFac = 1.0;
         if (indexCapFT > 0) {
-            if (CurveManager::PerfCurve(indexCapFT).NumDims == 2) {
+            if (dataCurveManager.PerfCurve(indexCapFT).NumDims == 2) {
                 TotCapTempModFac = CurveManager::CurveValue(indexCapFT, inletWetBulb, condInletTemp);
             } else {
                 TotCapTempModFac = CurveManager::CurveValue(indexCapFT, condInletTemp);
@@ -488,7 +488,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
 
     Real64 EIRTempModFac = 1.0; // EIR as a function of temperature curve result
     if (indexEIRFT > 0) {
-        if (CurveManager::PerfCurve(indexEIRFT).NumDims == 2) {
+        if (dataCurveManager.PerfCurve(indexEIRFT).NumDims == 2) {
             EIRTempModFac = CurveManager::CurveValue(indexEIRFT, inletWetBulb, condInletTemp);
         } else {
             EIRTempModFac = CurveManager::CurveValue(indexEIRFT, condInletTemp);

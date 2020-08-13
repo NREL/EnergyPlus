@@ -2461,7 +2461,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     HeatBalanceManager::SetPreConstructionInputParameters();
     CurveManager::GetCurveInput();
-    CurveManager::GetCurvesInputFlag = false;
+    dataCurveManager.GetCurvesInputFlag = false;
 
     HeatBalanceManager::GetWindowGlassSpectralData(FoundError);
     EXPECT_FALSE(FoundError);

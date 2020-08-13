@@ -2994,7 +2994,7 @@ namespace PackagedThermalStorageCoil {
                 }
             }
             {
-                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve).NumDims == 2) {
+                if (dataCurveManager.PerfCurve(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve).NumDims == 2) {
                     SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
                 } else {
                     SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
@@ -3426,7 +3426,7 @@ namespace PackagedThermalStorageCoil {
                 }
             }
             {
-                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve).NumDims == 2) {
+                if (dataCurveManager.PerfCurve(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve).NumDims == 2) {
                     SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
                 } else {
                     SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
@@ -3975,7 +3975,7 @@ namespace PackagedThermalStorageCoil {
                 }
             } // coil will be wet so use SHR curves
             {
-                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve).NumDims == 2) {
+                if (dataCurveManager.PerfCurve(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve).NumDims == 2) {
                     SHRTempFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
                 } else {
                     SHRTempFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);

@@ -299,10 +299,10 @@ namespace ChillerReformulatedEIR {
 
             // Check the type of part-load curves implemented: 1_LeavingCondenserWaterTemperature, 2_Lift
             if (UtilityRoutines::SameString(PartLoadCurveType, "LeavingCondenserWaterTemperature") &&
-                CurveManager::PerfCurve(thisChiller.ChillerEIRFPLRIndex).NumDims == 2) {
+                dataCurveManager.PerfCurve(thisChiller.ChillerEIRFPLRIndex).NumDims == 2) {
                 thisChiller.PartLoadCurveType = PLR::LeavingCondenserWaterTemperature;
             } else if (UtilityRoutines::SameString(PartLoadCurveType, "Lift") &&
-                       CurveManager::PerfCurve(thisChiller.ChillerEIRFPLRIndex).NumDims == 3) {
+                       dataCurveManager.PerfCurve(thisChiller.ChillerEIRFPLRIndex).NumDims == 3) {
                 thisChiller.PartLoadCurveType = PLR::Lift;
             } else {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");

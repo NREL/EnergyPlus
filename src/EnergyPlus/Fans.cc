@@ -3216,7 +3216,7 @@ namespace Fans {
             FanFaultyAirFlowRate = FanFaultyAirFlowRate - 0.005;
             FanCalDeltaPresstemp = CurveValue(FanCurvePtr, FanFaultyAirFlowRate);
 
-            if ((FanCalDeltaPresstemp <= FanCalDeltaPress) || (FanFaultyAirFlowRate <= PerfCurve(FanCurvePtr).Var1Min)) {
+            if ((FanCalDeltaPresstemp <= FanCalDeltaPress) || (FanFaultyAirFlowRate <= dataCurveManager.PerfCurve(FanCurvePtr).Var1Min)) {
                 // The new operational point of the fan go beyond the fan selection range
                 ShowWarningError("The operational point of the fan " + FanName + " may go beyond the fan selection ");
                 ShowContinueError("range in the faulty fouling air filter cases");

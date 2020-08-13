@@ -1026,7 +1026,7 @@ namespace HVACVariableRefrigerantFlow {
                     HRCAPFT = VRF(VRFCond).HRCAPFTCool; // Index to cool capacity as a function of temperature\PLR curve for heat recovery
                     if (HRCAPFT > 0) {
                         //         VRF(VRFCond)%HRCAPFTCoolConst = 0.9d0 ! initialized to 0.9
-                        if (CurveManager::PerfCurve(VRF(VRFCond).HRCAPFTCool).NumDims == 2) { // Curve type for HRCAPFTCool
+                        if (dataCurveManager.PerfCurve(VRF(VRFCond).HRCAPFTCool).NumDims == 2) { // Curve type for HRCAPFTCool
                             VRF(VRFCond).HRCAPFTCoolConst = CurveValue(HRCAPFT, InletAirWetBulbC, CondInletTemp);
                         } else {
                             VRF(VRFCond).HRCAPFTCoolConst = CurveValue(HRCAPFT, tmpVRFCondPLR);
@@ -1040,7 +1040,7 @@ namespace HVACVariableRefrigerantFlow {
                     HREIRFT = VRF(VRFCond).HREIRFTCool; // Index to cool EIR as a function of temperature curve for heat recovery
                     if (HREIRFT > 0) {
                         //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
-                        if (CurveManager::PerfCurve(VRF(VRFCond).HREIRFTCool).NumDims == 2) { // Curve type for HREIRFTCool
+                        if (dataCurveManager.PerfCurve(VRF(VRFCond).HREIRFTCool).NumDims == 2) { // Curve type for HREIRFTCool
                             VRF(VRFCond).HREIRFTCoolConst = CurveValue(HREIRFT, InletAirWetBulbC, CondInletTemp);
                         } else {
                             VRF(VRFCond).HREIRFTCoolConst = CurveValue(HREIRFT, tmpVRFCondPLR);
@@ -1059,7 +1059,7 @@ namespace HVACVariableRefrigerantFlow {
                     HRCAPFT = VRF(VRFCond).HRCAPFTHeat; // Index to heat capacity as a function of temperature\PLR curve for heat recovery
                     if (HRCAPFT > 0) {
                         //         VRF(VRFCond)%HRCAPFTHeatConst = 1.1d0 ! initialized to 1.1
-                        if (CurveManager::PerfCurve(VRF(VRFCond).HRCAPFTHeat).NumDims == 2) { // Curve type for HRCAPFTCool
+                        if (dataCurveManager.PerfCurve(VRF(VRFCond).HRCAPFTHeat).NumDims == 2) { // Curve type for HRCAPFTCool
                             {
                                 auto const SELECT_CASE_var(VRF(VRFCond).HeatingPerformanceOATType);
                                 if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
@@ -1082,7 +1082,7 @@ namespace HVACVariableRefrigerantFlow {
                     HREIRFT = VRF(VRFCond).HREIRFTHeat; // Index to cool EIR as a function of temperature curve for heat recovery
                     if (HREIRFT > 0) {
                         //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
-                        if (CurveManager::PerfCurve(VRF(VRFCond).HREIRFTHeat).NumDims == 2) { // Curve type for HREIRFTHeat
+                        if (dataCurveManager.PerfCurve(VRF(VRFCond).HREIRFTHeat).NumDims == 2) { // Curve type for HREIRFTHeat
                             {
                                 auto const SELECT_CASE_var(VRF(VRFCond).HeatingPerformanceOATType);
                                 if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
@@ -2582,15 +2582,15 @@ namespace HVACVariableRefrigerantFlow {
                 ErrorsFound = true;
             } else {
                 {
-                    if (CurveManager::PerfCurve(indexOUEvapTempCurve).ObjectType == "Curve:Quadratic") {
-                        VRF(VRFNum).C1Te = EnergyPlus::CurveManager::PerfCurve(indexOUEvapTempCurve).Coeff1;
-                        VRF(VRFNum).C2Te = EnergyPlus::CurveManager::PerfCurve(indexOUEvapTempCurve).Coeff2;
-                        VRF(VRFNum).C3Te = EnergyPlus::CurveManager::PerfCurve(indexOUEvapTempCurve).Coeff3;
+                    if (dataCurveManager.PerfCurve(indexOUEvapTempCurve).ObjectType == "Curve:Quadratic") {
+                        VRF(VRFNum).C1Te = EnergyPlus::dataCurveManager.PerfCurve(indexOUEvapTempCurve).Coeff1;
+                        VRF(VRFNum).C2Te = EnergyPlus::dataCurveManager.PerfCurve(indexOUEvapTempCurve).Coeff2;
+                        VRF(VRFNum).C3Te = EnergyPlus::dataCurveManager.PerfCurve(indexOUEvapTempCurve).Coeff3;
 
                     } else {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                         ShowContinueError("...illegal " + cAlphaFieldNames(6) +
-                                          " type for this object = " + CurveManager::PerfCurve(indexOUEvapTempCurve).ObjectType);
+                                          " type for this object = " + dataCurveManager.PerfCurve(indexOUEvapTempCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
                         ErrorsFound = true;
                     }
@@ -2611,15 +2611,15 @@ namespace HVACVariableRefrigerantFlow {
                 ErrorsFound = true;
             } else {
                 {
-                    if (CurveManager::PerfCurve(indexOUCondTempCurve).ObjectType == "Curve:Quadratic") {
-                        VRF(VRFNum).C1Tc = EnergyPlus::CurveManager::PerfCurve(indexOUCondTempCurve).Coeff1;
-                        VRF(VRFNum).C2Tc = EnergyPlus::CurveManager::PerfCurve(indexOUCondTempCurve).Coeff2;
-                        VRF(VRFNum).C3Tc = EnergyPlus::CurveManager::PerfCurve(indexOUCondTempCurve).Coeff3;
+                    if (dataCurveManager.PerfCurve(indexOUCondTempCurve).ObjectType == "Curve:Quadratic") {
+                        VRF(VRFNum).C1Tc = EnergyPlus::dataCurveManager.PerfCurve(indexOUCondTempCurve).Coeff1;
+                        VRF(VRFNum).C2Tc = EnergyPlus::dataCurveManager.PerfCurve(indexOUCondTempCurve).Coeff2;
+                        VRF(VRFNum).C3Tc = EnergyPlus::dataCurveManager.PerfCurve(indexOUCondTempCurve).Coeff3;
 
                     } else {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                         ShowContinueError("...illegal " + cAlphaFieldNames(7) +
-                                          " type for this object = " + CurveManager::PerfCurve(indexOUCondTempCurve).ObjectType);
+                                          " type for this object = " + dataCurveManager.PerfCurve(indexOUCondTempCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
                         ErrorsFound = true;
                     }
@@ -2991,14 +2991,14 @@ namespace HVACVariableRefrigerantFlow {
                 }
                 ErrorsFound = true;
             } else {
-                if (CurveManager::PerfCurve(indexOUEvapTempCurve).ObjectType == "Curve:Quadratic") {
-                    VRF(VRFNum).C1Te = EnergyPlus::CurveManager::PerfCurve(indexOUEvapTempCurve).Coeff1;
-                    VRF(VRFNum).C2Te = EnergyPlus::CurveManager::PerfCurve(indexOUEvapTempCurve).Coeff2;
-                    VRF(VRFNum).C3Te = EnergyPlus::CurveManager::PerfCurve(indexOUEvapTempCurve).Coeff3;
+                if (dataCurveManager.PerfCurve(indexOUEvapTempCurve).ObjectType == "Curve:Quadratic") {
+                    VRF(VRFNum).C1Te = EnergyPlus::dataCurveManager.PerfCurve(indexOUEvapTempCurve).Coeff1;
+                    VRF(VRFNum).C2Te = EnergyPlus::dataCurveManager.PerfCurve(indexOUEvapTempCurve).Coeff2;
+                    VRF(VRFNum).C3Te = EnergyPlus::dataCurveManager.PerfCurve(indexOUEvapTempCurve).Coeff3;
                 } else {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError("...illegal " + cAlphaFieldNames(6) +
-                                      " type for this object = " + CurveManager::PerfCurve(indexOUEvapTempCurve).ObjectType);
+                                      " type for this object = " + dataCurveManager.PerfCurve(indexOUEvapTempCurve).ObjectType);
                     ShowContinueError("... Curve type must be Quadratic.");
                     ErrorsFound = true;
                 }
@@ -3017,14 +3017,14 @@ namespace HVACVariableRefrigerantFlow {
                 }
                 ErrorsFound = true;
             } else {
-                if (CurveManager::PerfCurve(indexOUCondTempCurve).ObjectType == "Curve:Quadratic") {
-                    VRF(VRFNum).C1Tc = EnergyPlus::CurveManager::PerfCurve(indexOUCondTempCurve).Coeff1;
-                    VRF(VRFNum).C2Tc = EnergyPlus::CurveManager::PerfCurve(indexOUCondTempCurve).Coeff2;
-                    VRF(VRFNum).C3Tc = EnergyPlus::CurveManager::PerfCurve(indexOUCondTempCurve).Coeff3;
+                if (dataCurveManager.PerfCurve(indexOUCondTempCurve).ObjectType == "Curve:Quadratic") {
+                    VRF(VRFNum).C1Tc = EnergyPlus::dataCurveManager.PerfCurve(indexOUCondTempCurve).Coeff1;
+                    VRF(VRFNum).C2Tc = EnergyPlus::dataCurveManager.PerfCurve(indexOUCondTempCurve).Coeff2;
+                    VRF(VRFNum).C3Tc = EnergyPlus::dataCurveManager.PerfCurve(indexOUCondTempCurve).Coeff3;
                 } else {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError("...illegal " + cAlphaFieldNames(7) +
-                                      " type for this object = " + CurveManager::PerfCurve(indexOUCondTempCurve).ObjectType);
+                                      " type for this object = " + dataCurveManager.PerfCurve(indexOUCondTempCurve).ObjectType);
                     ShowContinueError("... Curve type must be Quadratic.");
                     ErrorsFound = true;
                 }
@@ -4073,7 +4073,7 @@ namespace HVACVariableRefrigerantFlow {
                             // Check VRF DX heating coil heating capacity as a fuction of temperature performance curve. Only report here for
                             // biquadratic curve type.
                             if (VRFTU(VRFTUNum).VRFSysNum > 0 && VRFTU(VRFTUNum).HeatCoilIndex > 0 &&
-                                CurveManager::PerfCurve(GetDXCoilCapFTCurveIndex(state, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound)).NumDims == 2) {
+                                dataCurveManager.PerfCurve(GetDXCoilCapFTCurveIndex(state, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound)).NumDims == 2) {
                                 if (VRF(VRFTU(VRFTUNum).VRFSysNum).HeatingPerformanceOATType == DataHVACGlobals::WetBulbIndicator) {
                                     checkCurveIsNormalizedToOne(
                                         "GetDXCoils: " + DataHVACGlobals::cAllCoilTypes(VRFTU(VRFTUNum).DXHeatCoilType_Num),
@@ -7874,7 +7874,7 @@ namespace HVACVariableRefrigerantFlow {
                 // calculate the piping correction factors only once
                 if (VRF(VRFCond).PCFLengthCoolPtr > 0) {
                     {
-                        if (CurveManager::PerfCurve(VRF(VRFCond).PCFLengthCoolPtr).NumDims == 2) {
+                        if (dataCurveManager.PerfCurve(VRF(VRFCond).PCFLengthCoolPtr).NumDims == 2) {
                             VRF(VRFCond).PipingCorrectionCooling = min(
                                 1.0,
                                 max(0.5,
@@ -7894,7 +7894,7 @@ namespace HVACVariableRefrigerantFlow {
 
                 if (VRF(VRFCond).PCFLengthHeatPtr > 0) {
                     {
-                        if (CurveManager::PerfCurve(VRF(VRFCond).PCFLengthHeatPtr).NumDims == 2) {
+                        if (dataCurveManager.PerfCurve(VRF(VRFCond).PCFLengthHeatPtr).NumDims == 2) {
                             VRF(VRFCond).PipingCorrectionHeating = min(
                                 1.0,
                                 max(0.5,

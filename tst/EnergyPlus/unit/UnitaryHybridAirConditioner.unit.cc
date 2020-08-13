@@ -819,8 +819,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
     ASSERT_TRUE(process_idf(idf_objects));
 
     CurveManager::GetCurveInput();
-    CurveManager::GetCurvesInputFlag = false;
-    EXPECT_EQ(4, CurveManager::NumCurves);
+    dataCurveManager.GetCurvesInputFlag = false;
+    EXPECT_EQ(4, dataCurveManager.NumCurves);
 
     bool ErrorsFound(false);
     GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
@@ -1219,8 +1219,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ModelOperatingSetting
     ASSERT_TRUE(process_idf(idf_objects));
 
     CurveManager::GetCurveInput();
-    CurveManager::GetCurvesInputFlag = false;
-    EXPECT_EQ(8, CurveManager::NumCurves);
+    dataCurveManager.GetCurvesInputFlag = false;
+    EXPECT_EQ(8, dataCurveManager.NumCurves);
 
     bool ErrorsFound(false);
     GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);

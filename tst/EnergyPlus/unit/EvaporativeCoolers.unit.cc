@@ -428,21 +428,21 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
     CurveNum = 1;
     EvaporativeCoolers::EvapCond(EvapCoolNum).FanPowerModifierCurveIndex = CurveNum;
 
-    NumCurves = 1;
-    PerfCurve.allocate(1);
-    PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
-    PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-    PerfCurve(CurveNum).Coeff1 = 0.0;
-    PerfCurve(CurveNum).Coeff2 = 1.0;
-    PerfCurve(CurveNum).Coeff3 = 0.0;
-    PerfCurve(CurveNum).Coeff4 = 0.0;
-    PerfCurve(CurveNum).Coeff5 = 0.0;
-    PerfCurve(CurveNum).Coeff6 = 0.0;
-    PerfCurve(CurveNum).Var1Min = 0.0;
-    PerfCurve(CurveNum).Var1Max = 1.0;
-    PerfCurve(CurveNum).Var2Min = 0;
-    PerfCurve(CurveNum).Var2Max = 0;
+    dataCurveManager.NumCurves = 1;
+    dataCurveManager.PerfCurve.allocate(1);
+    dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    dataCurveManager.PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
+    dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    dataCurveManager.PerfCurve(CurveNum).Coeff1 = 0.0;
+    dataCurveManager.PerfCurve(CurveNum).Coeff2 = 1.0;
+    dataCurveManager.PerfCurve(CurveNum).Coeff3 = 0.0;
+    dataCurveManager.PerfCurve(CurveNum).Coeff4 = 0.0;
+    dataCurveManager.PerfCurve(CurveNum).Coeff5 = 0.0;
+    dataCurveManager.PerfCurve(CurveNum).Coeff6 = 0.0;
+    dataCurveManager.PerfCurve(CurveNum).Var1Min = 0.0;
+    dataCurveManager.PerfCurve(CurveNum).Var1Max = 1.0;
+    dataCurveManager.PerfCurve(CurveNum).Var2Min = 0;
+    dataCurveManager.PerfCurve(CurveNum).Var2Max = 0;
 
     // make the call for dry full load operating condition
     EvaporativeCoolers::EvapCond(EvapCoolNum).EvapCoolerPower = EvaporativeCoolers::IndEvapCoolerPower(EvapCoolNum, DryWetMode, FlowRatio);
@@ -463,7 +463,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
     EXPECT_EQ(200 * 0.8 + 100 * 0.8 * 0.5, EvaporativeCoolers::EvapCond(EvapCoolNum).EvapCoolerPower);
 
     EvaporativeCoolers::EvapCond.deallocate();
-    PerfCurve.deallocate();
+    dataCurveManager.PerfCurve.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
@@ -719,15 +719,15 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     DataEnvironment::OutBaroPress = 101325.0;
 
     int const CurveNum = 1;
-    CurveManager::NumCurves = 1;
-    PerfCurve.allocate(1);
-    PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
-    PerfCurve(CurveNum).ObjectType = "Curve:Linear";
-    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-    PerfCurve(CurveNum).Coeff1 = 0.0;
-    PerfCurve(CurveNum).Coeff2 = 1.0;
-    PerfCurve(CurveNum).Var1Min = 0.0;
-    PerfCurve(CurveNum).Var1Max = 1.0;
+    dataCurveManager.NumCurves = 1;
+    dataCurveManager.PerfCurve.allocate(1);
+    dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    dataCurveManager.PerfCurve(CurveNum).ObjectType = "Curve:Linear";
+    dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    dataCurveManager.PerfCurve(CurveNum).Coeff1 = 0.0;
+    dataCurveManager.PerfCurve(CurveNum).Coeff2 = 1.0;
+    dataCurveManager.PerfCurve(CurveNum).Var1Min = 0.0;
+    dataCurveManager.PerfCurve(CurveNum).Var1Max = 1.0;
 
     // set up the flow rates for a direct RDDSpecial
     thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerDirectResearchSpecial;
