@@ -90,8 +90,8 @@ json IdfParser::decode(std::string const &idf, json const &schema, bool &success
 
 std::string IdfParser::encode(json const &root, json const &schema)
 {
-    std::string end_of_field("," + NL + "  ");
-    std::string end_of_object(";" + NL + NL);
+    std::string end_of_field(",\n  ");
+    std::string end_of_object(";\n\n");
 
     std::string encoded, extension_key;
 
@@ -115,7 +115,7 @@ std::string IdfParser::encode(json const &root, json const &schema)
                     continue;
                 }
                 for (size_t j = 0; j < skipped_fields; j++)
-                    encoded += "," + NL + "  ";
+                    encoded += end_of_field;
                 skipped_fields = 0;
                 encoded += end_of_field;
                 auto const &val = obj_in.value()[entry];
