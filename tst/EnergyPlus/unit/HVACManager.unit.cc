@@ -154,6 +154,9 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataHeatBalFanSys::MCPI.allocate(NumOfZones);
     DataHeatBalFanSys::MCPV.allocate(NumOfZones);
     DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(NumOfZones);
+    DataHeatBalance::TotVentilation = 1;
+    DataHeatBalance::Ventilation.allocate(DataHeatBalance::TotVentilation);
+    DataZoneEquipment::VentMCP.allocate(1);
 
     DataGlobals::NumOfZones = NumOfZones;
     DataHVACGlobals::TimeStepSys = 1.0;
@@ -178,6 +181,9 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
     DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
+    DataHeatBalance::Ventilation(1).ZonePtr = 1;
+    DataHeatBalance::Ventilation(1).AirTemp = DataHeatBalance::Zone(1).OutDryBulbTemp;
+    DataZoneEquipment::VentMCP(1) = DataHeatBalFanSys::MCPV(1);
     // Call HVACManager
     ReportAirHeatBalance(state);
 
@@ -189,6 +195,16 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     EXPECT_NEAR(7.5702731, DataHeatBalance::ZnAirRpt(2).VentilVolumeCurDensity, 0.0001);
     EXPECT_NEAR(4.4741862, DataHeatBalance::ZnAirRpt(2).InfilVolumeStdDensity, 0.0001);
     EXPECT_NEAR(7.4569771, DataHeatBalance::ZnAirRpt(2).VentilVolumeStdDensity, 0.0001);
+
+    // #8068
+    Real64 deltah = DataHeatBalFanSys::MCPI(1) / (Psychrometrics::PsyCpAirFnW(DataEnvironment::OutHumRat)) * 3600.0 *
+                    (Psychrometrics::PsyHFnTdbW(DataHeatBalance::Zone(1).OutDryBulbTemp, DataEnvironment::OutHumRat) -
+                     Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1)));
+    EXPECT_NEAR(-deltah, DataHeatBalance::ZnAirRpt(1).InfilTotalLoss, 0.0001);
+    deltah = DataHeatBalFanSys::MCPV(1) / (Psychrometrics::PsyCpAirFnW(DataEnvironment::OutHumRat)) * 3600.0 *
+                    (Psychrometrics::PsyHFnTdbW(DataHeatBalance::Zone(1).OutDryBulbTemp, DataEnvironment::OutHumRat) -
+                     Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1)));
+    EXPECT_NEAR(-deltah, DataHeatBalance::ZnAirRpt(1).VentilTotalLoss, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
