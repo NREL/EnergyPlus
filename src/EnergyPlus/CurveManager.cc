@@ -107,12 +107,6 @@ namespace CurveManager {
     // validating it, and storing it in such a manner that the curve manager
     // can provide the simulation with performance curve output.
 
-    // Using/Aliasing
-    using DataGlobals::AnyEnergyManagementSystemInModel;
-    using namespace DataBranchAirLoopPlant;
-
-    using json = nlohmann::json;
-
     std::map<std::string, Btwxt::Method>  BtwxtManager::interpMethods =                                 // NOLINT(cert-err58-cpp)
             {{"Linear", Btwxt::Method::LINEAR}, {"Cubic", Btwxt::Method::CUBIC}};
 
@@ -2206,34 +2200,34 @@ namespace CurveManager {
                                 PerfCurve(CurveIndex).Name);
         }
 
-        for (CurveIndex = 1; CurveIndex <= NumPressureCurves; ++CurveIndex) {
+        for (CurveIndex = 1; CurveIndex <= DataBranchAirLoopPlant::NumPressureCurves; ++CurveIndex) {
             SetupOutputVariable("Performance Curve Input Variable 1 Value",
                                 OutputProcessor::Unit::None,
-                                PressureCurve(CurveIndex).CurveInput1,
+                                DataBranchAirLoopPlant::PressureCurve(CurveIndex).CurveInput1,
                                 "HVAC",
                                 "Average",
-                                PressureCurve(CurveIndex).Name);
+                                DataBranchAirLoopPlant::PressureCurve(CurveIndex).Name);
             SetupOutputVariable("Performance Curve Input Variable 2 Value",
                                 OutputProcessor::Unit::None,
-                                PressureCurve(CurveIndex).CurveInput2,
+                                DataBranchAirLoopPlant::PressureCurve(CurveIndex).CurveInput2,
                                 "HVAC",
                                 "Average",
-                                PressureCurve(CurveIndex).Name);
+                                DataBranchAirLoopPlant::PressureCurve(CurveIndex).Name);
             SetupOutputVariable("Performance Curve Input Variable 3 Value",
                                 OutputProcessor::Unit::None,
-                                PressureCurve(CurveIndex).CurveInput3,
+                                DataBranchAirLoopPlant::PressureCurve(CurveIndex).CurveInput3,
                                 "HVAC",
                                 "Average",
-                                PressureCurve(CurveIndex).Name);
+                                DataBranchAirLoopPlant::PressureCurve(CurveIndex).Name);
             SetupOutputVariable("Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
-                                PressureCurve(CurveIndex).CurveOutput,
+                                DataBranchAirLoopPlant::PressureCurve(CurveIndex).CurveOutput,
                                 "HVAC",
                                 "Average",
-                                PressureCurve(CurveIndex).Name);
+                                DataBranchAirLoopPlant::PressureCurve(CurveIndex).Name);
         }
 
-        if (AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
+        if (DataGlobals::AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= NumCurves; ++CurveIndex) {
                 SetupEMSActuator("Curve",
                                  PerfCurve(CurveIndex).Name,
@@ -2243,14 +2237,14 @@ namespace CurveManager {
                                  PerfCurve(CurveIndex).EMSOverrideCurveValue);
             } // All performance curves
         }
-        if (AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
-            for (CurveIndex = 1; CurveIndex <= NumPressureCurves; ++CurveIndex) {
+        if (DataGlobals::AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
+            for (CurveIndex = 1; CurveIndex <= DataBranchAirLoopPlant::NumPressureCurves; ++CurveIndex) {
                 SetupEMSActuator("Curve",
-                                 PressureCurve(CurveIndex).Name,
+                                 DataBranchAirLoopPlant::PressureCurve(CurveIndex).Name,
                                  "Curve Result",
                                  "[unknown]",
-                                 PressureCurve(CurveIndex).EMSOverrideOn,
-                                 PressureCurve(CurveIndex).EMSOverrideCurveValue);
+                                 DataBranchAirLoopPlant::PressureCurve(CurveIndex).EMSOverrideOn,
+                                 DataBranchAirLoopPlant::PressureCurve(CurveIndex).EMSOverrideCurveValue);
             } // All pressure curves
         }
     }
@@ -2709,7 +2703,7 @@ namespace CurveManager {
         int CurveNum;
 
         NumPressure = inputProcessor->getNumObjectsFound(CurveObjectName);
-        PressureCurve.allocate(NumPressure);
+        DataBranchAirLoopPlant::PressureCurve.allocate(NumPressure);
         for (CurveNum = 1; CurveNum <= NumPressure; ++CurveNum) {
             inputProcessor->getObjectItem(CurveObjectName,
                                           CurveNum,
@@ -2723,20 +2717,20 @@ namespace CurveManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurveObjectName, cAlphaFieldNames(1), ErrsFound);
-            PressureCurve(CurveNum).Name = Alphas(1);
-            PressureCurve(CurveNum).EquivDiameter = Numbers(1);
-            PressureCurve(CurveNum).MinorLossCoeff = Numbers(2);
-            PressureCurve(CurveNum).EquivLength = Numbers(3);
-            PressureCurve(CurveNum).EquivRoughness = Numbers(4);
+            DataBranchAirLoopPlant::PressureCurve(CurveNum).Name = Alphas(1);
+            DataBranchAirLoopPlant::PressureCurve(CurveNum).EquivDiameter = Numbers(1);
+            DataBranchAirLoopPlant::PressureCurve(CurveNum).MinorLossCoeff = Numbers(2);
+            DataBranchAirLoopPlant::PressureCurve(CurveNum).EquivLength = Numbers(3);
+            DataBranchAirLoopPlant::PressureCurve(CurveNum).EquivRoughness = Numbers(4);
             if (NumNumbers > 4 && !lNumericFieldBlanks(5)) {
                 if (Numbers(5) != 0.0) {
-                    PressureCurve(CurveNum).ConstantFPresent = true;
-                    PressureCurve(CurveNum).ConstantF = Numbers(5);
+                    DataBranchAirLoopPlant::PressureCurve(CurveNum).ConstantFPresent = true;
+                    DataBranchAirLoopPlant::PressureCurve(CurveNum).ConstantF = Numbers(5);
                 }
             }
         }
 
-        NumPressureCurves = NumPressure;
+        DataBranchAirLoopPlant::NumPressureCurves = NumPressure;
 
         if (ErrsFound) {
             ShowFatalError("GetPressureCurveInput: Errors found in Curve Objects.  Preceding condition(s) cause termination.");
@@ -2808,9 +2802,9 @@ namespace CurveManager {
         }
 
         // Then try to retrieve a pressure curve object
-        if (allocated(PressureCurve)) {
-            if (size(PressureCurve) > 0) {
-                TempCurveIndex = UtilityRoutines::FindItemInList(PressureCurveName, PressureCurve);
+        if (allocated(DataBranchAirLoopPlant::PressureCurve)) {
+            if (size(DataBranchAirLoopPlant::PressureCurve) > 0) {
+                TempCurveIndex = UtilityRoutines::FindItemInList(PressureCurveName, DataBranchAirLoopPlant::PressureCurve);
             } else {
                 TempCurveIndex = 0;
             }
@@ -2870,12 +2864,12 @@ namespace CurveManager {
         Real64 RoughnessRatio;
 
         // Retrieve data from structure
-        Diameter = PressureCurve(PressureCurveIndex).EquivDiameter;
-        MinorLossCoeff = PressureCurve(PressureCurveIndex).MinorLossCoeff;
-        Length = PressureCurve(PressureCurveIndex).EquivLength;
-        Roughness = PressureCurve(PressureCurveIndex).EquivRoughness;
-        IsConstFPresent = PressureCurve(PressureCurveIndex).ConstantFPresent;
-        ConstantF = PressureCurve(PressureCurveIndex).ConstantF;
+        Diameter = DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).EquivDiameter;
+        MinorLossCoeff = DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).MinorLossCoeff;
+        Length = DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).EquivLength;
+        Roughness = DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).EquivRoughness;
+        IsConstFPresent = DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).ConstantFPresent;
+        ConstantF = DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).ConstantF;
 
         // Intermediate calculations
         CrossSectArea = (Pi / 4.0) * pow_2(Diameter);
@@ -2884,12 +2878,12 @@ namespace CurveManager {
         RoughnessRatio = Roughness / Diameter;
 
         // If we don't have any flow then exit out
-        if (MassFlow < MassFlowTolerance) {
+        if (MassFlow < DataBranchAirLoopPlant::MassFlowTolerance) {
             PressureCurveValue = 0.0;
-            PressureCurve(PressureCurveIndex).CurveInput1 = MassFlow;
-            PressureCurve(PressureCurveIndex).CurveInput2 = Density;
-            PressureCurve(PressureCurveIndex).CurveInput3 = Velocity;
-            PressureCurve(PressureCurveIndex).CurveOutput = 0.0;
+            DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).CurveInput1 = MassFlow;
+            DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).CurveInput2 = Density;
+            DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).CurveInput3 = Velocity;
+            DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).CurveOutput = 0.0;
             return PressureCurveValue;
         }
 
@@ -2903,12 +2897,12 @@ namespace CurveManager {
         // Pressure drop calculation
         PressureCurveValue = (FrictionFactor * (Length / Diameter) + MinorLossCoeff) * (Density * pow_2(Velocity)) / 2.0;
 
-        if (PressureCurve(PressureCurveIndex).EMSOverrideOn) PressureCurveValue = PressureCurve(PressureCurveIndex).EMSOverrideCurveValue;
+        if (DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).EMSOverrideOn) PressureCurveValue = DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).EMSOverrideCurveValue;
 
-        PressureCurve(PressureCurveIndex).CurveInput1 = MassFlow;
-        PressureCurve(PressureCurveIndex).CurveInput2 = Density;
-        PressureCurve(PressureCurveIndex).CurveInput3 = Velocity;
-        PressureCurve(PressureCurveIndex).CurveOutput = PressureCurveValue;
+        DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).CurveInput1 = MassFlow;
+        DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).CurveInput2 = Density;
+        DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).CurveInput3 = Velocity;
+        DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).CurveOutput = PressureCurveValue;
 
         return PressureCurveValue;
     }
