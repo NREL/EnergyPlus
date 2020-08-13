@@ -52201,7 +52201,7 @@
 
   Output:Meter:MeterFileOnly,ElectricityNet:Facility,Hourly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,Hourly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,Hourly;
 
   Output:Meter:MeterFileOnly,InteriorLights:Electricity,Hourly;
 

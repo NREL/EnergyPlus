@@ -3956,21 +3956,21 @@
 
   Output:Variable,*,Heating Coil Heating Energy,annual;
 
-  Output:Variable,*,Heating Coil Gas Energy,monthly;
+  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,monthly;
 
-  Output:Variable,*,Heating Coil Gas Energy,annual;
+  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,annual;
 
-  Output:Variable,*,Heating Coil Gas Rate,monthly;
+  Output:Variable,*,Heating Coil NaturalGas Rate,monthly;
 
-  Output:Variable,*,Heating Coil Gas Rate,annual;
+  Output:Variable,*,Heating Coil NaturalGas Rate,annual;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,monthly;
+  Output:Variable,*,Heating Coil Ancillary NaturalNaturalGas Energy,monthly;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,annual;
+  Output:Variable,*,Heating Coil Ancillary NaturalNaturalGas Energy,annual;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Rate,monthly;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Rate,monthly;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Rate,annual;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Rate,annual;
 
   Output:Variable,*,Heating Coil Heating Rate,monthly;
 
@@ -4068,13 +4068,13 @@
 
   Output:Variable,*,Water Heater Net Heat Transfer Energy,annual;
 
-  Output:Variable,*,Water Heater Gas Energy,monthly;
+  Output:Variable,*,Water Heater NaturalNaturalGas Energy,monthly;
 
-  Output:Variable,*,Water Heater Gas Energy,annual;
+  Output:Variable,*,Water Heater NaturalNaturalGas Energy,annual;
 
-  Output:Variable,*,Water Heater Gas Rate,monthly;
+  Output:Variable,*,Water Heater NaturalGas Rate,monthly;
 
-  Output:Variable,*,Water Heater Gas Rate,annual;
+  Output:Variable,*,Water Heater NaturalGas Rate,annual;
 
   Output:Variable,*,Water Heater Water Volume,monthly;
 
@@ -4236,17 +4236,17 @@
 
   Output:Meter:MeterFileOnly,Fans:Electricity,annual;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,annual;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,annual;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,annual;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,annual;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,annual;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,annual;
 
   Output:Meter:MeterFileOnly,Water:Plant,monthly;
 
@@ -5165,7 +5165,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Water Heater Use Side Heat Transfer Energy,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Water Heater Gas Energy, !- Variable or Meter 3 Name
+    Water Heater NaturalNaturalGas Energy, !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
     Water Heater Total Demand Heat Transfer Energy,  !- Variable or Meter 4 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 4

@@ -2132,9 +2132,9 @@
 
   Output:Meter,Gas:Plant,timestep;
 
-  Output:Meter,Cooling:Gas,timestep;
+  Output:Meter,Cooling:NaturalGas,timestep;
 
-  Output:Meter,Heating:Gas,timestep;
+  Output:Meter,Heating:NaturalGas,timestep;
 
   Output:Meter,Electricity:Plant,timestep;
 
@@ -2184,17 +2184,17 @@
 
   Output:Variable,*,Chiller Heater Condenser Heat Transfer Energy,timestep;
 
-  Output:Variable,*,Chiller Heater Gas Rate,timestep;
+  Output:Variable,*,Chiller Heater NaturalGas Rate,timestep;
 
-  Output:Variable,*,Chiller Heater Gas Energy,timestep;
+  Output:Variable,*,Chiller Heater NaturalNaturalGas Energy,timestep;
 
-  Output:Variable,*,Chiller Heater Cooling Gas Rate,timestep;
+  Output:Variable,*,Chiller Heater Cooling NaturalGas Rate,timestep;
 
-  Output:Variable,*,Chiller Heater Cooling Gas Energy,timestep;
+  Output:Variable,*,Chiller Heater Cooling NaturalNaturalGas Energy,timestep;
 
-  Output:Variable,*,Chiller Heater Heating Gas Rate,timestep;
+  Output:Variable,*,Chiller Heater Heating NaturalGas Rate,timestep;
 
-  Output:Variable,*,Chiller Heater Heating Gas Energy,timestep;
+  Output:Variable,*,Chiller Heater Heating NaturalNaturalGas Energy,timestep;
 
   Output:Variable,*,Chiller Heater Electric Power,timestep;
 
@@ -2258,9 +2258,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -2272,9 +2272,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

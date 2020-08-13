@@ -410,21 +410,21 @@
 
   Output:Variable,*,Water Heater Part Load Ratio,DETAILED;
 
-  Output:Variable,*,Water Heater Gas Rate,DETAILED;
+  Output:Variable,*,Water Heater NaturalGas Rate,DETAILED;
 
-  Output:Variable,*,Water Heater Gas Energy,DETAILED;
+  Output:Variable,*,Water Heater NaturalNaturalGas Energy,DETAILED;
 
   Output:Variable,*,Water Heater Electric Power,DETAILED;
 
   Output:Variable,*,Water Heater Electric Energy,DETAILED;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Gas Rate,DETAILED;
+  Output:Variable,*,Water Heater Off Cycle Parasitic NaturalGas Rate,DETAILED;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Gas Energy,DETAILED;
+  Output:Variable,*,Water Heater Off Cycle Parasitic NaturalNaturalGas Energy,DETAILED;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Gas Rate,DETAILED;
+  Output:Variable,*,Water Heater On Cycle Parasitic NaturalGas Rate,DETAILED;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Gas Energy,DETAILED;
+  Output:Variable,*,Water Heater On Cycle Parasitic NaturalNaturalGas Energy,DETAILED;
 
   Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,DETAILED;
 
@@ -462,25 +462,25 @@
 
   Output:Variable,*,Water Heater Heater 2 Runtime Fraction,DETAILED;
 
-  Output:Meter,WaterSystems:Gas,Daily;
+  Output:Meter,WaterSystems:NaturalGas,Daily;
 
   Output:Meter,WaterSystems:Water,Daily;
 
-  Output:Meter,WaterSystems:Gas,Monthly;
+  Output:Meter,WaterSystems:NaturalGas,Monthly;
 
   Output:Meter,WaterSystems:Water,Monthly;
 
-  Output:Meter,WaterSystems:Gas,RunPeriod;
+  Output:Meter,WaterSystems:NaturalGas,RunPeriod;
 
   Output:Meter,WaterSystems:Water,RunPeriod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,RunPeriod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,RunPeriod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,RunPeriod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,RunPeriod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

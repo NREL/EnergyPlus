@@ -1499,13 +1499,13 @@
 
   Output:Variable,*,Heating Coil Heating Rate,timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,timestep;
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
   Output:Variable,*,Heating Coil Electric Power,timestep;
 
   Output:Variable,*,Heating Coil Runtime Fraction,timestep;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Rate,timestep;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Rate,timestep;
 
   Output:Variable,*,Facility Thermal Comfort ASHRAE 55 Simple Model Winter Clothes Not Comfortable Time,timestep;
 
@@ -1521,9 +1521,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -1533,9 +1533,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 

@@ -5083,7 +5083,7 @@
 
   Output:Meter,Electricity:Building,hourly;
 
-  Output:Meter,Cogeneration:Gas,hourly;
+  Output:Meter,Cogeneration:NaturalGas,hourly;
 
   Output:Meter,ElectricityProduced:Facility,hourly;
 

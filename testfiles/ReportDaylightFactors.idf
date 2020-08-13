@@ -8484,7 +8484,7 @@
 
   Output:Variable,*,Cooling Coil Electric Power,hourly;
 
-  Output:Variable,*,Boiler Gas Rate,hourly;
+  Output:Variable,*,Boiler NaturalGas Rate,hourly;
 
   Output:Variable,*,Boiler Part Load Ratio,HOURLY;
 

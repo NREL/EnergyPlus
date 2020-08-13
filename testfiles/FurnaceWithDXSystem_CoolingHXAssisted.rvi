@@ -6,8 +6,8 @@ Zone Air Humidity Ratio
 Zone Air System Sensible Heating Energy
 Unitary System Fan Part Load Ratio
 Heating Coil Air Heating Rate
-Heating Coil Gas Rate
-Heating Coil Gas Energy
+Heating Coil NaturalGas Rate
+Heating Coil NaturalNaturalGas Energy
 System Node Mass Flow Rate
 AIR LOOP INLET NODE,System Node Temperature
 HEATING COIL AIR INLET NODE,System Node Temperature

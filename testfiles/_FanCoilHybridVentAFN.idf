@@ -3178,7 +3178,7 @@
 
   Output:Variable,West Zone,AFN Zone Infiltration Sensible Heat Gain Energy,Timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,Timestep;
+  Output:Variable,*,Heating Coil NaturalGas Rate,Timestep;
 
   Output:Variable,*,Cooling Coil Electric Power,Timestep;
 

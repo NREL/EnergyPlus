@@ -2205,13 +2205,13 @@
 
   Output:Variable,*,Heating Coil Electric Energy,Hourly;
 
-  Output:Variable,*,Heating Coil Gas Rate,Hourly;
+  Output:Variable,*,Heating Coil NaturalGas Rate,Hourly;
 
-  Output:Variable,*,Heating Coil Gas Energy,Hourly;
+  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,Hourly;
 
   Output:Variable,*,Heating Coil Runtime Fraction,Hourly;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Rate,Hourly;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Rate,Hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,Hourly;
 

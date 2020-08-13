@@ -3402,7 +3402,7 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,hourly;
 
-  Output:Variable,*,Boiler Gas Rate,hourly;
+  Output:Variable,*,Boiler NaturalGas Rate,hourly;
 
   Output:Variable,*,Boiler Heating Rate,hourly;
 
@@ -3434,9 +3434,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3448,9 +3448,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
   OutputControl:Table:Style,
     HTML,                    !- Column Separator
@@ -4002,13 +4002,13 @@
     ,                        !- Digits After Decimal
     Boiler Heating Energy,   !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Boiler Gas Energy,       !- Variable or Meter 2 Name
+    Boiler NaturalNaturalGas Energy,       !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Boiler Heating Energy,   !- Variable or Meter 3 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 3
     Boiler Heating Rate,     !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    Boiler Gas Rate,         !- Variable or Meter 5 Name
+    Boiler NaturalGas Rate,         !- Variable or Meter 5 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 5
     Boiler Inlet Temperature,!- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
@@ -4258,7 +4258,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Water Heater Burner Heating Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Water Heater Gas Energy, !- Variable or Meter 4 Name
+    Water Heater NaturalNaturalGas Energy, !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
     Water Heater Total Demand Heat Transfer Energy,  !- Variable or Meter 5 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 5
@@ -4280,7 +4280,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Generator Diesel Energy, !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Generator Gas Energy,    !- Variable or Meter 3 Name
+    Generator NaturalNaturalGas Energy,    !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
     Generator Produced Electric Energy,  !- Variable or Meter 4 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 4

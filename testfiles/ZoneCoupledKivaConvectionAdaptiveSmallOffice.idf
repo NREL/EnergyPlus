@@ -4859,7 +4859,7 @@
 
   Output:Variable,*,Cooling Coil Electric Power,timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,timestep;
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
   Output:Variable,*,Surface Inside Face Temperature,timestep;
 

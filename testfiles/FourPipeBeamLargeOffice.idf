@@ -9930,7 +9930,7 @@
 
   Output:Variable,*,Boiler Mass Flow Rate,hourly;
 
-  Output:Variable,*,Boiler Gas Rate,hourly;
+  Output:Variable,*,Boiler NaturalGas Rate,hourly;
 
   Output:Variable,*,Chiller Evaporator Mass Flow Rate,hourly;
 

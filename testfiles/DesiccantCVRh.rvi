@@ -40,7 +40,7 @@ DESICCANT 1,Dehumidifier Regeneration Energy
 DESICCANT 1,Dehumidifier Regeneration Air Speed
 DESICCANT 1,Dehumidifier Regeneration Air Mass Flow Rate
 DESICCANT 1,Dehumidifier Process Air Mass Flow Rate
-DESICCANT REGEN COIL,Heating Coil Gas Rate
+DESICCANT REGEN COIL,Heating Coil NaturalGas Rate
 SUPPLY FAN 1,Fan Electric Power
 SUPPLY FAN 1,Fan Rise in Air Temperature
 DESICCANT REGEN FAN,Fan Electric Power

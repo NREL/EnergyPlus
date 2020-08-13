@@ -404,7 +404,7 @@
 
   Output:Variable,*,Exterior Lights Electric Energy,timestep;
 
-  Output:Variable,*,Exterior Equipment Gas Energy,timestep;
+  Output:Variable,*,Exterior Equipment NaturalNaturalGas Energy,timestep;
 
   Output:Variable,*,Exterior Equipment Coal Energy,timestep;
 
@@ -424,7 +424,7 @@
 
   Output:Meter,ExteriorEquipment*,Environment;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   Output:VariableDictionary,Regular;
 

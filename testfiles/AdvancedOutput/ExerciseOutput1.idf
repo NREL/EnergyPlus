@@ -1395,15 +1395,15 @@
 
   Output:Variable,*,Zone Air Temperature,Monthly;
 
-  Output:Variable,*,Heating Coil Gas Energy,Timestep;
+  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,Timestep;
 
-  Output:Variable,*,Heating Coil Gas Energy,Hourly;
+  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,Hourly;
 
-  Output:Variable,*,Heating Coil Gas Energy,Daily;
+  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,Daily;
 
-  Output:Variable,*,Heating Coil Gas Energy,Monthly;
+  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,Monthly;
 
-  Output:Variable,*,Heating Coil Gas Energy,Annual;
+  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,Annual;
 
   Output:Variable,*,Heating Coil Electric Energy,Timestep;
 
@@ -1415,15 +1415,15 @@
 
   Output:Variable,*,Heating Coil Electric Energy,Annual;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Timestep;
+  Output:Variable,*,Heating Coil Ancillary NaturalNaturalGas Energy,Timestep;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Hourly;
+  Output:Variable,*,Heating Coil Ancillary NaturalNaturalGas Energy,Hourly;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Daily;
+  Output:Variable,*,Heating Coil Ancillary NaturalNaturalGas Energy,Daily;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Monthly;
+  Output:Variable,*,Heating Coil Ancillary NaturalNaturalGas Energy,Monthly;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Annual;
+  Output:Variable,*,Heating Coil Ancillary NaturalNaturalGas Energy,Annual;
 
   Output:Variable,*,Cooling Coil Electric Energy,Timestep;
 
@@ -1543,7 +1543,7 @@
 
   Output:Meter,Electricity:Facility,Monthly;
 
-  Output:Meter,Heating:Gas,Monthly;
+  Output:Meter,Heating:NaturalGas,Monthly;
 
   Output:Meter,Gas:HVAC,Monthly;
 

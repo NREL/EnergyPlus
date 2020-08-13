@@ -2215,7 +2215,7 @@
 
   Output:Variable,*,Unitary System Total Heating Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Gas Rate,timestep;
+  Output:Variable,*,Cooling Coil NaturalGas Rate,timestep;
 
   Output:Variable,*,Unitary System Total Heating Rate,timestep;
 
@@ -2225,17 +2225,17 @@
 
   Output:Variable,*,Unitary System DX Coil Speed Level,timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,timestep;
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Heating Coil Defrost Gas Rate,timestep;
+  Output:Variable,*,Heating Coil Defrost NaturalGas Rate,timestep;
 
   Output:Variable,*,Heating Coil Heating Energy,timestep;
 
   Output:Variable,*,Heating Coil Heating Rate,timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,timestep;
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Heating Coil Defrost Gas Energy,timestep;
+  Output:Variable,*,Heating Coil Defrost NaturalNaturalGas Energy,timestep;
 
   Output:Variable,MIXED AIR NODE,System Node Mass Flow Rate,timestep;
 
@@ -2253,9 +2253,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -2265,9 +2265,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

@@ -3694,7 +3694,7 @@
 
   Output:Variable,*,Heating Coil Electric Power,hourly;
 
-  Output:Variable,*,Heating Coil Gas Rate,hourly;
+  Output:Variable,*,Heating Coil NaturalGas Rate,hourly;
 
   Output:Variable,*,Heating Coil Runtime Fraction,hourly;
 

@@ -5377,7 +5377,7 @@
 
   Output:Meter,Gas:Facility,Timestep;
 
-  Output:Meter,Heating:Gas,Timestep;
+  Output:Meter,Heating:NaturalGas,Timestep;
 
   Output:Meter,Water Heater:WaterSystems:Gas,Timestep;
 

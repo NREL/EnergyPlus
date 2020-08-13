@@ -1703,11 +1703,11 @@
 
   Output:Variable,*,Heating Coil Electric Power,detailed;
 
-  Output:Variable,*,Heating Coil Gas Rate,detailed;
+  Output:Variable,*,Heating Coil NaturalGas Rate,detailed;
 
   Output:Variable,*,Heating Coil Runtime Fraction,detailed;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Rate,detailed;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Rate,detailed;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,detailed;
 

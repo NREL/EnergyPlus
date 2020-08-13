@@ -6195,7 +6195,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,hourly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,hourly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,hourly;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
 !-   ===========  ALL OBJECTS IN CLASS: ENVIRONMENTALIMPACTFACTORS ===========

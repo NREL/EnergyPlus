@@ -9359,9 +9359,9 @@
 
   Output:Meter,Gas:Facility,HOURLY;
 
-  Output:Meter,Heating:Gas,HOURLY;
+  Output:Meter,Heating:NaturalGas,HOURLY;
 
-  Output:Meter,InteriorEquipment:Gas,HOURLY;
+  Output:Meter,InteriorEquipment:NaturalGas,HOURLY;
 
   Output:Meter,Water Heater:WaterSystems:Gas,HOURLY;
 
@@ -9371,7 +9371,7 @@
 
   Output:Variable,*,Site Outdoor Air Relative Humidity,HOURLY;
 
-  Output:Variable,*,Boiler Gas Energy,HOURLY;
+  Output:Variable,*,Boiler NaturalNaturalGas Energy,HOURLY;
 
   Output:Variable,*,Boiler Inlet Temperature,HOURLY;
 

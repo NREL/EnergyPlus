@@ -3437,7 +3437,7 @@
 
   Output:Meter,Electricity:Facility,Hourly;
 
-  Output:Meter,Heating:Gas,Hourly;
+  Output:Meter,Heating:NaturalGas,Hourly;
 
   Output:Meter,Gas:Plant,Hourly;
 

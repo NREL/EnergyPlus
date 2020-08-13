@@ -13,7 +13,7 @@ Cat Diesel,Generator Diesel Rate
 Cat Diesel,Generator Diesel Mass Flow Rate
 Cat Diesel,Generator Exhaust Air Temperature
 Solar Turbine,Generator Produced Electric Power
-Solar Turbine,Generator Gas Rate
+Solar Turbine,Generator NaturalGas Rate
 Solar Turbine,Generator Gas Mass Flow Rate
 Solar Turbine,Generator Exhaust Air Temperature
 Capstone C65,Generator Produced Electric Power

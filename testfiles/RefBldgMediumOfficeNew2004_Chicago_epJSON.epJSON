@@ -6956,11 +6956,11 @@
             "variable_details": [
                 {
                     "aggregation_type_for_variable_or_meter": "SumOrAverage",
-                    "variable_or_meter_name": "Heating Coil Gas Rate"
+                    "variable_or_meter_name": "Heating Coil NaturalGas Rate"
                 },
                 {
                     "aggregation_type_for_variable_or_meter": "Maximum",
-                    "variable_or_meter_name": "Heating Coil Gas Rate"
+                    "variable_or_meter_name": "Heating Coil NaturalGas Rate"
                 }
             ]
         }
@@ -7047,7 +7047,7 @@
         "Output:Variable 6": {
             "key_value": "*",
             "reporting_frequency": "Hourly",
-            "variable_name": "Boiler Gas Energy"
+            "variable_name": "Boiler NaturalNaturalGas Energy"
         },
         "Output:Variable 7": {
             "key_value": "*",

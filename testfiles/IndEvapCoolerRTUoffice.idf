@@ -7222,7 +7222,7 @@
 
   Output:Variable,*,Cooling Coil Electric Energy,runperiod;
 
-  Output:Variable,*,Heating Coil Gas Energy,runperiod;
+  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,runperiod;
 
   Output:Meter,InteriorLights:Electricity,runperiod;
 
@@ -7248,13 +7248,13 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Building,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

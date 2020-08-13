@@ -16381,7 +16381,7 @@
 
   Output:Meter:MeterFileOnly,ElectricityNet:Facility,Hourly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,Hourly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,Hourly;
 
 !-   ===========  ALL OBJECTS IN CLASS: REPORT ===========
 

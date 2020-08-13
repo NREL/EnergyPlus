@@ -5256,13 +5256,13 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Refrigeration:Electricity,monthly;
 
   Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   Output:Meter:MeterFileOnly,Refrigeration:Water,Monthly;
 
