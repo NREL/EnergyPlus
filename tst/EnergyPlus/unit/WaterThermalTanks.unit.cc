@@ -5097,7 +5097,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_FalsePositiveBlank
     EXPECT_EQ(1, WaterThermalTanks::numWaterHeaterStratified);
     WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTanks::WaterThermalTank(1);
     EXPECT_EQ(6, Tank.Nodes);
-    EXPECT_EQ(6, Tank.AdditionalLossCoeff.size());
+    EXPECT_EQ(6u, Tank.AdditionalLossCoeff.size());
     for (int i = 1; i <= Tank.Nodes; ++i) {
         if (i==2) {
             EXPECT_EQ(0, Tank.AdditionalLossCoeff(i));
@@ -5198,7 +5198,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_FalsePositiveZeroe
     EXPECT_EQ(1, WaterThermalTanks::numWaterHeaterStratified);
     WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTanks::WaterThermalTank(1);
     EXPECT_EQ(6, Tank.Nodes);
-    EXPECT_EQ(6, Tank.AdditionalLossCoeff.size());
+    EXPECT_EQ(6u, Tank.AdditionalLossCoeff.size());
     for (int i = 1; i <= Tank.Nodes; ++i) {
         if (i==2) {
             EXPECT_EQ(0, Tank.AdditionalLossCoeff(i));
@@ -5297,7 +5297,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_ExpectedWarning)
     EXPECT_EQ(1, WaterThermalTanks::numWaterHeaterStratified);
     WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTanks::WaterThermalTank(1);
     EXPECT_EQ(6, Tank.Nodes);
-    EXPECT_EQ(6, Tank.AdditionalLossCoeff.size());
+    EXPECT_EQ(6u, Tank.AdditionalLossCoeff.size());
     for (int i = 1; i <= Tank.Nodes; ++i) {
         if (i==2) {
             EXPECT_EQ(0, Tank.AdditionalLossCoeff(i));
