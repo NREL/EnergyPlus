@@ -165,13 +165,6 @@ namespace DXCoils {
 
     Real64 const DryCoilOutletHumRatioMin(0.00001); // dry coil outlet minimum hum ratio kgWater/kgDryAir
 
-    // Curve Types
-    int const Linear(1);
-    int const BiLinear(2);
-    int const Quadratic(3);
-    int const BiQuadratic(4);
-    int const Cubic(5);
-
     // Multimode DX Coil
     int const MaxCapacityStages(2);                               // Maximum number of capacity stages supported
     int const MaxDehumidModes(1);                                 // Maximum number of enhanced dehumidification modes supported

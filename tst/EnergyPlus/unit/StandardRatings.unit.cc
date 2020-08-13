@@ -52,7 +52,6 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -74,9 +73,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 {
     // Test that the standard ratings calculation with negative curve value
 
-    using CurveManager::Cubic;
     using CurveManager::NumCurves;
-    using CurveManager::Quadratic;
     using DXCoils::DXCoil;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using StandardRatings::SingleSpeedDXHeatingCoilStandardRatings;
@@ -126,7 +123,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 
     int const nCapfT = 1;
     pCurve = &PerfCurve(nCapfT);
-    pCurve->CurveType = Cubic;
+    pCurve->CurveType = CurveTypeEnum::Cubic;
     pCurve->NumDims = 1;
     pCurve->Name = "PTHPHeatingCAPFT";
     pCurve->Coeff1 = 0.876825;
@@ -140,7 +137,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 
     int const nCapfFF = 2;
     pCurve = &PerfCurve(nCapfFF);
-    pCurve->CurveType = Quadratic;
+    pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->NumDims = 1;
     pCurve->Name = "HPHeatCapfFF";
     pCurve->Coeff1 = 1;
@@ -154,7 +151,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 
     int const nEIRfT = 3;
     pCurve = &PerfCurve(nEIRfT);
-    pCurve->CurveType = Cubic;
+    pCurve->CurveType = CurveTypeEnum::Cubic;
     pCurve->NumDims = 1;
     pCurve->Name = "PTHPHeatingEIRFT";
     pCurve->Coeff1 = 0.704658;
@@ -167,7 +164,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 
     int const nEIRfFF = 4;
     pCurve = &PerfCurve(nEIRfFF);
-    pCurve->CurveType = Quadratic;
+    pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->NumDims = 1;
     pCurve->Name = "HPHeatEIRfFF";
     pCurve->Coeff1 = 1;
@@ -181,7 +178,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 
     int const nPLFfPLR = 5;
     pCurve = &PerfCurve(nPLFfPLR);
-    pCurve->CurveType = Quadratic;
+    pCurve->CurveType = CurveTypeEnum::Quadratic;
     pCurve->NumDims = 1;
     pCurve->Name = "HPHeatPLFfPLR";
     pCurve->Coeff1 = 1;
@@ -195,9 +192,9 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 
     for (int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum) {
         PerformanceCurveData &rCurve = PerfCurve(CurveNum);
-        if (rCurve.CurveType == Cubic) {
+        if (rCurve.CurveType == CurveTypeEnum::Cubic) {
             rCurve.ObjectType = "Curve:Cubic";
-        } else if (rCurve.CurveType == Quadratic) {
+        } else if (rCurve.CurveType == CurveTypeEnum::Quadratic) {
             rCurve.ObjectType = "Curve:Quadratic";
         }
         rCurve.InterpolationType = EvaluateCurveToLimits;
@@ -244,8 +241,6 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 TEST_F(EnergyPlusFixture, ChillerIPLVTest)
 {
 
-    using CurveManager::Cubic;
-    using CurveManager::BiQuadratic;
     using CurveManager::NumCurves;
     using StandardRatings::CalcChillerIPLV;
     using DataPlant::TypeOf_Chiller_ElectricEIR;
@@ -264,7 +259,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
 
     // Cap=f(T)
     CurveNum = 1;
-    PerfCurve(CurveNum).CurveType = BiQuadratic;
+    PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
     PerfCurve(CurveNum).NumDims = 2;
     PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -283,7 +278,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
 
     // EIR=f(T)
     CurveNum = 2;
-    PerfCurve(CurveNum).CurveType = BiQuadratic;
+    PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
     PerfCurve(CurveNum).NumDims = 2;
     PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -302,7 +297,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
 
     // EIR=f(PLR)
     CurveNum = 3;
-    PerfCurve(CurveNum).CurveType = Cubic;
+    PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
     PerfCurve(CurveNum).NumDims = 1;
     PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;

@@ -62,10 +62,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
@@ -109,44 +107,11 @@ namespace CurveManager {
     // validating it, and storing it in such a manner that the curve manager
     // can provide the simulation with performance curve output.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::AnyEnergyManagementSystemInModel;
     using namespace DataBranchAirLoopPlant;
 
     using json = nlohmann::json;
-
-    // Curve Type parameters, these can differ from object types (e.g. a CurveType_TableOneIV can be linear, quadratic, etc)
-    int const Linear(1);
-    int const BiLinear(2);
-    int const Quadratic(3);
-    int const BiQuadratic(4);
-    int const Cubic(5);
-    int const QuadraticLinear(6);
-    int const BiCubic(7);
-    int const TriQuadratic(8);
-    int const Exponent(9);
-    int const Quartic(10);
-    int const FanPressureRise(11);
-    int const ExponentialSkewNormal(12);
-    int const Sigmoid(13);
-    int const RectangularHyperbola1(14);
-    int const RectangularHyperbola2(15);
-    int const ExponentialDecay(16);
-    int const DoubleExponentialDecay(17);
-    int const QuadLinear(18);
-    int const CubicLinear(19);
-    int const ChillerPartLoadWithLift(20);
 
     // Interpolation Types
     int const EvaluateCurveToLimits(1);
@@ -421,7 +386,7 @@ namespace CurveManager {
 
             // could add checks for blank numeric fields, and use field names for errors.
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = BiQuadratic;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 2;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -491,7 +456,7 @@ namespace CurveManager {
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
 
-            PerfCurve(CurveNum).CurveType = ChillerPartLoadWithLift;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::ChillerPartLoadWithLift;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 3;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -564,7 +529,7 @@ namespace CurveManager {
             ++CurveNum;
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = Cubic;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -618,7 +583,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = Quartic;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quartic;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -673,7 +638,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = Quadratic;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -726,7 +691,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = QuadraticLinear;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadraticLinear;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 2;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -795,7 +760,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = CubicLinear;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::CubicLinear;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 2;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -864,7 +829,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = Linear;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::Linear;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -916,7 +881,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = BiCubic;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiCubic;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 2;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -989,7 +954,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = TriQuadratic;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::TriQuadratic;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 3;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -1095,7 +1060,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = QuadLinear;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadLinear;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 4;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -1190,7 +1155,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = Exponent;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::Exponent;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -1236,7 +1201,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = FanPressureRise;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::FanPressureRise;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 2;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -1290,7 +1255,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = ExponentialSkewNormal;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialSkewNormal;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -1346,7 +1311,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = Sigmoid;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::Sigmoid;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -1403,7 +1368,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = RectangularHyperbola1;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola1;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -1458,7 +1423,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = RectangularHyperbola2;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola2;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -1513,7 +1478,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = ExponentialDecay;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialDecay;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -1568,7 +1533,7 @@ namespace CurveManager {
             GlobalNames::VerifyUniqueInterObjectName(UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             PerfCurve(CurveNum).Name = Alphas(1);
-            PerfCurve(CurveNum).CurveType = DoubleExponentialDecay;
+            PerfCurve(CurveNum).CurveType = CurveTypeEnum::DoubleExponentialDecay;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
             PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
@@ -2336,32 +2301,32 @@ namespace CurveManager {
 
         {
             auto const SELECT_CASE_var(Curve.CurveType);
-            if (SELECT_CASE_var == Linear) {
+            if (SELECT_CASE_var == CurveTypeEnum::Linear) {
                 CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2;
-            } else if (SELECT_CASE_var == Quadratic) {
+            } else if (SELECT_CASE_var == CurveTypeEnum::Quadratic) {
                 CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3);
-            } else if (SELECT_CASE_var == QuadLinear) {
+            } else if (SELECT_CASE_var == CurveTypeEnum::QuadLinear) {
                 CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5;
-            } else if (SELECT_CASE_var == Cubic) {
+            } else if (SELECT_CASE_var == CurveTypeEnum::Cubic) {
                 CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4));
-            } else if (SELECT_CASE_var == Quartic) {
+            } else if (SELECT_CASE_var == CurveTypeEnum::Quartic) {
                 CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * (Curve.Coeff4 + V1 * Curve.Coeff5)));
-            } else if (SELECT_CASE_var == BiQuadratic) {
+            } else if (SELECT_CASE_var == CurveTypeEnum::BiQuadratic) {
                 CurveValue =
                     Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3) + V2 * (Curve.Coeff4 + V2 * Curve.Coeff5) + V1 * V2 * Curve.Coeff6;
-            } else if (SELECT_CASE_var == QuadraticLinear) {
+            } else if (SELECT_CASE_var == CurveTypeEnum::QuadraticLinear) {
                 CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3)) + (Curve.Coeff4 + V1 * (Curve.Coeff5 + V1 * Curve.Coeff6)) * V2;
-            } else if (SELECT_CASE_var == CubicLinear) {
+            } else if (SELECT_CASE_var == CurveTypeEnum::CubicLinear) {
                 CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4))) + (Curve.Coeff5 + V1 * Curve.Coeff6) * V2;
-            } else if (SELECT_CASE_var == BiCubic) {
+            } else if (SELECT_CASE_var == CurveTypeEnum::BiCubic) {
                 CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V1 * V1 * Curve.Coeff3 + V2 * Curve.Coeff4 + V2 * V2 * Curve.Coeff5 +
                              V1 * V2 * Curve.Coeff6 + V1 * V1 * V1 * Curve.Coeff7 + V2 * V2 * V2 * Curve.Coeff8 + V1 * V1 * V2 * Curve.Coeff9 +
                              V1 * V2 * V2 * Curve.Coeff10;
-            } else if (SELECT_CASE_var == ChillerPartLoadWithLift) {
+            } else if (SELECT_CASE_var == CurveTypeEnum::ChillerPartLoadWithLift) {
                 CurveValue = Curve.Coeff1 + Curve.Coeff2 * V1 + Curve.Coeff3 * V1 * V1 + Curve.Coeff4 * V2 + Curve.Coeff5 * V2 * V2 +
                              Curve.Coeff6 * V1 * V2 + Curve.Coeff7 * V1 * V1 * V1 + Curve.Coeff8 * V2 * V2 * V2 + Curve.Coeff9 * V1 * V1 * V2 +
                              Curve.Coeff10 * V1 * V2 * V2 + Curve.Coeff11 * V1 * V1 * V2 * V2 + Curve.Coeff12 * V3 * V2 * V2 * V2;
-            } else if (SELECT_CASE_var == TriQuadratic) {
+            } else if (SELECT_CASE_var == CurveTypeEnum::TriQuadratic) {
                 auto const &Tri2ndOrder(Curve.Tri2ndOrder(1));
                 auto const V1s(V1 * V1);
                 auto const V2s(V2 * V2);
@@ -2375,31 +2340,31 @@ namespace CurveManager {
                              Tri2ndOrder.CoeffA20 * V1s * V2s * V3 + Tri2ndOrder.CoeffA21 * V1s * V2 * V3s + Tri2ndOrder.CoeffA22 * V1 * V2s * V3s +
                              Tri2ndOrder.CoeffA23 * V1s * V2 * V3 + Tri2ndOrder.CoeffA24 * V1 * V2s * V3 + Tri2ndOrder.CoeffA25 * V1 * V2 * V3s +
                              Tri2ndOrder.CoeffA26 * V1 * V2 * V3;
-            } else if (SELECT_CASE_var == Exponent) {
+            } else if (SELECT_CASE_var == CurveTypeEnum::Exponent) {
                 CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::pow(V1, Curve.Coeff3);
-            } else if (SELECT_CASE_var == FanPressureRise) { // Added Fan Pressure Rise curve
+            } else if (SELECT_CASE_var == CurveTypeEnum::FanPressureRise) {
                 CurveValue = V1 * (Curve.Coeff1 * V1 + Curve.Coeff2 + Curve.Coeff3 * std::sqrt(V2)) + Curve.Coeff4 * V2;
-            } else if (SELECT_CASE_var == ExponentialSkewNormal) { // Added Exponential Skew Normal curve
+            } else if (SELECT_CASE_var == CurveTypeEnum::ExponentialSkewNormal) {
                 CoeffZ1 = (V1 - Curve.Coeff1) / Curve.Coeff2;
                 CoeffZ2 = (Curve.Coeff4 * V1 * std::exp(Curve.Coeff3 * V1) - Curve.Coeff1) / Curve.Coeff2;
                 CoeffZ3 = -Curve.Coeff1 / Curve.Coeff2;
                 CurveValueNumer = std::exp(-0.5 * (CoeffZ1 * CoeffZ1)) * (1.0 + sign(1.0, CoeffZ2) * std::erf(std::abs(CoeffZ2) * sqrt_2_inv));
                 CurveValueDenom = std::exp(-0.5 * (CoeffZ3 * CoeffZ3)) * (1.0 + sign(1.0, CoeffZ3) * std::erf(std::abs(CoeffZ3) * sqrt_2_inv));
                 CurveValue = CurveValueNumer / CurveValueDenom;
-            } else if (SELECT_CASE_var == Sigmoid) { // Added Sigmoid curve
+            } else if (SELECT_CASE_var == CurveTypeEnum::Sigmoid) {
                 CurveValueExp = std::exp((Curve.Coeff3 - V1) / Curve.Coeff4);
                 CurveValue = Curve.Coeff1 + Curve.Coeff2 / std::pow(1.0 + CurveValueExp, Curve.Coeff5);
-            } else if (SELECT_CASE_var == RectangularHyperbola1) { // Added Rectangular Hyperbola Type 1 curve
+            } else if (SELECT_CASE_var == CurveTypeEnum::RectangularHyperbola1) {
                 CurveValueNumer = Curve.Coeff1 * V1;
                 CurveValueDenom = Curve.Coeff2 + V1;
                 CurveValue = (CurveValueNumer / CurveValueDenom) + Curve.Coeff3;
-            } else if (SELECT_CASE_var == RectangularHyperbola2) { // Added Rectangular Hyperbola Type 2 curve
+            } else if (SELECT_CASE_var == CurveTypeEnum::RectangularHyperbola2) {
                 CurveValueNumer = Curve.Coeff1 * V1;
                 CurveValueDenom = Curve.Coeff2 + V1;
                 CurveValue = (CurveValueNumer / CurveValueDenom) + (Curve.Coeff3 * V1);
-            } else if (SELECT_CASE_var == ExponentialDecay) { // Added Exponential Decay curve
+            } else if (SELECT_CASE_var == CurveTypeEnum::ExponentialDecay) {
                 CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1);
-            } else if (SELECT_CASE_var == DoubleExponentialDecay) { // ykt Jul 2011 Added Double Exponential Decay curve
+            } else if (SELECT_CASE_var == CurveTypeEnum::DoubleExponentialDecay) {
                 CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1) + Curve.Coeff4 * std::exp(Curve.Coeff5 * V1);
             } else {
                 CurveValue = 0.0;
@@ -2811,7 +2776,6 @@ namespace CurveManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TempCurveIndex;
-        bool FoundCurve;
         std::string GenericCurveType;
 
         // If input is not gotten, go ahead and get it now
@@ -2822,7 +2786,6 @@ namespace CurveManager {
         }
 
         // Initialize
-        FoundCurve = false;
         PressureCurveType = PressureCurve_None;
         PressureCurveIndex = 0;
 
@@ -2867,7 +2830,7 @@ namespace CurveManager {
         // If we made it here, we didn't find either type of match
 
         // Last check, see if it is blank:
-        if (PressureCurveName == "") {
+        if (PressureCurveName.empty()) {
             PressureCurveType = PressureCurve_None;
             return;
         }

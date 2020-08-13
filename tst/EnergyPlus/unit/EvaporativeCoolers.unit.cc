@@ -414,8 +414,6 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcIndirectRDDEvapCoolerOutletTemp
 
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
 {
-    using CurveManager::Quadratic;
-
     int CurveNum;
 
     EvaporativeCoolers::EvapCond.allocate(1);
@@ -432,7 +430,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
 
     NumCurves = 1;
     PerfCurve.allocate(1);
-    PerfCurve(CurveNum).CurveType = Quadratic;
+    PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 0.0;
@@ -723,7 +721,7 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     int const CurveNum = 1;
     CurveManager::NumCurves = 1;
     PerfCurve.allocate(1);
-    PerfCurve(CurveNum).CurveType = Quadratic;
+    PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Linear";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 0.0;

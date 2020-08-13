@@ -128,7 +128,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     PerfCurve.allocate(NumCurves);
 
     CurveNum = 1;
-    PerfCurve(CurveNum).CurveType = Quadratic;
+    PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 21.2;
@@ -143,7 +143,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     PerfCurve(CurveNum).Var2Max = 2.0;
 
     CurveNum = 2;
-    PerfCurve(CurveNum).CurveType = Quadratic;
+    PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
     PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 18.8;

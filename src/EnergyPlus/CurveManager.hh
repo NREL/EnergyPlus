@@ -75,26 +75,30 @@ namespace EnergyPlus {
 namespace CurveManager {
 
     // Curve Type parameters, these can differ from object types (e.g. a CurveType_TableOneIV can be linear, quadratic, etc)
-    extern int const Linear;
-    extern int const BiLinear;
-    extern int const Quadratic;
-    extern int const BiQuadratic;
-    extern int const Cubic;
-    extern int const QuadraticLinear;
-    extern int const BiCubic;
-    extern int const TriQuadratic;
-    extern int const Exponent;
-    extern int const Quartic;
-    extern int const FanPressureRise;
-    extern int const ExponentialSkewNormal;
-    extern int const Sigmoid;
-    extern int const RectangularHyperbola1;
-    extern int const RectangularHyperbola2;
-    extern int const ExponentialDecay;
-    extern int const DoubleExponentialDecay;
-    extern int const QuadLinear;
-    extern int const CubicLinear;
-    extern int const ChillerPartLoadWithLift;
+
+    enum class CurveTypeEnum {
+        Unassigned,
+        Linear,
+        BiLinear,
+        Quadratic,
+        BiQuadratic,
+        Cubic,
+        QuadraticLinear,
+        BiCubic,
+        TriQuadratic,
+        Exponent,
+        Quartic,
+        FanPressureRise,
+        ExponentialSkewNormal,
+        Sigmoid,
+        RectangularHyperbola1,
+        RectangularHyperbola2,
+        ExponentialDecay,
+        DoubleExponentialDecay,
+        QuadLinear,
+        CubicLinear,
+        ChillerPartLoadWithLift
+    };
 
     // Interpolation Types
     extern int const EvaluateCurveToLimits;
@@ -151,7 +155,7 @@ namespace CurveManager {
         // Members
         std::string Name;                                 // Curve Name
         std::string ObjectType;                           // Curve object type
-        int CurveType;                                    // Curve type (see parameter definitions above)
+        CurveTypeEnum CurveType;                                    // Curve type (see parameter definitions above)
         int InterpolationType;                            // table interpolation method
         int DataFormat;                                   // format of tabular data
         int TableIndex;                                   // Index to tablular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
@@ -215,7 +219,7 @@ namespace CurveManager {
 
         // Default Constructor
         PerformanceCurveData()
-            : CurveType(0), InterpolationType(0), DataFormat(0), TableIndex(0), NumDims(0), NumIVLowErrorIndex(0),
+            : CurveType(CurveTypeEnum::Unassigned), InterpolationType(0), DataFormat(0), TableIndex(0), NumDims(0), NumIVLowErrorIndex(0),
               NumIVHighErrorIndex(0), X1SortOrder(1), X2SortOrder(1), GridValueIndex(0), NormalizationValue(1.0), Coeff1(0.0),
               Coeff2(0.0), Coeff3(0.0), Coeff4(0.0), Coeff5(0.0), Coeff6(0.0), Coeff7(0.0), Coeff8(0.0), Coeff9(0.0), Coeff10(0.0),
               Coeff11(0.0), Coeff12(0.0), Var1Max(0.0), Var1Min(0.0), Var2Max(0.0), Var2Min(0.0), Var3Max(0.0), Var3Min(0.0), Var4Max(0.0),
