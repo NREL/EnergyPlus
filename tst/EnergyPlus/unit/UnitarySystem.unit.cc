@@ -11938,7 +11938,6 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
 
     OutputReportPredefined::SetPredefinedTables();
     DataSizing::ZoneSizingRunDone = true;
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesignSizeFromParent = true;
     // DataSizing::NumPltSizInput = 2;
 
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = WaterCoils::WaterCoil(1).Name;
@@ -11963,7 +11962,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.5);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.5);
     // check autosized no cooling and no heating flow rates
-    EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, userspecifiedFractionOfAutoSizedCoolingFlowRateValue * thisSys->m_MaxCoolAirVolFlow);
+    EXPECT_NEAR(thisSys->m_MaxNoCoolHeatAirVolFlow, userspecifiedFractionOfAutoSizedCoolingFlowRateValue * thisSys->m_MaxCoolAirVolFlow, 0.000001);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
@@ -12081,7 +12080,6 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
 
     OutputReportPredefined::SetPredefinedTables();
     DataSizing::ZoneSizingRunDone = true;
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesignSizeFromParent = true;
 
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = WaterCoils::WaterCoil(1).Name;
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -12105,7 +12103,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.5);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.5);
     // check autosized no cooling and no heating flow rates
-    EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, userspecifiedFlowPerCoolingCapacityValue * thisSys->m_DesignCoolingCapacity);
+    EXPECT_NEAR(thisSys->m_MaxNoCoolHeatAirVolFlow, userspecifiedFlowPerCoolingCapacityValue * thisSys->m_DesignCoolingCapacity, 0.0000001);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)

@@ -271,6 +271,8 @@ protected:
 
     void selectSizerOutput(bool &errorsFound);
 
+    void select2StgDXHumCtrlSizerOutput(bool& errorsFound);
+
     bool isValidCoilType(std::string const &compType);
 
     bool isValidFanType(std::string const &compType);

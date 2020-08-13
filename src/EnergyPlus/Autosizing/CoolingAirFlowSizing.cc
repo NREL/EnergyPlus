@@ -605,17 +605,6 @@ Real64 CoolingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
         } else if (this->curSysNum > 0) {
             if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
                 this->autoSizedValue = _originalValue;
-                if (this->printWarningFlag && this->autoSizedValue > 0.0) {
-                    if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
-                        this->autoSizedValue /= (1 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
-                        this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->autoSizedValue);
-                        this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
-                        this->reportSizerOutput(
-                            this->compType, this->compName, "User-Specified " + this->sizingString + " (non-bypassed)", this->autoSizedValue);
-                    } else {
-                        this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->autoSizedValue);
-                    }
-                }
             } else {
                 if (this->curOASysNum > 0) {
                     if (this->oaSysEqSizing(this->curOASysNum).AirFlow) {
@@ -655,6 +644,7 @@ Real64 CoolingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
         } else if (this->dataNonZoneNonAirloopValue > 0) {
             this->autoSizedValue = this->dataNonZoneNonAirloopValue;
         }
+
         // override sizing string
         if (this->isEpJSON) this->sizingString = "cooling_supply_air_flow_rate [m3/s]";
         if (this->dataScalableSizingON) {
@@ -673,7 +663,7 @@ Real64 CoolingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
             this->sizingString = ScalableSM + this->sizingString;
         }
     }
-    this->selectSizerOutput(errorsFound);
+    this->select2StgDXHumCtrlSizerOutput(errorsFound);
 
     if (this->isCoilReportObject) {
         // SizingResult is airflow in m3/s

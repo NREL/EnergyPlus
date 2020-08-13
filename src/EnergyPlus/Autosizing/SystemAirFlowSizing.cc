@@ -66,9 +66,11 @@ Real64 SystemAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
 
     if (this->dataEMSOverrideON) {
         this->autoSizedValue = this->dataEMSOverride;
+    } else if (this->dataConstantUsedForSizing > 0.0 && this->dataFractionUsedForSizing > 0.0) {
+        this->autoSizedValue = this->dataConstantUsedForSizing * this->dataFractionUsedForSizing;
     } else {
         if (this->curZoneEqNum > 0) {
-            if ( !this->wasAutoSized && !this->sizingDesRunThisZone ) {
+            if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
                 this->autoSizedValue = _originalValue;
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
                 this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;

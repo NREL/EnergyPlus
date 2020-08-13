@@ -4302,7 +4302,6 @@ namespace EvaporativeCoolers {
         std::string CompType;     // component type
         std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
         Real64 TempSize;          // autosized value of coil input field
-        int FieldNum;             // IDD numeric field number where input field description is found
         int SizingMethod;         // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing,
                                   // CoolingCapacitySizing, HeatingCapacitySizing, etc.)
         bool PrintFlag;           // TRUE when sizing information is reported in the eio file

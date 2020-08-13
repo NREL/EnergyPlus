@@ -58,7 +58,7 @@ struct SystemAirFlowSizer : BaseSizerWithScalableInputs
     SystemAirFlowSizer()
     {
         this->sizingType = AutoSizingType::SystemAirFlowSizing;
-        this->sizingString = "Supply Air Maximum Flow Rate [m3/s]";
+        this->sizingString = "Maximum Flow Rate [m3/s]";
     }
     ~SystemAirFlowSizer() = default;
 
