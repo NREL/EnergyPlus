@@ -197,11 +197,11 @@ protected:
         DataSizing::SysSizInput(1).AirLoopNum = 1;
         CurveManager::NumCurves = 10;
         CurveManager::PerfCurve.allocate(10);
-        CurveManager::PerfCurve(1).InterpolationType = EvaluateCurveToLimits;
+        CurveManager::PerfCurve(1).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
         CurveManager::PerfCurve(1).CurveType = CurveTypeEnum::Linear;
         CurveManager::PerfCurve(1).Coeff1 = 1.0;
         CurveManager::PerfCurve(1).CurveMax = 1.0;
-        CurveManager::PerfCurve(2).InterpolationType = EvaluateCurveToLimits;
+        CurveManager::PerfCurve(2).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
         CurveManager::PerfCurve(2).CurveType = CurveTypeEnum::Linear;
         CurveManager::PerfCurve(2).Coeff1 = 1.0;
         CurveManager::PerfCurve(2).CurveMax = 1.0;
@@ -2746,7 +2746,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     // Inputs: parameters
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
     PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
     PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2

@@ -88,7 +88,7 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     TestNum = 1;
     IceStorageCurveType = IceThermalStorage::CurveVars::FracChargedLMTD;
     CurveManager::PerfCurve(TestNum).CurveType = CurveTypeEnum::QuadraticLinear;
-    CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::EvaluateCurveToLimits;
+    CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
     CurveManager::PerfCurve(TestNum).Var1Max = 1.0;
     CurveManager::PerfCurve(TestNum).Var1Min = 0.0;
     CurveManager::PerfCurve(TestNum).Var2Max = 10.0;
@@ -107,7 +107,7 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     TestNum = 2;
     IceStorageCurveType = IceThermalStorage::CurveVars::FracDischargedLMTD;
     CurveManager::PerfCurve(TestNum).CurveType = CurveTypeEnum::BiQuadratic;
-    CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::EvaluateCurveToLimits;
+    CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
     CurveManager::PerfCurve(TestNum).Var1Max = 1.0;
     CurveManager::PerfCurve(TestNum).Var1Min = 0.0;
     CurveManager::PerfCurve(TestNum).Var2Max = 10.0;
@@ -126,7 +126,7 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     TestNum = 3;
     IceStorageCurveType = IceThermalStorage::CurveVars::LMTDMassFlow;
     CurveManager::PerfCurve(TestNum).CurveType = CurveTypeEnum::CubicLinear;
-    CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::EvaluateCurveToLimits;
+    CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
     CurveManager::PerfCurve(TestNum).Var1Max = 10.0;
     CurveManager::PerfCurve(TestNum).Var1Min = 0.0;
     CurveManager::PerfCurve(TestNum).Var2Max = 1.0;
@@ -145,7 +145,7 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     TestNum = 4;
     IceStorageCurveType = IceThermalStorage::CurveVars::LMTDFracCharged;
     CurveManager::PerfCurve(TestNum).CurveType = CurveTypeEnum::CubicLinear;
-    CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::EvaluateCurveToLimits;
+    CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
     CurveManager::PerfCurve(TestNum).Var1Max = 10.0;
     CurveManager::PerfCurve(TestNum).Var1Min = 0.0;
     CurveManager::PerfCurve(TestNum).Var2Max = 1.0;

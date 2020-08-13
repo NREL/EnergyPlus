@@ -197,7 +197,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
         } else if (rCurve.CurveType == CurveTypeEnum::Quadratic) {
             rCurve.ObjectType = "Curve:Quadratic";
         }
-        rCurve.InterpolationType = EvaluateCurveToLimits;
+        rCurve.InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     }
     Real64 NetHeatingCapRatedHighTemp;
     Real64 NetHeatingCapRatedLowTemp;
@@ -262,7 +262,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
     PerfCurve(CurveNum).NumDims = 2;
     PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpCapfT";
     PerfCurve(CurveNum).Coeff1 = 0.98898813;
     PerfCurve(CurveNum).Coeff2 = 0.036832851;
@@ -281,7 +281,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
     PerfCurve(CurveNum).NumDims = 2;
     PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpEIRfT";
     PerfCurve(CurveNum).Coeff1 = 0.814058418;
     PerfCurve(CurveNum).Coeff2 = 0.002335553;
@@ -300,7 +300,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
     PerfCurve(CurveNum).NumDims = 1;
     PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpEIRfPLR";
     PerfCurve(CurveNum).Coeff1 = -0.08117804;
     PerfCurve(CurveNum).Coeff2 = 1.433532026;

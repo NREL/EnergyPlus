@@ -100,11 +100,11 @@ namespace CurveManager {
         ChillerPartLoadWithLift
     };
 
-    // Interpolation Types
-    extern int const EvaluateCurveToLimits;
-    extern int const BtwxtMethod;
-
-    // MODULE VARIABLE DECLARATIONS:
+    enum class InterpTypeEnum {
+        Unassigned,
+        EvaluateCurveToLimits,
+        BtwxtMethod
+    };
 
     extern int NumCurves;
     extern bool GetCurvesInputFlag; // First time, input is "gotten"
@@ -155,8 +155,8 @@ namespace CurveManager {
         // Members
         std::string Name;                                 // Curve Name
         std::string ObjectType;                           // Curve object type
-        CurveTypeEnum CurveType;                                    // Curve type (see parameter definitions above)
-        int InterpolationType;                            // table interpolation method
+        CurveTypeEnum CurveType;                          // Curve type (see parameter definitions above)
+        InterpTypeEnum InterpolationType;                 // Table interpolation method
         int DataFormat;                                   // format of tabular data
         int TableIndex;                                   // Index to tablular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
         int NumDims;                                      // Number of dimensions (AKA, independent variables)
@@ -219,8 +219,8 @@ namespace CurveManager {
 
         // Default Constructor
         PerformanceCurveData()
-            : CurveType(CurveTypeEnum::Unassigned), InterpolationType(0), DataFormat(0), TableIndex(0), NumDims(0), NumIVLowErrorIndex(0),
-              NumIVHighErrorIndex(0), X1SortOrder(1), X2SortOrder(1), GridValueIndex(0), NormalizationValue(1.0), Coeff1(0.0),
+            : CurveType(CurveTypeEnum::Unassigned), InterpolationType(InterpTypeEnum::Unassigned), DataFormat(0), TableIndex(0), NumDims(0),
+              NumIVLowErrorIndex(0), NumIVHighErrorIndex(0), X1SortOrder(1), X2SortOrder(1), GridValueIndex(0), NormalizationValue(1.0), Coeff1(0.0),
               Coeff2(0.0), Coeff3(0.0), Coeff4(0.0), Coeff5(0.0), Coeff6(0.0), Coeff7(0.0), Coeff8(0.0), Coeff9(0.0), Coeff10(0.0),
               Coeff11(0.0), Coeff12(0.0), Var1Max(0.0), Var1Min(0.0), Var2Max(0.0), Var2Min(0.0), Var3Max(0.0), Var3Min(0.0), Var4Max(0.0),
               Var4Min(0.0), Var5Max(0.0), Var5Min(0.0), Var6Max(0.0), Var6Min(0.0), CurveMin(0.0), CurveMax(0.0), CurveMinPresent(false),

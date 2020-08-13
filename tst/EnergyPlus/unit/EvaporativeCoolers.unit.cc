@@ -432,7 +432,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
     PerfCurve.allocate(1);
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 0.0;
     PerfCurve(CurveNum).Coeff2 = 1.0;
     PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -723,7 +723,7 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     PerfCurve.allocate(1);
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Linear";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 0.0;
     PerfCurve(CurveNum).Coeff2 = 1.0;
     PerfCurve(CurveNum).Var1Min = 0.0;

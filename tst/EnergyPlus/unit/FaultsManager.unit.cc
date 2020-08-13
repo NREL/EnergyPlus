@@ -107,7 +107,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     CurveNum = 1;
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
     PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1151.1;
     PerfCurve(CurveNum).Coeff2 = 13.509;
     PerfCurve(CurveNum).Coeff3 = -0.9105;
@@ -361,7 +361,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     CurveNum = 1;
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
     PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1151.1;
     PerfCurve(CurveNum).Coeff2 = 13.509;
     PerfCurve(CurveNum).Coeff3 = -0.9105;

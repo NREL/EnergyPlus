@@ -287,7 +287,7 @@ protected:
 
         CurveManager::PerfCurve.allocate(1);
         CurveManager::NumCurves = 1;
-        CurveManager::PerfCurve(1).InterpolationType = CurveManager::EvaluateCurveToLimits;
+        CurveManager::PerfCurve(1).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
         CurveManager::PerfCurve(1).CurveType = CurveManager::CurveTypeEnum::Linear;
         CurveManager::PerfCurve(1).Coeff1 = 1.0;
 

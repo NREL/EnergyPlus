@@ -53,7 +53,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -130,7 +129,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     CurveNum = 1;
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 21.2;
     PerfCurve(CurveNum).Coeff2 = 0.09;
     PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -145,7 +144,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     CurveNum = 2;
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 18.8;
     PerfCurve(CurveNum).Coeff2 = 0.33;
     PerfCurve(CurveNum).Coeff3 = 0.0;

@@ -113,10 +113,6 @@ namespace CurveManager {
 
     using json = nlohmann::json;
 
-    // Interpolation Types
-    int const EvaluateCurveToLimits(1);
-    int const BtwxtMethod(2);
-
     std::map<std::string, Btwxt::Method>  BtwxtManager::interpMethods =
             {{"Linear", Btwxt::Method::LINEAR}, {"Cubic", Btwxt::Method::CUBIC}};
 
@@ -234,9 +230,9 @@ namespace CurveManager {
 
         {
             auto const SELECT_CASE_var(PerfCurve(CurveIndex).InterpolationType);
-            if (SELECT_CASE_var == EvaluateCurveToLimits) {
+            if (SELECT_CASE_var == InterpTypeEnum::EvaluateCurveToLimits) {
                 CurveValue = PerformanceCurveObject(CurveIndex, Var1, Var2, Var3);
-            } else if (SELECT_CASE_var == BtwxtMethod) {
+            } else if (SELECT_CASE_var == InterpTypeEnum::BtwxtMethod) {
                 CurveValue = BtwxtTableInterpolation(CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
             } else {
                 ShowFatalError("CurveValue: Invalid Interpolation Type");
@@ -389,7 +385,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 2;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -459,7 +455,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::ChillerPartLoadWithLift;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 3;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
 
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
@@ -532,7 +528,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -586,7 +582,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quartic;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -641,7 +637,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -694,7 +690,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadraticLinear;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 2;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -763,7 +759,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::CubicLinear;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 2;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -832,7 +828,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::Linear;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Var1Min = Numbers(3);
@@ -884,7 +880,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiCubic;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 2;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -957,7 +953,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::TriQuadratic;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 3;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Tri2ndOrder.allocate(1);
             for (auto &e : PerfCurve(CurveNum).Tri2ndOrder) {
                 e.CoeffA0 = Numbers(1);
@@ -1063,7 +1059,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadLinear;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 4;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1158,7 +1154,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::Exponent;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1204,7 +1200,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::FanPressureRise;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 2;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1258,7 +1254,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialSkewNormal;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1314,7 +1310,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::Sigmoid;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1371,7 +1367,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola1;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1426,7 +1422,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola2;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1481,7 +1477,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialDecay;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1536,7 +1532,7 @@ namespace CurveManager {
             PerfCurve(CurveNum).CurveType = CurveTypeEnum::DoubleExponentialDecay;
             PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             PerfCurve(CurveNum).NumDims = 1;
-            PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+            PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
             PerfCurve(CurveNum).Coeff1 = Numbers(1);
             PerfCurve(CurveNum).Coeff2 = Numbers(2);
             PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1648,7 +1644,7 @@ namespace CurveManager {
                     PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
                     PerfCurve(CurveNum).NumDims = 1;
 
-                    PerfCurve(CurveNum).InterpolationType = BtwxtMethod;
+                    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
 
                     std::string contextString = CurrentModuleObject + " \"" + Alphas(1) + "\"";
                     Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &contextString);
@@ -1856,7 +1852,7 @@ namespace CurveManager {
                 ++CurveNum;
                 PerfCurve(CurveNum).Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 PerfCurve(CurveNum).ObjectType = "Table:Lookup";
-                PerfCurve(CurveNum).InterpolationType = BtwxtMethod;
+                PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
 
                 std::string
                     indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name"));

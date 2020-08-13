@@ -6082,7 +6082,7 @@ namespace AirflowNetworkBalanceManager {
         CurveManager::PerfCurve(CurveNum).ObjectType = "Table:Lookup";
         CurveManager::PerfCurve(CurveNum).NumDims = 1;
 
-        CurveManager::PerfCurve(CurveNum).InterpolationType = CurveManager::BtwxtMethod;
+        CurveManager::PerfCurve(CurveNum).InterpolationType = CurveManager::InterpTypeEnum::BtwxtMethod;
 
         CurveManager::PerfCurve(CurveNum).Var1Min = 0.0;
         CurveManager::PerfCurve(CurveNum).Var1MinPresent = true;

@@ -165,7 +165,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     CurveNum = 1;
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
     PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -180,7 +180,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     CurveNum = 2;
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
     PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -195,7 +195,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     CurveNum = 3;
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
     PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -317,7 +317,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     CurveNum = 1;
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
     PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -332,7 +332,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     CurveNum = 2;
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
     PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -347,7 +347,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     CurveNum = 3;
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1;
     PerfCurve(CurveNum).Coeff2 = 0.0;
     PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -651,10 +651,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
         PerformanceCurveData &rCurve = PerfCurve(CurveNum);
         if (rCurve.CurveType == CurveTypeEnum::BiQuadratic) {
             rCurve.ObjectType = "Curve:Biquadratic";
-            rCurve.InterpolationType = EvaluateCurveToLimits;
+            rCurve.InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
         } else if (rCurve.CurveType == CurveTypeEnum::Quadratic) {
             rCurve.ObjectType = "Curve:Quadratic";
-            rCurve.InterpolationType = EvaluateCurveToLimits;
+            rCurve.InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
         }
     }
 
@@ -896,10 +896,10 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
         PerformanceCurveData &rCurve = PerfCurve(CurveNum);
         if (rCurve.CurveType == CurveTypeEnum::BiQuadratic) {
             rCurve.ObjectType = "Curve:Biquadratic";
-            rCurve.InterpolationType = EvaluateCurveToLimits;
+            rCurve.InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
         } else if (rCurve.CurveType == CurveTypeEnum::Quadratic) {
             rCurve.ObjectType = "Curve:Quadratic";
-            rCurve.InterpolationType = EvaluateCurveToLimits;
+            rCurve.InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
         }
     }
 
@@ -3847,7 +3847,7 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     PerfCurve(CurveNum).Name = "HP_Cool-Cap-fT-SP1";
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1.658788451;
     PerfCurve(CurveNum).Coeff2 = -0.0834530076;
     PerfCurve(CurveNum).Coeff3 = 0.00342409032;
@@ -3863,7 +3863,7 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     PerfCurve(CurveNum).Name = "HP_Cool-Cap-fT-SP2";
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 1.472738138;
     PerfCurve(CurveNum).Coeff2 = -0.0672218352;
     PerfCurve(CurveNum).Coeff3 = 0.0029199042;
@@ -3879,7 +3879,7 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     PerfCurve(CurveNum).Name = "HP_Heat-Cap-fT-SP1";
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 0.84077409;
     PerfCurve(CurveNum).Coeff2 = -0.0014336586;
     PerfCurve(CurveNum).Coeff3 = -0.000150336;
@@ -3895,7 +3895,7 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     PerfCurve(CurveNum).Name = "HP_Heat-Cap-fT-SP2";
     PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
     PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
     PerfCurve(CurveNum).Coeff1 = 0.831506971;
     PerfCurve(CurveNum).Coeff2 = 0.0018392166;
     PerfCurve(CurveNum).Coeff3 = -0.000187596;
