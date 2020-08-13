@@ -1109,7 +1109,7 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
 
     DataGlobals::NumOfTimeStepInHour =4;
     Environment.allocate(1);
-    Environment(1).SkyTempModel = WP_ClarkAllenModel;
+    Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
     Environment(1).StartMonth = 1;
     Environment(1).StartDay = 1;
 
