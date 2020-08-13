@@ -162,7 +162,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
 
     // set some values to run at rated conditions and call to run normal mode speed 1
     evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
-    bool useAlternateMode = false;
+    int useAlternateMode = coilNormalMode;
     Real64 PLR = 1.0;
     int speedNum = 1;
     Real64 speedRatio = 1.0;
@@ -184,7 +184,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     EXPECT_NEAR(0.0114, evapOutletNode.HumRat, 0.001);
 
     // ok so now run at alternate mode, speed 1
-    useAlternateMode = true;
+    useAlternateMode = coilEnhancedMode;
     speedNum = 1;
     thisCoil.simulate(state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
 //    std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
@@ -193,7 +193,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     EXPECT_NEAR(0.0126, evapOutletNode.HumRat, 0.0001);
 
     // ok so now run at alternate mode, speed 2
-    useAlternateMode = true;
+    useAlternateMode = coilEnhancedMode;
     speedNum = 2;
     thisCoil.simulate(state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
 //    std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
@@ -300,7 +300,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation )
 
     // set some values to run at rated conditions and call to run normal mode speed 1
     evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
-    bool useAlternateMode = false;
+    int useAlternateMode = coilNormalMode;
     Real64 PLR = 1.0;
     int speedNum = 1;
     Real64 speedRatio = 1.0;
@@ -327,7 +327,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation )
     }
 
     // ok so now run at alternate mode, speed 1
-    useAlternateMode = true;
+    useAlternateMode = coilEnhancedMode;
     speedNum = 1;
     thisCoil.simulate(state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     if (!setExpectations) {
@@ -339,7 +339,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation )
     }
 
     // ok so now run at alternate mode, speed 2
-    useAlternateMode = true;
+    useAlternateMode = coilEnhancedMode;
     speedNum = 2;
     thisCoil.simulate(state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     if (!setExpectations) {
