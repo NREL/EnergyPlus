@@ -5392,6 +5392,12 @@ namespace OutputProcessor {
             "FuelOilNo2,                 !- Fuel Type",
             ",                           !- Key Name 1",
             "FuelOilNo2:Facility;        !- Variable or Meter 1 Name",
+
+            "Meter:Custom,",
+            "NaturalGasCustomMeter,      !- Name",
+            "NaturalGas,                 !- Fuel Type",
+            ",                           !- Key Name 1",
+            "NaturalGas:Facility;        !- Variable or Meter 1 Name",
             });
 
         ASSERT_TRUE(process_idf(idf_objects));
