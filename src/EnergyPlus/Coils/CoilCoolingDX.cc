@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -78,6 +79,11 @@ using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
 namespace EnergyPlus {
+
+    int const coilNormalMode = 0;       // Normal operation mode
+    int const coilEnhancedMode = 1;     // Enhanced operation mode
+    int const coilSubcoolReheatMode = 2; // SubcoolReheat operation mode
+
     std::vector<CoilCoolingDX> coilCoolingDXs;
     bool coilCoolingDXGetInputFlag = true;
     std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
@@ -140,6 +146,12 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
     bool errorsFound = false;
     this->name = input_data.name;
     this->performance = CoilCoolingDXCurveFitPerformance(input_data.performance_object_name);
+
+    if (!this->performance.original_input_specs.base_operating_mode_name.empty() &&
+        !this->performance.original_input_specs.alternate_operating_mode_name.empty() && 
+        !this->performance.original_input_specs.alternate_operating_mode2_name.empty()) {
+        this->CoolingCoilType = DataHVACGlobals::CoilDX_SubcoolReheat;
+    }
 
     // other construction below
     this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.evaporator_inlet_node_name,
@@ -495,6 +507,37 @@ void CoilCoolingDX::oneTimeInit() {
                             _,
                             "System");
     }
+    if (this->CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
+        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode",
+                            OutputProcessor::Unit::None,
+                            this->performance.OperatingMode,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode Ratio", 
+                            OutputProcessor::Unit::None, 
+                            this->performance.ModeRatio, 
+                            "System", 
+                            "Average", 
+                            this->name);
+        SetupOutputVariable("SubcoolReheat Cooling Coil Recovered Heat Energy Rate",
+                            OutputProcessor::Unit::W,
+                            this->recoveredHeatEnergyRate,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable("SubcoolReheat Cooling Coil Recovered Heat Energy",
+                            OutputProcessor::Unit::J,
+                            this->recoveredHeatEnergy,
+                            "System",
+                            "Sum",
+                            this->name,
+                            _,
+                            "ENERGYTRANSFER",
+                            "HEATRECOVERY",
+                            _,
+                            "System");
+    }
 
     if (this->isSecondaryDXCoilInZone) {
         SetupOutputVariable("Secondary Coil Heat Rejection Rate",
@@ -631,12 +674,12 @@ Real64 CoilCoolingDX::condMassFlowRate(bool const useAlternateMode)
     }
 }
 
-void CoilCoolingDX::size() {
+void CoilCoolingDX::size(state) {
     this->performance.parentName = this->name;
-    this->performance.size();
+    this->performance.size(state);
 }
 
-void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode)
+void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode, Real64 LoadSHR)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit();
@@ -661,8 +704,10 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     // call the simulation, which returns useful data
     // TODO: check the avail schedule and reset data/pass through data as needed
     // TODO: check the minOATcompressor and reset data/pass through data as needed
+    this->performance.OperatingMode = 0;
+    this->performance.ModeRatio = 0.0;
     this->performance.simulate(
-        evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
+        evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode, LoadSHR);
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
@@ -699,7 +744,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
             Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
             this->evaporativeCondSupplyTankConsump = this->evaporativeCondSupplyTankVolumeFlow * reportingConstant;
-            if (!useAlternateMode) {
+            if (useAlternateMode == coilNormalMode) {
                 this->evapCondPumpElecPower = this->performance.normalMode.getCurrentEvapCondPumpPower(speedNum);
             }
             DataWater::WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) =
@@ -736,6 +781,11 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     this->partLoadRatioReport = PLR;
     this->speedNumReport = speedNum;
     this->speedRatioReport = speedRatio;
+
+    if (useAlternateMode == coilSubcoolReheatMode) {
+        this->recoveredHeatEnergyRate = this->performance.recoveredEnergyRate;
+        this->recoveredHeatEnergy = this->recoveredHeatEnergyRate * reportingConstant;
+    }
 
     if (this->isSecondaryDXCoilInZone) {
         // call CalcSecondaryDXCoils ???

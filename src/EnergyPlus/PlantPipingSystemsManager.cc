@@ -48,16 +48,13 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
-#include <fstream>
 #include <memory>
 #include <set>
-#include <utility>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/floops.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -71,13 +68,14 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
@@ -149,7 +147,7 @@ namespace EnergyPlus {
             DataGlobals::AnySlabsInModel = (numSlabsCheck > 0);
         }
 
-        void CheckIfAnyBasements() {
+        void CheckIfAnyBasements(EnergyPlusData &EP_UNUSED(state)) {
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Matt Mitchell
             //       DATE WRITTEN   May 2014
@@ -159,10 +157,10 @@ namespace EnergyPlus {
             DataGlobals::AnyBasementsInModel = (numBasementsCheck > 0);
         }
 
-        PlantComponent *Circuit::factory(int EP_UNUSED(objectType), std::string objectName) {
+        PlantComponent *Circuit::factory(EnergyPlusData &state, int EP_UNUSED(objectType), std::string objectName) {
             // Process the input data for circuits if it hasn't been done already
             if (GetInputFlag) {
-                GetPipingSystemsAndGroundDomainsInput();
+                GetPipingSystemsAndGroundDomainsInput(state);
                 GetInputFlag = false;
             }
             // Now look for this particular pipe in the list
@@ -178,7 +176,7 @@ namespace EnergyPlus {
             return nullptr; // LCOV_EXCL_LINE
         }
 
-        void Circuit::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+        void Circuit::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                bool const EP_UNUSED(FirstHVACIteration),
                                Real64 &EP_UNUSED(CurLoad),
                                bool const EP_UNUSED(RunFlag)) {
@@ -186,7 +184,7 @@ namespace EnergyPlus {
             auto &thisDomain(domains[this->ParentDomainIndex]);
 
             // Do any initialization here
-            thisDomain.InitPipingSystems(this);
+            thisDomain.InitPipingSystems(state.dataBranchInputManager, this);
 
             // Update the temperature field
             thisDomain.PerformIterationLoop(this);
@@ -195,7 +193,7 @@ namespace EnergyPlus {
             thisDomain.UpdatePipingSystems(this);
         }
 
-        void SimulateGroundDomains(OutputFiles &outputFiles, bool initOnly)
+        void SimulateGroundDomains(EnergyPlusData &state, bool initOnly)
         {
 
             // SUBROUTINE INFORMATION:
@@ -209,7 +207,7 @@ namespace EnergyPlus {
 
             // Read input if necessary
             if (GetInputFlag) {
-                GetPipingSystemsAndGroundDomainsInput();
+                GetPipingSystemsAndGroundDomainsInput(state);
                 GetInputFlag = false;
             }
 
@@ -394,12 +392,12 @@ namespace EnergyPlus {
                 // Write eio header
                 static constexpr auto DomainCellsToEIOHeader(
                     "! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells\n");
-                print(outputFiles.eio, DomainCellsToEIOHeader);
+                print(state.files.eio, DomainCellsToEIOHeader);
 
                 // Write eio data
                 for (auto &thisDomain : domains) {
                     static constexpr auto DomainCellsToEIO("{},{:5},{:5},{:5}\n");
-                    print(outputFiles.eio,
+                    print(state.files.eio,
                           DomainCellsToEIO,
                           thisDomain.Name,
                           thisDomain.NumDomainCells,
@@ -410,7 +408,7 @@ namespace EnergyPlus {
             }
         }
 
-        void GetPipingSystemsAndGroundDomainsInput() {
+        void GetPipingSystemsAndGroundDomainsInput(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -435,16 +433,16 @@ namespace EnergyPlus {
             int NumPipeCircuits = inputProcessor->getNumObjectsFound(ObjName_Circuit);
 
             // Read in raw inputs, don't try to interpret dependencies yet
-            ReadGeneralDomainInputs(1, NumGeneralizedDomains, ErrorsFound);
+            ReadGeneralDomainInputs(state, 1, NumGeneralizedDomains, ErrorsFound);
             //ReadPipeCircuitInputs(ErrorsFound);
-            ReadHorizontalTrenchInputs(NumGeneralizedDomains + 1, NumPipeCircuits + 1, ErrorsFound);
+            ReadHorizontalTrenchInputs(state, NumGeneralizedDomains + 1, NumPipeCircuits + 1, ErrorsFound);
 
             // This is heavily dependent on the order of the domains in the main array.
-            ReadZoneCoupledDomainInputs(NumGeneralizedDomains + NumHorizontalTrenches + 1, NumZoneCoupledDomains,
+            ReadZoneCoupledDomainInputs(state, NumGeneralizedDomains + NumHorizontalTrenches + 1, NumZoneCoupledDomains,
                                         ErrorsFound);
 
             // This is heavily dependent on the order of the domains in the main array.
-            ReadBasementInputs(NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + 1, NumBasements,
+            ReadBasementInputs(state, NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + 1, NumBasements,
                                ErrorsFound);
 
             // Report errors that are purely input problems
@@ -505,7 +503,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadGeneralDomainInputs(int const IndexStart, int const NumGeneralizedDomains, bool &ErrorsFound) {
+        void ReadGeneralDomainInputs(EnergyPlusData &state, int const IndexStart, int const NumGeneralizedDomains, bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -816,12 +814,12 @@ namespace EnergyPlus {
                 }
 
                 // Initialize ground temperature model and get pointer reference
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(groundTempType, groundTempName);
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, groundTempType, groundTempName);
 
             }
         }
 
-        void ReadZoneCoupledDomainInputs(int const StartingDomainNumForZone, int const NumZoneCoupledDomains,
+        void ReadZoneCoupledDomainInputs(EnergyPlusData &state, int const StartingDomainNumForZone, int const NumZoneCoupledDomains,
                                          bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
@@ -899,7 +897,7 @@ namespace EnergyPlus {
                 // Get slab material properties
                 if (thisDomain.SlabInGradeFlag) {
                     thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
-                                                                                 DataHeatBalance::Material,
+                                                                                 dataMaterial.Material,
                                                                                  DataHeatBalance::TotMaterials);
                     if (thisDomain.SlabMaterialNum == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
@@ -907,12 +905,12 @@ namespace EnergyPlus {
                         ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.SlabThickness = DataHeatBalance::Material(thisDomain.SlabMaterialNum).Thickness;
-                        thisDomain.SlabProperties.Density = DataHeatBalance::Material(
+                        thisDomain.SlabThickness = dataMaterial.Material(thisDomain.SlabMaterialNum).Thickness;
+                        thisDomain.SlabProperties.Density = dataMaterial.Material(
                                 thisDomain.SlabMaterialNum).Density;
-                        thisDomain.SlabProperties.SpecificHeat = DataHeatBalance::Material(
+                        thisDomain.SlabProperties.SpecificHeat = dataMaterial.Material(
                                 thisDomain.SlabMaterialNum).SpecHeat;
-                        thisDomain.SlabProperties.Conductivity = DataHeatBalance::Material(
+                        thisDomain.SlabProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.SlabMaterialNum).Conductivity;
                     }
                 }
@@ -934,7 +932,7 @@ namespace EnergyPlus {
                 // Get horizontal insulation material properties
                 if (thisDomain.HorizInsPresentFlag) {
                     thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(8),
-                                                                                     DataHeatBalance::Material,
+                                                                                     dataMaterial.Material,
                                                                                      DataHeatBalance::TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + "=" +
@@ -942,13 +940,13 @@ namespace EnergyPlus {
                         ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.HorizInsThickness = DataHeatBalance::Material(
+                        thisDomain.HorizInsThickness = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Thickness;
-                        thisDomain.HorizInsProperties.Density = DataHeatBalance::Material(
+                        thisDomain.HorizInsProperties.Density = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Density;
-                        thisDomain.HorizInsProperties.SpecificHeat = DataHeatBalance::Material(
+                        thisDomain.HorizInsProperties.SpecificHeat = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).SpecHeat;
-                        thisDomain.HorizInsProperties.Conductivity = DataHeatBalance::Material(
+                        thisDomain.HorizInsProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                             ErrorsFound = true;
@@ -991,7 +989,7 @@ namespace EnergyPlus {
                 // Get vertical insulation material properties
                 if (thisDomain.VertInsPresentFlag) {
                     thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(11),
-                                                                                    DataHeatBalance::Material,
+                                                                                    dataMaterial.Material,
                                                                                     DataHeatBalance::TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" +
@@ -999,13 +997,13 @@ namespace EnergyPlus {
                         ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.VertInsThickness = DataHeatBalance::Material(
+                        thisDomain.VertInsThickness = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Thickness;
-                        thisDomain.VertInsProperties.Density = DataHeatBalance::Material(
+                        thisDomain.VertInsProperties.Density = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Density;
-                        thisDomain.VertInsProperties.SpecificHeat = DataHeatBalance::Material(
+                        thisDomain.VertInsProperties.SpecificHeat = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).SpecHeat;
-                        thisDomain.VertInsProperties.Conductivity = DataHeatBalance::Material(
+                        thisDomain.VertInsProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                             ErrorsFound = true;
@@ -1121,7 +1119,7 @@ namespace EnergyPlus {
                         thisDomain.Mesh.Y.RegionMeshCount; // Need to clean this out at some point
 
                 // Farfield model
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(2),
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(2),
                                                                                 DataIPShortCuts::cAlphaArgs(3));
 
                 // Other parameters
@@ -1136,7 +1134,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadBasementInputs(int const StartingDomainNumForBasement, int const NumBasements, bool &ErrorsFound) {
+        void ReadBasementInputs(EnergyPlusData &state, int const StartingDomainNumForBasement, int const NumBasements, bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -1330,7 +1328,7 @@ namespace EnergyPlus {
                 // Get horizontal insulation material properties
                 if (thisDomain.HorizInsPresentFlag) {
                     thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
-                                                                                     DataHeatBalance::Material,
+                                                                                     dataMaterial.Material,
                                                                                      DataHeatBalance::TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
@@ -1338,13 +1336,13 @@ namespace EnergyPlus {
                         ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.HorizInsThickness = DataHeatBalance::Material(
+                        thisDomain.HorizInsThickness = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Thickness;
-                        thisDomain.HorizInsProperties.Density = DataHeatBalance::Material(
+                        thisDomain.HorizInsProperties.Density = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Density;
-                        thisDomain.HorizInsProperties.SpecificHeat = DataHeatBalance::Material(
+                        thisDomain.HorizInsProperties.SpecificHeat = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).SpecHeat;
-                        thisDomain.HorizInsProperties.Conductivity = DataHeatBalance::Material(
+                        thisDomain.HorizInsProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                             ErrorsFound = true;
@@ -1392,7 +1390,7 @@ namespace EnergyPlus {
                         ErrorsFound = true;
                     }
                     thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(10),
-                                                                                    DataHeatBalance::Material,
+                                                                                    dataMaterial.Material,
                                                                                     DataHeatBalance::TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" +
@@ -1400,13 +1398,13 @@ namespace EnergyPlus {
                         ShowContinueError("Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.VertInsThickness = DataHeatBalance::Material(
+                        thisDomain.VertInsThickness = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Thickness;
-                        thisDomain.VertInsProperties.Density = DataHeatBalance::Material(
+                        thisDomain.VertInsProperties.Density = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Density;
-                        thisDomain.VertInsProperties.SpecificHeat = DataHeatBalance::Material(
+                        thisDomain.VertInsProperties.SpecificHeat = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).SpecHeat;
-                        thisDomain.VertInsProperties.Conductivity = DataHeatBalance::Material(
+                        thisDomain.VertInsProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                             ErrorsFound = true;
@@ -1429,7 +1427,7 @@ namespace EnergyPlus {
 
                 // Farfield ground temperature model -- note this will overwrite the DataIPShortCuts variables
                 // so any other processing below this line won't have access to the cAlphaArgs, etc., here
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(2),
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(2),
                                                                                 DataIPShortCuts::cAlphaArgs(3));
 
                 // Total surface area
@@ -1479,15 +1477,15 @@ namespace EnergyPlus {
 
         bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
                                             int const MaterialNum) {
-            
-            if ( (MaterialThickness <= 0.0) || (DataHeatBalance::Material(MaterialNum).ROnly) ) {
+
+            if ( (MaterialThickness <= 0.0) || (dataMaterial.Material(MaterialNum).ROnly) ) {
                 return true;
             } else {
                 return false;
             }
 
         }
-        
+
         void SiteGroundDomainNoMassMatError(std::string const &FieldName,
                                             std::string const &UserInputField,
                                             std::string const &ObjectName) {
@@ -1499,7 +1497,7 @@ namespace EnergyPlus {
 
         }
 
-        
+
         void ReadPipeCircuitInputs(bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
@@ -1832,7 +1830,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadHorizontalTrenchInputs(int const StartingDomainNumForHorizontal,
+        void ReadHorizontalTrenchInputs(EnergyPlusData &state, int const StartingDomainNumForHorizontal,
                                         int const StartingCircuitNumForHorizontal,
                                         bool &ErrorsFound) {
 
@@ -1894,7 +1892,7 @@ namespace EnergyPlus {
                 //******* We'll first set up the domain ********
                 // the extents will be: zMax = axial length; yMax = burial depth*2; xMax = ( NumPipes+1 )*HorizontalPipeSpacing
                 thisDomain.IsActuallyPartOfAHorizontalTrench = true;
-                ObjexxFCL::gio::write(thisDomain.Name, "( 'HorizontalTrenchDomain',I4 )") << HorizontalGHXCtr;
+                thisDomain.Name = format("HorizontalTrenchDomain{:4}", HorizontalGHXCtr);
                 thisDomain.Extents.xMax = (double(NumPipeSegments) + 1.0) * thisInterPipeSpacing;
                 thisDomain.Extents.yMax = 2.0 * thisBurialDepth;
                 thisDomain.Extents.zMax = DataIPShortCuts::rNumericArgs(2);
@@ -1929,7 +1927,7 @@ namespace EnergyPlus {
 
                 // Farfield model parameters -- this is pushed down pretty low because it internally calls GetObjectItem
                 // using DataIPShortCuts, so it will overwrite the cAlphaArgs and rNumericArgs values
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(4),
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(4),
                                                                                 DataIPShortCuts::cAlphaArgs(5));
 
                 //******* Then we'll do the segments *******!
@@ -2109,7 +2107,7 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::InitPipingSystems(Circuit * thisCircuit) {
+        void Domain::InitPipingSystems(BranchInputManagerData &dataBranchInputManager, Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2131,7 +2129,8 @@ namespace EnergyPlus {
                 }
 
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(thisCircuit->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        thisCircuit->Name,
                                                         TypeToLookFor,
                                                         thisCircuit->LoopNum,
                                                         thisCircuit->LoopSideNum,

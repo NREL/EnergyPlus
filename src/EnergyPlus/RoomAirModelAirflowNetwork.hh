@@ -52,6 +52,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace RoomAirModelAirflowNetwork {
 
@@ -72,25 +74,25 @@ namespace RoomAirModelAirflowNetwork {
         // functions
 
         //*****************************************************************************************
-        void InitRoomAirModelAirflowNetwork(int const RoomAirNode); // index number for the specified zone and room air node
+        void InitRoomAirModelAirflowNetwork(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
 
         //*****************************************************************************************
         void CalcRoomAirModelAirflowNetwork(int const ThisRoomAirNode); // index number for the specified zone and room air node
 
         //*****************************************************************************************
-        void UpdateRoomAirModelAirflowNetwork(); // index number for the specified zone
+        void UpdateRoomAirModelAirflowNetwork(ZoneDehumidifierData &dataZoneDehumidifier); // index number for the specified zone
 
         //*****************************************************************************************
-        void CalcNodeSums(int const RoomAirNode); // index number for the specified zone and room air node
+        void CalcNodeSums(ZonePlenumData &dataZonePlenum, int const RoomAirNode); // index number for the specified zone and room air node
 
         //*****************************************************************************************
-        void SumNonAirSystemResponseForNode(int const RoomAirNode); // index number for the specified zone and room air node
+        void SumNonAirSystemResponseForNode(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
         //*****************************************************************************************
-        void SumSystemDepResponseForNode(); // index number for the specified zone and room air node
+        void SumSystemDepResponseForNode(ZoneDehumidifierData &dataZoneDehumidifier); // index number for the specified zone and room air node
 
         //*****************************************************************************************
 
-        void CalcSurfaceMoistureSums(int const RoomAirNode, Real64 &SumHmAW, Real64 &SumHmARa, Real64 &SumHmARaW, Array1<bool> const &SurfMask);
+        void CalcSurfaceMoistureSums(int const RoomAirNode, Real64 &SumHmAW, Real64 &SumHmARa, Real64 &SumHmARaW, Array1D<bool> const &SurfMask);
     };
 
     // Object data
@@ -98,9 +100,9 @@ namespace RoomAirModelAirflowNetwork {
 
     void clear_state();
 
-    void SimRoomAirModelAirflowNetwork(int const ZoneNum); // index number for the specified zone
+    void SimRoomAirModelAirflowNetwork(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
-    void LoadPredictionRoomAirModelAirflowNetwork(int const ZoneNum, int const RoomAirNode); // index number for the specified zone and node
+    void LoadPredictionRoomAirModelAirflowNetwork(EnergyPlusData &state, int const ZoneNum, int const RoomAirNode); // index number for the specified zone and node
 
     //*****************************************************************************************
 

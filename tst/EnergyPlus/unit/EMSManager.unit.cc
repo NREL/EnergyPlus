@@ -52,18 +52,23 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DataRuntimeLanguage.hh>
-#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
@@ -152,14 +157,14 @@ TEST_F(EnergyPlusFixture, Dual_NodeTempSetpoints)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.files);
 
     EMSManager::FinishProcessingUserInput = true;
 
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
 
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointHi, 20.0, 0.000001);
 
@@ -192,7 +197,7 @@ TEST_F(EnergyPlusFixture, CheckActuatorInit)
 
     ASSERT_TRUE(process_idf(idf_objects));
     OutAirNodeManager::SetOutAirNodes();
-    EMSManager::GetEMSInput();
+    EMSManager::GetEMSInput(state.files);
 
     // now check that Erl variable is Null
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(1).Value.Type, DataRuntimeLanguage::ValueNull);
@@ -225,7 +230,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     ASSERT_TRUE(process_idf(idf_objects));
 
     // sets number of EMS objects
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.files);
 
     // allows NodeSetpoint and AvailabilityManagers actuators to be setup
     EMSManager::FinishProcessingUserInput = true;
@@ -275,13 +280,13 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
 
     bool anyRan;
     // set up EMS
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
 
     // set dummy EMS value
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
@@ -311,7 +316,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should remain on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
@@ -336,7 +341,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
 
     // dummy value set above should reset to 0 on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
     // override flag should also be true
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_TRUE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
@@ -389,7 +394,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     ASSERT_TRUE(process_idf(idf_objects));
 
     // sets number of EMS objects
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.files);
 
     // allows NodeSetpoint and AvailabilityManagers actuators to be setup
     EMSManager::FinishProcessingUserInput = true;
@@ -439,12 +444,12 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
 
     bool anyRan;
     // set up EMS
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     // set dummy EMS value
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
@@ -474,7 +479,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should remain on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
@@ -501,7 +506,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
 
     // dummy value set above should reset to 0 on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
     // override flag should also be true
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_TRUE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
@@ -696,11 +701,11 @@ TEST_F(EnergyPlusFixture, Test_EMSLogic)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.files);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_NEAR(DataLoopNode::Node(1).TempSetPoint, 11.0, 0.0000001);
     EXPECT_NEAR(DataLoopNode::Node(2).TempSetPoint, 12.0, 0.0000001);
@@ -710,7 +715,7 @@ TEST_F(EnergyPlusFixture, Test_EMSLogic)
     EXPECT_NEAR(DataLoopNode::Node(6).TempSetPoint, 16.0, 0.0000001);
     EXPECT_NEAR(DataLoopNode::Node(7).TempSetPoint, 17.0, 0.0000001);
 
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_NEAR(DataLoopNode::Node(1).TempSetPoint, 21.0, 0.0000001);
     EXPECT_NEAR(DataLoopNode::Node(2).TempSetPoint, 22.0, 0.0000001);
@@ -735,13 +740,22 @@ TEST_F(EnergyPlusFixture, Debug_EMSLogic)
 
         "OutdoorAir:Node, Test node 1;",
 
-        "EnergyManagementSystem:Actuator,", "TempSetpoint1,          !- Name", "Test node 1,  !- Actuated Component Unique Name",
-        "System Node Setpoint,    !- Actuated Component Type", "Temperature Setpoint;    !- Actuated Component Control Type",
+        "EnergyManagementSystem:Actuator,",
+        "TempSetpoint1,          !- Name",
+        "Test node 1,  !- Actuated Component Unique Name",
+        "System Node Setpoint,    !- Actuated Component Type",
+        "Temperature Setpoint;    !- Actuated Component Control Type",
 
-        "EnergyManagementSystem:ProgramCallingManager,", "Logic Manager 1,  !- Name", "BeginNewEnvironment,  !- EnergyPlus Model Calling Point",
+        "EnergyManagementSystem:ProgramCallingManager,",
+        "Logic Manager 1,  !- Name",
+        "BeginNewEnvironment,  !- EnergyPlus Model Calling Point",
         "LogicTest1;  !- Program Name 1",
 
-        "EnergyManagementSystem:Program,", "LogicTest1,", "Set MyVar1 = ( -2 ),", "Set MyVar2 = ( -2 ),", "Set TempSetpoint1 = MyVar1 / MyVar2;",
+        "EnergyManagementSystem:Program,",
+        "LogicTest1,",
+        "Set MyVar1 = ( -2 ),",
+        "Set MyVar2 = ( -2 ),",
+        "Set TempSetpoint1 = MyVar1 / MyVar2;",
 
         //		"IF MyVar1 == 8,",
         //		"  Set TempSetpoint1 = 11.0,",
@@ -755,11 +769,11 @@ TEST_F(EnergyPlusFixture, Debug_EMSLogic)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.files);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyRan, ObjexxFCL::Optional_int_const());
 
     EXPECT_NEAR(DataLoopNode::Node(1).TempSetPoint, 1.0, 0.0000001);
 }
@@ -792,19 +806,19 @@ TEST_F(EnergyPlusFixture, TestAnyRanArgument)
     ASSERT_TRUE(process_idf(idf_objects));
 
     OutAirNodeManager::SetOutAirNodes();
-    NodeInputManager::SetupNodeVarsForReporting();
-    EMSManager::CheckIfAnyEMS();
+    NodeInputManager::SetupNodeVarsForReporting(state.files);
+    EMSManager::CheckIfAnyEMS(state.files);
 
     EMSManager::FinishProcessingUserInput = true;
 
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     EXPECT_FALSE(anyRan);
 
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyRan, ObjexxFCL::Optional_int_const());
     EXPECT_FALSE(anyRan);
 
-    EMSManager::ManageEMS(DataGlobals::emsCallFromHVACIterationLoop, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromHVACIterationLoop, anyRan, ObjexxFCL::Optional_int_const());
     EXPECT_TRUE(anyRan);
 }
 
@@ -830,14 +844,14 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.files);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     // Expect the variable to not yet be initialized
     EXPECT_FALSE(ErlVariable(25).Value.initialized);
     // next run a small program that sets the value
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyRan, ObjexxFCL::Optional_int_const());
     // check that it worked and the value came thru
     EXPECT_NEAR(ErlVariable(25).Value.Number, 21.0, 0.0000001);
     // check of state to see if now initialized
@@ -885,10 +899,10 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.files);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     // Expect the variable to not yet be initialized, call EvaluateExpresssion and check argument
 
     ErlValueType ReturnValue;
@@ -900,7 +914,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
     EXPECT_TRUE(seriousErrorFound);
 
     // next run a small program that sets the global variable value
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
     // now check that it worked, should stay false
     seriousErrorFound = false;
     ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(
@@ -922,7 +936,7 @@ TEST_F(EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    CheckIfAnyEMS();
+    CheckIfAnyEMS(state.files);
     EXPECT_TRUE(AnyEnergyManagementSystemInModel);
 }
 
@@ -1064,14 +1078,14 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
 
     DataGlobals::TimeStepZone = 0.25;
 
-    EMSManager::CheckIfAnyEMS(); // get EMS input
+    EMSManager::CheckIfAnyEMS(state.files); // get EMS input
     EMSManager::FinishProcessingUserInput = true;
     bool ErrorsFound(false);
     CurveManager::GetCurveInputData(ErrorsFound); // process curve for use with EMS
     EXPECT_FALSE(ErrorsFound);
 
     bool anyRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromHVACIterationLoop, anyRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromHVACIterationLoop, anyRan, ObjexxFCL::Optional_int_const());
     EXPECT_TRUE(anyRan);
 
     for (int i = 1; i <= 6; ++i) {
@@ -1081,7 +1095,10 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
         DataRuntimeLanguage::TrendVariable(i).TrendValARR(4) = 4.4;
     }
 
-    EMSManager::ManageEMS(DataGlobals::emsCallFromHVACIterationLoop, anyRan); // process trend functions again using above data
+    EMSManager::ManageEMS(state,
+                          DataGlobals::emsCallFromHVACIterationLoop,
+                          anyRan,
+                          ObjexxFCL::Optional_int_const()); // process trend functions again using above data
     EXPECT_TRUE(anyRan);
 
     int index(0);
@@ -1311,7 +1328,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     index = 28 + offset;
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name,
               "VAR28"); // http://www.gribble.org/cycling/air_density.html 30 C db, 1013.25 hPa, 16 C dp = 0.011565 g/m3
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 0.011459487,
+    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number,
+                0.011459487,
                 0.00000001); // RhovFnTdbWPb 30.0 0.01 101325.0 = ** this and previous 2 numbers seem very different **
 
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(29).Operator, FuncRhFnTdbRhov);
@@ -1344,7 +1362,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(32).Operand(3).Type, 1); // argument was passed to EMS function
     index = 32 + offset;
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR32"); // verified at sugartech site using 30 C db and 0.01 kg/kg = 19.60536624685125 C
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 19.589790661, 0.00000001); // TwbFnTdbWPb 30.0 0.01 101325.0 =
+    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 19.60933534, 0.00000001); // TwbFnTdbWPb 30.0 0.01 101325.0 =
 
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(33).Operator, FuncVFnTdbWPb);
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(33).NumOperands, 3);
@@ -1482,7 +1500,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(49).Operand(2).Type, 1); // argument was passed to EMS function
     index = 49 + offset;
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR49");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, -4.4,
+    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number,
+                -4.4,
                 0.00000001); // TrendDirection Variable_Trend5 4 (-1.1 per 0.25 hrs = -4.4/hr)
 
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(50).Operator, FuncTrendSum);
@@ -1521,7 +1540,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
 
 TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
 {
-//    EMSActuatorAvailable.allocate(100);
+    //    EMSActuatorAvailable.allocate(100);
     NumOfNodes = 3;
     numActuatorsUsed = 3;
     Node.allocate(3);
@@ -1557,5 +1576,48 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
     EXPECT_TRUE(Node(1).IsLocalNode);
     EXPECT_FALSE(Node(2).IsLocalNode);
     EXPECT_TRUE(Node(3).IsLocalNode);
+}
+TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOption)
+{
+    // #7586
+    DataSurfaces::Surface.allocate(2);
+    DataSurfaces::SurfaceWindow.allocate(2);
+    dataConstruction.Construct.allocate(1);
+    DataSurfaces::WindowShadingControl.allocate(2);
+    DataDaylighting::ZoneDaylight.allocate(1);
+    DataSurfaces::Surface(1).Name = "Surface1";
+    DataSurfaces::Surface(2).Name = "Surface2";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(2).Zone = 1;
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    DataSurfaces::Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    DataSurfaces::Surface(1).WindowShadingControlPtr = 1;
+    DataSurfaces::Surface(2).WindowShadingControlPtr = 2;
+    DataSurfaces::Surface(1).HasShadeControl = true;
+    DataSurfaces::Surface(2).HasShadeControl = true;
+
+    DataSurfaces::SurfaceWindow(1).HasShadeOrBlindLayer = false;
+    DataSurfaces::SurfaceWindow(2).HasShadeOrBlindLayer = false;
+    DataSurfaces::SurfaceWindow(1).ShadedConstruction = 1;
+    DataSurfaces::SurfaceWindow(2).ShadedConstruction = 1;
+
+    dataConstruction.Construct(1).Name = "Construction1";
+
+    DataSurfaces::WindowShadingControl(1).ShadingType = 0;
+    DataSurfaces::WindowShadingControl(2).ShadingType = DataSurfaces::WSC_ST_ExteriorScreen;
+
+    DataSurfaces::TotSurfaces = 2;
+
+    SetupWindowShadingControlActuators();
+
+    EXPECT_FALSE(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn);
+    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue, 0);
+
+    DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn = true;
+    DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue = 1.0;
+    SolarShading::WindowShadingManager(state.dataWindowEquivalentLayer);
+    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlag, DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue);
 
 }

@@ -50,13 +50,14 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -709,7 +710,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -717,16 +718,16 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
+    OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(); // just gets input and
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -735,7 +736,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -747,7 +748,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
         DataGlobals::DayOfSim = 0;
-        DataGlobals::DayOfSimChr = "0";
+        state.dataGlobals.DayOfSimChr = "0";
 
         while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
@@ -785,9 +786,9 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                         }
                     }
 
-                    WeatherManager::ManageWeather();
+                    WeatherManager::ManageWeather(state.files);
 
-                    HeatBalanceManager::ManageHeatBalance();
+                    HeatBalanceManager::ManageHeatBalance(state);
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -1459,7 +1460,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -1467,16 +1468,16 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
+    OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(); // just gets input and
-    SizingManager::ManageSizing(OutputFiles::getSingleton());
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and
+    SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     // should be sized now

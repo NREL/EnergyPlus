@@ -51,19 +51,26 @@
 #include <vector>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include "IOFiles.hh"
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
+
+    bool eioHeaderDoneOnce(false);
+
+    void SizingAnalysisObjects_clear_state() {
+        eioHeaderDoneOnce = false;
+    }
+
 ZoneTimestepObject::ZoneTimestepObject()
 {
     kindOfSim = 0;
@@ -382,7 +389,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
         locDayOfSim,
         DataGlobals::HourOfDay,
         DataGlobals::TimeStep,
-        OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep,
+        *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep,
         DataGlobals::NumOfTimeStepInHour);
 
     return tmpztStepStamp;
@@ -412,8 +419,8 @@ void SizingLoggerFramework::UpdateSizingLogValuesSystemStep()
     if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
         tmpSysStepStamp.CurMinuteEnd = MinutesPerHour;
     }
-    tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep * MinutesPerHour;
-    tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
+    tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - (*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * MinutesPerHour;
+    tmpSysStepStamp.TimeStepDuration = *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
 
     for (auto &l : logObjs) {
         l.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
@@ -439,7 +446,7 @@ PlantCoinicidentAnalysis::PlantCoinicidentAnalysis(
     plantSizingIndex = sizingIndex;
 }
 
-void PlantCoinicidentAnalysis::ResolveDesignFlowRate(OutputFiles &outputFiles, int const HVACSizingIterCount)
+void PlantCoinicidentAnalysis::ResolveDesignFlowRate(IOFiles &ioFiles, int const HVACSizingIterCount)
 {
     using DataSizing::GlobalCoolingSizingFactorMode;
     using DataSizing::GlobalCoolSizingFactor;
@@ -463,7 +470,6 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(OutputFiles &outputFiles, i
     std::string chSetSizes;
     std::string chDemandTrapUsed;
     bool changedByDemand(false);
-    static bool eioHeaderDoneOnce(false);
     bool nullStampProblem;
 
     // first make sure we have valid time stamps to work with
@@ -547,7 +553,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(OutputFiles &outputFiles, i
 
     // add a seperate eio summary report about what happened, did demand trap get used, what were the key values.
     if (!eioHeaderDoneOnce) {
-        print(outputFiles.eio,"{}", "! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass "
+        print(ioFiles.eio,"{}", "! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass "
                                              "Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous "
                                              "Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor "
                                              "{},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}\n");
@@ -565,7 +571,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(OutputFiles &outputFiles, i
         chDemandTrapUsed = "No";
     }
 
-    print(outputFiles.eio,
+    print(ioFiles.eio,
           "Plant Coincident Sizing Algorithm,{},{},{:.7R},{:.2R},{:.7R},{},{:.6R},{:.6R},{},{:.4R},{:.6R},{:.4R},{:.4R}\n",
           name,
           chIteration,

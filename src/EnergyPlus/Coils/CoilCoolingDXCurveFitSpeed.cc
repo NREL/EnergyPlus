@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -244,7 +245,8 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
 
       parentModeRatedGrossTotalCap(0.0),
       parentModeRatedEvapAirFlowRate(0.0),
-      parentModeRatedCondAirFlowRate(0.0),
+      parentModeRatedCondAirFlowRate(0.0), 
+      parentOperatingMode(0),
 
       ambPressure(0.0),          // outdoor pressure {Pa}
       PLR(0.0),                  // coil operating part load ratio
@@ -262,8 +264,8 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
 
       // rating data
       RatedInletAirTemp(26.6667),        // 26.6667C or 80F
-      RatedInletWetBulbTemp(19.44),      // 19.44 or 67F
-      RatedInletAirHumRat(0.01125),      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+      RatedInletWetBulbTemp(19.4444),      // 19.44 or 67F
+      RatedInletAirHumRat(0.0111847),   // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
       RatedOutdoorAirTemp(35.0),         // 35 C or 95F
       DryCoilOutletHumRatioMin(0.00001) // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
@@ -314,7 +316,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
     }
 }
 
-void CoilCoolingDXCurveFitSpeed::size(int const speedNum, int const maxSpeeds)
+void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state, int const speedNum, int const maxSpeeds)
 {
 
     std::string RoutineName = "sizeSpeed";
@@ -345,7 +347,7 @@ void CoilCoolingDXCurveFitSpeed::size(int const speedNum, int const maxSpeeds)
         DataSizing::DataBypassFrac = 1 - this->active_fraction_of_face_coil_area;
         tempSize = DataSizing::AutoSize;
     }
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, tempSize, PrintFlag, RoutineName);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, tempSize, PrintFlag, RoutineName);
     DataSizing::DataBypassFrac = 0;
     DataSizing::DataIsDXCoil = false;
     this->evap_air_flow_rate = tempSize;
@@ -356,7 +358,7 @@ void CoilCoolingDXCurveFitSpeed::size(int const speedNum, int const maxSpeeds)
     tempSize = this->rated_total_capacity;
     if (this->ratedGrossTotalCapIsAutosized) tempSize = DataSizing::AutoSize;
 
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, tempSize, PrintFlag, RoutineName);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, tempSize, PrintFlag, RoutineName);
     this->rated_total_capacity = tempSize;
 
      //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
@@ -365,18 +367,29 @@ void CoilCoolingDXCurveFitSpeed::size(int const speedNum, int const maxSpeeds)
     SizingString = preFixString + "Gross Sensible Heat Ratio";
     DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
     DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName);
+    if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 2) {
+        ReportSizingManager::RequestSizing(state,CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName, 0.667);
+    } else if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 3) {
+        ReportSizingManager::RequestSizing(state,CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName, 0.333);    
+    } else {
+        ReportSizingManager::RequestSizing(state,CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName);
+    }
     DataSizing::DataFlowUsedForSizing = 0.0;
     DataSizing::DataCapacityUsedForSizing = 0.0;
     //  DataSizing::DataEMSOverrideON = false;
     //  DataSizing::DataEMSOverride = 0.0;
 
+    if (this->indexSHRFT > 0 && this->indexSHRFFF > 0) {
+        this->RatedCBF = 0.001;
+    } else {
+    
     this->RatedCBF = CalcBypassFactor(RatedInletAirTemp,
                                       RatedInletAirHumRat,
                                       this->rated_total_capacity,
                                       this->grossRatedSHR,
                                       Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat),
                                       DataEnvironment::StdPressureSeaLevel);
+    }
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
     this->ratedLatentCapacity = this->rated_total_capacity * (1.0 - this->grossRatedSHR);
 

@@ -11,6 +11,6 @@ add_executable( generate_embeddedable_epJSON_schema ${generate_embeddedable_epJS
 
 set_target_properties( generate_embeddedable_epJSON_schema
     PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/scripts"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/scripts"
 )
 

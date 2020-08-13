@@ -56,6 +56,8 @@
 #include <EnergyPlus/OutputFiles.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 struct CoilCoolingDXInputSpecification
 {
@@ -80,7 +82,7 @@ struct CoilCoolingDX
     static void reportAllStandardRatings(OutputFiles &outputFiles);
     void instantiateFromInputSpec(const CoilCoolingDXInputSpecification &input_data);
     void oneTimeInit();
-    void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode);
+    void simulate(int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode, Real64 LoadSHR = -1.0);
     void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
     void getFixedData(int &evapInletNodeIndex,
                       int &evapOutletNodeIndex,
@@ -93,7 +95,7 @@ struct CoilCoolingDX
                             std::vector<Real64> &normalModeFlowRates,
                             std::vector<Real64> &normalModeRatedCapacities);
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
-    void size();
+    void size(EnergyPlusData &state);
 
     int getNumModes();
     int getOpModeCapFTIndex(bool useAlternateMode = false);
@@ -122,6 +124,7 @@ struct CoilCoolingDX
     int supplyFanIndex = 0;
     int supplyFanType = 0;
     std::string supplyFanName = "";
+    int CoolingCoilType = 0; // Coolig coil type
 
     CoilCoolingDXCurveFitSpeed &normModeNomSpeed();
     CoilCoolingDXCurveFitSpeed &altModeNomSpeed();
@@ -149,6 +152,8 @@ struct CoilCoolingDX
     Real64 speedRatioReport = 0.0;
     Real64 wasteHeatEnergyRate = 0.0;
     Real64 wasteHeatEnergy = 0.0;
+    Real64 recoveredHeatEnergy = 0.0;
+    Real64 recoveredHeatEnergyRate = 0.0;
     Real64 condenserInletTemperature = 0.0;
     int dehumidificationMode = 0;
     bool reportCoilFinalSizes = true;
@@ -159,6 +164,10 @@ struct CoilCoolingDX
     void setToHundredPercentDOAS();
     bool isHundredPercentDOAS = false;
 };
+
+extern int const coilNormalMode; // Normal operation mode
+extern int const coilEnhancedMode; // Enhanced operation mode
+extern int const coilSubcoolReheatMode; // SubcoolReheat operation mode
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
 extern bool stillNeedToReportStandardRatings; // standard ratings flag for all coils to report at the same time

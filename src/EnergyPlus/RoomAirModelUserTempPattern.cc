@@ -132,6 +132,13 @@ namespace RoomAirModelUserTempPattern {
     // MODULE SUBROUTINES:
 
     // Functions
+    bool MyOneTimeFlag(true); // one time setup flag
+    bool MyOneTimeFlag2(true);
+
+    void clear_state() {
+        MyOneTimeFlag = true;
+        MyOneTimeFlag2 = true;
+    }
 
     void ManageUserDefinedPatterns(int const ZoneNum) // index number for the specified zone
     {
@@ -221,7 +228,6 @@ namespace RoomAirModelUserTempPattern {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
-        static bool MyOneTimeFlag(true); // one time setup flag
         int SurfNum;                     // do loop counter
 
         if (MyOneTimeFlag) {
@@ -318,7 +324,6 @@ namespace RoomAirModelUserTempPattern {
         // Using/Aliasing
         using DataSurfaces::ZoneMeanAirTemp;
         using General::FindNumberInList;
-        using OutputReportTabular::IntToStr;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -357,7 +362,7 @@ namespace RoomAirModelUserTempPattern {
 
             if (CurPatrnID == 0) {
                 // throw error here ? way to test schedules before getting to this point?
-                ShowFatalError("User defined room air pattern index not found: " + IntToStr(CurntPatternKey));
+                ShowFatalError("User defined room air pattern index not found: " + std::to_string(CurntPatternKey));
                 return;
             }
 
@@ -580,11 +585,10 @@ namespace RoomAirModelUserTempPattern {
         Real64 DeltaHeight;                  // height difference in m
         Real64 tempDeltaTai;                 // temporary temperature difference
         static Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
-        static bool MyOneTimeFlag(true);
 
-        if (MyOneTimeFlag) {
+        if (MyOneTimeFlag2) {
             SetupOutputFlag.dimension(NumOfZones, true); // init
-            MyOneTimeFlag = false;
+            MyOneTimeFlag2 = false;
         }
 
         if (SetupOutputFlag(ZoneNum)) {

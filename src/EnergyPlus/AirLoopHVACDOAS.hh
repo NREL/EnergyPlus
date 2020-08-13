@@ -49,33 +49,24 @@
 #define ENERGYPLUS_AIRLOOPHVACDOAS_HH
 
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <string>
 #include <vector>
 
 namespace EnergyPlus {
 
+// forward declarations
+struct EnergyPlusData;
+
 namespace AirLoopHVACDOAS {
 
-    void clear_state();
-
-    extern int numAirLoopDOAS;
-
-    void CheckConvergence();
+    void CheckConvergence(EnergyPlusData &state);
 
     struct AirLoopMixer
     {
-
-    public:
-        AirLoopMixer(); // constructor
-        ~AirLoopMixer() // destructor
-        {
-        }
-
         std::string name;
-        static AirLoopMixer *factory(int object_type_of_num, std::string const objectName);
+        static AirLoopMixer *factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName);
         int numOfInletNodes;
-
-        //    private:
         int m_AirLoopMixer_Num;
         int OutletNodeNum;
         std::string OutletNodeName;
@@ -83,37 +74,41 @@ namespace AirLoopHVACDOAS {
         std::vector<int> InletNodeNum;
         Real64 OutletTemp;
 
-        static void getAirLoopMixer();
+        // default constructor
+        AirLoopMixer() : numOfInletNodes(0), m_AirLoopMixer_Num(0), OutletNodeNum(0), OutletTemp(0.0)
+        {
+        }
+
+        ~AirLoopMixer() = default; // destructor
+
+        static void getAirLoopMixer(EnergyPlusData &state);
         void CalcAirLoopMixer();
     };
 
     struct AirLoopSplitter
     {
-
-    public:
-        AirLoopSplitter(); // constructor
-        ~AirLoopSplitter() // destructor
-        {
-        }
-
         std::string name;
-        static AirLoopSplitter *factory(int object_type_of_num, std::string const objectName);
+        static AirLoopSplitter *factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName);
         int numOfOutletNodes;
-
-        //    private:
         int m_AirLoopSplitter_Num;
         std::string InletNodeName;
         std::vector<std::string> OutletNodeName;
         std::vector<int> OutletNodeNum;
         Real64 InletTemp;
 
-        static void getAirLoopSplitter();
+        // default constructor
+        AirLoopSplitter() : numOfOutletNodes(0), m_AirLoopSplitter_Num(0), InletTemp(0.0)
+        {
+        }
+
+        ~AirLoopSplitter() = default; // destructor
+
+        static void getAirLoopSplitter(EnergyPlusData &state);
         void CalcAirLoopSplitter(Real64 Temp, Real64 Humrat);
     };
 
     struct AirLoopDOAS
     {
-
         // friend class AirLoopMixer and AirLoopSplitter;
         // members
         Real64 SumMassFlowRate;
@@ -173,35 +168,65 @@ namespace AirLoopHVACDOAS {
         int CWBranchNum;
         int CWCompNum;
         int CWCtrlNodeNum;
+        bool MyEnvrnFlag;
 
-        //    private:
-        // private members not initialized in constructor
+        // default constructor
+        AirLoopDOAS() // constructor
+            : SumMassFlowRate(0.0), PreheatTemp(-999.0), PrecoolTemp(-999.0), PreheatHumRat(-999.0), PrecoolHumRat(-999.0), SizingMassFlow(0.0),
+              SizingCoolOATemp(-999.0), SizingCoolOAHumRat(-999.0), HeatOutTemp(0.0), HeatOutHumRat(0.0), m_AirLoopDOASNum(0), m_OASystemNum(0),
+              m_AvailManagerSchedPtr(0), m_AirLoopMixerIndex(-1), m_AirLoopSplitterIndex(-1), NumOfAirLoops(0), m_InletNodeNum(0), m_OutletNodeNum(0),
+              m_FanIndex(-1), m_FanInletNodeNum(0), m_FanOutletNodeNum(0), m_FanTypeNum(0), m_HeatCoilNum(0), m_CoolCoilNum(0), ConveCount(0),
+              ConveIndex(0), m_HeatExchangerFlag(false), SizingOnceFlag(true), DXCoilFlag(false), FanBlowTroughFlag(false),
+              m_CompPointerAirLoopMixer(nullptr), m_CompPointerAirLoopSplitter(nullptr), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0),
+              HWCtrlNodeNum(0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0), CWCtrlNodeNum(0), MyEnvrnFlag(true)
 
-    public:
-        AirLoopDOAS(); // constructor
-
-        ~AirLoopDOAS() // destructor
         {
         }
 
-        static void getAirLoopDOASInput();
+        ~AirLoopDOAS() = default; // destructor
 
-        void SimAirLoopHVACDOAS(bool const firstHVACIteration, int &CompIndex);
+        static void getAirLoopDOASInput(EnergyPlusData &state);
 
-        void initAirLoopDOAS(bool const FirstHVACIteration);
+        void SimAirLoopHVACDOAS(EnergyPlusData &state, bool firstHVACIteration, int &CompIndex);
 
-        void CalcAirLoopDOAS(bool const FirstHVACIteration);
+        void initAirLoopDOAS(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void SizingAirLoopDOAS();
+        void CalcAirLoopDOAS(EnergyPlusData &state, bool FirstHVACIteration);
+
+        void SizingAirLoopDOAS(EnergyPlusData &state);
 
         void GetDesignDayConditions();
     };
 
-    extern std::vector<AirLoopDOAS> airloopDOAS;
-    int getAirLoopMixerIndex(std::string const &objectName);
-    int getAirLoopSplitterIndex(std::string const &objectName);
-    void getAirLoopHVACDOASInput();
-    extern bool GetInputOnceFlag;
+    int getAirLoopMixerIndex(EnergyPlusData &state, std::string const &objectName);
+    int getAirLoopSplitterIndex(EnergyPlusData &state, std::string const &objectName);
+    void getAirLoopHVACDOASInput(EnergyPlusData &state);
+
 } // namespace AirLoopHVACDOAS
+
+    struct AirLoopHVACDOASData : BaseGlobalStruct
+    {
+        bool GetInputOnceFlag = true;
+        bool getAirLoopMixerInputOnceFlag = true;
+        bool getAirLoopSplitterInputOnceFlag = true;
+
+        int numAirLoopDOAS = 0;
+
+        std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
+        std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
+        std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
+
+        void clear_state() override
+        {
+            GetInputOnceFlag = true;
+            getAirLoopMixerInputOnceFlag = true;
+            getAirLoopSplitterInputOnceFlag = true;
+            numAirLoopDOAS = 0;
+            airloopDOAS.clear();
+            airloopMixer.clear();
+            airloopSplitter.clear();
+        }
+    };
+
 } // namespace EnergyPlus
 #endif // ENERGYPLUS_AIRLOOPHVACDOAS_HH

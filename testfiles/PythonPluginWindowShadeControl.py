@@ -23,7 +23,7 @@ class SetShadeControlState(EnergyPlusPlugin):
                 "Surface Outside Face Beam Solar Incident Angle Cosine Value", "Zn001:Wall001:Win001"
             )
             self.handle_shading_deploy_status = self.api.exchange.get_actuator_handle(
-                "Zn001:Wall001:Win001", "Window Shading Control", "Control Status"
+                "Window Shading Control", "Control Status", "Zn001:Wall001:Win001"
             )
             self.handle_global_shading_actuator_status = self.api.exchange.get_global_handle(
                 "Zn001_Wall001_Win001_Shading_Deploy_Status"

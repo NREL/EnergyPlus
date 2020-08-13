@@ -201,7 +201,7 @@ This field is the unique name of the Erl program. The name can be used to call t
 
 \paragraph{Field Set: Program lines 1 to N}\label{field-set-program-lines-1-to-n}
 
-Each remaining field contains a single line of code for the \emph{EnergyPlus Runtime Language}, or Erl. Erl is a little programming language with its own syntax. The commas separating fields can be thought of as end of line characters. The \emph{Application Guide for EMS} provides a the details on Erl program code.
+Each remaining field contains a single line of code for the \emph{EnergyPlus Runtime Language}, or Erl. Erl is a little programming language with its own syntax. The commas separating fields can be thought of as end of line characters. The \emph{Application Guide for EMS} provides the details on Erl program code.
 
 Example IDF input objects follow.
 
@@ -405,9 +405,9 @@ This field is used to specify the type of resource that the output variable cons
 \item
   \textbf{Coal}, this selects the meter for coal consumption, in units of Joules {[}J{]},
 \item
-  \textbf{FuelOilNo1}, this selects the meter for \#1 Fuel Oil consumption, in units of Joules {[}J{]},
+  \textbf{FuelOilNo1}, this selects the meter for No 1 Fuel Oil consumption, in units of Joules {[}J{]},
 \item
-  \textbf{FuelOilNo2}, this selects the meter for \#2 Fuel Oil consumption, in units of Joules {[}J{]},
+  \textbf{FuelOilNo2}, this selects the meter for No 2 Fuel Oil consumption, in units of Joules {[}J{]},
 \item
   \textbf{Propane}, this selects the meter for propane consumption, in units of Joules {[}J{]},
 \item
@@ -546,7 +546,7 @@ EnergyManagementSystem:TrendVariable,
 
 \subsection{EnergyManagementSystem:InternalVariable}\label{energymanagementsysteminternalvariable}
 
-The EMS also provides a method to obtain static data from elsewhere in the model. Whereas EMS sensors are used for time-varying data, there are also data that describe certain design parameters for the building which may be useful for EMS calculations. A method for accessing internal data is provided as a time saver and means of better generalizing Erl programs for wider applicability. Information needed for this input object is output by EnergyPlus to the eplusout.edd file see the \hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem} input object. The EDD file can list the internal data index keys and types that are available for use with this object. The Application Guide for EMS discusse internal variables in more depth.
+The EMS also provides a method to obtain static data from elsewhere in the model. Whereas EMS sensors are used for time-varying data, there are also data that describe certain design parameters for the building which may be useful for EMS calculations. A method for accessing internal data is provided as a time saver and means of better generalizing Erl programs for wider applicability. Information needed for this input object is output by EnergyPlus to the eplusout.edd file see the \hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem} input object. The EDD file can list the internal data index keys and types that are available for use with this object. The Application Guide for EMS discuses internal variables in more depth.
 
 \subsubsection{Inputs}\label{inputs-8-006}
 

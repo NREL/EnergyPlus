@@ -45,20 +45,29 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification& input_data)
+void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
 {
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
@@ -93,20 +102,29 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
         errorsFound = true;
     }
 
-    if (!input_data.alternate_operating_mode_name.empty()) {
-        this->hasAlternateMode = true;
+    if (!input_data.alternate_operating_mode_name.empty() && input_data.alternate_operating_mode2_name.empty()) {
+        this->hasAlternateMode = coilEnhancedMode;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode_name);
         this->alternateMode.oneTimeInit(); // oneTimeInit does not need to be delayed in this use case
     }
 
     this->compressorFuelType = input_data.compressor_fuel_type;
 
+    if (!input_data.alternate_operating_mode2_name.empty() && !input_data.alternate_operating_mode_name.empty()) {
+        this->hasAlternateMode = coilSubcoolReheatMode;
+        this->alternateMode = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode_name);
+        this->alternateMode2 = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode2_name);
+        setOperMode(this->normalMode, 1);
+        setOperMode(this->alternateMode, 2);
+        setOperMode(this->alternateMode2, 3);
+    }
+
     if (errorsFound) {
         ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
 }
 
-CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::string& name_to_find)
+CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::string &name_to_find)
 {
     int numPerformances = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
@@ -144,6 +162,9 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
         if (!lAlphaFieldBlanks(6)) {
             input_specs.alternate_operating_mode_name = cAlphaArgs(6);
         }
+        if (!lAlphaFieldBlanks(7)) {
+            input_specs.alternate_operating_mode2_name = cAlphaArgs(7);
+        }
 
         this->instantiateFromInputSpec(input_specs);
         break;
@@ -156,30 +177,136 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
 
 void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &inletNode,
                                                 DataLoopNode::NodeData &outletNode,
-                                                bool useAlternateMode,
+                                                int useAlternateMode,
                                                 Real64 &PLR,
                                                 int &speedNum,
                                                 Real64 &speedRatio,
                                                 int const fanOpMode,
                                                 DataLoopNode::NodeData &condInletNode,
                                                 DataLoopNode::NodeData &condOutletNode,
+                                                Real64 LoadSHR,
                                                 bool const singleMode)
 {
-    if (useAlternateMode) {
+    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+
+    if (useAlternateMode == coilSubcoolReheatMode) {
+        Real64 totalCoolingRate;
+        Real64 sensNorRate;
+        Real64 sensSubRate;
+        Real64 sensRehRate;
+        Real64 SysNorSHR;
+        Real64 SysSubSHR;
+        Real64 SysRehSHR;
+        Real64 minAirHumRat;
+        Real64 HumRatNorOut;
+        Real64 TempNorOut;
+        Real64 EnthalpyNorOut;
+        Real64 modeRatio;
+
+        this->recoveredEnergyRate = 0.0;
+        this->NormalSHR = 0.0;
+        this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+
+        //this->OperatingMode = 1;
+        totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
+        minAirHumRat = min(inletNode.HumRat, outletNode.HumRat);
+        sensNorRate = outletNode.MassFlowRate *
+                      (Psychrometrics::PsyHFnTdbW(inletNode.Temp, minAirHumRat) - Psychrometrics::PsyHFnTdbW(outletNode.Temp, minAirHumRat));
+        if (totalCoolingRate > 1.0E-10) {
+            this->OperatingMode = 1;
+            this->NormalSHR = sensNorRate / totalCoolingRate;
+        }
+
+        if (PLR == 0.0) return;
+        if (LoadSHR == 0.0) return;
+
+        if (totalCoolingRate == 0.0) {
+            SysNorSHR = 1.0;
+        } else {
+            SysNorSHR = sensNorRate / totalCoolingRate;
+        }
+        HumRatNorOut = outletNode.HumRat;
+        TempNorOut = outletNode.Temp;
+        EnthalpyNorOut = outletNode.Enthalpy;
+        this->recoveredEnergyRate = sensNorRate;
+
+        if (LoadSHR < SysNorSHR) {
+            outletNode.MassFlowRate = inletNode.MassFlowRate;
+            this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+            totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
+            minAirHumRat = min(inletNode.HumRat, outletNode.HumRat);
+            sensSubRate = outletNode.MassFlowRate *
+                          (Psychrometrics::PsyHFnTdbW(inletNode.Temp, minAirHumRat) - Psychrometrics::PsyHFnTdbW(outletNode.Temp, minAirHumRat));
+            SysSubSHR = sensSubRate / totalCoolingRate;
+            if (LoadSHR < SysSubSHR) {
+                outletNode.MassFlowRate = inletNode.MassFlowRate;
+                this->calculate(this->alternateMode2, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+                totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
+                minAirHumRat = min(inletNode.HumRat, outletNode.HumRat);
+                sensRehRate = outletNode.MassFlowRate *
+                              (Psychrometrics::PsyHFnTdbW(inletNode.Temp, minAirHumRat) - Psychrometrics::PsyHFnTdbW(outletNode.Temp, minAirHumRat));
+                SysRehSHR = sensRehRate / totalCoolingRate;
+                if (LoadSHR > SysRehSHR) {
+                    modeRatio = (LoadSHR - SysNorSHR) / (SysRehSHR - SysNorSHR);
+                    this->OperatingMode = 3;
+                    outletNode.HumRat = HumRatNorOut * (1.0 - modeRatio) + modeRatio * outletNode.HumRat;
+                    outletNode.Enthalpy = EnthalpyNorOut * (1.0 - modeRatio) + modeRatio * outletNode.Enthalpy;
+                    outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
+                    this->ModeRatio = modeRatio;
+                    // update other reporting terms
+                    this->powerUse = this->normalMode.OpModePower * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModePower;
+                    this->RTF = this->normalMode.OpModeRTF * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeRTF;
+                    this->electricityConsumption = this->powerUse * reportingConstant;
+                    this->wasteHeatRate = this->normalMode.OpModeWasteHeat * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeWasteHeat;
+                    this->recoveredEnergyRate = (this->recoveredEnergyRate - sensRehRate) * this->ModeRatio;
+                    return;
+                } else {
+                    this->ModeRatio = 1.0;
+                    this->OperatingMode = 3;
+                    this->recoveredEnergyRate = (this->recoveredEnergyRate - sensRehRate) * this->ModeRatio;
+                    return;
+                }
+            } else {
+                modeRatio = (LoadSHR - SysNorSHR) / (SysSubSHR - SysNorSHR);
+                this->OperatingMode = 2;
+                // process outlet conditions and total output
+                outletNode.HumRat = HumRatNorOut * (1.0 - modeRatio) + modeRatio * outletNode.HumRat;
+                outletNode.Enthalpy = EnthalpyNorOut * (1.0 - modeRatio) + modeRatio * outletNode.Enthalpy;
+                outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
+                this->ModeRatio = modeRatio;
+                // update other reporting terms
+                this->powerUse = this->normalMode.OpModePower * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModePower;
+                this->RTF = this->normalMode.OpModeRTF * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeRTF;
+                this->electricityConsumption = this->powerUse * reportingConstant;
+                this->wasteHeatRate = this->normalMode.OpModeWasteHeat * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeWasteHeat;
+                this->recoveredEnergyRate = (this->recoveredEnergyRate - sensSubRate) * this->ModeRatio;
+                return;
+            }
+        } else {
+            this->ModeRatio = 0.0;
+            this->OperatingMode = 1;
+            this->recoveredEnergyRate = 0.0;
+            return;
+        }
+
+    } else if (useAlternateMode == coilEnhancedMode) {
         this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
     } else {
         this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::size()
+void CoilCoolingDXCurveFitPerformance::size(EnergyPlusData &state)
 {
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
         this->normalMode.parentName = this->parentName;
-        this->normalMode.size();
-        if (this->hasAlternateMode) {
-            this->alternateMode.parentName = this->parentName;
-            this->alternateMode.size();
+        this->normalMode.size(state);
+        if (this->hasAlternateMode == coilEnhancedMode) {
+            this->alternateMode.size(state);
+        }
+        if (this->hasAlternateMode == coilSubcoolReheatMode) {
+            this->alternateMode.size(state);
+            this->alternateMode2.size(state);
         }
         this->mySizeFlag = false;
     }
@@ -240,6 +367,8 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
         this->powerUse = 0.0;
         this->electricityConsumption = 0.0;
     }
+void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex,
+                                                           IOFiles &ioFiles) {
 
 }
 

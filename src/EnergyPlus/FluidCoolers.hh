@@ -58,6 +58,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct BranchInputManagerData;
+
 namespace FluidCoolers {
 
     // MODULE PARAMETER DEFINITIONS:
@@ -167,7 +170,7 @@ namespace FluidCoolers {
         {
         }
 
-        void initialize();
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
         void setupOutputVars();
 
@@ -191,14 +194,14 @@ namespace FluidCoolers {
 
         void calcTwoSpeed();
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
                                  Real64 &EP_UNUSED(MaxLoad),
                                  Real64 &EP_UNUSED(MinLoad),
                                  Real64 &EP_UNUSED(OptLoad)) override;
 
-        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         static PlantComponent *factory(int typeOf, std::string objectName);
     };
@@ -209,8 +212,8 @@ namespace FluidCoolers {
 
     void CalcFluidCoolerOutlet(int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
 
-    Real64 SimpleFluidCoolerUAResidual(Real64 UA,                // UA of fluid cooler
-                                       Array1<Real64> const &Par // par(1) = design fluid cooler load [W]
+    Real64 SimpleFluidCoolerUAResidual(Real64 UA,                 // UA of fluid cooler
+                                       Array1D<Real64> const &Par // par(1) = design fluid cooler load [W]
     );
 
     void clear_state();

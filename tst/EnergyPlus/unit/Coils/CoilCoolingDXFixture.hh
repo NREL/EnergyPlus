@@ -50,165 +50,180 @@
 
 // EnergyPlus Headers
 #include "../Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
-class CoilCoolingDXTest : public EnergyPlus::EnergyPlusFixture
-{
+class CoilCoolingDXTest : public EnergyPlus::EnergyPlusFixture {
 public:
 protected:
-    void SetUp() override
-    {
-        EnergyPlus::EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
+  void SetUp() override {
+    EnergyPlus::EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
+  }
+
+  std::string getSpeedObjectString(const std::string &speedObjectName) {
+    std::string const idf_objects =
+        delimited_string({"Coil:Cooling:DX:CurveFit:Speed, ",
+                          " " + speedObjectName + ",       ",
+                          " 0.8,                           ",
+                          " 0.745,                         ",
+                          " 3.1415926,                     ",
+                          " 0.9,                           ",
+                          " 0.9,                           ",
+                          " 0.5,                           ",
+                          " 300,                           ",
+                          " 6.9,                           ",
+                          " 0.8,                           ",
+                          " " + speedObjectName + "CapFT,  ",
+                          " " + speedObjectName + "CapFF,  ",
+                          " " + speedObjectName + "EIRFT,  ",
+                          " " + speedObjectName + "EIRFF,  ",
+                          " " + speedObjectName + "PLFCurveName, ",
+                          " 0.6,                           ",
+                          " " + speedObjectName + "WasteHeatFunctionCurve, ",
+                          " " + speedObjectName + "SHRFT,  ",
+                          " " + speedObjectName + "SHRFF;  ",
+                          "Curve:Biquadratic,              ",
+                          " " + speedObjectName + "CapFT,  ",
+                          " 1, 0, 0, 0, 0, 0,              ",
+                          " 0, 1, 0, 1;                    ",
+                          "Curve:Linear,                   ",
+                          " " + speedObjectName + "CapFF,  ",
+                          " 1, 0,                          ",
+                          " 0, 1;                          ",
+                          "Curve:Biquadratic,              ",
+                          " " + speedObjectName + "EIRFT,  ",
+                          " 1, 0, 0, 0, 0, 0,              ",
+                          " 0, 1, 0, 1;                    ",
+                          "Curve:Linear,                   ",
+                          " " + speedObjectName + "EIRFF,  ",
+                          " 1, 0,                          ",
+                          " 0, 1;                          ",
+                          "Curve:Linear,                   ",
+                          " " + speedObjectName + "PLFCurveName, ",
+                          " 0.85, 0.15,                    ",
+                          " 0, 1;                          ",
+                          "Curve:Biquadratic,              ",
+                          " " + speedObjectName + "WasteHeatFunctionCurve, ",
+                          " 1, 0, 0, 0, 0, 0,              ",
+                          " 0, 1, 0, 1;                    ",
+                          "Curve:Biquadratic,              ",
+                          " " + speedObjectName + "SHRFT,  ",
+                          " 1, 0, 0, 0, 0, 0,              ",
+                          " 0, 1, 0, 1;                    ",
+                          "Curve:Linear,                   ",
+                          " " + speedObjectName + "SHRFF,  ",
+                          " 1, 0,                          ",
+                          " 0, 1;                          ",
+                          " "});
+    return idf_objects + '\n';
+  }
+
+  std::string getModeObjectString(std::string modeName, int numSpeeds) {
+    std::vector<std::string> mode_object_lines = {
+        "Coil:Cooling:DX:CurveFit:OperatingMode, ",
+        " " + modeName + ",                      ", // name
+        " 12000,                                 ", // rated gross total cooling
+                                                    // capacity
+        " 1,                                     ", // rated evap air flow rate
+        " 2,                                     ", // rated condenser air flow
+                                                    // rate
+        " 2.5,                                   ", // maximum cycling rate
+        " 0.5,                                   ", // ratio for latent cycling
+        " 100,                                   ", // latent time constant
+        " 300,                                   ", // latent time for removal
+                                                    // to begin
+        " Yes,                                   ", // apply latent in higher
+                                                    // speeds than 1
+        " EvaporativelyCooled,                   ", // condenser type
+        " 200,                                   ", // evap condenser pump power
+        " 5,                                     "  // nominal speed num
+    };
+    std::vector<std::string> speedObjects;
+    for (int speedNum = 1; speedNum <= numSpeeds; speedNum++) {
+      if (speedNum < numSpeeds) {
+        mode_object_lines.push_back(" " + modeName + "Speed" +
+                                    std::to_string(speedNum) + ",");
+      } else {
+        mode_object_lines.push_back(" " + modeName + "Speed" +
+                                    std::to_string(speedNum) + ";");
+      }
+      speedObjects.push_back(this->getSpeedObjectString(
+          modeName + "Speed" + std::to_string(speedNum)));
     }
+    std::string const mode_object = delimited_string(mode_object_lines);
 
-    std::string getSpeedObjectString(const std::string &speedObjectName)
-    {
-        std::string const idf_objects = delimited_string({"Coil:Cooling:DX:CurveFit:Speed, ",
-                                                          " " + speedObjectName + ",       ",
-                                                          " 0.8,                           ",
-                                                          " 0.745,                         ",
-                                                          " 3.1415926,                     ",
-                                                          " 0.9,                           ",
-                                                          " 0.9,                           ",
-                                                          " 0.5,                           ",
-                                                          " 300,                           ",
-                                                          " 6.9,                           ",
-                                                          " 0.8,                           ",
-                                                          " " + speedObjectName + "CapFT,  ",
-                                                          " " + speedObjectName + "CapFF,  ",
-                                                          " " + speedObjectName + "EIRFT,  ",
-                                                          " " + speedObjectName + "EIRFF,  ",
-                                                          " " + speedObjectName + "PLFCurveName, ",
-                                                          " 0.6,                           ",
-                                                          " " + speedObjectName + "WasteHeatFunctionCurve, ",
-                                                          " " + speedObjectName + "SHRFT,  ",
-                                                          " " + speedObjectName + "SHRFF;  ",
-                                                          "Curve:Biquadratic,              ",
-                                                          " " + speedObjectName + "CapFT,  ",
-                                                          " 1, 0, 0, 0, 0, 0,              ",
-                                                          " 0, 1, 0, 1;                    ",
-                                                          "Curve:Linear,                   ",
-                                                          " " + speedObjectName + "CapFF,  ",
-                                                          " 1, 0,                          ",
-                                                          " 0, 1;                          ",
-                                                          "Curve:Biquadratic,              ",
-                                                          " " + speedObjectName + "EIRFT,  ",
-                                                          " 1, 0, 0, 0, 0, 0,              ",
-                                                          " 0, 1, 0, 1;                    ",
-                                                          "Curve:Linear,                   ",
-                                                          " " + speedObjectName + "EIRFF,  ",
-                                                          " 1, 0,                          ",
-                                                          " 0, 1;                          ",
-                                                          "Curve:Linear,                   ",
-                                                          " " + speedObjectName + "PLFCurveName, ",
-                                                          " 0.85, 0.15,                    ",
-                                                          " 0, 1;                          ",
-                                                          "Curve:Biquadratic,              ",
-                                                          " " + speedObjectName + "WasteHeatFunctionCurve, ",
-                                                          " 1, 0, 0, 0, 0, 0,              ",
-                                                          " 0, 1, 0, 1;                    ",
-                                                          "Curve:Biquadratic,              ",
-                                                          " " + speedObjectName + "SHRFT,  ",
-                                                          " 1, 0, 0, 0, 0, 0,              ",
-                                                          " 0, 1, 0, 1;                    ",
-                                                          "Curve:Linear,                   ",
-                                                          " " + speedObjectName + "SHRFF,  ",
-                                                          " 1, 0,                          ",
-                                                          " 0, 1;                          ",
-                                                          " "});
-        return idf_objects + '\n';
+    std::string fullObject;
+    fullObject = mode_object;
+    for (auto &speedObj : speedObjects) {
+      fullObject += speedObj;
     }
+    return fullObject;
+  }
 
-    std::string getModeObjectString(std::string modeName, int numSpeeds)
-    {
-        std::vector<std::string> mode_object_lines = {
-            "Coil:Cooling:DX:CurveFit:OperatingMode, ",
-            " " + modeName + ",                      ", // name
-            " 12000,                                 ", // rated gross total cooling capacity
-            " 1,                                     ", // rated evap air flow rate
-            " 2,                                     ", // rated condenser air flow rate
-            " 2.5,                                   ", // maximum cycling rate
-            " 0.5,                                   ", // ratio for latent cycling
-            " 100,                                   ", // latent time constant
-            " 300,                                   ", // latent time for removal to begin
-            " Yes,                                   ", // apply latent in higher speeds than 1
-            " EvaporativelyCooled,                   ", // condenser type
-            " 200,                                   ", // evap condenser pump power
-            " 5,                                     "  // nominal speed num
-        };
-        std::vector<std::string> speedObjects;
-        for (int speedNum = 1; speedNum <= numSpeeds; speedNum++) {
-            if (speedNum < numSpeeds) {
-                mode_object_lines.push_back(" " + modeName + "Speed" + std::to_string(speedNum) + ",");
-            } else {
-                mode_object_lines.push_back(" " + modeName + "Speed" + std::to_string(speedNum) + ";");
-            }
-            speedObjects.push_back(this->getSpeedObjectString(modeName + "Speed" + std::to_string(speedNum)));
-        }
-        std::string const mode_object = delimited_string(mode_object_lines);
+  std::string getPerformanceObjectString(std::string const performanceName,
+                                         bool addAlternateMode,
+                                         int numSpeedsPerMode) {
+    std::vector<std::string> performance_object_lines = {
+        "Coil:Cooling:DX:CurveFit:Performance, ",
+        " " + performanceName + ",             ", // name
+        " 100,                                 ", // crankcase heater capacity
+        " 0,                                   ", // min OAT for compressor
+        " 1,                                   ", // max OAT for basin heater
+        " 100,                                 ", // static pressure
+        " Continuous,                          ", // capacity control method
+        " 100,                                 ", // basin heater capacity
+        " 400,                                 ", // basin heater setpoint temp
+        " ,                                    ", // basin heater operating
+                                                  // schedule name
+        " Electricity,                         ", // compressor fuel type
+        " BaseOperatingMode,                   "  // base operating mode name
+    };
 
-        std::string fullObject;
-        fullObject = mode_object;
-        for (auto &speedObj : speedObjects) {
-            fullObject += speedObj;
-        }
-        return fullObject;
+    std::vector<std::string> modeObjects;
+    modeObjects.push_back(
+        this->getModeObjectString("BaseOperatingMode", numSpeedsPerMode));
+    if (addAlternateMode) {
+      performance_object_lines.emplace_back(" AlternateOperatingMode;");
+      modeObjects.push_back(this->getModeObjectString("AlternateOperatingMode",
+                                                      numSpeedsPerMode));
+    } else {
+      performance_object_lines.emplace_back(";");
     }
+    std::string const performanceObject =
+        delimited_string(performance_object_lines);
 
-    std::string getPerformanceObjectString(std::string const performanceName, bool addAlternateMode, int numSpeedsPerMode)
-    {
-        std::vector<std::string> performance_object_lines = {
-            "Coil:Cooling:DX:CurveFit:Performance, ",
-            " " + performanceName + ",             ", // name
-            " 100,                                 ", // crankcase heater capacity
-            " 0,                                   ", // min OAT for compressor
-            " 1,                                   ", // max OAT for basin heater
-            " 100,                                 ", // static pressure
-            " Continuous,                          ", // capacity control method
-            " 100,                                 ", // basin heater capacity
-            " 400,                                 ", // basin heater setpoint temp
-            " ,                                    ", // basin heater operating schedule name
-            " Electricity,                         ", // compressor fuel type
-            " BaseOperatingMode,                   "  // base operating mode name
-        };
-
-        std::vector<std::string> modeObjects;
-        modeObjects.push_back(this->getModeObjectString("BaseOperatingMode", numSpeedsPerMode));
-        if (addAlternateMode) {
-            performance_object_lines.emplace_back(" AlternateOperatingMode;");
-            modeObjects.push_back(this->getModeObjectString("AlternateOperatingMode", numSpeedsPerMode));
-        } else {
-            performance_object_lines.emplace_back(";");
-        }
-        std::string const performanceObject = delimited_string(performance_object_lines);
-
-        std::string fullObject = performanceObject;
-        for (auto &modeObject : modeObjects) {
-            fullObject += modeObject;
-        }
-        return fullObject;
+    std::string fullObject = performanceObject;
+    for (auto &modeObject : modeObjects) {
+      fullObject += modeObject;
     }
+    return fullObject;
+  }
 
-    std::string getCoilObjectString(std::string const coilName, bool addAlternateMode, int numSpeedsPerMode)
-    {
-        std::string coilObject = delimited_string({"Coil:Cooling:DX,                     ",
-                                                   " " + coilName + ",                   ",   // name
-                                                   " EvapInletNode,                      ",   // evap inlet node
-                                                   " EvapOutletNode,                     ",   // evap outlet node
-                                                   " AvailSchedule,                      ",   // availability schedule name
-                                                   " ZoneNameForCondenser,               ",   // condenser zone name
-                                                   " CondenserInletNode,                 ",   // condenser inlet node
-                                                   " CondenserOutletNode,                ",   // condenser outlet node
-                                                   " PerformanceObjectName,              ",   // performance object name
-                                                   " ,!CondensateCollectionTankName,       ", // condensate storage tank name
-                                                   " ;!EvaporativeCondenserSupplyTankName; ", // evaporative condenser supply tank name
-                                                   "Schedule:Constant,AvailSchedule,,1;  "});
-        std::string performanceObject = this->getPerformanceObjectString("PerformanceObjectName", addAlternateMode, numSpeedsPerMode);
-        std::string fullObject = coilObject + performanceObject;
-        return fullObject;
-    }
+  std::string getCoilObjectString(std::string const coilName,
+                                  bool addAlternateMode, int numSpeedsPerMode) {
+    std::string coilObject = delimited_string(
+        {"Coil:Cooling:DX,                     ",
+         " " + coilName + ",                   ", // name
+         " EvapInletNode,                      ", // evap inlet node
+         " EvapOutletNode,                     ", // evap outlet node
+         " AvailSchedule,                      ", // availability schedule name
+         " ZoneNameForCondenser,               ", // condenser zone name
+         " CondenserInletNode,                 ", // condenser inlet node
+         " CondenserOutletNode,                ", // condenser outlet node
+         " PerformanceObjectName,              ", // performance object name
+         " ,!CondensateCollectionTankName,       ", // condensate storage tank
+                                                    // name
+         " ;!EvaporativeCondenserSupplyTankName; ", // evaporative condenser
+                                                    // supply tank name
+         "Schedule:Constant,AvailSchedule,,1;  "});
+    std::string performanceObject = this->getPerformanceObjectString(
+        "PerformanceObjectName", addAlternateMode, numSpeedsPerMode);
+    std::string fullObject = coilObject + performanceObject;
+    return fullObject;
+  }
 
-    void TearDown() override
-    {
-        EnergyPlus::EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
-    }
+  void TearDown() override {
+    EnergyPlus::EnergyPlusFixture::TearDown(); // Remember to tear down the base
+                                               // fixture after cleaning up
+                                               // derived fixture!
+  }
 };

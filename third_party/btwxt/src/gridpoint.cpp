@@ -294,15 +294,19 @@ void GridPoint::normalize_grid_values_at_target(const double scalar) {
   set_results();
 }
 
-void GridPoint::normalize_grid_values_at_target(std::size_t table_num, const double scalar) {
+double GridPoint::normalize_grid_values_at_target(std::size_t table_num, const double scalar) {
   if (!target_is_set) {
     showMessage(MsgLevel::MSG_WARN,
                 stringify("Cannot normalize grid values. No target has been set."));
-    return;
+    return scalar;
   }
-  grid_data->normalize_value_table(table_num,results[table_num]*scalar);
+  // create a scalar which represents the product of the inverted normalization factor and the value in the table at the independent variable reference value
+  double total_scalar = results[table_num]*scalar;
+  grid_data->normalize_value_table(table_num,total_scalar);
   hypercube_cache.clear();
   set_results();
+
+  return total_scalar;
 }
 
 } // namespace Btwxt

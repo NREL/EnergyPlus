@@ -116,8 +116,6 @@ namespace HVACInterfaceManager {
     // MODULE VARIABLE DECLARATIONS:
     bool CommonPipeSetupFinished(false);
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
-
     // Object Data
     Array1D<CommonPipeData> PlantCommonPipe;
 
@@ -392,7 +390,7 @@ namespace HVACInterfaceManager {
     //***************
 
     // In-Place Right Shift by 1 of Array Elements
-    void rshift1(Array1<Real64> &a)
+    void rshift1(Array1D<Real64> &a)
     {
         assert(a.size_bounded());
         for (int i = a.u(), e = a.l(); i > e; --i) {

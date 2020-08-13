@@ -55,7 +55,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array3D.hh>
@@ -67,6 +66,9 @@
 #include <EnergyPlus/ScheduleManager.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct CostEstimateManagerData;
 
 namespace OutputReportTabularAnnual {
 
@@ -80,7 +82,7 @@ namespace OutputReportTabularAnnual {
 
     void ResetAnnualGathering();
 
-    void WriteAnnualTables();
+    void WriteAnnualTables(CostEstimateManagerData &dataCostEstimateManager);
 
     void AddAnnualTableOfContents(std::ostream &);
 
@@ -119,7 +121,7 @@ namespace OutputReportTabularAnnual {
 
         void resetGathering();
 
-        void writeTable(int unitsStyle);
+        void writeTable(CostEstimateManagerData &dataCostEstimateManager, int unitsStyle);
 
         void addTableOfContents(std::ostream &);
 

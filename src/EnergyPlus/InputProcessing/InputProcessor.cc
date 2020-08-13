@@ -52,7 +52,6 @@
 #include <istream>
 #include <unordered_set>
 
-// ObjexxFCL Headers
 #include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
@@ -273,10 +272,10 @@ void InputProcessor::processInput()
     // std::vector<char> v;
     // if (FILE *fp = fopen("filename", "r"))
     // {
-    // 	char buf[1024];
-    // 	while (size_t len = fread(buf, 1, sizeof(buf), fp))
-    // 		v.insert(v.end(), buf, buf + len);
-    // 	fclose(fp);
+    //  char buf[1024];
+    //  while (size_t len = fread(buf, 1, sizeof(buf), fp))
+    //      v.insert(v.end(), buf, buf + len);
+    //  fclose(fp);
     // }
 
     try {
@@ -294,10 +293,10 @@ void InputProcessor::processInput()
             bool success = true;
             epJSON = idf_parser->decode(input_file, schema, success);
 
-            //			bool hasErrors = processErrors();
-            //			if ( !success || hasErrors ) {
-            //				ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
-            //			}
+            //          bool hasErrors = processErrors();
+            //          if ( !success || hasErrors ) {
+            //              ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
+            //          }
 
             if (DataGlobals::outputEpJSONConversion || DataGlobals::outputEpJSONConversionOnly) {
                 json epJSONClean = epJSON;
@@ -358,6 +357,8 @@ void InputProcessor::processInput()
     DataIPShortCuts::cNumericFieldNames.allocate(MaxNumeric);
     DataIPShortCuts::rNumericArgs.dimension(MaxNumeric, 0.0);
     DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
+
+    reportIDFRecordsStats();
 }
 
 bool InputProcessor::checkVersionMatch()
@@ -625,7 +626,7 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
                                         bool within_max_fields,
                                         Array1S_string Alphas,
                                         int &NumAlphas,
-                                        Array1S<Real64> Numbers,
+                                        Array1D<Real64> &Numbers,
                                         int &NumNumbers,
                                         Optional<Array1D_bool> NumBlank,
                                         Optional<Array1D_bool> AlphaBlank,
@@ -712,7 +713,7 @@ void InputProcessor::getObjectItem(std::string const &Object,
                                    int const Number,
                                    Array1S_string Alphas,
                                    int &NumAlphas,
-                                   Array1S<Real64> Numbers,
+                                   Array1D<Real64> &Numbers,
                                    int &NumNumbers,
                                    int &Status,
                                    Optional<Array1D_bool> NumBlank,
@@ -770,7 +771,7 @@ void InputProcessor::getObjectItem(std::string const &Object,
     auto key = legacy_idd.find("extension");
     std::string extension_key;
     if (key != legacy_idd.end()) {
-        extension_key = key.value();
+        extension_key = key.value().get<std::string>();
     }
 
     auto const &obj = epJSON_it;
@@ -1143,7 +1144,7 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
         const json &legacy_idd = schema_properties.at(object.key()).at("legacy_idd");
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
 
         size_t max_size = 0;
@@ -1226,7 +1227,7 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
     std::string extension_key;
     auto key = legacy_idd.find("extension");
     if (key != legacy_idd.end()) {
-        extension_key = key.value();
+        extension_key = key.value().get<std::string>();
     }
 
     for (auto const obj : *objects) {
@@ -1255,6 +1256,180 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
         }
     }
     NumArgs = NumAlpha + NumNumeric;
+}
+
+void InputProcessor::reportIDFRecordsStats()
+{
+
+    // SUBROUTINE INFORMATION: (previously called GetIDFRecordsStats)
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   February 2009
+    //       MODIFIED       na
+    //       RE-ENGINEERED  Julien Marrec of EffiBEM, 2020 (ported to the new InputProcessor/epJSON)
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This routine provides some statistics on the current IDF, such as number of records, total fields with defaults,
+    // number of fields that overrode the default (even if it was default value), and similarly for AutoSize.
+
+    // METHODOLOGY EMPLOYED:
+    // Traverses the IDF Records looking at each field vs object definition for defaults and autosize.
+
+    // Reset the globals
+    DataOutputs::iNumberOfRecords = 0;             // Number of IDF Records
+    DataOutputs::iNumberOfDefaultedFields = 0;     // Number of defaulted fields in IDF
+    DataOutputs::iTotalFieldsWithDefaults = 0;     // Total number of fields that could be defaulted
+    DataOutputs::iNumberOfAutoSizedFields = 0;     // Number of autosized fields in IDF
+    DataOutputs::iTotalAutoSizableFields = 0;      // Total number of autosizeable fields
+    DataOutputs::iNumberOfAutoCalcedFields = 0;    // Number of autocalculated fields
+    DataOutputs::iTotalAutoCalculatableFields = 0; // Total number of autocalculatable fields
+
+    auto const &schema_properties = schema.at("properties");
+
+    // Lambda to avoid repeating code twice (when processing regular fields, and extensible fields)
+    auto processField = [](const std::string& field, const json& epJSONObj, const json& schema_field_obj) {
+        bool hasDefault = false;
+        bool canBeAutosized = false;
+        bool canBeAutocalculated = false;
+
+        // If we wanted to count number of fields, would do it here
+
+        std::string defaultValue;
+
+        auto const &default_it = schema_field_obj.find("default");
+        if (default_it != schema_field_obj.end()) {
+            ++DataOutputs::iTotalFieldsWithDefaults;
+            hasDefault = true;
+            auto const &default_val = default_it.value();
+            if (default_val.is_string()) {
+                defaultValue = default_val.get<std::string>();
+            }
+        }
+
+        auto const &anyOf_it = schema_field_obj.find("anyOf");
+        if (anyOf_it != schema_field_obj.end()) {
+            for (auto const &anyOf : anyOf_it.value()) {
+                auto const &enum_it = anyOf.find("enum");
+                if (enum_it != anyOf.end()) {
+                    for (auto const &e: enum_it.value()) {
+                        if (e.is_string()) {
+                            auto const &enumVal = e.get<std::string>();
+                            if (enumVal == "Autosize") {
+                                ++DataOutputs::iTotalAutoSizableFields;
+                                canBeAutosized = true;
+                            } else if (enumVal == "Autocalculate") {
+                                ++DataOutputs::iTotalAutoCalculatableFields;
+                                canBeAutocalculated = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Locate the field in the ep_object
+        auto it = epJSONObj.find(field);
+        if (it != epJSONObj.end()) { // && !it.value().empty()) {
+            // Found it: check if Autosized or Autocalculated
+            auto const &field_value = it.value();
+            if (field_value.is_string()) {
+                std::string const val = field_value.get<std::string>();
+                // In the IDF, casing is an issue and Autosize/Autocalculate are accepted as synonyms
+                // but once converted to epJSON everything should is resolved, eg:
+                // * if "AutoSize" is entered for an autosizable field, the result is "Autosize"
+                // * if "AutoSize" is entered for an autocalculatable field, the result is "Autocalculate"
+                if (canBeAutosized && (val == "Autosize")) {
+                    ++DataOutputs::iNumberOfAutoSizedFields;
+                } else if (canBeAutocalculated && (val == "Autocalculate")) {
+                    ++DataOutputs::iNumberOfAutoCalcedFields;
+                }
+            }
+        } else if (hasDefault) {
+            // Not found: was defaulted
+            ++DataOutputs::iNumberOfDefaultedFields;
+            if (canBeAutosized && (defaultValue == "Autosize")) {
+                ++DataOutputs::iNumberOfAutoSizedFields;
+            } else if (canBeAutocalculated && (defaultValue == "Autocalculate")) {
+                ++DataOutputs::iNumberOfAutoCalcedFields;
+            }
+        }
+    };
+
+
+
+    // Loop on all objectTypes
+    for (auto epJSON_iter = epJSON.begin(); epJSON_iter != epJSON.end(); ++epJSON_iter) {
+        auto const &objectType = epJSON_iter.key();
+        auto const &objects = epJSON_iter.value();
+
+        const json &object_schema = schema_properties.at(objectType);
+
+        // Locations in JSON schema relating to normal fields
+        auto const &schema_obj_props = getPatternProperties(object_schema);
+        auto const &schema_name_field = object_schema.find("name");
+        auto const has_idd_name_field = schema_name_field != object_schema.end();
+
+        // Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
+        auto const &legacy_idd = object_schema["legacy_idd"];
+        auto const &legacy_idd_fields = legacy_idd["fields"];
+
+        // Look for extensible
+        auto key = legacy_idd.find("extension");
+        std::string extension_key;
+        if (key != legacy_idd.end()) {
+            extension_key = key.value().get<std::string>();
+        }
+
+        for (auto const &ep_object: objects) {
+
+            // Count number of objects
+            ++DataOutputs::iNumberOfRecords;
+
+            // Loop on all regular fields
+            for (size_t i = 0; i < legacy_idd_fields.size(); ++i) {
+
+                std::string const &field = legacy_idd_fields[i];
+
+                // This is weird, but some objects like Building have a Name default... and it's not in the patternProperties
+                if (has_idd_name_field && field == "name") {
+                    auto const &name_iter = schema_name_field.value();
+                    if (name_iter.find("default") != name_iter.end()) {
+                        ++DataOutputs::iTotalFieldsWithDefaults;
+                        auto it = ep_object.find(field);
+                        if (it == ep_object.end()) {
+                            ++DataOutputs::iNumberOfDefaultedFields;
+                        }
+                    }
+                    continue;
+                }
+
+                auto const &schema_field_obj = schema_obj_props[field];
+
+                processField(field, ep_object, schema_field_obj);
+
+            } // End regular fields
+
+            auto const &legacy_idd_extensibles_iter = legacy_idd.find("extensibles");
+            if (legacy_idd_extensibles_iter != legacy_idd.end()) {
+                auto const epJSON_extensions_array_itr = ep_object.find(extension_key);
+                if (epJSON_extensions_array_itr != ep_object.end()) {
+                    auto const &legacy_idd_extensibles = legacy_idd_extensibles_iter.value();
+                    auto const &epJSON_extensions_array = epJSON_extensions_array_itr.value();
+                    auto const &schema_extension_fields = schema_obj_props[extension_key]["items"]["properties"];
+
+                    for (auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it) {
+                        auto const &epJSON_extension_obj = it.value();
+                        for (size_t i = 0; i < legacy_idd_extensibles.size(); ++i) {
+                            std::string const &field = legacy_idd_extensibles[i];
+                            auto const &schema_extension_field_obj = schema_extension_fields[field];
+
+                            processField(field, epJSON_extension_obj, schema_extension_field_obj);
+                        }
+                    }
+                }
+            } // End extensible fields
+
+        } // End loop on each object of a given objectType
+    } // End loop on all objectTypes
 }
 
 void InputProcessor::reportOrphanRecordObjects()
@@ -1474,7 +1649,7 @@ void InputProcessor::preScanReportingVariables()
     static std::string const OutputVariable("Output:Variable");
     static std::string const MeterCustom("Meter:Custom");
     static std::string const MeterCustomDecrement("Meter:CustomDecrement");
-    //		static std::string const MeterCustomDifference( "METER:CUSTOMDIFFERENCE" );
+    //      static std::string const MeterCustomDifference( "METER:CUSTOMDIFFERENCE" );
     static std::string const OutputTableMonthly("Output:Table:Monthly");
     static std::string const OutputTableAnnual("Output:Table:Annual");
     static std::string const OutputTableTimeBins("Output:Table:TimeBins");
@@ -1508,7 +1683,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][MeterCustom]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1529,7 +1704,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][MeterCustomDecrement]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1589,7 +1764,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][OutputTableMonthly]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1609,7 +1784,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][OutputTableAnnual]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1629,7 +1804,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][OutputTableSummaries]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();

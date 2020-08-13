@@ -57,6 +57,11 @@
 #include <EnergyPlus/Plant/SplitterData.hh>
 
 namespace EnergyPlus {
+
+    // Forward declarations
+    struct EnergyPlusData;
+    struct BranchInputManagerData;
+
 namespace DataPlant {
 
     struct HalfLoopData
@@ -159,11 +164,11 @@ namespace DataPlant {
 
         void ValidateFlowControlPaths();
 
-        Real64 DetermineLoopSideFlowRate(int ThisSideInletNode, Real64 ThisSideLoopFlowRequest);
+        Real64 DetermineLoopSideFlowRate(BranchInputManagerData &dataBranchInputManager, int ThisSideInletNode, Real64 ThisSideLoopFlowRequest);
 
-        void SimulateAllLoopSideBranches(Real64 ThisLoopSideFlow, bool FirstHVACIteration, bool &LoopShutDownFlag);
+        void SimulateAllLoopSideBranches(EnergyPlusData &state, Real64 ThisLoopSideFlow, bool FirstHVACIteration, bool &LoopShutDownFlag);
 
-        void SimulateLoopSideBranchGroup(int FirstBranchNum,
+        void SimulateLoopSideBranchGroup(EnergyPlusData &state, int FirstBranchNum,
                                          int LastBranchNum,
                                          Real64 FlowRequest,
                                          bool FirstHVACIteration,
@@ -177,7 +182,7 @@ namespace DataPlant {
 
         void DisableAnyBranchPumpsConnectedToUnloadedEquipment();
 
-        void DoFlowAndLoadSolutionPass(int OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
+        void DoFlowAndLoadSolutionPass(EnergyPlusData &state, int OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
 
         Real64 CalcOtherSideDemand(Real64 ThisLoopSideFlow);
 
@@ -185,16 +190,16 @@ namespace DataPlant {
 
         Real64 EvaluateLoopSetPointLoad(int FirstBranchNum,
                                         int LastBranchNum,
-                                        Real64 ThisLoopSideFlow,
-                                        Array1S_int LastComponentSimulated);
+                                        Real64 ThisLoopSideFlow);
 
         void ResolveParallelFlows(Real64 ThisLoopSideFlow, bool FirstHVACIteration);
 
-        void SimulateSinglePump(PlantLocation SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
+        void SimulateSinglePump(BranchInputManagerData &dataBranchInputManager, PlantLocation SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
 
         void UpdateAnyLoopDemandAlterations(int BranchNum, int CompNum);
 
-        void SimulateAllLoopSidePumps(Optional<PlantLocation const> SpecificPumpLocation = _,
+        void SimulateAllLoopSidePumps(BranchInputManagerData &dataBranchInputManager,
+                                      Optional<PlantLocation const> SpecificPumpLocation = _,
                                       Optional<Real64 const> SpecificPumpFlowRate = _);
 
         void AdjustPumpFlowRequestByEMSControls(int BranchNum, int CompNum, Real64 &FlowToRequest);
@@ -206,7 +211,7 @@ namespace DataPlant {
 
         bool CheckPlantConvergence(bool FirstHVACIteration);
 
-        void solve(bool FirstHVACIteration, bool &ReSimOtherSideNeeded);
+        void solve(EnergyPlusData &state, bool FirstHVACIteration, bool &ReSimOtherSideNeeded);
 
     };
 } // namespace DataPlant

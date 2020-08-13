@@ -57,6 +57,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 struct CoilCoolingDXCurveFitOperatingModeInputSpecification
 {
@@ -81,7 +83,7 @@ struct CoilCoolingDXCurveFitOperatingMode
     std::string parentName;
 
     void instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data);
-    void size();
+    void size(EnergyPlusData &state);
     void oneTimeInit();
     CoilCoolingDXCurveFitOperatingModeInputSpecification original_input_specs;
     CoilCoolingDXCurveFitOperatingMode() = default;

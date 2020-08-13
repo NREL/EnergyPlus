@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -175,11 +174,11 @@ namespace RuntimeLanguageProcessor {
     // Functions
     void clear_state();
 
-    void InitializeRuntimeLanguage();
+    void InitializeRuntimeLanguage(IOFiles &ioFiles);
 
     void BeginEnvrnInitializeRuntimeLanguage();
 
-    void ParseStack(int const StackNum);
+    void ParseStack(IOFiles &ioFiles, int const StackNum);
 
     int AddInstruction(int const StackNum,
                        int const LineNum,
@@ -192,13 +191,10 @@ namespace RuntimeLanguageProcessor {
                   std::string const &Error // error message to be added to ErlStack
     );
 
-    ErlValueType EvaluateStack(int const StackNum);
+    ErlValueType EvaluateStack(IOFiles &ioFiles, int const StackNum);
 
-    void WriteTrace(int const StackNum,
-                    int const InstructionNum,
-                    ErlValueType const &ReturnValue,
-                    bool const seriousErrorFound // if true then also call energyplus error severe->fatal with Erl program line info
-    );
+    void
+    WriteTrace(IOFiles &ioFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
 
     //******************************************************************************************
 
@@ -206,23 +202,22 @@ namespace RuntimeLanguageProcessor {
 
     //******************************************************************************************
 
-    void ParseExpression(std::string const &InString, // String of expression text written in the Runtime Language
+    void ParseExpression(IOFiles &ioFiles,
+                         std::string const &InString, // String of expression text written in the Runtime Language
                          int const StackNum,          // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
                          std::string const &Line      // Actual line from string
     );
 
-    int ProcessTokens(Array1S<TokenType> const TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
+    int ProcessTokens(const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
 
     int NewExpression();
 
     ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound);
 
-    void GetRuntimeLanguageUserInput();
+    void GetRuntimeLanguageUserInput(IOFiles &ioFiles);
 
     void ReportRuntimeLanguage();
-
-    std::string IntegerToString(int const Number);
 
     ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const> OrigValue = _);
 

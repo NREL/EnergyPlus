@@ -117,6 +117,37 @@ This is the leakage downstream of the terminal unit as a fraction of the current
 
 This optional input field is the name of a \hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing} object which specifies sizing adjustments to be made for the air terminal unit referenced by this object. The terminal unit is initially sized according to the inputs in the corresponding \hyperref[sizingzone]{Sizing:Zone} object. Then the adjustment factors in the \hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing} object are applied. See \hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing} for more details. If left blank, then no adjustments are made.
 
+\subsubsection{Outputs}
+
+\begin{itemize}
+    \item
+    HVAC,Sum,Zone Air Terminal Sensible Heating Energy {[}J{]}
+    \item
+    HVAC,Sum,Zone Air Terminal Sensible Cooling Energy {[}J{]}
+    \item
+    HVAC,Average,Zone Air Terminal Sensible Heating Rate {[}W{]}
+    \item
+    HVAC,Average,Zone Air Terminal Sensible Cooling Rate {[}W{]}
+    \item
+    HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
+
+\paragraph{Zone Air Terminal Sensible Heating Rate {[}W{]}}\label{zone-air-terminal-sensible-heating-rate-w}
+
+\paragraph{Zone Air Terminal Sensible Heating Energy~ {[}J{]}}\label{zone-air-terminal-sensible-heating-energy-j}
+
+These outputs are the sensible heating rate and energy provided to the zone by the single duct constant volume no reheat air terminal unit.
+
+\paragraph{Zone Air Terminal Sensible Cooling Rate {[}W{]}}\label{zone-air-terminal-sensible-cooling-rate-w}
+
+\paragraph{Zone Air Terminal Sensible Cooling Energy {[}J{]}}\label{zone-air-terminal-sensible-cooling-energy-j}
+
+These outputs are the sensible cooling rate and energy provided to the zone by the single duct constant volume no reheat air terminal unit.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported.~ The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
+
 Two example IDF excerpts (one with duct leakage, one without):
 
 \begin{lstlisting}
@@ -209,7 +240,7 @@ Note that a \hyperref[zonehvacairdistributionunit]{ZoneHVAC:AirDistributionUnit}
 
 Unique identifying name.
 
-\paragraph{Field: Load Distribution Scheme}\label{field-load-distribution-scheme-000}
+\paragraph{Field: Load Distribution Scheme}
 
 The Load Distribution Scheme selects the algorithm used to allocate the current zone load across the zone equipment. There are four choices: SequentialLoad, UniformLoad, UniformPLR, and SequentialUniformPLR. The default is SequentialLoad. In all cases, the equipment operates in the order specifed by the Zone Equipment Cooling Sequence and Heating or No-Load Sequence fields.
 

@@ -45,8 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EPLUS_PLUGINMANAGER_HH
-#define EPLUS_PLUGINMANAGER_HH
+#ifndef EPLUS_PLUGIN_MANAGER_HH
+#define EPLUS_PLUGIN_MANAGER_HH
 
 #include <iomanip>
 #include <queue>
@@ -55,31 +55,23 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
-#if LINK_WITH_PYTHON
-#ifdef _DEBUG
-// We don't want to try to import a debug build of Python here
-// so if we are building a Debug build of the C++ code, we need
-// to undefine _DEBUG during the #include command for Python.h.
-// Otherwise it will fail
-#undef _DEBUG
-  #include <Python.h>
-  #define _DEBUG
-#else
-#include <Python.h>
-#endif
-#endif
+typedef void* PyObjectWrap;
 
 namespace EnergyPlus {
 
+    struct EnergyPlusData;
+
 namespace PluginManagement {
 
-    void registerNewCallback(int iCalledFrom, void (*f)());
-    void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan);
+    void registerNewCallback(EnergyPlusData &state, int iCalledFrom, const std::function<void (void *)>& f);
+    void runAnyRegisteredCallbacks(EnergyPlusData &state, int iCalledFrom, bool &anyRan);
+    void onBeginEnvironment();
+    std::string pythonStringForUsage();
 
     void clear_state();
 
     struct PluginInstance {
-        PluginInstance(std::string _moduleName, std::string _className, std::string emsName, bool runPluginDuringWarmup) :
+        PluginInstance(const std::string& _moduleName, const std::string& _className, std::string emsName, bool runPluginDuringWarmup) :
                 emsAlias(std::move(emsName)), runDuringWarmup(runPluginDuringWarmup)
         {
             this->moduleName = _moduleName;
@@ -94,20 +86,20 @@ namespace PluginManagement {
         bool runDuringWarmup;
         std::string stringIdentifier; // for diagnostic reporting
 #if LINK_WITH_PYTHON
-        PyObject *pModule = nullptr;  // reference to module
-        PyObject *pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
+        PyObjectWrap pModule = nullptr;  // reference to module
+        PyObjectWrap pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
 #endif
 
         // setup/shutdown should only be called once construction is completely done, i.e., setup() should only be called once the vector holding all the
         // instances is done for the day, and shutdown should only be called when you are ready to destruct all the instances.  The things that happen
-        // inside setup() and shutdown() are related to unmanaged memory, and it's tricky to manage inside existing constructor/move operations, so they
+        // inside setup() and shutdown() are related to un-managed memory, and it's tricky to manage inside existing constructor/move operations, so they
         // are split out into these explicitly called methods.
         void setup();
-        void shutdown();
+        void shutdown() const;
 
         // methods
         static void reportPythonError();
-        void run(int iCallingPoint); // calls main() on this plugin instance
+        bool run(int iCallingPoint) const; // calls main() on this plugin instance
 
         // plugin calling point hooks
         const char * sHookBeginNewEnvironment = "on_begin_new_environment";
@@ -149,50 +141,57 @@ namespace PluginManagement {
     class PluginManager {
     public:
         PluginManager();
-        ~PluginManager() {
-#if LINK_WITH_PYTHON
-            Py_FinalizeEx();
-#endif
-        }
+        ~PluginManager();
+
         static int numActiveCallbacks();
         static void addToPythonPath(const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
-        void setupOutputVariables();
+        static void setupOutputVariables();
 
-        static void addGlobalVariable(const std::string& name);
+        int maxGlobalVariableIndex = -1;
+        void addGlobalVariable(const std::string& name);
         static int getGlobalVariableHandle(const std::string& name, bool suppress_warning = false);
         static Real64 getGlobalVariableValue(int handle);
         static void setGlobalVariableValue(int handle, Real64 value);
 
-        int getTrendVariableHandle(const std::string& name);
-        Real64 getTrendVariableValue(int handle, int timeIndex);
+        int maxTrendVariableIndex = -1;
+        static int getTrendVariableHandle(const std::string& name);
+        static Real64 getTrendVariableValue(int handle, int timeIndex);
         static size_t getTrendVariableHistorySize(int handle);
-        Real64 getTrendVariableAverage(int handle, int count);
-        Real64 getTrendVariableMin(int handle, int count);
-        Real64 getTrendVariableMax(int handle, int count);
-        Real64 getTrendVariableSum(int handle, int count);
-        Real64 getTrendVariableDirection(int handle, int count);
-        void updatePluginValues();
+        static Real64 getTrendVariableAverage(int handle, int count);
+        static Real64 getTrendVariableMin(int handle, int count);
+        static Real64 getTrendVariableMax(int handle, int count);
+        static Real64 getTrendVariableSum(int handle, int count);
+        static Real64 getTrendVariableDirection(int handle, int count);
+
+        static void updatePluginValues();
 
         static int getLocationOfUserDefinedPlugin(std::string const &programName);
         static void runSingleUserDefinedPlugin(int index);
+        static bool anyUnexpectedPluginObjects();
     };
 
     struct PluginTrendVariable {
         std::string name;
-        int numVals;
+        int numValues;
         std::deque<Real64> values;
         std::deque<Real64> times;
         int indexOfPluginVariable;
-        PluginTrendVariable(std::string _name, int _numVals, int _indexOfPluginVariable) :
-            name(std::move(_name)), numVals(_numVals), indexOfPluginVariable(_indexOfPluginVariable)
+        PluginTrendVariable(std::string _name, int _numValues, int _indexOfPluginVariable) :
+            name(std::move(_name)), numValues(_numValues), indexOfPluginVariable(_indexOfPluginVariable)
         {
             // initialize the deque so it can be queried immediately, even with just zeroes
-            for (int i = 1; i <= this->numVals; i++) {
+            for (int i = 1; i <= this->numValues; i++) {
                 this->values.push_back(0);
             }
-            for (int loop = 1; loop <= _numVals; ++loop) {
+            for (int loop = 1; loop <= _numValues; ++loop) {
                 this->times.push_back(-loop * DataGlobals::TimeStepZone);
+            }
+        }
+        void reset() {
+            this->values.clear();
+            for (int i = 1; i <= this->numValues; i++) {
+                this->values.push_back(0);
             }
         }
     };
@@ -204,7 +203,9 @@ namespace PluginManagement {
 
     // some flags
     extern bool fullyReady;
+    extern bool apiErrorFlag;
+
 }
 }
 
-#endif // EPLUS_PLUGINMANAGER_HH
+#endif // EPLUS_PLUGIN_MANAGER_HH

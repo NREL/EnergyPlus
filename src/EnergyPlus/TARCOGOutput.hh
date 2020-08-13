@@ -49,51 +49,54 @@
 #define TARCOGOutput_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
+#include "IOFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace TARCOGOutput {
 
-    // Data
-    // variables:
-    // bi...Debug files handles:
-    // character(len=1000) :: DebugDir
-    extern std::string DBGD;
-    extern std::string FileMode;
-    extern std::string FilePosition;
-    extern bool WriteDebugOutput;
-    extern int DebugMode;
+    struct Files {
+      std::string DBGD;
+      std::string FileMode;
+      std::string FilePosition{"ASIS"};
+      bool WriteDebugOutput{false};
+      int DebugMode{0};
+
+      std::string WINCogFileName{"test.w7"};
+      InputOutputFile WINCogFile{WINCogFileName};
+
+     // Intermediate debug files
+      std::string TarcogIterationsFileName{"TarcogIterations.dbg"};
+      InputOutputFile TarcogIterationsFile{TarcogIterationsFileName};
+
+      std::string IterationCSVName{"IterationResults.csv"};
+      InputOutputFile IterationCSVFile{IterationCSVName};
+
+
+      // integer, parameter :: IterationHHAT = 102
+      // character(len=1000)    :: IterationHHATName = 'IterationHHAT.csv'
+
+      // character(len=1000)    :: SHGCFileName = 'test.w7'
+      std::string DebugOutputFileName{"Tarcog.dbg"};
+      InputOutputFile DebugOutputFile{DebugOutputFileName};
+    };
+
     extern int winID;
     extern int iguID;
 
-    extern int InArgumentsFile;
-    extern int OutArgumentsFile;
-    extern int WINCogFile;
-
-    // Intermediate debug files
-    extern int IterationCSVFileNumber;
-    extern int TarcogIterationsFileNumber;
-
-    extern std::string IterationCSVName;
-
-    // integer, parameter :: IterationHHAT = 102
-    // character(len=1000)    :: IterationHHATName = 'IterationHHAT.csv'
-
-    extern std::string WinCogFileName;
-    // character(len=1000)    :: SHGCFileName = 'test.w7'
-    extern std::string DebugOutputFileName;
 
     extern std::string const VersionNumber;
     extern std::string const VersionCompileDateCC;
 
     // Functions
 
-    void WriteInputArguments(Real64 const tout,
+    void WriteInputArguments(InputOutputFile &InArgumentsFile,
+                             const std::string &DBGD,
+                             Real64 const tout,
                              Real64 const tind,
                              Real64 const trmin,
                              Real64 const wso,
@@ -107,7 +110,7 @@ namespace TARCOGOutput {
                              Real64 const fclr,
                              Real64 const VacuumPressure,
                              Real64 const VacuumMaxGapThickness,
-                             Array1A_int const ibc,
+                             const Array1D_int &ibc,
                              Real64 const hout,
                              Real64 const hin,
                              int const standard,
@@ -119,40 +122,40 @@ namespace TARCOGOutput {
                              Real64 const tilt,
                              Real64 const totsol,
                              int const nlayer,
-                             Array1A_int const LayerType,
-                             Array1A<Real64> const thick,
-                             Array1A<Real64> const scon,
-                             Array1A<Real64> const asol,
-                             Array1A<Real64> const tir,
-                             Array1A<Real64> const emis,
-                             Array1A<Real64> const Atop,
-                             Array1A<Real64> const Abot,
-                             Array1A<Real64> const Al,
-                             Array1A<Real64> const Ar,
-                             Array1A<Real64> const Ah,
-                             Array1A<Real64> const SlatThick,
-                             Array1A<Real64> const SlatWidth,
-                             Array1A<Real64> const SlatAngle,
-                             Array1A<Real64> const SlatCond,
-                             Array1A<Real64> const SlatSpacing,
-                             Array1A<Real64> const SlatCurve,
-                             Array1A_int const nslice,
-                             Array1A<Real64> const LaminateA,
-                             Array1A<Real64> const LaminateB,
-                             Array1A<Real64> const sumsol,
-                             Array1A<Real64> const gap,
-                             Array1A<Real64> const vvent,
-                             Array1A<Real64> const tvent,
-                             Array1A<Real64> const presure,
-                             Array1A_int const nmix,
+                             const Array1D_int &LayerType,
+                             const Array1D<Real64> &thick,
+                             const Array1D<Real64> &scon,
+                             const Array1D<Real64> &asol,
+                             const Array1D<Real64> &tir,
+                             const Array1D<Real64> &emis,
+                             const Array1D<Real64> &Atop,
+                             const Array1D<Real64> &Abot,
+                             const Array1D<Real64> &Al,
+                             const Array1D<Real64> &Ar,
+                             const Array1D<Real64> &Ah,
+                             const Array1D<Real64> &SlatThick,
+                             const Array1D<Real64> &SlatWidth,
+                             const Array1D<Real64> &SlatAngle,
+                             const Array1D<Real64> &SlatCond,
+                             const Array1D<Real64> &SlatSpacing,
+                             const Array1D<Real64> &SlatCurve,
+                             const Array1D_int &nslice,
+                             const Array1D<Real64> &LaminateA,
+                             const Array1D<Real64> &LaminateB,
+                             const Array1D<Real64> &sumsol,
+                             const Array1D<Real64> &gap,
+                             const Array1D<Real64> &vvent,
+                             const Array1D<Real64> &tvent,
+                             const Array1D<Real64> &presure,
+                             const Array1D_int &nmix,
                              Array2A_int const iprop,
                              Array2A<Real64> const frct,
                              Array2A<Real64> const xgcon,
                              Array2A<Real64> const xgvis,
                              Array2A<Real64> const xgcp,
-                             Array1A<Real64> const xwght);
+                             const Array1D<Real64> &xwght);
 
-    void WriteModifiedArguments(int const InArgumentsFile,
+    void WriteModifiedArguments(InputOutputFile &InArgumentsFile,
                                 std::string const &DBGD,
                                 Real64 const esky,
                                 Real64 const trmout,
@@ -162,30 +165,30 @@ namespace TARCOGOutput {
                                 Real64 const Gout,
                                 Real64 const Gin,
                                 int const nlayer,
-                                Array1A_int const LayerType,
-                                Array1A_int const nmix,
+                                const Array1D_int &LayerType,
+                                const Array1D_int &nmix,
                                 Array2A<Real64> const frct,
-                                Array1A<Real64> const thick,
-                                Array1A<Real64> const scon,
-                                Array1A<Real64> const gap,
+                                const Array1D<Real64> &thick,
+                                const Array1D<Real64> &scon,
+                                const Array1D<Real64> &gap,
                                 Array2A<Real64> const xgcon,
                                 Array2A<Real64> const xgvis,
                                 Array2A<Real64> const xgcp,
-                                Array1A<Real64> const xwght);
+                                const Array1D<Real64> &xwght);
 
-    void WriteOutputArguments(int &OutArgumentsFile,
+    void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
                               std::string const &DBGD,
                               int const nlayer,
                               Real64 const tamb,
-                              Array1A<Real64> const q,
-                              Array1A<Real64> const qv,
-                              Array1A<Real64> const qcgas,
-                              Array1A<Real64> const qrgas,
-                              Array1A<Real64> const theta,
-                              Array1A<Real64> const vfreevent,
-                              Array1A<Real64> const vvent,
-                              Array1A<Real64> const Keff,
-                              Array1A<Real64> const ShadeGapKeffConv,
+                              const Array1D<Real64> &q,
+                              const Array1D<Real64> &qv,
+                              const Array1D<Real64> &qcgas,
+                              const Array1D<Real64> &qrgas,
+                              const Array1D<Real64> &theta,
+                              const Array1D<Real64> &vfreevent,
+                              const Array1D<Real64> &vvent,
+                              const Array1D<Real64> &Keff,
+                              const Array1D<Real64> &ShadeGapKeffConv,
                               Real64 const troom,
                               Real64 const ufactor,
                               Real64 const shgc,
@@ -196,13 +199,13 @@ namespace TARCOGOutput {
                               Real64 const hrin,
                               Real64 const hcout,
                               Real64 const hrout,
-                              Array1A<Real64> const Ra,
-                              Array1A<Real64> const Nu,
-                              Array1A_int const LayerType,
-                              Array1A<Real64> const Ebf,
-                              Array1A<Real64> const Ebb,
-                              Array1A<Real64> const Rf,
-                              Array1A<Real64> const Rb,
+                              const Array1D<Real64> &Ra,
+                              const Array1D<Real64> &Nu,
+                              const Array1D_int &LayerType,
+                              const Array1D<Real64> &Ebf,
+                              const Array1D<Real64> &Ebb,
+                              const Array1D<Real64> &Rf,
+                              const Array1D<Real64> &Rb,
                               Real64 const ebsky,
                               Real64 const Gout,
                               Real64 const ebroom,
@@ -213,25 +216,26 @@ namespace TARCOGOutput {
                               Real64 const ShadeHcRatioOut,
                               Real64 const HcUnshadedIn,
                               Real64 const HcUnshadedOut,
-                              Array1A<Real64> const hcgas,
-                              Array1A<Real64> const hrgas,
+                              const Array1D<Real64> &hcgas,
+                              const Array1D<Real64> &hrgas,
                               Real64 const AchievedErrorTolerance,
                               int const NumOfIter);
 
-    void WriteOutputEN673(int &OutArgumentsFile,
+    void WriteOutputEN673(InputOutputFile &OutArgumentsFile,
                           std::string const &DBGD,
                           int const nlayer,
                           Real64 const ufactor,
                           Real64 const hout,
                           Real64 const hin,
-                          Array1A<Real64> const Ra,
-                          Array1A<Real64> const Nu,
-                          Array1A<Real64> const hg,
-                          Array1A<Real64> const hr,
-                          Array1A<Real64> const hs,
+                          const Array1D<Real64> &Ra,
+                          const Array1D<Real64> &Nu,
+                          const Array1D<Real64> &hg,
+                          const Array1D<Real64> &hr,
+                          const Array1D<Real64> &hs,
                           int &nperr);
 
-    void WriteTARCOGInputFile(std::string const &VerNum,
+    void WriteTARCOGInputFile(Files &files,
+                              std::string const &VerNum,
                               Real64 const tout,
                               Real64 const tind,
                               Real64 const trmin,
@@ -250,7 +254,7 @@ namespace TARCOGOutput {
                               Real64 const Pa,
                               Real64 const Pini,
                               Real64 const Tini,
-                              Array1A_int const ibc,
+                              const Array1D_int &ibc,
                               Real64 const hout,
                               Real64 const hin,
                               int const standard,
@@ -262,47 +266,47 @@ namespace TARCOGOutput {
                               Real64 const tilt,
                               Real64 const totsol,
                               int const nlayer,
-                              Array1A_int const LayerType,
-                              Array1A<Real64> const thick,
-                              Array1A<Real64> const scon,
-                              Array1A<Real64> const YoungsMod,
-                              Array1A<Real64> const PoissonsRat,
-                              Array1A<Real64> const asol,
-                              Array1A<Real64> const tir,
-                              Array1A<Real64> const emis,
-                              Array1A<Real64> const Atop,
-                              Array1A<Real64> const Abot,
-                              Array1A<Real64> const Al,
-                              Array1A<Real64> const Ar,
-                              Array1A<Real64> const Ah,
-                              Array1A_int const SupportPillar,     // Shows whether or not gap have support pillar
-                              Array1A<Real64> const PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
-                              Array1A<Real64> const PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
-                              Array1A<Real64> const SlatThick,
-                              Array1A<Real64> const SlatWidth,
-                              Array1A<Real64> const SlatAngle,
-                              Array1A<Real64> const SlatCond,
-                              Array1A<Real64> const SlatSpacing,
-                              Array1A<Real64> const SlatCurve,
-                              Array1A_int const nslice,
-                              Array1A<Real64> const gap,
-                              Array1A<Real64> const GapDef,
-                              Array1A<Real64> const vvent,
-                              Array1A<Real64> const tvent,
-                              Array1A<Real64> const presure,
-                              Array1A_int const nmix,
+                              const Array1D_int &LayerType,
+                              const Array1D<Real64> &thick,
+                              const Array1D<Real64> &scon,
+                              const Array1D<Real64> &YoungsMod,
+                              const Array1D<Real64> &PoissonsRat,
+                              const Array1D<Real64> &asol,
+                              const Array1D<Real64> &tir,
+                              const Array1D<Real64> &emis,
+                              const Array1D<Real64> &Atop,
+                              const Array1D<Real64> &Abot,
+                              const Array1D<Real64> &Al,
+                              const Array1D<Real64> &Ar,
+                              const Array1D<Real64> &Ah,
+                              const Array1D_int &SupportPillar,
+                              const Array1D<Real64> &PillarSpacing,
+                              const Array1D<Real64> &PillarRadius,
+                              const Array1D<Real64> &SlatThick,
+                              const Array1D<Real64> &SlatWidth,
+                              const Array1D<Real64> &SlatAngle,
+                              const Array1D<Real64> &SlatCond,
+                              const Array1D<Real64> &SlatSpacing,
+                              const Array1D<Real64> &SlatCurve,
+                              const Array1D_int &nslice,
+                              const Array1D<Real64> &gap,
+                              const Array1D<Real64> &GapDef,
+                              const Array1D<Real64> &vvent,
+                              const Array1D<Real64> &tvent,
+                              const Array1D<Real64> &presure,
+                              const Array1D_int &nmix,
                               Array2A_int const iprop,
                               Array2A<Real64> const frct,
                               Array2A<Real64> const xgcon,
                               Array2A<Real64> const xgvis,
                               Array2A<Real64> const xgcp,
-                              Array1A<Real64> const xwght,
-                              Array1A<Real64> const gama);
+                              const Array1D<Real64> &xwght,
+                              const Array1D<Real64> &gama);
 
-    void FinishDebugOutputFiles(int const nperr);
+    void FinishDebugOutputFiles(Files &files, int const nperr);
 
     void PrepDebugFilesAndVariables(
-        std::string const &Debug_dir, std::string const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID, int &nperr);
+        Files &files, std::string const &Debug_dir, std::string const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID);
 
 } // namespace TARCOGOutput
 

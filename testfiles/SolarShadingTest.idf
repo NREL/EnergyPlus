@@ -82,7 +82,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,4;
 
@@ -90,7 +90,7 @@
     BUILDING WITH MANY SHADING EFFECTS,  !- Name
     0.0000000E+00,           !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -2935,6 +2935,8 @@
 
   Output:Variable,*,Zone Mean Radiant Temperature,hourly;
 
+  Output:Variable,*,Surface Outside Face Sunlit Fraction,timestep;
+
   Output:Variable,*,Surface Inside Face Temperature,daily;
 
   Output:Variable,*,Surface Outside Face Temperature,daily;
@@ -2965,3 +2967,10 @@
 
   Output:Surfaces:List,Details;
 
+  ShadowCalculation,
+    PolygonClipping, !- Shading Calculation Method
+    Periodic, !- Shading Calculation Update Frequency Method
+    , !- Shading Calculation Update Frequency
+    , !- Maximum Figures in Shadow Overlap Calculations
+    , !- Polygon Clipping Algorithm
+    ; !- Pixel Counting Resolution

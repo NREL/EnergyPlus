@@ -49,7 +49,6 @@
 #define ScheduleManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2A.hh>
@@ -62,8 +61,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
-    
+    class IOFiles;
+
 namespace ScheduleManager {
 
     // Using/Aliasing
@@ -192,17 +191,21 @@ namespace ScheduleManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ProcessScheduleInput(OutputFiles &outputFiles);
+    void ProcessScheduleInput(IOFiles &ioFiles);
 
-    void ReportScheduleDetails(OutputFiles &outputFiles, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    void ReportScheduleDetails(IOFiles &ioFiles, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
 
+    // Returns the CurrentScheduleValue
     Real64 GetCurrentScheduleValue(int const ScheduleIndex);
 
+    // Updates each schedule value to the current timestep
+    // Uses EMS value if actuated, otherwise calls LookUpScheduleValue with ThisHour=DataGlobals::HourOfDay, ThisTimeStep=DataGlobals::TimeStep
     void UpdateScheduleValues();
 
+    // Looks up a given Schedule value for an hour & timestep, minding whether DST is enabled or not
     Real64 LookUpScheduleValue(int const ScheduleIndex,
-                               int const ThisHour = -1,    // Negative => unspecified
-                               int const ThisTimeStep = -1 // Negative => unspecified
+                               int const ThisHour,
+                               int const ThisTimeStep = -1 // Negative => unspecified, will use NumOfTimeStepInHour
     );
 
     int GetScheduleIndex(std::string const &ScheduleName);
@@ -246,8 +249,8 @@ namespace ScheduleManager {
     bool isMinuteMultipleOfTimestep(int minute, int numMinutesPerTimestep);
 
     void ProcessForDayTypes(std::string const &ForDayField, // Field containing the "FOR:..."
-                            Array1A_bool TheseDays,         // Array to contain returned "true" days
-                            Array1A_bool AlReady,           // Array of days already done
+                            Array1D_bool &TheseDays,        // Array to contain returned "true" days
+                            Array1D_bool &AlReady,          // Array of days already done
                             bool &ErrorsFound               // Will be true if error found.
     );
 

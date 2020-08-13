@@ -53,14 +53,13 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array2S.hh>
 
 // EnergyPlus Headers
+#include "IOFiles.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-
 
 #define EP_cache_GlycolSpecificHeat
 
@@ -387,22 +386,22 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void InterpDefValuesForGlycolConc(int NumOfConcs,              // number of concentrations (dimension of raw data)
-                                      int NumOfTemps,              // number of temperatures (dimension of raw data)
-                                      Array1S<Real64> RawConcData, // concentrations for raw data
-                                      Array2S<Real64> RawPropData, // raw property data (concentration, temperature)
-                                      Real64 Concentration,        // concentration of actual fluid mix
-                                      Array1S<Real64> InterpData         // interpolated output data at proper concentration
+    void InterpDefValuesForGlycolConc(int NumOfConcs,                     // number of concentrations (dimension of raw data)
+                                      int NumOfTemps,                     // number of temperatures (dimension of raw data)
+                                      const Array1D<Real64> &RawConcData, // concentrations for raw data
+                                      Array2S<Real64> RawPropData,        // raw property data (concentration, temperature)
+                                      Real64 Concentration,               // concentration of actual fluid mix
+                                      Array1D<Real64> &InterpData         // interpolated output data at proper concentration
     );
 
     //*****************************************************************************
 
-    void InterpValuesForGlycolConc(int NumOfConcs,              // number of concentrations (dimension of raw data)
-                                   int NumOfTemps,              // number of temperatures (dimension of raw data)
-                                   Array1S<Real64> RawConcData, // concentrations for raw data
-                                   Array2S<Real64> RawPropData, // raw property data (temperature,concentration)
-                                   Real64 Concentration,        // concentration of actual fluid mix
-                                   Array1S<Real64> InterpData         // interpolated output data at proper concentration
+    void InterpValuesForGlycolConc(int NumOfConcs,               // number of concentrations (dimension of raw data)
+                                   int NumOfTemps,               // number of temperatures (dimension of raw data)
+                                   const Array1D<Real64> &RawConcData, // concentrations for raw data
+                                   Array2S<Real64> RawPropData,  // raw property data (temperature,concentration)
+                                   Real64 Concentration,         // concentration of actual fluid mix
+                                   Array1D<Real64> &InterpData   // interpolated output data at proper concentration
     );
 
     //*****************************************************************************
@@ -415,11 +414,11 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void ReportAndTestGlycols();
+    void ReportAndTestGlycols(EnergyPlus::IOFiles &ioFiles);
 
     //*****************************************************************************
 
-    void ReportAndTestRefrigerants();
+    void ReportAndTestRefrigerants(IOFiles &ioFiles);
 
     //*****************************************************************************
 
@@ -494,7 +493,7 @@ namespace FluidProperties {
     );
 
     Real64 GetSupHeatTempRefrigResidual(Real64 Temperature, // temperature of the refrigerant
-                                        Array1<Real64> const &Par);
+                                        Array1D<Real64> const &Par);
 
     //*****************************************************************************
 

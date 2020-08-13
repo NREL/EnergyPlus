@@ -57,6 +57,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace MicroCHPElectricGenerator {
 
     extern int NumMicroCHPs;
@@ -197,15 +201,15 @@ namespace MicroCHPElectricGenerator {
         {
         }
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         void setupOutputVars();
 
-        void InitMicroCHPNoNormalizeGenerators();
+        void InitMicroCHPNoNormalizeGenerators(BranchInputManagerData &dataBranchInputManager);
 
         void CalcUpdateHeatRecovery();
 
@@ -217,10 +221,10 @@ namespace MicroCHPElectricGenerator {
 
         void UpdateMicroCHPGeneratorRecords();
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(IOFiles &ioFiles, std::string const &objectName);
     };
 
-    void GetMicroCHPGeneratorInput();
+    void GetMicroCHPGeneratorInput(IOFiles &ioFiles);
 
     Real64 FuncDetermineEngineTemp(Real64 TcwOut,   // hot water leaving temp
                                    Real64 MCeng,    // Fictitious mass and heat capacity of engine

@@ -55,6 +55,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace SystemReports {
 
@@ -223,9 +225,9 @@ namespace SystemReports {
 
     // Functions
 
-    void InitEnergyReports();
+    void InitEnergyReports(IOFiles &ioFiles);
 
-    void FindFirstLastPtr(int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
+    void FindFirstLastPtr(IOFiles &ioFiles, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
 
     void UpdateZoneCompPtrArray(int &Idx,
                                 int const ListNum,
@@ -303,7 +305,7 @@ namespace SystemReports {
                              Real64 const CompLoad,
                              Real64 const CompEnergy);
 
-    void ReportMaxVentilationLoads();
+    void ReportMaxVentilationLoads(EnergyPlusData &state);
 
     void MatchPlantSys(int const AirLoopNum, // counter for zone air distribution inlets
                        int const BranchNum   // counter for zone air distribution inlets
@@ -318,7 +320,7 @@ namespace SystemReports {
                              int &MatchComp               // Component number of the match
     );
 
-    void ReportAirLoopConnections();
+    void ReportAirLoopConnections(IOFiles &ioFiles);
 
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************

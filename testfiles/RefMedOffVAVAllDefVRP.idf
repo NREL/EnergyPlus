@@ -72,7 +72,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 18
 
-  Version,9.3;
+  Version,9.4;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -85,7 +85,7 @@
     Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name
     0.0000,                  !- North Axis {deg}
     City,                    !- Terrain
-    0.0400,                  !- Loads Convergence Tolerance Value
+    0.0400,                  !- Loads Convergence Tolerance Value {W}
     0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -5111,7 +5111,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Core_bottom,     !- Name
@@ -5151,7 +5155,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Core_mid,        !- Name
@@ -5183,7 +5191,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Core_top,        !- Name
@@ -5215,7 +5227,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_bot_ZN_1,  !- Name
@@ -5247,7 +5263,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_bot_ZN_2,  !- Name
@@ -5279,7 +5299,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_bot_ZN_3,  !- Name
@@ -5311,7 +5335,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_bot_ZN_4,  !- Name
@@ -5343,7 +5371,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_mid_ZN_1,  !- Name
@@ -5375,7 +5407,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_mid_ZN_2,  !- Name
@@ -5407,7 +5443,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_mid_ZN_3,  !- Name
@@ -5439,7 +5479,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_mid_ZN_4,  !- Name
@@ -5471,7 +5515,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_top_ZN_1,  !- Name
@@ -5503,7 +5551,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_top_ZN_2,  !- Name
@@ -5535,7 +5587,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_top_ZN_3,  !- Name
@@ -5567,7 +5623,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_top_ZN_4,  !- Name
@@ -5897,7 +5957,7 @@
     VAV_1 Supply Equipment Inlet Node,  !- Return Air Node Name
     VAV_1_OA-VAV_1_CoolCNode,!- Mixed Air Node Name
     VAV_1_OAInlet Node,      !- Actuator Node Name
-    AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Minimum Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
@@ -5908,7 +5968,7 @@
     -100.0,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
     NoLockout,               !- Lockout Type
     FixedMinimum,            !- Minimum Limit Type
-    MinOA_MotorizedDamper_Sched,  !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Outdoor Air Schedule Name
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     VAV_1_OA_MechVent;       !- Mechanical Ventilation Controller Name
@@ -5919,19 +5979,19 @@
     Yes,                     !- Demand Controlled Ventilation
     VentilationRateProcedure,!- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    Core_bottom,             !- Zone 1 Name
+    Core_bottom,             !- Zone or ZoneList 1 Name
     SZ DSOA Core_bottom,     !- Design Specification Outdoor Air Object Name 1
     ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 1
-    Perimeter_bot_ZN_1,      !- Zone 2 Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList 2 Name
     SZ DSOA Perimeter_bot_ZN_1,  !- Design Specification Outdoor Air Object Name 2
     ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 2
-    Perimeter_bot_ZN_2,      !- Zone 3 Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList 3 Name
     SZ DSOA Perimeter_bot_ZN_2,  !- Design Specification Outdoor Air Object Name 3
     ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 3
-    Perimeter_bot_ZN_3,      !- Zone 4 Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList 4 Name
     SZ DSOA Perimeter_bot_ZN_3,  !- Design Specification Outdoor Air Object Name 4
     ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 4
-    Perimeter_bot_ZN_4,      !- Zone 5 Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList 5 Name
     SZ DSOA Perimeter_bot_ZN_4,  !- Design Specification Outdoor Air Object Name 5
     ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name 5
 
@@ -5941,7 +6001,7 @@
     VAV_2 Supply Equipment Inlet Node,  !- Return Air Node Name
     VAV_2_OA-VAV_2_CoolCNode,!- Mixed Air Node Name
     VAV_2_OAInlet Node,      !- Actuator Node Name
-    AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Minimum Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
@@ -5952,7 +6012,7 @@
     -100.0,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
     NoLockout,               !- Lockout Type
     FixedMinimum,            !- Minimum Limit Type
-    MinOA_MotorizedDamper_Sched,  !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Outdoor Air Schedule Name
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     VAV_2_OA_MechVent;       !- Mechanical Ventilation Controller Name
@@ -5963,19 +6023,19 @@
     Yes,                     !- Demand Controlled Ventilation
     VentilationRateProcedure,!- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    Core_mid,                !- Zone 1 Name
+    Core_mid,                !- Zone or ZoneList 1 Name
     SZ DSOA Core_mid,        !- Design Specification Outdoor Air Object Name 1
     ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 1
-    Perimeter_mid_ZN_1,      !- Zone 2 Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList 2 Name
     SZ DSOA Perimeter_mid_ZN_1,  !- Design Specification Outdoor Air Object Name 2
     ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 2
-    Perimeter_mid_ZN_2,      !- Zone 3 Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList 3 Name
     SZ DSOA Perimeter_mid_ZN_2,  !- Design Specification Outdoor Air Object Name 3
     ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 3
-    Perimeter_mid_ZN_3,      !- Zone 4 Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList 4 Name
     SZ DSOA Perimeter_mid_ZN_3,  !- Design Specification Outdoor Air Object Name 4
     ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 4
-    Perimeter_mid_ZN_4,      !- Zone 5 Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList 5 Name
     SZ DSOA Perimeter_mid_ZN_4,  !- Design Specification Outdoor Air Object Name 5
     ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name 5
 
@@ -5985,7 +6045,7 @@
     VAV_3 Supply Equipment Inlet Node,  !- Return Air Node Name
     VAV_3_OA-VAV_3_CoolCNode,!- Mixed Air Node Name
     VAV_3_OAInlet Node,      !- Actuator Node Name
-    AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Minimum Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
@@ -5996,7 +6056,7 @@
     -100.0,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}
     NoLockout,               !- Lockout Type
     FixedMinimum,            !- Minimum Limit Type
-    MinOA_MotorizedDamper_Sched,  !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Outdoor Air Schedule Name
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     VAV_3_OA_MechVent;       !- Mechanical Ventilation Controller Name
@@ -6007,19 +6067,19 @@
     Yes,                     !- Demand Controlled Ventilation
     VentilationRateProcedure,!- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    Core_top,                !- Zone 1 Name
+    Core_top,                !- Zone or ZoneList 1 Name
     SZ DSOA Core_top,        !- Design Specification Outdoor Air Object Name 1
     ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 1
-    Perimeter_top_ZN_1,      !- Zone 2 Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList 2 Name
     SZ DSOA Perimeter_top_ZN_1,  !- Design Specification Outdoor Air Object Name 2
     ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 2
-    Perimeter_top_ZN_2,      !- Zone 3 Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList 3 Name
     SZ DSOA Perimeter_top_ZN_2,  !- Design Specification Outdoor Air Object Name 3
     ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 3
-    Perimeter_top_ZN_3,      !- Zone 4 Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList 4 Name
     SZ DSOA Perimeter_top_ZN_3,  !- Design Specification Outdoor Air Object Name 4
     ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 4
-    Perimeter_top_ZN_4,      !- Zone 5 Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList 5 Name
     SZ DSOA Perimeter_top_ZN_4,  !- Design Specification Outdoor Air Object Name 5
     ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name 5
 
@@ -6937,21 +6997,6 @@
     Until: 24:00,0.0,        !- Field 7
     For: Saturday WinterDesignDay, !- Field 9
     Until: 06:00,0.0,        !- Field 10
-    Until: 18:00,1.0,        !- Field 12
-    Until: 24:00,0.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,0.0;        !- Field 17
-
-  Schedule:Compact,
-    MinOA_MotorizedDamper_Sched,  !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay, !- Field 2
-    Until: 07:00,0.0,        !- Field 3
-    Until: 22:00,1.0,        !- Field 5
-    Until: 24:00,0.0,        !- Field 7
-    For: Saturday WinterDesignDay, !- Field 9
-    Until: 07:00,0.0,        !- Field 10
     Until: 18:00,1.0,        !- Field 12
     Until: 24:00,0.0,        !- Field 14
     For: AllOtherDays,       !- Field 16

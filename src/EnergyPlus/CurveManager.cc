@@ -178,6 +178,8 @@ namespace CurveManager {
     Array1D<PerfomanceCurveData> PerfCurve;
     BtwxtManager btwxtManager;
     std::unordered_map<std::string, std::string> UniqueCurveNames;
+    bool CurveValueMyBeginTimeStepFlag;
+    bool FrictionFactorErrorHasOccurred = false;
 
     // Functions
     void BtwxtMessageCallback(
@@ -211,6 +213,8 @@ namespace CurveManager {
         UniqueCurveNames.clear();
         PerfCurve.deallocate();
         btwxtManager.clear();
+        CurveValueMyBeginTimeStepFlag = true;  // uhh, this static wasn't initialized inside the CurveValue function
+        FrictionFactorErrorHasOccurred = false;
     }
 
     void ResetPerformanceCurveOutput()
@@ -303,18 +307,15 @@ namespace CurveManager {
         // DERIVED TYPE DEFINITIONS
         // na
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static bool MyBeginTimeStepFlag;
-
         // need to be careful on where and how resetting curve outputs to some "iactive value" is done
         // EMS can intercept curves and modify output
-        if (BeginEnvrnFlag && MyBeginTimeStepFlag) {
+        if (BeginEnvrnFlag && CurveValueMyBeginTimeStepFlag) {
             ResetPerformanceCurveOutput();
-            MyBeginTimeStepFlag = false;
+            CurveValueMyBeginTimeStepFlag = false;
         }
 
         if (!BeginEnvrnFlag) {
-            MyBeginTimeStepFlag = true;
+            CurveValueMyBeginTimeStepFlag = true;
         }
 
         if ((CurveIndex <= 0) || (CurveIndex > NumCurves)) {
@@ -414,6 +415,7 @@ namespace CurveManager {
         int NumAlphas;                   // Number of Alphas for each GetObjectItem call
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call
         int IOStatus;                    // Used in GetObjectItem
+        int NumTableLookup;
         std::string CurrentModuleObject; // for ease in renaming.
         static int MaxTableNums(0);      // Maximum number of numeric input fields in Tables
         //   certain object in the input file
@@ -433,7 +435,7 @@ namespace CurveManager {
         NumBicubic = inputProcessor->getNumObjectsFound("Curve:Bicubic");
         NumTriQuad = inputProcessor->getNumObjectsFound("Curve:Triquadratic");
         NumExponent = inputProcessor->getNumObjectsFound("Curve:Exponent");
-        int NumTableLookup = inputProcessor->getNumObjectsFound("Table:Lookup");
+        NumTableLookup = inputProcessor->getNumObjectsFound("Table:Lookup");
         NumFanPressRise = inputProcessor->getNumObjectsFound("Curve:FanPressureRise");                    // cpw22Aug2010
         NumExpSkewNorm = inputProcessor->getNumObjectsFound("Curve:ExponentialSkewNormal");               // cpw22Aug2010
         NumSigmoid = inputProcessor->getNumObjectsFound("Curve:Sigmoid");                                 // cpw22Aug2010
@@ -1855,7 +1857,7 @@ namespace CurveManager {
                             std::size_t rowNum = indVarInstance.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
                             if (!btwxtManager.tableFiles.count(filePath)) {
-                                btwxtManager.tableFiles.emplace(filePath, filePath);
+                                btwxtManager.tableFiles.emplace(filePath, TableFile{IOFiles::getSingleton(), filePath});
                             }
 
                             axis = btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
@@ -2028,8 +2030,6 @@ namespace CurveManager {
                     normalizationDivisor = fields.at("normalization_divisor");
                 }
 
-                PerfCurve(CurveNum).NormalizationValue = normalizationDivisor;  // TODO: Remove/Fix use in Hybrid Unitary
-
                 std::vector<double> lookupValues;
                 if (fields.count("external_file_name")) {
                     std::string filePath = fields.at("external_file_name");
@@ -2047,7 +2047,7 @@ namespace CurveManager {
                     std::size_t rowNum = fields.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
                     if (!btwxtManager.tableFiles.count(filePath)) {
-                        btwxtManager.tableFiles.emplace(filePath, filePath);
+                        btwxtManager.tableFiles.emplace(filePath, TableFile{IOFiles::getSingleton(), filePath});
                     }
 
                     lookupValues = btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
@@ -2087,12 +2087,20 @@ namespace CurveManager {
                         ShowContinueError("    b) no normalization reference values are defined.");
                         ErrorsFound = true;
                     } else if (pointsSpecified) {
-                        // normalizeGridValues normalizes to 1.0 at the reference values. We must redivide by passing in the 1.0/normalizationDivisor as the scalar here.
-                        btwxtManager.normalizeGridValues(gridIndex, PerfCurve(CurveNum).GridValueIndex, normalizeTarget, 1.0/normalizationDivisor);
+                        // normalizeGridValues normalizes curve values to 1.0 at the normalization target, and returns the scalar needed to perform this normalization.
+                        // The result is multiplied by the input normalizationDivisor again for the AutomaticWithDivisor case, in which normalizeGridValues returns a compound scalar.
+                        normalizationDivisor = btwxtManager.normalizeGridValues(gridIndex, PerfCurve(CurveNum).GridValueIndex, normalizeTarget, normalizationDivisor)*normalizationDivisor;
                     }
+                }
 
-              }
-
+                if ((normalizeMethod == NM_DIVISOR_ONLY) || (normalizeMethod == NM_AUTO_WITH_DIVISOR)) {
+                    if (PerfCurve(CurveNum).CurveMaxPresent) {
+                        PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
+                    }
+                    if (PerfCurve(CurveNum).CurveMinPresent) {
+                        PerfCurve(CurveNum).CurveMin = PerfCurve(CurveNum).CurveMin / normalizationDivisor;
+                    }
+                }
             }
         }
         btwxtManager.tableFiles.clear();
@@ -2127,8 +2135,8 @@ namespace CurveManager {
         return grids[gridIndex](target)[outputIndex];
     }
 
-    void BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target, const double scalar) {
-        grids[gridIndex].normalize_values_at_target(outputIndex, target, scalar);
+    double BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target, const double scalar) {
+        return grids[gridIndex].normalize_values_at_target(outputIndex, target, scalar);
     }
 
     void BtwxtManager::clear() {
@@ -2138,15 +2146,17 @@ namespace CurveManager {
         tableFiles.clear();
     }
 
-    TableFile::TableFile(std::string path) {
-        load(path);
+    TableFile::TableFile(IOFiles &ioFiles, std::string path)
+    {
+        load(ioFiles, path);
     }
 
-    void TableFile::load(std::string path) {
+    void TableFile::load(IOFiles &ioFiles, std::string path)
+    {
         filePath = path;
         bool fileFound;
         std::string fullPath;
-        DataSystemVariables::CheckForActualFileName(path, fileFound, fullPath);
+        DataSystemVariables::CheckForActualFileName(ioFiles, path, fileFound, fullPath);
         if (!fileFound) {
             ShowFatalError("File \"" + filePath + "\" : File not found.");
         }
@@ -2687,22 +2697,6 @@ namespace CurveManager {
         }
         return GetCurveName;
     }
-    double GetNormalPoint(int const CurveIndex)
-    {
-
-        std::string s = std::to_string(CurveIndex);
-        if (CurveIndex > 0 && CurveIndex <= NumCurves) {
-            if (PerfCurve(CurveIndex).InterpolationType == BtwxtMethod) {
-                return PerfCurve(CurveIndex).NormalizationValue;
-            } else {
-                ShowWarningError("GetNormalPoint: CurveIndex is not a table, CurveIndex requested  " + s);
-                return -1;
-            }
-        }
-
-        ShowWarningError("GetNormalPoint: CurveIndex not in range of curves, CurveIndex requested  " + s);
-        return -1;
-    }
 
     int GetCurveIndex(std::string const &CurveName) // name of the curve
     {
@@ -2929,7 +2923,7 @@ namespace CurveManager {
         int NumAlphas;                // Number of Alphas for each GetObjectItem call
         int NumNumbers;               // Number of Numbers for each GetObjectItem call
         int IOStatus;                 // Used in GetObjectItem
-        static bool ErrsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrsFound(false); // Set to true if errors in input, fatal at end of routine
         int CurveNum;
 
         NumPressure = inputProcessor->getNumObjectsFound(CurveObjectName);
@@ -3199,7 +3193,6 @@ namespace CurveManager {
         Real64 Term3;
         std::string RR;
         std::string Re;
-        static bool FrictionFactorErrorHasOccurred(false);
 
         // Check for no flow before calculating values
         if (ReynoldsNumber == 0.0) {

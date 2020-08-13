@@ -54,22 +54,21 @@
 int outdoorDewPointActuator = -1;
 int outdoorTempSensor = -1;
 int outdoorDewPointSensor = -1;
+int handlesRetrieved = 0;
 
-void afterZoneTimeStepHandler()
+void afterZoneTimeStepHandler(EnergyPlusState state)
 {
     printf("STARTING A NEW TIME STEP\n");
-    if (outdoorDewPointActuator == -1) {
-        outdoorDewPointActuator = getActuatorHandle("Environment", "Weather Data", "Outdoor Dew Point");
+    if (handlesRetrieved == 0) {
+        if (!apiDataFullyReady()) return;
+        outdoorDewPointActuator = getActuatorHandle("Weather Data", "Outdoor Dew Point", "Environment");
         outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
         outdoorDewPointSensor = getVariableHandle("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
+        printf("Got handles %d, %d, %d", outdoorDewPointActuator, outdoorTempSensor, outdoorDewPointSensor);
         if (outdoorDewPointActuator == -1 || outdoorTempSensor == -1 || outdoorDewPointSensor == -1) {
             exit(1);
         }
-//        FILE *apiAvailFile;
-//        apiAvailFile = fopen("/tmp/api_stuff_available.csv", "w");
-//        const char * apiStuff = listAllAPIDataCSV();
-//        fputs(apiStuff, apiAvailFile);
-//        fclose(apiAvailFile);
+        handlesRetrieved = 1;
     }
     setActuatorValue(outdoorDewPointActuator, -25.0);
     Real64 oa_temp = getVariableValue(outdoorTempSensor);
@@ -79,9 +78,10 @@ void afterZoneTimeStepHandler()
 }
 
 int main(int argc, const char * argv[]) {
-    callbackEndOfZoneTimeStepAfterZoneReporting(afterZoneTimeStepHandler);
+    EnergyPlusState state = stateNew();
+    callbackEndOfZoneTimeStepAfterZoneReporting(state, afterZoneTimeStepHandler);
     requestVariable("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
     requestVariable("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
-    energyplus(argc, argv);
+    energyplus(state, argc, argv);
     return 0;
 }

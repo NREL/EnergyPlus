@@ -57,6 +57,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 struct CoilCoolingDXCurveFitSpeedInputSpecification
 {
@@ -122,6 +124,7 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 parentModeRatedGrossTotalCap = 0.0;
     Real64 parentModeRatedEvapAirFlowRate = 0.0;
     Real64 parentModeRatedCondAirFlowRate = 0.0;
+    int parentOperatingMode = 0;
     Real64 parentModeTimeForCondensateRemoval = 0.0;
     Real64 parentModeEvapRateRatio = 0.0;
     Real64 parentModeMaxCyclingRate = 0.0;
@@ -144,8 +147,8 @@ struct CoilCoolingDXCurveFitSpeed
 
     // rating data
     Real64 RatedInletAirTemp = 26.6667;        // 26.6667C or 80F
-    Real64 RatedInletWetBulbTemp = 19.44;    // 19.44 or 67F
-    Real64 RatedInletAirHumRat = 0.01125;      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    Real64 RatedInletWetBulbTemp = 19.4444;    // 19.44 or 67F
+    Real64 RatedInletAirHumRat = 0.0111847;    // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
     Real64 RatedOutdoorAirTemp = 35.0;      // 35 C or 95F
     Real64 DryCoilOutletHumRatioMin = 0.00001; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
@@ -155,7 +158,7 @@ struct CoilCoolingDXCurveFitSpeed
 
     void CalcSpeedOutput(
         const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int  const fanOpMode, Real64 condInletTemp);
-    void size(int speedNum, int maxSpeeds);
+    void size(EnergyPlusData &state, int speedNum, int maxSpeeds);
     Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 q, Real64 shr, Real64 h, Real64 p);
 
     Real64 calcEffectiveSHR(

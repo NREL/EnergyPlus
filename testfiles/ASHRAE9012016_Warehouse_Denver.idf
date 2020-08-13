@@ -134,7 +134,7 @@
 !    semiheated_skylight_frame = Skylight_Frame_Semiheated
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -142,7 +142,7 @@
     Warehouse,               !- Name
     90,                      !- North Axis {deg}
     Urban,                   !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -6435,7 +6435,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    0;                       !- Heating Maximum Air Flow Fraction
+    0,                       !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Zone1 Office,    !- Name
@@ -6466,7 +6471,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    0;                       !- Heating Maximum Air Flow Fraction
+    0,                       !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Zone2 Fine Storage,  !- Name
@@ -6497,7 +6507,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     0,                       !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     0,                       !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Zone3 Bulk Storage,  !- Name
@@ -7469,9 +7484,11 @@
   Output:Table:SummaryReports,
     EnvelopeSummary,         !- Report 1 Name
     InputVerificationandResultsSummary,  !- Report 2 Name
-    AnnualBuildingUtilityPerformanceSummary, !- Report 3 Name
+    AnnualBuildingUtilityPerformanceSummary,  !- Report 3 Name
     EquipmentSummary,        !- Report 4 Name
-    AllMonthly;              !- Report 5 Name
+    AnnualBuildingUtilityPerformanceSummary,  !- Report 5 Name
+    InputVerificationandResultsSummary,  !- Report 6 Name
+    AllMonthly;              !- Report 7 Name
 
  !-   ===========  ALL OBJECTS IN CLASS: REPORT:TABLE:MONTHLY ===========
 

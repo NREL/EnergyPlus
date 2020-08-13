@@ -56,23 +56,24 @@
 
 namespace EnergyPlus {
 
-void ReportSurfaces();
+void ReportSurfaces(IOFiles &ioFiles);
 
-void LinesOut(std::string const &option);
+void LinesOut(IOFiles &ioFiles, std::string const &option);
 
-void DXFOut(std::string &PolygonAction,
-            std::string &ColorScheme // Name from user for color scheme or blank
+void DXFOut(IOFiles &ioFiles,
+            std::string const &PolygonAction,
+            std::string const &ColorScheme // Name from user for color scheme or blank
 );
 
-void DXFOutLines(std::string const &ColorScheme);
+void DXFOutLines(IOFiles &ioFiles, std::string const &ColorScheme);
 
-void DXFOutWireFrame(std::string const &ColorScheme);
+void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme);
 
-void DetailsForSurfaces(int const RptType); // (1=Vertices only, 10=Details only, 11=Details with vertices)
+void DetailsForSurfaces(IOFiles &ioFiles, int const RptType); // (1=Vertices only, 10=Details only, 11=Details with vertices)
 
-void CostInfoOut();
+void CostInfoOut(IOFiles &ioFiles);
 
-void VRMLOut(std::string &PolygonAction, std::string &ColorScheme);
+void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::string &ColorScheme);
 
 } // namespace EnergyPlus
 

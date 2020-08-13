@@ -88,7 +88,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,4;
 
@@ -96,7 +96,7 @@
     Simple One Zone (Wireframe DXF),  !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.004,                   !- Temperature Convergence Tolerance Value {deltaC}
     MinimalShadowing,        !- Solar Distribution
     30,                      !- Maximum Number of Warmup Days
@@ -388,7 +388,7 @@
 
   Output:Variable,*,Zone Other Equipment Total Heating Energy,monthly;
 
-  Output:Variable,*,Other Equipment FuelOil#2 Rate,hourly;
+  Output:Variable,*,Other Equipment FuelOilNo2 Rate,hourly;
 
   Output:Variable,*,Other Equipment Total Heating Rate,hourly;
 
@@ -404,7 +404,7 @@
 
   Output:Meter:MeterFileOnly,EnergyTransfer:Facility,hourly;
 
-  Output:Meter,FuelOil#2:Facility,hourly;
+  Output:Meter,FuelOilNo2:Facility,hourly;
 
   OutputControl:Table:Style,
     ALL;                     !- Column Separator
@@ -427,7 +427,7 @@
 
   OtherEquipment,
     Test 352a,               !- Name
-    FuelOilNo2,                !- Fuel Type
+    FuelOilNo2,              !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
     OthEqSch,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method

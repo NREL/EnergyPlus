@@ -1090,13 +1090,11 @@ namespace PlantUtilities {
         static std::string const RoutineName("UpdateChillerComponentCondenserSide");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool DidAnythingChange(false); // set to true if conditions changed
+        bool DidAnythingChange(false); // set to true if conditions changed
         int OtherLoopNum;                     // local loop pointer for remote connected loop
         int OtherLoopSide;                    // local loop side pointer for remote connected loop
         int ConnectLoopNum;                   // local do loop counter
         Real64 Cp;
-
-        DidAnythingChange = false;
 
         // check if any conditions have changed
         if (Node(InletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
@@ -1179,13 +1177,11 @@ namespace PlantUtilities {
         static std::string const RoutineName("UpdateComponentHeatRecoverySide");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool DidAnythingChange(false); // set to true if conditions changed
+        bool DidAnythingChange(false); // set to true if conditions changed
         int OtherLoopNum;                     // local loop pointer for remote connected loop
         int OtherLoopSide;                    // local loop side pointer for remote connected loop
         int ConnectLoopNum;                   // local do loop counter
         Real64 Cp;                            // local fluid specific heat
-
-        DidAnythingChange = false;
 
         // check if any conditions have changed
         if (Node(InletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
@@ -1261,12 +1257,10 @@ namespace PlantUtilities {
         using DataPlant::PlantLoop;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool DidAnythingChange(false); // set to true if conditions changed
+        bool DidAnythingChange(false); // set to true if conditions changed
         int OtherLoopNum;                     // local loop pointer for remote connected loop
         int OtherLoopSide;                    // local loop side pointer for remote connected loop
         int ConnectLoopNum;                   // local do loop counter
-
-        DidAnythingChange = false;
 
 //        TODO: Umm, this block seems like it doesn't do much...
 //        // check if node heat rate compares well with generator heat rate
@@ -1679,7 +1673,7 @@ namespace PlantUtilities {
     }
 
     // In-Place Right Shift by 1 of Array Elements
-    void rshift1(Array1<Real64> &a, Real64 const a_l)
+    void rshift1(Array1D<Real64> &a, Real64 const a_l)
     {
         assert(a.size_bounded());
         for (int i = a.u(), e = a.l(); i > e; --i) {
@@ -1734,7 +1728,8 @@ namespace PlantUtilities {
         }
     }
 
-    void ScanPlantLoopsForObject(std::string const &CompName,
+    void ScanPlantLoopsForObject(BranchInputManagerData &dataBranchInputManager,
+                                 std::string const &CompName,
                                  int const CompType,
                                  int &LoopNum,
                                  int &LoopSideNum,
@@ -1839,7 +1834,7 @@ namespace PlantUtilities {
                 if (!present(SingleLoopSearch)) {
                     ShowSevereError("Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + CompName +
                                     "\" was not found on any plant loops.");
-                    AuditBranches(true, DataPlant::ccSimPlantEquipTypes(CompType), CompName);
+                    AuditBranches(dataBranchInputManager, true, DataPlant::ccSimPlantEquipTypes(CompType), CompName);
                 } else {
                     ShowSevereError("Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + CompName +
                                     "\" was not found on plant loop=\"" + DataPlant::PlantLoop(SingleLoopSearch).Name + "\".");

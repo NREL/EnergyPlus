@@ -48,24 +48,25 @@
 #ifndef EnergyPlusPgm_hh_INCLUDED
 #define EnergyPlusPgm_hh_INCLUDED
 
-#include <EnergyPlus/api/EnergyPlusAPI.hh>
+#include <EnergyPlus/api/EnergyPlusAPI.h>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 // C++ Headers
 #include <string>
 
 // Functions
 
-void CreateCurrentDateTimeString(std::string &CurrentDateTimeString);
+std::string CreateCurrentDateTimeString();
 
-int initializeEnergyPlus(std::string const & filepath);
+int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath);
 
-int wrapUpEnergyPlus();
+int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state);
 
-void ENERGYPLUSLIB_API EnergyPlusPgm(std::string const &filepath = std::string());
+int ENERGYPLUSLIB_API EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath = std::string());
 
-int ENERGYPLUSLIB_API RunEnergyPlus(std::string const & filepath = std::string());
+int ENERGYPLUSLIB_API RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath = std::string());
 
-int runEnergyPlusAsLibrary(int argc, const char *argv[]);
+int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const char *argv[]);
 
 void ENERGYPLUSLIB_API StoreProgressCallback(void (*f)(int const));
 

@@ -58,6 +58,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace SwimmingPool {
 
     extern int NumSwimmingPools; // Number of swimming pools
@@ -135,7 +139,6 @@ namespace SwimmingPool {
         bool MyOneTimeFlag;
         bool MyEnvrnFlagGeneral;
         bool MyPlantScanFlagPool;
-        Array1D_int SurfaceToPoolIndex;
         Array1D<Real64> QPoolSrcAvg;          // Average source over the time step for a particular radiant surface
         Array1D<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
         Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
@@ -160,14 +163,20 @@ namespace SwimmingPool {
         {
         }
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void initialize(bool FirstHVACIteration // true during the first HVAC iteration
+        void ErrorCheckSetupPoolSurface(std::string const Alpha1,
+                                        std::string const Alpha2,
+                                        std::string const cAlphaField2,
+                                        bool &ErrorsFound
+        );
+
+        void initialize(BranchInputManagerData &dataBranchInputManager, bool FirstHVACIteration // true during the first HVAC iteration
         );
 
         void setupOutputVars();
 
-        void initSwimmingPoolPlantLoopIndex();
+        void initSwimmingPoolPlantLoopIndex(BranchInputManagerData &dataBranchInputManager);
 
         void initSwimmingPoolPlantNodeFlow(bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
         );
@@ -190,7 +199,7 @@ namespace SwimmingPool {
 
     void GetSwimmingPool();
 
-    void SimSwimmingPool(bool FirstHVACIteration);
+    void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration);
 
     void UpdatePoolSourceValAvg(bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
 

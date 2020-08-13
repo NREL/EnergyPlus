@@ -53,11 +53,12 @@
 // EnergyPlus Headers
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/HVACControllers.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -1041,7 +1042,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation();
+    SimulationManager::ManageSimulation(state);
 
     EXPECT_EQ(1, NumOASystems);
     EXPECT_EQ("OA SYS 1", OutsideAirSys(OASysNum).Name);
@@ -1051,7 +1052,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
     EXPECT_EQ("OA MIXING BOX", OutsideAirSys(OASysNum).ComponentName(2));      // OA mixer
 
     // simulate the outdoor air system
-    ManageOutsideAirSystem(OutsideAirSys(OASysNum).Name, false, AirLoopNum, OASysNum);
+    ManageOutsideAirSystem(state, OutsideAirSys(OASysNum).Name, false, AirLoopNum, OASysNum);
 
     // Hot water coil is scheduled off, inlet and outlet conditions are the same
     EXPECT_DOUBLE_EQ(WaterCoil(1).InletAirTemp, -17.3);          // preheat Hot Water coil air inlet temp is the heating design day outdoor air temp
@@ -2019,7 +2020,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation();
+    SimulationManager::ManageSimulation(state);
 
     EXPECT_EQ(1, NumOASystems);
     EXPECT_EQ("OA SYS 1", OutsideAirSys(OASysNum).Name);
@@ -2029,7 +2030,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
     EXPECT_EQ("OA MIXING BOX", OutsideAirSys(OASysNum).ComponentName(2));      // OA mixer
 
     // simulate the outdoor air system
-    ManageOutsideAirSystem(OutsideAirSys(OASysNum).Name, false, AirLoopNum, OASysNum);
+    ManageOutsideAirSystem(state, OutsideAirSys(OASysNum).Name, false, AirLoopNum, OASysNum);
 
     EXPECT_DOUBLE_EQ(WaterCoil(1).InletAirTemp, -17.3); // preheat Hot Water coil air inlet temp is the heating design day outdoor air temp
 

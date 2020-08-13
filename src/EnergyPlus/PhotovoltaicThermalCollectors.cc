@@ -68,6 +68,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -106,7 +107,7 @@ namespace PhotovoltaicThermalCollectors {
 
     Real64 const SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
-    static bool GetInputFlag(true); // First time, input is "gotten"
+    bool GetInputFlag(true); // First time, input is "gotten"
 
     int NumPVT(0); // count of all types of PVT in input file
 
@@ -138,21 +139,21 @@ namespace PhotovoltaicThermalCollectors {
         return nullptr;
     }
 
-    void PVTCollectorStruct::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void PVTCollectorStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initialize(true);
+        this->initialize(state.dataBranchInputManager, true);
         this->size();
     }
 
-    void PVTCollectorStruct::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PVTCollectorStruct::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                       bool const FirstHVACIteration,
                                       Real64 &EP_UNUSED(CurLoad),
                                       bool const EP_UNUSED(RunFlag))
     {
 
-        this->initialize(FirstHVACIteration);
+        this->initialize(state.dataBranchInputManager, FirstHVACIteration);
         this->control();
-        this->calculate();
+        this->calculate(state.dataConvectionCoefficients, state.files);
         this->update();
     }
 
@@ -444,7 +445,7 @@ namespace PhotovoltaicThermalCollectors {
             "Generator PVT Fluid Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.MdotWorkFluid, "System", "Average", this->Name);
     }
 
-    void PVTCollectorStruct::initialize(bool const FirstHVACIteration)
+    void PVTCollectorStruct::initialize(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -467,7 +468,7 @@ namespace PhotovoltaicThermalCollectors {
         if (this->SetLoopIndexFlag) {
             if (allocated(DataPlant::PlantLoop) && (this->PlantInletNodeNum > 0)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError("InitPVTcollectors: Program terminated for previous conditions.");
@@ -843,7 +844,7 @@ namespace PhotovoltaicThermalCollectors {
         }
     }
 
-    void PVTCollectorStruct::calculate()
+    void PVTCollectorStruct::calculate(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -946,7 +947,9 @@ namespace PhotovoltaicThermalCollectors {
                 Real64 HcExt(0.0);
                 Real64 HrSky(0.0);
 
-                ConvectionCoefficients::InitExteriorConvectionCoeff(this->SurfNum,
+                ConvectionCoefficients::InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                                                                    ioFiles,
+                                                                    this->SurfNum,
                                                                     0.0,
                                                                     DataHeatBalance::VerySmooth,
                                                                     this->Simple.SurfEmissivity,
@@ -1169,13 +1172,13 @@ namespace PhotovoltaicThermalCollectors {
         return 0; // Shutup compiler
     }
 
-    void simPVTfromOASys(int const index, bool const FirstHVACIteration)
+    void simPVTfromOASys(EnergyPlusData &state, int const index, bool const FirstHVACIteration)
     {
         PlantLocation dummyLoc(0, 0, 0, 0);
         Real64 dummyCurLoad(0.0);
         bool dummyRunFlag(true);
 
-        PVT(index).simulate(dummyLoc, FirstHVACIteration, dummyCurLoad, dummyRunFlag);
+        PVT(index).simulate(state, dummyLoc, FirstHVACIteration, dummyCurLoad, dummyRunFlag);
     }
 
 } // namespace PhotovoltaicThermalCollectors

@@ -53,7 +53,7 @@ Design\;Air\;Flow\;Rate = \frac{{0.5{\rho_{air}}(Fan\;power\;at\;Design\;Air\;Fl
 
 where a fan pressure rise of 190 Pascals and total fan efficiency of 0.5 are assumed.
 
-\paragraph{Field: Design Fan Power}\label{field-design-fan-power}
+\paragraph{Field: Design Fan Power}
 
 This numeric field contains the fan power (in watts) at the design air flow rate specified in the previous field. A value greater than zero must be specified regardless of the tower performance input method, or this field can be autosized. If autosized, the fan power is calculated as follows:
 
@@ -85,7 +85,7 @@ This numeric field contains the air flow rate (m\(^{3}\)/s) when the tower is in
 
 This numeric field contains the sizing factor to use when calculating the free convection regime air flow rate.~ The default is 0.1.
 
-\paragraph{Field: Free Convection Regime U-Factor Times Area Value}\label{fieldfree-convection-regine-u-factor-times-area-value}
+\paragraph{Field: Free Convection Regime U-Factor Times Area Value}\label{fieldfree-convection-regime-u-factor-times-area-value}
 
 This numeric field contains the heat transfer coefficient-area product (W/K) when the tower is in the ``free convection'' regime (water flow exists but tower fan is turned off). This value must be less than the value specified for the field ``U-Factor Times Area Value at Design Air Flow Rate''. This field may be autosized, in which case it is set to a fraction of the ``U-Factor Times Area Value at Design Air Flow Rate'' determined in the following input field. If the user does not wish to model ``free convection'' and is using the~ Performance Input Method ``UFactorTimesAreaAndDesignWaterFlowRate'', then this field should be set to 0.0. If ``Performance Input Method'' is specified as ``NominalCapacity'', then this field must be left blank since the model automatically calculates the tower UA based on the tower capacity specified in the field ``Free Convection Capacity''.\textbackslash{}
 
@@ -121,7 +121,7 @@ This numeric field specifies the design inlet air dry-bulb temperature of the to
 
 This numeric field specifies the design inlet air wet-bulb temperature of the tower. The default is \SI{25.6}{\celsius}.
 
-\paragraph{Field: Design Approach Temperature}\label{field-design-approach-temperature}
+\paragraph{Field: Design Approach Temperature}
 
 This numeric field specifies the design approach temperature of the tower corresponding to the design inlet air wet-bulb temperature and the design temperature range.
 The approach temperature should be the outlet water temperature minus the inlet air wet-bulb temperature at design conditions.
@@ -139,7 +139,7 @@ This numeric field contains the capacity of the tower's electric basin heater in
 
 \paragraph{Field: Basin Heater Setpoint Temperature}\label{field-basin-heater-setpoint-temperature}
 
-This numeric field contains the set point temperature (˚C) for the basin heater described in the previous field. The basin heater is active when the outdoor air dry-bulb temperature falls below this setpoint temperature, as long as the tower fan is off and water is not flowing through the tower. This set point temperature must be greater than or equal to 2˚C, and the default value is 2˚C if this field is left blank.
+This numeric field contains the set point temperature (°C) for the basin heater described in the previous field. The basin heater is active when the outdoor air dry-bulb temperature falls below this setpoint temperature, as long as the tower fan is off and water is not flowing through the tower. This set point temperature must be greater than or equal to 2˚C, and the default value is 2˚C if this field is left blank.
 
 \paragraph{Field: Basin Heater Operating Schedule Name}\label{field-basin-heater-operating-schedule-name}
 
@@ -3540,11 +3540,11 @@ This numeric field is the number of parallel trenches. Design flow rate will be 
 
 This numeric field is the center-to-center distance in between parallel trenches, in meters.
 
-\paragraph{Field: Type of Undisturbed Ground Temperature Object}\label{field-type-of-undisturbed-ground-temperature-object}
+\paragraph{Field: Type of Undisturbed Ground Temperature Object}
 
 The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-\paragraph{Field: Name of Undisturbed Ground Temperature Object}\label{field-name-of-undisturbed-ground-temperature-object}
+\paragraph{Field: Name of Undisturbed Ground Temperature Object}
 
 The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 

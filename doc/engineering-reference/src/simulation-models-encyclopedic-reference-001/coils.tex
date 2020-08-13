@@ -1575,6 +1575,88 @@ Multi-stage control is modeled with the DX coil. If 2-stage operation has been s
 
 If enhanced dehumidification mode is available, this is controlled by the parent object of the DX coil, such as DXSystem:AirLoop. A dehumidification mode flag is passed to the coil model which is used to select a different set of performance specifications from a CoilPerformance:DX:Cooling input object. Then the simulation of the DX coil proceeds as described above including any bypass or multi-stage operation.
 
+\paragraph{Subcool Reheat Mode}\label{subcool-reheat-mode}
+
+When 3 operation modes are entered in the Coil:Cooling:DX:CurveFit:Performance object with a parent as Coil:Cooling:DX, the coil is considered as a Subcool Reheat Coil and can perfom normal DX coil operation alone, and combined sensible cooling and dehumidification simultaneously with combination of normal mode and subcool or reheat mode. Load sensible heat ratio (LoadSHR) ( Zone Sensible Load / ( Zone Sensible Load + Zone Latent Load)) determines which mode operates.
+
+The zone sensible and latent loads determine the coil delivered energy between system supply node and controlled zone node. Due to fan heat and outdoor air introduction, the coil inlet node conditions are not equal to ones at the controlled zone node. In other words, the requested coil output sensible heat ratio (CoilSHR) (Sensible Coil output / (Sensible Coil Output + Latent Coile Output)) will be different from LoadSHR. The given LoadSHR needs to be converted into coil sensible heat ratio (CoilSHR), so that coil requested sensible and latent energy can be delivered correctly to control zone temperature and humidity ratio simultaneously.
+
+CoilSHR calculation procedure
+
+1. Get full system sensible and latent outputs in normal mode as SenSysOutput and LatSysOutput.
+
+2. Since system outputs are proportional to part load ratio (PLR), sensible (SenPLR) and latent (LatPLR)part load ratios can be calculated below
+
+	SenPLR = SenLoad / SenSysOutput
+
+	LatPLR = LatLoad / LatSysOutput
+
+3. At the same time, coil sensible and latent outputs across the coil are obtained in Step 2 as SenCoilOutput and LatCoilOutput.
+
+4. If coil sensible and latent outputs are aslo propotional to the part load ratios, sensible (SenCoil) and latent (LatcOIL) coil load at given part load ratios are calculated as
+
+	SenCoil = SenPLR * SenCoilOutput
+
+	LatCoil = LatPLR * LatCoilOutput
+
+It should be pointed out that coil outputs at PLR = 0 are zero.
+
+5. Coil sensible heat ratio (CoilSHR) can be calculated at
+
+	CoilSHR = SenCoil / (SenCoil + LatCoil)
+
+After getting CoilSHR, coil performance can be calculated as follows
+
+Simulation logic
+
+1. No latent control
+
+   Perform normal operation with SHR\(_{Normal}\)
+
+2. Latent control
+
+a.  If CoilSHR >= SHR\(_{Normal}\)
+
+   Perform normal operation to meet sensible load, adjusted by PLR for a single capacity equipmentl
+
+	SenLoad = SenOut * PLR
+
+b.  Else if SHR\(_{Normal}\) > CoilSHR And CoilSHR >= SHR\(_{Sub}\)
+
+   Perform combination between normal and subcooling operation
+
+  CoilSHR = SHR\(_{Sub}\) * r\(_{Sub}\) + SHR\(_{Normal}\) * (1 - r\(_{Sub})\)
+
+  SenLoad = [SenOut\(_{Sub}\) * r\(_{Sub}\) + SenOut\(_{Normal}\) * (1 - r\(_{Sub}\))] * PLR
+
+c.  Else if SHR\(_{Sub}\) > CoilSHR And CoilSHR >= SHR\(_{Reheat}\)
+
+   Perform combination between normal and reheat operation
+
+  CoilSHR = SHR\(_{Reheat}\) * r\(_{Reheat}\) + SHR\(_{Normal}\) * (1 - r\(_{Sub}\))
+
+  SenLoad = [SenOut\(_{Sub}\) * r\(_{Sub}\) + SenOut\(_{Normal}\) * (1 - r\(_{Sub}\))] * PLR
+
+Else
+
+    Performreheatg operation
+
+    SenLoad = SenOut\(_{Reheat}\) * PLR
+
+End If
+
+where
+ 
+\(SHR_{Normal}\) = Gross sensible heat ratio in normal mode
+
+\(SHR_{Subl}\) = Gross sensible heat ratio in subcool mode
+
+\(SHR_{Reheatl}\) = Gross sensible heat ratio in reheat mode
+
+\(r_{Sub}\) = Subcooling mode ratio between subcooling and normal operation
+
+\(r_{Reheat}\) = Reheat mode ratio between hot gas reheat and normal operation
+
 \subsubsection{Standard Rating of Single-Speed DX Cooling Coils}\label{standard-rating-of-single-speed-dx-cooling-coils}
 
 For small single-speed direct expansion (DX) cooling coils, the industry standard ratings of Standard Rating Cooling Capacity and Seasonal Energy Efficiency Ratio (SEER) are calculated according to ANSI/AHRI Standard 210/240 (AHRI 2008). These ratings apply to unitary air conditioners and air-source unitary heat pumps with air-cooled condensers with standard rating cooling capacities under 19 kW (\textless{}65,000 Btu/hr). For larger DX cooling coils, the industry standard ratings of Standard Rating Cooling Capacity, Energy Efficiency Ratio (EER), and Integrated Energy Efficiency Ratio (IEER) are calculated according to ANSI/AHRI Standard 340/360 (AHRI 2007). These ratings apply to unitary air conditioners and air-source unitary heat pumps with standard rating cooling capacities from 19 kW to below 73.2 kW (65,000 Btu/hr to \textless{}250,000 Btu/hr).
@@ -5107,7 +5189,7 @@ where:
 The temperature of the water leaving the desuperheater is then calculated as
 
 \begin{equation}
-{T_{water,outlet}} = {T_{water,inlet}} + \frac{{{Q_{coil}}}}{{{{\dot m}_{water}}\cdot {C_{p,water}}}} ~for~ {\dot m_{water}} \textgreater{} 0
+{T_{water,outlet}} = {T_{water,inlet}} + \frac{{{Q_{coil}}}}{{{{\dot m}_{water}}\cdot {C_{p,water}}}} ~for~ {\dot m_{water}} > 0
 \end{equation}
 
 \begin{equation}

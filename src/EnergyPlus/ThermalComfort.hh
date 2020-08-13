@@ -49,7 +49,6 @@
 #define ThermalComfort_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -57,6 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    //forward declarations
+    struct ZoneTempPredictorCorrectorData;
 
 namespace ThermalComfort {
 
@@ -284,7 +285,9 @@ namespace ThermalComfort {
 
     void clear_state();
 
-    void ManageThermalComfort(bool const InitializeOnly); // when called from ZTPC and calculations aren't needed
+    void ManageThermalComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
+                              IOFiles &ioFiles,
+                              bool const InitializeOnly); // when called from ZTPC and calculations aren't needed
 
     void InitThermalComfort();
 
@@ -297,12 +300,12 @@ namespace ThermalComfort {
 
     void CalcThermalComfortKSU();
 
-    void DERIV(int &TempIndiceNum,        // Number of temperature indices  unused1208
-               Array1A<Real64> Temp,      // Temperature unused1208
-               Array1A<Real64> TempChange // Change of temperature
+    void DERIV(int &TempIndiceNum,         // Number of temperature indices  unused1208
+               Array1D<Real64> &Temp,      // Temperature unused1208
+               Array1D<Real64> &TempChange // Change of temperature
     );
 
-    void RKG(int &NEQ, Real64 &H, Real64 &X, Array1A<Real64> Y, Array1A<Real64> DY, Array1A<Real64> C);
+    void RKG(int &NEQ, Real64 &H, Real64 &X, Array1D<Real64> &Y, Array1D<Real64> &DY, Array1D<Real64> &C);
 
     void GetAngleFactorList();
 
@@ -318,17 +321,19 @@ namespace ThermalComfort {
 
     void ResetThermalComfortSimpleASH55();
 
-    void CalcIfSetPointMet();
+    void CalcIfSetPointMet(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
 
     void ResetSetPointMet();
 
     void CalcThermalComfortAdaptiveASH55(
+        IOFiles &ioFiles,
         bool const initiate,                  // true if supposed to initiate
         Optional_bool_const wthrsim = _,      // true if this is a weather simulation
         Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day
     );
 
     void CalcThermalComfortAdaptiveCEN15251(
+        IOFiles &ioFiles,
         bool const initiate,                  // true if supposed to initiate
         Optional_bool_const wthrsim = _,      // true if this is a weather simulation
         Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day

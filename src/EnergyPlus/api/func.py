@@ -2,7 +2,6 @@ from ctypes import cdll, c_char_p, c_void_p, CFUNCTYPE
 from types import FunctionType
 from pyenergyplus.common import RealEP
 
-
 # CFUNCTYPE wrapped Python callbacks need to be kept in memory explicitly, otherwise GC takes it
 # This causes undefined behavior but generally segfaults and illegal access violations
 # Keeping them referenced in a global array here suffices to keep GC away from it
@@ -40,15 +39,39 @@ class Glycol:
         self.api.glycolDelete(self.instance)
 
     def specific_heat(self, temperature: float) -> float:
+        """
+        Returns the specific heat of the fluid at the specified temperature.
+
+        :param temperature: Fluid temperature, in degrees Celsius
+        :return: The specific heat of the fluid, in J/kg-K
+        """
         return self.api.glycolSpecificHeat(self.instance, temperature)
 
     def density(self, temperature: float) -> float:
+        """
+        Returns the density of the fluid at the specified temperature.
+
+        :param temperature: Fluid temperature, in degrees Celsius
+        :return: The density of the fluid, in kg/m3
+        """
         return self.api.glycolDensity(self.instance, temperature)
 
     def conductivity(self, temperature: float) -> float:
+        """
+        Returns the conductivity of the fluid at the specified temperature.
+
+        :param temperature: Fluid temperature, in degrees Celsius
+        :return: The conductivity of the fluid, in W/m-K
+        """
         return self.api.glycolConductivity(self.instance, temperature)
 
     def viscosity(self, temperature: float) -> float:
+        """
+        Returns the dynamic viscosity of the fluid at the specified temperature.
+
+        :param temperature: Fluid temperature, in degrees Celsius
+        :return: The dynamic viscosity of the fluid, in Pa-s (or kg/m-s)
+        """
         return self.api.glycolViscosity(self.instance, temperature)
 
 
@@ -84,18 +107,51 @@ class Refrigerant:
         self.api.refrigerantDelete(self.instance)
 
     def saturation_pressure(self, temperature: float) -> float:
+        """
+        Returns the saturation pressure of the refrigerant at the specified temperature.
+
+        :param temperature: Refrigerant temperature, in Celsius.
+        :return: Refrigerant saturation pressure, in Pa
+        """
         return self.api.refrigerantSaturationPressure(self.instance, temperature)
 
     def saturation_temperature(self, pressure: float) -> float:
+        """
+        Returns the saturation temperature of the refrigerant at the specified pressure.
+
+        :param pressure: Refrigerant pressure, in Pa
+        :return: Refrigerant saturation temperature, in Celsius
+        """
         return self.api.refrigerantSaturationTemperature(self.instance, pressure)
 
     def saturated_enthalpy(self, temperature: float, quality: float) -> float:
+        """
+        Returns the refrigerant saturated enthalpy at the specified temperature and quality.
+
+        :param temperature: Refrigerant temperature, in Celsius
+        :param quality: Refrigerant quality, in fractional form from 0.0 to 1.0
+        :return: Refrigerant saturated enthalpy, in J/kg
+        """
         return self.api.refrigerantSaturatedEnthalpy(self.instance, temperature, quality)
 
     def saturated_density(self, temperature: float, quality: float) -> float:
+        """
+        Returns the refrigerant density at the specified temperature and quality.
+
+        :param temperature: Refrigerant temperature, in Celsius
+        :param quality: Refrigerant quality, in fractional form from 0.0 to 1.0
+        :return: Refrigerant saturated density, in kg/m3
+        """
         return self.api.refrigerantSaturatedDensity(self.instance, temperature, quality)
 
     def saturated_specific_heat(self, temperature: float, quality: float) -> float:
+        """
+        Returns the refrigerant specific heat at the specified temperature and quality.
+
+        :param temperature: Refrigerant temperature, in Celsius
+        :param quality: Refrigerant quality, in fractional form from 0.0 to 1.0
+        :return: Refrigerant saturated specific heat, in J/kg-K
+        """
         return self.api.refrigerantSaturatedSpecificHeat(self.instance, temperature, quality)
 
 
@@ -105,6 +161,7 @@ class Psychrometrics:
     available as functions of different independent variables, and so there are functions with suffixes like
     `vapor_density_b` and `relative_humidity_c`.
     """
+
     def __init__(self, api: cdll):
         self.api = api
         self.api.psyRhoFnPbTdbW.argtypes = [RealEP, RealEP, RealEP]
@@ -151,66 +208,219 @@ class Psychrometrics:
         self.api.psyTdpFnTdbTwbPb.restype = RealEP
 
     def density(self, barometric_pressure: float, dry_bulb_temp: float, humidity_ratio: float) -> float:
+        """
+        Returns the psychrometric density at the specified conditions.
+
+        :param barometric_pressure: Barometric pressure, in Pa
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
+        :return:
+        """
         return self.api.psyRhoFnPbTdbW(barometric_pressure, dry_bulb_temp, humidity_ratio)
 
     def latent_energy_of_air(self, dry_bulb_temp: float) -> float:
+        """
+        Returns the psychrometric latent energy of air at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :return:
+        """
         return self.api.psyHfgAirFnWTdb(dry_bulb_temp)
 
     def latent_energy_of_moisture_in_air(self, dry_bulb_temp: float) -> float:
+        """
+        Returns the psychrometric latent energy of the moisture in air at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :return:
+        """
         return self.api.psyHgAirFnWTdb(dry_bulb_temp)
 
     def enthalpy(self, dry_bulb_temp: float, humidity_ratio: float) -> float:
+        """
+        Returns the psychrometric enthalpy at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
+        :return:
+        """
         return self.api.psyHFnTdbW(dry_bulb_temp, humidity_ratio)
 
     def enthalpy_b(self, dry_bulb_temp: float, relative_humidity_fraction: float, barometric_pressure: float) -> float:
+        """
+        Returns the psychrometric enthalpy at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :param relative_humidity_fraction: Psychrometric relative humidity, as a fraction from 0.0 to 1.0.
+        :param barometric_pressure: Barometric pressure, in Pa
+        :return:
+        """
         return self.api.psyHFnTdbRhPb(dry_bulb_temp, relative_humidity_fraction, barometric_pressure)
 
     def specific_heat(self, humidity_ratio: float) -> float:
+        """
+        Returns the psychrometric specific heat at the specified conditions.
+
+        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
+        :return:
+        """
         return self.api.psyCpAirFnW(humidity_ratio)
 
     def dry_bulb(self, enthalpy: float, humidity_ratio: float) -> float:
+        """
+        Returns the psychrometric dry bulb temperature at the specified conditions.
+
+        :param enthalpy: Psychrometric enthalpy, in J/kg
+        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
+        :return:
+        """
         return self.api.psyTdbFnHW(enthalpy, humidity_ratio)
 
     def vapor_density(self, dry_bulb_temp: float, humidity_ratio: float, barometric_pressure: float) -> float:
+        """
+        Returns the psychrometric vapor density at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
+        :param barometric_pressure: Barometric pressure, in Pa
+        :return:
+        """
         return self.api.psyRhovFnTdbWPb(dry_bulb_temp, humidity_ratio, barometric_pressure)
 
     def relative_humidity(self, dry_bulb_temp: float, vapor_density: float) -> float:
+        """
+        Returns the psychrometric relative humidity at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :param vapor_density: Psychrometric vapor density, in kg/m3
+        :return:
+        """
         return self.api.psyRhFnTdbRhov(dry_bulb_temp, vapor_density)
 
     def relative_humidity_b(self, dry_bulb_temp: float, humidity_ratio: float, barometric_pressure: float) -> float:
+        """
+        Returns the psychrometric relative humidity at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
+        :param barometric_pressure: Barometric pressure, in Pa
+        :return:
+        """
         return self.api.psyRhFnTdbWPb(dry_bulb_temp, humidity_ratio, barometric_pressure)
 
     def wet_bulb(self, dry_bulb_temp: float, humidity_ratio: float, barometric_pressure: float) -> float:
+        """
+        Returns the psychrometric wet bulb temperature at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
+        :param barometric_pressure: Barometric pressure, in Pa
+        :return:
+        """
         return self.api.psyTwbFnTdbWPb(dry_bulb_temp, humidity_ratio, barometric_pressure)
 
     def specific_volume(self, dry_bulb_temp: float, humidity_ratio: float, barometric_pressure: float) -> float:
+        """
+        Returns the psychrometric specific volume at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
+        :param barometric_pressure: Barometric pressure, in Pa
+        :return:
+        """
         return self.api.psyVFnTdbWPb(dry_bulb_temp, humidity_ratio, barometric_pressure)
 
     def saturation_pressure(self, dry_bulb_temp: float) -> float:
+        """
+        Returns the psychrometric saturation pressure at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :return:
+        """
         return self.api.psyPsatFnTemp(dry_bulb_temp)
 
     def saturation_temperature(self, enthalpy: float, barometric_pressure: float) -> float:
+        """
+        Returns the psychrometric saturation temperature at the specified conditions.
+
+        :param enthalpy: Psychrometric enthalpy, in J/kg
+        :param barometric_pressure: Barometric pressure, in Pa
+        :return:
+        """
         return self.api.psyTsatFnHPb(enthalpy, barometric_pressure)
 
     def vapor_density_b(self, dry_bulb_temp: float, relative_humidity_fraction: float) -> float:
+        """
+        Returns the psychrometric vapor density at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :param relative_humidity_fraction: Psychrometric relative humidity, as a fraction from 0.0 to 1.0.
+        :return:
+        """
         return self.api.psyRhovFnTdbRh(dry_bulb_temp, relative_humidity_fraction)
 
     def humidity_ratio(self, dry_bulb_temp: float, enthalpy: float) -> float:
+        """
+        Returns the psychrometric humidity ratio at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :param enthalpy: Psychrometric enthalpy, in J/kg
+        :return:
+        """
         return self.api.psyWFnTdbH(dry_bulb_temp, enthalpy)
 
     def humidity_ratio_b(self, dew_point_temp: float, barometric_pressure: float) -> float:
+        """
+        Returns the psychrometric humidity ratio at the specified conditions.
+
+        :param dew_point_temp: Psychrometric dew point temperature, in Celsius
+        :param barometric_pressure: Barometric pressure, in Pa
+        :return:
+        """
         return self.api.psyWFnTdpPb(dew_point_temp, barometric_pressure)
 
-    def humidity_ratio_c(self, dry_bulb_temp: float, relative_humidity_fraction: float, barometric_pressure: float) -> float:
+    def humidity_ratio_c(self, dry_bulb_temp: float, relative_humidity_fraction: float,
+                         barometric_pressure: float) -> float:
+        """
+        Returns the psychrometric humidity ratio at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :param relative_humidity_fraction: Psychrometric relative humidity, as a fraction from 0.0 to 1.0.
+        :param barometric_pressure: Barometric pressure, in Pa
+        :return:
+        """
         return self.api.psyWFnTdbRhPb(dry_bulb_temp, relative_humidity_fraction, barometric_pressure)
 
     def humidity_ratio_d(self, dry_bulb_temp: float, wet_bulb_temp: float, barometric_pressure: float) -> float:
+        """
+        Returns the psychrometric humidity ratio at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :param wet_bulb_temp: Psychrometric wet bulb temperature, in C
+        :param barometric_pressure: Barometric pressure, in Pa
+        :return:
+        """
         return self.api.psyWFnTdbTwbPb(dry_bulb_temp, wet_bulb_temp, barometric_pressure)
 
     def dew_point(self, humidity_ratio: float, barometric_pressure: float) -> float:
+        """
+        Returns the psychrometric dew point temperature at the specified conditions.
+
+        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
+        :param barometric_pressure: Barometric pressure, in Pa
+        :return:
+        """
         return self.api.psyTdpFnWPb(humidity_ratio, barometric_pressure)
 
     def dew_point_b(self, dry_bulb_temp: float, wet_bulb_temp: float, barometric_pressure: float) -> float:
+        """
+        Returns the psychrometric dew point temperature at the specified conditions.
+
+        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
+        :param wet_bulb_temp: Psychrometric wet bulb temperature, in C
+        :param barometric_pressure: Barometric pressure, in Pa
+        :return:
+        """
         return self.api.psyTdpFnTdbTwbPb(dry_bulb_temp, wet_bulb_temp, barometric_pressure)
 
 
@@ -219,6 +429,7 @@ class EnergyPlusVersion:
     This is the EnergyPlus version.  Could also call into the DLL but it's the same effect.
 
     """
+
     def __init__(self):
         self.ep_version_major = int("${CMAKE_VERSION_MAJOR}")
         self.ep_version_minor = int("${CMAKE_VERSION_MINOR}")
@@ -226,6 +437,10 @@ class EnergyPlusVersion:
         self.ep_version_build = str("${CMAKE_VERSION_BUILD}")
 
     def __str__(self) -> str:
+        """
+        Returns a string representation of this EnergyPlus version.
+        :return: EnergyPlus version, as major.minor.patch.build
+        """
         return "%s.%s.%s-%s" % (
             self.ep_version_major, self.ep_version_minor, self.ep_version_patch, self.ep_version_build
         )

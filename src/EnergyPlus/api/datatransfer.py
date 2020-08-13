@@ -1,5 +1,5 @@
 from ctypes import cdll, c_int, c_char_p, c_void_p
-from pyenergyplus.common import RealEP, EnergyPlusException
+from pyenergyplus.common import RealEP, EnergyPlusException, is_number
 from typing import Union
 
 
@@ -36,6 +36,10 @@ class DataExchange:
         self.api.listAllAPIDataCSV.restype = c_char_p
         self.api.apiDataFullyReady.argtypes = []
         self.api.apiDataFullyReady.restype = c_int
+        self.api.apiErrorFlag.argtypes = []
+        self.api.apiErrorFlag.restype = c_int
+        self.api.resetErrorFlag.argtypes = []
+        self.api.resetErrorFlag.restype = c_void_p
         self.api.requestVariable.argtypes = [c_char_p, c_char_p]
         self.api.requestVariable.restype = c_void_p
         self.api.getVariableHandle.argtypes = [c_char_p, c_char_p]
@@ -52,6 +56,8 @@ class DataExchange:
         self.api.setActuatorValue.restype = c_void_p
         self.api.resetActuator.argtypes = [c_int]
         self.api.resetActuator.restype = c_void_p
+        self.api.getActuatorValue.argtypes = [c_int]
+        self.api.getActuatorValue.restype = RealEP
         self.api.getInternalVariableHandle.argtypes = [c_char_p, c_char_p]
         self.api.getInternalVariableHandle.restype = c_int
         self.api.getInternalVariableValue.argtypes = [c_int]
@@ -72,7 +78,7 @@ class DataExchange:
         self.api.hour.argtypes = []
         self.api.hour.restype = c_int
         self.api.currentTime.argtypes = []
-        self.api.currentTime.restype = c_int
+        self.api.currentTime.restype = RealEP
         self.api.minutes.argtypes = []
         self.api.minutes.restype = c_int
         self.api.holidayIndex.argtypes = []
@@ -81,6 +87,8 @@ class DataExchange:
         self.api.sunIsUp.restype = c_int
         self.api.isRaining.argtypes = []
         self.api.isRaining.restype = c_int
+        self.api.zoneTimeStep.argtypes = []
+        self.api.zoneTimeStep.restype = RealEP
         self.api.systemTimeStep.argtypes = []
         self.api.systemTimeStep.restype = RealEP
         self.api.currentEnvironmentNum.argtypes = []
@@ -107,19 +115,54 @@ class DataExchange:
         self.api.getPluginTrendVariableSum.restype = RealEP
         self.api.getPluginTrendVariableDirection.argtypes = [c_int, c_int]
         self.api.getPluginTrendVariableDirection.restype = RealEP
+        self.api.getConstructionHandle.argtypes = [c_char_p]
+        self.api.getConstructionHandle.restype = c_int
+        self.api.actualTime.argtypes = []
+        self.api.actualTime.restype = c_int
+        self.api.actualDateTime.argtypes = []
+        self.api.actualDateTime.restype = c_int
+        self.api.kindOfSim.argtypes = []
+        self.api.kindOfSim.restype = c_int
 
-    def list_available_api_data_csv(self) -> str:
+    def list_available_api_data_csv(self) -> bytes:
         """
         Lists out all API data stuff in an easily parseable CSV form
-        :return:
+
+        :return: Returns a raw bytes CSV representation of the available API data
         """
         return self.api.listAllAPIDataCSV()
 
     def api_data_fully_ready(self) -> bool:
+        """
+        Check whether the data exchange API is ready.
+        Handles to variables, actuators, and other data are not reliably defined prior to this being true.
+
+        :return: Returns a boolean value to indicate whether variables, actuators, and other data are ready for access.
+        """
         success = self.api.apiDataFullyReady()
         if success == 0:
             return True
         return False
+
+    def api_error_flag(self) -> bool:
+        """
+        Check whether the error flag has been activated.
+        A number of functions will return 0 in erroneous situations, and this function allows for disambiguation
+        between valid zero return values and the error condition.
+
+        :return: Returns true if the error flag was activated during prior calculations.
+        """
+        if self.api.apiErrorFlag() == 1:
+            return True
+        return False
+
+    def reset_api_error_flag(self) -> None:
+        """
+        Resets the error flag for API calls.
+        A number of functions will return 0 in erroneous situations, but activate an error flag.  In certain work flows,
+        it may be useful to reset this error flag (unit testing, etc.).  This function allows resetting it to false.
+        """
+        self.api.resetErrorFlag()
 
     def request_variable(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> None:
         """
@@ -130,7 +173,8 @@ class DataExchange:
         EnergyPlus as a program, including when using Python Plugins, variables are requested through input objects.
         When running EnergyPlus as a library, variables can also be requested through this function call.  This
         function has the same signature as the get_variable_handle function, which is used to then request the ID
-        of a variable once the simulation has begun.
+        of a variable once the simulation has begun.  NOTE: Variables should be requested before *each* run of
+        EnergyPlus, as the internal array is cleared when clearing the state of each run.
 
         :param variable_name: The name of the variable to retrieve, e.g. "Site Outdoor Air DryBulb Temperature", or
                               "Fan Air Mass Flow Rate"
@@ -139,8 +183,16 @@ class DataExchange:
         """
         if isinstance(variable_name, str):
             variable_name = variable_name.encode('utf-8')
+        elif not isinstance(variable_name, bytes):
+            raise EnergyPlusException(
+                "`request_variable` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(variable_name))
         if isinstance(variable_key, str):
             variable_key = variable_key.encode('utf-8')
+        elif not isinstance(variable_key, bytes):
+            raise EnergyPlusException(
+                "`request_variable` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(variable_key))
         self.api.requestVariable(variable_name, variable_key)
 
     def get_variable_handle(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
@@ -160,8 +212,16 @@ class DataExchange:
         """
         if isinstance(variable_name, str):
             variable_name = variable_name.encode('utf-8')
+        elif not isinstance(variable_name, bytes):
+            raise EnergyPlusException(
+                "`get_variable_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(variable_name))
         if isinstance(variable_key, str):
             variable_key = variable_key.encode('utf-8')
+        elif not isinstance(variable_key, bytes):
+            raise EnergyPlusException(
+                "`get_variable_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(variable_key))
         return self.api.getVariableHandle(variable_name, variable_key)
 
     def get_meter_handle(self, meter_name: Union[str, bytes]) -> int:
@@ -180,13 +240,17 @@ class DataExchange:
         meter_name = meter_name.upper()
         if isinstance(meter_name, str):
             meter_name = meter_name.encode('utf-8')
+        elif not isinstance(meter_name, bytes):
+            raise EnergyPlusException(
+                "`get_meter_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(meter_name))
         return self.api.getMeterHandle(meter_name)
 
     def get_actuator_handle(
             self,
-            actuator_key: Union[str, bytes],
             component_type: Union[str, bytes],
-            control_type: Union[str, bytes]
+            control_type: Union[str, bytes],
+            actuator_key: Union[str, bytes]
     ) -> int:
         """
         Get a handle to an available actuator in a running simulation.
@@ -197,18 +261,30 @@ class DataExchange:
         Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
         as needed.
 
-        :param actuator_key: The instance of the variable to retrieve, e.g. "Environment"
         :param component_type: The actuator category, e.g. "Weather Data"
         :param control_type: The name of the actuator to retrieve, e.g. "Outdoor Dew Point"
+        :param actuator_key: The instance of the variable to retrieve, e.g. "Environment"
         :return: An integer ID for this output variable, or -1 if one could not be found.
         """
-        if isinstance(actuator_key, str):
-            actuator_key = actuator_key.encode('utf-8')
         if isinstance(component_type, str):
             component_type = component_type.encode('utf-8')
+        elif not isinstance(component_type, bytes):
+            raise EnergyPlusException(
+                "`get_actuator_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(component_type))
         if isinstance(control_type, str):
             control_type = control_type.encode('utf-8')
-        return self.api.getActuatorHandle(actuator_key, component_type, control_type)
+        elif not isinstance(control_type, bytes):
+            raise EnergyPlusException(
+                "`get_actuator_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(control_type))
+        if isinstance(actuator_key, str):
+            actuator_key = actuator_key.encode('utf-8')
+        elif not isinstance(actuator_key, bytes):
+            raise EnergyPlusException(
+                "`get_actuator_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(actuator_key))
+        return self.api.getActuatorHandle(component_type, control_type, actuator_key)
 
     def get_variable_value(self, variable_handle: int) -> float:
         """
@@ -217,8 +293,13 @@ class DataExchange:
         then get the value of the variable.
 
         :param variable_handle: An integer returned from the `get_variable_handle` function.
-        :return: Floating point representation of the current variable value
+        :return: Floating point representation of the current variable value.  Returns zero if the handle is invalid.
+                 Use the api_error_flag function to disambiguate between valid zero returns and error states.
         """
+        if not is_number(variable_handle):
+            raise EnergyPlusException(
+                "`get_variable_value` expects `variable_handle` as an `int`, not "
+                "'{}'".format(variable_handle))
         return self.api.getVariableValue(variable_handle)
 
     def get_meter_value(self, meter_handle: int) -> float:
@@ -227,36 +308,74 @@ class DataExchange:
         to get a handle to the meter by name.  Then once the handle is retrieved, it is passed into this function to
         then get the value of the meter.
 
-        Note this function is not completed yet.  It currently gives an instant reading of the meter, not an aggregate
-        value throughout the simulation.  Use caution
+        Caution: This function currently returns the instantaneous value of a meter, not the cumulative value.
+        This will change in a future version of the API.
 
         :param meter_handle: An integer returned from the `get_meter_handle` function.
-        :return: Floating point representation of the current meter value
+        :return: Floating point representation of the current meter value.  Returns zero if the handle is invalid.
+                 Use the api_error_flag function to disambiguate between valid zero returns and error states.
         """
+        if not is_number(meter_handle):
+            raise EnergyPlusException(
+                "`get_meter_value` expects `meter_handle` as an `int`, not "
+                "'{}'".format(meter_handle))
         return self.api.getMeterValue(meter_handle)
 
-    def set_actuator_value(self, actuator_handle: int, actuator_value: RealEP) -> None:
+    def set_actuator_value(self, actuator_handle: int, actuator_value: float) -> None:
         """
         Sets the value of an actuator in a running simulation.  The `get_actuator_handle` function is first used
         to get a handle to the actuator by name.  Then once the handle is retrieved, it is passed into this function,
-        along with the value to assign, to then set the value of the actuator.
+        along with the value to assign, to then set the value of the actuator.  Internally, actuators can alter floating
+        point, integer, and boolean operational values.  The API only exposes this set function with a floating point
+        argument.  For floating point types, the value is assigned directly.  For integer types, the value is rounded
+        to the nearest integer, with the halfway point rounded away from zero (2.5 becomes 3), then cast to a plain
+        integer.  For logical values, the original EMS convention is kept, where a value of 1.0 means TRUE, and a value
+        of 0.0 means FALSE -- and any other value defaults to FALSE.  A small tolerance is applied internally to allow
+        for small floating point round-off.  A value *very close* to 1.0 will still evaluate to TRUE.
 
         :param actuator_handle: An integer returned from the `get_actuator_handle` function.
-        :param actuator_value: The value to assign to the actuator
+        :param actuator_value: The floating point value to assign to the actuator
         :return: Nothing
         """
+        if not is_number(actuator_handle):
+            raise EnergyPlusException(
+                "`set_actuator_value` expects `actuator_handle` as an `int`, not "
+                "'{}'".format(actuator_handle))
+        if not is_number(actuator_value):
+            raise EnergyPlusException(
+                "`set_actuator_value` expects `actuator_value` as a `float`, not "
+                "'{}'".format(actuator_value))
         self.api.setActuatorValue(actuator_handle, actuator_value)
 
     def reset_actuator(self, actuator_handle: int) -> None:
         """
         Resets the actuator internally to EnergyPlus.  This allows subsequent calculations to be used for the actuator
         instead of the externally set actuator value.
-        // TODO: Add a call to this in the test
 
         :param actuator_handle: An integer returned from the `get_actuator_handle` function.
         :return: Nothing
         """
+        if not is_number(actuator_handle):
+            raise EnergyPlusException(
+                "`reset_actuator` expects `actuator_handle` as an `int`, not "
+                "'{}'".format(actuator_handle))
         self.api.resetActuator(actuator_handle)
+
+    def get_actuator_value(self, actuator_handle: int) -> float:
+        """
+        Gets the most recent value of an actuator.  In some applications, actuators are altered by multiple scripts, and
+        this allows getting the most recent value.
+
+        :param actuator_handle: An integer returned from the `get_actuator_handle` function.
+        :return: A floating point of the actuator value.  For boolean actuators returns 1.0 for true and 0.0 for false.
+                 Returns zero if the handle is invalid.  Use the api_error_flag function to disambiguate between valid
+                 zero returns and error states.
+        """
+        if not is_number(actuator_handle):
+            raise EnergyPlusException(
+                "`get_actuator_value` expects `actuator_handle` as an `int`, not "
+                "'{}'".format(actuator_handle))
+        return self.api.getActuatorValue(actuator_handle)
 
     def get_internal_variable_handle(self, variable_type: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
         """
@@ -270,12 +389,20 @@ class DataExchange:
 
         :param variable_type: The name of the variable to retrieve, e.g. "Zone Air Volume", or "Zone Floor Area"
         :param variable_key: The instance of the variable to retrieve, e.g. "Zone 1"
-        :return: An integer ID for this output variable, or zero if one could not be found.
+        :return: An integer ID for this output variable, or -1 if one could not be found.
         """
         if isinstance(variable_type, str):
             variable_type = variable_type.encode('utf-8')
+        elif not isinstance(variable_type, bytes):
+            raise EnergyPlusException(
+                "`get_internal_variable_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(variable_type))
         if isinstance(variable_key, str):
             variable_key = variable_key.encode('utf-8')
+        elif not isinstance(variable_key, bytes):
+            raise EnergyPlusException(
+                "`get_internal_variable_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(variable_key))
         return self.api.getInternalVariableHandle(variable_type, variable_key)
 
     def get_internal_variable_value(self, variable_handle: int) -> float:
@@ -285,9 +412,39 @@ class DataExchange:
         function to then get the value of the variable.
 
         :param variable_handle: An integer returned from the `get_internal_variable_handle` function.
-        :return: Floating point representation of the internal variable value
+        :return: Floating point representation of the internal variable value.  Returns zero if the handle is invalid.
+                 Use the api_error_flag function to disambiguate between valid zero returns and error states.
         """
+        if not is_number(variable_handle):
+            raise EnergyPlusException(
+                "`get_internal_variable_value` expects `variable_handle` as an `int`, not "
+                "'{}'".format(variable_handle))
         return self.api.getInternalVariableValue(variable_handle)
+
+    def get_construction_handle(self, var_name: Union[str, bytes]) -> int:
+        """
+        Get a handle to a constructions in a running simulation.  This is only used for Python Plugin applications!
+
+        Some actuators allow specifying different constructions to allow switchable construction control.
+        This function returns an index that can be used in those functions.  The construction is specified by name.
+
+        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
+        automatically converts values to upper-case when finding matches to internal variables in the simulation.
+
+        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
+        as needed.
+
+        :return: An integer ID for this construction, or -1 if one could not be found.
+        """
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_construction_handle is only available as part of a Python Plugin workflow")
+        if isinstance(var_name, str):
+            var_name = var_name.encode('utf-8')
+        elif not isinstance(var_name, bytes):
+            raise EnergyPlusException(
+                "`get_construction_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(var_name))
+        return self.api.getConstructionHandle(var_name)
 
     def get_global_handle(self, var_name: Union[str, bytes]) -> int:
         """
@@ -307,12 +464,16 @@ class DataExchange:
 
         :param var_name: The name of the global variable to retrieve, this name must be listed in the IDF object:
                          `PythonPlugin:GlobalVariables`
-        :return: An integer ID for this global variable, or zero if one could not be found.
+        :return: An integer ID for this global variable, or -1 if one could not be found.
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_global_handle is only available as part of a Python Plugin workflow")
         if isinstance(var_name, str):
             var_name = var_name.encode('utf-8')
+        elif not isinstance(var_name, bytes):
+            raise EnergyPlusException(
+                "`get_global_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(var_name))
         return self.api.getPluginGlobalVariableHandle(var_name)
 
     def get_global_value(self, handle: int) -> float:
@@ -337,6 +498,10 @@ class DataExchange:
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_global_value is only available as part of a Python Plugin workflow")
+        if not is_number(handle):
+            raise EnergyPlusException(
+                "`get_global_value` expects `handle` as an `int`, not "
+                "'{}'".format(handle))
         return self.api.getPluginGlobalVariableValue(handle)
 
     def set_global_value(self, handle: int, value: float) -> None:
@@ -350,72 +515,232 @@ class DataExchange:
         using the get_global_value and this set_global_value functions as needed.  Note all global variables are
         floating point values.
 
+        :param handle: An integer returned from the `get_global_handle` function.
+        :param value: Floating point value to assign to the global variable
+        """
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("set_global_handle is only available as part of a Python Plugin workflow")
+        if not is_number(handle):
+            raise EnergyPlusException(
+                "`set_global_value` expects `variable_handle` as an `int`, not "
+                "'{}'".format(handle))
+        if not is_number(value):
+            raise EnergyPlusException(
+                "`get_global_value` expects `value` as a `float`, not "
+                "'{}'".format(value))
+        self.api.setPluginGlobalVariableValue(handle, value)
+
+    def get_trend_handle(self, trend_var_name: Union[str, bytes]) -> int:
+        """
+        Get a handle to a trend variable in a running simulation.  This is only used for Python Plugin applications!
+
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using this get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
         The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
         automatically converts values to upper-case when finding matches to internal variables in the simulation.
 
         Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
         as needed.
 
-        :param handle: An integer returned from the `get_global_handle` function.
-        :param value: Floating point value to assign to the global variable
-        """
-        if not self.running_as_python_plugin:
-            raise EnergyPlusException("set_global_handle is only available as part of a Python Plugin workflow")
-        self.api.setPluginGlobalVariableValue(handle, value)
-
-    def get_trend_handle(self, trend_var_name: Union[str, bytes]) -> int:
-        """
-
-        :param trend_var_name:
-        :return:
+        :param trend_var_name: The name of the global variable to retrieve, this name must match the name of a
+                               `PythonPlugin:TrendVariable` IDF object.
+        :return: An integer ID for this trend variable, or -1 if one could not be found.
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_handle is only available as part of a Python Plugin workflow")
         if isinstance(trend_var_name, str):
             trend_var_name = trend_var_name.encode('utf-8')
+        elif not isinstance(trend_var_name, bytes):
+            raise EnergyPlusException(
+                "`get_trend_handle` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(trend_var_name))
         return self.api.getPluginTrendVariableHandle(trend_var_name)
 
-    def get_trend_value(self, trend_handle: int, time_index: int) -> RealEP:
+    def get_trend_value(self, trend_handle: int, time_index: int) -> float:
         """
+        Get the value of a plugin trend variable at a specific history point.  The time_index argument specifies how
+        many time steps to go back in the trend history.  A value of 1 indicates taking the most recent value.  The
+        value of time_index must be less than or equal to the number of history terms specified in the matching
+        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin
+        applications!
 
-        :param trend_handle:
-        :param time_index:
-        :return:
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
+        :param trend_handle: An integer returned from the `get_trend_handle` function.
+        :param time_index: The number of time steps to search back in history to evaluate this function.
+        :return: Floating point value representation of the specific evaluation.
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_value is only available as part of a Python Plugin workflow")
+        if not is_number(trend_handle):
+            raise EnergyPlusException(
+                "`get_trend_value` expects `trend_handle` as an `int`, not "
+                "'{}'".format(trend_handle))
+        if not is_number(time_index):
+            raise EnergyPlusException(
+                "`get_trend_value` expects `time_index` as an `int`, not "
+                "'{}'".format(time_index))
         return self.api.getPluginTrendVariableValue(trend_handle, time_index)
 
-    def get_trend_average(self, trend_handle: int, count: int) -> RealEP:
+    def get_trend_average(self, trend_handle: int, count: int) -> float:
+        """
+        Get the average of a plugin trend variable over a specific history set.  The count argument specifies how
+        many time steps to go back in the trend history.  A value of 1 indicates averaging just the most recent value.
+        The value of time_index must be less than or equal to the number of history terms specified in the matching
+        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin
+        applications!
+
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
+        :param trend_handle: An integer returned from the `get_trend_handle` function.
+        :param count: The number of time steps to search back in history to evaluate this function.
+        :return: Floating point value representation of the specific evaluation.
+        """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_average is only available as part of a Python Plugin workflow")
+        if not is_number(trend_handle):
+            raise EnergyPlusException(
+                "`get_trend_average` expects `trend_handle` as an `int`, not "
+                "'{}'".format(trend_handle))
+        if not is_number(count):
+            raise EnergyPlusException(
+                "`get_trend_average` expects `count` as an `int`, not "
+                "'{}'".format(count))
         return self.api.getPluginTrendVariableAverage(trend_handle, count)
 
-    def get_trend_min(self, trend_handle: int, count: int) -> RealEP:
+    def get_trend_min(self, trend_handle: int, count: int) -> float:
+        """
+        Get the minimum of a plugin trend variable over a specific history set.  The count argument specifies how
+        many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.
+        The value of time_index must be less than or equal to the number of history terms specified in the matching
+        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin
+        applications!
+
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
+        :param trend_handle: An integer returned from the `get_trend_handle` function.
+        :param count: The number of time steps to search back in history to evaluate this function.
+        :return: Floating point value representation of the specific evaluation.
+        """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_min is only available as part of a Python Plugin workflow")
+        if not is_number(trend_handle):
+            raise EnergyPlusException(
+                "`get_trend_min` expects `trend_handle` as an `int`, not "
+                "'{}'".format(trend_handle))
+        if not is_number(count):
+            raise EnergyPlusException(
+                "`get_trend_min` expects `count` as an `int`, not "
+                "'{}'".format(count))
         return self.api.getPluginTrendVariableMin(trend_handle, count)
 
-    def get_trend_max(self, trend_handle: int, count: int) -> RealEP:
+    def get_trend_max(self, trend_handle: int, count: int) -> float:
+        """
+        Get the maximum of a plugin trend variable over a specific history set.  The count argument specifies how
+        many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.
+        The value of time_index must be less than or equal to the number of history terms specified in the matching
+        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin
+        applications!
+
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
+        :param trend_handle: An integer returned from the `get_trend_handle` function.
+        :param count: The number of time steps to search back in history to evaluate this function.
+        :return: Floating point value representation of the specific evaluation.
+        """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_max is only available as part of a Python Plugin workflow")
+        if not is_number(trend_handle):
+            raise EnergyPlusException(
+                "`get_trend_max` expects `trend_handle` as an `int`, not "
+                "'{}'".format(trend_handle))
+        if not is_number(count):
+            raise EnergyPlusException(
+                "`get_trend_max` expects `count` as an `int`, not "
+                "'{}'".format(count))
         return self.api.getPluginTrendVariableMax(trend_handle, count)
 
-    def get_trend_sum(self, trend_handle: int, count: int) -> RealEP:
+    def get_trend_sum(self, trend_handle: int, count: int) -> float:
+        """
+        Get the summation of a plugin trend variable over a specific history set.  The count argument specifies how
+        many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.
+        The value of time_index must be less than or equal to the number of history terms specified in the matching
+        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin
+        applications!
+
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
+        :param trend_handle: An integer returned from the `get_trend_handle` function.
+        :param count: The number of time steps to search back in history to evaluate this function.
+        :return: Floating point value representation of the specific evaluation.
+        """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_sum is only available as part of a Python Plugin workflow")
+        if not is_number(trend_handle):
+            raise EnergyPlusException(
+                "`get_trend_sum` expects `trend_handle` as an `int`, not "
+                "'{}'".format(trend_handle))
+        if not is_number(count):
+            raise EnergyPlusException(
+                "`get_trend_sum` expects `count` as an `int`, not "
+                "'{}'".format(count))
         return self.api.getPluginTrendVariableSum(trend_handle, count)
 
-    def get_trend_direction(self, trend_handle: int, count: int) -> RealEP:
+    def get_trend_direction(self, trend_handle: int, count: int) -> float:
+        """
+        Get the trajectory of a plugin trend variable over a specific history set.  The count argument specifies how
+        many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.
+        A linear regression is performed over the swept values and the slope of the regression line is returned as a
+        representation of the average trajectory over this range.
+        The value of time_index must be less than or equal to the number of history terms specified in the matching
+        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin
+        applications!
+
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
+        :param trend_handle: An integer returned from the `get_trend_handle` function.
+        :param count: The number of time steps to search back in history to evaluate this function.
+        :return: Floating point value representation of the specific evaluation.
+        """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_direction is only available as part of a Python Plugin workflow")
+        if not is_number(trend_handle):
+            raise EnergyPlusException(
+                "`get_trend_direction` expects `trend_handle` as an `int`, not "
+                "'{}'".format(trend_handle))
+        if not is_number(count):
+            raise EnergyPlusException(
+                "`get_trend_direction` expects `count` as an `int`, not "
+                "'{}'".format(count))
         return self.api.getPluginTrendVariableDirection(trend_handle, count)
 
     def year(self) -> int:
         """
-        Get the current year of the simulation.
+        Get the "current" calendar year of the simulation.  All simulations operate at a real year, either user
+        specified or automatically selected by EnergyPlus based on other data (start day of week + leap year option).
 
-        :return: An integer year
+        :return: An integer year (2020, for example)
         """
         return self.api.year()
 
@@ -437,41 +762,41 @@ class DataExchange:
 
     def hour(self) -> int:
         """
-        Get the current hour of the simulation (1-24) TODO: VERIFY THIS
+        Get the current hour of the simulation (0-23)
 
-        :return: An integer hour of the day (1-24)
+        :return: An integer hour of the day (0-23)
         """
         return self.api.hour()
 
     def current_time(self) -> float:
         """
-        Get the current time of day in hours TODO: IM NOT SURE WHAT THIS GETS
+        Get the current time of day in hours, where current time represents the end time of the current time step.
 
-        :return: A floating point representation of the current time -- fractional hours?
+        :return: A floating point representation of the current time in hours
         """
         return self.api.currentTime()
 
     def minutes(self) -> int:
         """
-        Get the current minutes into the hour TODO: VERIFY THIS
+        Get the current minutes into the hour (1-60)
 
-        :return: An integer number of minutes into the current hour (1-60) # TODO VERIFY THIS
+        :return: An integer number of minutes into the current hour (1-60)
         """
         return self.api.minutes()
 
     def day_of_week(self) -> int:
         """
-        Get the current day of the week (0-6) TODO: VERIFY THIS
+        Get the current day of the week (1-7)
 
-        :return: An integer day of week (0-6)
+        :return: An integer day of week (1-7)
         """
         return self.api.dayOfWeek()
 
     def day_of_year(self) -> int:
         """
-        Get the current day of the year (1-366) TODO: VERIFY THIS
+        Get the current day of the year (1-366)
 
-        :return: AN integer day of the year (1-366)
+        :return: An integer day of the year (1-366)
         """
         return self.api.dayOfYear()
 
@@ -520,6 +845,15 @@ class DataExchange:
         """
         return self.api.warmupFlag() == 1
 
+    def zone_time_step(self) -> float:
+        """
+        Gets the current zone time step value in EnergyPlus.  The zone time step is variable and fluctuates
+        during the simulation.
+
+        :return: The current zone time step in fractional hours.
+        """
+        return self.api.systemTimeStep()
+
     def system_time_step(self) -> float:
         """
         Gets the current system time step value in EnergyPlus.  The system time step is variable and fluctuates
@@ -538,3 +872,27 @@ class DataExchange:
         :return: The current environment number.
         """
         return self.api.currentEnvironmentNum()
+
+    def actual_time(self) -> int:
+        """
+        Gets a simple sum of the values of the time part of the date/time function. Could be used in random seeding.
+
+        :return: Integer value of time portion of the date/time function.
+        """
+        return self.api.actualTime()
+
+    def actual_date_time(self) -> int:
+        """
+        Gets a simple sum of the values of the date/time function. Could be used in random seeding.
+
+        :return: Integer value of the date/time function.
+        """
+        return self.api.actualDateTime()
+
+    def kind_of_sim(self) -> int:
+        """
+        Gets the current environment number.
+
+        :return: Integer value of current environment.
+        """
+        return self.api.kindOfSim()

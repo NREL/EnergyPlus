@@ -87,7 +87,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,4;
 
@@ -95,7 +95,7 @@
     Simple One Zone (Wireframe DXF),  !- Name
     0.0000000E+00,           !- North Axis {deg}
     Suburbs,                 !- Terrain
-    .05,                     !- Loads Convergence Tolerance Value
+    .05,                     !- Loads Convergence Tolerance Value {W}
     .05,                     !- Temperature Convergence Tolerance Value {deltaC}
     MinimalShadowing,        !- Solar Distribution
     60,                      !- Maximum Number of Warmup Days

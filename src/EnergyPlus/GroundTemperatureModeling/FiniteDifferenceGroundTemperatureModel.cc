@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
@@ -79,7 +80,7 @@ Real64 iterationTempConvergenceCriteria = 0.00001;
 //******************************************************************************
 
 // Finite difference model factory
-std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(int objectType, std::string objectName)
+std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -134,7 +135,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
         groundTempModels.push_back(thisModel);
 
         // Simulate
-        thisModel->initAndSim();
+        thisModel->initAndSim(state);
 
         // Return the pointer
         return thisModel;
@@ -146,7 +147,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::initAndSim()
+void FiniteDiffGroundTempsModel::initAndSim(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -157,7 +158,7 @@ void FiniteDiffGroundTempsModel::initAndSim()
     // PURPOSE OF THIS SUBROUTINE:
     // Initalizes and simulated finite difference ground temps model
 
-    FiniteDiffGroundTempsModel::getWeatherData();
+    FiniteDiffGroundTempsModel::getWeatherData(state);
 
     FiniteDiffGroundTempsModel::developMesh();
 
@@ -166,7 +167,7 @@ void FiniteDiffGroundTempsModel::initAndSim()
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::getWeatherData()
+void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -210,7 +211,7 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     bool EndMonthFlag_reset = EndMonthFlag;
     bool WarmupFlag_reset = WarmupFlag;
     int DayOfSim_reset = DayOfSim;
-    std::string DayOfSimChr_reset = DayOfSimChr;
+    std::string DayOfSimChr_reset = state.dataGlobals.DayOfSimChr;
     int NumOfWarmupDays_reset = NumOfWarmupDays;
     bool BeginDayFlag_reset = BeginDayFlag;
     bool EndDayFlag_reset = EndDayFlag;
@@ -241,7 +242,7 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     WeatherManager::Envrn = originalNumOfEnvn;
     Available = true;
     ErrorsFound = false;
-    GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
+    GetNextEnvironment(state, Available, ErrorsFound);
     if (ErrorsFound) {
         ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
     }
@@ -258,7 +259,7 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     EndMonthFlag = false;
     WarmupFlag = false;
     DayOfSim = 0;
-    DayOfSimChr = "0";
+    state.dataGlobals.DayOfSimChr = "0";
     NumOfWarmupDays = 0;
 
     annualAveAirTemp_num = 0.0;
@@ -306,7 +307,7 @@ void FiniteDiffGroundTempsModel::getWeatherData()
                     }
                 }
 
-                ManageWeather();
+                ManageWeather(state.files);
 
                 outDryBulbTemp_num += OutDryBulbTemp;
                 airDensity_num += OutAirDensity;
@@ -366,7 +367,7 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     EndMonthFlag = EndMonthFlag_reset;
     WarmupFlag = WarmupFlag_reset;
     DayOfSim = DayOfSim_reset;
-    DayOfSimChr = DayOfSimChr_reset;
+    state.dataGlobals.DayOfSimChr = DayOfSimChr_reset;
     NumOfWarmupDays = NumOfWarmupDays_reset;
     BeginDayFlag = BeginDayFlag_reset;
     EndDayFlag = EndDayFlag_reset;

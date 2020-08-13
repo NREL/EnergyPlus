@@ -52,7 +52,6 @@
 #include <fstream>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 
@@ -65,8 +64,14 @@
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
 
 namespace EnergyPlus {
+
+    // Forward Declarations
+    struct EnergyPlusData;
+    struct WindowComplexManagerData;
+    struct WindowEquivalentLayerData;
 
 namespace SolarShading {
 
@@ -201,9 +206,9 @@ namespace SolarShading {
     // Functions
     void clear_state();
 
-    void InitSolarCalculations();
+    void InitSolarCalculations(IOFiles &ioFiles);
 
-    void GetShadowingInput(OutputFiles &outputFiles);
+    void GetShadowingInput(IOFiles &ioFiles);
 
     void AllocateModuleArrays();
 
@@ -224,23 +229,23 @@ namespace SolarShading {
                 int const SBSNR  // Surface number of subsurface
     );
 
-    bool polygon_contains_point(int const nsides,           // number of sides (vertices)
-                                Array1A<Vector> polygon_3d, // points of polygon
-                                Vector const &point_3d,     // point to be tested
+    bool polygon_contains_point(int const nsides,            // number of sides (vertices)
+                                Array1D<Vector> &polygon_3d, // points of polygon
+                                Vector const &point_3d,      // point to be tested
                                 bool const ignorex,
                                 bool const ignorey,
                                 bool const ignorez);
 
     void ComputeIntSolarAbsorpFactors();
 
-    void CLIP(int const NVT, Array1<Real64> &XVT, Array1<Real64> &YVT, Array1<Real64> &ZVT);
+    void CLIP(int const NVT, Array1D<Real64> &XVT, Array1D<Real64> &YVT, Array1D<Real64> &ZVT);
 
-    void CTRANS(int const NS,        // Surface number whose vertex coordinates are being transformed
-                int const NGRS,      // Base surface number for surface NS
-                int &NVT,            // Number of vertices for surface NS
-                Array1<Real64> &XVT, // XYZ coordinates of vertices of NS in plane of NGRS
-                Array1<Real64> &YVT,
-                Array1<Real64> &ZVT);
+    void CTRANS(int const NS,         // Surface number whose vertex coordinates are being transformed
+                int const NGRS,       // Base surface number for surface NS
+                int &NVT,             // Number of vertices for surface NS
+                Array1D<Real64> &XVT, // XYZ coordinates of vertices of NS in plane of NGRS
+                Array1D<Real64> &YVT,
+                Array1D<Real64> &ZVT);
 
     void HTRANS(int const I,          // Mode selector: 0 - Compute H.C. of sides
                 int const NS,         // Figure Number
@@ -291,7 +296,7 @@ namespace SolarShading {
                                  int const NS3  // Location to place results of overlap
     );
 
-    void CalcPerSolarBeam(Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
+    void CalcPerSolarBeam(WindowComplexManagerData &dataWindowComplexManager, Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
                           Real64 const AvgSinSolarDeclin, // Average value of Sine of Solar Declination for period
                           Real64 const AvgCosSolarDeclin  // Average value of Cosine of Solar Declination for period
     );
@@ -332,13 +337,13 @@ namespace SolarShading {
                                    int const TS     // Time step Index
     );
 
-    void CalcInteriorSolarDistribution();
+    void CalcInteriorSolarDistribution(WindowEquivalentLayerData &dataWindowEquivalentLayer);
 
     void CalcAborbedOnExteriorOpaqueSurfaces();
 
-    void CalcInteriorSolarDistributionWCE();
+    void CalcInteriorSolarDistributionWCE(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager);
 
-    void CalcInteriorSolarDistributionWCESimple();
+    void CalcInteriorSolarDistributionWCESimple(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager);
 
     int WindowScheduledSolarAbs(int const SurfNum, // Surface number
                                 int const ConstNum // Construction number
@@ -348,7 +353,7 @@ namespace SolarShading {
                                  int const ConstNum // Construction number
     );
 
-    void PerformSolarCalculations();
+    void PerformSolarCalculations(WindowComplexManagerData &dataWindowComplexManager, IOFiles &ioFiles);
 
     void SHDRVL(int const HTSS,  // Heat transfer surface number of the subsurface
                 int const SBSNR, // Subsurface number
@@ -374,7 +379,7 @@ namespace SolarShading {
               Real64 const CosSolarDeclin  // Cosine of the Solar declination (current day)
     );
 
-    void WindowShadingManager();
+    void WindowShadingManager(WindowEquivalentLayerData &dataWindowEquivalentLayer);
 
     void WindowGapAirflowControl();
 
@@ -395,7 +400,7 @@ namespace SolarShading {
 
     void ComputeWinShadeAbsorpFactors();
 
-    void CalcWinTransDifSolInitialDistribution();
+    void CalcWinTransDifSolInitialDistribution(WindowEquivalentLayerData &dataWindowEquivalentLayer);
 
     void CalcInteriorWinTransDifSolInitialDistribution(
         int const IntWinEnclosureNum,     // Interior Window Enclosure index number
@@ -408,7 +413,7 @@ namespace SolarShading {
                                   int const ISurf                    // Surface number of the complex fenestration
     );
 
-    void TimestepInitComplexFenestration();
+    void TimestepInitComplexFenestration(WindowComplexManagerData &dataWindowComplexManager);
 
 } // namespace SolarShading
 

@@ -21,6 +21,7 @@ endif()
 add_library( airflownetworklib STATIC ${SRCS} ${HDRS} )
 
 target_include_directories( airflownetworklib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include )
+target_link_libraries( airflownetworklib PUBLIC fmt::fmt )
 
 
 

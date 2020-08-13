@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
@@ -2387,7 +2387,7 @@
     Sys 1 Furnace DX Cool Cooling Coil,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
-    ,                        !- Latent Load Control
+    LatentWithSensibleLoadControl, !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
@@ -2791,7 +2791,7 @@
     Sys 2 Furnace DX Cool Cooling Coil,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
-    ,                        !- Latent Load Control
+    LatentWithSensibleLoadControl, !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
@@ -3182,7 +3182,7 @@
     Sys 3 Heat Pump Air Source Cooling Coil,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
-    ,                        !- Latent Load Control
+    LatentWithSensibleLoadControl, !- Latent Load Control
     Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
     Sys 3 Heat Pump Air Source Supp Heat or Reheat Coil,  !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
@@ -3654,7 +3654,7 @@
     Sys 4 Heat Pump Air Source Cooling Coil,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
-    ,                        !- Latent Load Control
+    LatentWithSensibleLoadControl, !- Latent Load Control
     Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
     Sys 4 Heat Pump Air Source Supp Heat or Reheat Coil,  !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method

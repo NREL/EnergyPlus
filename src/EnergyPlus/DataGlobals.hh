@@ -51,11 +51,16 @@
 // C++ Headers
 #include <iosfwd>
 #include <string>
+#include <functional>
 
 // EnergyPlus Headers
+#include "IOFiles.hh"
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+    struct EnergyPlusData;
 
 namespace DataGlobals {
 
@@ -65,7 +70,6 @@ namespace DataGlobals {
 
     extern bool runReadVars;
     extern bool DDOnlySimulation;
-    extern bool AnnualSimulation;
     extern bool outputEpJSONConversion;
     extern bool outputEpJSONConversionOnly;
     extern bool isEpJSON;
@@ -74,12 +78,14 @@ namespace DataGlobals {
     extern bool isUBJSON;
     extern bool isBSON;
     extern bool preserveIDFOrder;
+    extern bool stopSimulation;
+    extern std::function<void (void *)> externalHVACManager;
+    extern bool externalHVACManagerInitialized;
 
     // MODULE PARAMETER DEFINITIONS:
     extern int const BeginDay;
     extern int const DuringDay;
     extern int const EndDay;
-    extern int const EndZoneSizingCalc;
     extern int const EndSysSizingCalc;
 
     // Parameters for KindOfSim
@@ -149,64 +155,6 @@ namespace DataGlobals {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    struct JsonOutputStreams
-    {
-        std::ostream *json_stream = nullptr; // Internal stream used for json output
-        std::ostream *json_TSstream_Zone = nullptr;
-        std::ostream *json_TSstream_HVAC = nullptr;
-        std::ostream *json_TSstream = nullptr;
-        std::ostream *json_HRstream = nullptr;
-        std::ostream *json_MNstream = nullptr;
-        std::ostream *json_DYstream = nullptr;
-        std::ostream *json_SMstream = nullptr;
-        std::ostream *json_YRstream = nullptr;
-        std::ostream *cbor_stream = nullptr; // Internal stream used for cbor output
-        std::ostream *cbor_TSstream_Zone = nullptr;
-        std::ostream *cbor_TSstream_HVAC = nullptr;
-        std::ostream *cbor_TSstream = nullptr;
-        std::ostream *cbor_HRstream = nullptr;
-        std::ostream *cbor_MNstream = nullptr;
-        std::ostream *cbor_DYstream = nullptr;
-        std::ostream *cbor_SMstream = nullptr;
-        std::ostream *cbor_YRstream = nullptr;
-        std::ostream *msgpack_stream = nullptr; // Internal stream used for messagepack output
-        std::ostream *msgpack_TSstream_Zone = nullptr;
-        std::ostream *msgpack_TSstream_HVAC = nullptr;
-        std::ostream *msgpack_TSstream = nullptr;
-        std::ostream *msgpack_HRstream = nullptr;
-        std::ostream *msgpack_MNstream = nullptr;
-        std::ostream *msgpack_DYstream = nullptr;
-        std::ostream *msgpack_SMstream = nullptr;
-        std::ostream *msgpack_YRstream = nullptr;
-
-        int OutputFileJson = 0; // Unit number for Schema output
-        int OutputFileTSZoneJson = 0;
-        int OutputFileTSHVACJson = 0;
-        int OutputFileTSJson = 0;
-        int OutputFileHRJson = 0;
-        int OutputFileDYJson = 0;
-        int OutputFileMNJson = 0;
-        int OutputFileSMJson = 0;
-        int OutputFileYRJson = 0;
-        int OutputFileCBOR = 0; // Unit number for Schema output
-        int OutputFileTSZoneCBOR = 0;
-        int OutputFileTSHVACCBOR = 0;
-        int OutputFileTSCBOR = 0;
-        int OutputFileHRCBOR = 0;
-        int OutputFileDYCBOR = 0;
-        int OutputFileMNCBOR = 0;
-        int OutputFileSMCBOR = 0;
-        int OutputFileYRCBOR = 0;
-        int OutputFileMsgPack = 0; // Unit number for Schema output
-        int OutputFileTSZoneMsgPack = 0;
-        int OutputFileTSHVACMsgPack = 0;
-        int OutputFileTSMsgPack = 0;
-        int OutputFileHRMsgPack = 0;
-        int OutputFileDYMsgPack = 0;
-        int OutputFileMNMsgPack = 0;
-        int OutputFileSMMsgPack = 0;
-        int OutputFileYRMsgPack = 0;
-    };
 
     extern bool BeginDayFlag;           // True at the start of each day, False after first time step in day
     extern bool BeginEnvrnFlag;         // True at the start of each environment, False after first time step in environ
@@ -216,7 +164,6 @@ namespace DataGlobals {
     extern bool BeginFullSimFlag;       // True until full simulation has begun, False after first time step
     extern bool BeginTimeStepFlag;      // True at the start of each time step, False after first subtime step of time step
     extern int DayOfSim;                // Counter for days (during the simulation)
-    extern std::string DayOfSimChr;     // Counter for days (during the simulation) (character -- for reporting)
     extern int CalendarYear;            // Calendar year of the current day of simulation
     extern std::string CalendarYearChr; // Calendar year of the current day of simulation (character -- for reporting)
     extern bool EndEnvrnFlag;           // True at the end of each environment (last time step of last hour of last day of environ)
@@ -234,24 +181,9 @@ namespace DataGlobals {
     extern int TimeStep;                             // Counter for time steps (fractional hours)
     extern Real64 TimeStepZone;                      // Zone time step in fractional hours
     extern bool WarmupFlag;                          // True during the warmup portion of a simulation
-    extern int OutputFileStandard;                   // Unit number for the standard output file (hourly data only)
-    extern std::ostream *eso_stream;                 // Internal stream used for eso output (used for performance)
-    extern JsonOutputStreams jsonOutputStreams;      // Internal streams used for json outputs
     extern int OutputStandardError;                  // Unit number for the standard error output file
-    extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records
-    extern std::ostream *eio_stream;                 // Internal stream used for eio output (used for unit tests)
-    extern int OutputFileDebug;                      // Unit number for debug outputs
-    extern int OutputFilePerfLog;                    // Unit number for performance log outputs
-    extern int OutputFileZoneSizing;                 // Unit number of zone sizing calc output file
-    extern int OutputFileSysSizing;                  // Unit number of system sizing calc output file
-    extern int OutputFileMeters;                     // Unit number for meters output
-    extern std::ostream *mtr_stream;                 // Internal stream used for mtr output (used for performance)
-    extern int OutputFileShadingFrac;                // Unit number for shading output
     extern int StdMeterRecordCount;                  // Count of Meter output records
-    extern int OutputFileBNDetails;                  // Unit number for Branch-Node Details
-    extern int OutputDElightIn;                      // Unit number for the DElight In file
-    extern std::ostream *delightin_stream;           // Internal stream used for DElight In file
     extern bool ZoneSizingCalc;                      // TRUE if zone sizing calculation
     extern bool SysSizingCalc;                       // TRUE if system sizing calculation
     extern bool DoZoneSizing;                        // User input in SimulationControl object
@@ -287,7 +219,6 @@ namespace DataGlobals {
     extern bool AnyEnergyManagementSystemInModel;  // true if there is any EMS or Erl in model.  otherwise false
     extern bool AnyLocalEnvironmentsInModel;       // true if there is any local environmental data objected defined in model, otherwise false
     extern bool AnyPlantInModel;                   // true if there are any plant or condenser loops in model, otherwise false
-    extern int CacheIPErrorFile;                   // Cache IP errors until IDF processing done.
     extern bool AnyIdealCondEntSetPointInModel;    // true if there is any ideal condenser entering set point manager in model.
     extern bool RunOptCondEntTemp;                 // true if the ideal condenser entering set point optimization is running
     extern bool CompLoadReportIsReq;               // true if the extra sizing calcs are performed to create a "pulse" for the load component report
@@ -299,7 +230,7 @@ namespace DataGlobals {
     extern bool AnySlabsInModel;         // true if there are any zone-coupled ground domains in the input file
     extern bool AnyBasementsInModel;     // true if there are any basements in the input file
     extern bool DoCoilDirectSolutions;        //true if use coil direction solutions
-    extern bool createProfLog; //true if the _proflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
+    extern bool createPerfLog; //true if the _perflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
     extern int Progress;
     extern void (*fProgressPtr)(int const);
     extern void (*fMessagePtr)(std::string const &);
@@ -311,9 +242,25 @@ namespace DataGlobals {
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state();
+    void clear_state(EnergyPlus::IOFiles &ioFiles);
 
 } // namespace DataGlobals
+
+    struct DataGlobal : BaseGlobalStruct {
+        // Data
+        bool AnnualSimulation = false;
+
+        // MODULE VARIABLE DECLARATIONS:
+        std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
+
+        // MODULE PARAMETER DEFINITIONS
+        static constexpr int EndZoneSizingCalc = 4;
+
+        void clear_state() override {
+            AnnualSimulation = false;
+            DayOfSimChr = "0";
+        }
+    };
 
 } // namespace EnergyPlus
 

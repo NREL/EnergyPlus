@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 
@@ -68,7 +69,6 @@ namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 {
-
     std::string const idf_objects = delimited_string({
         "OutdoorAir:Node, Test node;",
 
@@ -97,14 +97,14 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    NodeInputManager::SetupNodeVarsForReporting();
+    NodeInputManager::SetupNodeVarsForReporting(state.files);
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.files);
 
     EMSManager::FinishProcessingUserInput = true;
 
     bool anyEMSRan;
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyEMSRan);
+    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyEMSRan, ObjexxFCL::Optional_int_const());
 
     DataLoopNode::Node(1).Temp = 20.0;
     DataLoopNode::Node(1).HumRat = 0.01;
@@ -114,7 +114,7 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 
     EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).RelHumidity, 67.65, 0.01);
     EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).AirDewPointTemp, 13.84, 0.01);
-    EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).WetBulbTemp, 16.11, 0.01);
+    EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).WetBulbTemp, 16.12, 0.01);
     EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).SpecificHeat, 1023.43, 0.01);
 }
 

@@ -63,6 +63,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -190,6 +191,7 @@ namespace DataZoneEquipment {
     Array1D<ControlList> CoolingControlList;
     Array1D<SupplyAir> SupplyAirPath;
     Array1D<ReturnAir> ReturnAirPath;
+    bool CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
 
     // Functions
     // Clears the global data in DataZoneEquipment.
@@ -216,9 +218,10 @@ namespace DataZoneEquipment {
         SupplyAirPath.deallocate();
         ReturnAirPath.deallocate();
         UniqueZoneEquipListNames.clear();
+        CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
     }
 
-    void GetZoneEquipmentData()
+    void GetZoneEquipmentData(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -255,10 +258,10 @@ namespace DataZoneEquipment {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        GetZoneEquipmentData1();
+        GetZoneEquipmentData1(state);
     }
 
-    void GetZoneEquipmentData1()
+    void GetZoneEquipmentData1(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -670,7 +673,7 @@ namespace DataZoneEquipment {
                         } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") { // Unitary System
                             thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySys_Num;
                             UnitarySystems::UnitarySys thisSys;
-                            thisZoneEquipList.compPointer[ZoneEquipTypeNum] = thisSys.factory(
+                            thisZoneEquipList.compPointer[ZoneEquipTypeNum] = thisSys.factory(state, 
                                 DataHVACGlobals::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
 
                         } else if (SELECT_CASE_var == "ZONEHVAC:DEHUMIDIFIER:DX") { // Zone dehumidifier
@@ -1234,7 +1237,7 @@ namespace DataZoneEquipment {
         return IsOnList;
     }
 
-    int GetControlledZoneIndex(std::string const &ZoneName) // Zone name to match into Controlled Zone structure
+    int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName) // Zone name to match into Controlled Zone structure
     {
 
         // FUNCTION INFORMATION:
@@ -1251,7 +1254,7 @@ namespace DataZoneEquipment {
         int ControlledZoneIndex; // Index into Controlled Zone structure
 
         if (!ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1();
+            GetZoneEquipmentData1(state);
             ZoneEquipInputsFilled = true;
         }
 
@@ -1260,7 +1263,7 @@ namespace DataZoneEquipment {
         return ControlledZoneIndex;
     }
 
-    int FindControlledZoneIndexFromSystemNodeNumberForZone(int const TrialZoneNodeNum) // Node number to match into Controlled Zone structure
+    int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state, int const TrialZoneNodeNum) // Node number to match into Controlled Zone structure
     {
 
         // FUNCTION INFORMATION:
@@ -1283,7 +1286,7 @@ namespace DataZoneEquipment {
         FoundIt = false;
 
         if (!ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1();
+            GetZoneEquipmentData1(state);
             ZoneEquipInputsFilled = true;
         }
         ControlledZoneIndex = 0;
@@ -1300,7 +1303,7 @@ namespace DataZoneEquipment {
         return ControlledZoneIndex;
     }
 
-    int GetSystemNodeNumberForZone(std::string const &ZoneName) // Zone name to match into Controlled Zone structure
+    int GetSystemNodeNumberForZone(EnergyPlusData &state, std::string const &ZoneName) // Zone name to match into Controlled Zone structure
     {
 
         // FUNCTION INFORMATION:
@@ -1320,7 +1323,7 @@ namespace DataZoneEquipment {
         int ControlledZoneIndex;
 
         if (!ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1();
+            GetZoneEquipmentData1(state);
             ZoneEquipInputsFilled = true;
         }
 
@@ -1335,7 +1338,7 @@ namespace DataZoneEquipment {
         return SystemZoneNodeNumber;
     }
 
-    int GetReturnAirNodeForZone(std::string const &ZoneName,             // Zone name to match into Controlled Zone structure
+    int GetReturnAirNodeForZone(EnergyPlusData &state, std::string const &ZoneName,             // Zone name to match into Controlled Zone structure
                                 std::string const &NodeName,             // Return air node name to match (may be blank)
                                 std::string const &calledFromDescription // String identifying the calling function and object
     )
@@ -1357,7 +1360,7 @@ namespace DataZoneEquipment {
         int ControlledZoneIndex;
 
         if (!ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1();
+            GetZoneEquipmentData1(state);
             ZoneEquipInputsFilled = true;
         }
 
@@ -1390,7 +1393,7 @@ namespace DataZoneEquipment {
         return ReturnAirNodeNumber;
     }
 
-    int GetReturnNumForZone(std::string const &ZoneName, // Zone name to match into Controlled Zone structure
+    int GetReturnNumForZone(EnergyPlusData &state, std::string const &ZoneName, // Zone name to match into Controlled Zone structure
                             std::string const &NodeName  // Return air node name to match (may be blank)
     )
     {
@@ -1407,7 +1410,7 @@ namespace DataZoneEquipment {
         int ControlledZoneIndex;
 
         if (!ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1();
+            GetZoneEquipmentData1(state);
             ZoneEquipInputsFilled = true;
         }
 
@@ -1520,15 +1523,14 @@ namespace DataZoneEquipment {
         Real64 CO2PeopleGeneration;       // CO2 generation from people at design level
         int PeopleNum;
         static Array1D_bool MyEnvrnFlag;
-        static bool OneTimeFlag(true);
 
         OAVolumeFlowRate = 0.0;
         if (DSOAPtr == 0) return OAVolumeFlowRate;
 
-        if (OneTimeFlag) {
+        if (CalcDesignSpecificationOutdoorAirOneTimeFlag) {
             MyEnvrnFlag.allocate(DataSizing::NumOARequirements);
             MyEnvrnFlag = true;
-            OneTimeFlag = false;
+            CalcDesignSpecificationOutdoorAirOneTimeFlag = false;
         }
 
         if (present(PerPersonNotSet)) {

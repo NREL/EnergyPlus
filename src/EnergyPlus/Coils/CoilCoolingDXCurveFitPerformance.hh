@@ -56,7 +56,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-class OutputFiles;
+    // Forward declarations
+    struct EnergyPlusData;
+    class IOFiles;
 
 struct CoilCoolingDXCurveFitPerformanceInputSpecification
 {
@@ -71,6 +73,7 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
     int compressor_fuel_type;
     std::string base_operating_mode_name;
     std::string alternate_operating_mode_name;
+    std::string alternate_operating_mode2_name;
     std::string capacity_control;
 };
 
@@ -81,13 +84,14 @@ struct CoilCoolingDXCurveFitPerformance
     void instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
     void simulate(const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
-                  bool useAlternateMode,
+                  int useAlternateMode,
                   Real64 &PLR,
                   int &speedNum,
                   Real64 &speedRatio,
                   int const fanOpMode,
                   DataLoopNode::NodeData &condInletNode,
                   DataLoopNode::NodeData &condOutletNode,
+                  Real64 LoadSHR = 0.0,
                   bool const singleMode);
 
     void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
@@ -104,7 +108,8 @@ struct CoilCoolingDXCurveFitPerformance
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
     explicit CoilCoolingDXCurveFitPerformance(const std::string &name);
-    void size();
+    void size(EnergyPlusData &state);
+    void setOperMode(CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
 
     std::string name;
     Real64 crankcaseHeaterCap = 0.0;
@@ -134,6 +139,10 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 RTF = 0.0;
     bool oneTimeEIOHeaderWrite = true;
     Real64 wasteHeatRate = 0.0;
+    int OperatingMode = 0;
+    Real64 ModeRatio = 0.0;
+    Real64 recoveredEnergyRate = 0.0;
+    Real64 NormalSHR = 0.0;
 
     // standard rating stuff -- for now just 210/240
     Real64 standardRatingCoolingCapacity = 0.0;  // net cooling capacity of single speed DX cooling coil
@@ -142,8 +151,9 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 standardRatingIEER = 0.0;  // Integrated energy efficiency ratio of single speed DX cooling coil
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
-    bool hasAlternateMode = false;
-    CoilCoolingDXCurveFitOperatingMode alternateMode; // enhanced dehumidifcation
+    int hasAlternateMode = 0; // 0 Normal, 1 Enhanced, 2 SubcoolReheat
+    CoilCoolingDXCurveFitOperatingMode alternateMode; // enhanced dehumidifcation or Subcool mode
+    CoilCoolingDXCurveFitOperatingMode alternateMode2; // Reheat mode
 };
 
 } // namespace EnergyPlus

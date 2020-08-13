@@ -51,7 +51,7 @@ This field is the name of the hot water outlet node for the baseboard heater.
 
 This field is the rated average water temperature for the baseboard heater which is published in the manufacturer's literature in degree Celsius. It typically ranges from 65.56°C to 115.36°C in the I = B = R rating document while the lowest allowable temperature is 32.22°C. The default value is 87.78°C. If the user does not enter this field, the default value is assumed.
 
-\paragraph{Field: Rated Water Mass Flow Rate}\label{field-rated-water-mass-flow-rate}
+\paragraph{Field: Rated Water Mass Flow Rate}
 
 This field is the rated standard water flow rate in kg/s which is published as part of the manufacturer's literature. It is used by the manufacturers when determining the rated capacity (see next field). The default value is 0.063kg/s. If it is blank or zero, the default values is assumed.
 
@@ -561,7 +561,7 @@ The name of the water inlet node for the radiant cooling panel.
 
 The name of the water outlet node for the radiant cooling panel.
 
-\paragraph{Field: Rated Inlet Water Temperature}\label{field-rated-inlet-water-temperature}
+\paragraph{Field: Rated Inlet Water Temperature}
 
 This field is the inlet temperature to the panel under conditions used to rate the capacity of the panel.  This value along with the other rating condition parameters is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the zone.  The default value is 5°C (41°F).
 
@@ -593,7 +593,7 @@ This field is used to enter the cooling capacity as a fraction of the autosized 
 
 This field specifies the maximum chilled water volumetric flow rate in m3/sec.  This field can also be autosized.
 
-\paragraph{Field: Control Type}\label{field-control-type}
+\paragraph{Field: Control Type}
 
 This field specifies two different types of control categories: temperature or zone load.  For one of the temperature based controls, this field along with the throttling range and setpoint schedules determines how the user wishes to control the radiant cooling panel.  The temperature denoted in the setpoint schedule can refer to one of five different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, or the outdoor wet-bulb temperature.  The current field controls the choice of temperature.  For controls that are based more on zone load, the user can make one of two choices based on whether the zone load is met by only the convective output of the unit or the total output of the unit.  These zone load controls will not perform as precisely as air-based systems.  The convective zone load control will come close to meeting the current setpoint temperature (defined by the typical zone thermostat input by the user) since the convective output of the unit will be set to match the remaining zone load.  However, in the long run, this will likely overcool the space since radiant energy is being absorbed by surfaces and this will impact the zone conditions at later time steps.  The total zone load control will likely undercool the space in the short term since the total output (radiant and convective) of the unit will be set to meet the remaining zone load.  However, this will not fully impact the zone air temperature immediately since some of the energy is being absorbed from surfaces rather than the zone air.  The user must select from the following options:
 
@@ -617,15 +617,15 @@ This field specifies two different types of control categories: temperature or z
 
 Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature. If the user does not select a control type, MeanAirTemperature control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information.
 
-\paragraph{Field: Cooling Control Throttling Range}\label{field-cooling-control-throttling-range}
+\paragraph{Field: Cooling Control Throttling Range}
 
 This field specifies the range of temperature in degrees Celsuis over which the radiant cooling panel throttles from zero flow rate up to the maximum defined by the maximum chilled water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature to define the response of the system to various zone conditions. The cooling control temperature schedule specifies the “setpoint” temperature where the flow rate to the system is at half of the maximum flow rate. For example, if the cooling control temperature setpoint is currently 25 C and the cooling throttling range is 2 C, the water flow rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, ODB, or OWB; see control type field above) is at or below 24 C and the maximum flow rate when the controlling temperature is at or above 26 C. This represents a throttling range of 2 C around the setpoint of 25 C. In between 24 C and 26 C, the flow rate to the radiant system is varied linearly.  Note that this field is ignored when the control type is either ZoneLoadConvective or ZoneLoadTotal.  For the two zone load controls, the user must use a typical zone thermostat and the system output will be dependent on the remaining zone load.
 
-\paragraph{Field: Cooling Control Temperature Schedule Name}\label{field-cooling-control-temperature-schedule-name}
+\paragraph{Field: Cooling Control Temperature Schedule Name}
 
 This field specifies the cooling setpoint or control temperature for the radiant cooling panel in degrees Celsius. Used in conjunction with the previous field (cooling control throttling range), it will define whether or not the system is running and the current flow rate. Water flow rate to the system is varied linearly around the setpoint temperature based on the throttling range and the maximum cooling flow rate parameters (see above). It should be noted that this control schedule will allow different setpoint temperatures throughout the year for cooling. The control of the radiant cooling panel is based solely on the cooling control throttling range listed above, the cooling control temperature schedule, and the control temperature type listed above. The radiant cooling panel will not use any zone thermostat that might be used by other systems serving the zone in which this radiant cooling panel resides.  Note that this field is ignored when the control type is either ZoneLoadConvective or ZoneLoadTotal.  For the two zone load controls, the user must use a typical zone thermostat and the system output will be dependent on the remaining zone load.
 
-\paragraph{Field: Condensation Control Type}\label{field-condensation-control-type}
+\paragraph{Field: Condensation Control Type}
 
 Since radiant cooling panels provide a cold surface in what could be a humid zone, there is the possibility that condensation will occur on the surface of the panel. This is due to the fact that the surface temperature may drop below the dew-point temperature of the space. When this occurs, condensation on the surface will occur. Since there is no direct calculation of the surface temperature of the radiant cooling panel, the condensation check will be made at the inlet water temperature to the panel. Since the user can utilize the next parameter to adjust the differential between the dewpoint temperature and the inlet water temperature, this will allow some flexibility in controlling when the panel will shutdown to avoid condensation. There are three options for handling potential condensation: Off, SimpleOff, and VariableOff. This parameter is optional and will default to SimpleOff.
 
@@ -638,7 +638,7 @@ Since radiant cooling panels provide a cold surface in what could be a humid zon
   VariableOff - the program will attempt to reduce the inlet temperature to the panel by locally recirculating some of the water leaving the panel and mixing it with water from the overall demand side flow.  This also means that some of the demand side water will bypass the panel. In reality, this would require a pump to achieve such mixing and recirculation, but due to the simple nature of this model, no pump definition will be required. Like the SimpleOff option, the VariableOff option uses the condensation dewpoint offset parameter to adjust when the system will try to adjust for the possibility of condensation.
 \end{itemize}
 
-\paragraph{Field: Condensation Control Dewpoint Offset}\label{field-condensation-control-dewpoint-offset}
+\paragraph{Field: Condensation Control Dewpoint Offset}
 
 This optional parameter is only valid with the SimpleOff and VariableOff condensation handling algorithm (see previous input parameter). It establishes the difference between the calculated dew-point temperature of the space and the allowed inlet water temperature to the radiant cooling panel before the system shuts down in degrees Celsius. This parameter can be any positive, negative, or zero value. When this parameter is zero, the radiant system will shut down or recirculate water (depending on whether SimpleOff or VariableOff is used) when the inlet temperature drops to the dew-point temperature or below. When this parameter is positive, the radiant system will shut down or recirculate water when the inlet water temperature is the number of degrees Celsius above the dew-point temperature. This allows some extra safety to avoid condensation. When this parameter is negative, the radiant system will shut down or recirculate water when the inlet water temperature is the number of degrees Celsius below the dew-point temperature. This strategy allows the user to simulate a situation where small amounts of condensation are tolerable or the resistance of the panel from the water loop to the panel surface is being taken into account as condensation would likely happen at the panel surface. The default value for this parameter is 1°C.
 
@@ -1014,34 +1014,61 @@ This field is the name of the zone (Ref: Zone) in which the hydronic low tempera
 
 \paragraph{Field: Surface Name or Radiant Surface Group Name}\label{field-surface-name-or-radiant-surface-group-name}
 
-This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Note also that surfaces in a list do not need to be in the same zone or in the zone being served by this system (see previous field). Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
-\paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter-000}
+\paragraph{Field: Fluid to Radiant Surface Heat Transfer Model}\label{field-fluid-to-radiant-surface-heat-transfer-model-000}
 
-This field is the inside diameter of the tubes through which water is circulated for the system being defined by this statement. The inside diameter should be recorded in meters and is used to determine the convective heat transfer from the water to the inside surface of the hydronic tubing.
-
-\paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length}
-
-This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.
-
-\paragraph{Field: Temperature Control Type}\label{field-temperature-control-type}
-
-This field specifies along with the throttling range and setpoint schedules how the user wishes to control the hydronic radiant system. The temperature denoted in the setpoint schedule can refer to one of five different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, or the outdoor wet-bulb temperature. The choice of temperature is controlled by the current field---temperature control type. The user must select from the following options:
+This field is provides the opportunity to control how the heat transfer between the fluid circulating through this radiant system and the radiant system itself.  There are two options for this parameter: ConvectionOnly or ISOStandard.  The default value is ConvectionOnly.  More information on each of these options is provided below.
 
 \begin{itemize}
 \item
-  MeanAirTemperature
+  ConvectionOnly - This is the default mode and the method that was implemented when the radiant model was first introduced into EnergyPlus.  In this modeling option, it is assumed that the impact of the tube material on heat exchange between the fluid and the radiant system and that only the convection between the fluid and the radiant system is the only critical heat transfer mechanism to take into account.  The reasoning behind this included the fact that there are other simplifications in the method for calculating heat transfer and that this simplification would not result in any significant difference in the simulated heat transfer performance of the system.  Convection between the fluid and the pipe wall of the system is related to physical parameters of the system (pipe/tube inner diameter and length) as well as the flow characteristics.
 \item
-  MeanRadiantTemperature
-\item
-  OperativeTemperature
-\item
-  OutdoorDryBulbTemperature
-\item
-  OutdoorWetBulbTemperature
+  ISOStandard - This method is based on the ISO Standard 11855, Part 2 (2012) document entitled ``Building environment design — Design, dimensioning, installation and control of embedded radiant heating and cooling systems — Part 2: Determination of the design heating and cooling capacity'', Reference Number ISO 11855-2:2012(E).  This standard recommends equations (see Appendix B of this document) to include the effects of convective heat transfer between the fluid and the inside of the piping and conduction through the pipe wall.  This model requires both the inner and outer diameter of the pipe/tube, the length of the pipe/tube, and the thermal conductivity of the pipe/tube material.  Note that as part of the implementation of this model in EnergyPlus, flow within the piping/tubing is always assumed to be turbulent.
 \end{itemize}
 
-Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature. If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information.
+\paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter-000}
+
+This field is the inside diameter of the tubes through which the fluid is circulated for the system being defined by this statement. The inner diameter should be recorded in meters and is used to determine the convective heat transfer from the water to the inside surface of the hydronic tubing.  The default for this parameter is 0.013 which is approximately equivalent to the inner diameter of a typical 1/2" PEX pipe size.
+
+\paragraph{Field: Hydronic Tubing Outside Diameter}\label{field-hydronic-tubing-outside-diameter-000}
+
+This field is the outside diameter of the tubes through which the fluid is circulated for the system being defined by this statement. The outer diameter should be recorded in meters and is used to determine the conduction through the hydronic tubing and the contact resistance between the tube/pipe and the radiant system itself in the ISOStandard option for the Fluid to Radiant Surface Heat Transfer Model (see above).  The default for this parameter is 0.016 which is approximately equivalent to the outer diameter a typical 1/2" PEX pipe size.
+
+\paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length-000}
+
+This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.
+
+\paragraph{Field: Hydronic Tubing Conductivity}\label{field-hydronic-tubing-conductivity-000}
+
+This field is the thermal conductivity of the pipe/tube that is used in this radiant system in Watts per meter-Kelvin (W/m-K).  It is used to calculate the resistance to heat transfer through the pipe/tube wall in the ISOStandard option for the Fluid to Radiant Surface Heat Transfer Model (see above).  The default for this parameter is 0.35 which is the value given for PEX piping in ISO Standard 11855-2(2012).
+
+\paragraph{Field: Temperature Control Type}\label{field-temperature-control-type}
+
+This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of seven different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, or the radiant surface interior temperture. The choice of temperature is controlled by the current field--temperature control type. The user must select from the following options:
+
+\begin{itemize}
+\item
+  MeanAirTemperature - The mean air temperature of the zone being controlled by this radiant system.
+\item
+  MeanRadiantTemperature - The mean radiant temperature of the zone being controlled by this radiant system.
+\item
+  OperativeTemperature - The operative temperature of the zone being controlled by the radint system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.  
+\item
+  OutdoorDryBulbTemperature - The outdoor dry-bulb temperature of the current outdoor environment.
+\item
+  OutdoorWetBulbTemperature - The outdoor wet-bulb temperature of the current outdoor environment.
+\item
+  SurfaceFaceTemperature - This option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).
+\item
+  SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
+\end{itemize}
+
+If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information on how the setpoint temperature is established for this particular radiant system.
+
+\paragraph{Field: Setpoint Control Type}\label{field-variable-flow-radiant-system-setpoint-control-type}
+
+This field has two options (ZeroFlowPower and HalfFlowPower) and is used to determine the response of the low temperature radiant system at the setpoint temperature.  The Heating Control Temperature Schedule Name and Cooling Control Temperature Schedule Name (both listed below) define a schedule for a temperature setpoint.  The previous field (Temperature Control Type) defines which temperature is being controlled to that setpoint.  This field determines the response of the system when the temperature being controlled is at the temperature setpoint.  When ZeroFlowPower is chosen for this field, then the system will assume that it should shut off when the temperature controlled arrives at the setpoint.  So, if Mean Air Temperature control is used and it becomes equal to the setpoint temperature, then the system will turn off.  When HalfFlowPower is chosen for this field, then the system will assume that it should be at half of the maximum water flow when it achieves the setpoint condition.
 
 \paragraph{Field: Heating Design Capacity Method}\label{field-heating-design-capacity-method-5}
 
@@ -1073,7 +1100,9 @@ This field contains the name of the hot water oulet node to the radiant system. 
 
 \paragraph{Field: Heating Control Throttling Range}\label{field-heating-control-throttling-range}
 
-This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero flow rate up to the maximum defined by the maximum hot water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature to define the response of the system to various zone conditions. The heating control temperature schedule specifies the ``setpoint'' temperature where the flow rate to the system is at half of the maximum flow rate. For example, if the heating control temperature setpoint is currently 15°C and the heating throttling range is 2°C, the water flow rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, ODB, or OWB; see control type field above) is at or above 16°C and the maximum flow rate when the controlling temperature is at or below 14°C. This represents a throttling range of 2°C around the setpoint of 15°C. In between 14°C and 16°C, the flow rate to the radiant system is varied linearly.
+This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero flow rate up to the maximum defined by the maximum hot water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature and the setpoint type to define the response of the system to various conditions. The Heating Control Temperature Schedule specifies the ``setpoint'' temperature that is to be met.  This is used in conjunction with the Setpoint Type which defines whether the flow rate of the system is at zero flow or half flow when the parameter defined by the Temperature Control Type is equal to the setpoint temperature defined by the Heating Control Temperature Schedule.  See these other input parameters of this radiant system for more information on these different parameters.  Note that when the throttling range is set to zero that this approximates an on-off system that is either fully on or totally off.
+
+For clarity, here is an example of how the flow rate to the system will be set.  In this example, it is assumed that heating control temperature setpoint is currently 15°C, the heating throttling range is 2°C, and that the setpoint type is HalfFlowPower.  The water flow rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, etc.; see control type field above) is at or above 16°C and the maximum flow rate when the controlling temperature is at or below 14°C. This represents a throttling range of 2°C around the setpoint of 15°C. In between 14°C and 16°C, the flow rate to the radiant system is varied linearly from full flow at a control temperature of 14°C to half flow at 15°C to zero flow at 16°C.  If the throttling range is changed to 0°C or on-off control, then the system will be off above 15°C and on below 15°C.  However, if the throttling range is kept at 2°C and the setpoint type is changed to ZeroFlowPower, then the system will vary the flow linearly between zero for when the control temperature is at 15°C to full flow at 13°C.
 
 \paragraph{Field: Heating Control Temperature Schedule Name}\label{field-heating-control-temperature-schedule-name}
 
@@ -1109,7 +1138,9 @@ This field contains the name of the cold water oulet node to the radiant system.
 
 \paragraph{Field: Cooling Control Throttling Range}\label{field-cooling-control-throttling-range}
 
-This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero flow rate up to the maximum defined by the maximum cold water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature to define the response of the system to various zone conditions. The cooling control temperature schedule specifies the ``setpoint'' temperature where the flow rate to the system is at half of the maximum flow rate. For example, if the cooling control temperature setpoint is currently 25°C and the cooling throttling range is 2°C, the water flow rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, ODB, or OWB; see control type field above) is at or below 24°C and the maximum flow rate when the controlling temperature is at or above 26°C. This represents a throttling range of 2°C around the setpoint of 25°C. In between 24°C and 26°C, the flow rate to the radiant system is varied linearly.
+This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero flow rate up to the maximum defined by the maximum cold water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature and the setpoint type to define the response of the system to various conditions. The Cooling Control Temperature Schedule specifies the ``setpoint'' temperature that is to be met.  This is used in conjunction with the Setpoint Type which defines whether the flow rate of the system is at zero flow or half flow when the parameter defined by the Temperature Control Type is equal to the setpoint temperature defined by the Cooling Control Temperature Schedule.  See these other input parameters of this radiant system for more information on these different parameters.  Note that when the throttling range is set to zero that this approximates an on-off system that is either fully on or totally off.
+
+For clarity, here is an example of how the flow rate to the system will be set.  In this example, it is assumed that cooling control temperature setpoint is currently 25°C, the cooling throttling range is 2°C, and that the setpoint type is HalfFlowPower.  The water flow rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, etc.; see control type field above) is at or below 24°C and the maximum flow rate when the controlling temperature is at or above 26°C. This represents a throttling range of 2°C around the setpoint of 25°C. In between 24°C and 26°C, the flow rate to the radiant system is varied linearly from zero flow at a control temperature of 24°C to half flow at 15°C to full flow at w6°C.  If the throttling range is changed to 0°C or on-off control, then the system will be on above 25°C and off below 25°C.  However, if the throttling range is kept at 2°C and the setpoint type is changed to ZeroFlowPower, then the system will vary the flow linearly between zero for when the control temperature is at 25°C to full flow at 27°C.
 
 \paragraph{Field: Cooling Control Temperature Schedule Name}\label{field-cooling-control-temperature-schedule-name}
 
@@ -1149,9 +1180,13 @@ An example IDF with a hydronic low temperature radiant system is shown below.
       RADIANTSYSAVAILSCHED,    !- Availability Schedule Name
       SPACE1-1,                !- Zone Name
       C1-1,                    !- Surface Name or Radiant Surface Group Name
+      ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
       0.013,                   !- Hydronic Tubing Inside Diameter {m}
+      0.016,                   !- Hydronic Tubing Outside Diameter {m}
       autosize,                !- Hydronic Tubing Length {m}
+      0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
       OperativeTemperature,    !- Temperature Control Type
+      HalfFlowPower,           !- Setpoint Control Type
       HeatingDesignCapacity,   !- Heating Design Capacity Method
       autosize,                !- Heating Design Capacity{ W }
       ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
@@ -1265,34 +1300,79 @@ This field is the name of the zone (Ref: Zone) in which the constant flow low te
 
 \paragraph{Field: Surface Name or Radiant Surface Group Name}\label{field-surface-name-or-radiant-surface-group-name-1}
 
-This field is the name of the surface (Ref: \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Note also that surfaces in a list do not need to be in the same zone or in the zone being served by this system (see previous field). Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
-\paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter-1-000}
+\paragraph{Field: Fluid to Radiant Surface Heat Transfer Model}\label{field-fluid-to-radiant-surface-heat-transfer-model-001}
 
-This field is the inside diameter of the tubes through which water is circulated for the system being defined by this statement. The inside diameter should be recorded in meters and is used to determine the convective heat transfer from the water to the inside surface of the hydronic tubing.
-
-\paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length-1}
-
-This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat being transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.
-
-\paragraph{Field: Temperature Control Type}\label{field-temperature-control-type-1}
-
-This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of five different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, or the outdoor wet-bulb temperature. The choice of temperature is controlled by the current field---temperature control type. The user must select from the following options:
+This field is provides the opportunity to control how the heat transfer between the fluid circulating through this radiant system and the radiant system itself.  There are two options for this parameter: ConvectionOnly or ISOStandard.  The default value is ConvectionOnly.  More information on each of these options is provided below.
 
 \begin{itemize}
 \item
-  MeanAirTemperature
+  ConvectionOnly - This is the default mode and the method that was implemented when the radiant model was first introduced into EnergyPlus.  In this modeling option, it is assumed that the impact of the tube material on heat exchange between the fluid and the radiant system and that only the convection between the fluid and the radiant system is the only critical heat transfer mechanism to take into account.  The reasoning behind this included the fact that there are other simplifications in the method for calculating heat transfer and that this simplification would not result in any significant difference in the simulated heat transfer performance of the system.  Convection between the fluid and the pipe wall of the system is related to physical parameters of the system (pipe/tube inner diameter and length) as well as the flow characteristics.
 \item
-  MeanRadiantTemperature
-\item
-  OperativeTemperature
-\item
-  OutdoorDryBulbTemperature
-\item
-  OutdoorWetBulbTemperature
+ISOStandard - This method is based on the ISO Standard 11855, Part 2 (2012) document entitled ``Building environment design — Design, dimensioning, installation and control of embedded radiant heating and cooling systems — Part 2: Determination of the design heating and cooling capacity'', Reference Number ISO 11855-2:2012(E).  This standard recommends equations (see Appendix B of this document) to include the effects of convective heat transfer between the fluid and the inside of the piping and conduction through the pipe wall.  This model requires both the inner and outer diameter of the pipe/tube, the length of the pipe/tube, and the thermal conductivity of the pipe/tube material.  Note that as part of the implementation of this model in EnergyPlus, flow within the piping/tubing is always assumed to be turbulent.
 \end{itemize}
 
-Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature. If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information.
+\paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter-001}
+
+This field is the inside diameter of the tubes through which the fluid is circulated for the system being defined by this statement. The inner diameter should be recorded in meters and is used to determine the convective heat transfer from the water to the inside surface of the hydronic tubing.  The default for this parameter is 0.013 which is approximately equivalent to the inner diameter of a typical 1/2" PEX pipe size.
+
+\paragraph{Field: Hydronic Tubing Outside Diameter}\label{field-hydronic-tubing-outside-diameter-001}
+
+This field is the outside diameter of the tubes through which the fluid is circulated for the system being defined by this statement. The outer diameter should be recorded in meters and is used to determine the conduction through the hydronic tubing and the contact resistance between the tube/pipe and the radiant system itself in the ISOStandard option for the Fluid to Radiant Surface Heat Transfer Model (see above).  The default for this parameter is 0.016 which is approximately equivalent to the outer diameter a typical 1/2" PEX pipe size.
+
+\paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length-001}
+
+This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.
+
+\paragraph{Field: Hydronic Tubing Conductivity}\label{field-hydronic-tubing-conductivity-001}
+
+This field is the thermal conductivity of the pipe/tube that is used in this radiant system in Watts per meter-Kelvin (W/m-K).  It is used to calculate the resistance to heat transfer through the pipe/tube wall in the ISOStandard option for the Fluid to Radiant Surface Heat Transfer Model (see above).  The default for this parameter is 0.35 which is the value given for PEX piping in ISO Standard 11855-2(2012).
+
+
+\paragraph{Field: Temperature Control Type}\label{field-temperature-control-type-1}
+
+This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of eight different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, the radiant surface interior temperture, or the running mean outdoor dry-bulb temperature. The choice of temperature is controlled by the current field--temperature control type. The user must select from the following options:
+
+\begin{itemize}
+\item
+  MeanAirTemperature - The mean air temperature of the zone being controlled by this radiant system.
+\item
+  MeanRadiantTemperature - The mean radiant temperature of the zone being controlled by this radiant system.
+\item
+  OperativeTemperature - The operative temperature of the zone being controlled by the radint system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.  
+\item
+  OutdoorDryBulbTemperature - The outdoor dry-bulb temperature of the current outdoor environment.
+\item
+  OutdoorWetBulbTemperature - The outdoor wet-bulb temperature of the current outdoor environment.
+\item
+  SurfaceFaceTemperature - This option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).
+\item
+  SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
+\item
+  RunningMeanOutdoorDryBulbTemperature - This option will allow the user to control the inlet water temperature to the system as a function of the running mean outdoor air temperature.  The next field (\hyperref[field-running-mean-outdoor-dry-bulb-temperature-weighting-factor]{Running Mean Outdoor Dry-Bulb Temperature Weighting Factor}) will define how this temperature is actually calculated within EnergyPlus.
+\end{itemize}
+
+If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information on how the setpoint temperature is established for this particular radiant system.
+
+\paragraph{Field: Running Mean Outdoor Dry-Bulb Temperature Weighting Factor}\label{field-running-mean-outdoor-dry-bulb-temperature-weighting-factor}
+
+This field specifies the weighting factor that is used to calculate the running mean outdoor dry-bulb temperature.  The running mean outdoor dry-bulb temperature is determined using the following equation:
+
+\begin{equation}
+\Theta_{rm} = (1 - \alpha) \Theta_{ed-1} + \alpha \Theta_{rm-1}
+\label{eq:RunningMeanOutdoorDryBulbTemperatureEquation}
+\end{equation}
+
+where: 
+
+\(\Theta_{rm}\) is the current running mean outdoor dry-bulb temperature that is used to control the radiant system
+
+\(\Theta_{ed-1}\) is the average outdoor dry-bulb temperature from the previous day
+
+\(\Theta_{rm-1}\) is the running mean outdoor dry-bulb temperature from the previous day
+
+\(\alpha\) is the user defined weighting factor that is defined by this field.  It controls the weighting of the running mean outdoor dry-bulb temperature from the previous day and the average outdoor dry-bulb temperature from the previous day for the purposes of calculating the running mean outdoor dry-bulb temperature for the current day.  The value for this weighting factor must be between zero and 1.
 
 \paragraph{Field: Rated Flow Rate}\label{field-rated-flow-rate}
 
@@ -1400,9 +1480,13 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
       RadiantSysAvailSched,   !- availability schedule
       Resistive Zone,         !- Zone name
       Zn001:Flr001,           !- Surface name or group
-      0.012,                  !- Hydronic tubing inside diameter {m}
-      400.0,                  !- Hydronic tubing length {m}
+      ConvectionOnly,         !- Fluid to Radiant Surface Heat Transfer Model
+      0.013,                  !- Hydronic Tubing Inside Diameter {m}
+      0.016,                  !- Hydronic Tubing Outside Diameter {m}
+      autosize,               !- Hydronic Tubing Length {m}
+      0.35,                   !- Hydronic Tubing Conductivity {W/m-K}
       MeanAirTemperature,     !- temperature control type
+      0.8,                    !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
       0.0004,                 !- maximum water volumetric flow rate {m3/s}
       ,                       !-schedule for flow rate (optional, non-existent means constant)
       30000,                  !-Rated Pump Head in Pa
@@ -1466,6 +1550,12 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
   HVAC,Sum,Zone Radiant HVAC Cooling Fluid Heat Transfer Energy {[}J{]}
 \item
   HVAC,Sum,Zone Radiant HVAC Heating Fluid Heat Transfer Energy {[}J{]}
+\item
+  HVAC,Average,Constant Flow Running Mean Outdoor Dry-Bulb Temperature {[}C{]}
+\item
+  HVAC,Average,Constant Flow Previous Day Running Mean Outdoor Dry-Bulb Temperature {[}C{]}
+\item
+  HVAC,Average,Constant Flow Previous Day Average Outdoor Dry-Bulb Temperature {[}C{]}
 \end{itemize}
 
 \paragraph{Zone Radiant HVAC Heating Rate {[}W{]}}\label{zone-radiant-hvac-heating-rate-w-1}
@@ -1540,11 +1630,23 @@ The heat transfer energy for the cooling fluid connection, in Joules.
 
 The heat transfer energy for the heating fluid connection, in Joules.
 
+\paragraph{Zone Radiant HVAC Running Mean Outdoor Dry-Bulb Temperature {[}C{]}}\label{zone-radiant-hvac-running-mean-outdoor-dry-bulb-temperature-1}
+
+This field reports the current running mean outdoor dry-bulb temperature in Celsius. This value is used to control the constant flow low temperature radiant system when the user opts to use the \emph{RunningMeanOutdoorDryBulbTemperature} control type.
+
+\paragraph{Zone Radiant HVAC Previous Day Running Mean Outdoor Dry-Bulb Temperature {[}C{]}}\label{zone-radiant-hvac-previous-day-running-mean-outdoor-dry-bulb-temperature}
+
+This field reports the running mean outdoor dry-bulb temperature of the previous day in Celsius. This value is used to calculate the running mean outdoor dry-bulb temperature when the user opts to use the \emph{RunningMeanOutdoorDryBulbTemperature} control type.
+
+\paragraph{Zone Radiant HVAC Previous Day Average Outdoor Dry-Bulb Temperature {[}C{]}}\label{zone-radiant-hvac-previous-day-average-outdoor-dry-bulb-temperature}
+
+This field reports the average of the outdoor dry-bulb temperature for the previous day in Celsius. This value is used to calculate the running mean outdoor dry-bulb temperature when the user opts to use the \emph{RunningMeanOutdoorDryBulbTemperature} control type.
+
 \subsection{ZoneHVAC:LowTemperatureRadiant:Electric}\label{zonehvaclowtemperatureradiantelectric}
 
 This low temperature radiant system (electric) is a component of zone equipment that is intended to model any ``radiant system'' where electric resistance heating is used to supply energy (heat) to a building surface (wall, ceiling, or floor). The component is controlled by the radiant system controls that are defined in the syntax below and this control does not require the use of a zone thermostat unless the unit is being autosized. Note also that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first. If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.
 
-The control is accomplished by varying the electrical power supplied to the unit. This model covers either a radiant panel system or wires embedded in entire walls, floors, or ceilings. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model (ref: \hyperref[zonehvachightemperatureradiant]{ZoneHVAC:HighTemperatureRadiant}) and different input syntax. Low temperature radiant systems that use water flowing through tubes to provide heat to the system should also be defined using separate input syntax (ref: \hyperref[zonehvaclowtemperatureradiantvariableflow]{ZoneHVAC:LowTemperatureRadiant:VariableFlow} or ConstantFlow).
+The control is accomplished by varying the electrical power supplied to the unit. This model covers either a radiant panel system or wires embedded in entire walls, floors, or ceilings. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model (ref: \hyperref[zonehvachightemperatureradiant]{ZoneHVAC:HighTemperatureRadiant}) and different input syntax. Low temperature radiant systems that use water flowing through tubes to provide heat to the system should also be defined using separate input syntax (ref: \hyperref[zonehvaclowtemperatureradiantvariableflow]{ZoneHVAC:LowTemperatureRadiant:VariableFlow} or \hyperref[zonehvaclowtemperatureradiantconstantflow]{ZoneHVAC:LowTemperatureRadiant:ConstantFlow}).
 
 \subsubsection{Inputs}\label{inputs-7-019}
 
@@ -1562,7 +1664,7 @@ This field is the name of the zone (Ref: Zone) in which the electric low tempera
 
 \paragraph{Field: Surface Name or Radiant Surface Group Name}\label{field-surface-name-or-radiant-surface-group-name-2}
 
-This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the heating element is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how energy flow is split between the various surfaces. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}, \hyperref[walldetailed]{Wall:Detailed}, \hyperref[roofceilingdetailed]{RoofCeiling:Detailed}, etc.), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the heating element is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how energy flow is split between the various surfaces. Note also that surfaces in a list do not need to be in the same zone or in the zone being served by this system (see previous field). Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}, \hyperref[walldetailed]{Wall:Detailed}, \hyperref[roofceilingdetailed]{RoofCeiling:Detailed}, etc.), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 \paragraph{Field: Heating Design Capacity Method}\label{field-heating-design-capacity-method-6}
 
@@ -1582,26 +1684,36 @@ Enter the heating capacity as a fraction of the autosized heating capacity of lo
 
 \paragraph{Field: Temperature Control Type}\label{field-temperature-control-type-2}
 
-This field specifies along with the throttling range and setpoint schedules how the user wishes to control the low temperature electric radiant system. The temperature denoted in the setpoint schedule can refer to one of three different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, or the outdoor wet-bulb temperature. The choice of temperature is controlled by the current field---temperature control type. The user must select from the following options:
+This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of seven different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, or the radiant surface interior temperture. The choice of temperature is controlled by the current field--temperature control type. The user must select from the following options:
 
 \begin{itemize}
 \item
-  MeanAirTemperature
+  MeanAirTemperature - The mean air temperature of the zone being controlled by this radiant system.
 \item
-  MeanRadiantTemperature
+  MeanRadiantTemperature - The mean radiant temperature of the zone being controlled by this radiant system.
 \item
-  OperativeTemperature
+  OperativeTemperature - The operative temperature of the zone being controlled by the radint system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.  
 \item
-  OutdoorDryBulbTemperature
+  OutdoorDryBulbTemperature - The outdoor dry-bulb temperature of the current outdoor environment.
 \item
-  OutdoorWetBulbTemperature
+  OutdoorWetBulbTemperature - The outdoor wet-bulb temperature of the current outdoor environment.
+\item
+  SurfaceFaceTemperature - This option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).
+\item
+  SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
 \end{itemize}
 
-Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature. If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information.
+If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information on how the setpoint temperature is established for this particular radiant system.
+
+\paragraph{Field: Setpoint Control Type}\label{field-electric-radiant-system-setpoint-control-type}
+
+This field has two options (ZeroFlowPower and HalfFlowPower) and is used to determine the response of the low temperature radiant system at the setpoint temperature.  The Heating Setpoint Temperature Schedule Name (see below) defines a schedule for a temperature setpoint.  The previous field (Temperature Control Type) defines which temperature is being controlled to that setpoint.  This field determines the response of the system when the temperature being controlled is at the temperature setpoint.  When ZeroFlowPower is chosen for this field, then the system will assume that it should shut off when the temperature controlled arrives at the setpoint.  So, if Mean Air Temperature control is used and it becomes equal to the setpoint temperature, then the system will turn off.  When HalfFlowPower is chosen for this field, then the system will assume that it should be at half of the maximum water flow when it achieves the setpoint condition.
 
 \paragraph{Field: Heating Throttling Range}\label{field-heating-throttling-range}
 
-This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero heat input via the electric resistance wires up to the maximum defined by the maximum electrical power field described above. The throttling range parameter is used in conjunction with the control temperature (see below) to define the response of the system to various zone conditions. The heating control temperature schedule specifies the ``setpoint'' temperature where the power input to the system is at half of the maximum power input. For example, if the heating control temperature setpoint is currently 15°C and the heating throttling range is 2°C, the electrical power supplied to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, ODB, or OWB; see control type field above) is at or above 16°C and the maximum power input when the controlling temperature is at or below 14°C. This represents a throttling range of 2°C around the setpoint of 15°C. In between 14°C and 16°C, the power input to the radiant system is varied linearly. The minimum throttling range is 0.5°C.
+This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero flow heat input via the electric resistance wires up to the maximum defined by the maximum electrical power field described above. The throttling range parameter is used in conjunction with the control temperature and the setpoint type to define the response of the system to various conditions. The Heating Setpoint Temperature Schedule specifies the ``setpoint'' temperature that is to be met.  This is used in conjunction with the Setpoint Type which defines whether the flow rate of the system is at zero heat input or half heat input when the parameter defined by the Temperature Control Type is equal to the setpoint temperature defined by the Heating Control Temperature Schedule.  See these other input parameters of this radiant system for more information on these different parameters.  Note that when the throttling range is set to zero that this approximates an on-off system that is either fully on or totally off.
+
+For clarity, here is an example of how the heat input fraction (of the unit capacity) to the system will be set.  In this example, it is assumed that heating control temperature setpoint is currently 15°C, the heating throttling range is 2°C, and that the setpoint type is HalfFlowPower.  The heat input rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, etc.; see control type field above) is at or above 16°C and the maximum heat input when the controlling temperature is at or below 14°C. This represents a throttling range of 2°C around the setpoint of 15°C. In between 14°C and 16°C, the heat input rate to the radiant system is varied linearly from full heat input at a control temperature of 14°C to half heat input at 15°C to zero heat input at 16°C.  If the throttling range is changed to 0°C or on-off control, then the system will be off above 15°C and on below 15°C.  However, if the throttling range is kept at 2°C and the setpoint type is changed to ZeroFlowPower, then the system will vary the heat input linearly between zero for when the control temperature is at 15°C to full heat input at 13°C.
 
 \paragraph{Field: Heating Setpoint Temperature Schedule Name}\label{field-heating-setpoint-temperature-schedule-name}
 
@@ -1621,6 +1733,7 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
            ,                           !- Heating Design Capacity Per Floor Area{ W/m2 }
            ,                           !- Fraction of Autosized Heating Design Capacity{ - }
            MeanAirTemperature,         !- Temperature Control Type (control on mean air temperature)
+           HalfFlowPower,              !- Setpoint Control Type
            2.0 ,                       !- Heating Throttling Range { deltaC }
            Radiant Heating Setpoints ; !- Heating Setpoint Temperature Schedule Name
 \end{lstlisting}
@@ -1654,7 +1767,7 @@ These outputs are the heating provided by the low temperature radiant system to 
 
 \subsection{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}\label{zonehvaclowtemperatureradiantsurfacegroup}
 
-A low temperature radiant system (hydronic or electric) may consist of multiple active surfaces that serve to condition the space. Surfaces that act serially can be specified as multiple radiant systems using the standard radiant system input described above. However, if the multiple surfaces act in parallel, the Radiant System Surface Group input line is used to specify which surfaces are acting in a coordinated fashion and how energy flow is split between the surfaces. This list of surfaces (the name it is assigned) replaces the name of a single surface in the radiant system input described above. Note that all of the surfaces within a single list must be a part of the same zone and that the zone of these surfaces must also match the zone the radiant system is attempting to condition.
+A low temperature radiant system (hydronic or electric) may consist of multiple active surfaces that serve to condition the space. Surfaces that act serially can be specified as multiple radiant systems using the standard radiant system input described above. However, if the multiple surfaces act in parallel, the Radiant System Surface Group input line is used to specify which surfaces are acting in a coordinated fashion and how energy flow is split between the surfaces. This list of surfaces (the name it is assigned) replaces the name of a single surface in the radiant system input described above. Note that all of the surfaces within a single list do not need to be in the same zone so the zones of these surfaces do not need to match the zone the radiant system is attempting to condition. Keep in mind, however, that if the surfaces within a single surface group do not reside in the zone that these zones must all have the same zone multipliers.
 
 \subsubsection{Inputs}\label{inputs-8-017}
 
@@ -1668,7 +1781,7 @@ The pairs of Surface Name, Flow Fraction to Surface are used in several objects.
 
 \paragraph{Field: Surface \textless{}x\textgreater{} Name}\label{field-surface-x-name-2}
 
-This field is the name of a surface in the zone being conditioned by the radiant system. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of a surface being conditioned by the radiant system. It should be noted that the surfaces listed in this field do \emph{not} need to be present in the zone being served by the radiant system to which this surface is related. This allows radiant systems to span more than one zone and have surfaces controlled by conditions in another zone. When the user does select surfaces that are in different zones than the zone being served by the radiant system, a warning message is generated to alert the user that the surface is not in the same zone as the zone being served by the radiant system. If this is the intent of the user, this warning message can be ignored. Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 \paragraph{Field: Flow Fraction for Surface \textless{}x\textgreater{}}\label{field-flow-fraction-for-surface-x}
 
@@ -1682,7 +1795,7 @@ ZoneHVAC:LowTemperatureRadiant:SurfaceGroup,
       Zone 1 Radiant Surfaces, !- name of surface list
       Zn001:Flr001,            !- Surface name 1
       0.75,                    !- Flow fraction for surface 1
-      Zn001:Roof001,           !- Surface name 2
+      Zn002:Flr002,            !- Surface name 2
       0.25;                    !- Flow fraction for surface 2
 \end{lstlisting}
 
@@ -2006,7 +2119,7 @@ This field is a node name used to identify the node that serves as the inlet of 
 
 This field is a node name used to identify the node that serves as the outlet from the ventilated slab system to the zone when using the ``SlabAndZone'' configuration. It is the node exiting the slab section of the system. This node will typically be the same node as a zone inlet node. In the case of ``SlabOnly'' or ``SeriesSlabs'' configuration, this field will be ignored and it should be left BLANK.
 
-\paragraph{Field: Outdoor Air Node Name}\label{field-outdoor-air-node-name}
+\paragraph{Field: Outdoor Air Node Name}
 
 This field is a node name used to identify the node associated with fresh outdoor air brought into the ventilated slab system outdoor air mixer.~ This node should also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} or \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object.
 
