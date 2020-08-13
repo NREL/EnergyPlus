@@ -113,10 +113,10 @@ namespace CurveManager {
 
     using json = nlohmann::json;
 
-    std::map<std::string, Btwxt::Method>  BtwxtManager::interpMethods =
+    std::map<std::string, Btwxt::Method>  BtwxtManager::interpMethods =                                 // NOLINT(cert-err58-cpp)
             {{"Linear", Btwxt::Method::LINEAR}, {"Cubic", Btwxt::Method::CUBIC}};
 
-    std::map<std::string, Btwxt::Method>  BtwxtManager::extrapMethods =
+    std::map<std::string, Btwxt::Method>  BtwxtManager::extrapMethods =                                 // NOLINT(cert-err58-cpp)
             {{"Linear", Btwxt::Method::LINEAR}, {"Constant", Btwxt::Method::CONSTANT}};
 
     int NumCurves(0);              // Autodesk Was used unintialized in InitCurveReporting
@@ -2005,7 +2005,7 @@ namespace CurveManager {
         btwxtManager.tableFiles.clear();
     }
 
-    int BtwxtManager::getGridIndex(std::string indVarListName, bool &ErrorsFound) {
+    int BtwxtManager::getGridIndex(std::string &indVarListName, bool &ErrorsFound) {
         int gridIndex = -1;
         if (gridMap.count(indVarListName)) {
             gridIndex = gridMap.at(indVarListName);
@@ -2030,11 +2030,11 @@ namespace CurveManager {
         return (int)grids[gridIndex].get_ndims();
     }
 
-    double BtwxtManager::getGridValue(int gridIndex, int outputIndex, const std::vector<double> target) {
+    double BtwxtManager::getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target) {
         return grids[gridIndex](target)[outputIndex];
     }
 
-    double BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target, const double scalar) {
+    double BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> &target, const double scalar) {
         return grids[gridIndex].normalize_values_at_target(outputIndex, target, scalar);
     }
 

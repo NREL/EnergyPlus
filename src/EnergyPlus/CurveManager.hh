@@ -263,12 +263,12 @@ namespace CurveManager {
             gridMap.emplace(indVarListName,grids.size() - 1 );
             return static_cast<int>(grids.size()) - 1;
         };
-        double normalizeGridValues(int gridIndex, int outputIndex, std::vector<double> target, double scalar = 1.0);
+        double normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> &target, double scalar = 1.0);
         int addOutputValues(int gridIndex, std::vector<double> values);
-        int getGridIndex(std::string indVarListName, bool &ErrorsFound);
+        int getGridIndex(std::string &indVarListName, bool &ErrorsFound);
         int getNumGridDims(int gridIndex);
         std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
-        double getGridValue(int gridIndex, int outputIndex, std::vector<double> target);
+        double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
         std::map<std::string, const json&> independentVarRefs;
         std::map<std::string, TableFile> tableFiles;
         void clear();
@@ -385,8 +385,6 @@ namespace CurveManager {
                                      Optional<Real64 const> Var4 = _,     // 4th independent variable
                                      Optional<Real64 const> Var5 = _      // 5th independent variable
     );
-
-    //=================================================================================================!
 
 } // namespace CurveManager
 
